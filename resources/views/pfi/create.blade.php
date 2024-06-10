@@ -55,32 +55,26 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            Dealers :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->dealers }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
                                         <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
                                             So Number :
                                         </div>
                                         <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->so_number }}
+                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                {{ $LoiSoNumber->so_number }}
+                                                @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
                                     <div class="row ">
                                         <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            Perefered Location :
+                                           Country :
                                         </div>
                                         <div class="col-sm-6">
-                                            {{ $letterOfIndent->prefered_location }}
+                                            {{ $letterOfIndent->customer->country->name ?? '' }}
                                         </div>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                                             LOI Category :
@@ -100,13 +94,21 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            Destination :
+                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                                            Dealers :
                                         </div>
-                                        <div class="col-sm-6">
-                                            {{ $letterOfIndent->destination }}
+                                        <div class="col-sm-6 col-md-6 col-lg-6">
+                                            {{ $letterOfIndent->dealers }}
                                         </div>
                                     </div>
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">--}}
+{{--                                            Destination :--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-sm-6">--}}
+{{--                                            {{ $letterOfIndent->destination }}--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
                                 </div>
                             </div>
                         </div>
@@ -141,18 +143,18 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="choices-single-default" class="form-label">Released Date</label>
-                                                    <input type="date" class="form-control" name="pfi_date">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="choices-single-default" class="form-label">Released Amount</label>
-                                                    <input type="number" min="0" class="form-control" name="released_amount" placeholder="Released Amount">
-                                                </div>
-                                            </div>
+{{--                                            <div class="col-lg-4 col-md-6">--}}
+{{--                                                <div class="mb-3">--}}
+{{--                                                    <label for="choices-single-default" class="form-label">Released Date</label>--}}
+{{--                                                    <input type="date" class="form-control" name="pfi_date">--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="col-lg-4 col-md-6">--}}
+{{--                                                <div class="mb-3">--}}
+{{--                                                    <label for="choices-single-default" class="form-label">Released Amount</label>--}}
+{{--                                                    <input type="number" min="0" class="form-control" name="released_amount" placeholder="Released Amount">--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Amount</label>
@@ -577,7 +579,7 @@
             let supplier = $(this).val();
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
             let letter_of_indent_id = $('#letter_of_indent_id').val();
-        
+
             if(MMC == 1) {
                 $('.mmc-items-div').attr('hidden', false);
             }else{

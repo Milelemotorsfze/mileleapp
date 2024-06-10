@@ -35,6 +35,12 @@ class MasterModelController extends Controller
                 ->addColumn('action', function(MasterModel $masterModel) {
                     return view('master-models.action',compact('masterModel'));
                 })
+                ->editColumn('amount_uae', function($query) {
+                    return number_format($query->amount_uae);
+                })
+                ->editColumn('amount_belgium', function($query) {
+                    return  number_format($query->amount_belgium);
+                })
                 ->rawColumns(['action'])
                 ->toJson();
         }
@@ -94,8 +100,8 @@ class MasterModelController extends Controller
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
-        $model->amount_uae = $request->amount_uae;
-        $model->amount_belgium = $request->amount_belgium;
+        $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
+        $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
         $model->is_milele = $request->is_milele ? true : false;
         $model->is_transcar = $request->is_transcar ? true : false;
@@ -157,8 +163,8 @@ class MasterModelController extends Controller
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
-        $model->amount_uae = $request->amount_uae;
-        $model->amount_belgium = $request->amount_belgium;
+        $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
+        $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
         $model->is_milele = $request->is_milele ? true : false;
         $model->is_transcar = $request->is_transcar ? true : false;

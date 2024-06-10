@@ -115,6 +115,7 @@ class ColorCodesController extends Controller
         }
         $colourcodes = ColorCode::findOrFail($id);
         $oldValues = $colourcodes->toArray();
+
         $colourcodes->name  = $name;
         $colourcodes->code = $request->input('code');
         $colourcodes->belong_to = $belong_to;
@@ -124,7 +125,7 @@ class ColorCodesController extends Controller
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
                 $newValue = $colourcodes->$field;
-                if ($oldValue != $newValue) {
+                if ($oldValue !== $newValue) {
                     $changes[$field] = [
                         'old_value' => $oldValue,
                         'new_value' => $newValue,
@@ -132,6 +133,7 @@ class ColorCodesController extends Controller
                 }
             }
         }
+
         if (!empty($changes)) {
         $colourcodes->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');

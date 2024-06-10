@@ -105,11 +105,13 @@
                     <th>Interior Color</th>
                     <th>Exterior Color</th>
                     <th>ETA Import Date</th>
+                    <th>Aging</th>
                     <th>Production Month</th>
-                    <th>DN Number</th>
+                    <th>DN Number/Status</th>
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
+                    <th>updated By</th>
                     <th>Status</th>
                     @can('inventory-log-details')
                         @php
@@ -179,6 +181,17 @@
                                 <input type="date" class="eta-import form-control" data-field="eta_import" id="eta_import-editable-{{$supplierInventory->id}}"
                                        data-id="{{$supplierInventory->id}}" value="{{ $supplierInventory->eta_import }}" >
                             </td>
+                            <td>
+                                @if($supplierInventory->eta_import)
+                                    <?php
+                                    $etaImport = \Illuminate\Support\Carbon::createFromDate($supplierInventory->eta_import);
+                                    $now = \Illuminate\Support\Carbon::now();
+                                    ?>
+                                    {{ $etaImport->diffInDays($now) }}
+                                @else
+                                    0
+                                @endif
+                            </td>
                             <td data-field="pord_month" class="pord_month"  id="pord_month-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}</td>
                             <td data-field="delivery_note"  id="delivery_note-editable-{{$supplierInventory->id}}"  contenteditable="true"
@@ -186,6 +199,8 @@
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
+                            <td>{{ $supplierInventory->updatedBy->name ?? '' }}</td>
+
                           <td >
                               <select class="upload_status" data-field="upload_status"
                               data-id="{{ $supplierInventory->id }}"  id="upload_status-editable-{{$supplierInventory->id}}">
@@ -262,6 +277,11 @@
             $('#dtBasicExample3 tbody td').on('change', '.country', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
+                let country = $('#country-editable-'+id).val();
+                let deliveryNote = $('#delivery_note-editable-'+id).text();
+                if(deliveryNote.length > 0) {
+                    checkDeliveryNote(country,deliveryNote,id);
+                }
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
@@ -276,13 +296,10 @@
             });
 
             function validData(field,id) {
-                console.log(field);
-                console.log(id);
 
                 if(field == 'pord_month') {
                     let InputId = 'pord_month-editable-'+id;
                     let value = $('#'+InputId).text();
-
                     if($.isNumeric(value) == true){
                         feildValidInput = true;
                         removeValidationError(InputId);
@@ -290,9 +307,7 @@
                         if(value.length != 6) {
                             $msg = "Characters length should be 6";
                             showValidationError(InputId,$msg);
-
                         }else {
-
                             let url = '{{ route('supplier-inventories.checkProductionMonth') }}';
                             $.ajax({
                                 type:"GET",
@@ -351,8 +366,8 @@
                     let InputId = 'color_code-editable-'+id;
                     let colorCode = $('#'+InputId).text();
 
-                    if(colorCode.length > 7 ) {
-                        $msg = "Maximum length is 7";
+                    if(colorCode.length > 10 ) {
+                        $msg = "Maximum length is 10";
                         showValidationError(InputId,$msg);
 
                     }else if(colorCode.length < 4 && colorCode.length > 0) {
@@ -363,8 +378,9 @@
                         removeValidationError(InputId);
                     }
 
-
-                    if(colorCode.length >= 4 && colorCode.length <= 7 ) {
+                    console.log(colorCode.length);
+                    if(colorCode.length >= 4 && colorCode.length <= 10 ) {
+                        console.log("yes");
                         $.ajax({
                             type:"GET",
                             url: url,
@@ -373,7 +389,7 @@
                             },
                             dataType : 'json',
                             success: function(data) {
-                                console.log(data);
+                              //  console.log(data);
                                 if(data == 0) {
                                     $msg = "This color code is not existing in our master Color Codes.";
                                     showValidationError(InputId, $msg);
@@ -386,25 +402,51 @@
                         });
                     }
                 }else if(field == 'delivery_note') {
+                    let country = $('#country-editable-'+id).val();
                     let InputId = 'delivery_note-editable-'+id;
                     let deliveryNote = $('#'+InputId).text();
-
-                    if($.isNumeric(deliveryNote)) {
-                        if(deliveryNote.length < 5) {
-                            $msg = "Delivery Note minimum length should be 5";
-                            showValidationError(InputId,$msg);
-                        }else {
-                            removeValidationError(InputId);
+                    if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {
+                        if($.isNumeric(deliveryNote) ) {
+                            if(deliveryNote.length < 5) {
+                                $msg = "Delivery Note minimum length should be 5";
+                                showValidationError(InputId,$msg);
+                            }else {
+                                removeValidationError(InputId);
+                            }
                         }
-                    }else{
-                        if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
-                            $msg = "Only Waiting status is allowed or any DN Number can update.";
-                            showValidationError(InputId,$msg);
-                        }else {
+                    }
+                    if(deliveryNote.length > 0) {
+                        checkDeliveryNote(country,deliveryNote,id);
+                    }
+                }
+            }
+
+            function checkDeliveryNote(country,deliveryNote,id){
+                let InputId = 'delivery_note-editable-'+id;
+                let url = '{{ route('supplier-inventories.check-delivery-note') }}';
+
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        country: country,
+                        delivery_note: deliveryNote,
+                        data_from: 'LIST'
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        if(data == 0) {
+                            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
+                                $msg = "Delivery note value will be Waiting or Received.";
+                            }else{
+                                $msg = "Delivery note will be Waiting or number";
+                            }
+                            showValidationError(InputId, $msg);
+                        }else{
                             removeValidationError(InputId);
                         }
                     }
-                }
+                });
             }
 
              $('.update-inventory-btn').on('click', function () {
@@ -457,7 +499,6 @@
             }
         }
         function showValidationError(id,$msg){
-
             feildValidInput = false;
             $('#'+id).attr('title', $msg);
             $('#'+id).css('color', 'red');

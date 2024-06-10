@@ -5,6 +5,7 @@
         @page { size: 700pt }
         .content{
             font-family: arial, sans-serif;
+
         }
         .center {
             display: block;
@@ -29,10 +30,14 @@
         .fw-bold{
             font-weight: bold;
         }
+        .border-outline {
+            border: 1px solid #0f0f0f;
+            padding: 10px !important;
+        }
         @media only screen and (min-device-width: 1200px)
         {
             .container{
-                max-width: 1000px; !important;
+                max-width: 850px; !important;
             }
         }
     </style>
@@ -43,7 +48,7 @@
                 <input type="hidden" name="height" id="total-height" value="">
                 <input type="hidden" name="width" id="width" value="">
                 <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
-                <input type="hidden" name="type" value="INDIVIDUAL">
+                <input type="hidden" name="type" value="individual">
                 <input type="hidden" name="download" value="1">
 
                 <div class="text-end mb-3">
@@ -53,18 +58,18 @@
                     </button>
                 </div>
             </form>
-
-            <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
-            <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>
-            <p style="margin-bottom: 0px;"> <span class="fw-bold">Full Name: </span> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
-            <p> <span class="fw-bold">Address: </span>  Dubai, UAE</p>
-            <p>Dear Milele Motors,</p>
-            <p>I, ({{ ucfirst($letterOfIndent->customer->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
-            <h5 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline;color: black">Requirements:</h5>
+            <div class="border-outline">
+                <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
+                <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>
+                <p style="margin-bottom: 0px;"> <span class="fw-bold">Full Name: </span> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
+                <p> <span class="fw-bold">Address: </span>  Dubai, UAE</p>
+                <p>Dear Milele Motors,</p>
+                <p>I, ({{ ucfirst($letterOfIndent->customer->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
+                <h5 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline;color: black">Requirements:</h5>
                 <div style="list-style-type: none;">
                     @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                         <li>{{$key + 1}}.&nbsp;
-                            <span class="fw-bold">Model Name:</span>
+                            <span class="fw-bold">Model Description:</span>
                             @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
                                 {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
                             @else
@@ -72,33 +77,34 @@
                             @endif
                         </li>
                         <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
-                        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Drive: </span>
-                            @if($letterOfIndentItem->masterModel->steering == 'LHD')
-                                Left Hand Drive
-                            @elseif($letterOfIndentItem->masterModel->steering == 'RHD')
-                                Right Hand Drive
-                            @endif
-
-                        </li>
-                        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Engine: </span>
-                        {{ $letterOfIndentItem->masterModel->variant->engine ?? ''}}</li>
                         <li style="margin-bottom: 10px;">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;<span class="fw-bold">Quantity: </span>
                             {{ $letterOfIndentItem->quantity ?? '' }}
                         </li>
                     @endforeach
                 </div>
-            <br>
-            <p>
-                I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
-                purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
-                I would like to declare that the purchased automobile(s) will be registered within the designated country,
-                and this acquisition is not intended for resale purposes.
-            </p>
-            <p style="margin-bottom: 5px;">Sincerely,</p>
-            <p> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
-            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                <p>
+                    I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
+                    purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
+                    I would like to declare that the purchased automobile(s) will be registered within the designated country,
+                    and this acquisition is not intended for resale purposes.
+                </p>
+                <p style="margin-bottom: 5px;">Sincerely,</p>
+                <p> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
+                @if($letterOfIndent->signature)
+                    <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                    @endif
+                    </p>
+                    <br>
+                    @if($letterOfIndent->LOIDocuments->count() > 0)
+                        <h5 class="fw-bold text-center">Customer Document</h5>
+                    @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                            <div  id="remove-doc-{{$letterOfIndentDocument->id}}">
+                                <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  height="500px;" ></iframe>
+                            </div>
+                        @endforeach
+                    @endif
+            </div>
 
-            </p>
         </div>
     </div>
 

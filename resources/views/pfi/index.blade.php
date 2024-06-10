@@ -30,8 +30,8 @@
                             <th>Customer Name </th>
                             <th>Customer Country</th>
                             <th>Amount</th>
-                            <th>Released Amount</th>
-                            <th>Release Date</th>
+{{--                            <th>Released Amount</th>--}}
+{{--                            <th>Release Date</th>--}}
                             <th>Comment</th>
                             <th>Status</th>
                             <th>Payment Status</th>
@@ -52,8 +52,8 @@
                                 <td>{{ $pfi->letterOfIndent->customer->name }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
-                                <td>{{ $pfi->released_amount }}</td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>
+{{--                                <td>{{ $pfi->released_amount }}</td>--}}
+{{--                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>--}}
                                 <td>{{ $pfi->comment }}</td>
                                 <td>{{ $pfi->status }}</td>
                                 <td>{{ $pfi->payment_status }} </td>
