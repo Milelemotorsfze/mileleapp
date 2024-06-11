@@ -2510,4 +2510,28 @@ public function rerequestpayment(Request $request)
             'redirectUrl' => route('purchasing-order.index')
         ]);
     }
+    public function paymentintconfirmrej($id)
+{
+    $vehicle = Vehicles::find($id);
+    if ($vehicle) {
+        $vehicle->status = 'Approved';
+        $vehicle->payment_status = Null;
+        $vehicle->save();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Payment Initiated Request Rejected';
+            $vehicleslog->vehicles_id = $id;
+            $vehicleslog->field = "Vehicle Status, Payment Status";
+            $vehicleslog->old_value = "Request for Initiate Payment";
+            $vehicleslog->new_value = "Payment Initiated Request Rejected";
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+        return redirect()->back()->with('success', 'Payment Initiated Request Rejected confirmed');
+    }
+    return redirect()->back()->with('error', 'Vehicle not found.');
+}
 }

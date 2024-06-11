@@ -1085,9 +1085,14 @@
 											@if ($hasPermission)
 											@if ($purchasingOrder->status === 'Approved')
 											@if ($vehicles->status === 'Request for Payment')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Approved Payment
-											</a>
+											<div class="btn-group" role="group" aria-label="Payment Actions">
+                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                                                Approved
+                                            </a>
+                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentintconfirmrej', $vehicles->id) }}" onclick="return confirmPaymentrej();" style="white-space: nowrap;">
+                                                Reject
+                                            </a>
+                                        </div>
 											@endif
 											@endif
 											@endif
@@ -2119,6 +2124,14 @@ function postUpdateStatus(status, orderId, remarks = '') {
         <script>
             function confirmPayment() {
                 var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
+                if (confirmDialog) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            function confirmPaymentrej() {
+                var confirmDialog = confirm("Are you sure you want to Rejected Payment Request this Vehicles?");
                 if (confirmDialog) {
                     return true;
                 } else {
