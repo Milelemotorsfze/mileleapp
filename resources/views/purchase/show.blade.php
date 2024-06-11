@@ -309,13 +309,13 @@
         </select>
             </div>
             <div class="col-md-4 p-3">
-                <label for="shippingCost" class="form-label font-size-13 text-center">PL Number:</label>
+                <label for="shippingCost" class="form-label font-size-13 text-center">PFI Number:</label>
             </div>
             <div class="col-md-8 p-3">
-            <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PL Number" value="{{$purchasingOrder->pl_number}}">
+            <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PFI Number" value="{{$purchasingOrder->pl_number}}">
             </div>
             <div class="col-md-4 p-3">
-                <label for="shippingCost" class="form-label font-size-13 text-center">Upload PL:</label>
+                <label for="shippingCost" class="form-label font-size-13 text-center">Upload PFI:</label>
             </div>
             <div class="col-md-8 p-3">
             <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
@@ -423,7 +423,7 @@
                     @if ($purchasingOrder->pl_number)
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>PL Number</strong></label>
+                            <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                         <span> {{ $purchasingOrder->pl_number ?? '' }}</span>
@@ -433,11 +433,11 @@
                     @if ($purchasingOrder->pl_file_path)
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>PL Document</strong></label>
+                            <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                         <button type="button" class="btn btn-primary btn-sm view-doc-btn" data-toggle="modal" data-target="#viewdocModal">
-                            <i class="fas fa-file-pdf mr-2"></i> View PL
+                            <i class="fas fa-file-pdf mr-2"></i> View PFI
                         </button>
                         </div>
                     </div>
