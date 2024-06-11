@@ -82,6 +82,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="fileUploadModal" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileUploadModalLabel">Swift Copy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="fileUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Uploading PDF of Swift Copy</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                    </div>
+                    <br>
+                    <input type="hidden" id="status" name="status">
+                    <input type="hidden" id="orderId" name="orderId">
+                    <button type="submit" class="btn btn-primary">Upload & Complete Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="card-header">
         <!-- @if ($previousId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
@@ -452,9 +474,40 @@
                                 <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                     @endif
+                    @if ($purchasingOrderSwiftCopies->count() > 0)
+                    <br>
+        <div class="row mb-2">
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label for="choices-single-default" class="form-label"><strong>Swift Copy</strong></label>
+            </div>
+            <div class="col-lg-6 col-md-9 col-sm-12">
+            @foreach ($purchasingOrderSwiftCopies as $swiftCopy)
+                <button type="button" class="btn btn-primary btn-sm view-swift-btn" data-file-path="{{ asset($swiftCopy->file_path) }}">
+                    <i class="fas fa-file-pdf mr-2"></i> B - {{ $swiftCopy->batch_no }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+@endif
+
+<!-- Modal -->
+<div class="modal fade" id="swiftCopyModal" tabindex="-1" role="dialog" aria-labelledby="swiftCopyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="swiftCopyModalLabel">Swift Copy</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="swiftCopyContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
                     @if($purchasingOrder->status === 'Cancel Request')
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
@@ -465,7 +518,8 @@
                         </div>
                     </div>
                     @else
-                    <div class="row"></div>
+                    <div class="row">
+                    </div>
                     <br>
                     <br>
                     @endif
@@ -622,7 +676,7 @@
                                         <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp('Approved', {{ $purchasingOrder->id }})">Complete All Payments</button>
+                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp({{ $purchasingOrder->id }})">Complete All Payments</button>
                                     </div>
                                 @endif
                             @endif
@@ -1130,9 +1184,62 @@
 									@if ($hasPermission)
 									@if ($purchasingOrder->status === 'Approved')
 									@if ($vehicles->payment_status === 'Payment Release Approved')
-									<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                                    <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="fileUploadModalsingleLabel">Swift Copy</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="paymentFile">Upload File</label>
+            <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
+          </div>
+          <input type="hidden" id="vehicleId" name="vehicleId" value="">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+                                        <!-- File Upload Modal -->
+                                        <!-- <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                            <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="fileUploadModalsingleLabel">Upload Payment Confirmation</h5>
+                                                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label for="paymentFile">Upload File</label>
+                                                    <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
+                                                </div>
+                                                <input type="hidden" id="vehicleId" name="vehicleId" value="">
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </form>
+                                            </div>
+                                        </div>
+                                        </div> -->
+                                    <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="#" onclick="allpaymentintreqfinpaycompsingle({{ $vehicles->id }});" style="margin-right: 10px; white-space: nowrap;">
+    Payment Completed
+</a>
+									<!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 									Payment Completed
-									</a>
+									</a> -->
 									@endif
 									@endif
 									@endif
@@ -2252,27 +2359,32 @@ function postUpdateStatus(status, orderId, remarks = '') {
                         window.location.reload();
                     });
             }
-            function allpaymentintreqfinpaycomp(status, orderId) {
-                let url = '{{ route('purchasing.allpaymentreqssfinpaycomp') }}';
-                let data = { status: status, orderId: orderId };
-                console.log(data);
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
-            }
+            function allpaymentintreqfinpaycomp(orderId) {
+    document.getElementById('status').value = 'Approved';
+    document.getElementById('orderId').value = orderId;
+    $('#fileUploadModal').modal('show');
+}
+document.getElementById('fileUploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+    let url = '{{ route('purchasing.allpaymentreqssfinpaycomp') }}';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('File upload successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        console.log('File upload failed', error);
+        window.location.reload();
+    });
+});
             function allpaymentintreqpocomp(status, orderId) {
                 let url = '{{ route('purchasing.allpaymentintreqpocomp') }}';
                 let data = { status: status, orderId: orderId };
@@ -2462,5 +2574,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+<script>
+$(document).ready(function() {
+    $('.view-swift-btn').on('click', function() {
+        var filePath = $(this).data('file-path');
+        $('#swiftCopyContainer').html(`<embed src="${filePath}" type="application/pdf" width="100%" height="500px" />`);
+        $('#swiftCopyModal').modal('show');
+    });
+
+    $('#swiftCopyModal').on('hidden.bs.modal', function () {
+        $('#swiftCopyContainer').html('');
+    });
+});
+</script>
+<script>
+function allpaymentintreqfinpaycompsingle(vehicleId) {
+    // Update the form action URL with the correct vehicle ID
+    var form = document.getElementById('paymentForm');
+    var actionTemplate = "{{ route('vehicles.paymentrelconfirmdebited', ':id') }}";
+    var action = actionTemplate.replace(':id', vehicleId);
+    form.setAttribute('action', action);
+    // Open the modal
+    $('#fileUploadModalsingle').modal('show');
+}
 </script>
 @endsection
