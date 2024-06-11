@@ -1808,7 +1808,7 @@ $(document).ready(function () {
   var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
   columnDefs: [
-    { type: 'date', targets: [0] },
+    { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
   initComplete: function() {
