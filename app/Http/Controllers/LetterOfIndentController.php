@@ -76,7 +76,7 @@ class LetterOfIndentController extends Controller
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
-        $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
         $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models','salesPersons'));
@@ -198,7 +198,6 @@ class LetterOfIndentController extends Controller
                 $soNumbers = $request->so_number;
                 foreach($soNumbers as $soNumber) {
                     if(!empty($soNumber)) {
-                        info($soNumber);
                         $loiSoNumber = new LoiSoNumber();
                         $loiSoNumber->letter_of_indent_id = $LOI->id;
                         $loiSoNumber->so_number = $soNumber;
@@ -257,12 +256,12 @@ class LetterOfIndentController extends Controller
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
-                try{
+                // try{
                      $pdf = $this->pdfMerge($letterOfIndent->id);
                     return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
-                }catch (\Exception $e){
-                    return $e->getMessage();
-                }
+                // }catch (\Exception $e){
+                //     return $e->getMessage();
+                // }
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else if($request->type == 'milele_cars'){
@@ -334,7 +333,8 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
         $filename = 'LOI_'.$letterOfIndentId.date('Y_m_d').'.pdf';
         $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
-     
+        // $pdf = new  \setasign\Fpdi\Tfpdf();
+
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         $files[] = 'LOI/'.$filename;
@@ -551,8 +551,6 @@ class LetterOfIndentController extends Controller
     }
     public function RequestSupplierApproval(Request $request)
     {
-//       dd("test");
-//        info($request->all());
       $LOI = LetterOfIndent::find($request->id);
 
       $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;

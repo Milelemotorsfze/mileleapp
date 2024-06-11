@@ -61,6 +61,7 @@ class LetterOfIndent extends Model
         if(!$letterOfIndentItemQty) {
             return 0;
         }
+    
         return $letterOfIndentItemQty;
     }
     public function getTotalApprovedQuantityAttribute() {
