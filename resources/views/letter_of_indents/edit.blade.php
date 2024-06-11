@@ -638,6 +638,7 @@
 
         jQuery.validator.addMethod('fileCheck', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
+            console.log(remainingCount);
             if(remainingCount != 0) {
                 return true;
             }else{
@@ -647,7 +648,9 @@
 
         $('#file-upload').change(function () {
             if($('#file-upload')[0].files.length !== 0) {
-                $('#remaining-document-count').val(1);
+                let newRemainingCount = + $('#remaining-document-count').val() + + 1;
+            
+                $('#remaining-document-count').val(newRemainingCount);
             }
         });
 
@@ -1094,6 +1097,7 @@
                     module: 'LOI',
                 },
                 success:function (data) {
+                    console.log(data);
                     $('#loi-description-'+index).val("");
                     let quantity = data.quantity;
                     let modelId = data.master_model_id;
