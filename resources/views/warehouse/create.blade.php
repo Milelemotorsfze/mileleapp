@@ -264,11 +264,11 @@ input[type=number]::-webkit-outer-spin-button {
             </div>
             <div class="row">
     <div class="col-lg-2 col-md-6">
-        <label for="plNumber" class="form-label">PL Number:</label>
-        <input type="number" id="plNumber" name="plNumber" class="form-control" placeholder="Enter PL Number">
+        <label for="plNumber" class="form-label">PFI Number:</label>
+        <input type="text" id="plNumber" name="plNumber" class="form-control" placeholder="Enter PFI Number">
     </div>
     <div class="col-lg-2 col-md-6">
-        <label for="uploadPL" class="form-label">Upload PL:</label>
+        <label for="uploadPL" class="form-label">Upload PFI:</label>
         <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
     </div>
 </div>
