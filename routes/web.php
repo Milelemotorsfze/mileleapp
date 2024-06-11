@@ -650,7 +650,7 @@ Route::get('/d', function () {
     Route::get('vehicles/paymentrelconfirm/{id}', [PurchasingOrderController::class, 'paymentrelconfirm'])->name('vehicles.paymentrelconfirm');
     Route::get('vehicles/paymentreleasesconfirm/{id}', [PurchasingOrderController::class, 'paymentreleasesconfirm'])->name('vehicles.paymentreleasesconfirm');
     Route::post('vehicles/paymentreleasesrejected/{id}', [PurchasingOrderController::class, 'paymentreleasesrejected'])->name('vehicles.paymentreleasesrejected');
-    Route::get('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
+    Route::post('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
     Route::post('/update-purchasing-allstatus', [PurchasingOrderController::class, 'purchasingallupdateStatus'])->name('purchasing.updateallStatus');
     Route::get('vehicles/paymentrelconfirmvendors/{id}', [PurchasingOrderController::class, 'paymentrelconfirmvendors'])->name('vehicles.paymentrelconfirmvendors');
     Route::get('vehicles/paymentrelconfirmincoming/{id}', [PurchasingOrderController::class, 'paymentrelconfirmincoming'])->name('vehicles.paymentrelconfirmincoming');

@@ -10,6 +10,7 @@ use App\Models\PFI;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
 use App\Models\PurchasingOrderItems;
+use App\Models\PurchasingOrderSwiftCopies;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
@@ -824,17 +825,17 @@ public function getBrandsAndModelLines(Request $request)
                     ->where('supplier_id', $pfi->supplier_id)
                     ->where('whole_sales', $dealer)
                     ->count();
-
                 $variantCount = $variantCount + $pfiVehicleVariant->quantity;
-
             }
         }
+        $purchasingOrderSwiftCopies = PurchasingOrderSwiftCopies::where('purchasing_order_id', $id)->orderBy('created_at', 'desc')
+        ->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies'));
     }
     public function edit($id)
     {
@@ -1798,9 +1799,27 @@ public function paymentreleasesrejected(Request $request, $id)
     }
     return response()->json(['error' => 'Vehicle not found.'], 404);
 }
-public function paymentrelconfirmdebited($id)
+public function paymentrelconfirmdebited(Request $request, $id)
 {
     $vehicle = Vehicles::find($id);
+    $vehicleCount = $vehicle->count();
+           if ($request->hasFile('paymentFile')) {
+            $file = $request->file('paymentFile');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $vehicle->purchasing_order_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $vehicle->purchasing_order_id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+        }
     if ($vehicle) {
         DB::beginTransaction();
         $vehicle->status = 'Payment Completed';
@@ -2139,6 +2158,27 @@ public function allpaymentreqssfinpay(Request $request)
            ->where('status', 'Payment Requested')
            ->where('payment_status', 'Payment Release Approved')
            ->get();
+           $vehicleCount = $vehicles->count();
+           if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+        }        
            foreach ($vehicles as $vehicle) {
                $status = 'Payment Completed';
                $payment_status = 'Payment Completed';
@@ -2160,15 +2200,12 @@ public function allpaymentreqssfinpay(Request $request)
                        $vehicleslog->save();
                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                        $currentDateTime = Carbon::now($dubaiTimeZone);
-                           $paymentlogs = new PaymentLog();
-                           $paymentlogs->date = $currentDateTime->toDateString();
-                           $paymentlogs->vehicle_id = $vehicle->id;
-                           $paymentlogs->created_by = auth()->user()->id;
-                           $paymentlogs->save();
-
-
+                       $paymentlogs = new PaymentLog();
+                       $paymentlogs->date = $currentDateTime->toDateString();
+                       $paymentlogs->vehicle_id = $vehicle->id;
+                       $paymentlogs->created_by = auth()->user()->id;
+                       $paymentlogs->save();
                    }
-
                    return redirect()->back()->with('success', 'Payment Status Updated');
               }
               public function allpaymentintreqpocomp(Request $request)
