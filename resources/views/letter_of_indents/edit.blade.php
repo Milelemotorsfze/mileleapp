@@ -13,6 +13,9 @@
         {
             height:32px!important;
         }
+        .error {
+            color: #FF0000;
+        }
 
     </style>
     @can('LOI-edit')
@@ -127,7 +130,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                                <input type="date" class="form-control widthinput" id="basicpill-firstname-input" name="date"
+                                <input type="date" class="form-control widthinput" id="date" name="date"
                                     value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
                             </div>
                         </div>
@@ -247,7 +250,7 @@
                         </div>
                     </div>
 
-            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+            <div class="alert m-2" role="alert" hidden id="country-comment-div">
                 <span id="country-comment"></span><br>
                 <span class="error" id="max-individual-quantity-error"></span>
                 <span class="error" id="min-company-quantity-error"></span>
@@ -354,7 +357,7 @@
                     </select>
                     <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary float-end">Update</button>
+                        <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
                     </div>
 
                 </form>
@@ -425,11 +428,9 @@
                 allowClear: true,
                 maximumSelectionLength: 1
             });
-            // $('#customer-type').select2({
-            //     placeholder : 'Select Customer Type',
-            //     allowClear: true,
-            //     maximumSelectionLength: 1
-            // });
+            $('#date').change(function (){
+                checkCountryCriterias();
+            });
             $('#country').select2({
                 placeholder: 'Select Country',
                 allowClear: true,
@@ -444,6 +445,7 @@
                 maximumSelectionLength: 1
             }).on('change', function() {
                 $('#customer-error').remove();
+                checkCountryCriterias();
             });
             $('#dealer').change(function () {
                 var value = $('#dealer').val();
@@ -483,16 +485,15 @@
                             $('#template-type option[value=individual]').prop('disabled', false);
                             $('#template-type option[value=business]').prop('disabled', false);
                         }
+                       
                     }
                 }).set({title:"Are You Sure?"});
+                checkCountryCriterias();
             });
 
         $('.remove-signature-button').click(function () {
             $('#is_signature_removed').val(1);
             $('#signature-preview').hide();
-        });
-        $('#customer-type').change(function () {
-            checkCountryCriterias();
         });
 
         $(document.body).on('input', ".quantities", function (e) {
@@ -502,29 +503,35 @@
         function checkCountryCriterias() {
             // console.log('reached');
             let url = '{{ route('loi-country-criteria.check') }}';
-            var country = $('#country').val();
+            var customer = $('#customer').val();
             var customer_type = $('#customer-type').val();
+            var date = $('#date').val();
             let total_quantities = 0;
+
             $(".quantities ").each(function(){
                 if($(this).val() > 0) {
                     total_quantities += parseInt($(this).val());
                 }
             });
-            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
                 $.ajax({
                     type: "GET",
                     url: url,
                     dataType: "json",
                     data: {
-                        country_id: country,
+                        loi_date:date,
+                        customer_id: customer[0],
                         customer_type: customer_type,
                         total_quantities:total_quantities
                     },
                     success:function (data) {
                         formValid = true;
+                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
+                       
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
+                        
                         }
                         else{
                             $('#country-comment-div').attr('hidden', true);
@@ -533,38 +540,40 @@
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
                             $('#customer-type-error').attr('hidden', true);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }
                         else{
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
                             formValid = false;
-                            // $('#quantity-error-div').attr('hidden', false);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
                         } else {
-                            // formValid = true;
-                            // $('#quantity-error-div').attr('hidden', true);
                             $('#max-individual-quantity-error').html('');
                         }
                         if(data.min_qty_per_company_error) {
                             formValid = false;
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+                         
                             $('#min-company-quantity-error').html('');
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+                           
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
                             formValid = false;
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+                    
                             $('#company-only-allowed-error').html('');
                         }
                     }
@@ -683,6 +692,9 @@
                 },
                 "quantity[]": {
                     required: true
+                },
+                "template_type[]":{
+                    required:true
                 },
                 "files[]": {
                     fileCheck:true,
@@ -857,6 +869,7 @@
                     });
                 });
                 enableDealer();
+                checkCountryCriterias();
 
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one LOI Item Required',function (e) {

@@ -234,7 +234,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                    <div class="alert m-2" role="alert" hidden id="country-comment-div">
                         <span id="country-comment"></span>
                     </div>
                     <div class="row">
@@ -415,7 +415,7 @@
                 },
                 messages: {
                     file: {
-                        extension: "Please upload file  format (Pdf,png,jpeg,jpg)"
+                        extension: "Please upload file format (Pdf,png,jpeg,jpg)"
                     },
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
@@ -449,6 +449,7 @@
                 e.preventDefault();
             }
         });
+
         $('#template-type').select2({
             placeholder : 'Select Template Type',
             allowClear: true,
@@ -466,6 +467,7 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             $('#customer-error').remove();
+            checkCountryCriterias();
         });
         $('#customer-type').select2({
             placeholder : 'Select Customer Type',
@@ -481,9 +483,12 @@
             checkCountryCriterias();
         });
 
+        $('#date').change(function (){
+            checkCountryCriterias();
+        });
         $('#customer-type').change(function (){
             getCustomers();
-            checkCountryCriterias();
+           
             let customerType = $('#customer-type').val();
             $('#template-type').val('').trigger('change');
             if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
@@ -494,6 +499,7 @@
                 $('#template-type option[value=individual]').prop('disabled',false);
                 $('#template-type option[value=business]').prop('disabled',false);
             }
+            checkCountryCriterias();
         });
         $('#model-1').select2({
             placeholder: 'Select Model',
@@ -532,18 +538,14 @@
             }
         });
 
-        $('#customer-type').change(function () {
-            checkCountryCriterias();
-        });
-
         $(document.body).on('input', ".quantities", function (e) {
             checkCountryCriterias();
         });
 
         function checkCountryCriterias() {
-
             let url = '{{ route('loi-country-criteria.check') }}';
-            var country = $('#country').val();
+            var customer = $('#customer').val();
+            var date = $('#date').val();
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
             $(".quantities ").each(function(){
@@ -551,15 +553,15 @@
                     total_quantities += parseInt($(this).val());
                 }
             });
-
-            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
                 $.ajax({
                     type: "GET",
                     url: url,
                     dataType: "json",
                     data: {
-                        country_id: country,
-                        customer_type: customer_type,
+                        loi_date:date,
+                        customer_id: customer[0],
+                        customer_type: customer_type[0],
                         total_quantities:total_quantities
                     },
                     success:function (data) {
@@ -572,48 +574,54 @@
                             $('#country-comment-div').attr('hidden', true);
                         }
                         formValid = true;
+                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
+
                         if(data.customer_type_error) {
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
                             $('#customer-type-error').attr('hidden', false);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }
                         else{
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
                             formValid = false;
-                            // $('#quantity-error-div').attr('hidden', false);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                        } else {
-                            // formValid = true;
-                            // $('#quantity-error-div').attr('hidden', true);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
+
+                        } else { 
                             $('#max-individual-quantity-error').html('');
                         }
                         if(data.min_qty_per_company_error) {
-                            formValid = false;
+                            formValid = false;                          
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+
                             $('#min-company-quantity-error').html('');
+                            console.log("min company qty error not found");
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+                          
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
-                            formValid = false;
+                            formValid = false;                           
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
                             $('#company-only-allowed-error').html('');
                         }
                     }
                 });
             }
         }
+       
         function getCustomers() {
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
@@ -836,6 +844,7 @@
                         allowClear: true
                     });
                 });
+                checkCountryCriterias();
 
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one LOI Item Required',function (e) {

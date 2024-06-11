@@ -86,8 +86,6 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>Supplier Approval</th>
                                     <th>LOI</th>
@@ -112,8 +110,6 @@
                                             @endforeach
                                          </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             @can('LOI-approve')
@@ -286,7 +282,7 @@
                             <table id="waiting-for-approval-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                                 <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>S.NO</th>
+                                    <th>S.NO:</th>
                                     <th>LOI Number</th>
                                     <th>Date</th>
                                     <th>Customer</th>
@@ -294,8 +290,7 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
+                                    <th>LOI Quantity</th>
                                     <th> Status</th>
                                     <th>LOI</th>
                                     <th>Approve/Reject</th>
@@ -320,8 +315,7 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
+                                        <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
@@ -667,6 +661,7 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
+                                    <th>LOI Quantity</th>
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>LOI</th>
@@ -692,6 +687,7 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td>{{ $letterOfIndent->submission_status }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
                                         <td>
@@ -846,8 +842,6 @@
                                     <th>Dealer</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -881,8 +875,6 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
 
                                         @can('LOI-approve')

@@ -76,7 +76,7 @@ class LetterOfIndentController extends Controller
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
-        $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
         $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models','salesPersons'));
@@ -551,8 +551,6 @@ class LetterOfIndentController extends Controller
     }
     public function RequestSupplierApproval(Request $request)
     {
-//       dd("test");
-//        info($request->all());
       $LOI = LetterOfIndent::find($request->id);
 
       $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;

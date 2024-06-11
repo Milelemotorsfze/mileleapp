@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Models\Customer;
+use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\MasterModelLines;
 use Carbon\Carbon;
@@ -182,34 +185,57 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-//        info($request->all());
-        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
+        info($request->all());
+        $customer = Customer::find($request->customer_id);
+        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
         $data = [];
+
+        // get the loi count for this customer for thid=s year;
+        $year = Carbon::parse($request->loi_date)->format('Y');
+        $totalUnitCountUsed = LetterOfIndentItem::with('LOI')
+                                    ->whereHas('LOI', function($query) use($year, $request){
+                                        $query->where('customer_id', $request->customer_id)
+                                        ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+                                        ->whereYear('date', $year);
+                                    })
+                                    ->sum('quantity');
+
+        info($totalUnitCountUsed);
+        $quantity = $totalUnitCountUsed + $request->total_quantities;
+        info($quantity);
+
         if(!empty($LoiCountryCriteria->comment)) {
             $data['comment'] = $LoiCountryCriteria->comment;
         }
-        if(!empty($LoiCountryCriteria->is_only_company_allowed)) {
-            if($LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES ) {
-                if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY ) {
-                    $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
-                    $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
-                }
+    
+        if(!empty($LoiCountryCriteria->is_only_company_allowed && $LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES)) {
+            info("company allowed paarmeter yes");
+            if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            
+                $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
+                $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
             }
         }
-        if($request->total_quantities) {
+        if($quantity > 0) {
+            $msg = "";
+            if($totalUnitCountUsed > 0) {
+               $msg = 'Already ' .$totalUnitCountUsed.' unit is used by this customer!';    
+            }
             if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
-                if($request->total_quantities > $LoiCountryCriteria->max_qty_per_passport) {
-                    $data['max_qty_per_passport_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_per_passport;
+                    info("individaul type");
+                if($quantity > $LoiCountryCriteria->max_qty_per_passport) {
+                    info("qty exceeded");
+                    $data['max_qty_per_passport_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
                 }
             }
             if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
-                if($LoiCountryCriteria->min_qty_for_company > $request->total_quantities) {
-                    $data['min_qty_per_company_error'] = 'Quantity should be greater than '.$LoiCountryCriteria->min_qty_for_company;
+                if($LoiCountryCriteria->min_qty_for_company > $quantity) {
+                    $data['min_qty_per_company_error'] = 'Total Quantity should be greater than allowed quantity( '.$LoiCountryCriteria->min_qty_for_company.' ). '.$msg;
                 }
             }
             if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
-                if($LoiCountryCriteria->max_qty_for_company < $request->total_quantities) {
-                    $data['max_qty_per_company_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_for_company;
+                if($LoiCountryCriteria->max_qty_for_company < $quantity) {
+                    $data['max_qty_per_company_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_for_company.' ). '.$msg;
                 }
             }
         }
