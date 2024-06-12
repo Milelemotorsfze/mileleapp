@@ -868,6 +868,7 @@ Route::get('/d', function () {
     Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
     Route::post('purchasing_order/cancelpo/{id}', [PurchasingOrderController::class, 'cancelpo'])->name('purchasing_order.cancelpo');
     Route::post('/update-purchasing-status-cancel', [PurchasingOrderController::class, 'purchasingupdateStatuscancel'])->name('purchasing.updateStatuscancel');
+    Route::post('/check-authorization', [DailyleadsController::class, 'checkAuthorization'])->name('checkAuthorization');
 
 
 

@@ -301,17 +301,22 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
-    <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'followUp')">FollowUp</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'prospecting')">Prospecting</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'uniqueInquiry')">Unique Inquiry / Demand</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'quotation')">Quotation</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li>
+    <!-- <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li> -->
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li> -->
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
-      <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
+      <!-- <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li> -->
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
-      <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li> -->
     </ul>
   </div>
                     </td>
@@ -1928,8 +1933,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
+                data: 'remarks',
+                name: 'remarks',
     searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
@@ -3310,6 +3315,51 @@ function updateRemainingTime() {
 }
 setInterval(updateRemainingTime, 1000);
 </script>
+<script>
+      function checkAuthorization(callId, action) {
+        $.ajax({
+            url: '{{ route("checkAuthorization") }}', // Define this route in your web.php
+            type: 'POST',
+            data: {
+                call_id: callId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.authorized) {
+                    performAction(callId, action);
+                } else {
+                  alertify.error('Sorry, Lead Already Assign to Another Sales Person By auto System');
+                    location.reload();
+                }
+            },
+            error: function() {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    function performAction(callId, action) {
+        switch(action) {
+            case 'followUp':
+                openModalfellowup(callId);
+                break;
+            case 'prospecting':
+                openModalp(callId);
+                break;
+            case 'uniqueInquiry':
+                openModald(callId);
+                break;
+            case 'quotation':
+              window.location.href = `{{ route('qoutation.proforma_invoice', ['callId' => '__CALL_ID__']) }}`.replace('__CALL_ID__', callId);
+                break;
+            case 'rejected':
+                openModalr(callId);
+                break;
+            default:
+                console.log('Unknown action');
+        }
+    }
+  </script>
 @else
     @php
         redirect()->route('home')->send();

@@ -713,4 +713,13 @@ public function saveprospecting(Request $request)
         $data = Fellowup::where('calls_id', $id)->first();
         return response()->json($data);
     } 
+    public function checkAuthorization(Request $request)
+{
+    $call = Calls::find($request->call_id);
+    if ($call && $call->sales_person == auth()->user()->id) {
+        return response()->json(['authorized' => true]);
+    } else {
+        return response()->json(['authorized' => false]);
+    }
+}
 }
