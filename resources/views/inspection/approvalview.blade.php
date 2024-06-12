@@ -247,7 +247,7 @@
             </tr>
             <tr>
     <td>Interior Colour</td>
-    <td>{{$vehiclecolour->name}}</td>
+    <td>{{ $vehiclecolour->name ?? '' }}</td>
     <td>
         <select class="form-control" name="int_colour">
             @foreach($intmaster as $intmaster)
@@ -267,7 +267,7 @@
 </tr>
             <tr>
                 <td>Exterior Colour</td>
-                <td>{{$extvehicle->name}}</td>
+                <td>{{$extvehicle->name ?? ''}}</td>
                 <td>
                     <select class="form-control" name="ex_colour">
                     @foreach($extmaster as $extmaster)
