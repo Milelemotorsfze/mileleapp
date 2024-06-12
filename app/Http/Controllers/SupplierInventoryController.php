@@ -241,7 +241,7 @@ class SupplierInventoryController extends Controller
 
     public function ExcelUpdate(Request $request)
     {
-        (new UserActivityController)->createActivity('Added Supplier Inventories');
+        (new UserActivityController)->createActivity('Added Supplier Inventories by Excel Upload');
 
         $request->validate([
             'whole_sales' => 'required',
@@ -2045,6 +2045,7 @@ class SupplierInventoryController extends Controller
             'deletedRows','updatedRows','suppliers','deliveredInventories'));
     }
     public function lists(Request $request) {
+        (new UserActivityController)->createActivity('open the listing page of inventory.');
 
         $request->validate([
             'start_date' => 'date',
@@ -2203,6 +2204,8 @@ class SupplierInventoryController extends Controller
     }
     public function inventoryLogs($id)
     {
+        (new UserActivityController)->createActivity('Open the supplier inventory log listing page');
+
         $supplierInventoryLogs = SupplierInventoryLog::where('supplier_inventory_id', $id)->orderBy('id', 'DESC')->get();
 
         return view('supplier_inventories.inventory_logs.index', compact('supplierInventoryLogs'));

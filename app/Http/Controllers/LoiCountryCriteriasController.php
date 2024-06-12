@@ -83,6 +83,8 @@ class LoiCountryCriteriasController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open LOI Restricted Counties Create Page');
+
         $LOIRestrictedCountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->pluck('country_id');
         $countries = Country::whereNotIn('id', $LOIRestrictedCountries)->get();
         $modelLines = MasterModelLines::all();
@@ -114,6 +116,8 @@ class LoiCountryCriteriasController extends Controller
 
         $loiCountryCriteria->save();
 
+        (new UserActivityController)->createActivity('Created Entry in  LOI Restricted Counties.');
+
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Restricted Country Added Successfully.');
 
     }
@@ -131,6 +135,7 @@ class LoiCountryCriteriasController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the Edit page LOI Restricted Counties.');
         $loiCountryCriteria = LoiCountryCriteria::find($id);
 
         $modelLines = MasterModelLines::all();
@@ -162,6 +167,9 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->save();
 
+        (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
+
+
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Country Criteria Updated Successfully.');
     }
 
@@ -170,12 +178,16 @@ class LoiCountryCriteriasController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted Entry in  LOI Restricted Counties.');
+
         $loiCountryCriteria = LoiCountryCriteria::find($id);
         $loiCountryCriteria->delete();
 
         return response(true);
     }
     public function statusChange(Request $request) {
+
+        (new UserActivityController)->createActivity('Status change don in  LOI restricted counties.');
 
         $loiCountryCriteria = LoiCountryCriteria::find($request->id);
         $loiCountryCriteria->status = $request->status;
@@ -185,7 +197,7 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-        info($request->all());
+    
         $customer = Customer::find($request->customer_id);
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
         $data = [];
@@ -200,16 +212,14 @@ class LoiCountryCriteriasController extends Controller
                                     })
                                     ->sum('quantity');
 
-        info($totalUnitCountUsed);
         $quantity = $totalUnitCountUsed + $request->total_quantities;
-        info($quantity);
 
         if(!empty($LoiCountryCriteria->comment)) {
             $data['comment'] = $LoiCountryCriteria->comment;
         }
     
         if(!empty($LoiCountryCriteria->is_only_company_allowed && $LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES)) {
-            info("company allowed paarmeter yes");
+          
             if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
             
                 $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
@@ -222,9 +232,7 @@ class LoiCountryCriteriasController extends Controller
                $msg = 'Already ' .$totalUnitCountUsed.' unit is used by this customer!';    
             }
             if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
-                    info("individaul type");
                 if($quantity > $LoiCountryCriteria->max_qty_per_passport) {
-                    info("qty exceeded");
                     $data['max_qty_per_passport_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
                 }
             }

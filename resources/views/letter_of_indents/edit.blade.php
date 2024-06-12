@@ -367,6 +367,7 @@
 @endsection
 @push('scripts')
     <script>
+        var previousSelected = $('#customer-type').val();
         let formValid = true;
         let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
@@ -437,7 +438,7 @@
                 maximumSelectionLength: 1,
             }).on('change', function() {
                 getCustomers();
-                checkCountryCriterias();
+              
             });
             $('#customer').select2({
                 placeholder : 'Select Customer',
@@ -452,6 +453,7 @@
                 $('#dealer-input').val(value);
                 showSignatureRemoveButton(value)
                 getModels('all','dealer-change');
+            
                 var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Dealer?',function (e) {
                     if (e) {
                         $('#template-type').val('').trigger('change');
@@ -467,12 +469,16 @@
 
                 }).set({title:"Are You Sure?"});
             });
-
+   
             $('#customer-type').change(function () {
                 getCustomers();
                 let customerType = $('#customer-type').val();
+            
                 var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Customer Type!',function (e) {
                     if (e) {
+                    
+                        previousSelected = customerType;
+                    
                         $('#template-type').val('').trigger('change');
                         if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
                             $('#template-type option[value=business]').prop('disabled', true);
@@ -485,10 +491,12 @@
                             $('#template-type option[value=individual]').prop('disabled', false);
                             $('#template-type option[value=business]').prop('disabled', false);
                         }
-                       
+                        checkCountryCriterias();
                     }
-                }).set({title:"Are You Sure?"});
-                checkCountryCriterias();
+                }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){ 
+                    $('#customer-type').val(previousSelected);
+                } );
+             
             });
 
         $('.remove-signature-button').click(function () {
@@ -640,6 +648,7 @@
                         jQuery.each(data, function (key, value) {
                             var selectedId = '{{ $letterOfIndent->customer_id }}';
                             $('#customer').append('<option value="' + value.id + ' " >' + value.name + '</option>');
+                            checkCountryCriterias();
                         });
                     }
                 });
