@@ -179,8 +179,20 @@
   </div>
 </div>
     @php
-        $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-        $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+    $exColours = \App\Models\ColorCode::where('belong_to', 'ex')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        // Combine 'name' and 'code' with code in parentheses and use 'id' as the key
+        return [$color->id => $color->name . ' (' . $color->code . ')'];
+    })
+    ->toArray();
+    $intColours = \App\Models\ColorCode::where('belong_to', 'int')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        // Combine 'name' and 'code' and use 'id' as the key
+        return [$color->id => $color->name . ' (' . $color->code . ')'];
+    })
+    ->toArray();
     @endphp
     <div class="card-body">
     @php
