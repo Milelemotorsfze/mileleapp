@@ -2506,7 +2506,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                 <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
                                 <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
