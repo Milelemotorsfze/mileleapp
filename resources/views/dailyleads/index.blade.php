@@ -1945,7 +1945,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -1966,7 +1976,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-{ data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2097,7 +2117,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2118,7 +2148,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2205,7 +2245,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2226,7 +2276,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2247,7 +2307,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2378,7 +2448,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false },
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2399,7 +2479,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate, searchable: false' },
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2420,7 +2510,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false },
+{
+            data: 'qdate',
+            name: 'qdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2456,7 +2556,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ndate', name: 'ndate', searchable: false },
+{
+            data: 'ndate',
+            name: 'ndate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
                 {
     data: 'nsalesnotes',
@@ -2559,7 +2669,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2580,7 +2700,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false},
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2600,7 +2730,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
     data: 'qsalesnotes',
@@ -2672,7 +2812,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 //         }
 //     }
 // },
-                { data: 'cdate', name: 'cdate', searchable: false},
+{
+            data: 'cdate',
+            name: 'cdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
                 {
     data: 'csalesnotes',
@@ -2754,7 +2904,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2775,7 +2935,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false},
+{
+            data: 'ddate',
+            name: 'ddate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2796,7 +2966,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
     data: 'qsalesnotes',
@@ -2868,7 +3048,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 //         }
 //     }
 // },
-                { data: 'rdate', name: 'rdate', searchable: false},
+{
+            data: 'rdate',
+            name: 'rdate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'reason', name: 'reason', searchable: false },
                 {
     data: 'rsalesnotes',
@@ -2944,7 +3134,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         { data: 'remarks', name: 'calls.remarks' },
-        { data: 'datefol', name: 'datefol' },
+        {
+            data: 'datefol',
+            name: 'datefol',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
         { data: 'sales_notes', name: 'fellow_up.sales_notes' },
