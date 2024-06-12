@@ -63,7 +63,6 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
-use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\Repeatedcustomers;
 use App\Http\Controllers\ProfileController;
@@ -431,8 +430,7 @@ Route::get('/d', function () {
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
-    Route::post('letter-of-indents/supplier-approval', [LOIItemsController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
-    Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
+    Route::post('letter-of-indents/supplier-approval', [LetterOfIndentController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
@@ -440,7 +438,6 @@ Route::get('/d', function () {
         ->name('letter-of-indent.request-supplier-approval');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
-    Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
 
     // PFI

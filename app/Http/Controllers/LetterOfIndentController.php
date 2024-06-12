@@ -560,6 +560,25 @@ class LetterOfIndentController extends Controller
       return response(true);
 
     }
+    public function supplierApproval(Request $request) {
+
+        $LOI = LetterOfIndent::find($request->id);
+        if($request->status == 'REJECTED') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+            $LOI->review = $request->review;
+
+        }elseif ($request->status == 'APPROVE') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+
+        }
+        $LOI->loi_approval_date = $request->loi_approval_date;
+        $LOI->save();
+        return response(true);
+
+    }
+
     /**
      * Remove the specified resource from storage.
      */
