@@ -1908,13 +1908,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
@@ -1948,13 +1951,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -1979,13 +1985,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2080,13 +2089,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
@@ -2120,13 +2132,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -2151,13 +2166,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2208,13 +2226,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
@@ -2248,13 +2269,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -2279,13 +2303,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2310,13 +2337,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'qdate',
             name: 'qdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
                 {
@@ -2411,13 +2441,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
@@ -2451,13 +2484,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -2482,13 +2518,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2513,13 +2552,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'qdate',
             name: 'qdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
                 {
@@ -2633,13 +2675,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
@@ -2672,13 +2717,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -2703,13 +2751,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2733,13 +2784,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'qdate',
             name: 'qdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
@@ -2815,13 +2869,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'cdate',
             name: 'cdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
                 {
@@ -2867,13 +2924,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               {
             data: 'created_at',
             name: 'created_at',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'type', name: 'type'},
                 { data: 'name', name: 'name'},
@@ -2907,13 +2967,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'date',
             name: 'date',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'salesnotes',
@@ -2938,13 +3001,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'ddate',
             name: 'ddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 {
     data: 'dsalesnotes',
@@ -2969,13 +3035,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'qdate',
             name: 'qdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
@@ -3051,13 +3120,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 {
             data: 'rdate',
             name: 'rdate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
                 { data: 'reason', name: 'reason', searchable: false },
                 {
@@ -3090,13 +3162,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         {
             data: 'date_formatted',
             name: 'date_formatted',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
         { data: 'deal_value', name: 'quotations.deal_value' },
         { data: 'sales_notes', name: 'quotations.sales_notes' },
@@ -3118,13 +3193,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
       {
             data: 'leaddate',
             name: 'leaddate',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
         { data: 'type', name: 'calls.type' },
         { data: 'name', name: 'calls.name' },
@@ -3137,13 +3215,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         {
             data: 'datefol',
             name: 'datefol',
-            render: function (data, type, row) {
-                if (type === 'display' || type === 'filter') {
-                    // Convert the date to your desired format
-                    return moment(data).format('DD-MMM-YYYY');
-                }
-                return data;
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
             }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
         },
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
