@@ -35,5 +35,10 @@ class WOVehicles extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'deposit_received',
     ];
+    public function addons()
+    {
+        return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
+    }
 }

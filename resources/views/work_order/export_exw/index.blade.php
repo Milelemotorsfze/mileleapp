@@ -86,7 +86,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 <div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
 			<div class="table-responsive">
-			<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
@@ -153,6 +153,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="dark">Finance Approval At</th>
                             <th rowspan="2" class="light">COE Office Approval By</th>
                             <th rowspan="2" class="light">COE Office Approval At</th>
+							<th rowspan="2" class="dark">Total Number Of BOE</th>
 						</tr>
 						<tr>
 							<td class="dark">Name</td>
@@ -207,8 +208,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         </li>
                                         @endif
                                         <li>
-                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->id ?? '')}}">
-                                            <i class="fa fa-eye" aria-hidden="true"></i> Edit
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$data->id ?? '')}}">
+                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
 									</ul>
@@ -285,6 +286,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             
 							<td>{{$data->coeOfficeApprovalBy->name ?? ''}}</td>
                             <td>@if($data->coe_office_approved_at != ''){{\Carbon\Carbon::parse($data->coe_office_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+							<td></td>
 						</tr>
 						@endforeach
 					</tbody>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\WorkOrder;
 use App\Models\WOVehicles;
 use App\Models\WOVehicleAddons;
+use App\Models\WOComments;
+use App\Models\WORecordHistory;
 use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
@@ -19,21 +21,23 @@ use Illuminate\Support\Collection;
 use App\Http\Controllers\UserActivityController;
 use App\Http\Requests\StoreWorkOrderRequest;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
+        (new UserActivityController)->createActivity('Open '.$type.' work order create page');
+        $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
+        $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
+        $customers = $dpCustomers->union($clients)->get();
+        $customers = $customers->unique('customer_name');
+
         // $type = 'export_exw';
         // $customers = Customer::orderBy('name','ASC')->get();
         // $clients = Clients::orderBy('name','ASC')->get();
-        (new UserActivityController)->createActivity('Open '.$type.' work order create page');
 
-        $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
-        $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
         
-        $customers = $dpCustomers->union($clients)->get();
         // ->union($workOrders)
-        $customers = $customers->unique('customer_name');
        // Combine the queries ensuring each select has the same number of columns
         // Select and transform data from the Customer table
         // $dpCustomers = Customer::select(
@@ -80,11 +84,12 @@ class WorkOrderController extends Controller
         // });
         // dd($customers);
         // ->union($workOrders)
+        
+        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
+        
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->get();
-        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
-        
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
         return view('work_order.export_exw.create',compact('type','customers','airlines','vins','users'));
@@ -214,8 +219,7 @@ class WorkOrderController extends Controller
     //     // }
     // }
     public function store(StoreWorkOrderRequest $request)
-    { 
-        // dd($request->vehicle->addons[]);
+    {  
         DB::beginTransaction();
 
         try {
@@ -229,11 +233,16 @@ class WorkOrderController extends Controller
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
             $input['freight_agent_contact_number'] = $request->freight_agent_contact_number['full'] ?? null;
             $input['transporting_driver_contact_number'] = $request->transporting_driver_contact_number['full'] ?? null;
-            $input['customer_name'] = $request->customer_name ?? $request->new_customer_name;
             $input['created_by'] = $authId;
             $input['so_total_amount'] = $request->so_total_amount ?? 0.00;
             $input['amount_received'] = $request->amount_received ?? 0.00;
             $input['balance_amount'] = $request->balance_amount ?? 0.00;
+
+            if ($request->customer_reference_type == 'new') {
+                $input['customer_name'] = $request->new_customer_name;
+            } else if ($request->customer_reference_type == 'existing') {
+                $input['customer_name'] = $request->existing_customer_name;
+            }
             // Handle file uploads
             if ($request->hasFile('brn_file')) {
                 $brnFileName = $this->handleFileUpload($request->file('brn_file'), 'wo/brn_file');
@@ -331,10 +340,37 @@ class WorkOrderController extends Controller
                         }       
                     }
                 }
-            }            
+            }  
+            // Initialize an array to keep track of old to new comment IDs
+            $commentIdMap = [];
+
+            // Handle comments
+            $comments = json_decode($request->input('comments'), true);
+            foreach ($comments as $comment) {
+                $newComment = WOComments::create([
+                    'work_order_id' => $workOrder->id,
+                    'text' => $comment['text'],
+                    'parent_id' => null, // Temporary null, will update later
+                    'user_id' => auth()->id(),
+                ]);
+                // Map the old comment ID to the new comment ID
+                $commentIdMap[$comment['commentId']] = $newComment->id;
+            }
+
+            // Update parent IDs
+            foreach ($comments as $comment) {
+                if (!empty($comment['parentId'])) {
+                    $newCommentId = $commentIdMap[$comment['commentId']];
+                    $newParentId = $commentIdMap[$comment['parentId']];
+                    WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
+                }
+            }    
+            (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
             DB::commit();
-            return redirect()->route('work-order-create.index',$request->type)->with('success','Work Order created successfully!');
+            return response()->json(['success' => true, 'message' => 'Work order created successfully.']);
+            // return response()->json(['message' => 'Work order created successfully']);
+            // return redirect()->route('work-order.index',$request->type)->with('success','Work Order created successfully!');
             // return response()->json(['message' => 'Work Order created successfully!', 'Work Order' => $workOrder], 201);
         } catch (\Exception $e) {
             // Rollback the transaction
@@ -342,8 +378,9 @@ class WorkOrderController extends Controller
 
             // Log the error for debugging
             Log::error('Error creating Work Order: ' . $e->getMessage());
-        dd($e);
-            return response()->json(['error' => 'Failed to create Work Order. Please try again.'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        // dd($e);
+            // return response()->json(['error' => 'Failed to create Work Order. Please try again.'], 500);
         }
     }
 
@@ -365,12 +402,16 @@ class WorkOrderController extends Controller
      */
     public function show(WorkOrder $workOrder)
     {
-        $errorMsg ="This page will coming very soon !";
-        return view('hrm.notaccess',compact('errorMsg'));
-        // $type = $workOrder->type;
-        // $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
-        // $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
-        // return view('work_order.export_exw.show',compact('type','workOrder','previous','next'));
+        // $errorMsg ="This page will coming very soon !";
+        // return view('hrm.notaccess',compact('errorMsg'));
+        $type = $workOrder->type;
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments')->first();
+        $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
+        $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
+        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+            $q = $q->where('type','employee');
+        })->get();
+        return view('work_order.export_exw.show',compact('type','users','workOrder','previous','next'));
     }
 
     /**
@@ -378,8 +419,24 @@ class WorkOrderController extends Controller
      */
     public function edit(WorkOrder $workOrder)
     {
-        $errorMsg ="This page will coming very soon !";
-        return view('hrm.notaccess',compact('errorMsg'));
+        $type = $workOrder->type;
+        $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
+        $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
+        // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
+        
+        $customers = $dpCustomers->union($clients)->get();
+        // ->union($workOrders)
+        $customers = $customers->unique('customer_name');
+        // $errorMsg ="This page will coming very soon !";
+        // return view('hrm.notaccess',compact('errorMsg'));
+        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+            $q = $q->where('type','employee');
+        })->get();
+        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
+        
+        $airlines = MasterAirlines::orderBy('name','ASC')->get();
+        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
+        return view('work_order.export_exw.create',compact('workOrder','type','customers','airlines','vins','users'));
     }
 
     /**
@@ -387,7 +444,45 @@ class WorkOrderController extends Controller
      */
     public function update(Request $request, WorkOrder $workOrder)
     {
-        //
+        // $workOrder = WorkOrder::findOrFail($id);
+
+        $newData = $request->all();
+        $oldData = $workOrder->getOriginal();
+    
+        $changes = [];
+    
+        foreach ($newData as $field => $newValue) {
+            if (is_array($newValue)) {
+                $newValue = implode(',', $newValue);
+            }
+    
+            $oldValue = $oldData[$field] ?? null;
+    
+            if (is_array($oldValue)) {
+                $oldValue = implode(',', $oldValue);
+            }
+    
+            if ($oldValue != $newValue) {
+                $changes[] = [
+                    'work_order_id' => $workOrder->id,
+                    'user_id' => Auth::id(),
+                    'field_name' => $field,
+                    'old_value' => $oldValue,
+                    'new_value' => $newValue,
+                    'changed_at' => Carbon::now()
+                ];
+            }
+        }
+    
+        if (!empty($changes)) {
+            WORecordHistory::insert($changes);
+        }
+    
+        $workOrder->update($newData);
+        return response()->json(['success' => true, 'message' => 'Work order updated successfully.']);
+        // return response()->json(['message' => 'Work order created successfully']);
+        // return redirect()->route('work-orders.index',$workOrder->type)->with('success', 'Work order updated successfully.');
+    
     }
 
     /**
@@ -439,4 +534,32 @@ class WorkOrderController extends Controller
 
         // return response()->json([]);
     }
+    public function storeComments(Request $request)
+    {
+        $request->validate([
+            'text' => 'required|string|max:255',
+            'parent_id' => 'nullable|integer|exists:w_o_comments,id',
+            'work_order_id' => 'required|integer|exists:work_orders,id'
+        ]);
+
+        $comment = WOComments::create([
+            'work_order_id' => $request->input('work_order_id'),
+            'text' => $request->input('text'),
+            'parent_id' => $request->input('parent_id'),
+            'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
+        ]);
+
+        return response()->json($comment, 201);
+    }
+    // public function getComments($workOrderId)
+    // {
+    //     // Fetch comments for the specified work order
+    //     $comments = WOComments::where('work_order_id', $workOrderId)->get();
+    //     return response()->json(['comments' => $comments]);
+    // }
+    public function getComments($workOrderId)
+{
+    $comments = WOComments::where('work_order_id', $workOrderId)->get();
+    return response()->json(['comments' => $comments]);
+}
 }
