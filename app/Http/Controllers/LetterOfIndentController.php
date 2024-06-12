@@ -38,6 +38,8 @@ class LetterOfIndentController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open LOI Listing Page.');
+
         $newLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
@@ -73,6 +75,8 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open LOI Create Page.');
+        
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
@@ -217,6 +221,8 @@ class LetterOfIndentController extends Controller
 
             DB::commit();
 
+            (new UserActivityController)->createActivity('Created New LOI.');
+        
             return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0] ]);
 
         }else{
@@ -234,6 +240,8 @@ class LetterOfIndentController extends Controller
     }
     public function generateLOI(Request $request)
     {
+        (new UserActivityController)->createActivity('Generated LOI Document.');
+        
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
         $imageFiles = [];
@@ -371,6 +379,8 @@ class LetterOfIndentController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open LOI Edit Page.');
+       
         $letterOfIndent = LetterOfIndent::find($id);
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
@@ -409,7 +419,8 @@ class LetterOfIndentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        dd($request->all());
+        (new UserActivityController)->createActivity('Updated LOI Details.');
+      
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
@@ -551,6 +562,8 @@ class LetterOfIndentController extends Controller
     }
     public function RequestSupplierApproval(Request $request)
     {
+     (new UserActivityController)->createActivity('Requested for Supplier Approval of LOI.');
+      
       $LOI = LetterOfIndent::find($request->id);
 
       $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
@@ -562,6 +575,8 @@ class LetterOfIndentController extends Controller
     }
     public function supplierApproval(Request $request) {
 
+        (new UserActivityController)->createActivity('Supplier Approved successfully.');
+    
         $LOI = LetterOfIndent::find($request->id);
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
@@ -576,7 +591,6 @@ class LetterOfIndentController extends Controller
         $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->save();
         return response(true);
-
     }
 
     /**
@@ -584,12 +598,16 @@ class LetterOfIndentController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('LOI Deleted successfully.');
+    
         DB::beginTransaction();
 
+        LoiTemplate::where('letter_of_indent_id', $id)->delete();
+        LoiSoNumber::where('letter_of_indent_id', $id)->delete();
         LetterOfIndentDocument::where('letter_of_indent_id', $id)->delete();
         LetterOfIndentItem::where('letter_of_indent_id', $id)->delete();
         LetterOfIndent::find($id)->delete();
-
+    
         DB::commit();
 
         return response(true);

@@ -355,6 +355,7 @@ class PFIController extends Controller
             $letterOfIndent->save();
         }
         $pfi->delete();
+        (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');
 
         DB::commit();
 
@@ -412,7 +413,9 @@ class PFIController extends Controller
 
     }
     public function paymentStatusUpdate(Request $request, $id) {
-        info($id);
+
+        (new UserActivityController)->createActivity('PFI payment status updated.');
+
         $pfi = PFI::find($id);
         $pfi->payment_status = $request->payment_status;
         $pfi->save();
