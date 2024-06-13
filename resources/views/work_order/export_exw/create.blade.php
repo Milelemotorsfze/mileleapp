@@ -227,8 +227,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<div class="col-xxl-12 col-lg-12 col-md-12">
 		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 	</div>
-	<form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
-		@csrf
+	<!-- <form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
+		@csrf -->
+		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
+    @csrf
+    @if(isset($workOrder))
+        @method('PUT')
+    @endif
 		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
 		<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
 		</a>
@@ -243,25 +248,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
+					<input type="hidden" name="customerCount" id="customerCount" value={{$customerCount ?? ''}}>
 					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
 						<input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
-							value="" autocomplete="date" autofocus>
+							value="{{ isset($workOrder) ? $workOrder->date : '' }}" autocomplete="date" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
-						<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
-							placeholder="Enter SO Number" value="SO-00" autocomplete="so_number" autofocus onkeyup="setWo()">
+						<!-- <input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
+							placeholder="Enter SO Number" value="SO-00" autocomplete="so_number" autofocus onkeyup="setWo()"> -->
+							<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
+								placeholder="Enter SO Number" value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" 
+								autocomplete="so_number" autofocus onkeyup="setWo()">
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus>
+							<!-- <select name="batch" id="batch" class="form-control widthinput" autofocus>
 								<option value="">Choose Batch</option>
 								<option value="Batch 1">Batch 1</option>
 								<option value="Batch 2">Batch 2</option>
@@ -273,6 +282,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								<option value="Batch 8">Batch 8</option>
 								<option value="Batch 9">Batch 9</option>
 								<option value="Batch 10">Batch 10</option>
+							</select> -->
+							<select name="batch" id="batch" class="form-control widthinput" autofocus>
+								<option value="">Choose Batch</option>
+								@for ($i = 1; $i <= 10; $i++)
+									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
+								@endfor
 							</select>
 						</div>
 					</div>
@@ -280,106 +295,112 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="wo_number" class="col-form-label text-md-end">{{ __('WO Number') }}</label>
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
-							placeholder="Enter WO" value="WO-" autocomplete="wo_number" autofocus readonly>
+							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
 					<div class="col-xxl-5 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
-						<input hidden id="customer_reference_id" name="customer_reference_id" value="">
-						<input hidden id="customer_reference_type" name="customer_reference_type" value="">
-						<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
-							@foreach($customers as $customer)
-							<option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
-							@endforeach
-						</select>
-						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
-							class="form-control widthinput @error('customer_name') is-invalid @enderror">
+                        <input hidden id="customer_type" name="customer_type" value="existing">
+                        <input hidden id="customer_reference_id" name="customer_reference_id" value="">
+                        <input hidden id="customer_reference_type" name="customer_reference_type" value="">
+                        <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
+                            @foreach($customers as $customer)
+                            <option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
+                            @endforeach
+                        </select>
+                        <input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
+                            class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
-						<a  title="Create New Customer" onclick=checkValue() style="margin-top:38px; width:100%;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
-					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown" >
-						<a title="Choose Customer Name" onclick=switchToDropdown() style="margin-top:38px; width:100%;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
-					</div>
+                    <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
+                        <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
+                            class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
+                    </div>
+                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown">
+                        <a title="Choose Customer Name" onclick="switchToDropdown()" style="margin-top:38px; width:100%;"
+                            class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
+                    </div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="customer_email" class="col-form-label text-md-end">{{ __('Customer Email ID') }}</label>
 						<input id="customer_email" type="text" class="form-control widthinput @error('customer_email') is-invalid @enderror" name="customer_email"
-							placeholder="Enter Customer Email ID" value="" autocomplete="customer_email" autofocus>
+							placeholder="Enter Customer Email ID" value="{{ isset($workOrder) ? $workOrder->customer_email : '' }}" autocomplete="customer_email" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
 						<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
 							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
-							value="" autocomplete="customer_company_number[full]" autofocus>
+							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
 						<textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
-							name="customer_address" placeholder="Address in UAE" value="{{ old('customer_address') }}"  autocomplete="customer_address"
-							autofocus></textarea>
+							name="customer_address" placeholder="Address in UAE" value="{{ isset($workOrder) ? $workOrder->customer_address : '' }}"  autocomplete="customer_address"
+							autofocus onkeyup="sanitizeInput(this)"></textarea>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_name" class="col-form-label text-md-end">{{ __("Customer Representative Name" ) }}</label>
 						<input id="customer_representative_name" type="text" class="form-control widthinput @error('customer_representative_name') is-invalid @enderror" name="customer_representative_name"
-							placeholder="Enter Customer Representative Name" value="" autocomplete="customer_representative_name" autofocus>
+							placeholder="Enter Customer Representative Name" value="{{ isset($workOrder) ? $workOrder->customer_representative_name : '' }}" 
+							autocomplete="customer_representative_name" autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_email" class="col-form-label text-md-end">{{ __('Customer Representative Email ID') }}</label>
 						<div class="dropdown-option-div">
 							<input id="customer_representative_email" type="text" class="form-control widthinput @error('customer_representative_email') is-invalid @enderror"
 								name="customer_representative_email"
-								placeholder="Enter Customer Representative Email ID" value="" autocomplete="customer_representative_email" autofocus>
+								placeholder="Enter Customer Representative Email ID" value="{{ isset($workOrder) ? $workOrder->customer_representative_email : '' }}" autocomplete="customer_representative_email" autofocus>
 						</div>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
 							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number"
-							value="" autocomplete="customer_representative_contact[full]" autofocus>
+							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					@if(isset($type) && $type == 'export_exw')
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_name" class="col-form-label text-md-end">{{ __('Freight Agent Name') }}</label>
 						<input id="freight_agent_name" type="text" class="form-control widthinput @error('freight_agent_name') is-invalid @enderror"
 							name="freight_agent_name"
-							placeholder="Enter Freight Agent Name" value="" autocomplete="freight_agent_name" autofocus>
+							placeholder="Enter Freight Agent Name" value="{{ isset($workOrder) ? $workOrder->freight_agent_name : '' }}" autocomplete="freight_agent_name" 
+							autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_email" class="col-form-label text-md-end">{{ __('Freight Agent Email ID') }}</label>
 						<input id="freight_agent_email" type="text" class="form-control widthinput @error('freight_agent_email') is-invalid @enderror"
-							name="freight_agent_email"
-							placeholder="Enter Freight Agent Email ID" value="" autocomplete="freight_agent_email" autofocus>
+							name="freight_agent_email" 
+							placeholder="Enter Freight Agent Email ID" value="{{ isset($workOrder) ? $workOrder->freight_agent_email : '' }}" autocomplete="freight_agent_email" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
 							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
-							value="" autocomplete="freight_agent_contact_number[full]" autofocus>
+							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
-							name="port_of_loading"
-							placeholder="Enter Port of Loading" value="" autocomplete="port_of_loading" autofocus>
+							name="port_of_loading" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
-							name="port_of_discharge"
-							placeholder="Enter Port of Discharge" value="" autocomplete="port_of_discharge" autofocus>
+							name="port_of_discharge" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Port of Discharge" value="{{ isset($workOrder) ? $workOrder->port_of_discharge : '' }}" autocomplete="port_of_discharge" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
-							name="final_destination"
-							placeholder="Enter Final Destination" value="" autocomplete="final_destination" autofocus>
+							name="final_destination" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Final Destination" value="{{ isset($workOrder) ? $workOrder->final_destination : '' }}" autocomplete="final_destination" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
-						<fieldset style="margin-top:5px;" class="radio-div-container">
+						<!-- <fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-4 col-lg-4 col-md-4">
 									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" />
@@ -394,6 +415,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									<label for="road">Road</label>
 								</div>
 							</div>
+						</fieldset> -->
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+							<div class="row some-class">
+								<div class="col-xxl-4 col-lg-4 col-md-4">
+									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'air' ? 'checked' : '' }} />
+									<label for="air">Air</label>
+								</div>
+								<div class="col-xxl-4 col-lg-4 col-md-4">
+									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'sea' ? 'checked' : '' }} />
+									<label for="sea">Sea</label>
+								</div>
+								<div class="col-xxl-4 col-lg-4 col-md-4">
+									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'road' ? 'checked' : '' }} />
+									<label for="road">Road</label>
+								</div>
+							</div>
 						</fieldset>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="brn-file-div">
@@ -403,20 +443,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="brn-div">
 						<label for="brn" class="col-form-label text-md-end">{{ __('BRN') }}</label>
-						<input id="brn" type="text" class="form-control widthinput @error('brn') is-invalid @enderror" name="brn"
-							placeholder="Enter BRN" autocomplete="brn" autofocus>
+						<input id="brn" type="text" class="form-control widthinput @error('brn') is-invalid @enderror" name="brn" onkeyup="sanitizeInput(this)"
+							placeholder="Enter BRN" autocomplete="brn" value="{{ isset($workOrder) ? $workOrder->brn : '' }}" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="container-number-div">
 						<label for="container_number" class="col-form-label text-md-end">{{ __('Container Number') }}</label>
 						<input id="container_number" type="text" class="form-control widthinput @error('container_number') is-invalid @enderror" name="container_number"
-							placeholder="Enter Container Number" autocomplete="container_number" autofocus>
+							placeholder="Enter Container Number" autocomplete="container_number" value="{{ isset($workOrder) ? $workOrder->container_number : '' }}" autofocus
+							onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
 							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
-							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
+							<!-- <select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 								<option value="{{$airline->name}}">{{$airline->name}}</option>
+								@endforeach
+							</select> -->
+							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
+								@foreach($airlines as $airline)
+									<option value="{{$airline->name}}" 
+										{{ isset($workOrder) && $workOrder->airline == $airline->name ? 'selected' : '' }}>{{$airline->name}}
+									</option>
 								@endforeach
 							</select>
 						</div>
@@ -424,51 +472,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
 						<label for="airway_bill" class="col-form-label text-md-end">{{ __('Airway Bill') }}</label>
 						<input id="airway_bill" type="text" class="form-control widthinput @error('airway_bill') is-invalid @enderror"
-							name="airway_bill"
-							placeholder="Enter Airway Bill" value="" autocomplete="airway_bill" autofocus>
+							name="airway_bill" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Airway Bill" value="{{ isset($workOrder) ? $workOrder->airway_bill : '' }}" autocomplete="airway_bill" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="shippingline-div">
 						<label for="shipping_line" class="col-form-label text-md-end">{{ __('Shipping Line') }}</label>
 						<input id="shipping_line" type="text" class="form-control widthinput @error('shipping_line') is-invalid @enderror"
-							name="shipping_line"
-							placeholder="Enter Shipping Line" value="" autocomplete="shipping_line" autofocus>
+							name="shipping_line" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Shipping Line" value="{{ isset($workOrder) ? $workOrder->shipping_line : '' }}" autocomplete="shipping_line" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
 						<label for="forward_import_code" class="col-form-label text-md-end">{{ __('Forward Import Code') }}</label>
 						<input id="forward_import_code" type="text" class="form-control widthinput @error('forward_import_code') is-invalid @enderror"
-							name="forward_import_code"
-							placeholder="Enter Forward Import Code" value="" autocomplete="forward_import_code" autofocus>
+							name="forward_import_code" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Forward Import Code" value="{{ isset($workOrder) ? $workOrder->forward_import_code : '' }}" autocomplete="forward_import_code" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="trailer-number-plate-div">
 						<label for="trailer_number_plate" class="col-form-label text-md-end">{{ __('Trailer Number Plate') }}</label>
 						<input id="trailer_number_plate" type="text" class="form-control widthinput @error('trailer_number_plate') is-invalid @enderror"
-							name="trailer_number_plate"
-							placeholder="Enter Trailer Number Plate" value="" autocomplete="trailer_number_plate" autofocus>
+							name="trailer_number_plate" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Trailer Number Plate" value="{{ isset($workOrder) ? $workOrder->trailer_number_plate : '' }}" autocomplete="trailer_number_plate" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="transportation-company-div">
 						<label for="transportation_company" class="col-form-label text-md-end">{{ __('Transportation Company') }}</label>
 						<input id="transportation_company" type="text" class="form-control widthinput @error('transportation_company') is-invalid @enderror"
-							name="transportation_company"
-							placeholder="Enter Transportation Company" value="" autocomplete="transportation_company" autofocus>
+							name="transportation_company" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Transportation Company" value="{{ isset($workOrder) ? $workOrder->transportation_company : '' }}" autocomplete="transportation_company" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="transporting-driver-contact-number-div">
 						<label for="transporting_driver_contact_number" class="col-form-label text-md-end">{{ __('Transporting Driver Contact Number') }}</label>
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
 							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
-							value="" autocomplete="transporting_driver_contact_number[full]" autofocus>
+							value="" autocomplete="transporting_driver_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
 						<label for="airway_details" class="col-form-label text-md-end">{{ __('Airway Details') }}</label>
 						<input id="airway_details" type="text" class="widthinput contact form-control @error('airway_details')
-							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details"
-							value="" autocomplete="airway_details" autofocus>
+							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details"  onkeyup="sanitizeInput(this)"
+							value="{{ isset($workOrder) ? $workOrder->airway_details : '' }}" autocomplete="airway_details" autofocus>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="transportation-company-details-div">
 						<label for="transportation_company_details" class="col-form-label text-md-end">{{ __('Transportation Company Details') }}</label>
 						<input id="transportation_company_details" type="text" class="widthinput contact form-control @error('transportation_company_details')
-							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details"
-							value="" autocomplete="transportation_company_details" autofocus>
+							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details"  onkeyup="sanitizeInput(this)"
+							value="{{ isset($workOrder) ? $workOrder->transportation_company_details : '' }}" autocomplete="transportation_company_details" autofocus>
 					</div>
+                        <div class="row brn-preview-div" hidden>
+							<div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+								<span class="fw-bold col-form-label text-md-end" id="brn_file_label"></span>
+								<div id="brn_file_preview">
+									@if(isset($candidate->candidateDetails->image_path))
+									<div id="brn_file_preview1">
+										<div class="row">
+											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
+											</div>
+											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+												<a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
+												Download
+												</a>
+												</button>
+												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+													data-file-type="PASSPORT"> Delete</button>
+											</div>
+										</div>
+										<iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+									</div>
+									@endif
+								</div>
+							</div>
+						</div>
 					@endif
 				</div>
 				<hr>
@@ -476,11 +550,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
 						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
 							<div class="input-group-append">
 								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
-									<option value="AED">AED</option>
-									<option value="USD">USD</option>
+									<option value="AED" {{ isset($workOrder) && $workOrder->currency == 'AED' ? 'selected' : '' }}>AED</option>
+									<option value="USD" {{ isset($workOrder) && $workOrder->currency == 'USD' ? 'selected' : '' }}>USD</option>
 								</select>
 							</div>
 						</div>
@@ -488,18 +562,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
 						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="so_vehicle_quantity" autofocus>
+							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" autofocus>
 					</div>
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" />
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" 
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'total_deposit' ? 'checked' : '' }} />
 									<label for="total_deposit">Total Deposit</label>
 								</div>
 								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit" />
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit"
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'custom_deposit' ? 'checked' : '' }} />
 									<label for="custom_deposit">Custom Deposit</label>
 								</div>
 							</div>
@@ -508,7 +584,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
 						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" onkeyup="setDepositBalance()">
+							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
+							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="setDepositBalance()">
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
 							</div>
@@ -517,7 +594,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" readonly>
+							<input type="text" value="" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
+							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
 							</div>
@@ -577,7 +655,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								<th>Model Year to mention on Documents</th>
 								<th>Steering</th>
 								<th>Exterior Colour</th>
-								<th>Interior Coloure</th>
+								<th>Interior Colour</th>
 								<th>Warehouse</th>
 								<th>Territory</th>
 								<th>Preferred Destination</th>
@@ -604,17 +682,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_location" class="col-form-label text-md-end"> Delivery Location :</label>
 						<input id="delivery_location" type="text" class="form-control widthinput @error('delivery_location') is-invalid @enderror" name="delivery_location"
-							placeholder="Enter Delivery Location" value="" autocomplete="delivery_location" autofocus>
+							placeholder="Enter Delivery Location" value="{{ isset($workOrder) ? $workOrder->delivery_location : '' }}" autocomplete="delivery_location" 
+							autofocus  onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
-							placeholder="Enter Delivery Contact Person" value="" autocomplete="delivery_contact_person" autofocus>
+							placeholder="Enter Delivery Contact Person" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
+							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_date" class="col-form-label text-md-end"> Delivery Date  :</label>
 						<input id="delivery_date" type="date" class="form-control widthinput @error('delivery_date') is-invalid @enderror" name="delivery_date"
-							placeholder="Enter Delivery Date " value="" autocomplete="delivery_date" autofocus>
+							placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
+							onkeyup="sanitizeInput(this)">
 					</div>
 				</div>
 				<div class="row" id="boe-div">
@@ -676,198 +757,201 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
 					</div>
 				</div>
-				<div class="card preview-div" hidden>
-					<div class="card-body">
-						<div class="row">
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="signed_pfi-label"></span>
-								<div id="signed_pfi-preview">
-									@if(isset($candidate->candidateDetails->image_path))
-									<div id="signed_pfi-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="PASSPORT"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="signed_contract-label"></span>
-								<div id="signed_contract-preview">
-									@if(isset($candidate->candidateDetails->signed_contract))
-									<div id="signed_contract-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">signed_contract</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="signed_contract"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" alt="signed_contract"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="payment_receipts-label"></span>
-								<div id="payment_receipts-preview">
-									@if(isset($candidate->candidateDetails->payment_receipts))
-									<div id="payment_receipts-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">payment_receipts</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="payment_receipts"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" alt="payment_receipts"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="emirates-id-label"></span>
-								<div id="noc-preview">
-									@if(isset($candidate->candidateDetails->noc_file))
-									<div id="noc-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="EMIRATESID"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-						</div>
-						<div class="row mt-4">
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="passport-label">
-								@if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0) Passport @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0)
-								@foreach($candidate->candidateDetails->candidatePassport as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/passport/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" class="mt-2" alt="Passport"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_trade_license-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="national-id-label">
-								@if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0) National ID @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0)
-								@foreach($candidate->candidateDetails->candidateNationalId as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/enduser_passport/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/enduser_passport/' . $document->document_path) }}" class="mt-2" alt="National ID"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_passport-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="enduser_contract-label">
-								@if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0) Attested Educational Documents @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0)
-								@foreach($candidate->candidateDetails->candidateEduDocs as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/enduser_contract/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/enduser_contract/' . $document->document_path) }}" class="mt-2" alt="Attested Educational Documents"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_contract-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="professional-diploma-certificates-label">
-								@if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0) Professional / Diploma Certificates @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0)
-								@foreach($candidate->candidateDetails->candidateProDipCerti as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/professional_diploma_certificates/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" class="mt-2" alt="Professional / Diploma Certificates"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="professional-diploma-certificates-preview">
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+                <br>
+                <div class="row preview-div" hidden>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="signed_pfi_label"></span>
+                        <div id="signed_pfi_preview">
+                            @if(isset($candidate->candidateDetails->signed_contract))
+                            <div id="signed_pfi_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">signed_contract</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="signed_contract"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" alt="signed_contract"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="signed_contract_label"></span>
+                        <div id="signed_contract_preview">
+                            @if(isset($candidate->candidateDetails->payment_receipts))
+                            <div id="signed_contract_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">payment_receipts</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="payment_receipts"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" alt="payment_receipts"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="payment_receipts_label"></span>
+                        <div id="payment_receipts_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="payment_receipts_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="noc_label"></span>
+                        <div id="noc_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="noc_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_trade_license_label"></span>
+                        <div id="enduser_trade_license_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="enduser_trade_license_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_passport_label"></span>
+                        <div id="enduser_passport_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="enduser_passport_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_contract_label"></span>
+                        <div id="enduser_contract_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="enduser_contract_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="vehicle_handover_person_id_label"></span>
+                        <div id="vehicle_handover_person_id_preview">
+                            @if(isset($candidate->candidateDetails->noc_file))
+                            <div id="vehicle_handover_person_id_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="EMIRATESID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 			</div>
 		</div>
 		<div class="card  no-border">
@@ -899,60 +983,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<br>
 	<div class="card mt-3">
 		<div class="card-header text-center">
-			<h4 class="card-title">Record History</h4>
+			<h4 class="card-title">Data History</h4>
 		</div>
 		<div class="card-body">
-			<div class="row m-0">
-				<div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #e6f1ff" >
-					<label class="col-form-label">Filter Region</label>
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">User</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
-						@foreach($users as $user)
-						<option value="{{$user->id ?? ''}}">{{$user->name ?? ''}}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">Field</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<input type="text" class="form-control widthinput" placeholder="Field">
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">History Type</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<input type="text" class="form-control widthinput" placeholder="History Type">
-				</div>
-			</div>
-			<div class="row mt-1">
-				<div class="table-responsive">
-					<table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
-						<thead style="background-color: #e6f1ff">
-							<tr>
-								<th>Date</th>
-								<th>User</th>
-								<th>History Type</th>
-								<th>Old Value</th>
-								<th>New Value</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
-								<td> Jacob</td>
-								<td>Test Type</td>
-								<td>TEST</td>
-								<td></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
+			@include('work_order.export_exw.data_history')
 		</div>
 	</div>
 </div>
@@ -975,9 +1009,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
+	var customerCount =  $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
 	var selectedDepositReceivedValue = '';
+	var newCustomerEmail = '';
+	var newCustomerContact = '';
+	var newCustomerAddress = '';
 	var onChangeSelectedVins = [];
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	$(document).ready(function () { 
@@ -1173,98 +1211,607 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			});
 		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS END
+
+        // SHOW FILE UPLOAD DATA START
+            const fileInputBRNFile = document.querySelector("#brn_file");            
+			const fileInputSignedPFI = document.querySelector("#signed_pfi");
+			const fileInputSignedContract = document.querySelector("#signed_contract");            
+			const fileInputPaymentReceipts = document.querySelector("#payment_receipts");
+			const fileInputNOC = document.querySelector("#noc");
+			const fileInputEnduserTradeLicense = document.querySelector("#enduser_trade_license");
+			const fileInputEnduserPassport = document.querySelector("#enduser_passport");
+			const fileInputEnduserContract = document.querySelector("#enduser_contract");
+            const fileInputVehicleHandoverPersonID = document.querySelector("#vehicle_handover_person_id");
+
+            const previewFileBRNFile = document.querySelector("#brn_file_preview");
+			const previewFileSignedPFI = document.querySelector("#signed_pfi_preview");
+			const previewFileSignedContract = document.querySelector("#signed_contract_preview");
+			const previewFilePaymentReceipts = document.querySelector("#payment_receipts_preview");
+			const previewFileNOC = document.querySelector("#noc_preview");
+			const previewFileEnduserTradeLicense = document.querySelector("#enduser_trade_license_preview");
+			const previewFileEnduserPassport = document.querySelector("#enduser_passport_preview");
+			const previewFileEnduserContract = document.querySelector("#enduser_contract_preview");
+            const previewFileVehicleHandoverPersonID = document.querySelector("#vehicle_handover_person_id_preview");
+
+            fileInputBRNFile.addEventListener("change", function(event) { 
+			    $('.brn-preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileBRNFile.firstChild) {
+			        previewFileBRNFile.removeChild(previewFileBRNFile.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('brn_file_label').textContent="BRN File";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileBRNFile.appendChild(iframe);
+			});
+
+            fileInputSignedPFI.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileSignedPFI.firstChild) {
+			        previewFileSignedPFI.removeChild(previewFileSignedPFI.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('signed_pfi_label').textContent="Signed PFI";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileSignedPFI.appendChild(iframe);
+			});
+
+            fileInputSignedContract.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileSignedContract.firstChild) {
+			        previewFileSignedContract.removeChild(previewFileSignedContract.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('signed_contract_label').textContent="Signed Contract";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileSignedContract.appendChild(iframe);
+			});
+
+            fileInputPaymentReceipts.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFilePaymentReceipts.firstChild) {
+			        previewFilePaymentReceipts.removeChild(previewFilePaymentReceipts.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('payment_receipts_label').textContent="Payment Receipts";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFilePaymentReceipts.appendChild(iframe);
+			});
+
+            fileInputNOC.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileNOC.firstChild) {
+			        previewFileNOC.removeChild(previewFileNOC.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('noc_label').textContent="NOC";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileNOC.appendChild(iframe);
+			});
+
+            fileInputEnduserTradeLicense.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserTradeLicense.firstChild) {
+			        previewFileEnduserTradeLicense.removeChild(previewFileEnduserTradeLicense.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_trade_license_label').textContent="Enduser Trade License";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserTradeLicense.appendChild(iframe);
+			});
+
+            fileInputEnduserPassport.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserPassport.firstChild) {
+			        previewFileEnduserPassport.removeChild(previewFileEnduserPassport.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_passport_label').textContent="Enduser Passport";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserPassport.appendChild(iframe);
+			});
+
+            fileInputEnduserContract.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserContract.firstChild) {
+			        previewFileEnduserContract.removeChild(previewFileEnduserContract.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_contract_label').textContent="Enduser Contract";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserContract.appendChild(iframe);
+			});
+
+            fileInputVehicleHandoverPersonID.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileVehicleHandoverPersonID.firstChild) {
+			        previewFileVehicleHandoverPersonID.removeChild(previewFileVehicleHandoverPersonID.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('vehicle_handover_person_id_label').textContent="Vehicle Handover Person ID";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileVehicleHandoverPersonID.appendChild(iframe);
+			});
+        // SHOW FILE UPLOAD DATA END
+
+		document.getElementById('WOForm').addEventListener('submit', function(event) {
+			event.preventDefault(); // Prevent default form submission
+
+			// Collect all comments
+			const comments = [];
+			document.querySelectorAll('#comments-section .comment').forEach(comment => {
+				const commentId = comment.getAttribute('data-comment-id');
+				const parentId = comment.getAttribute('data-parent-id');
+				const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+
+				comments.push({ commentId, parentId, text });
+			});
+
+			// Append comments to form data
+			const formData = new FormData(this);
+			formData.append('comments', JSON.stringify(comments));
+
+			// Send form data via AJAX
+			fetch(this.action, {
+				method: this.method,
+				body: formData,
+				headers: {
+					'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+				}
+			}).then(response => {
+				if (!response.ok) {
+					return response.text().then(text => { throw new Error(text) });
+				}
+				return response.json();
+			}).then(data => {
+				if (data.success) {
+					window.location.href = `{{ url('work-order-info') }}/${type}`;
+				} else {
+					throw new Error(data.message);
+				}
+			}).catch(error => {
+				// Optionally display the error message to the user
+				// alert(`Error: ${error.message}`);
+			});
+		});
 	});
 
-	function addComment(parentId = null) {
-            const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
-            if (commentText.trim() === '') return;
+	// ADD CUSTOM VALIDATION RULES START
+        // Add custom validation rule for email
+        $.validator.addMethod("customEmail", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
+        }, "Please enter a valid email address");
+        $.validator.addMethod("SONumberFormat", function(value, element) {
+            // Regular expression to match the format SO- followed by exactly 6 digits
+            return this.optional(element) || /^SO-\d{6}$/.test(value);
+        }, "Please enter a valid order number in the format SO-######");
 
-            const commentId = commentIdCounter++;
-            const commentHtml = `
-                <div class="comment mt-2" id="comment-${commentId}">
-						<div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-							<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-						</div>
-						<div class="col-xxl-11 col-lg-11 col-md-11">${commentText}</br>
-							<span style="color:gray;">Rejitha R Prasad</span>
-							<span style="color:gray;"> - 30 May 2024, 18:00:00</span></br>
-							<button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentId})">Reply</button></br>
-							<div class="reply-form" id="reply-form-${commentId}" style="display: none;">
-								<textarea class="form-control reply" id="reply-input-${commentId}" rows="2" placeholder="Write a reply..."></textarea>
-								<button class="btn btn-sm btn-info mt-2" onclick="addComment(${commentId})">Send Reply</button>
-							</div>
-                    		<div class="replies" id="replies-${commentId}"></div>
-						</div>
-                </div>
-            `;
+        $.validator.addMethod("notSO000000", function(value, element) {
+            return this.optional(element) || value !== "SO-000000";
+        }, "SO Number cannot be SO-000000");
 
-            if (parentId === null) {
-                $('#comments-section').append(commentHtml);
-                $('#new-comment').val('');
-            } else {
-                $(`#replies-${parentId}`).append(commentHtml);
-                $(`#reply-input-${parentId}`).val('');
-                $(`#reply-form-${parentId}`).hide();
+        $.validator.addMethod("noSpaces", function(value, element) {
+            return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
+        }, "No leading or trailing spaces allowed");
+        // Add custom validation method for contact number
+        // $.validator.addMethod("validContactNumber", function(value, element) {
+        // 	return this.optional(element) || /^[0-9]$/.test(value);
+        // }, "Please enter a valid contact number");
+
+        // $.validator.addMethod("noMultipleSpaces", function(value, element) {
+        //     return this.optional(element) || !/\s\s+/.test(value);
+        // }, "No more than one consecutive space is allowed");
+
+        // Add custom validation rule for numeric input only (excluding spaces)
+        $.validator.addMethod("numericOnly", function(value, element) {
+            return this.optional(element) || /^[0-9+]+$/.test(value);
+        }, "Please enter a valid number");
+
+        // Add custom validation rule for address field (no multiple consecutive spaces)
+        $.validator.addMethod("validAddress", function(value, element) {
+            return this.optional(element) || !/\s\s+/.test(value);
+        }, "No more than one consecutive space is allowed in the address");
+
+        // $.validator.addMethod("WONumberFormat", function(value, element) {
+        // 	// Regular expression to match the format WO- followed by exactly 6 digits
+        // 	return this.optional(element) || /^WO-\d{6}$/.test(value);
+        // }, "Please enter a valid order number in the format WO-######");
+    // ADD CUSTOM VALIDATION RULE END
+
+	// CLIENT SIDE VALIDATION START
+        jQuery.validator.setDefaults({
+            errorClass: "is-invalid",
+            errorElement: "p",
+            errorPlacement: function ( error, element ) {
+                error.addClass( "invalid-feedback font-size-13" );
+                if ( element.prop( "type" ) === "checkbox" ) {
+                    error.insertAfter( element.parent( "label" ) );
+                }
+                else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                    if (!element.val() || element.val().length === 0) {
+                        console.log("Error is here with length", element.val().length);
+                        error.addClass('select-error');
+                        error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                    } else {
+                        console.log("No error");
+                    }
+                }
+            else if (element.parent().hasClass('input-group')) {
+                    error.insertAfter(element.parent());
+                }
+                else {
+                    error.insertAfter( element );
+                }
             }
+        });
+        $('#WOForm').validate({ // initialize the plugin 
+            rules: {
+                type: {
+                    required: true,
+                },
+                date: {
+                    required: true,
+                    date: true,
+                },
+                so_number: {
+                    required: true,
+                    noSpaces: true,
+                    SONumberFormat: true,
+                    notSO000000: true,
+                },
+                batch: {
+                    required: true,
+                },
+                // wo_number: {
+                // 	required: true,
+                // 	WONumberFormat: true
+                // },
+                // customer_reference_id: {
+
+                // },
+                // customer_reference_type: {
+
+                // },
+                new_customer_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                // existing_customer_name: {
+
+                // }
+                customer_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "customer_company_number[main]": {
+                    // validContactNumber: true,
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                customer_address: {
+                    // required: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+                customer_representative_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                customer_representative_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "customer_representative_contact[main]": {
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                freight_agent_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                freight_agent_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "freight_agent_contact_number[main]": {
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                port_of_loading: {
+                    required: true,
+                    noSpaces: true,
+                },
+                port_of_discharge: {
+                    required: true,
+                    noSpaces: true,
+                },
+                final_destination: {
+                    required: true,
+                    noSpaces: true,
+                },
+                // transport_type: {
+                // 	// required: true,
+                // },
+                brn_file: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                brn: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                container_number: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                // airline_reference_id: {
+
+                // }
+                // airline: {
+                // 	// required: true,
+                // },
+                airway_bill: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                shipping_line: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                forward_import_code: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                trailer_number_plate: {
+                    noSpaces: true,
+                },
+                transportation_company: {
+                    noSpaces: true,
+                },
+                "transporting_driver_contact_number[main]": {
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                airway_details: {
+                    noSpaces: true,
+                },
+                transportation_company_details: {
+                    noSpaces: true,
+                },
+                // currency: {
+
+                // },
+                // so_total_amount: {
+
+                // },
+                // so_vehicle_quantity: {
+
+                // },
+                // deposit_received_as: {
+
+                // },
+                // amount_received: {
+
+                // },
+                // balance_amount: {
+
+                // },				
+                delivery_location: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                delivery_contact_person: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                delivery_date: {
+                    // required: true,
+                    date: true,
+                },
+                signed_pfi: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                signed_contract: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                payment_receipts: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                noc: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_trade_license: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_passport: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_contract: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                vehicle_handover_person_id: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                // DYNAMIC FIELDS
+                // vin: {
+                // 	// required: true,
+                // },
+                // brand: {
+                // 	// required: true,
+                // },
+                // variant: {
+                // 	// required: true,
+                // },
+                // engine: {
+                // 	// required: true,
+                // },
+                // model_description: {
+                // 	// required: true,
+                // },
+                // model_year: {
+                // 	// required: true,
+                // },
+                // model_year: {
+                // 	// required: true,
+                // },
+                // steering: {
+                // 	// required: true,
+                // },
+                // exterior_colour: {
+                // 	// required: true,
+                // },
+                // interior_colour: {
+                // 	// required: true,
+                // },
+                // warehouse: {
+                // 	// required: true,
+                // },
+                // territory: {
+                // 	// required: true,
+                // },
+                // preferred_destination: {
+                // 	// required: true,
+                // },
+                // import_document_type: {
+                // 	// required: true,
+                // },
+                // ownership_name: {
+                // 	// required: true,
+                // },
+                // modification_or_jobs_to_perform_per_vin: {
+                // 	// required: true,
+                // },
+                // certification_per_vin: {
+                // 	// required: true,
+                // },
+                // special_request_or_remarks: {
+                // 	// required: true,
+                // },
+            },
+            messages: {
+                brn_file:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                signed_pfi:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                signed_contract:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                payment_receipts:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                noc:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_trade_license:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_passport:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_contract:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                vehicle_handover_person_id: {
+                    filesize:" file size must be less than 1 GB.",
+                }
+            },
+        });
+    // CLIENT SIDE VALIDATION END
+	
+	
+
+		
+    function addComment(parentId = null) {
+        const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
+        if (commentText.trim() === '') return;
+
+        const commentHtml = `
+            <div class="comment mt-2" data-comment-id="${commentIdCounter}" data-parent-id="${parentId || ''}">
+                <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
+                    <img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+                </div>
+                <div class="col-xxl-11 col-lg-11 col-md-11">${commentText}</br>
+                    <span style="color:gray;">Rejitha R Prasad</span>
+                    <span style="color:gray;"> - 30 May 2024, 18:00:00</span></br>
+                    <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentIdCounter})">Reply</button></br>
+                    <div class="reply-form" id="reply-form-${commentIdCounter}" style="display: none;">
+                        <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..."></textarea>
+                        <button class="btn btn-sm btn-info mt-2" onclick="addComment(${commentIdCounter})">Send Reply</button>
+                    </div>
+                    <div class="replies" id="replies-${commentIdCounter}"></div>
+                </div>
+            </div>
+        `;
+
+        if (parentId === null) {
+            $('#comments-section').append(commentHtml);
+            $('#new-comment').val('');
+        } else {
+            $(`#replies-${parentId}`).append(commentHtml);
+            $(`#reply-input-${parentId}`).val('');
+            $(`#reply-form-${parentId}`).hide();
         }
 
-        function showReplyForm(commentId) {
-            $(`#reply-form-${commentId}`).toggle();
-        }
-	// // SHOW MENTION IN COMMENTS SECTION START
-	// 	document.getElementById('comment-input').addEventListener('input', showMentions);
-
-	// 	function showMentions(event) {
-	// 		const input = event.target.value;
-	// 		const mentionList = document.getElementById('mentions-list');
-	// 		const mentionTrigger = input.match(/@\w*$/);
-			
-	// 		if (mentionTrigger) {
-	// 			const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
-	// 			const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
-				
-	// 			mentionList.innerHTML = '';
-	// 			filteredMentions.forEach(mention => {
-	// 				const mentionItem = document.createElement('div');
-	// 				mentionItem.textContent = mention;
-	// 				mentionItem.addEventListener('click', () => selectMention(mention));
-	// 				mentionList.appendChild(mentionItem);
-	// 			});
-				
-	// 			mentionList.style.display = 'block';
-	// 		} else {
-	// 			mentionList.style.display = 'none';
-	// 		}
-	// 	}
-
-	// 	function selectMention(mention) {
-	// 		const inputField = document.getElementById('comment-input');
-	// 		const inputText = inputField.value;
-	// 		const newText = inputText.replace(/@\w*$/, mention + ' ');
-	// 		inputField.value = newText;
-	// 		document.getElementById('mentions-list').style.display = 'none';
-	// 		inputField.focus();
-	// 	}
-
-	// 	function postComment() {
-	// 		const commentInput = document.getElementById('comment-input');
-	// 		const commentText = commentInput.value;
-			
-	// 		if (commentText.trim()) {
-	// 			const commentList = document.getElementById('comment-list');
-	// 			const commentItem = document.createElement('li');
-	// 			commentItem.className = 'comment-item';
-				
-	// 			const mentionRegex = /@\w+/g;
-	// 			const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
-				
-	// 			commentItem.innerHTML = formattedText;
-	// 			commentList.appendChild(commentItem);
-				
-	// 			commentInput.value = '';
-	// 		}
-	// 	}
-	// // SHOW MENTION IN COMMENTS SECTION END
+        commentIdCounter++;
+    }
+		
+    function showReplyForm(commentId) {
+        $(`#reply-form-${commentId}`).toggle();
+    }
 
 	// ADDON DYNAMICALLY ADD AND REMOVE START
 		// Function to reset row indexes
@@ -1945,43 +2492,83 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// HIDE FIELDS END
 
 	// CUSTOMER DETAILS SECTION START
-		function checkValue() {
-			var textInput = document.getElementById('textInput');
-			var Other = document.getElementById('Other');
-			var switchToDropdown = document.getElementById('switchToDropdown');
-			$('#customer_name').next('.select2-container').hide();
-			textInput.style.display = 'inline';
-			Other.style.display = 'none';
-			switchToDropdown.style.display = 'inline';
-			$('#customer_address').val('');
-		}
-		function switchToDropdown() {
-			var textInput = document.getElementById('textInput');
-			var Other = document.getElementById('Other');
-			var switchToDropdown = document.getElementById('switchToDropdown');
-			$('#customer_name').next('.select2-container').show();
-			textInput.style.display = 'none';
-			Other.style.display = 'inline';
-			switchToDropdown.style.display = 'none';
-			var selectedCustomerName = $('#customer_name').val();
-			if(selectedCustomerName.length > 0) {
-				setCustomerRelations(selectedCustomerName);
+        function checkValue() {
+            $('#customer_type').val('new');
+            var textInput = document.getElementById('textInput');
+            var Other = document.getElementById('Other');
+            var switchToDropdown = document.getElementById('switchToDropdown');
+            
+            // Store the current select value
+            var selectedCustomerName = $('#customer_name').val();
+            $('#customer_reference_type').val('select');
+            $('#customer_reference_id').val(selectedCustomerName);
+            
+            // Hide the select2 container and show the text input
+            $('#customer_name').next('.select2-container').hide();
+            textInput.style.display = 'inline';
+            Other.style.display = 'none';
+            switchToDropdown.style.display = 'inline';
+            $('#customer_address').val(newCustomerAddress);
+			$('#customer_email').val(newCustomerEmail);
+			$('#customer_company_number').val(newCustomerContact);
+        }
+
+        function switchToDropdown() {
+			newCustomerEmail = $('#customer_email').val();
+			newCustomerAddress = $('#customer_address').val();
+			newCustomerContact = $('#customer_company_number').val();
+            $('#customer_type').val('existing');
+            var textInput = document.getElementById('textInput');
+            var Other = document.getElementById('Other');
+            var switchToDropdown = document.getElementById('switchToDropdown');
+            
+            // Store the current text input value
+            var newCustomerName = $('#textInput').val();
+            $('#customer_reference_type').val('input');
+            $('#customer_reference_id').val(newCustomerName);
+            
+            // Show the select2 container and hide the text input
+            $('#customer_name').next('.select2-container').show();
+            textInput.style.display = 'none';
+            Other.style.display = 'inline';
+            switchToDropdown.style.display = 'none';
+            
+            var selectedCustomerName = $('#customer_name').val();
+            if (selectedCustomerName.length > 0) {
+                setCustomerRelations(selectedCustomerName);
+            }
+			else {
+				$('#customer_address').val('');
+				$('#customer_email').val('');
+				$('#customer_company_number').val('');
 			}
-		}
-		function setCustomerRelations(selectedCustomerName) {
-			$('#customer_address').val('');
-			// document.getElementById('customer_email').value = '';
-			// document.getElementById('customer_company_number').value = '';
-			if(selectedCustomerName != '') {
-				for (var i = 0; i < customers.length; i++) {
-					if (customers[i].name == selectedCustomerName) {
-						if(customers[i].address != null) {
-							$('#customer_address').val(customers[i]?.address);
-						}
-					}
-				}
-			}
-		}
+        }
+
+        function setCustomerRelations(selectedCustomerName) {
+            $('#customer_address').val('');
+			$('#customer_email').val('');
+			$('#customer_company_number').val('');
+            // document.getElementById('customer_email').value = '';
+            // document.getElementById('customer_company_number').value = '';
+            if (selectedCustomerName != '') {
+                for (var i = 0; i < customerCount; i++) {
+                    if (customers[i].customer_name == selectedCustomerName[0]) {
+                        if (customers[i].customer_address != null) {
+                            $('#customer_address').val(customers[i]?.customer_address);
+                        }
+						if (customers[i].customer_email != null) {
+							console.log(customers[i]?.customer_email);
+                            $('#customer_email').val(customers[i]?.customer_email);
+                        }
+						if (customers[i].customer_company_number != null) {
+							console.log(customers[i]?.customer_company_number);
+                            // $('#customer_company_number').val(customers[i]?.customer_company_number);
+							$('#customer_company_number').val(customers[i].customer_company_number);
+                        }
+                    }
+                }
+            }
+        }
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
@@ -2047,242 +2634,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		}
 	// CURRENCY UPDATE END
 
-	// CLIENT SIDE VALIDATION START
-		$.validator.addMethod("SONumberFormat", function(value, element) {
-			// Regular expression to match the format SO- followed by exactly 6 digits
-			return this.optional(element) || /^SO-\d{6}$/.test(value);
-		}, "Please enter a valid order number in the format SO-######");
-		// Add custom validation method for contact number
-		// $.validator.addMethod("validContactNumber", function(value, element) {
-		// 	return this.optional(element) || /^[0-9]$/.test(value);
-		// }, "Please enter a valid contact number");
-		// $.validator.addMethod("WONumberFormat", function(value, element) {
-		// 	// Regular expression to match the format WO- followed by exactly 6 digits
-		// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
-		// }, "Please enter a valid order number in the format WO-######");
-		jQuery.validator.setDefaults({
-			errorClass: "is-invalid",
-			errorElement: "p",
-			errorPlacement: function ( error, element ) {
-				error.addClass( "invalid-feedback font-size-13" );
-				if ( element.prop( "type" ) === "checkbox" ) {
-					error.insertAfter( element.parent( "label" ) );
-				}
-				else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-					if (!element.val() || element.val().length === 0) {
-						console.log("Error is here with length", element.val().length);
-						error.addClass('select-error');
-						error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-					} else {
-						console.log("No error");
-					}
-				}
-			else if (element.parent().hasClass('input-group')) {
-					error.insertAfter(element.parent());
-				}
-				else {
-					error.insertAfter( element );
-				}
-			}
-		});
-		$('#WOForm').validate({ // initialize the plugin
-			rules: {
-				type: {
-					required: true,
-				},
-				date: {
-					required: true,
-					date: true,
-				},
-				so_number: {
-					required: true,
-					SONumberFormat: true
-				},
-				batch: {
-					required: true,
-				},
-				// wo_number: {
-				// 	required: true,
-				// 	WONumberFormat: true
-				// },
-				customer_name: {
-					// required: true,
-				},
-				customer_email: {
-					// required: true,
-					email: true,
-				},
-				customer_company_number: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-					// validContactNumber: true,
-				},
-				customer_address: {
-					// required: true,
-					// money: true,
-					// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
-				},
-				customer_representative_name: {
-					// required: true,
-				},
-				customer_representative_email: {
-					// required: true,
-					email: true,
-				},
-				customer_representative_contact: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-				},
-				freight_agent_name: {
-					// required: true,
-				},
-				freight_agent_email: {
-					// required: true,
-					email: true,
-				},
-				freight_agent_contact_number: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-				},
-				port_of_loading: {
-					required: true,
-				},
-				port_of_discharge: {
-					required: true,
-				},
-				final_destination: {
-					required: true,
-				},
-				transport_type: {
-					// required: true,
-				},
-				airline: {
-					// required: true,
-				},
-				airway_bill: {
-					// required: true,
-				},
-				shipping_line: {
-					// required: true,
-				},
-				forward_import_code: {
-					// required: true,
-				},
-				brn: {
-					// required: true,
-				},
-				brn_file: {
-					// required: true,
-				},
-				container_number: {
-					// required: true,
-				},
-				// vin: {
-				// 	// required: true,
-				// },
-				// brand: {
-				// 	// required: true,
-				// },
-				// variant: {
-				// 	// required: true,
-				// },
-				// engine: {
-				// 	// required: true,
-				// },
-				// model_description: {
-				// 	// required: true,
-				// },
-				// model_year: {
-				// 	// required: true,
-				// },
-				// model_year: {
-				// 	// required: true,
-				// },
-				// steering: {
-				// 	// required: true,
-				// },
-				// exterior_colour: {
-				// 	// required: true,
-				// },
-				// interior_colour: {
-				// 	// required: true,
-				// },
-				// warehouse: {
-				// 	// required: true,
-				// },
-				// territory: {
-				// 	// required: true,
-				// },
-				// preferred_destination: {
-				// 	// required: true,
-				// },
-				// import_document_type: {
-				// 	// required: true,
-				// },
-				// ownership_name: {
-				// 	// required: true,
-				// },
-				// modification_or_jobs_to_perform_per_vin: {
-				// 	// required: true,
-				// },
-				// certification_per_vin: {
-				// 	// required: true,
-				// },
-				// special_request_or_remarks: {
-				// 	// required: true,
-				// },
-				delivery_location: {
-					// required: true,
-				},
-				delivery_contact_person: {
-					// required: true,
-				},
-				delivery_date: {
-					// required: true,
-				},
-				signed_pfi: {
-					// required: true,
-				},
-				signed_contract: {
-					// required: true,
-				},
-				payment_receipts: {
-					// required: true,
-				},
-				noc: {
-					// required: true,
-				},
-				enduser_trade_license: {
-					// required: true,
-				},
-				enduser_passport: {
-					// required: true,
-				},
-				enduser_contract: {
-					// required: true,
-				},
-			},
-			// errorPlacement: function ( error, element ) {
-			// 	error.addClass( "invalid-feedback font-size-13" );
-			// 	if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-			// 		console.log(element.val().length);
-			// 		if (!element.val() || element.val().length === 0 || element.val().length > 0) {
-			// 			console.log("Error is here with length", element.val().length);
-			// 			error.addClass('select-error');
-			// 			error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-			// 		} else {
-			// 			console.log("No error");
-			// 		}
-			// 	}
-			// 	else {
-			// 		error.insertAfter( element );
-			// 	}
-			// }
-		});
-	// CLIENT SIDE VALIDATION END
+    function sanitizeInput(input) {
+        // Replace multiple spaces with a single space
+        input.value = input.value.replace(/\s\s+/g, ' ');
+    }
+    function sanitizeNumberInput(input) {
+        // Remove any non-numeric characters
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+	
 </script>
 
 @endsection

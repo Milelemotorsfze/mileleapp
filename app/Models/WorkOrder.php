@@ -98,8 +98,16 @@ class WorkOrder extends Model
     {
         return $this->hasOne(User::class,'id','finance_approval_by');
     }
-    public function coeOfficeApprovalBy()
+    public function vehicles()
     {
-        return $this->hasOne(User::class,'id','coe_office_approval_by');
+        return $this->hasMany(WOVehicles::class,'work_order_id','id');
+    }
+    public function comments()
+    {
+        return $this->hasMany(WOComments::class,'work_order_id','id');
+    }
+    public function dataHistories()
+    {
+        return $this->hasMany(WORecordHistory::class,'work_order_id','id');
     }
 }

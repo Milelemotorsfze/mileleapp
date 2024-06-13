@@ -22,9 +22,9 @@ class StoreWorkOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required',
-            'date' => 'required',
-            'so_number' =>'required',
+            'type' => 'required|string',
+            'date' => 'required|date',
+            'so_number' => 'required|string|regex:/^SO-\d{6}$/|not_in:SO-000000',
             // 'batch' =>'required',
             // 'wo_number' =>'required',
             'contact_number' => 'regex:/^[0-9]$/',
@@ -32,6 +32,7 @@ class StoreWorkOrderRequest extends FormRequest
             'customer_representative_email' => 'nullable|email|max:255',
             'freight_agent_email' => 'nullable|email|max:255',
             // Add other fields and validation rules as needed
+            // 'customer_company_number.main' => 'required|numeric',
         ];
     }
 }
