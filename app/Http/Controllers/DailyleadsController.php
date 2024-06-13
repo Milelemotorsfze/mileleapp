@@ -174,7 +174,7 @@ class DailyleadsController extends Controller
                     });
                 }
                 if ($status === 'Prospecting') {
-                    $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                    $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%Y %m %d') as date"), 'prospectings.salesnotes');
                     $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
                     $data->addSelect(
                         DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y %m %d'), '') as ddate"),
