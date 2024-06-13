@@ -1354,6 +1354,11 @@ public function purchasingupdateStatus(Request $request)
             $purchasinglog->save();
         }
     }
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "PO Approved";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $id;
+            $purchasingordereventsLog->save();
         return response()->json(['message' => 'Status updated successfully'], 200);
     }
     public function confirmPayment($id)
@@ -1379,6 +1384,15 @@ public function purchasingupdateStatus(Request $request)
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->role = Auth::user()->selectedRole;
                 $vehicleslog->save();
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Request for Payment";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = "Vehicle Status";
+                    $purchasingordereventsLog->old_value = "Not Paid";
+                    $purchasingordereventsLog->new_value = "Request for Initiate Payment";
+                    $purchasingordereventsLog->description = "PO Creator Request the Payment to the Againt of the Vehicle Ref $id";
+                    $purchasingordereventsLog->save();
             return redirect()->back()->with('success', 'Payment confirmed. Vehicle status updated.');
         }
         return redirect()->back()->with('error', 'Vehicle not found.');
@@ -1414,6 +1428,14 @@ public function purchasingupdateStatus(Request $request)
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->role = Auth::user()->selectedRole;
                 $vehicleslog->save();
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Vehicle Cancel";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = "Cancel Vehicle";
+                    $purchasingordereventsLog->new_value = "Vehicle Cancel";
+                    $purchasingordereventsLog->description = "Vehicle Procurement Manager Cancel the Vehicle $id";
+                    $purchasingordereventsLog->save();
                 $updateqty = PurchasingOrderItems::where('variant_id', $vehicle->varaints_id)->where('purchasing_order_id', $vehicle->purchasing_order_id)->first();
                 if($updateqty)
                 {
@@ -1460,6 +1482,14 @@ public function purchasingupdateStatus(Request $request)
             $purchasedorders = PurchasingOrder::find($vehicle->purchasing_order_id);
             $purchasedorders->status = 'Pending Approval';
             $purchasedorders->save();
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Cancel Request";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = "Vehicle Cancel Request";
+                    $purchasingordereventsLog->new_value = "Cancel Request";
+                    $purchasingordereventsLog->description = "Vehicle Executive Send to Cancel the Vehicle $id";
+                    $purchasingordereventsLog->save();
             }
         }
         else
@@ -1488,6 +1518,14 @@ public function purchasingupdateStatus(Request $request)
         $vehicleslog->created_by = auth()->user()->id;
         $vehicleslog->role = Auth::user()->selectedRole;
         $vehicleslog->save();
+        $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Vehicle Cancel";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = "Cancel Vehicle";
+                    $purchasingordereventsLog->new_value = "Vehicle Cancel";
+                    $purchasingordereventsLog->description = "Vehicle Procurement Manager Cancel the Vehicle $id";
+                    $purchasingordereventsLog->save();
         $updateqty = PurchasingOrderItems::where('variant_id', $vehicle->varaints_id)->where('purchasing_order_id', $vehicle->purchasing_order_id)->first();
         if($updateqty)
         {
