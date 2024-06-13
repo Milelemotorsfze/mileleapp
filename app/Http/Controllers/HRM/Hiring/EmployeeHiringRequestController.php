@@ -22,6 +22,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class EmployeeHiringRequestController extends Controller
 {
@@ -466,7 +467,7 @@ class EmployeeHiringRequestController extends Controller
                 if($request->status == 'approved') {
                     $update->action_by_hiring_manager = 'pending';
                     $RecruitingManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
-                $update->recruiting_manager_id = $RecruitingManager->handover_to_id;
+                $update->hiring_manager_id = $RecruitingManager->handover_to_id;
                     $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }
@@ -476,7 +477,7 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_hiring_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
-                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    $employee1 = EmployeeProfile::where('user_id',$update->requested_by)->first();
                 $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
                 $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';

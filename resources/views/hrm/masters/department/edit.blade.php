@@ -66,7 +66,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-department'])
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="department_head_id" class="col-form-label text-md-end">{{ __('Department Head Name') }}</label>
-							<select name="department_head_id" id="department_head_id" multiple="true" class="department_head_id form-control widthinput" onchange=setHandover() autofocus>
+							<select name="department_head_id" id="department_head_id" multiple="true" class="department_head_id form-control widthinput" autofocus>
 							@foreach($deptHeads as $departmentHead)
 							<option value="{{$departmentHead->id}}" @if($data->department_head_id == $departmentHead->id) selected @endif>{{$departmentHead->name}}</option>
 							@endforeach

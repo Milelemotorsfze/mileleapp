@@ -841,7 +841,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					@php
 					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information']);
 					@endphp
-					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && $data->candidateDetails->personal_information_verified_at == NULL)
+					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && 
+					$data->candidateDetails->personal_information_verified_at == NULL && $data->candidateDetails->personal_information_created_at > $data->candidateDetails->personal_information_send_at)
 					<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
 						data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
 					<i class="fa fa-check" aria-hidden="true"></i> Verified Personal information
@@ -1068,13 +1069,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Residence Telephone Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->residence_telephone_number ?? '' }}</span>
+										<span>{{ $data->residence_telephone_number ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Mobile Number  :</label>
+										<label for="choices-single-default" class="form-label"> Company Email Address  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->contact_number ?? '' }}</span>
+										<span>{{ $data->user->email ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Personal Email Address  :</label>
@@ -1125,14 +1126,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactUAE->contact_number ?? '' }}</span>
 									</div>
-									@if($contactUAE->alternative_contact_number != '')
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactUAE->alternative_contact_number ?? '' }}</span>
 									</div>
-									@endif
 								</div>
 								@endforeach
 								@endif
@@ -1158,7 +1157,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Relation  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->contact_number ?? '' }}</span>
+										<span>{{ $contactHomeCountry->relationName->name ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Email  :</label>
@@ -1172,14 +1171,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactHomeCountry->contact_number ?? '' }}</span>
 									</div>
-									@if($contactHomeCountry->alternative_contact_number != '')
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactHomeCountry->alternative_contact_number ?? '' }}</span>
 									</div>
-									@endif
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Home Country Address  :</label>
 									</div>
@@ -1220,7 +1217,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	                        alertify.success(status + " Successfully")
 	                    }
 	                    else if(data == 'error') {
-	
+							window.location.reload();
+							alertify.error("Can't Verify, It was verified already..")
 	                    }
 	                }
 	            });
@@ -1246,7 +1244,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	                        alertify.success(status + " Successfully")
 	                    }
 	                    else if(data == 'error') {
-	
+							window.location.reload();
+	                        alertify.error(status + "Can't verify! It has already been verified.")
 	                    }
 	                }
 	            });
@@ -1272,7 +1271,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	                        alertify.success(status + " Successfully")
 	                    }
 	                    else if(data == 'error') {
-	
+							window.location.reload();
+	                        alertify.error("Can't verify! It has already been verified")
 	                    }
 	                }
 	            });

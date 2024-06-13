@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addon;
+use Illuminate\Support\Facades\File;
 use App\Models\User;
 use App\Models\UserActivities;
 use App\Models\Clients;
@@ -84,6 +85,7 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+        
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
@@ -106,6 +108,14 @@ class QuotationController extends Controller
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         DB::beginTransaction();
         $call = Calls::find($request->calls_id);
+        if($request->shipping_method == "CNF")
+        {
+            $call->type = "Local";    
+        }
+        else
+        {
+            $call->type = "Export"; 
+        }
         $call->status = 'Quoted';
         $call->save();
         $call->company_name = $request->company_name;
@@ -141,30 +151,30 @@ class QuotationController extends Controller
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
         $agentsId = $request->agents_id;
-        if (!isset($agentsId) || empty($agentsId)) {
-        } 
-        else {
-            $agentIdsArray = explode(',', $agentsId);
-            $agentsCount = count($agentIdsArray);
-            if ($agentsCount == 1) {
-                $agentId = $agentIdsArray[0];
-                $agentsId = $agentId;
+            if (!isset($agentsId) || empty($agentsId)) {
+                // Handle the case where no agent ID is provided or it's empty
             } 
             else {
-                $agentId = $agentIdsArray[0];
-                $agentsId = $agentId;
-                foreach ($agentIdsArray as $agentId) {
+                $agentIdsArray = explode(',', $agentsId);
+                $agentsCount = count($agentIdsArray);
+                if ($agentsCount == 1) {
+                    $agentsId = $agentIdsArray[0];
+                } 
+                else {
                     $agentsin = 1;
-                    $multipleAgent = new MuitlpleAgents();
-                    $multipleAgent->agents_id = $agentId;
-                    $multipleAgent->quotations_id = $quotation->id;
-                    $multipleAgent->save();
+                    foreach ($agentIdsArray as $agentId) {
+                        $multipleAgent = new MuitlpleAgents();
+                        $multipleAgent->agents_id = $agentId;
+                        $multipleAgent->quotations_id = $quotation->id;
+                        $multipleAgent->save();
+                    }
+                    $agentsId = end($agentIdsArray);
                 }
             }
-        }
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
+        $quotationDetail->delivery_country  = $request->countryofdischarge;
         $quotationDetail->incoterm  = $request->incoterm;
         $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
         $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
@@ -405,7 +415,7 @@ class QuotationController extends Controller
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
         $data['sales_person'] = $salespersonqu->name;
@@ -438,7 +448,7 @@ class QuotationController extends Controller
             $shippingChargeDistriAmount = 0;
         }
         $quotationid = $quotation->id;
-        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', $quotationDetail->agents_id)->get();
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
@@ -448,7 +458,7 @@ class QuotationController extends Controller
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
         $pdf = $this->pdfMerge($quotation->id);
-        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file; 
         $quotation->save();
@@ -582,31 +592,34 @@ class QuotationController extends Controller
     $quotation->shipping_method = $request->shipping_method;
     $quotation->save();
     $agentsId = $request->agents_id;
+    $lastAgentId = null;
     if (!isset($agentsId) || empty($agentsId)) {
-    } 
-    else {
+        // Handle the case where $agentsId is not set or is empty.
+    } else {
         $agentIdsArray = explode(',', $agentsId);
         $agentsCount = count($agentIdsArray);
-        if ($agentsCount == 1) {
-            $agentId = $agentIdsArray[0];
-            $agentsId = $agentId;
-        } 
-        else {
-            $agentId = $agentIdsArray[0];
-            $agentsId = $agentId;
-            foreach ($agentIdsArray as $agentId) {
-                $agentsin = 1;
-                $multipleAgent = new MuitlpleAgents();
-                $multipleAgent->agents_id = $agentId;
-                $multipleAgent->quotations_id = $quotation->id;
-                $multipleAgent->save();
-            }
+        $existingAgentIds = [];
+    
+        foreach ($agentIdsArray as $agentId) {
+            $agentsin = 1;
+            $multipleAgent = MuitlpleAgents::updateOrCreate(
+                ['agents_id' => $agentId, 'quotations_id' => $quotation->id],
+                ['agents_id' => $agentId, 'quotations_id' => $quotation->id]
+            );
+            $multipleAgentId = $multipleAgent->id;
+            $existingAgentIds[] = $agentId;
+            $lastAgentId = $agentId;
         }
-    }
+        // Find and delete agents that are not in the $agentIdsArray
+        MuitlpleAgents::where('quotations_id', $quotation->id)
+            ->whereNotIn('agents_id', $existingAgentIds)
+            ->delete();
+    }        
     $quotationDetail = QuotationDetail::where('quotation_id', $qoutationid)->first();
     if ($quotationDetail) {
     $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
+        $quotationDetail->delivery_country  = $request->countryofdischarge;
         $quotationDetail->incoterm  = $request->incoterm;
         $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
         $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
@@ -620,8 +633,12 @@ class QuotationController extends Controller
         if($agentsin == 1)
         {
             $quotationDetail->muitlple_agents_id = $multipleAgent->id;
+            $quotationDetail->agents_id = $lastAgentId;
         }
-        $quotationDetail->agents_id = $request->agents_id;
+        else
+        {
+            $quotationDetail->agents_id = $request->agents_id;
+        }
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->due_date = $request->due_date;
         $quotationDetail->selected_bank = $request->select_bank;
@@ -744,7 +761,6 @@ class QuotationController extends Controller
                 }
                $commissionAED = $commissionAED + $amount;
             }
-           $commissionAED = $commissionAED + $amount;
            if(isset($request->vehiclesitemsid[$key])) {
             $quotationItem = QuotationItem::find($request->vehiclesitemsid[$key]);
             } else {
@@ -754,8 +770,11 @@ class QuotationController extends Controller
            $quotationItem->quantity = $request->quantities[$key];
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
+           if($request->agents_id)
+           {
            $quotationItem->system_code_amount = $separatedValues[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
+           }
            $quotationItem->quotation_id = $qoutationid;
            $quotationItem->uuid = $request->uuids[$key];
            $quotationItem->is_addon = $request->is_addon[$key];
@@ -942,7 +961,7 @@ class QuotationController extends Controller
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
         $data['sales_person'] = $salespersonqu->name;
@@ -973,7 +992,9 @@ class QuotationController extends Controller
         }else{
             $shippingChargeDistriAmount = 0;
         }
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+        $quotationid = $quotation->id;
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
         $filename = 'quotation_'.$quotation->id.'.pdf';
@@ -982,7 +1003,7 @@ class QuotationController extends Controller
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
         $pdf = $this->pdfMerge($quotation->id);
-        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file; 
         $quotation->save();
@@ -1094,10 +1115,11 @@ public function addqaddone(Request $request)
     public function getShippingCharges(Request $request) {
         info($request->from_shipping_port_id);
         info($request->to_shipping_port_id);
-        $shippingCharges = Shipping::with('shippingMedium')
+        $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
+                            info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
@@ -1169,12 +1191,18 @@ public function addqaddone(Request $request)
             $x = 100;
             $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
         }
-        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); 
+        $originalFileName = basename($pdfPath);
+        $newFileName = str_replace('.pdf', '_signed.pdf', $originalFileName);
+        $outputPath = public_path('storage/quotation_files/' . $newFileName);
         $pdf->Output($outputPath, 'F');
+    
         unlink($pngImagePath);
+    
+        // Update the database record
         $quotation = Quotation::find($quotationId);
         $quotation->signature_status = "Signed";
         $quotation->signature_link = null;
+        $quotation->file_path = 'quotation_files/' . $newFileName; // Update file_path in the database
         $quotation->save();
         return redirect()->back()->with('success', 'Thank you! Your signature has been successfully submitted.');
     }
@@ -1258,7 +1286,7 @@ public function directquotationtocustomer($id)
             'language' => $client->lauguage,
             'created_at' => $formattedDate,
             'created_by' => Auth::id(),
-            'status' => "New",
+            'status' => "Customer",
             'priority' => "High",
             'customer_coming_type' => "Direct From Sales",
         ];
@@ -1299,4 +1327,46 @@ public function getVehiclesvinsfirst(Request $request)
     ->get();
     return response()->json(['vehicles' => $vehicles]);
 }
+// FileUploadController.php
+public function uploadingQuotation(Request $request)
+{
+    $request->validate([
+        'quotationFile' => 'required|file',
+        'callId' => 'required'
+    ]);
+
+    $file = $request->file('quotationFile');
+    $callId = $request->input('callId');
+
+    // Fetching the Quotation based on call ID
+    $quotation = Quotation::where('calls_id', $callId)->first();
+
+    if (!$quotation) {
+        return response()->json(['error' => 'Quotation not found'], 404);
+    }
+
+    $filename = 'Quotation_' . $quotation->id . '_' . date('Y_m_d') . '.pdf';
+    $directory = public_path('storage/quotation_files');
+
+    // Ensure the directory exists
+    if (!File::isDirectory($directory)) {
+        File::makeDirectory($directory, 0777, true, true);
+    }
+
+    // Move the uploaded file to the desired location with the new filename
+    $file->move($directory, $filename);
+
+    // Update the file path in the database
+    $quotation->file_path = 'quotation_files/' . $filename;
+    $quotation->signature_status = "Signed";
+    $quotation->save();
+
+    return response()->json(['success' => 'File has been uploaded and saved successfully.']);
+}
+public function getAgentsByQuotationId($quotationId)
+    {
+        $quotationdetails = QuotationDetail::where('quotation_id' , $quotationId)->first();
+        $agents = MuitlpleAgents::with('agent')->where('quotations_id', $quotationId)->where('agents_id', '!=', $quotationdetails->agents_id)->get();
+        return response()->json($agents);
+    }
 }

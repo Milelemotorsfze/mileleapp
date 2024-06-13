@@ -83,7 +83,6 @@
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
-    @can('inspection-edit')
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pending Pictures</a>
@@ -180,7 +179,6 @@
           </div> 
         </div>  
       </div> 
-      @endcan
       </div>
     </div>
   </div>

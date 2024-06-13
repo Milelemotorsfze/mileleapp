@@ -169,7 +169,8 @@
       @csrf
       <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title fs-5" id="adoncode">Add New Agent</h5>
+        <h5 class="modal-title fs-5 mb-1" id="adoncode">Add New Agent</h5>
+        <h6 class="modal-subtitle text-muted" id="adoncode">(Please avoid adding dummy or duplicate details)</h6>
           <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
@@ -233,7 +234,7 @@
         <div class="modal-body p-4">
           <div class="row">
             <div class="col-md-12 form-group">
-              <label for="name">CB Name:</label>
+              <label for="name">CR Name:</label>
               <select name="cb_name" id="cb_name_more" class="form-control form-control-xs">
               </select>
             </div>
@@ -467,20 +468,7 @@
             </div>
             <div class="col-sm-4" >
                 <div id="export-shipment">
-                    <div class="row mt-2">
-                        <div class="col-sm-6">
-                            Final Destination :
-                        </div>
-                        <div class="col-sm-6">
-                            <select class="form-control col" id="country" name="country_id" multiple style="width: 100%">
-                                <option ></option>
-                                @foreach($countries as $country)
-                                    <option value="{{ $country->id }}" >{{ $country->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
+                <div class="row mt-2">
                         <div class="col-sm-6">
                             Incoterm :
                         </div>
@@ -510,11 +498,37 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
+                            Final Destination :
+                        </div>
+                        <div class="col-sm-6">
+                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                            <option disabled selected>Select Final Destination</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}" >{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Country Of Discharge :
+                        </div>
+                        <div class="col-sm-6">
+                        <select name="countryofdischarge" id="countryofdischarge" class="form-control form-control-xs">
+                        <option disabled selected>Select Country Of Discharge</option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}" >{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
                             Port of Discharge :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="shipping_port" multiple name="from_shipping_port_id" style="width: 100%">
-                                <option></option>
+                            <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
+                            <option disabled selected>Select Port of Discharge</option>
                             </select>
                         </div>
                     </div>
@@ -579,7 +593,7 @@
             <div class="col-sm-4">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB Name:
+                        CR Name:
                     </div>
                     <div class="col-sm-6">
                     <div class="input-group">
@@ -597,7 +611,7 @@
                 <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB No:
+                        CR No:
                     </div>
                     <div class="col-sm-6">
                         <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number" readonly>
@@ -1079,6 +1093,8 @@
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
+                                        <th>Sailing Date</th>
+                                        <th>ETA</th>
                                         <th style="width:30px;">Add Into Quotation</th>
                                     </tr>
                                     </thead>
@@ -1107,7 +1123,7 @@
                                     <tr>
                                         <th>S.No:</th>
                                         <th>Code</th>
-                                        <th> Name</th>
+                                        <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -1390,10 +1406,16 @@
     }
 $(document).ready(function () {
     $('#cb_name').change(function () {
+        console.log("pouch");
         var selectedAgentId = $(this).val();
         var selectedAgentName = $(this).find(':selected').text();
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
+        if (selectedAgentId) {
+                        $('.system-code').removeAttr('disabled');
+                    } else {
+                        $('.system-code').attr('disabled', 'disabled');
+                    }
     });
     fetchAgentData();
     function fetchAgentData() {
@@ -1430,6 +1452,12 @@ $(document).ready(function () {
 
     // Intercept form submission and handle it through AJAX
     $('#form-update2_492').submit(function (e) {
+        var name = $('#name').val().trim();
+        var phone = $('#phone').val().trim();
+    if (name === "" || phone === "") {
+        alert('Name and phone number cannot be blank.');
+        return false;
+    }
         e.preventDefault();
         var formData = new FormData($(this)[0]);
         $.ajax({
@@ -1620,7 +1648,6 @@ $(document).ready(function () {
         });
         $('#country').select2({
             placeholder: "Select Final Destination",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
@@ -1643,7 +1670,6 @@ $(document).ready(function () {
         });
         $('#shipping_port').select2({
             placeholder: "Select Port Of Discharge",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
@@ -1666,7 +1692,6 @@ $(document).ready(function () {
 
         $('#to_shipping_port').select2({
             placeholder: "Select Port Of Loading",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
@@ -1708,26 +1733,27 @@ $(document).ready(function () {
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
 
-
-        $('#country').on('select2:select', function(e){
-            let country = $(this).val();
-            let url = '{{ route('quotation.shipping_ports') }}';
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                data: {
-                    country_id: country,
-                },
-                success:function (data) {
-                    $('#shipping_port').empty();
-                    $('#shipping_port').html('<option value=""> Select Shipping Port </option>');
-                    jQuery.each(data, function(key,value){
-                        $('#shipping_port').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-                    });
-                }
-            });
+        $('#country').select2();
+        $('#countryofdischarge').select2().on('select2:select', function(e){
+        let country = $(this).val();
+        let url = '{{ route('quotation.shipping_ports') }}';
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json",
+            data: { country_id: country },
+            success:function (data) {
+                $('#shipping_port').empty();
+                $('#shipping_port').html('<option value="">Select Shipping Port</option>');
+                $.each(data, function(key, value) {
+                    $('#shipping_port').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                });
+            }
         });
+    });
+
+// Initialize the shipping port Select2
+$('#shipping_port').select2();
 
         $('#client_category').on('change',function(){
             let clientCategory = $(this).val();
@@ -1751,9 +1777,9 @@ $(document).ready(function () {
             getShippingCharges();
         });
         function getShippingCharges() {
-            console.log("pouch");
             let fromShippingPortId = $('#shipping_port').val();
             let toShippingPortId = $('#to_shipping_port').val();
+            console.log(fromShippingPortId);
             var table = $('#shipping-table').DataTable();
             let url = '{{ route('quotation.shipping_charges') }}';
             if(fromShippingPortId) {
@@ -1766,6 +1792,7 @@ $(document).ready(function () {
                         to_shipping_port_id: toShippingPortId,
                     },
                     success:function (response) {
+                        console.log(response);
                         var slNo = 0;
                         var data = response.map(function(response) {
                             slNo = slNo + 1;
@@ -1777,6 +1804,8 @@ $(document).ready(function () {
                                 response.shipping_medium.name,
                                 response.shipping_medium.description,
                                 response.price,
+                                response.sailing_date,
+                                response.ETA,
                                 addButton
                             ];
                         });
@@ -1791,6 +1820,8 @@ $(document).ready(function () {
                                 { title: 'Name' },
                                 { title: 'Description' },
                                 { title: 'Price' },
+                                { title: 'Sailing Date' },
+                                { title: 'ETA' },
                                 { title: 'Add Into Quotation' }
                             ]
                         });
@@ -2338,26 +2369,21 @@ $(document).ready(function () {
                 }
             },
             {
-    targets: -5,
-    data: null,
-    render: function (data, type, row) {
-        // Check if agent id is selected
-        var agentId = $("#agents_id").val();
-        if (agentId) {
-            return '<div class="input-group"> ' +
-                        '<input type="text" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
-                        '<div class="input-group-append"> ' +
-                            '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
-                                '<option value="A">A</option><option value="U">U</option>' +
-                            '</select>' +
-                        '</div> ' +
-                    '</div>';
-        } else {
-            // If agent id is not selected, return empty string to hide the column
-            return '';
-             }
-            }
-        },
+                targets: -5,
+                data: null,
+                render: function (data, type, row) {
+                    var agentId = $("#agents_id").val();
+                    var disabledAttr = agentId ? '' : 'disabled';
+                    return '<div class="input-group"> ' +
+                               '<input type="text" min="0" value="1" step="1" class="system-code form-control" name="system_code_amount[]" id="system-code-amount-'+ row['index'] +'" ' + disabledAttr + ' />' +
+                               '<div class="input-group-append"> ' +
+                                   '<select class="form-control system-code-currency" name="system_code_currency[]" id="system-code-currency-'+ row['index'] +'">' +
+                                       '<option value="A">A</option><option value="U">U</option>' +
+                                   '</select>' +
+                               '</div> ' +
+                           '</div>';
+                }
+            },
             {
                 targets: -3,
                 data: null,
@@ -2374,8 +2400,8 @@ $(document).ready(function () {
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[1];
                         var modelDescription = row[3];
-                        var interiorColor = row[6];
-                        var exteriorColor = row[7];
+                        var interiorColor = row[7];
+                        var exteriorColor = row[6];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + exteriorColor + ', ' + interiorColor;
 
                     }
@@ -2487,7 +2513,7 @@ $(document).ready(function () {
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping') {
             var table = $('#shipping-table').DataTable();
-            table.row.add([row[0],row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
             var shipppingAddedCount =   $('#is-shipping-charge-added').val();
             var count = shipppingAddedCount - 1;
             $('#is-shipping-charge-added').val(count);
@@ -2592,6 +2618,7 @@ $(document).ready(function () {
         var addon = "";
         var brand = "";
         var modelLine = "";
+        var modelyear = "";
         var modelNumber = "";
         var variant = "";
         var interiorColor = "";
@@ -2913,7 +2940,6 @@ $(document).ready(function () {
     $('#search-button').on('click', function() {
         var modelLineId = $('#model_line').val();
         var brandId = $('#brand').val();
-
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
@@ -4042,8 +4068,37 @@ function updateSecondTable(RowId, savedVins) {
                     $(this).find(".checkbox-hide").attr('id','checkbox-' + i);
                     $(this).find(".checkbox-hide").attr('name','is_hide['+ checkboxIndex +']');
                     $(this).find(".price-error").attr('id','priceError'+ checkboxIndex);
-
                 });
             }
         </script>
+        <script>
+        $(document).ready(function() {
+            $('#countryofdischarge').prop('disabled', true).html('<option value="" disabled selected>Select Shipping Country</option>');
+    $('#country').change(function() {
+        var countryId = $(this).val();
+        var countryName = $('#country option:selected').text();
+        if (countryId) {
+            $('#countryofdischarge').prop('disabled', false).empty().html('<option value="" disabled selected>Select Shipping Country</option>');
+            $.ajax({
+                url: '/countries/' + countryId + '/neighbors',
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $('#countryofdischarge').empty();
+                    $('#countryofdischarge').html('<option value="" disabled selected>Select Shipping Country</option>');
+                    $('#countryofdischarge').append('<option value="' + countryId + '">' + countryName + '</option>');
+                    $.each(data, function(key, value) {
+                        if (key != countryId) {
+                            $('#countryofdischarge').append('<option value="' + key + '">' + value + '</option>');
+                        }
+                    });
+                }
+            });
+        } else {
+            $('#countryofdischarge').empty();
+            $('#countryofdischarge').prop('disabled', true).empty().html('<option value="" disabled selected>Select Country first</option>');
+        }
+    });
+});
+</script>
 @endpush

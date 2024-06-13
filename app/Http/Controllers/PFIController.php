@@ -80,7 +80,7 @@ class PFIController extends Controller
 
         $request->validate([
             'pfi_reference_number' => 'required',
-            'pfi_date' => 'required',
+//            'pfi_date' => 'required',
             'amount'  => 'required',
             'file' => 'required|mimes:pdf'
         ]);
@@ -89,7 +89,7 @@ class PFIController extends Controller
         $pfi = new PFI();
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
-        $pfi->pfi_date = $request->pfi_date;
+//        $pfi->pfi_date = $request->pfi_date;
         $pfi->amount = $request->amount;
         $pfi->letter_of_indent_id = $request->letter_of_indent_id;
         $pfi->created_by = Auth::id();
@@ -98,7 +98,7 @@ class PFIController extends Controller
         $pfi->delivery_location = $request->delivery_location;
         $pfi->currency = $request->currency;
         $pfi->supplier_id = $request->supplier_id;
-        $pfi->released_amount = $request->released_amount;
+//        $pfi->released_amount = $request->released_amount;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
@@ -232,7 +232,7 @@ class PFIController extends Controller
 
         $request->validate([
             'pfi_reference_number' => 'required',
-            'pfi_date' => 'required',
+//            'pfi_date' => 'required',
             'amount'  => 'required',
             'file' => 'mimes:pdf'
         ]);
@@ -241,13 +241,13 @@ class PFIController extends Controller
         $pfi = PFI::find($id);
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
-        $pfi->pfi_date = Carbon::parse($request->pfi_date)->format('Y-m-d');
+//        $pfi->pfi_date = Carbon::parse($request->pfi_date)->format('Y-m-d');
         $pfi->amount = $request->amount;
         $pfi->comment = $request->comment;
         $pfi->delivery_location = $request->delivery_location;
         $pfi->currency = $request->currency;
         $pfi->supplier_id = $request->supplier_id;
-        $pfi->released_amount = $request->released_amount;
+//        $pfi->released_amount = $request->released_amount;
 
         $destinationPath = 'PFI_document_withoutsign';
         $destination = 'PFI_document_withsign';
@@ -355,6 +355,7 @@ class PFIController extends Controller
             $letterOfIndent->save();
         }
         $pfi->delete();
+        (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');
 
         DB::commit();
 
@@ -412,7 +413,9 @@ class PFIController extends Controller
 
     }
     public function paymentStatusUpdate(Request $request, $id) {
-        info($id);
+
+        (new UserActivityController)->createActivity('PFI payment status updated.');
+
         $pfi = PFI::find($id);
         $pfi->payment_status = $request->payment_status;
         $pfi->save();

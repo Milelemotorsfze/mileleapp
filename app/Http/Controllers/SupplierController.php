@@ -1435,14 +1435,16 @@ class SupplierController extends Controller
     {
         // dd('hi');
         info($request->all());
+
         $contactNumber = $request->contact_number;
         if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
             $isVendorExist = Supplier::where('supplier', $request->name);
 
         }else{
-            $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name);
+            $isVendorExist = Supplier::select('contact_number','supplier','id')
+                ->whereIn('contact_number', [$contactNumber,Supplier::MIGRATED_SUPPLIER_DUMMY_CONTACT_NUMBER])
+                ->where('supplier', $request->name);
         }
-
         if($request->id) {
             $isVendorExist = $isVendorExist->whereNot('id', $request->id);
         }
@@ -1453,7 +1455,7 @@ class SupplierController extends Controller
                 $data['name_error'] = 'Supplier Name already existing';
                 $data['error'] = "";
             }else{
-                $data['error'] = 'Combination of Name and Contact Number should be unique';
+                $data['error'] = 'Combination of Name and Contact Number('.$isVendorExist->contact_number.') already existing.';
                 $data['name_error'] = "";
             }
             return response($data);

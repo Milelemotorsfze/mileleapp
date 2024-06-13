@@ -17,6 +17,7 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function index(Builder $builder)
     {
+        (new UserActivityController)->createActivity('Open the listing page of model year calculation Rule.');
         $modelYearRules = ModelYearCalculationRule::all();
 
         return view('model-year-settings.rules.index', compact('modelYearRules'));
@@ -27,7 +28,7 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function create()
     {
-
+        (new UserActivityController)->createActivity('Open the create page of model year calculation Rule.');
         return view('model-year-settings.rules.create');
     }
 
@@ -45,6 +46,7 @@ class ModelYearCalculationRuleController extends Controller
         $modelYearRule->name = $request->name;
         $modelYearRule->value = $request->value;
         $modelYearRule->save();
+        (new UserActivityController)->createActivity('Created new model year calculation Rule.');
 
         return redirect()->route('model-year-calculation-rules.index')->with('success', "Model Year Calculation Rule created successfully.");
     }
@@ -62,6 +64,7 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the edit page of model year calculation Rule.');
         $modelYearCalculationRule = ModelYearCalculationRule::findOrFail($id);
 
         return view('model-year-settings.rules.edit', compact('modelYearCalculationRule'));
@@ -83,6 +86,7 @@ class ModelYearCalculationRuleController extends Controller
         $modelYearCalculationRule->name = $request->name;
         $modelYearCalculationRule->value = $request->value;
         $modelYearCalculationRule->save();
+        (new UserActivityController)->createActivity('Updated model year calculation Rule.');
 
         return redirect()->route('model-year-calculation-rules.index')->with('success', "Model Year Calculation Rule updated successfully.");
     }
@@ -92,6 +96,8 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted model year calculation Rule.');
+
         $modelYearCategories = ModelYearCalculationCategory::where('model_year_rule_id', $id)->delete();
 
         $modelYearCalculationRule = ModelYearCalculationRule::findOrFail($id);

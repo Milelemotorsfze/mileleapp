@@ -26,9 +26,11 @@
     <div class="card-body">
         <div class="row">
         <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Date : </label>
-            <input type="Date" id="date" name="date" class="form-control" value = "{{$movementref->date}}" placeholder="Date" readonly>
-        </div>
+    <label for="basicpill-firstname-input" class="form-label">Date Of Movement:</label>
+    <div id="date" name="date">
+        {{ \Carbon\Carbon::parse($movementref->date)->format('j-M-Y') }}
+    </div>
+</div>
         </div>
         <br>
         <div class="table-responsive" >

@@ -13,6 +13,8 @@ use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\User;
 use App\Models\Masters\PassportRequestPurpose;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\Masters\MasterDivisionWithHead;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class PassportReleaseController extends Controller
 {
@@ -150,6 +152,9 @@ class PassportReleaseController extends Controller
             $update->release_action_by_employee = $request->status;
             if($request->status == 'approved') {
                 $update->release_action_by_department_head = 'pending';
+                $employee2 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$employee2->team_lead_or_reporting_manager)->first();
+                $update->release_department_head_id = $leadOrMngr->approval_by_id;
                 $message = 'Employee passport release request send to Reporting Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
             }
         }

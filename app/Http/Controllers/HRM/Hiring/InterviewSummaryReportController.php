@@ -22,6 +22,7 @@ use Validator;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class InterviewSummaryReportController extends Controller
 {
@@ -333,7 +334,7 @@ class InterviewSummaryReportController extends Controller
             })->latest();
         }
         $hiringrequests = $hiringrequests->get();
-        $data = EmployeeHiringRequest::where('id',$id);
+        $data = EmployeeHiringRequest::where('id',$currentInterviewReport->hiring_request_id);
         if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
             $data = $data->latest();
         }
@@ -358,7 +359,7 @@ class InterviewSummaryReportController extends Controller
             return view('hrm.notaccess',compact('errorMsg'));
         }
         else {
-            return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
             'masterGender','interviewersNames','hiringrequests'));
         }
     }
@@ -484,7 +485,7 @@ class InterviewSummaryReportController extends Controller
             $message = '';
             $update = InterviewSummaryReport::where('id',$request->id)->first();
             if($update && $update->status == 'pending') {
-
+                
             
             if($request->current_approve_position == 'HR Manager') {
                 $update->comments_by_hr_manager = $request->comment;
@@ -492,7 +493,7 @@ class InterviewSummaryReportController extends Controller
                 $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
-                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    $employee1 = EmployeeProfile::where('user_id',$update->employeeHiringRequest->requested_by)->first();
                     $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
                     $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Interview Summary Report send to Division Head ( '.$update->divisionHeadName->name.' - '.$update->divisionHeadName->email.' ) for approval';
@@ -534,7 +535,7 @@ class InterviewSummaryReportController extends Controller
         } 
         catch (\Exception $e) {
             DB::rollback();
-            info($e);
+            dd($e);
             $errorMsg ="Something went wrong! Contact your admin";
             return view('hrm.notaccess',compact('errorMsg'));
         }
@@ -838,17 +839,17 @@ class InterviewSummaryReportController extends Controller
         $divisionHeadPendings = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','pending'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadApproved = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','approved'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadRejected = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','rejected'],                
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         return view('hrm.hiring.interview_summary_report.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
     }

@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    .btn-danger {
+    position: relative;
+    z-index: 10;
+}
     .editing {
         background-color: white !important;
         border: 1px solid black  !important;
@@ -34,6 +38,72 @@
     }
 </style>
 @section('content')
+<!-- Modal -->
+<div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="remarksModalLabel">Enter Remarks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="remarks" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitRemarks">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="remarksrejModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Payment Release</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="remarksRejForm">
+                    @csrf
+                    <input type="hidden" id="vehicleId" name="vehicleId">
+                    <div class="form-group">
+                        <label for="remarksrej">Remarks</label>
+                        <textarea id="remarksrej" name="remarks" class="form-control" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="submitRemarksrej" class="btn btn-primary">Submit Remarks</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="fileUploadModal" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileUploadModalLabel">Swift Copy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="fileUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Uploading PDF of Swift Copy</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                    </div>
+                    <br>
+                    <input type="hidden" id="status" name="status">
+                    <input type="hidden" id="orderId" name="orderId">
+                    <button type="submit" class="btn btn-primary">Upload & Complete Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="card-header">
         <!-- @if ($previousId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
@@ -41,16 +111,89 @@
       </a>
       @endif -->
         <b>Purchase Order Number : {{$purchasingOrder->po_number}}</b>
+        <a class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}">
+    <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+</a>
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-cancel');
+                    @endphp
+                    @if ($hasPermission)
+@php
+    $purchasedordergrn = DB::table('vehicles')
+    ->where('vehicles.purchasing_order_id', $purchasingOrder->id)
+    ->whereNotNull('vehicles.grn_id')
+    ->count();
+        @endphp      
+        @if($purchasedordergrn == 0)
+@if($purchasingOrder->status != "Cancel Request" && $purchasingOrder->status != "Cancelled")
+<a id="cancelButton" class="btn btn-sm btn-danger float-end me-4" href="{{ route('purchasing_order.cancelpo', ['id' => $purchasingOrder->id]) }}">
+    <i class="fa fa-times" aria-hidden="true"></i> PO Cancel
+</a>
+@endif
+@endif
+@endif
         <!-- @if ($nextId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $nextId) }}">
          <i class="fa fa-arrow-right" aria-hidden="true"></i>
       </a>
       @endif -->
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to cancel this PO?</p>
+        <div class="form-group">
+          <label for="remarkspo">Remarks:</label>
+          <textarea class="form-control" id="remarkspo" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmCancel">Yes, Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="confirmationvehModal" tabindex="-1" role="dialog" aria-labelledby="confirmationvehModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationvehModalLabel">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to cancel this Vehicle?</p>
+        <div class="form-group">
+          <label for="remarkspo">Remarks:</label>
+          <textarea class="form-control" id="remarksveh" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmvehCancel">Yes, Send Cancel Request</button>
+      </div>
+    </div>
+  </div>
+</div>
     @php
-        $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-        $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+    $exColours = \App\Models\ColorCode::where('belong_to', 'ex')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
+        return [$color->id => $formattedName];
+    })
+    ->toArray();
+    $intColours = \App\Models\ColorCode::where('belong_to', 'int')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        // Combine 'name' and 'code' and use 'id' as the key
+        $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
+        return [$color->id => $formattedName];
+    })
+    ->toArray();
     @endphp
     <div class="card-body">
     @php
@@ -58,8 +201,16 @@
                     @endphp
                     @if ($hasPermission)
                     <div class ="row">
-                    <div class="col-lg-9 col-md-6 col-sm-6">    
+                    <div class="col-lg-9 col-md-6 col-sm-6">
+    @php
+    $purchasedordergrn = DB::table('vehicles')
+    ->where('vehicles.purchasing_order_id', $purchasingOrder->id)
+    ->whereNotNull('vehicles.grn_id')
+    ->count();
+        @endphp      
+        @if($purchasedordergrn == 0)
                     <a href="#" class="btn btn-sm btn-primary float-end edit-basic-btn" data-purchase-id="{{ $purchasingOrder->id }}">Edit Basic Details</a>
+        @endif
                     <a href="#" class="btn btn-sm btn-success float-end update-basic-btn" style="display: none;">Update Basic Details</a>
                     </div>
                     </div>
@@ -89,7 +240,7 @@
         <div class="card-body">
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST">
+    <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
         <div class="modal-header">
@@ -132,6 +283,7 @@
                 <option value="EUR" {{ $purchasingOrder->currency === 'EUR' ? 'selected' : '' }}>EUR</option>
                 <option value="GBP" {{ $purchasingOrder->currency === 'GBP' ? 'selected' : '' }}>GBP</option>
                 <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
+                <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
             </select>
             </div>
             <div class="col-md-4 p-3">
@@ -156,31 +308,64 @@
             <label for="Incoterm" class="form-label">Port of Loading:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading" value="{{$purchasingOrder->pol}}">
+            <select name="pol" class="form-control" id="pol">
+                <option value="">Select the Port of Loading</option>
+                @foreach ($ports as $port)
+                    <option value="{{ $port->id }}" {{ $port->id == $purchasingOrder->pol ? 'selected' : '' }}>
+                        {{ $port->name }} - {{ $port->country->name }}
+                    </option>
+                @endforeach
+            </select>
             </div>
             <div class="col-md-4 p-3">
             <label for="Incoterm" class="form-label">Port of Discharge:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge" value="{{$purchasingOrder->pod}}">
+            <select name="pod" class="form-control" id="pod">
+                <option value="">Select the Port of Loading</option>
+                @foreach ($ports as $port)
+                    <option value="{{ $port->id }}" {{ $port->id == $purchasingOrder->pod ? 'selected' : '' }}>
+                        {{ $port->name }} - {{ $port->country->name }}
+                    </option>
+                @endforeach
+            </select>
             </div>
             <div class="col-md-4 p-3">
             <label for="Incoterm" class="form-label">Preferred Destination:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination" value="{{$purchasingOrder->fd}}">
+            <select name="fd" class="form-control" id="fd">
+            <option value="">Select the Preferred Destination</option>
+            @foreach ($countries as $country)
+                <option value="{{ $country->id }}" {{ $country->id == $purchasingOrder->fd ? 'selected' : '' }}>
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingCost" class="form-label font-size-13 text-center">PFI Number:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PFI Number" value="{{$purchasingOrder->pl_number}}">
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingCost" class="form-label font-size-13 text-center">Upload PFI:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
             </div>
         </div>
-    </div>
-</div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
-          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm createAddonId">Submit</button>
         </div>
-      </div>
-    </form>
-  </div>
-</div>
+            </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm createAddonId">Submit</button>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
             <div class="row">
                 <div class="col-lg-9 col-md-6 col-sm-12">
                     <div class="row">
@@ -239,7 +424,11 @@
                             <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
+                        <span>{{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
+                        @else    
+                        <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+                        @endif
                         </div>
                     </div>
                     <div class="row">
@@ -260,15 +449,93 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>POL / POD / FD</strong></label>
+                            <label for="choices-single-default" class="form-label"><strong>POL / POD / PD</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{$purchasingOrder->pol}} / {{$purchasingOrder->pod}} / {{$purchasingOrder->fd}}</span>
+                        <span> {{ $purchasingOrder->polPort->name ?? '' }} / {{ $purchasingOrder->podPort->name ?? '' }} / {{ $purchasingOrder->fdCountry->name ?? '' }}</span>
                         </div>
                     </div>
-                    <div class="row"></div>
+                    @if ($purchasingOrder->pl_number)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span> {{ $purchasingOrder->pl_number ?? '' }}</span>
+                        </div>
+                    </div>
+                    @endif
+                    @if ($purchasingOrder->pl_file_path)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <button type="button" class="btn btn-primary btn-sm view-doc-btn" data-toggle="modal" data-target="#viewdocModal">
+                            <i class="fas fa-file-pdf mr-2"></i> View PFI
+                        </button>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="viewdocModal" tabindex="-1" role="dialog" aria-labelledby="viewdocModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewdocModalLabel">PL Viewer</h5>
+                                    <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    @endif
+                    @if ($purchasingOrderSwiftCopies->count() > 0)
+                    <br>
+        <div class="row mb-2">
+            <div class="col-lg-2 col-md-3 col-sm-12">
+                <label for="choices-single-default" class="form-label"><strong>Swift Copy</strong></label>
+            </div>
+            <div class="col-lg-6 col-md-9 col-sm-12">
+            @foreach ($purchasingOrderSwiftCopies as $swiftCopy)
+                <button type="button" class="btn btn-primary btn-sm view-swift-btn" data-file-path="{{ asset($swiftCopy->file_path) }}">
+                    <i class="fas fa-file-pdf mr-2"></i> B - {{ $swiftCopy->batch_no }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+@endif
+
+<!-- Modal -->
+<div class="modal fade" id="swiftCopyModal" tabindex="-1" role="dialog" aria-labelledby="swiftCopyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="swiftCopyModalLabel">Swift Copy</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="swiftCopyContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+                    @if($purchasingOrder->status === 'Cancel Request')
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Cancel Remarks</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                            <span>{{$purchasingOrder->remarks}}</span>
+                        </div>
+                    </div>
+                    @else
+                    <div class="row">
+                    </div>
                     <br>
                     <br>
+                    @endif
                     <div class="row">
                         <div class="col-lg-1 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Status</strong></label>
@@ -287,6 +554,10 @@
                                 <span id="status-badge" class="badge badge-soft-success float-middle badge-large">Approved</span>
                             @elseif ($purchasingOrder->status === 'Rejected')
                                 <span id="status-badge" class="badge badge-soft-danger float-middle badge-large">Rejected</span>
+                                @elseif ($purchasingOrder->status === 'Cancel Request')
+                                <span id="status-badge" class="badge badge-soft-danger float-middle badge-middle">Cancel Request</span>
+                                @elseif ($purchasingOrder->status === 'Cancelled')
+                                <span id="status-badge" class="badge badge-soft-danger float-middle badge-large">Cancelled</span>
                             @endif
                             @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
@@ -295,9 +566,28 @@
                                 @if ($purchasingOrder->status === 'Pending Approval')
                                     <button id="approval-btn" class="btn btn-success" onclick="updateStatus('Approved', {{ $purchasingOrder->id }})">Approve</button>
                                     <button id="rejection-btn" class="btn btn-danger" onclick="updateStatus('Rejected', {{ $purchasingOrder->id }})">Reject</button>
+                                    @elseif ($purchasingOrder->status === 'Cancel Request')
+                                    <button id="approvalrej-btn" class="btn btn-danger" onclick="updateStatusrej('Approved', {{ $purchasingOrder->id }})">Approve</button>
+                                    <button id="rejectionrej-btn" class="btn btn-success" onclick="updateStatusrej('Rejected', {{ $purchasingOrder->id }})">Reject</button>
                                 @endif
                             @endif
                         </div>
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                        @endphp
+                        @if ($hasPermission)
+                            @if ($purchasingOrder->status === 'Approved')
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                        <label for="choices-single-default" class="form-label"><strong>Forward All Payment Request</strong></label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approval</button>
+                                    <button id="allpaymentintreqfinreq-btn" class="btn btn-danger" onclick="allpaymentintreqfin('Rejected', {{ $purchasingOrder->id }})">Reject</button>
+                                    </div>
+                                @endif
+                            @endif
+                            @endif
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
@@ -365,16 +655,16 @@
                             @endif
                         @endif
                         @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
                         @endphp
                         @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')
-                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Rejected'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <label for="choices-single-default" class="form-label"><strong>Payment Request Approval</strong></label>
+                                        <label for="choices-single-default" class="form-label"><strong>Re-Request for Payment</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approved All</button>
+                                        <button id="approval-btn" class="btn btn-success" onclick="rerequestpayment('Approved', {{ $purchasingOrder->id }})">Re-Request All</button>
                                     </div>
                                 @endif
                             @endif
@@ -399,82 +689,120 @@
                                         <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp('Approved', {{ $purchasingOrder->id }})">Complete All Payments</button>
+                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp({{ $purchasingOrder->id }})">Complete All Payments</button>
                                     </div>
                                 @endif
                             @endif
                             @endif
                     </div>
                 </div>
+                @php
+                            $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
+                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
+                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
+                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
+                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $serialNumber = 1;   
+                            @endphp
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
                         <thead class="bg-soft-secondary">
+                        <th style="font-size: 12px;">S.No</th>
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        <th style="font-size: 12px;">Pending With Department</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Not Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr> 
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;"> Vehicles Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Requested</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Request</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Initiated</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
+                            <td style="font-size: 12px;">CEO</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vendor Confirmed</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Incoming Stock</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
                         <th style="font-size: 12px;">Status</th>
                         <th style="font-size: 12px;">Qty</th>
                         </thead>
                         <tbody>
-                        @php
-                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
-                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
-                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->count();
-                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->count();
-                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->count();
-                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->count();
-                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
-                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->count();
-                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->count();
-                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->count();
-                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->count();
-                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
-                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->count();
-                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->count();
-                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->count();
-                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->count();
-                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->count();
-                        @endphp
                         <tr>
-                            <td style="font-size: 12px;">Vehicles Not Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;"> Vehicles Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Vehicles Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Requested To Manager</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Request To Finance</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Initiated By Finance</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Released</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Released Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Vendor Confirmed</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Incoming Stock</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                            <td style="font-size: 12px;">Vehicles Cancel</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -482,7 +810,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Vehicle's Details</h4>
+                    <h4 class="card-title">Active Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
@@ -510,7 +838,7 @@
                                 <th>Brand</th>
                                 <th>Model Line</th>
                                 <th>Variant</th>
-                                <th>Variants Detail</th>
+                                <th id="variants_detail">Variants Detail</th>
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
@@ -526,6 +854,7 @@
                                     <th>Payment Status</th>
                                 @endif
                                 <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
+                                <th style="vertical-align: middle; text-align: center;">Remarks</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -562,18 +891,29 @@
                             <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
                             <td>{{ ucfirst($vehicles->variant->name) }}</td>
-                            <td>
-                            <span class="full-text">{{ ucfirst(strtolower($vehicles->variant->detail)) }}</span>
-                            <span class="short-text"></span>
-                            <a href="#" class="read-more">Read more</a>
-                          </td>
-                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price ?? '') }}</td>
+                            @php
+                        $words = explode(' ', ucfirst(strtolower($vehicles->variant->detail)));
+                        $shortDetail = implode(' ', array_slice($words, 0, 3));
+                        $remainingDetail = implode(' ', array_slice($words, 3));
+                        @endphp
+                        <td>
+                            <span class="short-detail">{{ $shortDetail }}</span>
+                            @if(count($words) > 5)
+                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
+                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
+                            @endif
+                        </td>
+                        @if (!is_null($vehicles->VehiclePurchasingCost->unit_price) && !is_numeric($vehicles->VehiclePurchasingCost->unit_price))
+                        <td>{{ isset($vehicles->VehiclePurchasingCost->unit_price) ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
+                        @else
+                        <td>{{ $vehicles->VehiclePurchasingCost->unit_price }}</td>
+                        @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
                             @if ($hasPermission)
                             @if($vehicles->grn_id === null)
-							              @if ($vehicles->status != 'cancel')
+							@if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
@@ -632,7 +972,36 @@
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             @endif
-							              @endif
+                            @else
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+							@endif
                             @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval']);
@@ -695,20 +1064,18 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                         @endphp
                         @if ($hasPermission)
-                        @if ($vehicles->payment_status === '')
-                        @if($vehicles->status == 'Request for Cancel')
-                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', $vehicles->id) }}" onclick="return confirmApprovedcancel();"style="white-space: nowrap;">
+                        @if($vehicles->status == 'Request for Cancel' && is_null($vehicles->grn_id))
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', ['id' => $vehicles->id]) }}" style="white-space: nowrap;">
                             Approved Cancel
                         </a>
-                        @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment')
-                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
+                        @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment' && is_null($vehicles->grn_id))
+                        <a id = 'cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
                             Reject / Cancel
                         </a>
                         @elseif ($vehicles->status == 'Rejected')
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
                             Un-Reject
                         </a>
-                        @endif
                         @endif
                         @endif
                         @php
@@ -720,9 +1087,7 @@
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleasesrejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                        Reject
-                        </a>
+                        <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
                         </div>
                         @endif
                         @endif
@@ -736,7 +1101,7 @@
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Incoming Confirmed
 											</a>
-                      @endif
+                                            @endif
 											@endif
 											@endif
 											{{-- End For Vendor Confirm  --}}
@@ -787,8 +1152,25 @@
 											@if ($hasPermission)
 											@if ($purchasingOrder->status === 'Approved')
 											@if ($vehicles->status === 'Request for Payment')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Approved Payment
+											<div class="btn-group" role="group" aria-label="Payment Actions">
+                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                                                Approved
+                                            </a>
+                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentintconfirmrej', $vehicles->id) }}" onclick="return confirmPaymentrej();" style="white-space: nowrap;">
+                                                Reject
+                                            </a>
+                                        </div>
+											@endif
+											@endif
+											@endif
+                                            @php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Payment Release Rejected')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.repaymentintiation', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Re-Payment Request
 											</a>
 											@endif
 											@endif
@@ -815,9 +1197,62 @@
 									@if ($hasPermission)
 									@if ($purchasingOrder->status === 'Approved')
 									@if ($vehicles->payment_status === 'Payment Release Approved')
-									<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                                    <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="fileUploadModalsingleLabel">Swift Copy</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="paymentFile">Upload File</label>
+            <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
+          </div>
+          <input type="hidden" id="vehicleId" name="vehicleId" value="">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+                                        <!-- File Upload Modal -->
+                                        <!-- <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                            <form id="paymentForm" action="{{ route('vehicles.paymentrelconfirmdebited', 0) }}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="fileUploadModalsingleLabel">Upload Payment Confirmation</h5>
+                                                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label for="paymentFile">Upload File</label>
+                                                    <input type="file" class="form-control" id="paymentFile" name="paymentFile" required>
+                                                </div>
+                                                <input type="hidden" id="vehicleId" name="vehicleId" value="">
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </form>
+                                            </div>
+                                        </div>
+                                        </div> -->
+                                    <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="#" onclick="allpaymentintreqfinpaycompsingle({{ $vehicles->id }});" style="margin-right: 10px; white-space: nowrap;">
+    Payment Completed
+</a>
+									<!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 									Payment Completed
-									</a>
+									</a> -->
 									@endif
 									@endif
 									@endif
@@ -830,12 +1265,12 @@
 								@endphp
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
-                                @if($vehicles->status !== "Request for Cancel")
-								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
+                                @if($vehicles->status !== "Request for Cancel" && is_null($vehicles->grn_id))
+								<a id = 'cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
 									Cancel
 								</a>
                                 @endif
-								@elseif ($vehicles->status === 'Pending Approval')
+								@elseif ($vehicles->status === 'Pending Approval' && is_null($vehicles->grn_id))
 								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
 									Delete
 								</a>
@@ -846,6 +1281,7 @@
                         </div>
 							</div>
                         </td>
+                        <td>{{ ucfirst(strtolower($vehicles->procurement_vehicle_remarks)) }}</td>
                         </tr>
                             @endforeach
                             </tbody>
@@ -943,7 +1379,80 @@
 {{--                    @endif--}}
                 @endif
             @endcan
-
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Cancel Vehicle's Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" >
+                        <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>  
+                            <th>Ref No</th>
+                            <th>Brand</th>
+                            <th>Model Line</th>
+                            <th>Variant</th>
+                            <th>Variants Detail</th>
+                            <th>Price</th>
+                            <th>Exterior Colour</th>
+                            <th>Interior Colour</th>
+                            <th>VIN Number</th>
+                            <th>Territory</th>
+                            <th>Estimated Arrival</th>
+                            <th>Payment Status</th>
+                            <th>Remarks</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($vehiclesdel as $vehiclesdel)
+                                <tr>
+                                <td>{{ $vehiclesdel->id }}</td>
+                                @can('view-vehicle-model-sfx')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
+                                @endphp
+                                @if ($hasPermission)
+                                    <td>
+                                        @if($vehiclesdel->model_id)
+                                            {{ $vehiclesdel->masterModel->model ?? ''  }} - {{ $vehiclesdel->masterModel->sfx ?? '' }}
+                                        @endif
+                                    </td>
+                                @endif
+                            @endcan
+                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->brand->brand_name)) }}</td>
+                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->master_model_lines->model_line)) }}</td>
+                            <td>{{ ucfirst($vehiclesdel->variant->name) }}</td>
+                        @php
+                        $words = explode(' ', ucfirst(strtolower($vehiclesdel->variant->detail)));
+                        $shortDetail = implode(' ', array_slice($words, 0, 3));
+                        $remainingDetail = implode(' ', array_slice($words, 3));
+                        @endphp
+                        <td>
+                            <span class="short-detail">{{ $shortDetail }}</span>
+                            @if(count($words) > 5)
+                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
+                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
+                            @endif
+                        </td>
+                        @if (!is_null($vehiclesdel->VehiclePurchasingCost->unit_price) && !is_numeric($vehiclesdel->VehiclePurchasingCost->unit_price))
+                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
+                        @else
+                        <td>{{ $vehiclesdel->VehiclePurchasingCost->unit_price }}</td>
+                        @endif
+                          <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
+                          <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
+                          <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
+                         <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
+                                </tr>
+                                @endforeach
+                    </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Vehicles Log Details</h4>
@@ -1070,8 +1579,8 @@
                                        ';
                                        $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
                                        $change_bys = $change_by->name;
-                                       $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
-                                       $variant_name = $variant->name;
+                                       $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
+                                        $variant_name = $variant ? $variant->name: null;
                                        echo '
                                        <td>'. $previousLog->status .'</td>
                                        ';
@@ -1126,8 +1635,8 @@
                                     @php
                                         $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
                                         $change_bys = $change_by->name;
-                                        $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
-                                        $variant_name = $variant->name;
+                                        $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
+                                        $variant_name = $variant ? $variant->name: null;
                                         $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
                                         $ex_colours = $exColour ? $exColour->name : null;
                                         $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
@@ -1152,11 +1661,89 @@
                     </div>
                 </div>
             </div>
+            <!-- <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">All Events Log</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Date</th>
+                                <th>Updated By</th>
+                                <th>Event Type</th>
+                                <th>Field</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                                <th>Description / Remarks</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($purchasedorderevents as $purchasedorderevents)
+                            <tr>
+                            @php
+                                        $username = DB::table('users')->where('id', $purchasedorderevents->created_by)->first();
+                                        $usernames = $username->name;
+                            @endphp
+                                <td>{{$purchasedorderevents->created_at }}</td>
+                                <td>{{$usernames }}</td>
+                                <td>{{$purchasedorderevents->event_type }}</td>
+                                <td>{{$purchasedorderevents->field }}</td>
+                                <td>{{$purchasedorderevents->old_value }}</td>
+                                <td>{{$purchasedorderevents->new_value }}</td>
+                                <td>{{$purchasedorderevents->description }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> -->
         </div>
         <script>
+            let targetUrl;
+    function openModal(id) {
+        targetUrl = window.location.href; 
+        $('#vehicleId').val(id);
+        $('#remarksrejModal').modal('show');
+        return false;  // Prevent default button behavior
+    }
+
+    $('#submitRemarksrej').click(function() {
+        var vehicleId = $('#vehicleId').val();
+        var remarks = $('#remarksrej').val();
+        var token = $('input[name="_token"]').val();
+        var url = '{{ route("vehicles.paymentreleasesrejected", ":id") }}';
+        url = url.replace(':id', vehicleId);
+
+        if (remarks) {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: token,
+                    remarks: remarks
+                },
+                success: function(response) {
+                    // Handle the response here
+                    $('#remarksrejModal').modal('hide');
+                    alert('Remarks submitted successfully');
+                    // Redirect to the target URL after successful submission
+                    window.location.href = targetUrl;
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        } else {
+            alert('Please provide remarks.');
+        }
+    });
+</script>
+        <script>
             $(document).ready(function() {
-
-
                 $('.select2').select2();
 
                 // Table #dtBasicExample2
@@ -1226,7 +1813,9 @@
                             if (columnName === "ex_color") {
                                 return;
                             }
-
+                            if (columnName === "variants_detail") {
+                                return;
+                            }
                             var selectWrapper = $('<div class="select-wrapper"></div>');
                             var select = $('<select class="form-control my-1" multiple></select>')
                                 .appendTo(selectWrapper)
@@ -1311,42 +1900,36 @@
                 });
             });
         </script>
+         @php
+       $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+       @endphp
+       @if (!$hasPermission)
         <script>
-            // Get all editable fields
             const editableFields = document.querySelectorAll('.editable-field');
-            // Get the Edit button and Update Success button
             const editBtn = document.querySelector('.edit-btn');
             const updateBtn = document.querySelector('.update-btn');
-            // Add event listener to the Edit button
             editBtn.addEventListener('click', () => {
-                // Toggle the Edit and Update Success buttons
                 editBtn.style.display = 'none';
                 updateBtn.style.display = 'block';
-                // Enable editing for all editable fields and change their color
                 editableFields.forEach(field => {
                     field.contentEditable = true;
                     field.classList.add('editing');
-                    // Remove the "disabled" attribute from the select elements
                     const selectElement = field.querySelector('select');
                     if (selectElement) {
                         selectElement.removeAttribute('disabled');
                     }
-                    // Check if the field belongs to the "Estimation Date" column
                     const isEstimationDateColumn = field.classList.contains('estimation_date');
-                    // Check if the field contains a null value and is not in the "Estimation Date" column
                     const fieldValue = field.innerText.trim();
                     const isNullValue = fieldValue === '';
                     if (isNullValue && !isEstimationDateColumn) {
                         return;
                     }
-                    // Replace the non-editable field with an editable input field
                     if (isEstimationDateColumn) {
                         const inputField = document.createElement('input');
                         inputField.type = 'date';
                         inputField.name = 'oldestimated_arrival[]';
                         inputField.value = fieldValue;
                         inputField.classList.add('form-control');
-                        // Replace the field with the input field
                         field.innerHTML = '';
                         field.appendChild(inputField);
                     }
@@ -1356,9 +1939,8 @@
     checkDuplicateVIN(function(vinCheckResult) {
         console.log(vinCheckResult);
         if (vinCheckResult === false) {
-            return; // Do nothing if VIN check fails
+            return;
         } else {
-            // Proceed with update logic
             updateBtn.style.display = 'none';
             editBtn.style.display = 'block';
             editableFields.forEach(field => {
@@ -1399,10 +1981,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Handle the response from the controller if needed
                 console.log(data);
-
-                // Display the flash message on the page
                 const flashMessage = document.getElementById('flash-message');
                 flashMessage.textContent = 'Data updated successfully';
                 flashMessage.style.display = 'block';
@@ -1420,6 +1999,7 @@
     });
 });
         </script>
+        @endif
         <script>
             $(document).ready(function() {
                 $('#variants_id').on('input', function() {
@@ -1510,6 +2090,10 @@
                 });
             });
         </script>
+       @php
+       $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+       @endphp
+       @if (!$hasPermission)
         <script>
             var input = document.getElementById('variants_id');
             var dataList = document.getElementById('variantslist');
@@ -1531,7 +2115,29 @@
                 }
             });
         </script>
+        @endif
         <script>
+            function updateStatusrej(status, orderId) {
+                let url = '{{ route('purchasing.updateStatuscancel') }}';
+                let data = { status: status, orderId: orderId };
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Status update successful');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error updating status:', error);
+                    });
+            }
             function updateStatus(status, orderId) {
                 let url = '{{ route('purchasing.updateStatus') }}';
                 let data = { status: status, orderId: orderId };
@@ -1575,27 +2181,45 @@
                     });
             }
             function updateallStatusrel(status, orderId) {
+    if (status === 'Rejected') {
+        let remarksModal = new bootstrap.Modal(document.getElementById('remarksModal'));
+        remarksModal.show();
 
-                let url = '{{ route('purchasing.updateallStatusrel') }}';
-                let data = { status: status, orderId: orderId };
+        document.getElementById('submitRemarks').onclick = function() {
+            let remarks = document.getElementById('remarks').value;
 
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
+            if (remarks.trim() === '') {
+                alert('Please enter remarks.');
+                return;
             }
+            postUpdateStatus(status, orderId, remarks);
+            remarksModal.hide();
+        };
+    } else {
+        postUpdateStatus(status, orderId);
+    }
+}
+function postUpdateStatus(status, orderId, remarks = '') {
+    let url = '{{ route('purchasing.updateallStatusrel') }}';
+    let data = { status: status, orderId: orderId, remarks: remarks };
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Status update successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        window.location.reload();
+    });
+}
             function deletepo(id) {
                 let url = '{{ route('purchasing-order.deletes', ['id' => ':id']) }}';
                 url = url.replace(':id', id);
@@ -1620,19 +2244,53 @@
             }
 
         </script>
+  <script>
+ $(document).ready(function() {
+    var cancelUrl;
+    $('#cancelButtonveh').click(function(event) {
+                event.preventDefault(); // Prevent the default action (navigation)
+        cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
+        $('#confirmationvehModal').modal('show'); // Show the modal
+            });
+			$('#confirmvehCancel').click(function() {
+        var remarks = $('#remarksveh').val(); // Get the remarks from the textarea
+        if (!remarks) {
+            alert('Please provide remarks.');
+            return; // Do not proceed if remarks are empty
+        }
+
+        // Make an AJAX POST request with the remarks and purchasing order ID
+        $.ajax({
+            url: cancelUrl, // Use the stored URL
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                remarks: remarks
+            },
+            success: function(response) {
+                $('#confirmationvehModal').modal('hide'); // Hide the modal
+                alert('Remarks submitted successfully');
+                window.location.href = window.location.href; // Redirect to the cancel URL
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+           });
+        </script>
         <script>
-            function confirmCancel() {
-                var confirmDialog = confirm("Are you sure you want to cancel this Vehicles?");
+            function confirmPayment() {
+                var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
                 if (confirmDialog) {
                     return true;
                 } else {
                     return false;
                 }
             }
-        </script>
-        <script>
-            function confirmPayment() {
-                var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
+            function confirmPaymentrej() {
+                var confirmDialog = confirm("Are you sure you want to Rejected Payment Request this Vehicles?");
                 if (confirmDialog) {
                     return true;
                 } else {
@@ -1732,8 +2390,8 @@
                         window.location.reload();
                     });
             }
-            function allpaymentintreqfinpaycomp(status, orderId) {
-                let url = '{{ route('purchasing.allpaymentreqssfinpaycomp') }}';
+            function rerequestpayment(status, orderId) {
+                let url = '{{ route('purchasing.rerequestpayment') }}';
                 let data = { status: status, orderId: orderId };
                 console.log(data);
                 fetch(url, {
@@ -1753,6 +2411,32 @@
                         window.location.reload();
                     });
             }
+            function allpaymentintreqfinpaycomp(orderId) {
+    document.getElementById('status').value = 'Approved';
+    document.getElementById('orderId').value = orderId;
+    $('#fileUploadModal').modal('show');
+}
+document.getElementById('fileUploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+    let url = '{{ route('purchasing.allpaymentreqssfinpaycomp') }}';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('File upload successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        console.log('File upload failed', error);
+        window.location.reload();
+    });
+});
             function allpaymentintreqpocomp(status, orderId) {
                 let url = '{{ route('purchasing.allpaymentintreqpocomp') }}';
                 let data = { status: status, orderId: orderId };
@@ -1830,7 +2514,6 @@
         if (allBlank) {
             console.log("All VIN values are blank");
             callback(1);
-            // Indicate all values are blank
         } else {
             var Po = "{{$purchasingOrder->id}}";
             $.ajaxSetup({
@@ -1845,14 +2528,14 @@
                 success: function(response) {
                     if (response === 'duplicate') {
                         alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
-                        callback(false); // Indicate duplicate values found
+                        callback(false);
                     } else {
-                        callback(1); // Indicate all values are unique
+                        callback(1);
                     }
                 },
                 error: function() {
                     alert('An error occurred while checking for VIN duplication. Please try again.');
-                    callback(false); // Indicate error occurred
+                    callback(false);
                 }
             });
         }
@@ -1862,27 +2545,33 @@
 $(document).ready(function() {
   $('.edit-basic-btn').on('click', function() {
     var purchaseId = $(this).data('purchase-id');
-    $('#purchaseId').val(purchaseId); // Set the value in the hidden input field
-    $('#editModal').modal('show'); // Show the modal
+    $('#purchaseId').val(purchaseId);
+    $('#editModal').modal('show');
+  });
+  $('.view-doc-btn').on('click', function() {
+    $('#viewdocModal').modal('show');
   });
 });
 </script>
 <script>
 $(document).ready(function() {
     $('#form-update_basicdetails').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        var formData = $(this).serialize(); // Serialize form data
+        event.preventDefault();
+
+        // Create a FormData object
+        var formData = new FormData(this);
+
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
             data: formData,
+            contentType: false, // Important for file upload
+            processData: false, // Important for file upload
             success: function(response) {
-                // Handle success response, maybe show a success message
                 alert('Purchase order details updated successfully!');
-                location.reload(); // Refresh the page
+                location.reload();
             },
             error: function(xhr, status, error) {
-                // Handle error response, maybe show an error message
                 console.error(xhr.responseText);
                 alert('An error occurred while updating purchase order details.');
             }
@@ -1890,5 +2579,76 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+$(document).ready(function() {
+    var cancelUrl;
 
+    $('#cancelButton').click(function(event) {
+        event.preventDefault(); // Prevent the default action (navigation)
+        cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
+        $('#confirmationModal').modal('show'); // Show the modal
+    });
+
+    $('#confirmCancel').click(function() {
+        var remarks = $('#remarkspo').val(); // Get the remarks from the textarea
+        if (!remarks) {
+            alert('Please provide remarks.');
+            return; // Do not proceed if remarks are empty
+        }
+
+        // Make an AJAX POST request with the remarks and purchasing order ID
+        $.ajax({
+            url: cancelUrl, // Use the stored URL
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                remarks: remarks
+            },
+            success: function(response) {
+                $('#confirmationModal').modal('hide'); // Hide the modal
+                alert('Remarks submitted successfully');
+                window.location.href = window.location.href; // Redirect to the cancel URL
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.read-more').forEach(function(element) {
+        element.addEventListener('click', function() {
+            var fullDetail = this.getAttribute('data-full-detail');
+            alert(fullDetail);
+        });
+    });
+});
+</script>
+<script>
+$(document).ready(function() {
+    $('.view-swift-btn').on('click', function() {
+        var filePath = $(this).data('file-path');
+        $('#swiftCopyContainer').html(`<embed src="${filePath}" type="application/pdf" width="100%" height="500px" />`);
+        $('#swiftCopyModal').modal('show');
+    });
+
+    $('#swiftCopyModal').on('hidden.bs.modal', function () {
+        $('#swiftCopyContainer').html('');
+    });
+});
+</script>
+<script>
+function allpaymentintreqfinpaycompsingle(vehicleId) {
+    // Update the form action URL with the correct vehicle ID
+    var form = document.getElementById('paymentForm');
+    var actionTemplate = "{{ route('vehicles.paymentrelconfirmdebited', ':id') }}";
+    var action = actionTemplate.replace(':id', vehicleId);
+    form.setAttribute('action', action);
+    // Open the modal
+    $('#fileUploadModalsingle').modal('show');
+}
+</script>
 @endsection

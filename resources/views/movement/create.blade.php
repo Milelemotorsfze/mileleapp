@@ -224,8 +224,7 @@
             });
         });
         $('#rows-container').on('click', '.remove-row-btn', function() {
-            var row = $(this).data('row');
-            $('[data-row="' + row + '"]').remove();
+            $(this).closest(".row").remove();
         });
         $('.vin').trigger('change');
     });

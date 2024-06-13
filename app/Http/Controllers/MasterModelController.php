@@ -19,6 +19,8 @@ class MasterModelController extends Controller
      */
     public function index(Builder $builder)
     {
+        (new UserActivityController)->createActivity('Open the listing page of Master Models.');
+
         $masterModel = MasterModel::orderBy('id','DESC')->get();
 
         if (request()->ajax()) {
@@ -34,6 +36,12 @@ class MasterModelController extends Controller
                 })
                 ->addColumn('action', function(MasterModel $masterModel) {
                     return view('master-models.action',compact('masterModel'));
+                })
+                ->editColumn('amount_uae', function($query) {
+                    return number_format($query->amount_uae);
+                })
+                ->editColumn('amount_belgium', function($query) {
+                    return  number_format($query->amount_belgium);
                 })
                 ->rawColumns(['action'])
                 ->toJson();
@@ -62,6 +70,7 @@ class MasterModelController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Opened the create page of Master Models.');
         $variants = Varaint::all();
         return view('master-models.create', compact('variants'));
     }
@@ -94,8 +103,8 @@ class MasterModelController extends Controller
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
-        $model->amount_uae = $request->amount_uae;
-        $model->amount_belgium = $request->amount_belgium;
+        $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
+        $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
         $model->is_milele = $request->is_milele ? true : false;
         $model->is_transcar = $request->is_transcar ? true : false;
@@ -104,6 +113,7 @@ class MasterModelController extends Controller
         $model->created_by = Auth::id();
 
         $model->save();
+        (new UserActivityController)->createActivity('Created new Master Model.');
 
         return redirect()->route('master-models.index')->with('success','Model Created Successfully.');
 
@@ -122,6 +132,8 @@ class MasterModelController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the edit page of Master Model.');
+
         $masterModel = MasterModel::find($id);
         $variants = Varaint::all();
 
@@ -157,8 +169,8 @@ class MasterModelController extends Controller
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
-        $model->amount_uae = $request->amount_uae;
-        $model->amount_belgium = $request->amount_belgium;
+        $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
+        $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
         $model->is_milele = $request->is_milele ? true : false;
         $model->is_transcar = $request->is_transcar ? true : false;
@@ -166,6 +178,7 @@ class MasterModelController extends Controller
         $model->transcar_loi_description = $request->transcar_loi_description;
         $model->updated_by = Auth::id();
         $model->save();
+        (new UserActivityController)->createActivity('Upadated new Master Model.');
 
         return redirect()->route('master-models.index')->with('success','Model Updated Successfully.');
     }
@@ -175,6 +188,8 @@ class MasterModelController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted Master Model.');
+
         $masterModel = MasterModel::find($id);
         $masterModel->delete();
 

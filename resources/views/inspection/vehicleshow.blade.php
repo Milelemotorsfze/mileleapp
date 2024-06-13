@@ -13,6 +13,33 @@
     <br>
 </div>
 <div class="card-body">
+<div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                                        </div>
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
 <form id="inspection-form" action="{{ route('inspection.update', $vehicle->id) }}" method="POST" enctype="multipart/form-data">
              @method('PUT')
             @csrf
@@ -587,13 +614,20 @@ $(document).ready(function() {
                     var specification = item.specification;
                     var options = item.options;
                     if (options.length > 0) {
-                    var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '" required>');
+                    var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '">');
                     select.append('<option value="" disabled selected>Select an Option</option>');
 
                     options.forEach(function(option) {
                         select.append('<option value="' + option.id + '">' + option.name + '</option>');
                     });
-
+                    var addButton = $('<a><button class="btn btn-primary btn-sm ml-2">+</button></a>');
+                    addButton.on('click', function (event) {
+                        event.preventDefault();
+                        $('#specification-id-input').val(specification.id);
+                        $('#optionsmodal').modal('show');
+                    });
+                    var selectContainer = $('<div class="d-flex align-items-center"></div>');
+                    selectContainer.append(select).append(addButton);
                     select.on('change', function() {
                         var selectedValue = $(this).val();
                         selectedSpecifications.push({
@@ -605,7 +639,7 @@ $(document).ready(function() {
 
                     var specificationColumn = $('<div class="col-lg-4 mb-3">');
                     specificationColumn.append('<label class="form-label">' + specification.name + '</label');
-                    specificationColumn.append(select);
+                    specificationColumn.append(selectContainer);
                     $('#specification-details-container').append(specificationColumn);
                 }
                 });
@@ -624,4 +658,25 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+    function savenewoptions() {
+        var specificationId = $('#specification-id-input').val();
+        var newOptionValue = $('#option_name').val();
+        $.ajax({
+            url: '{{ route('variants.saveOption') }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                specificationId: specificationId,
+                newOption: newOptionValue
+            },
+            success: function (response) {
+                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
+                $('[data-specification-id="' + specificationId + '"]').append(option);
+                alertify.success('Specification Option successfully Added');
+                $('#optionsmodal').modal('hide');
+            }
+        });
+    }
+    </script>
 @endpush

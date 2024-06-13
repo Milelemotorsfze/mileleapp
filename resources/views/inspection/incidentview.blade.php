@@ -53,7 +53,6 @@
      Incident Info
     </h4>
     <br>
-    @can('inspection-edit')
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incidents</a>
@@ -165,8 +164,6 @@
           </div> 
         </div>  
       </div> 
-      @endcan
-      @can('inspection-edit')
       <div class="tab-pane fade show" id="tab3">
         <div class="card-body">
           <div class="table-responsive">
@@ -204,7 +201,6 @@
           </div> 
         </div>  
       </div> 
-      @endcan
       </div>
     </div>
   </div>

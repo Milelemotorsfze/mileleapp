@@ -7,12 +7,17 @@ use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
+use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
+use App\Models\MasterShippingPorts;
 use App\Models\PurchasingOrderItems;
+use App\Models\PurchasingOrderSwiftCopies;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
+use App\Models\ColorCode;
 use App\Models\Brand;
+use App\Models\Country;
 use App\Models\MasterModelLines;
 use App\Models\Supplier;
 use App\Models\Vehicles;
@@ -53,10 +58,30 @@ class PurchasingOrderController extends Controller
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
-            // ->whereIn('id', $demandPlanningPoIds)
-                                                ->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->orderBy('po_date', 'desc')
+            ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('id', 'desc')->get();
+            $data = PurchasingOrder::with('purchasing_order_items')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->where('vehicles.gdn_id', '=', null);
+    })
+    ->whereHas('vehicles', function ($query) {
+        $query->whereNotNull('id');
+    })
+    ->orderBy('po_date', 'desc')
+    ->get();
         }
     }
     else
@@ -68,18 +93,40 @@ class PurchasingOrderController extends Controller
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
-                                                // ->whereIn('created_by', $Ids)
-                                                // ->whereIn('id', $demandPlanningPoIds)
-                                                ->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->orderBy('po_date', 'desc')
+            ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')
-            // ->where('created_by', $userId)->orWhere('created_by', 16)
-            ->orderBy('id', 'desc')->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->orderBy('po_date', 'desc')
+            ->get();
         }
     }
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)
+    {
+        $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
+        return view('warehouse.index', compact('data'));
+    }
+    public function filtercancel($status)
     {
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
         return view('warehouse.index', compact('data'));
@@ -127,6 +174,7 @@ class PurchasingOrderController extends Controller
             $query->select(DB::raw(1))
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->where('purchasing_order.status', '<>', 'Cancelled')
                 ->where(function ($query) {
                     $query->where('status', 'Request for Payment')
                         ->orWhere(function ($query) {
@@ -151,6 +199,7 @@ class PurchasingOrderController extends Controller
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('purchasing_order.status', '<>', 'Cancelled')
                     ->where(function ($query) {
                         $query->where('status', 'Request for Payment')
                             ->orWhere(function ($query) {
@@ -173,7 +222,7 @@ class PurchasingOrderController extends Controller
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
     $data = PurchasingOrder::with('purchasing_order_items')
-    ->where('status', $status)
+    ->where('status', 'Approved')
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -190,7 +239,7 @@ else
     //     $query->where('purchasing_order.created_by', $userId)
     //         ->orWhere('purchasing_order.created_by', 16);
     // })
-    ->where('status', $status)
+    ->where('status', 'Approved')
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -221,6 +270,31 @@ else
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.status', 'Request for Payment')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        return view('warehouse.index', compact('data'));
+    }
+    public function filterpaymentrejectioned($status)
+    {
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -453,6 +527,8 @@ return view('warehouse.index', compact('data'));
      */
     public function create()
 {
+    $countries = Country::get();
+    $ports = MasterShippingPorts::with('country')->get();
     $useractivities =  New UserActivities();
         $useractivities->activity = "Creating Purchasing Order";
         $useractivities->users_id = Auth::id();
@@ -465,7 +541,7 @@ return view('warehouse.index', compact('data'));
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
     $payments = PaymentTerms::get();
-    return view('warehouse.create', compact('variants', 'vendors', 'payments'));
+    return view('warehouse.create', compact('variants', 'vendors', 'payments','countries','ports'));
 }
 public function getBrandsAndModelLines(Request $request)
 {
@@ -513,6 +589,21 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
         $purchasingOrder->is_demand_planning_po = $request->is_demand_planning_po ? true : false;
+        if ($request->hasFile('uploadPL')) {
+            // Get file with extension
+            $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+            // Get just filename
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            // Get just extension
+            $extension = $request->file('uploadPL')->getClientOriginalExtension();
+            // Filename to store
+            $fileNameToStore = $filename.'_'.time().'.'.$extension;
+            // Move file to public/storage/PL_Documents
+            $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
+            // Store the path in the database
+            $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+        }
+        $purchasingOrder->pl_number = $request->input('pl_number');
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
@@ -673,6 +764,11 @@ public function getBrandsAndModelLines(Request $request)
                 }
         }
         DB::commit();
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "PO Creation";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+        $purchasingordereventsLog->save();
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
     /**
@@ -680,6 +776,8 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function show($id)
     {
+        $countries = Country::get();
+        $ports = MasterShippingPorts::with('country')->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Show The Purchasing Order";
         $useractivities->users_id = Auth::id();
@@ -688,10 +786,11 @@ public function getBrandsAndModelLines(Request $request)
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
-    $purchasingOrder = PurchasingOrder::findOrFail($id);
+    $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+    $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
@@ -733,19 +832,19 @@ public function getBrandsAndModelLines(Request $request)
                     ->where('supplier_id', $pfi->supplier_id)
                     ->where('whole_sales', $dealer)
                     ->count();
-
                 $variantCount = $variantCount + $pfiVehicleVariant->quantity;
-
             }
         }
+        $purchasingOrderSwiftCopies = PurchasingOrderSwiftCopies::where('purchasing_order_id', $id)->orderBy('created_at', 'desc')
+        ->get();
+        $purchasedorderevents = PurchasingOrderEventsLog::where('purchasing_order_id', $id)->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents'));
     }
-
     public function edit($id)
     {
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -774,7 +873,6 @@ public function getBrandsAndModelLines(Request $request)
             {
             $variantIds = Varaint::whereIn('name', $variantNames)->pluck('id')->all();
             $variantsQuantity = array_count_values($variantNames);
-
             foreach ($variantIds as $variantId) {
                 $variant = Varaint::find($variantId);
                 $purchasingOrderItem = new PurchasingOrderItems();
@@ -938,7 +1036,15 @@ public function getBrandsAndModelLines(Request $request)
 
         }
         DB::commit();
-
+        foreach ($variantsQuantity as $variant => $quantity) {
+            $description = $variant . ' with ' . $quantity . ' qty';
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Add New Vehicles";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+            $purchasingordereventsLog->description = $description;
+            $purchasingordereventsLog->save();
+        }
     return back()->with('success', 'Added Vehicles In PO successfully!');
     }
     public function deletes($id)
@@ -1115,6 +1221,49 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->created_by = auth()->user()->id;
                     $vehicleslog->role = Auth::user()->selectedRole;
                     $vehicleslog->save();
+                    if ($field == 'int_colour') {
+                        $newfield = "Interior Colour";
+                        $oldval = ColorCode::find($change['old_value']);
+                        $oldvalue = $oldval ? $oldval->name : "";
+                        $newval = ColorCode::find($change['new_value']);
+                        $namevalue = $newval->name;
+                    } elseif ($field == 'ex_colour') {
+                        $newfield = "Exterior Colour";
+                        $oldval = ColorCode::find($change['old_value']);
+                        $oldvalue = $oldval ? $oldval->name : "";
+                        $newval = ColorCode::find($change['new_value']);
+                        $namevalue = $newval->name;
+                    } elseif ($field == 'engine') {
+                        $newfield = "Engine Number";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'vin') {
+                        $newfield = "VIN";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'territory') {
+                        $newfield = "Territory";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'estimation_date') {
+                        $newfield = "Estimation Date";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } else {
+                        $newfield = $field;
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    }
+                    $description = "Vehicle reference is $vehicleId change the $newfield from $oldvalue to $namevalue";
+                    $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                    $purchasingordereventsLog->event_type = "Changes into Vehicle date";
+                    $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = $newfield;
+                    $purchasingordereventsLog->old_value = $oldvalue;
+                    $purchasingordereventsLog->new_value = $namevalue;
+                    $purchasingordereventsLog->description = $description;
+                    $purchasingordereventsLog->save();
                 }
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
@@ -1234,11 +1383,11 @@ public function purchasingupdateStatus(Request $request)
         }
         return redirect()->back()->with('error', 'Vehicle not found.');
     }
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
         $vehicle = Vehicles::findOrFail($id);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
-        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process') {
+        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process'|| $vehicle->status == 'Payment Requested') {
             if($hasPermission)
             {
                 $purchasinglog = new Purchasinglog();
@@ -1299,12 +1448,18 @@ public function purchasingupdateStatus(Request $request)
                     }
 
                 }
+            $vehicle->procurement_vehicle_remarks = $request->input('remarks');
+            $vehicle->save();
             $vehicle->delete();
             }
             else
             {
             $vehicle->status = 'Request for Cancel';
+            $vehicle->procurement_vehicle_remarks = $request->input('remarks');
             $vehicle->save();
+            $purchasedorders = PurchasingOrder::find($vehicle->purchasing_order_id);
+            $purchasedorders->status = 'Pending Approval';
+            $purchasedorders->save();
             }
         }
         else
@@ -1367,6 +1522,8 @@ public function purchasingupdateStatus(Request $request)
                 }
 
             }
+        $vehicle->procurement_vehicle_remarks = $request->input('remarks');
+        $vehicle->save();
         $vehicle->delete();
         }
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
@@ -1631,9 +1788,9 @@ public function paymentreleasesconfirm($id)
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         DB::beginTransaction();
-
         $vehicle->status = 'Payment Requested';
         $vehicle->payment_status = 'Payment Release Approved';
+        $vehicle->procurement_vehicle_remarks = null;
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1673,12 +1830,15 @@ public function paymentreleasesconfirm($id)
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
 }
-public function paymentreleasesrejected($id)
+public function paymentreleasesrejected(Request $request, $id)
 {
+
+    info($id);
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
         $vehicle->payment_status = 'Payment Release Rejected';
+        $vehicle->procurement_vehicle_remarks = $request->input('remarks');
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1693,13 +1853,31 @@ public function paymentreleasesrejected($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-        return redirect()->back()->with('success', 'Payment Payment Release Rejected confirmed. Vehicle status updated.');
+            return response()->json(['success' => 'Payment Release Rejected confirmed. Vehicle status updated.']);
     }
-    return redirect()->back()->with('error', 'Vehicle not found.');
+    return response()->json(['error' => 'Vehicle not found.'], 404);
 }
-public function paymentrelconfirmdebited($id)
+public function paymentrelconfirmdebited(Request $request, $id)
 {
     $vehicle = Vehicles::find($id);
+    $vehicleCount = $vehicle->count();
+           if ($request->hasFile('paymentFile')) {
+            $file = $request->file('paymentFile');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $vehicle->purchasing_order_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $vehicle->purchasing_order_id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+        }
     if ($vehicle) {
         DB::beginTransaction();
         $vehicle->status = 'Payment Completed';
@@ -1842,11 +2020,9 @@ public function purchasingallupdateStatus(Request $request)
 }
 public function purchasingallupdateStatusrel(Request $request)
 {
-    // dd($request->all());
-
     $id = $request->input('orderId');
     $status = $request->input('status');
-
+    $remarks = $request->input('remarks', null);
     $vehicles = DB::table('vehicles')
         ->where('payment_status', 'Payment Initiated')
         ->where('purchasing_order_id', $id)
@@ -1854,12 +2030,19 @@ public function purchasingallupdateStatusrel(Request $request)
     foreach ($vehicles as $vehicle) {
         if ($status == 'Approved') {
                 $paymentStatus = 'Payment Release Approved';
+                $updateData = ['payment_status' => $paymentStatus,
+                'procurement_vehicle_remarks' => null
+            ];
             } elseif ($status == 'Rejected') {
                 $paymentStatus = 'Payment Release Rejected';
+                $updateData = [
+                    'payment_status' => $paymentStatus,
+                    'procurement_vehicle_remarks' => $remarks
+                ];
             }
             DB::table('vehicles')
                 ->where('id', $vehicle->id)
-                ->update(['payment_status' => $paymentStatus]);
+                ->update($updateData);
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -1873,7 +2056,6 @@ public function purchasingallupdateStatusrel(Request $request)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                     ->pluck('approved_loi_id');
@@ -1936,6 +2118,8 @@ public function allpaymentreqssfin(Request $request)
 {
     $id = $request->input('orderId');
     $status = $request->input('status');
+    if($status == "Approved")
+    {
     $vehicles = DB::table('vehicles')
     ->where('purchasing_order_id', $id)
     ->where('status', 'Request for Payment')
@@ -1960,7 +2144,36 @@ public function allpaymentreqssfin(Request $request)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-    }
+             }
+            }
+            else
+            {
+                $vehicles = DB::table('vehicles')
+                ->where('purchasing_order_id', $id)
+                ->where('status', 'Request for Payment')
+                ->where('payment_status', '')
+                ->get();
+                foreach ($vehicles as $vehicle) {
+                    $status = 'Approved';
+                    $payment_status = Null;
+                    DB::table('vehicles')
+                        ->where('id', $vehicle->id)
+                        ->update(['status' => $status, 'payment_status' => $payment_status]);
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'Payment Initiated Request Rejected';
+                        $vehicleslog->vehicles_id = $vehicle->id;
+                        $vehicleslog->field = "Vehicle Status, Payment Status";
+                        $vehicleslog->old_value = "Request for Initiate Payment";
+                        $vehicleslog->new_value = "Payment Initiated Request Rejected";
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->role = Auth::user()->selectedRole;
+                        $vehicleslog->save();
+                         }   
+            }
      return redirect()->back()->with('success', 'Payment Status Updated');
 }
 public function allpaymentreqssfinpay(Request $request)
@@ -2003,6 +2216,27 @@ public function allpaymentreqssfinpay(Request $request)
            ->where('status', 'Payment Requested')
            ->where('payment_status', 'Payment Release Approved')
            ->get();
+           $vehicleCount = $vehicles->count();
+           if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+        }        
            foreach ($vehicles as $vehicle) {
                $status = 'Payment Completed';
                $payment_status = 'Payment Completed';
@@ -2024,15 +2258,12 @@ public function allpaymentreqssfinpay(Request $request)
                        $vehicleslog->save();
                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                        $currentDateTime = Carbon::now($dubaiTimeZone);
-                           $paymentlogs = new PaymentLog();
-                           $paymentlogs->date = $currentDateTime->toDateString();
-                           $paymentlogs->vehicle_id = $vehicle->id;
-                           $paymentlogs->created_by = auth()->user()->id;
-                           $paymentlogs->save();
-
-
+                       $paymentlogs = new PaymentLog();
+                       $paymentlogs->date = $currentDateTime->toDateString();
+                       $paymentlogs->vehicle_id = $vehicle->id;
+                       $paymentlogs->created_by = auth()->user()->id;
+                       $paymentlogs->save();
                    }
-
                    return redirect()->back()->with('success', 'Payment Status Updated');
               }
               public function allpaymentintreqpocomp(Request $request)
@@ -2181,7 +2412,221 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->pol = $request->input('pol');
             $purchasingOrder->pod = $request->input('pod');
             $purchasingOrder->fd = $request->input('fd');
+            $purchasingOrder->pl_number = $request->input('pl_number');
+            $purchasingOrder->status = "Pending Approval";
+            info($request->hasFile('uploadPL'));
+            if ($request->hasFile('uploadPL')) {
+                // Get file with extension
+                $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+        
+                // Get just the filename
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        
+                // Get just the extension
+                $extension = $request->file('uploadPL')->getClientOriginalExtension();
+        
+                // Create a unique filename to store
+                $fileNameToStore = $filename.'_'.time().'.'.$extension;
+        
+                // Move the file to the public storage path
+                $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
+        
+                // Update the file path in the purchasing order
+                $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+            }
             $purchasingOrder->save();
             return response()->json(['message' => 'Purchase order details updated successfully'], 200);
         }
+        public function pendingvins($status)
+{
+$userId = auth()->user()->id;
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+if ($hasPermission){
+$data = PurchasingOrder::with('purchasing_order_items')
+    ->where('created_by', '!=', '16')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('deleted_at')
+              ->whereNull('vin'); // Check for at least one VIN being null
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+else
+{
+    $data = PurchasingOrder::with('purchasing_order_items')
+    ->where('created_by', '!=', '16')
+    // ->where('created_by', $userId)->orWhere('created_by', 16)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('deleted_at')
+              ->whereNull('vin'); // Check for at least one VIN being null
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+return view('warehouse.index', compact('data'));
+}
+public function rerequestpayment(Request $request)
+{
+    $id = $request->input('orderId');
+    $status = $request->input('status');
+    $vehicles = DB::table('vehicles')
+    ->where('purchasing_order_id', $id)
+    ->where('status', 'Payment Requested')
+    ->orwhere('status', 'Payment Rejected')
+    ->where('payment_status', 'Payment Release Rejected')
+    ->get();
+    info($vehicles);
+    foreach ($vehicles as $vehicle) {
+        $status = 'Payment Requested';
+        $payment_status = 'Payment Initiated Request';
+        DB::table('vehicles')
+            ->where('id', $vehicle->id)
+            ->update(['status' => $status, 'payment_status' => $payment_status]);
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'Re Payment Initiated';
+                $vehicleslog->vehicles_id = $vehicle->id;
+                $vehicleslog->field = "Vehicle Status, Payment Status";
+                $vehicleslog->old_value = "Payment Re Initiate Request";
+                $vehicleslog->new_value = "Payment Release Rejected";
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+            }
+            return redirect()->back()->with('success', 'Payment Status Updated');
+       }
+       public function repaymentintiation($id)
+       {
+           $vehicle = Vehicles::find($id);
+           if ($vehicle) {
+               $vehicle->status = 'Payment Requested';
+               $vehicle->payment_status = 'Payment Initiated Request';
+               $vehicle->save();
+               $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+               $currentDateTime = Carbon::now($dubaiTimeZone);
+                   $vehicleslog = new Vehicleslog();
+                   $vehicleslog->time = $currentDateTime->toTimeString();
+                   $vehicleslog->date = $currentDateTime->toDateString();
+                   $vehicleslog->status = 'Payment Re Initiated Request';
+                   $vehicleslog->vehicles_id = $id;
+                   $vehicleslog->field = "Vehicle Status, Payment Status";
+                   $vehicleslog->old_value = "Payment Released Rejected";
+                   $vehicleslog->new_value = "Payment Re Initiated Request";
+                   $vehicleslog->created_by = auth()->user()->id;
+                   $vehicleslog->role = Auth::user()->selectedRole;
+                   $vehicleslog->save();
+               return redirect()->back()->with('success', 'Payment Initiated Request confirmed. Vehicle status updated.');
+           }
+           return redirect()->back()->with('error', 'Vehicle not found.');
+       }
+       public function cancelpo(Request $request, $id)
+    {
+        $purchasingOrder = PurchasingOrder::find($id);
+        if ($purchasingOrder) {
+            $purchasingOrder->status = 'Cancel Request';
+            $purchasingOrder->remarks = $request->input('remarks');
+            $purchasingOrder->save();
+            $purchasinglog = new Purchasinglog();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Cancelled Request';
+            $purchasinglog->purchasing_order_id = $id;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->save();
+            // Respond with a JSON object indicating success and redirect URL
+            return response()->json([
+                'success' => true,
+                'redirectUrl' => route('purchasing-order.index')
+            ]);
+        }
+        // Respond with an error if the purchasing order was not found
+        return response()->json([
+            'success' => false,
+            'message' => 'Purchasing order not found.'
+        ], 404);
+    }
+    public function purchasingupdateStatuscancel(Request $request)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Cancel Purchasing Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $id = $request->input('orderId');
+        $status = $request->input('status');
+        $purchasingOrder = PurchasingOrder::find($id);
+        if($status == "Rejected")
+        {
+            $purchasingOrder->status = "Approved";
+            $purchasingOrder->save();
+        }
+        else
+        {
+            $purchasingOrder->status = "Cancelled";
+            $purchasingOrder->save();
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Cancelled';
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->purchasing_order_id = $id;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->save();
+            $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+            foreach ($vehicles as $vehicle) {
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = now()->toTimeString();
+                $vehicleslog->date = now()->toDateString();
+                $vehicleslog->status = 'Vehicle Cancel';
+                $vehicleslog->vehicles_id = $id;
+                $vehicleslog->field = "Status";
+                $vehicleslog->old_value = $vehicle->status;
+                $vehicleslog->new_value = 'Vehicle Cancel';
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+                $vehicle->delete();   
+            }
+        }
+        return response()->json([
+            'success' => true,
+            'redirectUrl' => route('purchasing-order.index')
+        ]);
+    }
+    public function paymentintconfirmrej($id)
+{
+    $vehicle = Vehicles::find($id);
+    if ($vehicle) {
+        $vehicle->status = 'Approved';
+        $vehicle->payment_status = Null;
+        $vehicle->save();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Payment Initiated Request Rejected';
+            $vehicleslog->vehicles_id = $id;
+            $vehicleslog->field = "Vehicle Status, Payment Status";
+            $vehicleslog->old_value = "Request for Initiate Payment";
+            $vehicleslog->new_value = "Payment Initiated Request Rejected";
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+        return redirect()->back()->with('success', 'Payment Initiated Request Rejected confirmed');
+    }
+    return redirect()->back()->with('error', 'Vehicle not found.');
+}
 }

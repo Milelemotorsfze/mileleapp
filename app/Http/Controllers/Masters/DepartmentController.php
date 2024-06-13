@@ -29,6 +29,7 @@ use App\Models\HRM\Employee\OverTime;
 use App\Models\HRM\Employee\OverTimeHistory;
 use App\Models\HRM\Employee\Separation;
 use App\Models\HRM\Employee\SeparationHistory;
+use App\Models\HRM\Employee\EmployeeProfile;
 
 class DepartmentController extends Controller
 {
@@ -78,7 +79,7 @@ class DepartmentController extends Controller
                                 $jdDeptHeadData->department_head_id = $request->approval_by_id;
                                 $jdDeptHeadData->updated_by = $authId;
                                 $jdDeptHeadData->update();
-                                $historyJD = '';
+                                $historyJD = [];
                                 $historyJD['hiring_request_id'] = $request->hiring_request_id;
                                 $historyJD['icon'] = 'icons8-send-30.png';
                                 $historyJD['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -221,7 +222,46 @@ class DepartmentController extends Controller
                         }
                     } 
                     $data->name = $request->name;
-                    $data->department_head_id = $request->department_head_id;
+                    if($data->department_head_id != $request->department_head_id) {
+                        $updateEmpLeads = EmployeeProfile::where('team_lead_or_reporting_manager',$data->department_head_id)
+                        ->whereNot('user_id',$request->department_head_id)->where('department_id',$id)->get();
+                        if(count($updateEmpLeads) > 0) {
+                            foreach($updateEmpLeads as $updateEmpLeadsData) {
+                                $updateEmpLeadsData->team_lead_or_reporting_manager = $request->department_head_id;
+                                $updateEmpLeadsData->updated_by = $authId;
+                                $updateEmpLeadsData->update();
+                            }
+                        } 
+                        $updateOldLead = EmployeeProfile::where('user_id',$data->department_head_id)->where('department_id',$id)
+                        ->where('team_lead_or_reporting_manager',$data->division->division_head_id)->first();
+                        if($updateOldLead) {
+                            $updateOldLead->team_lead_or_reporting_manager = $request->department_head_id;
+                            $updateOldLead->updated_by = $authId;
+                            $updateOldLead->update();
+                        }
+                        $updateNewLead = EmployeeProfile::where('user_id',$request->department_head_id)->where('department_id',$id)->first();
+                        if($updateNewLead) {
+                            $updateNewLead->team_lead_or_reporting_manager = $updateNewLead->department->division->division_head_id;
+                            $updateNewLead->updated_by = $authId;
+                            $updateNewLead->update();
+                        }
+                        $isOtherLead = EmployeeProfile::where('team_lead_or_reporting_manager',$data->department_head_id)
+                        ->whereNot('user_id',$request->department_head_id)->whereNot('department_id',$id)->get();
+                        $updateLeadHandover = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$data->department_head_id)->first();
+                        if($updateLeadHandover && count($isOtherLead) == 0) {
+                            $updateLeadHandover->lead_or_manager_id = $request->department_head_id;
+                            $updateLeadHandover->updated_by = $authId;
+                            $updateLeadHandover->update();                       
+                        }
+                        $updateLeadHandover2 = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$request->department_head_id)->first();
+                        if($updateLeadHandover2 == null) {
+                            $createHandOvr['lead_or_manager_id'] = $request->department_head_id;
+                            $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                            $createHandOvr['created_by'] = $authId;
+                            $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);              
+                        }
+                        $data->department_head_id = $request->department_head_id;
+                    }
                     $data->approval_by_id = $request->approval_by_id;
                     $data->updated_by = $authId;
                     $data->division_id = $request->division_id;
@@ -234,7 +274,7 @@ class DepartmentController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
                 $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }

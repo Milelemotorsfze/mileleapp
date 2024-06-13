@@ -32,5 +32,18 @@ class PurchasingOrder extends Model
         }
         return false;
     }
+    public function polPort()
+    {
+        return $this->belongsTo(MasterShippingPorts::class, 'pol');
+    }
 
+    public function podPort()
+    {
+        return $this->belongsTo(MasterShippingPorts::class, 'pod');
+    }
+
+    public function fdCountry()
+    {
+        return $this->belongsTo(Country::class, 'fd');
+    }
 }

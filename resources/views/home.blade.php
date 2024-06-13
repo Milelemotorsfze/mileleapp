@@ -189,6 +189,7 @@ Procurement
                                                 <th>Response Time</th>
                                                 <th>Open Leads</th>
                                                 <th>Lead Closed</th>
+                                                <th>Lead Shifted (Last 7 Days)</th>
                                             </tr>
                                         </thead>
                                         <tbody>

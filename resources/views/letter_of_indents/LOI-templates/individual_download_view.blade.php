@@ -25,6 +25,7 @@
         p{
             font-size: 14px;
         }
+        .page_break { page-break-before: always; }
     </style>
 
 </head>
@@ -44,7 +45,7 @@
         <div style="list-style-type: none;margin-right: 15px;font-size: 14px;">
             @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                 <li>{{$key + 1}}.&nbsp;
-                    <span class="fw-bold">Model Name:</span>
+                    <span class="fw-bold">Model Description:</span>
                     @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
                         {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
                     @else
@@ -52,23 +53,11 @@
                     @endif
                 </li>
                 <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
-                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Drive: </span>
-                    @if($letterOfIndentItem->masterModel->steering == 'LHD')
-                        Left Hand Drive
-                    @elseif($letterOfIndentItem->masterModel->steering == 'RHD')
-                        Right Hand Drive
-                    @endif
-
-                </li>
-                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Engine: </span>
-                    {{ $letterOfIndentItem->masterModel->variant->engine ?? ''}}</li>
                 <li style="margin-bottom: 10px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Quantity: </span>
                     {{ $letterOfIndentItem->quantity ?? '' }}
                 </li>
-
             @endforeach
         </div>
-        <br>
         <p>
             I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
             purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
@@ -77,10 +66,20 @@
         </p>
         <p style="margin-bottom: 5px;">Sincerely,</p>
         <p> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
-        <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+        @if($letterOfIndent->signature)
+            <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+        @endif
 
     </div>
 </div>
+@if(!empty($imageFiles))
+        <div class="page_break"></div>
+        <div class="row">
+            @foreach($imageFiles as $imageFile)
+            <img src="{{ public_path($imageFile) }}">
+            @endforeach
+        </div>
+    @endif
 </body>
 </html>
 

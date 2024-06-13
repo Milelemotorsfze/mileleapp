@@ -144,11 +144,12 @@ class SupplierInventoryController extends Controller
     {
         $request->validate([
             'whole_sales' => 'required',
-            'supplier_id' =>' required',
-            'country' => 'required',
-            'model' => 'required',
-            'sfx' => 'required',
+            'supplier_id' => 'required',
+            'country'     => 'required',
+            'model'       => 'required',
+            'sfx'         => 'required',
         ]);
+        (new UserActivityController)->createActivity('Supplier Inventory Created.');
 
         if(!empty($request->prod_month)) {
             $productionMonth = substr($request->prod_month,  -2);
@@ -169,24 +170,13 @@ class SupplierInventoryController extends Controller
 
         $colourcode = $request->color_code;
 
+        $extColour = mb_substr($colourcode, 0, -2);
+        $intColour = mb_substr($colourcode,  -2);
+
         $interiorColorId = NULL;
         $exteriorColorId = NUll;
 
         if($colourcode) {
-            $colourcodecount = strlen($colourcode);
-
-            if ($colourcodecount == 5) {
-                $extColour = substr($colourcode, 0, 3);
-                $intColour = substr($colourcode,  -2);
-
-            }
-            if ($colourcodecount == 4) {
-
-                $altercolourcode = "0" . $colourcode;
-                $extColour = substr($altercolourcode, 0, 3);
-                $intColour = substr($altercolourcode, -2);
-
-            }
             if($extColour) {
                 $extColourRow = ColorCode::where('code', $extColour)
                                         ->where('belong_to', ColorCode::EXTERIOR)
@@ -200,7 +190,6 @@ class SupplierInventoryController extends Controller
                 $intColourRow = ColorCode::where('code', $intColour)
                                     ->where('belong_to', ColorCode::INTERIOR)
                                     ->first();
-
                 if ($intColourRow)
                 {
                     $interiorColorId = $intColourRow->id;
@@ -219,7 +208,7 @@ class SupplierInventoryController extends Controller
         $supplierInventory->engine_number = $request->engine_number;
         $supplierInventory->pord_month = $request->prod_month;
         $supplierInventory->color_code = $request->color_code;
-        $supplierInventory->po_arm = $request->po_arm;
+        // $supplierInventory->po_arm = $request->po_arm;
         $supplierInventory->delivery_note = $request->delivery_note;
         $supplierInventory->interior_color_code_id  = $interiorColorId;
         $supplierInventory->exterior_color_code_id  = $exteriorColorId;
@@ -227,6 +216,19 @@ class SupplierInventoryController extends Controller
         $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
         $supplierInventory->date_of_entry = Carbon::now()->format('Y-m-d');
         $supplierInventory->master_model_id = $masterModel->id ?? '';
+
+        if ($request->delivery_note) {
+            if($request->country == SupplierInventory::COUNTRY_BELGIUM ) {
+                if(strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                }
+            }else{
+                if(is_numeric($request->delivery_note)) {
+                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                }
+            }
+        }
+        $supplierInventory->updated_by = Auth::id();
         $supplierInventory->save();
 
         $action = "Inventory Item Added";
@@ -239,7 +241,7 @@ class SupplierInventoryController extends Controller
 
     public function ExcelUpdate(Request $request)
     {
-        (new UserActivityController)->createActivity('Added Supplier Inventories');
+        (new UserActivityController)->createActivity('Added Supplier Inventories by Excel Upload');
 
         $request->validate([
             'whole_sales' => 'required',
@@ -268,8 +270,8 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-//            $date = Carbon::today()->format('Y-m-d');
-            $date = '2024-03-10';
+            $date = Carbon::today()->format('Y-m-d');
+//            $date = '2024-03-10';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -279,70 +281,25 @@ class SupplierInventoryController extends Controller
                 {
                     $supplier_id = $request->input('supplier_id');
                     $country = $request->input('country');
-                    $colourcode = $filedata[5];
-
-                    if($colourcode) {
-                        if(strlen($filedata[5]) < 4  || strlen($filedata[5]) > 5){
-                            return redirect()->back()->with('error', 'Invalid Colour Code '.$filedata[5].', Color Code length should be 5 or 4!');
-                        }
-                        $colourcodecount = strlen($colourcode);
-
-                        if ($colourcodecount == 5) {
-                            $extColour = substr($colourcode, 0, 3);
-                            $intColour = substr($colourcode,  -2);
-
-                        }
-                        if ($colourcodecount == 4) {
-
-                            $altercolourcode = "0" . $colourcode;
-                            $extColour = substr($altercolourcode, 0, 3);
-                            $intColour = substr($altercolourcode, -2);
-                            $colourcode = $extColour.''.$intColour;
-
-                        }
-                        if($extColour) {
-                            $extColourRow = ColorCode::where('code', $extColour)
-                                ->where('belong_to', ColorCode::EXTERIOR)
-                                ->first();
-                            $exteriorColor = "";
-                            if ($extColourRow)
-                            {
-                                $exteriorColor = $extColourRow->name;
-                                $exteriorColorId = $extColourRow->id;
-                            }else{
-                                $unavailableExtColours[]  = $extColour;
-                            }
-                        }
-                        if($intColour) {
-                            $intColourRow = ColorCode::where('code', $intColour)
-                                ->where('belong_to', ColorCode::INTERIOR)
-                                ->first();
-                            $interiorColor = "";
-                            if ($intColourRow)
-                            {
-                                $interiorColor = $intColourRow->name;
-                                $interiorColorId = $intColourRow->id;
-                            }else{
-                                $unavailableIntColours[] = $intColour;
-                            }
-                        }
-                    }
 
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
                     $uploadFileContents[$i]['chasis'] = !empty($filedata[3]) ? $filedata[3] : NULL;
                     $uploadFileContents[$i]['engine_number'] = $filedata[4];
-                    $uploadFileContents[$i]['color_code'] = $colourcode;
-                    $uploadFileContents[$i]['pord_month'] = $filedata[6];
-                    $uploadFileContents[$i]['po_arm'] = $filedata[7];
-                    if(!empty($filedata[6])) {
-                        if(strlen($filedata[6]) != 6){
-                            return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[6].', Production month length should be exactly 6!');
+                    $intColour = $filedata[5];
+                    $extColour = $filedata[6];
+
+                    $uploadFileContents[$i]['color_code'] = $filedata[6].$filedata[5];
+                    $uploadFileContents[$i]['pord_month'] = $filedata[7];
+                    // $uploadFileContents[$i]['po_arm'] = $filedata[7];
+                    if(!empty($filedata[7])) {
+                        if(strlen($filedata[7]) != 6){
+                            return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[7].', Production month length should be exactly 6!');
                         }else{
-                            $productionMonth = substr($filedata[6],  -2);
+                            $productionMonth = substr($filedata[7],  -2);
                             if($productionMonth < 0 || $productionMonth > 12) {
-                                return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[6].', Last 2 digit indicating Invalid month!');
+                                return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[7].', Last 2 digit indicating Invalid month!');
                             }
                         }
                     }
@@ -355,6 +312,36 @@ class SupplierInventoryController extends Controller
                     }else {
                         $filedata[8] = NULL;
                     }
+
+                    if($extColour) {
+                        $extColourRow = ColorCode::where('code', $extColour)
+                            ->where('belong_to', ColorCode::EXTERIOR)
+                            ->first();
+//                        $exteriorColor = "";
+                        if ($extColourRow)
+                        {
+//                            $exteriorColor = $extColourRow->name;
+                            $exteriorColorId = $extColourRow->id;
+                            info("available exterior Colour");
+                            info($exteriorColorId);
+                        }else{
+                            info("not available exterior Colour");
+                            info($extColour);
+                            $unavailableExtColours[]  = $extColour;
+                        }
+                    }
+                    if($intColour) {
+                        $intColourRow = ColorCode::where('code', $intColour)
+                            ->where('belong_to', ColorCode::INTERIOR)
+                            ->first();
+
+                        if ($intColourRow)
+                        {
+                            $interiorColorId = $intColourRow->id;
+                        }else{
+                            $unavailableIntColours[] = $intColour;
+                        }
+                    }
                     $uploadFileContents[$i]['eta_import'] = $filedata[8];
                     $uploadFileContents[$i]['delivery_note'] = !empty($filedata[9]) ? $filedata[9] : NULL;
                     $uploadFileContents[$i]['supplier_id'] = $supplier_id;
@@ -364,13 +351,14 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['veh_status'] = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                     $uploadFileContents[$i]['exterior_color_code_id'] = !empty($exteriorColorId) ? $exteriorColorId: NULL;
                     $uploadFileContents[$i]['interior_color_code_id'] = !empty($interiorColorId) ? $interiorColorId: NULL;
-
+                    info($uploadFileContents[$i]['exterior_color_code_id']);
+                    info($uploadFileContents[$i]['interior_color_code_id']);
                     ////// finding model year //////////
 
-                    if ($filedata[6]) {
+                    if ($filedata[7]) {
                         // fetch year from pod month
-                        $modelYear = substr($filedata[6], 0, -2);
-                        $productionMonth = substr($filedata[6], -2);
+                        $modelYear = substr($filedata[7], 0, -2);
+                        $productionMonth = substr($filedata[7], -2);
                         $modelYearCalculationCategories = ModelYearCalculationCategory::all();
 
                         foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
@@ -385,8 +373,8 @@ class SupplierInventoryController extends Controller
                             if ($isItemExistCategory->count() > 0) {
                                 $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
                                 if ($productionMonth > $correspondingCategoryRuleValue) {
-                                    if ($filedata[6]){
-                                        $modelYear = substr($filedata[6], 0, -2) + 1;
+                                    if ($filedata[7]){
+                                        $modelYear = substr($filedata[7], 0, -2) + 1;
                                     }
                                     break;
                                 }
@@ -407,8 +395,7 @@ class SupplierInventoryController extends Controller
                     ////////////// model year calculation end //////////
                     $uploadFileContents[$i]['model_year'] = $modelYear;
                 }
-                $exteriorColorId = NULL;
-                $interiorColorId = NULL;
+
                 $i++;
             }
 
@@ -417,17 +404,19 @@ class SupplierInventoryController extends Controller
             $newModelsWithSteerings = [];
             $j=0;
 
-            if(count($unavailableIntColours) || count($unavailableIntColours)) {
+            if(count($unavailableExtColours) || count($unavailableIntColours)) {
                 $extColors = implode(',', array_unique($unavailableExtColours));
                 $intColors = implode(',', array_unique($unavailableIntColours));
 
                 return redirect()->back()->with('error','These Colour codes are not available in the Master Data.
             Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
             }
+
+
             $excelPairs = [];
 
             foreach($uploadFileContents as $uploadFileContent) {
-
+                info($uploadFileContent['color_code']);
                 // if(empty($uploadFileContent['chasis'])) {
                 $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
                 // }
@@ -460,10 +449,21 @@ class SupplierInventoryController extends Controller
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
                 }
-                if(!empty($uploadFileContent['delivery_note']) && !is_numeric($uploadFileContent['delivery_note'])) {
-                    if (strcasecmp($uploadFileContent['delivery_note'], 'Waiting') !== 0) {
-                        return redirect()->back()->with('error', $uploadFileContent['delivery_note']." Delivery note should be a number or status should be Waiting");
+                $DN_WAITING = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_WAITING);
+                $DN_RECEIVED = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED);
+                if(!empty($uploadFileContent['delivery_note']) ) {
+                    if($country == SupplierInventory::COUNTRY_BELGIUM) {
+                        if ($DN_WAITING != 0 ) {
+                            if ($DN_RECEIVED != 0) {
+                                return redirect()->back()->with('error', $uploadFileContent['delivery_note'] . " Delivery note should be a Waiting or Received");
+                            }
+                        }
+                    }else{
+                        if ($DN_WAITING !== 0 || !is_numeric($uploadFileContent['delivery_note'])) {
+                            return redirect()->back()->with('error', "Delivery note should be a number or status should be Waiting");
+                        }
                     }
+
                 }
                 $j++;
             }
@@ -517,7 +517,17 @@ class SupplierInventoryController extends Controller
                     $dealer = $request->whole_sales;
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
-
+                        if ($uploadFileContent['delivery_note'] ) {
+                            if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                    $veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                }
+                            }else{
+                                if(is_numeric($uploadFileContent['delivery_note'])) {
+                                    $veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                }
+                            }
+                        }
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('model_year', $uploadFileContent['model_year'])
@@ -573,7 +583,7 @@ class SupplierInventoryController extends Controller
                                 $supplierInventory->engine_number = $uploadFileContent['engine_number'];
                                 $supplierInventory->color_code = $uploadFileContent['color_code'];
                                 $supplierInventory->pord_month = $uploadFileContent['pord_month'];
-                                $supplierInventory->po_arm = $uploadFileContent['po_arm'];
+                                // $supplierInventory->po_arm = $uploadFileContent['po_arm'];
                                 $supplierInventory->eta_import = $uploadFileContent['eta_import'];
                                 $supplierInventory->is_add_new = false;
                                 $supplierInventory->whole_sales = $uploadFileContent['whole_sales'];
@@ -584,9 +594,18 @@ class SupplierInventoryController extends Controller
                                 $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                 $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                 $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                if ($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                if ($uploadFileContent['delivery_note'] ) {
+                                    if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                        if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                        }
+                                    }else{
+                                        if(is_numeric($uploadFileContent['delivery_note'])) {
+                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                        }
+                                    }
                                 }
+                                $supplierInventory->updated_by = Auth::id();
                                 $supplierInventory->save();
 
                                 $action = "Inventory Item Added";
@@ -605,7 +624,7 @@ class SupplierInventoryController extends Controller
                                 ->where('engine_number', $uploadFileContent['engine_number'])
                                 ->where('color_code', $uploadFileContent['color_code'])
                                 ->where('pord_month', $uploadFileContent['pord_month'])
-                                ->where('po_arm', $uploadFileContent['po_arm'])
+                                // ->where('po_arm', $uploadFileContent['po_arm'])
                                 ->whereNotIn('id', $noChangeRowIds)
                                 ->whereNotIn('id', $updatedRowsIds)
                                 ->whereNotIn('id', $newlyAddedRowIds)
@@ -675,7 +694,7 @@ class SupplierInventoryController extends Controller
                                             $SimilarRowWithNullChaisis = $isNullChaisis->where('engine_number', $uploadFileContent['engine_number'])
                                                 ->where('color_code', $uploadFileContent['color_code'])
                                                 ->where('pord_month', $uploadFileContent['pord_month'])
-                                                ->where('po_arm', $uploadFileContent['po_arm'])
+                                                // ->where('po_arm', $uploadFileContent['po_arm'])
                                                 ->where('eta_import', $uploadFileContent['eta_import'])
                                                 ->where('delivery_note', $uploadFileContent['delivery_note'])
                                                 ->first();
@@ -734,14 +753,23 @@ class SupplierInventoryController extends Controller
                                                         $rowWithoutUpdate->engine_number   = $uploadFileContent['engine_number'];
                                                         $rowWithoutUpdate->color_code      = $uploadFileContent['color_code'];
                                                         $rowWithoutUpdate->pord_month      = $uploadFileContent['pord_month'];
-                                                        $rowWithoutUpdate->po_arm          = $uploadFileContent['po_arm'];
+                                                        // $rowWithoutUpdate->po_arm          = $uploadFileContent['po_arm'];
                                                         $rowWithoutUpdate->eta_import      = $uploadFileContent['eta_import'];
                                                         $rowWithoutUpdate->delivery_note   = $uploadFileContent['delivery_note'];
                                                         $rowWithoutUpdate->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                         $rowWithoutUpdate->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                        if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                            $rowWithoutUpdate->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        if($uploadFileContent['delivery_note'] ) {
+                                                            if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                                if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                                    $rowWithoutUpdate->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                                }
+                                                            }else{
+                                                                if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                                    $rowWithoutUpdate->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                                }
+                                                            }
                                                         }
+                                                        $rowWithoutUpdate->updated_by = Auth::id();
                                                         $rowWithoutUpdate->save();
 
                                                         $action = "Row updated by inventory Excel upload";
@@ -769,7 +797,7 @@ class SupplierInventoryController extends Controller
                                                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                         $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                        // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                         $supplierInventory->is_add_new     	= false;
                                                         $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -780,9 +808,18 @@ class SupplierInventoryController extends Controller
                                                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                                         $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                         $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                        if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        if($uploadFileContent['delivery_note'] ) {
+                                                            if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                                if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                                }
+                                                            }else{
+                                                                if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                                }
+                                                            }
                                                         }
+                                                        $supplierInventory->updated_by = Auth::id();
                                                         $supplierInventory->save();
 
                                                         $action = "Inventory Item Added";
@@ -813,12 +850,21 @@ class SupplierInventoryController extends Controller
                                                 $isChasisExist->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                 $isChasisExist->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                                                 $isChasisExist->pord_month      = $uploadFileContent['pord_month'];
-                                                $isChasisExist->po_arm          = $uploadFileContent['po_arm'];
+                                                // $isChasisExist->po_arm          = $uploadFileContent['po_arm'];
                                                 $isChasisExist->eta_import      = $uploadFileContent['eta_import'];
                                                 $isChasisExist->delivery_note   = $uploadFileContent['delivery_note'];
-                                                if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                    $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                if($uploadFileContent['delivery_note'] ) {
+                                                    if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                        if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                            $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }else{
+                                                        if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                            $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }
                                                 }
+                                                $isChasisExist->updated_by = Auth::id();
                                                 $isChasisExist->save();
 
                                                 $action = "Row updated by inventory Excel upload";
@@ -841,7 +887,7 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                 $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                 $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                 $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                 $supplierInventory->is_add_new     	= false;
                                                 $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -852,9 +898,18 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                                 $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                 $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                if($uploadFileContent['delivery_note'] ) {
+                                                    if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                        if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }else{
+                                                        if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }
                                                 }
+                                                $supplierInventory->updated_by = Auth::id();
                                                 $supplierInventory->save();
 
                                                 $action = "Inventory Item Added";
@@ -873,7 +928,6 @@ class SupplierInventoryController extends Controller
 //                                        $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number'])
 //                                            ->where('color_code', $uploadFileContent['color_code'])
 //                                            ->where('pord_month', $uploadFileContent['pord_month'])
-//                                            ->where('po_arm', $uploadFileContent['po_arm'])
 //                                            ->where('eta_import', $uploadFileContent['eta_import'])
 //                                            ->where('delivery_note', $deliveryNote)
 //                                            ->first();
@@ -898,12 +952,21 @@ class SupplierInventoryController extends Controller
                                         $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                         $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                        // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                         $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
-                                        if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                        if($uploadFileContent['delivery_note'] ) {
+                                            if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                }
+                                            }else{
+                                                if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                }
+                                            }
                                         }
+                                        $supplierInventory->updated_by = Auth::id();
                                         $supplierInventory->save();
 
                                         $action = "Row updated by inventory Excel upload";
@@ -949,14 +1012,23 @@ class SupplierInventoryController extends Controller
                                             $inventoryRow->engine_number   = $uploadFileContent['engine_number'];
                                             $inventoryRow->color_code      = $uploadFileContent['color_code'];
                                             $inventoryRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $inventoryRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $inventoryRow->po_arm          = $uploadFileContent['po_arm'];
                                             $inventoryRow->eta_import      = $uploadFileContent['eta_import'];
                                             $inventoryRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $inventoryRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $inventoryRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                $inventoryRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                            if($uploadFileContent['delivery_note'] ) {
+                                                if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                    if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                        $inventoryRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }else{
+                                                    if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                        $inventoryRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }
                                             }
+                                            $inventoryRow->updated_by = Auth::id();
                                             $inventoryRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1000,14 +1072,23 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
                                             $nullChasisRow->color_code      = $uploadFileContent['color_code'];
                                             $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
                                             $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $nullChasisRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                            if($uploadFileContent['delivery_note'] ) {
+                                                if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                    if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                        $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }else{
+                                                    if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                        $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }
                                             }
+                                            $nullChasisRow->updated_by = Auth::id();
                                             $nullChasisRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1043,7 +1124,7 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                 $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                 $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                 $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                 $supplierInventory->is_add_new     	= false;
                                                 $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -1054,9 +1135,18 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                                 $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                 $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                if($uploadFileContent['delivery_note'] ) {
+                                                    if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                        if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }else{
+                                                        if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                            $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                        }
+                                                    }
                                                 }
+                                                $supplierInventory->updated_by = Auth::id();
                                                 $supplierInventory->save();
 
                                                 $action = "Inventory Item Added";
@@ -1086,14 +1176,23 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
                                             $nullChasisRow->color_code      = $uploadFileContent['color_code'];
                                             $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
                                             $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $nullChasisRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                                $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                            if($uploadFileContent['delivery_note']) {
+                                                if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                                    if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                                        $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }else{
+                                                    if(is_numeric($uploadFileContent['delivery_note'])) {
+                                                        $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                    }
+                                                }
                                             }
+                                            $nullChasisRow->updated_by = Auth::id();
                                             $nullChasisRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1122,7 +1221,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
                         $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
                         $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
-                        $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                        // $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
                         $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
                         $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
                         $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1134,10 +1233,18 @@ class SupplierInventoryController extends Controller
                         $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                         $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                        if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                            $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                        if($uploadFileContent['delivery_note'] ) {
+                            if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                    $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                }
+                            }else{
+                                if(is_numeric($uploadFileContent['delivery_note'])) {
+                                    $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                }
+                            }
                         }
-
+                        $supplierInventoryHistory->updated_by = Auth::id();
                         $supplierInventoryHistory->save();
                     }
                     // to find deleted rows
@@ -1175,7 +1282,7 @@ class SupplierInventoryController extends Controller
                                 ->where('engine_number', $deletedRow->engine_number)
                                 ->where('color_code', $deletedRow->color_code)
                                 ->where('pord_month', $deletedRow->pord_month)
-                                ->where('po_arm', $deletedRow->po_arm)
+                                // ->where('po_arm', $deletedRow->po_arm)
                                 ->where('eta_import', $deletedRow->eta_import)
                                 ->where('delivery_note', $deletedRow->delivery_note)
                                 ->first();
@@ -1243,7 +1350,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                            // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                             $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                             $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
                             $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1255,9 +1362,18 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                             $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                             $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                            if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                            if($uploadFileContent['delivery_note'] ) {
+                                if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                    if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                        $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                    }
+                                }else{
+                                    if(is_numeric($uploadFileContent['delivery_note'])) {
+                                        $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                    }
+                                }
                             }
+                            $supplierInventory->updated_by = Auth::id();
                             $supplierInventory->save();
 
                             $action = "Inventory Item Added";
@@ -1271,7 +1387,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
-                            $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                            // $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
                             $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
                             $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
                             $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1283,9 +1399,18 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                             $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                             $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                            if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                            if($uploadFileContent['delivery_note']) {
+                                if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+                                    if(strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                                        $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                    }
+                                }else{
+                                    if(is_numeric($uploadFileContent['delivery_note'])) {
+                                        $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                    }
+                                }
                             }
+                            $supplierInventoryHistory->updated_by = Auth::id();
                             $supplierInventoryHistory->save();
                         }
                     }
@@ -1298,7 +1423,6 @@ class SupplierInventoryController extends Controller
                 }
             }
         }
-
     }
     public function LOIItemIdMapping(Request $request) {
 
@@ -1402,6 +1526,7 @@ class SupplierInventoryController extends Controller
         (new UserActivityController)->createActivity('Update the Supplier Inventories');
 
         $updatedDatas = $request->selectedUpdatedDatas;
+        info($request->all());
 
         DB::beginTransaction();
 
@@ -1418,7 +1543,6 @@ class SupplierInventoryController extends Controller
                     ->first();
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'eta_import') {
-
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
             else if($fieldName == 'pord_month') {
@@ -1454,31 +1578,16 @@ class SupplierInventoryController extends Controller
                 $inventory->$fieldName = $fieldValue;
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'color_code') {
-
                 if($fieldValue) {
                     $colourcode = $fieldValue;
-                    $colourcodecount = strlen($fieldValue);
-
-                    if ($colourcodecount == 5) {
-                        $extColour = substr($colourcode, 0, 3);
-                        $intColour = substr($colourcode,  -2);
-
-                    }
-                    if ($colourcodecount == 4) {
-
-                        $altercolourcode = "0" . $colourcode;
-                        $extColour = substr($altercolourcode, 0, 3);
-                        $intColour = substr($altercolourcode, -2);
-                        $fieldValue = $extColour.''.$intColour;
-                    }
+                    $extColour = mb_substr($colourcode, 0, -2);
+                    $intColour = mb_substr($colourcode,  -2);
                     if($extColour) {
                         $extColourRow = ColorCode::where('code', $extColour)
                             ->where('belong_to', ColorCode::EXTERIOR)
                             ->first();
-                        $exteriorColor = "";
                         if ($extColourRow)
                         {
-                            $exteriorColor = $extColourRow->name;
                             $exteriorColorId = $extColourRow->id;
                         }
                     }
@@ -1486,10 +1595,8 @@ class SupplierInventoryController extends Controller
                         $intColourRow = ColorCode::where('code', $intColour)
                             ->where('belong_to', ColorCode::INTERIOR)
                             ->first();
-                        $interiorColor = "";
                         if ($intColourRow)
                         {
-                            $interiorColor = $intColourRow->name;
                             $interiorColorId = $intColourRow->id;
                         }
                     }
@@ -1497,20 +1604,31 @@ class SupplierInventoryController extends Controller
                     $inventory->interior_color_code_id = $interiorColorId;
                     $inventory->exterior_color_code_id = $exteriorColorId;
                 }
-            }else if($fieldName == 'delivery_note' ) {
+            }else if($fieldName == 'delivery_note') {
                 $inventory->$fieldName = $fieldValue;
-                if ($fieldValue && is_numeric($fieldValue)) {
-                    $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                if ($fieldValue) {
+                    info("delivery note found ");
+                    if($inventory->country == SupplierInventory::COUNTRY_BELGIUM ) {
+                        info("country belgium");
+                        if(strcasecmp($fieldValue, SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                            $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                        }
+                    }else{
+                        info("country UAE");
+                        if(is_numeric($fieldValue)) {
+                            $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                        }
+                    }
                 }
             }
             else{
-
                $inventory->$fieldName = $fieldValue;
             }
 
             $action = str_replace('_', ' ', $fieldName) ." updated";
             (new SupplierInventoryController)->inventoryLog($action, $inventory->id);
 
+            $inventory->updated_by = Auth::id();
             $inventory->save();
         }
         DB::commit();
@@ -1629,7 +1747,7 @@ class SupplierInventoryController extends Controller
                     ->where('engine_number', $secondFileRowDetail['engine_number'])
                     ->where('color_code', $secondFileRowDetail['color_code'])
                     ->where('pord_month', $secondFileRowDetail['pord_month'])
-                    ->where('po_arm', $secondFileRowDetail['po_arm'])
+                    // ->where('po_arm', $secondFileRowDetail['po_arm'])
                     ->whereNotIn('id', $noChangeRowIds)
                     ->whereNotIn('id', $updatedRowsIds)
                     ->where('eta_import', $secondFileRowDetail['eta_import'])
@@ -1690,7 +1808,7 @@ class SupplierInventoryController extends Controller
                                 $SimilarRowWithNullChaisis = $isNullChaisis->where('engine_number', $secondFileRowDetail['engine_number'])
                                     ->where('color_code', $secondFileRowDetail['color_code'])
                                     ->where('pord_month', $secondFileRowDetail['pord_month'])
-                                    ->where('po_arm', $secondFileRowDetail['po_arm'])
+                                    // ->where('po_arm', $secondFileRowDetail['po_arm'])
                                     ->where('eta_import', $secondFileRowDetail['eta_import'])
                                     ->where('delivery_note', $secondFileRowDetail['delivery_note'])
                                     ->first();
@@ -1708,7 +1826,6 @@ class SupplierInventoryController extends Controller
 
                                 }else{
                                     info("null chasis smilar data not exist => check if any similar model sfx row without having any update yet.");
-
                                     info($updatedRowsIds);
 
                                     $rowWithoutUpdate = SupplierInventoryHistory::whereIn('id', $isNullChaisisIds)
@@ -1762,7 +1879,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventories = $supplierInventories->where('engine_number', $secondFileRowDetail['engine_number'])
                                 ->where('color_code', $secondFileRowDetail['color_code'])
                                 ->where('pord_month', $secondFileRowDetail['pord_month'])
-                                ->where('po_arm', $secondFileRowDetail['po_arm'])
+                                // ->where('po_arm', $secondFileRowDetail['po_arm'])
                                 ->where('eta_import', $secondFileRowDetail['eta_import'])
                                 ->first();
 
@@ -1928,6 +2045,7 @@ class SupplierInventoryController extends Controller
             'deletedRows','updatedRows','suppliers','deliveredInventories'));
     }
     public function lists(Request $request) {
+        (new UserActivityController)->createActivity('open the listing page of inventory.');
 
         $request->validate([
             'start_date' => 'date',
@@ -1961,7 +2079,6 @@ class SupplierInventoryController extends Controller
 
         return $supplierInventoryDates;
     }
-
     public function checkChasisUnique(Request $request) {
 
         $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
@@ -2023,20 +2140,10 @@ class SupplierInventoryController extends Controller
        return response($data);
     }
     public function isExistColorCode(Request $request) {
-
         $colourcode = $request->color_code;
         $colourcodecount = strlen($colourcode);
-
-        if ($colourcodecount == 5) {
-            $extColour = substr($colourcode, 0, 3);
-            $intColour = substr($colourcode,  -2);
-        }
-        if ($colourcodecount == 4) {
-
-            $altercolourcode = "0" . $colourcode;
-            $extColour = substr($altercolourcode, 0, 3);
-            $intColour = substr($altercolourcode, -2);
-        }
+        $extColour = mb_substr($colourcode, 0, -2);
+        $intColour = mb_substr($colourcode,  -2);
 
         $extColourRow = ColorCode::where('code', $extColour)
             ->where('belong_to', ColorCode::EXTERIOR)
@@ -2049,7 +2156,6 @@ class SupplierInventoryController extends Controller
        if($intColourRow && $extColourRow) {
            $data = 1;
        }
-
        return response($data);
     }
     public function uniqueProductionMonth(Request $request) {
@@ -2098,9 +2204,35 @@ class SupplierInventoryController extends Controller
     }
     public function inventoryLogs($id)
     {
+        (new UserActivityController)->createActivity('Open the supplier inventory log listing page');
+
         $supplierInventoryLogs = SupplierInventoryLog::where('supplier_inventory_id', $id)->orderBy('id', 'DESC')->get();
 
         return view('supplier_inventories.inventory_logs.index', compact('supplierInventoryLogs'));
     }
-
+    public function checkDeliveryNote(Request $request)
+    {
+        $DN_WAITING = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_WAITING);
+        $DN_RECEIVED = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED);
+        $isValidDeliveryNote = 1;
+        if($request->data_from == 'CREATE') {
+            $country = $request->country[0];
+        }else{
+            $country = $request->country;
+        }
+        if($country == SupplierInventory::COUNTRY_BELGIUM ) {
+            if($DN_WAITING != 0) {
+                if($DN_RECEIVED != 0 ) {
+                    $isValidDeliveryNote = 0;
+                }
+            }
+        }else{
+            if($DN_WAITING != 0) {
+                if(!is_numeric($request->delivery_note)) {
+                    $isValidDeliveryNote = 0;
+                }
+            }
+        }
+        return response($isValidDeliveryNote);
+    }
 }

@@ -270,12 +270,6 @@
                 variant_id: {
                     required: true,
                 },
-                amount_uae: {
-                    required: true,
-                },
-                amount_belgium: {
-                    required: true,
-                },
             },
         });
         function showOrHideLoiDescription() {
@@ -339,7 +333,7 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
-                    console.log(data);
+
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{

@@ -138,9 +138,6 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
     if ($exteriorColorId !== null) {
         $query->where('ex_colour', $exteriorColorId);
     }
-    $query->whereNotNull('vehicles.vin');
-    $query->whereNull('vehicles.so_id');
-    $query->whereNull('vehicles.gdn_id');
     $query->groupBy('varaints.id', 'interior_color_code.name', 'exterior_color_code.name');
     $availableVehicles = $query->get();
     return response()->json($availableVehicles);

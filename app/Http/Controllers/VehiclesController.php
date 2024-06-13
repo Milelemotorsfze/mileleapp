@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 use App\Models\ColorCode;
+use Illuminate\Support\Facades\Log;
 use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
+use App\Models\WordpressPost;
+use App\Models\WordpressPostMeta;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
 use App\Models\Gdn;
@@ -2703,11 +2707,14 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
-                        'varaints.detail',
+                        'purchasing_order.fd',
+                        'varaints.id as variant_id',
+                        'varaints.detail as variant_detail',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2747,11 +2754,14 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
-                        'varaints.detail',
+                        'varaints.detail as variant_detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2794,11 +2804,14 @@ public function viewalls(Request $request)
                         'vehicles.vin',
                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                         'vehicles.engine',
+                        'vehicles.territory',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
-                        'varaints.detail',
+                        'varaints.id as variant_id',
+                        'varaints.detail as variant_detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2848,11 +2861,14 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.grn_remark',
                         'vehicles.engine',
+                        'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
-                        'varaints.model_detail',
+                        'varaints.detail as variant_detail',
+                        'varaints.id as variant_id',
                         'varaints.detail',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2897,12 +2913,15 @@ public function viewalls(Request $request)
                          DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                          'vehicles.ppmmyyy',
                          'vehicles.vin',
+                         'vehicles.territory',
                          'vehicles.engine',
                          'vehicles.grn_remark',
                          'brands.brand_name',
+                         'purchasing_order.fd',
                          'varaints.name as variant',
+                         'varaints.id as variant_id',
                          'varaints.model_detail',
-                         'varaints.detail',
+                         'varaints.detail as variant_detail',
                          'varaints.seat',
                          'varaints.upholestry',
                          'varaints.steering',
@@ -2944,11 +2963,14 @@ public function viewalls(Request $request)
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2990,16 +3012,20 @@ public function viewalls(Request $request)
                         'vehicles.id',
                         'vehicles.grn_id',
                         'vehicles.gdn_id',
+                        'vehicles.territory',
                         'vehicles.inspection_date',
                         'vehicles.so_id',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',
-                        'vehicles.vin',
+                        'vehicles.vin as vin',
                         'vehicles.engine',
+                        'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.detail as variant_detail',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
                         'varaints.seat',
@@ -3034,10 +3060,218 @@ public function viewalls(Request $request)
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id');
                     $data = $data->groupBy('vehicles.id');  
                 }
+                else if($status === "dpvehicles")
+                {
+                    $data = Vehicles::select( [
+                        'vehicles.id',
+                        'vehicles.grn_id',
+                        'vehicles.gdn_id',
+                        'vehicles.territory',
+                        'vehicles.inspection_date',
+                        'vehicles.so_id',
+                        'vehicles.reservation_end_date',
+                        'warehouse.name as location',
+                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
+                        'vehicles.ppmmyyy',
+                        'vehicles.vin as vin',
+                        'vehicles.engine',
+                        'purchasing_order.fd',
+                        'brands.brand_name',
+                        'varaints.name as variant',
+                        'varaints.detail as variant_detail',
+                        'varaints.id as variant_id',
+                        'varaints.model_detail',
+                        'varaints.detail',
+                        'varaints.seat',
+                        'varaints.upholestry',
+                        'varaints.steering',
+                        'varaints.my',
+                        'varaints.fuel_type',
+                        'varaints.gearbox',
+                        'so.so_number',
+                        'master_model_lines.model_line',
+                        'int_color.name as interior_color',
+                        'ex_color.name as exterior_color',
+                        'purchasing_order.po_number',
+                        'grn.grn_number',
+                        'gdn.gdn_number',
+                        'users.name',
+                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
+                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
+                    ])
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                    $data = $data->groupBy('vehicles.id');  
+                }
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
         }
         return view('vehicles.stock');
     }
+    public function generategrnPDF(Request $request)
+    {
+    $vehicleId = $request->vehicle_id;
+    $vehicle = Vehicles::find($vehicleId);
+    if (!$vehicle) {
+        abort(404);
+    }
+    $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
+    return $pdf->stream('vehicle-details.pdf');
+    }
+    public function fetchData(Request $request)
+{
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
+    $variant = str_replace(' ', '', $vehicle->variant->name);
+    $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+
+    if (!$post) {
+        // Remove the first letter of the variant name and try again
+        $variant = substr($variant, 1);
+        $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+    }
+
+    if ($post) {
+        $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
+            ->where('post_id', $post->ID)
+            ->where('meta_key', 'gallery')
+            ->first();
+
+        $galleryIds = unserialize($galleryMeta->meta_value);
+
+        $imageUrls = [];
+        foreach ($galleryIds as $id) {
+            $imagePost = DB::connection('wordpress')->table('mm_posts')
+                ->where('ID', $id)
+                ->first();
+            
+            if ($imagePost) {
+                $imageUrls[] = $imagePost->guid;
+            }
+        }
+
+        return response()->json([
+            'gallery' => $imageUrls
+        ]);
+    } else {
+        return response()->json(['message' => 'No post found'], 404);
+    }
+}
+
+private function fetchPost($variant, $exteriorColor)
+{
+    $query = DB::connection('wordpress')->table('mm_posts')
+        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+        ->where('variant_meta.meta_key', 'Car ID')
+        ->where('variant_meta.meta_value', $variant)
+        ->where('mm_posts.post_status', 'publish');
+
+    if ($exteriorColor) {
+        $query->where('color_meta.meta_key', 'color')
+            ->where('color_meta.meta_value', $exteriorColor);
+    }
+
+    return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+        ->first();
+    }
+        public function currentstatus ()
+        {
+            return view('vehicles.currentstatus');
+        }
+        public function statussreach(Request $request)
+        {
+            $searchQuery = $request->input('search');
+            $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
+            $data = [];
+            foreach ($vehicles as $vehicle) {
+                $status = $vehicle->status;
+                $previous_status = '';
+                $current_status = '';
+                $next_stage = '';
+                switch ($status) {
+                    case 'Approved':
+                        $previous_status = 'Pending Approval From Vehicle Procurement Manager';
+                        $current_status = 'Vehicle is Approved For Initiated Payment';
+                        $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
+                        break;
+                    case 'Not Approved':
+                        $previous_status = 'Created PO By Vehicle Procurement Executive';
+                        $current_status = 'Vehicle is Not Approved By the Vehicle Procurement Manager';
+                        $next_stage = 'Approved Vehicle By Procurement Manager';
+                        break;
+                    case 'Request for Payment':
+                        $previous_status = 'Approved Vehicle By Procurement Manager';
+                        $current_status = 'Initiated Payment By Vehicle Procurement Executive';
+                        $next_stage = 'Procurement Manager Forward Request for Payment To Finance Department';
+                        break;
+                    case 'Payment Requested':
+                        $previous_status = 'Procurement Manager Forward Request for Payment To Finance Department';
+                        $current_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                        $next_stage = 'CEO Office Payment Released';
+                        break;
+                    case 'Payment Completed':
+                        $previous_status = 'CEO Office Payment Released';
+                        $current_status = 'Finance Department Complete the Payments';
+                        $next_stage = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                        break;
+                    case 'Payment Rejected':
+                        $previous_status = 'Request to CEO Office for Payment Release';
+                        $current_status = 'Payment Rejected By CEO Office';
+                        $next_stage = 'Procurement Manager Forward Again Request for Payment To Finance Department';
+                        break;
+                    default:
+                        break;
+                }
+                if ($vehicle->status == 'Payment Requested' && $vehicle->payment_status == 'Payment Initiated') {
+                    $previous_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                    $current_status = 'Request to CEO Office for Payment Release';
+                    $next_stage = 'CEO Office Payment Released';
+                }
+                if ($vehicle->status == 'Incoming Stock' && $vehicle->grn_id == NULL) {
+                    $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                    $current_status = 'Incoming Vehicles / Pending GRN';
+                    $next_stage = 'GRN Done';
+                }
+                if ($vehicle->grn_id != NULL && $vehicle->inspection_date == null) {
+                    $previous_status = 'GRN Done';
+                    $current_status = 'Pending Inspection';
+                    $next_stage = 'Available Stock';
+                }
+                if ($vehicle->inspection_date != NULL) {
+                    $previous_status = 'Inspection Done';
+                    $current_status = 'Available Stock';
+                    $next_stage = 'Create SO, Pending PDI, Pending GDN';
+                }
+                if ($vehicle->pdi_date == NULL && $vehicle->gdn == NULL && $vehicle->so_id != NULL) {
+                    $previous_status = 'Available Stock';
+                    $current_status = 'Pending PDI Inspection';
+                    $next_stage = 'GDN';
+                }
+                if ($vehicle->gdn_id != NULL) {
+                    $previous_status = 'PDI Inspection';
+                    $current_status = 'GDN Done';
+                    $next_stage = '';
+                }
+                $data[] = [
+                    'previous_status' => $previous_status,
+                    'current_status' => $current_status,
+                    'next_stage' => $next_stage
+                ];
+            }
+            return response()->json(['data' => $data]);
+        }        
     }

@@ -158,6 +158,7 @@
                                         <option value="2.8" {{ old('engine') == '2.8' ? 'selected' : '' }}>2.8</option>
                                         <option value="3.0" {{ old('engine') == '3.0' ? 'selected' : '' }}>3.0</option>
                                         <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
+                                        <option value="3.4" {{ old('engine') == '3.4' ? 'selected' : '' }}>3.4</option>
                                         <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
                                         <option value="3.6" {{ old('engine') == '3.6' ? 'selected' : '' }}>3.6</option>
                                         <option value="3.8" {{ old('engine') == '3.8' ? 'selected' : '' }}>3.8</option>

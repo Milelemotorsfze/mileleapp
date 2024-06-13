@@ -50,18 +50,24 @@ class AuthOtpController extends Controller
                     // check the mac address change to check whether the device is changed or not
 //                    if($latestLoginActivity->mac_address == $userMacAdress ) {
                         info("mac address same");
+                        info($latestLoginActivity);
                     if($latestLoginActivity) {
+                        info("last login activity is there");
 //                        if($latestLoginActivity->mac_address == $userMacAdress ) {
                         // check the platform same or not
                         if (Agent::isPhone() == 'phone') {
+                            info("logged in phone");
                             $userDevice = 'phone';
                         } elseif (Agent::isTablet() == 'tablet') {
+                            info("logged in tablet");
                             $userDevice = 'tablet';
                         } elseif (Agent::isDesktop() == 'desktop') {
+                            info("logged in tablet");
                             $userDevice = 'desktop';
                         }
 //                        info("mac address same");
                         if ($latestLoginActivity->device_name == $userDevice) {
+                            info("device matching");
                             if ($latestLoginActivity->browser_name == $userCurrentBrowser) {
                                 info("browser name same");
 
@@ -78,6 +84,7 @@ class AuthOtpController extends Controller
                         }
 //                    }
                     }
+
                 }
 
                 # Generate An OTP

@@ -174,9 +174,9 @@ class DemandController extends Controller
 
     public function getMasterModel(Request $request) {
         if($request->dealer == 'Trans Cars') {
-            $data = MasterModel::whereNotNull('transcar_loi_description');
+            $data = MasterModel::where('is_transcar', true);
         }else{
-            $data = MasterModel::whereNotNull('milele_loi_description');
+            $data = MasterModel::where('is_milele', true);
         }
 
         if($request->selectedModelIds) {

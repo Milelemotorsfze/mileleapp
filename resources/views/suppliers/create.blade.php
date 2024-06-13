@@ -1100,6 +1100,7 @@
         </form>
     </div>
     <input type="hidden" value="" id="indexValue">
+    <input type="hidden" value="0" id="vendor-unique-error">
     <div class="overlay"></div>
     @endif
     @endcan
@@ -1108,6 +1109,7 @@
         var PreviousHidden = '';
         var filteredArray = [];
         var addonDropdownCount = 1;
+        // var formInputError = false;
       var sub ='1';
         const file1InputLicense = document.querySelector("#passport-upload");
         const file2InputLicense = document.querySelector("#trade-licence-upload");
@@ -1593,6 +1595,47 @@
                 hiddenInput: "full",
                 utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
             });
+
+        function VendorUniqueCheck() {
+            var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+            var name = $('#supplier').val();
+            var supplierType = $('#supplier_type').val();
+            var url = '{{ route('vendor.vendorUniqueCheck') }}';
+            if(contactNumber.length > 0 && name.length > 0) {
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        contact_number: contactNumber,
+                        name: name,
+                        supplierType:supplierType,
+                    },
+                    success:function (data) {
+                        if(data.error) {
+                            removeSupplierError();
+                            showContactNumberError(data.error);
+                            // formInputError == true;
+                            $('#vendor-unique-error').val(1)
+                        }else if(data.name_error) {
+                            removeContactNumberError();
+                            showSupplierError(data.name_error);
+                            // formInputError == true;
+                            $('#vendor-unique-error').val(1)
+
+                        }
+                        else{
+                            removeSupplierError();
+                            removeContactNumberError();
+                            // formInputError = false;
+                            $('#vendor-unique-error').val(0)
+                        }
+                        // console.log(formInputError);
+                    }
+
+                });
+            }
+
+        }
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
@@ -1603,169 +1646,135 @@
             var inputPhone = $('#phone').val();
             var inputOfficePhone = $('#office_phone').val();
 
-            var inputPaymentMethodsId = $('#is_primary_payment_method').val();
-            var inputContactNumber = $('#contact_number').val();
-            var inputAlternativeContactNumber = $('#alternative_contact_number').val();
-            var inputEmail  = $('#email').val();
+                var inputPaymentMethodsId = $('#is_primary_payment_method').val();
+                var inputContactNumber = $('#contact_number').val();
+                var inputAlternativeContactNumber = $('#alternative_contact_number').val();
+                var inputEmail  = $('#email').val();
 
-            var formInputError = false;
+                var formInputError = false;
 
-            if(inputPhone != '') {
-                if (inputPhone.length < 5 && inputPhone.length != 0) {
+                if(inputPhone != '') {
+                    if (inputPhone.length < 5 && inputPhone.length != 0) {
 
-                    $msg = "Minimum 5 digits required";
-                    showPhoneError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-
-                } else if (inputPhone.length > 15) {
-
-                    $msg = "Maximum 15 digits allowed";
-                    showPhoneError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-
-                } else {
-                    removePhoneError();
-                }
-            }
-            else
-            {
-                removePhoneError();
-            }
-            if(inputOfficePhone != '') {
-
-                if (inputOfficePhone.length < 5 ) {
-                    console.log("less tahn 5");
-                    $msg = "Minimum 5 digits required";
-                    showOfficePhoneError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-                } else if (inputOfficePhone.length > 15) {
-                    console.log("more tahn 5");
-                    $msg = "Maximum 15 digits allowed";
-                    showOfficePhoneError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-
-                } else {
-                    removeOfficePhoneError();
-                }
-            }
-            else{
-                removeOfficePhoneError();
-            }
-            if(inputAlternativeContactNumber != '') {
-                if(inputAlternativeContactNumber.length > 15) {
-                    $msg = "Maximum 15 digits allowed";
-                    showAlternativeContactNumberError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-                }else if(inputAlternativeContactNumber.length < 5 ) {
-
-                    $msg = "Minimum 5 digits required";
-                    showAlternativeContactNumberError($msg);
-                    formInputError = true;
-                    e.preventDefault();
-                }else {
-                    removeAlternativeContactNumberError();
-                }
-            }
-            else{
-                removeAlternativeContactNumberError();
-            }
-            if(inputSupplier == '')
-            {
-                $msg = "Supplier field is required";
-                showSupplierError($msg);
-
-                formInputError = true;
-                e.preventDefault();
-            }
-
-            if(inputSupplierType == '')
-            {
-                $msg = "Supplier type is required";
-                showSupplierTypeError($msg);
-                formInputError = true;
-                e.preventDefault();
-            }
-            if(inputSupplierCatgeory == '') {
-                $msg = "Supplier Category is required";
-                showSupplierCategoryError($msg);
-                formInputError = true;
-                e.preventDefault();
-            }
-            if(inputPaymentMethodsId == '')
-            {
-                $msg = "Primary Payment method is required";
-                showPaymentMethodsError($msg)
-                formInputError = true;
-                e.preventDefault();
-            }
-            if(inputContactNumber == '' )
-            {
-                $msg ="Contact number is required";
-                showContactNumberError($msg);
-                formInputError = true;
-                e.preventDefault();
-            }
-            else
-            {
-                if(inputContactNumber.length != 0) {
-                    if (inputContactNumber.length < 5) {
-                        $msg ="Minimum 5 digits required";
-                        showContactNumberError($msg);
+                        $msg = "Minimum 5 digits required";
+                        showPhoneError($msg);
                         formInputError = true;
                         e.preventDefault();
+
+                    } else if (inputPhone.length > 15) {
+
+                        $msg = "Maximum 15 digits allowed";
+                        showPhoneError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+
+                    } else {
+                        removePhoneError();
+                    }
+                }
+                else
+                {
+                    removePhoneError();
+                }
+                if(inputOfficePhone != '') {
+
+                    if (inputOfficePhone.length < 5 ) {
+                        console.log("less tahn 5");
+                        $msg = "Minimum 5 digits required";
+                        showOfficePhoneError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    } else if (inputOfficePhone.length > 15) {
+                        console.log("more tahn 5");
+                        $msg = "Maximum 15 digits allowed";
+                        showOfficePhoneError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+
+                    } else {
+                        removeOfficePhoneError();
+                    }
+                }
+                else{
+                    removeOfficePhoneError();
+                }
+                if(inputAlternativeContactNumber != '') {
+                    if(inputAlternativeContactNumber.length > 15) {
+                        $msg = "Maximum 15 digits allowed";
+                        showAlternativeContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else if(inputAlternativeContactNumber.length < 5 ) {
+
+                        $msg = "Minimum 5 digits required";
+                        showAlternativeContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else {
+                        removeAlternativeContactNumberError();
+                    }
+                }
+                else{
+                    removeAlternativeContactNumberError();
+                }
+                if(inputSupplier == '')
+                {
+                    $msg = "Supplier field is required";
+                    showSupplierError($msg);
+
+                    formInputError = true;
+                    e.preventDefault();
+                }
+
+                if(inputSupplierType == '')
+                {
+                    $msg = "Supplier type is required";
+                    showSupplierTypeError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+                }
+                if(inputSupplierCatgeory == '') {
+                    $msg = "Supplier Category is required";
+                    showSupplierCategoryError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+                }
+                if(inputPaymentMethodsId == '')
+                {
+                    $msg = "Primary Payment method is required";
+                    showPaymentMethodsError($msg)
+                    formInputError = true;
+                    e.preventDefault();
+                }
+                if(inputContactNumber == '' )
+                {
+                    $msg ="Contact number is required";
+                    showContactNumberError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+                }
+                else
+                {
+                    if(inputContactNumber.length != 0) {
+                        if (inputContactNumber.length < 5) {
+                            $msg ="Minimum 5 digits required";
+                            showContactNumberError($msg);
+                            formInputError = true;
+                            e.preventDefault();
 
                     } else if(inputContactNumber.length > 15) {
                         $msg ="Maximum 15 digits allowed";
                         showContactNumberError($msg);
                         formInputError = true;
                         e.preventDefault();
-                    } else {
-                        var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-                        var name = $('#supplier').val();
-                        var supplierType = $('#supplier_type').val();
-                       alert("ok");
-                        var url = '{{ route('vendor.vendorUniqueCheck') }}';
-                        $.ajax({
-                            type: "GET",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                contact_number: contactNumber,
-                                name: name,
-                                supplierType:supplierType,
-                            },
-                            success:function (data) {
-                                if(data.error) {
-                                    removeSupplierError();
-                                    showContactNumberError(data.error);
-                                    formInputError == true;
-                                    e.preventDefault();
-                                    $('#submit').html('Save');
-                                    $('.overlay').hide();
-                                }else if(data.name_error) {
-                                    removeContactNumberError();
-                                    showSupplierError(data.name_error);
-                                    formInputError == true;
-                                    e.preventDefault();
-                                    $('#submit').html('Save');
-                                    $('.overlay').hide();
-                                }
-                                else{
-                                    removeSupplierError();
-                                    removeContactNumberError();
-                                }
-                            }
-                        });
                     }
+
                 }
 
             }
-            if(formInputError == false)
+            var isVendorDuplicate = $('#vendor-unique-error').val();
+                console.log(isVendorDuplicate);
+            if(formInputError == false && isVendorDuplicate == 0)
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='contact_number[full]'").val(full_number);
@@ -1832,6 +1841,10 @@
                     $('.overlay').hide();
                 }
                 });
+            }else{
+
+                $('.overlay').hide();
+                e.preventDefault();
             }
         });
 
@@ -2075,6 +2088,7 @@
                 }
 
             }
+            VendorUniqueCheck();
         }
         function showContactNumberError($msg)
         {

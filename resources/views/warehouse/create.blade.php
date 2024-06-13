@@ -80,7 +80,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order')) !!}
+        {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order', 'enctype' => 'multipart/form-data')) !!}
 <div class="row">
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
@@ -129,6 +129,7 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="EUR">EUR</option>
                                     <option value="GBP">GBP</option>
                                     <option value="JPY">JPY</option>
+                                    <option value="CAD">CAD</option>
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
@@ -231,21 +232,46 @@ input[type=number]::-webkit-outer-spin-button {
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Loading:</label>
-              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
+              <select name="pol" class="form-control" id="pol">
+              <option value="">Select the Port of Loading</option>
+                    @foreach ($ports as $port)
+                    <option value="{{ $port->id }}">{{ $port->name }} - {{ $port->country->name }}</option>
+                    @endforeach
+                </select>
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Discharge:</label>
-              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
+              <select name="pod" class="form-control" id="pod">
+              <option value="">Select the Port of Discharge</option>
+                    @foreach ($ports as $port)
+                    <option value="{{ $port->id }}">{{ $port->name }} - {{ $port->country->name }}</option>
+                    @endforeach
+                </select>
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Preferred Destination:</label>
-              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination">
+              <select name="fd" class="form-control" id="fd">
+              <option value="">Select the Preferred Destination</option>
+                    @foreach ($countries as $country)
+                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
           </div>
             <div class="col-lg-3 col-md-6 mt-3">
                 <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" >
                 <label for="is_demand_planning_po" class="form-label fw-bold">Is Demand Planning PO ?</label>
             </div>
             </div>
+            <div class="row">
+    <div class="col-lg-2 col-md-6">
+        <label for="plNumber" class="form-label">PFI Number:</label>
+        <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="Enter PFI Number">
+    </div>
+    <div class="col-lg-2 col-md-6">
+        <label for="uploadPL" class="form-label">Upload PFI:</label>
+        <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
+    </div>
+</div>
             <br>
             <br>
             <input type="hidden" name="totalcost" id="totalUnitPriceInputHidden" value="0">
@@ -257,8 +283,21 @@ input[type=number]::-webkit-outer-spin-button {
     </div>
     @endif
     @php
-    $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-    $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+    $exColours = \App\Models\ColorCode::where('belong_to', 'ex')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
+        return [$color->id => $formattedName];
+    })
+    ->toArray();
+    $intColours = \App\Models\ColorCode::where('belong_to', 'int')
+    ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
+    ->mapWithKeys(function ($color) {
+        // Combine 'name' and 'code' and use 'id' as the key
+        $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
+        return [$color->id => $formattedName];
+    })
+    ->toArray();
 @endphp
 @endsection
 @push('scripts')
@@ -302,6 +341,10 @@ $(document).ready(function() {
     }
     var qty = $('#QTY').val();
     var unitPrice = $('#unit_price').val(); // Get the unit price
+    if (!unitPrice || unitPrice.trim() === '') {
+        alert('Unit price cannot be null or blank');
+        return;
+    }
     var detail = variantOption.data('detail');
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');
@@ -479,5 +522,12 @@ $(document).ready(function() {
       checkDuplicateVIN();
     });
   });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#fd').select2();
+        $('#pol').select2();
+        $('#pod').select2();
+    });
 </script>
 @endpush
