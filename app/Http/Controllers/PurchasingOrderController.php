@@ -15,6 +15,7 @@ use App\Models\PurchasingOrderSwiftCopies;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
+use App\Models\ColorCode;
 use App\Models\Brand;
 use App\Models\Country;
 use App\Models\MasterModelLines;
@@ -1220,6 +1221,49 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->created_by = auth()->user()->id;
                     $vehicleslog->role = Auth::user()->selectedRole;
                     $vehicleslog->save();
+                    if ($field == 'int_colour') {
+                        $newfield = "Interior Colour";
+                        $oldval = ColorCode::find($change['old_value']);
+                        $oldvalue = $oldval ? $oldval->name : "";
+                        $newval = ColorCode::find($change['new_value']);
+                        $namevalue = $newval->name;
+                    } elseif ($field == 'ex_colour') {
+                        $newfield = "Exterior Colour";
+                        $oldval = ColorCode::find($change['old_value']);
+                        $oldvalue = $oldval ? $oldval->name : "";
+                        $newval = ColorCode::find($change['new_value']);
+                        $namevalue = $newval->name;
+                    } elseif ($field == 'engine') {
+                        $newfield = "Engine Number";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'vin') {
+                        $newfield = "VIN";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'territory') {
+                        $newfield = "Territory";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } elseif ($field == 'estimation_date') {
+                        $newfield = "Estimation Date";
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    } else {
+                        $newfield = $field;
+                        $oldvalue = $change['old_value'] ?? "";
+                        $namevalue = $change['new_value'];
+                    }
+                    $description = "Vehicle reference is $vehicleId change the $newfield from $oldvalue to $namevalue";
+                    $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                    $purchasingordereventsLog->event_type = "Changes into Vehicle date";
+                    $purchasingordereventsLog->created_by = auth()->user()->id;
+                    $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+                    $purchasingordereventsLog->field = $newfield;
+                    $purchasingordereventsLog->old_value = $oldvalue;
+                    $purchasingordereventsLog->new_value = $namevalue;
+                    $purchasingordereventsLog->description = $description;
+                    $purchasingordereventsLog->save();
                 }
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
@@ -2368,10 +2412,10 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->pol = $request->input('pol');
             $purchasingOrder->pod = $request->input('pod');
             $purchasingOrder->fd = $request->input('fd');
+            $purchasingOrder->pl_number = $request->input('pl_number');
             $purchasingOrder->status = "Pending Approval";
             info($request->hasFile('uploadPL'));
             if ($request->hasFile('uploadPL')) {
-                info("waqas");
                 // Get file with extension
                 $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
         
