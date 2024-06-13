@@ -26,73 +26,53 @@ class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
         (new UserActivityController)->createActivity('Open '.$type.' work order create page');
-        $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
-        $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
-        $customers = $dpCustomers->union($clients)->get();
-        $customers = $customers->unique('customer_name');
 
-        // $type = 'export_exw';
-        // $customers = Customer::orderBy('name','ASC')->get();
-        // $clients = Clients::orderBy('name','ASC')->get();
+        // Select data from the WorkOrder table
+        $workOrders = WorkOrder::select(
+            'customer_name', 
+            'customer_email', 
+            'customer_company_number', 
+            'customer_address',
+            DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\WorkOrder' as reference_type"),
+        );
 
-        // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
-        
-        // ->union($workOrders)
-       // Combine the queries ensuring each select has the same number of columns
+        // Select and transform data from the Clients table
+        $clients = Clients::select(
+            DB::raw('name as customer_name'), 
+            DB::raw('email as customer_email'), 
+            DB::raw('phone as customer_company_number'), 
+            DB::raw('NULL as customer_address'),
+            DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\Clients' as reference_type"),
+        );
+
         // Select and transform data from the Customer table
-        // $dpCustomers = Customer::select(
-        //     DB::raw('name as customer_name'), 
-        //     DB::raw('NULL as customer_email'), 
-        //     DB::raw('NULL as customer_company_number'), 
-        //     DB::raw('address as customer_address'),
-        //     DB::raw('(IF(address IS NOT NULL, 1, 0)) as score')
-        // )->distinct();
+        $dpCustomers = Customer::select(
+            DB::raw('name as customer_name'), 
+            DB::raw('NULL as customer_email'), 
+            DB::raw('NULL as customer_company_number'), 
+            DB::raw('address as customer_address'),
+            DB::raw('(IF(address IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\Customer' as reference_type"),
+        )->distinct();
 
-        // // Select and transform data from the Clients table
-        // $clients = Clients::select(
-        //     DB::raw('name as customer_name'), 
-        //     DB::raw('email as customer_email'), 
-        //     DB::raw('phone as customer_company_number'), 
-        //     DB::raw('NULL as customer_address'),
-        //     DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score')
-        // )->distinct();
+        // Combine the results
+        $combinedResults = $workOrders->union($clients)->union($dpCustomers)->get();
 
-        // // Select data from the WorkOrder table
-        // $workOrders = WorkOrder::select(
-        //     'customer_name', 
-        //     'customer_email', 
-        //     'customer_company_number', 
-        //     'customer_address',
-        //     DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score')
-        // )->distinct();
-
-        // // Combine the results
-        // $combinedResults = $dpCustomers->union($clients)->union($workOrders)->get();
-
-        // // Sort by score in descending order, then by customer_name in ascending order
-        // $customers = $combinedResults->sortByDesc('score')->unique('customer_name')->values()->sortBy('customer_name');
-
-        // // Convert collection to array or use directly if needed
-        // $customersArray = $customers->toArray();
-
-        // // Select distinct customer names with the highest scores
-        // $uniqueCustomers = new Collection();
-        // $customers->each(function ($item) use ($uniqueCustomers) {
-        //     if (!$uniqueCustomers->contains('customer_name', $item->customer_name)) {
-        //         $uniqueCustomers->push($item);
-        //     }
-        // });
-        // dd($customers);
-        // ->union($workOrders)
-        
-        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
-        
+        // Process combined results to remove duplicates based on customer_name
+        $customers = $combinedResults->groupBy('customer_name')->map(function($items) {
+            // Sort items by score in descending order and then take the first item
+            return $items->sortByDesc('score')->first();
+        })->values()->sortBy('customer_name');
+        // Get the count of customers
+        $customerCount = $customers->count();
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('type','customers','airlines','vins','users'));
+        return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users'));
     }
     /**
      * Display a listing of the resource.
@@ -220,6 +200,7 @@ class WorkOrderController extends Controller
     // }
     public function store(StoreWorkOrderRequest $request)
     {  
+        // dd($request->all());
         DB::beginTransaction();
 
         try {
@@ -227,7 +208,6 @@ class WorkOrderController extends Controller
             // Retrieve validated input data
             $validated = $request->validated();
             $input = $request->all();
-
             // Ensure these fields are properly converted to strings
             $input['customer_company_number'] = $request->customer_company_number['full'] ?? null;
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
@@ -243,54 +223,86 @@ class WorkOrderController extends Controller
             } else if ($request->customer_reference_type == 'existing') {
                 $input['customer_name'] = $request->existing_customer_name;
             }
-            // Handle file uploads
-            if ($request->hasFile('brn_file')) {
-                $brnFileName = $this->handleFileUpload($request->file('brn_file'), 'wo/brn_file');
-                $input['brn_file'] = $brnFileName;
-            }
+            // Handle file uploads and save file paths
+            $fileFields = [
+                'brn_file' => 'wo/brn_file',
+                'signed_pfi' => 'wo/signed_pfi',
+                'signed_contract' => 'wo/signed_contract',
+                'payment_receipts' => 'wo/payment_receipts',
+                'noc' => 'wo/noc',
+                'enduser_trade_license' => 'wo/enduser_trade_license',
+                'enduser_passport' => 'wo/enduser_passport',
+                'enduser_contract' => 'wo/enduser_contract',
+                'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
+            ];
 
-            if ($request->hasFile('signed_pfi')) {
-                $signedPdfFileName = $this->handleFileUpload($request->file('signed_pfi'), 'wo/signed_pfi');
-                $input['signed_pfi'] = $signedPdfFileName;
-            }
-
-            if ($request->hasFile('signed_contract')) {
-                $signedContractFileName = $this->handleFileUpload($request->file('signed_contract'), 'wo/signed_contract');
-                $input['signed_contract'] = $signedContractFileName;
-            }
-
-            if ($request->hasFile('payment_receipts')) {
-                $paymentReceiptsFileName = $this->handleFileUpload($request->file('payment_receipts'), 'wo/payment_receipts');
-                $input['payment_receipts'] = $paymentReceiptsFileName;
-            }
-
-            if ($request->hasFile('noc')) {
-                $nocFileName = $this->handleFileUpload($request->file('noc'), 'wo/noc');
-                $input['noc'] = $nocFileName;
-            }
-
-            if ($request->hasFile('enduser_trade_license')) {
-                $enduserTradeLicenseFileName = $this->handleFileUpload($request->file('enduser_trade_license'), 'wo/enduser_trade_license');
-                $input['enduser_trade_license'] = $enduserTradeLicenseFileName;
-            }
-
-            if ($request->hasFile('enduser_passport')) {
-                $enduserPassportFileName = $this->handleFileUpload($request->file('enduser_passport'), 'wo/enduser_passport');
-                $input['enduser_passport'] = $enduserPassportFileName;
-            }
-
-            if ($request->hasFile('enduser_contract')) {
-                $enduserContractFileName = $this->handleFileUpload($request->file('enduser_contract'), 'wo/enduser_contract');
-                $input['enduser_contract'] = $enduserContractFileName;
-            }
-
-            if ($request->hasFile('vehicle_handover_person_id')) {
-                $vehicleHandoverPersonIdFileName = $this->handleFileUpload($request->file('vehicle_handover_person_id'), 'wo/vehicle_handover_person_id');
-                $input['vehicle_handover_person_id'] = $vehicleHandoverPersonIdFileName;
+            foreach ($fileFields as $fileField => $path) {
+                if ($request->hasFile($fileField)) {
+                    $fileName = $this->handleFileUpload($request->file($fileField), $path);
+                    $validatedData[$fileField] = $fileName;
+                }
             }
 
             // Create the WorkOrder record
-            $workOrder = WorkOrder::create($input);
+            $workOrder = WorkOrder::create($validatedData);
+
+            // Exclude specific fields and filter out non-NULL values and arrays
+            $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments'];
+            $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
+                return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
+            }, ARRAY_FILTER_USE_BOTH);
+
+            // Additional specific nested fields to store if not null
+            $nestedFields = [
+                'customer_company_number' => 'full',
+                'customer_representative_contact' => 'full',
+                'freight_agent_contact_number' => 'full',
+                'transporting_driver_contact_number' => 'full'
+            ];
+
+            // Store each non-NULL, non-array field in the data history
+            foreach ($nonNullData as $field => $value) {
+                WORecordHistory::create([
+                    'work_order_id' => $workOrder->id,
+                    'field_name' => $field,
+                    'old_value' => NULL,
+                    'new_value' => $value,
+                    'type' => 'SET',
+                    'user_id' => Auth::id(),
+                    'changed_at' => Carbon::now(),
+                ]);
+            }
+
+            // Store specific nested fields if not null
+            foreach ($nestedFields as $field => $subField) {
+                if (isset($request->$field[$subField]) && !is_null($request->$field[$subField])) {
+                    WORecordHistory::create([
+                        'work_order_id' => $workOrder->id,
+                        'field_name' => $field . '.' . $subField,
+                        'old_value' => NULL,
+                        'new_value' => $request->$field[$subField],
+                        'type' => 'SET',
+                        'user_id' => Auth::id(),
+                        'changed_at' => Carbon::now(),
+                    ]);
+                }
+            }
+
+            // Store file paths in the data history
+            foreach ($fileFields as $fileField => $path) {
+                if (isset($validatedData[$fileField])) {
+                    WORecordHistory::create([
+                        'work_order_id' => $workOrder->id,
+                        'field_name' => $fileField,
+                        'old_value' => NULL,
+                        'new_value' => $validatedData[$fileField],
+                        'type' => 'SET',
+                        'user_id' => Auth::id(),
+                        'changed_at' => Carbon::now(),
+                    ]);
+                }
+            }
+
             if (isset($request->vehicle)) {
                 if (count($request->vehicle) > 0) {
                     foreach ($request->vehicle as $key => $vehicleData) {
@@ -367,7 +379,8 @@ class WorkOrderController extends Controller
             }    
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
-            DB::commit();
+            DB::commit(); 
+            // dd($nonNullData);
             return response()->json(['success' => true, 'message' => 'Work order created successfully.']);
             // return response()->json(['message' => 'Work order created successfully']);
             // return redirect()->route('work-order.index',$request->type)->with('success','Work Order created successfully!');
@@ -379,7 +392,7 @@ class WorkOrderController extends Controller
             // Log the error for debugging
             Log::error('Error creating Work Order: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        // dd($e);
+            // dd($nonNullData); dd($e);
             // return response()->json(['error' => 'Failed to create Work Order. Please try again.'], 500);
         }
     }
