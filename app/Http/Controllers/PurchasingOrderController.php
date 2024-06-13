@@ -7,6 +7,7 @@ use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
+use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
 use App\Models\PurchasingOrderItems;
@@ -762,6 +763,11 @@ public function getBrandsAndModelLines(Request $request)
                 }
         }
         DB::commit();
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "PO Creation";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+        $purchasingordereventsLog->save();
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
     /**
@@ -830,12 +836,13 @@ public function getBrandsAndModelLines(Request $request)
         }
         $purchasingOrderSwiftCopies = PurchasingOrderSwiftCopies::where('purchasing_order_id', $id)->orderBy('created_at', 'desc')
         ->get();
+        $purchasedorderevents = PurchasingOrderEventsLog::where('purchasing_order_id', $id)->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents'));
     }
     public function edit($id)
     {
@@ -865,7 +872,6 @@ public function getBrandsAndModelLines(Request $request)
             {
             $variantIds = Varaint::whereIn('name', $variantNames)->pluck('id')->all();
             $variantsQuantity = array_count_values($variantNames);
-
             foreach ($variantIds as $variantId) {
                 $variant = Varaint::find($variantId);
                 $purchasingOrderItem = new PurchasingOrderItems();
@@ -1029,7 +1035,15 @@ public function getBrandsAndModelLines(Request $request)
 
         }
         DB::commit();
-
+        foreach ($variantsQuantity as $variant => $quantity) {
+            $description = $variant . ' with ' . $quantity . ' qty';
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Add New Vehicles";
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+            $purchasingordereventsLog->description = $description;
+            $purchasingordereventsLog->save();
+        }
     return back()->with('success', 'Added Vehicles In PO successfully!');
     }
     public function deletes($id)

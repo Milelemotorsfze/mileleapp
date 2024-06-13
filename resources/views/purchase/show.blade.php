@@ -1661,7 +1661,46 @@
                     </div>
                 </div>
             </div>
-        </div>
+            <!-- <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">All Events Log</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Date</th>
+                                <th>Updated By</th>
+                                <th>Event Type</th>
+                                <th>Field</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                                <th>Description / Remarks</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($purchasedorderevents as $purchasedorderevents)
+                            <tr>
+                            @php
+                                        $username = DB::table('users')->where('id', $purchasedorderevents->created_by)->first();
+                                        $usernames = $username->name;
+                            @endphp
+                                <td>{{$purchasedorderevents->created_at }}</td>
+                                <td>{{$usernames }}</td>
+                                <td>{{$purchasedorderevents->event_type }}</td>
+                                <td>{{$purchasedorderevents->field }}</td>
+                                <td>{{$purchasedorderevents->old_value }}</td>
+                                <td>{{$purchasedorderevents->new_value }}</td>
+                                <td>{{$purchasedorderevents->description }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> -->
         <script>
             let targetUrl;
     function openModal(id) {
