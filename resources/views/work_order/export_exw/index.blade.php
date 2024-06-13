@@ -3,6 +3,10 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.btn-style {
+		font-size:0.7rem!important;
+		line-height: 0.1!important;
+	}
     th {
 		font-size:12px!important;
 	}
@@ -48,11 +52,11 @@
 	</h4>
 	@endif
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="">
-	<i class="fa fa-plus" aria-hidden="true"></i> New Work Order
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
+	<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
 	</a>
 	@endif
 	@if (count($errors) > 0)
@@ -239,7 +243,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>{{$data->port_of_discharge ?? ''}}</td>
                                 <td>{{$data->final_destination ?? ''}}</td>
                                 <td>{{$data->transport_type ?? ''}}</td>
-                                <td>{{$data->brn_file ?? ''}}</td>
+                                <td>
+									@if($data->brn_file)
+										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
+											<button class="btn btn-primary m-2 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
                                 <td>{{$data->airline ?? ''}}</td>
                                 <td>{{$data->airway_bill ?? ''}}</td>
                                 <td>{{$data->airway_details ?? ''}}</td>
@@ -263,14 +276,86 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->delivery_location ?? ''}}</td>
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
-                            <td>{{$data->signed_pfi ?? ''}}</td>
-							<td>{{$data->signed_contract ?? ''}}</td>
-							<td>{{$data->payment_receipts ?? ''}}</td>
-							<td>{{$data->noc ?? ''}}</td>
-							<td>{{$data->enduser_trade_license ?? ''}}</td>
-							<td>{{$data->enduser_passport ?? ''}}</td>
-                            <td>{{$data->enduser_contract ?? ''}}</td>
-							<td>{{$data->vehicle_handover_person_id ?? ''}}</td>
+                            <td>
+								@if($data->signed_pfi)
+									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->signed_contract)
+									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->payment_receipts)
+									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->noc)
+									<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/noc/' . $data->noc) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->enduser_trade_license)
+									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->enduser_passport)
+									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+                            <td>
+								@if($data->enduser_contract)
+									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
+							<td>
+								@if($data->vehicle_handover_person_id)
+									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
+										<button class="btn btn-primary m-2 btn-style">View</button>
+									</a>
+									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
+										<button class="btn btn-info btn-style">Download</button>
+									</a>
+								@endif
+							</td>
 
 							<td>{{$data->CreatedBy->name ?? ''}}</td>
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>

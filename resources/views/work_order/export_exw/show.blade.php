@@ -1,5 +1,9 @@
-@extends('layouts.table')
+@extends('layouts.main')
 <style>
+    .btn-style {
+		font-size:0.7rem!important;
+		line-height: 0.1!important;
+	}
     .comment {
             margin-bottom: 20px;
         }
@@ -149,783 +153,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                     <div class="portfolio">
                         <ul class="nav nav-pills nav-fill" id="my-tab">
                             <li class="nav-item">
-                                <a class="nav-link active form-label" data-bs-toggle="pill" href="#personal-info-{{$workOrder->id}}"> General Info</a>
-                            </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="pill" href="#contact-info-{{$workOrder->id}}"> Contact Info</a>
-                            </li> -->
-                            <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#visa-info-{{$workOrder->id}}"> Vehicles & Addons</a>
+                                <a class="nav-link active form-label" data-bs-toggle="pill" href="#general-info"> General Info</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#compensation-benefits-{{$workOrder->id}}"> Comments Section</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#vehicles_addons"> Vehicles & Addons</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#off-boarding-{{$workOrder->id}}"> Data History</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#documents"> Documents</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="pill" href="#interview-summary-{{$workOrder->id}}"> Interview Summary Report</a>
-                            </li> -->
-                            @if(isset($workOrder) && $workOrder->documents_form_submit_at != NULL)
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
-                            @endphp
-                            @if ($hasPermission)
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="pill" href="#documents-{{$workOrder->id}}"> Documents</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#comments_section"> Comments Section</a>
                             </li>
-                            @if($workOrder->offer_letter_send_at != '')
                             <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter-{{$workOrder->id}}"> Job Offer Letter</a>
-                            </li>
-                            @endif
-                            
-                            @endif
-                            @endif
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#data_history"> Data History</a>
+                            </li>                           
                         </ul>
                     </div>
                     </br>
                     <div class="tab-content">
-                        <div class="tab-pane fade show" id="interview-summary-{{$workOrder->id}}">
-                            <div class="row">
-                                <div class="col-xxl-6 col-lg-6 col-md-12">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Candidate Information</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>{{ $workOrder->candidate_name ?? 'NA' }}</span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Current Status  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>
-                                                        @if($workOrder->candidate_current_status == 'Rejected')
-                                                        <label class="badge badge-soft-danger">{{ $workOrder->candidate_current_status ?? 'NA' }}</label>
-                                                        @elseif($workOrder->candidate_current_status == 'Candidate Selected And Approved' OR $workOrder->candidate_current_status == 'Candidate Selected And Hiring Request Closed')  
-                                                        <label class="badge badge-soft-success">{{ $workOrder->candidate_current_status ?? 'NA' }}</label>  
-                                                        @else
-                                                        <label class="badge badge-soft-info">{{ $workOrder->candidate_current_status ?? 'NA' }}</label>
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Nationality  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>{{ $workOrder->nationalities->name ?? 'NA' }}</span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Gender  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>{{ $workOrder->genderName->name ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Rate the Appearance Of Applicant</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Dress  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->rate_dress_appearance ?? 'NA' }}</span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Body Language  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->rate_body_language_appearance ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @if($workOrder->date_of_telephonic_interview)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Telephonic Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_telephonic_interview != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_telephonic_interview)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->telephonicInterviewers))
-                                                        @if(count($workOrder->telephonicInterviewers) > 0)
-                                                        @foreach($workOrder->telephonicInterviewers as $telephonicInterviewers)
-                                                        {{ $telephonicInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->telephonic_interview ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->date_of_first_round)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">First Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_first_round != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_first_round)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->firstRoundInterviewers))
-                                                        @if(count($workOrder->firstRoundInterviewers) > 0)
-                                                        @foreach($workOrder->firstRoundInterviewers as $firstRoundInterviewers)
-                                                        {{ $firstRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->first_round ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->date_of_second_round)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Second Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_second_round != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_second_round)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->secondRoundInterviewers))
-                                                        @if(count($workOrder->secondRoundInterviewers) > 0)
-                                                        @foreach($workOrder->secondRoundInterviewers as $secondRoundInterviewers)
-                                                        {{ $secondRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->second_round ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->date_of_third_round)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Third Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_third_round != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_third_round)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->thirdRoundInterviewers))
-                                                        @if(count($workOrder->thirdRoundInterviewers) > 0)
-                                                        @foreach($workOrder->thirdRoundInterviewers as $thirdRoundInterviewers)
-                                                        {{ $thirdRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->third_round ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->date_of_forth_round)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Forth Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_forth_round != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_forth_round)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->forthRoundInterviewers))
-                                                        @if(count($workOrder->forthRoundInterviewers) > 0)
-                                                        @foreach($workOrder->forthRoundInterviewers as $forthRoundInterviewers)
-                                                        {{ $forthRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->forth_round ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->date_of_fifth_round)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">Fifth Round Interview Summary</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Date  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if($workOrder->date_of_fifth_round != '')
-                                                        {{\Carbon\Carbon::parse($workOrder->date_of_fifth_round)->format('d M Y')}}
-                                                        @else
-                                                        NA
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">
-                                                        @if(isset($workOrder->fifthRoundInterviewers))
-                                                        @if(count($workOrder->fifthRoundInterviewers) > 0)
-                                                        @foreach($workOrder->fifthRoundInterviewers as $fifthRoundInterviewers)
-                                                        {{ $fifthRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
-                                                        @endforeach
-                                                        @endif
-                                                        @endif
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Interview Summary  :</label>
-                                                    </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->fifth_round ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->final_evaluation_of_candidate)
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <div class="row">
-                                                    <div class="col-lg-8 col-md-8 col-sm-8 col-8">
-                                                        <h4 class="card-title">Final Evaluation Of Candidate</h4>
-                                                    </div>
-                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-4">
-                                                        @if($workOrder->candidate_selected == 'no')
-                                                        <label class="badge badge-soft-danger">Not Selected</label>
-                                                        @elseif($workOrder->candidate_selected == 'yes')  
-                                                        <label class="badge badge-soft-success">Selected</label> 
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-12 col-md-12 col-sm-6 col-12">
-                                                        <span class="texttransform">{{ $workOrder->final_evaluation_of_candidate ?? 'NA' }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                </div>
-                                <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                    @if($workOrder->resume_file_name)
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <div class="row">
-                                                <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                                    <h4 class="card-title">Resume</h4>
-                                                </div>
-                                                <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                                    <button style="float:right;" type="button" class="btn btn-sm btn-info mt-3 ">
-                                                    <a href="{{ url('resume/' . $workOrder->resume_file_name) }}" download class="text-white">
-                                                    Download
-                                                    </a>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <iframe src="{{ url('resume/' . $workOrder->resume_file_name) }}" alt="Resume" style="height:1000;"></iframe>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($workOrder->hr_manager_id)
-                                    <div class="card">
-                                        <div class="card-header" style="background-color:#e8f3fd;">
-                                            <h4 class="card-title">
-                                                <center>Approvals By</center>
-                                            </h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <center>
-                                                                <h4 class="card-title">HR Manager</h4>
-                                                            </center>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Name :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    {{$workOrder->hrManager->name ?? 'NA'}}
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Status :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <label class="badge texttransform @if($workOrder->action_by_hr_manager =='pending') badge-soft-info 
-                                                                        @elseif($workOrder->action_by_hr_manager =='approved') badge-soft-success 
-                                                                        @else badge-soft-danger @endif">{{$workOrder->action_by_hr_manager ?? 'NA'}}</label>
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Date & Time :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    @if($workOrder->hr_manager_action_at != '')
-                                                                    {{ \Carbon\Carbon::parse($workOrder->hr_manager_action_at)->format('d M Y, H:i:s') }}
-                                                                    @else
-                                                                    NA
-                                                                    @endif
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Comments :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    {{$workOrder->comments_by_hr_manager ?? 'NA'}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <center>
-                                                                <h4 class="card-title">Division Head</h4>
-                                                            </center>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="row">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Name :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    {{$workOrder->divisionHeadName->name ?? 'NA'}}
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Status :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <label class="badge texttransform @if($workOrder->action_by_division_head =='pending') badge-soft-info 
-                                                                        @elseif($workOrder->action_by_division_head =='approved') badge-soft-success 
-                                                                        @else badge-soft-danger @endif">{{$workOrder->action_by_division_head ?? 'NA'}}</label>
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Date & Time :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    @if($workOrder->division_head_action_at != '')
-                                                                    {{ \Carbon\Carbon::parse($workOrder->division_head_action_at)->format('d M Y, H:i:s') }}
-                                                                    @else 
-                                                                NA
-                                                                    @endif
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    Comments :
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    {{$workOrder->comments_by_division_head ?? 'NA'}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xxl-8 col-lg-8 col-md-8">	
-                            </div>
-                            <div class="col-xxl-4 col-lg-4 col-md-4">
-                                <div class="modal fade" id="send-personal-info-form-{{$workOrder->id}}"
-                                    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog ">
-                                        <div class="modal-content">
-                                            <form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$workOrder->id}}">
-                                                @csrf
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Resend Personal Information Form To candidate for Edit
-                                                    </h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body p-3">
-                                                    <div class="col-lg-12">
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <div class="row">
-                                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
-                                                                        <input type="text" name="id" value="{{$workOrder->id}}" hidden>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                                        <label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
-                                                                    </div>
-                                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                                        <textarea rows="5" name="comment"  id="comments_{{$workOrder->id}}" class="form-control" required
-                                                                            placeholder="Comments send to candidate" value=""></textarea>																		
-                                                                    </div>
-                                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                                        <label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
-                                                                    </div>
-                                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                                        <input name="email" id="email_{{$workOrder->id}}" class="form-control" required
-                                                                            placeholder="Enter Candidate Email" value="@if($workOrder->email){{$workOrder->email}}@endif">																		
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary send-email"
-                                                        data-id="{{ $workOrder->id }}" data-status="final">Submit</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade show" id="documents-{{$workOrder->id}}">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title fw-bold">Documents</div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
-                                            @endphp
-                                            @if ($hasPermission && $workOrder->documents_verified_at == NULL && $workOrder->documents_form_send_at != NULL && $workOrder->documents_form_submit_at != NULL)
-                                            <!-- && $workOrder->documents_form_send_at < $workOrder->documents_form_submit_at -->
-                                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-docs"  data-bs-toggle="modal"
-                                                data-bs-target="#verify-docs-{{$workOrder->id}}" data-id="{{$workOrder->id}}">
-                                            <i class="fa fa-check" aria-hidden="true"></i> Verified Documents
-                                            </button>
-                                            @endif
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
-                                            @endphp
-                                            @if ($hasPermission && $workOrder->documents_verified_at == NULL)	            							
-                                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                                                data-bs-target="#send-docs-form-{{$workOrder->id}}">
-                                            <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
-                                            </button>
-                                            @endif
-                                            <div class="modal fade" id="send-docs-form-{{$workOrder->id}}"
-                                                tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog ">
-                                                    <div class="modal-content">
-                                                        <form method="POST" action="{{route('docs.send-email')}}" id="send_email_{{$workOrder->id}}">
-                                                            @csrf
-                                                            <div class="modal-header">
-                                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Resend Documents Request Form To candidate for Edit
-                                                                </h1>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body p-3">
-                                                                <div class="col-lg-12">
-                                                                    <div class="row">
-                                                                        <div class="col-12">
-                                                                            <div class="row">
-                                                                                <div class="col-xxl-6 col-lg-6 col-md-6">
-                                                                                    <input type="text" name="id" value="{{$workOrder->id}}" hidden>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                                                    <label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
-                                                                                </div>
-                                                                                <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                                                    <textarea rows="5" name="comment"  id="comments_{{$workOrder->id}}" class="form-control" required
-                                                                                        placeholder="Comments send to candidate" value=""></textarea>																		
-                                                                                </div>
-                                                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                                                    <label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
-                                                                                </div>
-                                                                                <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                                                    <input name="email" id="email_{{$workOrder->id}}" class="form-control" required
-                                                                                        placeholder="Enter Candidate Email" value="@if($workOrder->email){{$workOrder->email}}@endif">																		
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-primary send-email"
-                                                                    data-id="{{ $workOrder->id }}" data-status="final">Submit</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                            @if($workOrder->image_path)
-                                            <div class="row">
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
-                                                </div>
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                                    <a href="{{ url('hrm/employee/photo/' . $workOrder->image_path) }}" target="_blank">
-                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                                    </a>
-                                                    <a href="{{ url('hrm/employee/photo/' . $workOrder->image_path) }}" download>
-                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <iframe src="{{ url('hrm/employee/photo/' . $workOrder->image_path) }}" alt="Passport Size Photograph"></iframe>
-                                            @endif
-                                        </div>
-                                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                            @if($workOrder->resume)
-                                            <div class="row">
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Resume</h6>
-                                                </div>
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                                    <a href="{{ url('hrm/employee/resume/' . $workOrder->resume) }}" target="_blank">
-                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                                    </a>
-                                                    <a href="{{ url('hrm/employee/resume/' . $workOrder->resume) }}" download>
-                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <iframe src="{{ url('hrm/employee/resume/' . $workOrder->resume) }}" alt="Resume"></iframe>
-                                            @endif
-                                        </div>
-                                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                            @if($workOrder->visa)
-                                            <div class="row">
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Visa</h6>
-                                                </div>
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                                    <a href="{{ url('hrm/employee/visa/' . $workOrder->visa) }}" target="_blank">
-                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                                    </a>
-                                                    <a href="{{ url('hrm/employee/visa/' . $workOrder->visa) }}" download>
-                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <iframe src="{{ url('hrm/employee/visa/' . $workOrder->visa) }}" alt="Visa"></iframe>
-                                            @endif
-                                        </div>
-                                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                            @if($workOrder->emirates_id_file)
-                                            <div class="row">
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Emirates ID</h6>
-                                                </div>
-                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                                    <a href="{{ url('hrm/employee/emirates_id/' . $workOrder->emirates_id_file) }}" target="_blank">
-                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                                    </a>
-                                                    <a href="{{ url('hrm/employee/emirates_id/' . $workOrder->emirates_id_file) }}" download>
-                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <iframe src="{{ url('hrm/employee/emirates_id/' . $workOrder->emirates_id_file) }}" alt="Emirates ID"></iframe>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade show" id="job-offer-letter-{{$workOrder->id}}">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="card-title fw-bold">Job Offer Letter</div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            @if($workOrder->offer_letter_fileName)
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <div class="row">
-                                                        <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                                            <h4 class="card-title">Resume</h4>
-                                                        </div>
-                                                        <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
-                                                            <button style="float:right;" type="button" class="btn btn-sm btn-info mt-3 ">
-                                                            <a href="{{ url('hrm/employee/offer_letter/' . $workOrder->offer_letter_fileName) }}" download class="text-white">
-                                                            Download
-                                                            </a>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <iframe src="{{ url('hrm/employee/offer_letter/' . $workOrder->offer_letter_fileName) }}" alt="Offer Letter" style="height:1000;"></iframe>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade show active" id="personal-info-{{$workOrder->id}}">
+                        <div class="tab-pane fade show active" id="general-info">
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">
@@ -1053,7 +299,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> BRN Fille </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->brn_file ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->brn_file)
+                                                            <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>                              
                                             </div>
                                         </div>
@@ -1172,7 +429,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Signed PFI </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->signed_pfi ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->signed_pfi)
+                                                            <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>                            
                                             </div>
                                         </div>
@@ -1182,43 +450,120 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Signed Contract </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->signed_contract ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->signed_contract)
+                                                            <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Payment Receipts </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->payment_receipts ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->payment_receipts)
+                                                            <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> NOC </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->noc ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->noc)
+                                                            <a href="{{ url('wo/noc/' . $workOrder->noc) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> End User Trade License </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->enduser_trade_license ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->enduser_trade_license)
+                                                            <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> End User Passport </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->enduser_passport ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->enduser_passport)
+                                                            <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> End User Contract </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->enduser_contract ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->enduser_contract)
+                                                            <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label">Vehicle Handover To Person ID</label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->vehicle_handover_person_id ?? 'NA'}}</span>
+                                                    <span class="data-font">
+                                                        @if($workOrder->vehicle_handover_person_id)
+                                                            <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" target="_blank">
+                                                                <button class="btn btn-primary m-2 btn-style">View</button>
+                                                            </a>
+                                                            <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download>
+                                                                <button class="btn btn-info btn-style">Download</button>
+                                                            </a>
+                                                        @else
+                                                            NA
+                                                        @endif
+                                                    </span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Created By</label>
@@ -1286,7 +631,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="visa-info-{{$workOrder->id}}">
+                        <div class="tab-pane fade" id="vehicles_addons">
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">
@@ -1296,7 +641,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="table-responsive">
-                                            <table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+                                            <table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
                                                 <tr style="border-bottom:1px solid #b3b3b3;">
                                                     <th>BOE</th>
                                                     <th>VIN</th>
@@ -1378,21 +723,200 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="compensation-benefits-{{$workOrder->id}}">
-                            @include('work_order.export_exw.comments')
-                            <!-- <div class="row">
-                                <div class="row" id="comments-section">
-
+                        <div class="tab-pane fade show" id="documents">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <center style="font-size:12px;">Documents</center>
+                                    </h4>
                                 </div>
-                                <div class="form-group">
-                                    <label for="new-comment">Add a comment:</label>
-                                    <textarea class="form-control" id="new-comment" rows="3"></textarea>
-                                    <button class="btn btn-sm btn-primary mt-2" onclick="addComment()">Add Comment</button>
+                                <div class="card-body">                                 
+                                    <div class="row">
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->brn_file)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">BRN File</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" alt="BRN File"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->signed_pfi)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Signed PFI</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" alt="Signed PFI"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->signed_contract)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Signed Contract</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" alt="Signed Contract"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->payment_receipts)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Payment Receipts</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" alt="Payment Receipts"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->noc)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">NOC</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/noc/' . $workOrder->noc) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/noc/' . $workOrder->noc) }}" alt="NOC"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->enduser_trade_license)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Enduser Trade License</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" alt="Enduser Trade License"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->enduser_passport)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Enduser Passport</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" alt="Enduser Passport"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->enduser_contract)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Enduser Contract</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" alt="Enduser Contract"></iframe>
+                                            @endif
+                                        </div>
+                                        <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
+                                            @if($workOrder->vehicle_handover_person_id)
+                                            <div class="row">
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                                    <h6 class="fw-bold text-center mb-1" style="float:left">Vehicle Handover Person ID</h6>
+                                                </div>
+                                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                                    <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" target="_blank">
+                                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                                    </a>
+                                                    <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download>
+                                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <iframe src="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" alt="Vehicle Handover Person ID"></iframe>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                            </div> -->
+                            </div>
+                        </div>                       
+                        <div class="tab-pane fade" id="comments_section">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <center style="font-size:12px;">Comments Section</center>
+                                    </h4>
+                                </div>
+                                <div class="card-body">                            
+                                    @include('work_order.export_exw.comments')
+                                </div>
+                            </div>
                         </div>
-                        <div class="tab-pane fade" id="off-boarding-{{$workOrder->id}}">
-                            @include('work_order.export_exw.data_history')
+                        <div class="tab-pane fade" id="data_history">
+                            <div class="card-header text-center">
+                                <center style="font-size:12px;">Data History</center>
+                            </div>
+                            <div class="card-body">
+                                @include('work_order.export_exw.data_history')
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1407,7 +931,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
+<!-- <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script> -->
+<script type="text/javascript">
+    $(document).ready(function () { 
+		// $('.my-datatable').DataTable();
+    });
+</script>
 @endsection
-@push('scripts')
-
-@endpush

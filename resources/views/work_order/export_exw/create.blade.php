@@ -985,7 +985,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		<div class="card-header text-center">
 			<h4 class="card-title">Data History</h4>
 		</div>
-		@include('work_order.export_exw.data_history')
+		<div class="card-body">
+			@include('work_order.export_exw.data_history')
+		</div>
 	</div>
 </div>
 <br>
