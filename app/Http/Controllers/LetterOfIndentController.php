@@ -29,6 +29,7 @@ use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
+
 use Illuminate\Support\Facades\Storage;
 
 class LetterOfIndentController extends Controller
@@ -65,7 +66,6 @@ class LetterOfIndentController extends Controller
              LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
             ->cursor();
        
-
         return view('letter_of_indents.index', compact('newLOIs','approvalWaitingLOIs',
             'partialApprovedLOIs','supplierApprovedLOIs'));
     }

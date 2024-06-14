@@ -442,7 +442,6 @@
             return this.valid();
         };
        
-        
         $('#submit-button').click(function (e) {
             e.preventDefault();
             uniqueCheckSoNumber();

@@ -19,7 +19,7 @@
 
             <div class="card-body">
                 <div class="table-responsive" >
-                    <table id="PFI-table" class="table table-striped table-editable table-edits table table-condensed" style="">
+                    <table id="PFI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.NO</th>
@@ -30,8 +30,8 @@
                             <th>Customer Name </th>
                             <th>Customer Country</th>
                             <th>Amount</th>
-{{--                            <th>Released Amount</th>--}}
-{{--                            <th>Release Date</th>--}}
+                            <th>Released Amount</th>
+                            <th>Release Date</th>
                             <th>Comment</th>
                             <th>Status</th>
                             <th>Payment Status</th>
@@ -52,8 +52,8 @@
                                 <td>{{ $pfi->letterOfIndent->customer->name }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
-{{--                                <td>{{ $pfi->released_amount }}</td>--}}
-{{--                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>--}}
+                                <td>{{ $pfi->released_amount }}</td>
+                               <td>{{ \Illuminate\Support\Carbon::parse($pfi->released_date)->format('d M y') }}</td>
                                 <td>{{ $pfi->comment }}</td>
                                 <td>{{ $pfi->status }}</td>
                                 <td>{{ $pfi->payment_status }} </td>
@@ -79,6 +79,10 @@
                                             <a class="btn btn-soft-green btn-sm" title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
                                                 <i class="fa fa-edit"></i>
                                             </a>
+                                            <button type="button" class="btn btn-secondary btn-sm" title="To Update Released Amount"
+                                                data-bs-toggle="modal" data-bs-target="#update-released-amount-{{$pfi->id}}">
+                                                <i class="fa fa-euro-sign"></i>
+                                            </button>
                                             @endif
                                         @endcan
                                     @endif
@@ -110,6 +114,37 @@
                                         @endif
                                     @endcan
 
+                                   <!-- PFI released amount update Model -->
+                                   <div class="modal fade " id="update-released-amount-{{$pfi->id}}" data-bs-backdrop="static" 
+                                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog ">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Released Amount</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="date" name="released_date" required class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="number" min="0" required name="released_amount" class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                      <!--  PFI PAYMENT UPDATE MODAL -->
                                         <div class="modal fade " id="update-pfi-payment-status-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog ">
