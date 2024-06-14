@@ -29,6 +29,7 @@ use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
+
 use Illuminate\Support\Facades\Storage;
 
 class LetterOfIndentController extends Controller
@@ -50,7 +51,8 @@ class LetterOfIndentController extends Controller
             ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
+            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,
+                        LetterOfIndent::LOI_STATUS_APPROVED])
             ->get();
         foreach ($partialApprovedLOIs as $partialApprovedLOI) {
             $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
@@ -60,15 +62,12 @@ class LetterOfIndentController extends Controller
         }
         $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+            ->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,
+             LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
             ->cursor();
-        $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
-            ->cursor();
-
+       
         return view('letter_of_indents.index', compact('newLOIs','approvalWaitingLOIs',
-            'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
+            'partialApprovedLOIs','supplierApprovedLOIs'));
     }
     /**
      * Show the form for creating a new resource.

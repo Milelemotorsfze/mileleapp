@@ -421,4 +421,13 @@ class PFIController extends Controller
         $pfi->save();
         return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
     }
+    public function relaesedAmountUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('PFI released amount updated.');
+
+        $pfi = PFI::find($id);
+        $pfi->released_amount = $request->released_amount;
+        $pfi->released_date = $request->released_date;
+        $pfi->save();
+        return redirect()->back()->with('success', 'Payment released amount Successfully.');
+    }
 }

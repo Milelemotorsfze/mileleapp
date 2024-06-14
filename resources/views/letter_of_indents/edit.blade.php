@@ -14,7 +14,7 @@
             height:32px!important;
         }
         .error {
-            color: #FF0000;
+            color: #fd625e;
         }
 
     </style>
@@ -50,7 +50,8 @@
                             {{ Session::get('success') }}
                         </div>
                     @endif
-                <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" id="form-doc-upload">
+                <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" 
+                         id="form-update">
                     @csrf
                     @method('PUT')
                     <div class="row">
@@ -203,8 +204,8 @@
                                             <div class="col-xxl-9 col-lg-6 col-md-12">
                                                 <input id="so_number_{{$i}}" type="text" class="form-control widthinput so_number" name="so_number[{{$i}}]"
                                                     placeholder="So Number" value="{{$soNumber->so_number}}"
-                                                    autocomplete="so_number" onkeyup="setPartNumber(this,{{$i}})">
-                                                <span id="soNumberError_{{$i}}" class="invalid-feedback soNumberError"></span>
+                                                    autocomplete="so_number" oninput=uniqueCheckSoNumber()>
+                                                <span id="soNumberError_{{$i}}" class="error is-invalid soNumberError"></span>
                                             </div>
                                             <div class="col-xxl-3 col-lg-1 col-md-1">
                                                 <a class="btn btn-sm btn-danger removeSoNumber" data-index="{{$i}}" >
@@ -672,7 +673,7 @@
             }
         });
 
-        $("#form-doc-upload").validate({
+        $("#form-update").validate({
             ignore: [],
             rules: {
                 customer_id: {
@@ -1241,8 +1242,8 @@
 	                               <div class="col-xxl-9 col-lg-6 col-md-12">
 	                                   <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
 	                                   placeholder="So Number" value="{{ old('so_number') }}"
-	                                   autocomplete="so_number" onkeyup="setPartNumber(this,${index})">
-	                                   <span id="soNumberError_${index}" class="invalid-feedback soNumberError"></span>
+	                                   autocomplete="so_number" oninput=uniqueCheckSoNumber()>
+	                                   <span id="soNumberError_${index}" class="error is-invalid soNumberError"></span>
 	                               </div>
 	                               <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
 	                                   <a class="btn btn-sm btn-danger removeSoNumber" data-index="${index}" >
@@ -1255,10 +1256,8 @@
 	       });
 	       $(document.body).on('click', ".removeSoNumber", function (e)
 	       {
-
             var indexNumber = $(this).attr('data-index');
-            var deletedValue = '';
-            deletedValue = $("#so_number_"+indexNumber).val();
+    
             $(this).closest('#row-'+indexNumber).remove();
             $('.soNumberApendHere').each(function(i) {
                 var index = +i + +1;
@@ -1267,23 +1266,75 @@
                 $(this).find('.so_number').attr('id', 'so_number_'+index);
                 $(this).find('.removeSoNumber').attr('data-index',index);
                 $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
-                if(deletedValue != '')
-                {
-                soNumberUniquecheck(deletedValue);
-                }
+              
             });
+            uniqueCheckSoNumber();
 	   });
+
+       function uniqueCheckSoNumber() {
+            var totalIndex = $(".soNumberMain").find(".soNumberApendHere").length;
+            var isValid = [];
+            for(var j = 1; j <= totalIndex; j++)
+            {
+                soNumberInput = $('#so_number_'+j).val();
+                if(soNumberInput != '')
+                {
+                    var existingSoNumbers = [];
+                    for(var m = 1; m <= totalIndex; m++)
+                    {
+                        if(m != j)
+                        {
+                            var soNumberInputOther = '';
+                            var soNumberInputOther = $('#so_number_'+m).val();
+                            existingSoNumbers.push(soNumberInputOther);
+                        }
+                    }
+                    if(existingSoNumbers.includes(soNumberInput))
+                    {
+                        $msg = "So number is already exist";
+                        isValid.push(false);
+                        showSoNumberError($msg,j);
+                    }
+                    else
+                    {
+                        $msg = "";
+                        removeSoNumberError($msg,j);
+                    }
+                }
+            }
+            if(isValid.includes(false))
+            {
+                formValid = false;
+            }else{
+            
+                formValid = true;
+            }  
+        }
         $('#submit-button').click(function (e) {
             e.preventDefault();
-
+            uniqueCheckSoNumber();
             if (formValid == true) {
-                if($("#form-doc-upload").valid()) {
-                    $('#form-doc-upload').unbind('submit').submit();
+                if($("#form-update").valid()) {
+                    $('#form-update').unbind('submit').submit();
                 }
             }else{
                 e.preventDefault();
             }
         });
+
+        function showSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent=$msg;
+	    document.getElementById("so_number_"+i).classList.add("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.add("paragraph-class");
+      
+	}
+	function removeSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent="";
+	    document.getElementById("so_number_"+i).classList.remove("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.remove("paragraph-class");
+	}
     </script>
 @endpush
 

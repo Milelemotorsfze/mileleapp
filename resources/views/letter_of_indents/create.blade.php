@@ -13,7 +13,7 @@
             height:32px!important;
         }
         .error {
-            color: #FF0000;
+            color: #fd625e;
         }
 
     </style>
@@ -203,10 +203,10 @@
                                 <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-1">
                                     <div class="row mt-2">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                                            <input id="so_number_1" type="text" class="form-control widthinput so_number" name="so_number[1]"
-                                                placeholder="SO Number" value="{{ old('so_number') }}"
-                                                autocomplete="so_number" >
-                                            <span id="soNumberError_1" class="invalid-feedback soNumberError"></span>
+                                            <input id="so_number_1" type="text" class="form-control widthinput so_number"
+                                                oninput=uniqueCheckSoNumber()  name="so_number[1]"
+                                                placeholder="SO Number" value="{{ old('so_number') }}" >
+                                            <span id="soNumberError_1" class="error is-invalid soNumberError"></span>
                                         </div>
 
                                         <div class="col-lg-1 col-md-6 col-sm-12">
@@ -324,9 +324,10 @@
 
     <script type="text/javascript">
         let formValid = true;
+        let previousSelected = $('#customer-type').val();
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
-        // const previewImage = document.querySelector("#image-preview");
+      
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
             while (previewFile.firstChild) {
@@ -368,11 +369,13 @@
             signaturePreviewFile.appendChild(iframe);
 
         });
-        getCustomers();
 
         $("#form-create").validate({
             ignore: [],
             rules: {
+                country: {
+                    required: true,
+                },
                 customer_id: {
                     required: true,
                 },
@@ -438,9 +441,10 @@
             }
             return this.valid();
         };
-
+       
         $('#submit-button').click(function (e) {
             e.preventDefault();
+            uniqueCheckSoNumber();
             if (formValid == true) {
                 if($("#form-create").valid()) {
                     $('#form-create').unbind('submit').submit();
@@ -473,7 +477,10 @@
             placeholder : 'Select Customer Type',
             allowClear: true,
             maximumSelectionLength: 1
+        }).on('change', function() {
+            $('#customer-type-error').remove();
         });
+       
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
@@ -481,6 +488,7 @@
         }).on('change', function() {
             getCustomers();
             checkCountryCriterias();
+            $('#country-error').remove();
         });
 
         $('#date').change(function (){
@@ -1141,9 +1149,8 @@
                                     <div class="row">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
-                                            placeholder="So Number" value="{{ old('so_number') }}"
-                                            autocomplete="so_number" >
-                                            <span id="soNumberError_${index}" class="invalid-feedback soNumberError"></span>
+                                            placeholder="So Number" value="{{ old('so_number') }}" oninput=uniqueCheckSoNumber() >
+                                            <span id="soNumberError_${index}" class="error is-invalid soNumberError"></span>
                                         </div>
                                         <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
                                             <a class="btn btn-sm btn-danger removeSoNumber" data-index="${index}" >
@@ -1158,8 +1165,8 @@
         $(document.body).on('click', ".removeSoNumber", function (e)
 	    {
             var indexNumber = $(this).attr('data-index');
-            var deletedValue = '';
-            deletedValue = $("#so_number_"+indexNumber).val();
+        
+           
             $(this).closest('#row-'+indexNumber).remove();
             $('.soNumberApendHere').each(function(i) {
                 var index = +i + +1;
@@ -1168,10 +1175,69 @@
                 $(this).find('.so_number').attr('id', 'so_number_'+index);
                 $(this).find('.removeSoNumber').attr('data-index',index);
                 $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
-
+                
             });
 
-	})
+            uniqueCheckSoNumber();
+           
+	});
+
+   
+ 
+    function uniqueCheckSoNumber() {
+        var totalIndex = $(".soNumberMain").find(".soNumberApendHere").length;
+        var isValid = [];
+        for(var j = 1; j <= totalIndex; j++)
+        {
+            soNumberInput = $('#so_number_'+j).val();
+            if(soNumberInput != '')
+            {
+                var existingSoNumbers = [];
+                for(var m = 1; m <= totalIndex; m++)
+                {
+                    if(m != j)
+                    {
+                        var soNumberInputOther = '';
+                        var soNumberInputOther = $('#so_number_'+m).val();
+                        existingSoNumbers.push(soNumberInputOther);
+                    }
+                }
+                if(existingSoNumbers.includes(soNumberInput))
+                {
+                    $msg = "SO Number is already exist";
+                    isValid.push(false);
+                    showSoNumberError($msg,j);
+                }
+                else
+                {
+                    $msg = "";
+                    removeSoNumberError($msg,j);
+                }
+            }
+        }
+        if(isValid.includes(false))
+        {
+            formValid = false;
+        }else{
+           
+            formValid = true;
+        }
+       
+    }
+    
+    function showSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent=$msg;
+	    document.getElementById("so_number_"+i).classList.add("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.add("paragraph-class");
+      
+	}
+	function removeSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent="";
+	    document.getElementById("so_number_"+i).classList.remove("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.remove("paragraph-class");
+	}
     </script>
 @endpush
 
