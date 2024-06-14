@@ -41,7 +41,7 @@
             url: `/comments/${workOrderId}`, // Endpoint to fetch all comments for the work order
             type: 'GET',
             success: function(response) {
-                console.log('AJAX response:', response); // Log the entire response
+                // console.log('AJAX response:', response); // Log the entire response
                 if (response && response.comments) {
                     renderComments(response.comments); // Assuming the response contains an array of comments
                 } else {
@@ -55,7 +55,7 @@
     });
 
 function addComment(commentData = {}) {
-    console.log('Adding comment:', commentData); // Log the comment data
+    // console.log('Adding comment:', commentData); // Log the comment data
 
     const { text = '', parent_id = null, id = null, created_at = new Date().toISOString() } = commentData;
 

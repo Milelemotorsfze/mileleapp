@@ -218,12 +218,100 @@ class WorkOrderController extends Controller
             $input['amount_received'] = $request->amount_received ?? 0.00;
             $input['balance_amount'] = $request->balance_amount ?? 0.00;
 
-            if ($request->customer_reference_type == 'new') {
+            if ($request->customer_type == 'new') {
                 $input['customer_name'] = $request->new_customer_name;
-            } else if ($request->customer_reference_type == 'existing') {
+            } else if ($request->customer_type == 'existing') {
                 $input['customer_name'] = $request->existing_customer_name;
             }
-            // Handle file uploads and save file paths
+
+            $fields = [
+                'air' => [
+                    'brn', 'container_number', 'shipping_line', 'forward_import_code',
+                    'trailer_number_plate', 'transportation_company',
+                    'transporting_driver_contact_number', 'transportation_company_details'
+                ],
+                'sea' => [
+                    'airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate',
+                    'transportation_company', 'transporting_driver_contact_number',
+                    'airway_details', 'transportation_company_details'
+                ],
+                'road' => [
+                    'brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline',
+                    'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code'
+                ]
+            ];
+            
+            $transportType = $request->transport_type;
+            
+            if (isset($fields[$transportType])) {
+                foreach ($fields[$transportType] as $field) {
+                    $input[$field] = NULL;
+                }
+            }
+
+            // if($request->brn_file) {
+            //     $brnFileName = auth()->id() . '_' . time() . '.'. $request->brn_file->extension();
+            //     $type = $request->brn_file->getClientMimeType();
+            //     $size = $request->brn_file->getSize();
+            //     $request->brn_file->move(public_path('wo/brn_file'), $brnFileName);
+            //     $input['brn_file'] = $brnFileName;
+            // }
+            // if($request->signed_pfi) {
+            //     $signedPdfFileName = auth()->id() . '_' . time() . '.'. $request->signed_pfi->extension();
+            //     $type = $request->signed_pfi->getClientMimeType();
+            //     $size = $request->signed_pfi->getSize();
+            //     $request->signed_pfi->move(public_path('wo/signed_pfi'), $signedPdfFileName);
+            //     $input['signed_pfi'] = $signedPdfFileName;
+            // }
+            // if($request->signed_contract) {
+            //     $signedContractFileName = auth()->id() . '_' . time() . '.'. $request->signed_contract->extension();
+            //     $type = $request->signed_contract->getClientMimeType();
+            //     $size = $request->signed_contract->getSize();
+            //     $request->signed_contract->move(public_path('wo/signed_contract'), $signedContractFileName);
+            //     $input['signed_contract'] = $signedContractFileName;
+            // }
+            // if($request->payment_receipts) {
+            //     $paymentReceiptsFileName = auth()->id() . '_' . time() . '.'. $request->payment_receipts->extension();
+            //     $type = $request->payment_receipts->getClientMimeType();
+            //     $size = $request->payment_receipts->getSize();
+            //     $request->payment_receipts->move(public_path('wo/payment_receipts'), $paymentReceiptsFileName);
+            //     $input['payment_receipts'] = $paymentReceiptsFileName;
+            // }
+            // if($request->noc) {
+            //     $nocFileName = auth()->id() . '_' . time() . '.'. $request->noc->extension();
+            //     $type = $request->noc->getClientMimeType();
+            //     $size = $request->noc->getSize();
+            //     $request->noc->move(public_path('wo/noc'), $nocFileName);
+            //     $input['noc'] = $nocFileName;
+            // }
+            // if($request->enduser_trade_license) {
+            //     $enduserTradeLicenseFileName = auth()->id() . '_' . time() . '.'. $request->enduser_trade_license->extension();
+            //     $type = $request->enduser_trade_license->getClientMimeType();
+            //     $size = $request->enduser_trade_license->getSize();
+            //     $request->enduser_trade_license->move(public_path('wo/enduser_trade_license'), $enduserTradeLicenseFileName);
+            //     $input['enduser_trade_license'] = $enduserTradeLicenseFileName;
+            // }
+            // if($request->enduser_passport) {
+            //     $enduserPassportFileName = auth()->id() . '_' . time() . '.'. $request->enduser_passport->extension();
+            //     $type = $request->enduser_passport->getClientMimeType();
+            //     $size = $request->enduser_passport->getSize();
+            //     $request->enduser_passport->move(public_path('wo/enduser_passport'), $enduserPassportFileName);
+            //     $input['enduser_passport'] = $enduserPassportFileName;
+            // }
+            // if($request->enduser_contract) {
+            //     $enduserContractFileName = auth()->id() . '_' . time() . '.'. $request->enduser_contract->extension();
+            //     $type = $request->enduser_contract->getClientMimeType();
+            //     $size = $request->enduser_contract->getSize();
+            //     $request->enduser_contract->move(public_path('wo/enduser_contract'), $enduserContractFileName);
+            //     $input['enduser_contract'] = $enduserContractFileName;
+            // }
+            // if($request->vehicle_handover_person_id) {
+            //     $vehicleHandoverPersonIdFileName = auth()->id() . '_' . time() . '.'. $request->vehicle_handover_person_id->extension();
+            //     $type = $request->vehicle_handover_person_id->getClientMimeType();
+            //     $size = $request->vehicle_handover_person_id->getSize();
+            //     $request->vehicle_handover_person_id->move(public_path('wo/vehicle_handover_person_id'), $vehicleHandoverPersonIdFileName);
+            //     $input['vehicle_handover_person_id'] = $vehicleHandoverPersonIdFileName;
+            // } 
             $fileFields = [
                 'brn_file' => 'wo/brn_file',
                 'signed_pfi' => 'wo/signed_pfi',
@@ -235,16 +323,49 @@ class WorkOrderController extends Controller
                 'enduser_contract' => 'wo/enduser_contract',
                 'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
             ];
+            // Loop through each file field
+foreach ($fileFields as $fileField => $path) {
+    if ($request->hasFile($fileField)) {
+        $file = $request->file($fileField);
+        if ($file->isValid() && $file->getError() == UPLOAD_ERR_OK) {
+            $fileName = auth()->id() . '_' . time() . '.' . $file->extension();
+            $file->move(public_path($path), $fileName);
 
-            foreach ($fileFields as $fileField => $path) {
-                if ($request->hasFile($fileField)) {
-                    $fileName = $this->handleFileUpload($request->file($fileField), $path);
-                    $validatedData[$fileField] = $fileName;
-                }
-            }
+            // Add the file name to the input array
+            $input[$fileField] = $fileName;
+
+            // Collect file metadata for data history
+            $fileData[] = [
+                'file_name' => $fileName,
+                'file_type' => $file->getClientMimeType(),
+                // 'file_size' => $file->getSize(),
+                'file_path' => $path . '/' . $fileName
+            ];
+        }
+    }
+}
+            $workOrder = WorkOrder::create($input);
+            // Handle file uploads and save file paths
+            // $fileFields = [
+            //     'brn_file' => 'wo/brn_file',
+            //     'signed_pfi' => 'wo/signed_pfi',
+            //     'signed_contract' => 'wo/signed_contract',
+            //     'payment_receipts' => 'wo/payment_receipts',
+            //     'noc' => 'wo/noc',
+            //     'enduser_trade_license' => 'wo/enduser_trade_license',
+            //     'enduser_passport' => 'wo/enduser_passport',
+            //     'enduser_contract' => 'wo/enduser_contract',
+            //     'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
+            // ];
+            // foreach ($fileFields as $fileField => $path) {
+            //     if ($request->hasFile($fileField)) {
+            //         $fileName = $this->handleFileUpload($request->file($fileField), $path);
+            //         $validatedData[$fileField] = $fileName;
+            //     }
+            // }
 
             // Create the WorkOrder record
-            $workOrder = WorkOrder::create($validatedData);
+            // $workOrder = WorkOrder::create($validatedData);
 
             // Exclude specific fields and filter out non-NULL values and arrays
             $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments'];
@@ -288,20 +409,42 @@ class WorkOrderController extends Controller
                 }
             }
 
+            // Store file information in the data history table
+// if (!empty($fileData)) {
+//     foreach ($fileData as $data) {
+//         // DataHistory::create([
+//         //     'work_order_id' => $workOrder->id,
+//         //     'file_name' => $data['file_name'],
+//         //     'file_type' => $data['file_type'],
+//         //     'file_size' => $data['file_size'],
+//         //     'file_path' => $data['file_path']
+//         // ]);
+//         WORecordHistory::create([
+//             'work_order_id' => $workOrder->id,
+//             'field_name' => $data['file_name'],
+//             'old_value' => NULL,
+//             'new_value' => $data['file_path'],
+//             'type' => 'SET',
+//             'user_id' => Auth::id(),
+//             'changed_at' => Carbon::now(),
+//         ]);
+//     }
+// }
+
             // Store file paths in the data history
-            foreach ($fileFields as $fileField => $path) {
-                if (isset($validatedData[$fileField])) {
-                    WORecordHistory::create([
-                        'work_order_id' => $workOrder->id,
-                        'field_name' => $fileField,
-                        'old_value' => NULL,
-                        'new_value' => $validatedData[$fileField],
-                        'type' => 'SET',
-                        'user_id' => Auth::id(),
-                        'changed_at' => Carbon::now(),
-                    ]);
-                }
-            }
+            // foreach ($fileFields as $fileField => $path) {
+            //     if (isset($validatedData[$fileField])) {
+            //         WORecordHistory::create([
+            //             'work_order_id' => $workOrder->id,
+            //             'field_name' => $fileField,
+            //             'old_value' => NULL,
+            //             'new_value' => $validatedData[$fileField],
+            //             'type' => 'SET',
+            //             'user_id' => Auth::id(),
+            //             'changed_at' => Carbon::now(),
+            //         ]);
+            //     }
+            // }
 
             if (isset($request->vehicle)) {
                 if (count($request->vehicle) > 0) {

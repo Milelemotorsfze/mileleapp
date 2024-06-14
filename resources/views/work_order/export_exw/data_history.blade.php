@@ -4,8 +4,11 @@
     }
 </style>
 <div class="row m-0">
-    <div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #e6f1ff" >
-        <label class="col-form-label">Filter Region</label>
+    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+        <label class="col-form-label">Date Range</label>
+    </div>
+    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+        <input type="text" id="date_range" class="form-control widthinput" placeholder="Date Range">
     </div>
     <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
         <label class="col-form-label">User</label>
@@ -18,16 +21,16 @@
         </select>
     </div>
     <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-        <label class="col-form-label">Field</label>
-    </div>
-    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <input type="text" class="form-control widthinput" placeholder="Field">
-    </div>
-    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
         <label class="col-form-label">Type</label>
     </div>
     <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <input type="text" class="form-control widthinput" placeholder="History Type">
+        <input type="text" id="type" class="form-control widthinput" placeholder="Type">
+    </div>
+    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+        <label class="col-form-label">Field</label>
+    </div>
+    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+        <input type="text" id="field" class="form-control widthinput" placeholder="Field">
     </div>
 </div>
 <div class="row mt-1">

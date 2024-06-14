@@ -259,8 +259,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
-						<!-- <input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
-							placeholder="Enter SO Number" value="SO-00" autocomplete="so_number" autofocus onkeyup="setWo()"> -->
 							<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
 								placeholder="Enter SO Number" value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" 
 								autocomplete="so_number" autofocus onkeyup="setWo()">
@@ -324,11 +322,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter Customer Email ID" value="{{ isset($workOrder) ? $workOrder->customer_email : '' }}" autocomplete="customer_email" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
 						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
 						<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
 							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
 							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
-					</div>
+					</div></div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
 						<textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
@@ -550,7 +549,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
 						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" 
+							class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
 								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
 									<option value="AED" {{ isset($workOrder) && $workOrder->currency == 'AED' ? 'selected' : '' }}>AED</option>
@@ -562,7 +562,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
 						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" autofocus>
+							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
+							autofocus onkeyup="sanitizeQuantity(this)">
 					</div>
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
@@ -585,7 +586,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
 						<div class="input-group">
 							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
-							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="setDepositBalance()">
+							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
 							</div>
@@ -689,7 +690,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
 							placeholder="Enter Delivery Contact Person" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
-							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeNumberInput(this)">
+							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_date" class="col-form-label text-md-end"> Delivery Date  :</label>
@@ -1445,31 +1446,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
-        jQuery.validator.setDefaults({
-            errorClass: "is-invalid",
-            errorElement: "p",
-            errorPlacement: function ( error, element ) {
-                error.addClass( "invalid-feedback font-size-13" );
-                if ( element.prop( "type" ) === "checkbox" ) {
-                    error.insertAfter( element.parent( "label" ) );
-                }
-                else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-                    if (!element.val() || element.val().length === 0) {
-                        console.log("Error is here with length", element.val().length);
-                        error.addClass('select-error');
-                        error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-                    } else {
-                        console.log("No error");
-                    }
-                }
-            else if (element.parent().hasClass('input-group')) {
-                    error.insertAfter(element.parent());
-                }
-                else {
-                    error.insertAfter( element );
-                }
-            }
-        });
+	
         $('#WOForm').validate({ // initialize the plugin 
             rules: {
                 type: {
@@ -1519,6 +1496,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
                 customer_address: {
                     // required: true,
+					noSpaces: true,
                     validAddress: true,
                     maxlength: 255
                 },
@@ -1618,12 +1596,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 // currency: {
 
                 // },
-                // so_total_amount: {
-
-                // },
-                // so_vehicle_quantity: {
-
-                // },
+                so_total_amount: {
+					noSpaces: true,
+					number: true,
+					min: 0 // Ensures the price is a non-negative number
+                },
+                so_vehicle_quantity: {
+					digits: true,
+					min: 1 // Ensure it's a positive integer
+                },
                 // deposit_received_as: {
 
                 // },
@@ -1769,11 +1750,62 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     filesize:" file size must be less than 1 GB.",
                 }
             },
+			errorPlacement: function(error, element) {
+				error.appendTo(element.parent()); 
+				element.addClass('is-invalid');
+				if ( element.prop( "type" ) === "tel" && element.closest('.select-button-main-div').length > 0 ) {
+					if (!element.val() || element.val().length === 0 || element.val().length > 0) {
+						console.log("Error is here with length", element.val().length);
+						error.addClass('select-error');
+						error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+					} else {
+						console.log("No error");
+					}
+				}
+			},
+			highlight: function (element, errorClass, validClass) {
+				$(element).addClass(errorClass).removeClass(validClass);
+				$(element).next('p.invalid-feedback').show();
+			},
+			unhighlight: function (element, errorClass, validClass) {
+				$(element).removeClass(errorClass).addClass(validClass);
+				$(element).next('p.invalid-feedback').hide();
+				if (!$(element).hasClass(errorClass)) {
+					$(element).removeClass('is-invalid');
+				}
+			}
         });
     // CLIENT SIDE VALIDATION END
-	
-	
+	function sanitizeQuantity(input) {
+		let value = input.value;
+		// Remove non-numeric characters and ensure it's a positive integer
+		value = value.replace(/[^0-9]/g, '');
+		input.value = value;
+	}
+	function sanitizeAmount(input) {
+		let value = input.value;
+		// Remove non-numeric characters except for dots
+		value = value.replace(/[^0-9.]/g, '');
 
+		// Remove multiple dots
+		const parts = value.split('.');
+		if (parts.length > 2) {
+			value = parts[0] + '.' + parts.slice(1).join('');
+		}
+
+		input.value = value;
+		setDepositBalance();
+	}
+
+	function setDepositBalance() {
+			var totalAmount = $('#so_total_amount').val();
+			var amountReceived = $('#amount_received').val();
+			var balanceAmount = '';
+			if(totalAmount != '' && amountReceived != '') {
+				balanceAmount = Number(totalAmount) - Number(amountReceived);
+			}
+			document.getElementById('balance_amount').value = balanceAmount;
+		}
 		
     function addComment(parentId = null) {
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
@@ -2500,7 +2532,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             
             // Store the current select value
             var selectedCustomerName = $('#customer_name').val();
-            $('#customer_reference_type').val('select');
+            // $('#customer_reference_type').val('select');
             $('#customer_reference_id').val(selectedCustomerName);
             
             // Hide the select2 container and show the text input
@@ -2524,7 +2556,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             
             // Store the current text input value
             var newCustomerName = $('#textInput').val();
-            $('#customer_reference_type').val('input');
+            // $('#customer_reference_type').val('input');
             $('#customer_reference_id').val(newCustomerName);
             
             // Show the select2 container and hide the text input
@@ -2613,15 +2645,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				return addedVins.includes(value);
 			})).trigger('change');
 		}
-		function setDepositBalance() {
-			var totalAmount = $('#so_total_amount').val();
-			var amountReceived = $('#amount_received').val();
-			var balanceAmount = '';
-			if(totalAmount != '' && amountReceived != '') {
-				balanceAmount = Number(totalAmount) - Number(amountReceived);
-			}
-			document.getElementById('balance_amount').value = balanceAmount;
-		}
+		
 	// SET DEPOSIT BALANCE END
 
 	// CURRENCY UPDATE START
