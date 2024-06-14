@@ -291,8 +291,9 @@
                                     <th>So Number</th>
                                     <th>Country</th>
                                     <th>LOI Quantity</th>
-                                    <th> Status</th>
+                                    <th>Status</th>
                                     <th>LOI</th>
+                                    <th>Remarks</th>
                                     <th>Approve/Reject</th>
                                     <th>Actions</th>
                                 </tr>
@@ -324,6 +325,7 @@
                                                 </a>
                                             @endforeach
                                         </td>
+                                        <td>{{ $letterOfIndent->review }}</td>
                                         <td>
                                             @can('loi-supplier-approve')
                                                 @php
@@ -665,6 +667,7 @@
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>LOI</th>
+                                    <th>Remarks</th>
                                     <th>PFI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
@@ -697,6 +700,7 @@
                                                 </a>
                                             @endforeach
                                         </td>
+                                        <td>{{ $letterOfIndent->review }}</td>
                                         <td>
                                             @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                                 <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
@@ -843,14 +847,6 @@
                                     <th>So Number</th>
                                     <th>Country</th>
                                     <th>Status</th>
-                                    @can('LOI-approve')
-                                        @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                        @endphp
-                                        @if ($hasPermission)
-                                            <th>Utilization Qty Update</th>
-                                        @endif
-                                    @endcan
                                     <th>Total Quantity</th>
                                     <th>Utilized Quantity</th>
                                     <th width="200">LOI </th>
@@ -876,24 +872,6 @@
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
-
-                                        @can('LOI-approve')
-                                            @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <td>
-                                                @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
-                                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                                        <button type="button" class="btn btn-soft-green btn-sm" title="Utilization Quantity Update" >
-                                                            <i class="fa fa-edit"></i>
-                                                        </button>
-                                                    </a>
-                                                 @endif
-                                            </td>
-                                            @endif
-                                        @endcan
-
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                         <td>

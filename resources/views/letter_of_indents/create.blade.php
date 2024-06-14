@@ -205,8 +205,7 @@
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_1" type="text" class="form-control widthinput so_number"
                                                 oninput=uniqueCheckSoNumber()  name="so_number[1]"
-                                                placeholder="SO Number" value="{{ old('so_number') }}" 
-                                                autocomplete="so_number" >
+                                                placeholder="SO Number" value="{{ old('so_number') }}" >
                                             <span id="soNumberError_1" class="error is-invalid soNumberError"></span>
                                         </div>
 
@@ -328,7 +327,7 @@
         let previousSelected = $('#customer-type').val();
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
-        // const previewImage = document.querySelector("#image-preview");
+      
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
             while (previewFile.firstChild) {
@@ -370,12 +369,13 @@
             signaturePreviewFile.appendChild(iframe);
 
         });
-        getCustomers();
-
 
         $("#form-create").validate({
             ignore: [],
             rules: {
+                country: {
+                    required: true,
+                },
                 customer_id: {
                     required: true,
                 },
@@ -478,7 +478,10 @@
             placeholder : 'Select Customer Type',
             allowClear: true,
             maximumSelectionLength: 1
+        }).on('change', function() {
+            $('#customer-type-error').remove();
         });
+       
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
@@ -486,6 +489,7 @@
         }).on('change', function() {
             getCustomers();
             checkCountryCriterias();
+            $('#country-error').remove();
         });
 
         $('#date').change(function (){
@@ -1146,8 +1150,7 @@
                                     <div class="row">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
-                                            placeholder="So Number" value="{{ old('so_number') }}" oninput=uniqueCheckSoNumber()
-                                            autocomplete="so_number" >
+                                            placeholder="So Number" value="{{ old('so_number') }}" oninput=uniqueCheckSoNumber() >
                                             <span id="soNumberError_${index}" class="error is-invalid soNumberError"></span>
                                         </div>
                                         <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">

@@ -50,7 +50,8 @@
                             {{ Session::get('success') }}
                         </div>
                     @endif
-                <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" id="form-doc-upload">
+                <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" 
+                         id="form-update">
                     @csrf
                     @method('PUT')
                     <div class="row">
@@ -672,7 +673,7 @@
             }
         });
 
-        $("#form-doc-upload").validate({
+        $("#form-update").validate({
             ignore: [],
             rules: {
                 customer_id: {
@@ -1313,8 +1314,8 @@
             e.preventDefault();
             uniqueCheckSoNumber();
             if (formValid == true) {
-                if($("#form-doc-upload").valid()) {
-                    $('#form-doc-upload').unbind('submit').submit();
+                if($("#form-update").valid()) {
+                    $('#form-update').unbind('submit').submit();
                 }
             }else{
                 e.preventDefault();
