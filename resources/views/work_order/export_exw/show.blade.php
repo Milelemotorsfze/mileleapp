@@ -393,19 +393,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> SO Total Amount </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->so_total_amount ?? 'NA'}}</span>
+                                                    <span class="data-font">@if($workOrder->so_total_amount != 0.00) {{$workOrder->so_total_amount ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Amount Received </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->amount_received ?? 'NA'}}</span>
+                                                    <span class="data-font">@if($workOrder->amount_received != 0.00) {{$workOrder->amount_received ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Balance Amount </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->balance_amount ?? 'NA'}}</span>
+                                                    <span class="data-font">@if($workOrder->balance_amount != 0.00) {{$workOrder->balance_amount ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Delivery Location </label>
@@ -423,7 +423,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Delivery Date </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->delivery_date != ''){{\Carbon\Carbon::parse($workOrder->delivery_date)->format('d M Y') ?? 'NA'}}@endif</span>
+                                                    <span class="data-font">@if($workOrder->delivery_date != ''){{\Carbon\Carbon::parse($workOrder->delivery_date)->format('d M Y') ?? 'NA'}} @else NA @endif</span>
                                                 </div>                                 
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Signed PFI </label>
@@ -578,10 +578,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <span class="data-font">@if($workOrder->created_at != ''){{\Carbon\Carbon::parse($workOrder->created_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Updated By </label>
+                                                    <label for="choices-single-default" class="form-label"> Updated By</label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                    <span class="data-font">{{$workOrder->UpdatedBy->name ?? 'NA'}}</span>
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                    <label for="choices-single-default" class="form-label"> Updated At </label>
+                                                </div>
+                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                    <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Sales Support Data Confirmation By</label>
@@ -593,7 +599,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Sales Support Data Confirmation At</label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                    <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Finance Approval By </label>
@@ -605,7 +611,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Finance Approved At </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->finance_approved_at != ''){{\Carbon\Carbon::parse($workOrder->finance_approved_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                    <span class="data-font">@if($workOrder->finance_approved_at != ''){{\Carbon\Carbon::parse($workOrder->finance_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> COE Office Approval By </label>
@@ -617,7 +623,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> COE Office Approved At </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->coe_office_approved_at != ''){{\Carbon\Carbon::parse($workOrder->coe_office_approved_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                    <span class="data-font">@if($workOrder->coe_office_approved_at != ''){{\Carbon\Carbon::parse($workOrder->coe_office_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
@@ -665,57 +671,63 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     @endif
                                                 </tr>
                                                 @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
-                                                @foreach($workOrder->vehicles as $vehicle)
-                                                <tr class="custom-border-top">
-                                                    <td>{{$vehicle->boe_number ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->vin ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->brand ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->variant ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->engine ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->model_description ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->model_year ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->model_year_to_mention_on_documents ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->steering ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->exterior_colour ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->interior_colour ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->warehouse ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->territory ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->preferred_destination ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->import_document_type ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->ownership_name ?? 'NA'}}</td>
-                                                    <td>{{$vehicle->certification_per_vin ?? 'NA'}}</td>
-                                                    @if(isset($type) && $type == 'export_cnf')
-                                                    <td>{{$vehicle->shipment ?? 'NA'}}</td>
-                                                    @endif
-                                                </tr>
+                                                    @foreach($workOrder->vehicles as $vehicle)
+                                                    <tr class="custom-border-top">
+                                                        <td>{{$vehicle->boe_number ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->vin ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->brand ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->variant ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->engine ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->model_description ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->model_year ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->model_year_to_mention_on_documents ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->steering ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->exterior_colour ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->interior_colour ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->warehouse ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->territory ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->preferred_destination ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->import_document_type ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->ownership_name ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->certification_per_vin ?? 'NA'}}</td>
+                                                        @if(isset($type) && $type == 'export_cnf')
+                                                        <td>{{$vehicle->shipment ?? 'NA'}}</td>
+                                                        @endif
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="2">Modification/Jobs</th>
+                                                        <td colspan="16">{{$vehicle->modification_or_jobs_to_perform_per_vin ?? 'NA'}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="2">Special Request/Remarks</th>
+                                                        <td colspan="16">{{$vehicle->special_request_or_remarks ?? 'NA'}}</td>
+                                                    </tr>
+                                                        @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
+                                                        <tr>
+                                                            <th colspan="18">Service Breakdown</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan="1">Addon Code</th>
+                                                            <th colspan="2">Addon Name</th>
+                                                            <th colspan="1">Quantity</th>
+                                                            <th colspan="14">Addon Description</th>
+                                                        </tr>
+                                                            @foreach($vehicle->addons as $addon)
+                                                            <tr>
+                                                                <td colspan="1">{{$addon->addon_code ?? 'NA'}}</td>
+                                                                <td colspan="2">{{$addon->addon_name ?? 'NA'}}</td>
+                                                                <td colspan="1">{{$addon->addon_quantity ?? 'NA'}}</td>
+                                                                <td colspan="14">{{$addon->addon_description ?? 'NA'}}</td>
+                                                            </tr>
+                                                            @endforeach
+                                                        @endif
+                                                    @endforeach
+                                                @else
                                                 <tr>
-                                                    <th colspan="2">Modification/Jobs</th>
-                                                    <td colspan="16">{{$vehicle->modification_or_jobs_to_perform_per_vin ?? 'NA'}}</td>
+                                                    <td colspan="18">
+                                                        <center style="font-size:12px;">No vehilces and addons available</center>
+                                                    </td>
                                                 </tr>
-                                                <tr>
-                                                    <th colspan="2">Special Request/Remarks</th>
-                                                    <td colspan="16">{{$vehicle->special_request_or_remarks ?? 'NA'}}</td>
-                                                </tr>
-                                                @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
-                                                <tr>
-                                                    <th colspan="18">Service Breakdown</th>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="1">Addon Code</th>
-                                                    <th colspan="2">Addon Name</th>
-                                                    <th colspan="1">Quantity</th>
-                                                    <th colspan="14">Addon Description</th>
-                                                </tr>
-                                                @foreach($vehicle->addons as $addon)
-                                                <tr>
-                                                    <td colspan="1">{{$addon->addon_code ?? 'NA'}}</td>
-                                                    <td colspan="2">{{$addon->addon_name ?? 'NA'}}</td>
-                                                    <td colspan="1">{{$addon->addon_quantity ?? 'NA'}}</td>
-                                                    <td colspan="14">{{$addon->addon_description ?? 'NA'}}</td>
-                                                </tr>
-                                                @endforeach
-                                                @endif
-                                                @endforeach
                                                 @endif
                                             </table>
                                         </div>
@@ -732,6 +744,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                                 <div class="card-body">                                 
                                     <div class="row">
+                                        @if($workOrder->brn_file || $workOrder->signed_pfi || $workOrder->signed_contract || $workOrder->payment_receipts ||
+                                        $workOrder->noc || $workOrder->enduser_trade_license || $workOrder->enduser_passport || $workOrder->enduser_contract ||
+                                        $workOrder->vehicle_handover_person_id)
                                         <div class="col-xxl-4 col-md-4 col-sm-12 text-center mb-5 mt-5">
                                             @if($workOrder->brn_file)
                                             <div class="row">
@@ -894,6 +909,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                             <iframe src="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" alt="Vehicle Handover Person ID"></iframe>
                                             @endif
                                         </div>
+                                        @else
+                                        <p>
+                                            <center style="font-size:12px;">No documents available</center>
+                                        </p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

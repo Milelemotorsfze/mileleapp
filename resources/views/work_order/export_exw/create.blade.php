@@ -249,6 +249,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			<div class="card-body">
 				<div class="row">
 					<input type="hidden" name="customerCount" id="customerCount" value={{$customerCount ?? ''}}>
+					<input type="hidden" name="wo_id" id="wo_id" value={{ isset($workOrder) ? $workOrder->id : '' }}>
 					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -261,7 +262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 							<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
 								placeholder="Enter SO Number" value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" 
-								autocomplete="so_number" autofocus onkeyup="setWo()">
+								autocomplete="so_number" autofocus onkeyup="setWo()" @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
@@ -302,11 +303,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
+                            <option value="{{$customer->customer_name ?? ''}}"
+							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
-                        </select>
-                        <input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
-                            class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
+                        </select> 
+						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
+							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
                     <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
                         <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
@@ -351,7 +353,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
-							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number"
+							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
 							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					@if(isset($type) && $type == 'export_exw')
@@ -1017,10 +1019,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var newCustomerEmail = '';
 	var newCustomerContact = '';
 	var newCustomerAddress = '';
+	var selectedCustomerEmail = '';
+	var selectedCustomerContact = '';
+	var selectedCustomerAddress = '';
 	var onChangeSelectedVins = [];
+	@if(isset($workOrder))
+        var workOrder = {!! json_encode($workOrder) !!};
+    @else
+        var workOrder = null;
+    @endif
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	$(document).ready(function () { 
-        hideDependentTransportType();
 		$("#boe-div").hide();
 		// SELECT 2 START
 			$('#customer_name').select2({
@@ -1030,6 +1039,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 // dropdownAutoWidth : true,
                 // width: 'auto'
 			});
+			if (workOrder !== null && workOrder.customer_reference_id === null && workOrder.customer_name !== null) {
+				checkValue();
+				$('#textInput').val(workOrder.customer_name);
+			} else if (workOrder !== null && (workOrder.customer_reference_id !== null || workOrder.customer_reference_id === 0) && workOrder.customer_name !== null) {
+				$("#customer_name").val(workOrder.customer_name).change();
+			}
+			if(workOrder == null || workOrder.transport_type == null) {
+				hideDependentTransportType();
+			}
+			if(workOrder !== null) {
+				$('#customer_address').val(workOrder.customer_address);
+				$('#customer_email').val(workOrder.customer_email);
+				$('#customer_company_number').val(workOrder.customer_company_number);
+				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
+				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
+				if(workOrder.transport_type == 'air') {
+					airRelation();
+				}
+				else if(workOrder.transport_type == 'sea') {
+					seaRelation();
+				}
+				else if(workOrder.transport_type == 'road') {
+					roadRelation();
+					$('#transporting_driver_contact_number').val(workOrder.transporting_driver_contact_number);					
+				}
+			}
+			
+			
+			
 			$('#vin_multiple').select2({
 				allowClear: true,
 				// maximumSelectionLength: 1,
@@ -1048,6 +1086,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
+			
+			// var input = document.querySelector("#customer_company_number_main");
+			// var iti = window.intlTelInput(input, {
+			// 	initialCountry: "auto",
+			// 	nationalMode: false,
+			// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // just for formatting/placeholders etc
+			// });
 			var customer_company_number = window.intlTelInput(document.querySelector("#customer_company_number"), {
 				separateDialCode: true,
 				preferredCountries:["ae"],
@@ -1073,64 +1118,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// TRANSPORT TYPE ONCHANGE START
 			$('.transport_type').click(function() {
 				if($(this).val() == 'air') {
-					$("#airline-div").show();
-					$('#airline').select2({
-						allowClear: true,
-						maximumSelectionLength: 1,
-						placeholder:"Choose Airline",
-					});
-					$("#airway-bill-div").show();
-					$("#brn-div").hide();
-					$("#brn-file-div").show();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#shippingline-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").show();
-					$("#transportation-company-details-div").hide();
+					airRelation();
 				}
 				else if($(this).val() == 'sea') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").show();
-					$("#forward-import-code-div").show();
-					$("#brn-div").show();
-					$("#brn-file-div").show();
-					$("#container-number-div").show();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").hide();
+					seaRelation();
 				}
 				else if($(this).val() == 'road') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#brn-div").hide();
-					$("#brn-file-div").hide();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").show();
-					$("#transportation-company-div").show();
-					$("#transporting-driver-contact-number-div").show();				
-					var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-						separateDialCode: true,
-						preferredCountries:["ae"],
-						hiddenInput: "full",
-						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-					});	
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").show();
+					roadRelation();
 				}
 			});
+
+			// TRANSPORT TYPE AIR RELATED DATA
+			function airRelation() {
+				$("#airline-div").show();
+				$('#airline').select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder:"Choose Airline",
+				});
+				$("#airway-bill-div").show();
+				$("#brn-div").hide();
+				$("#brn-file-div").show();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#shippingline-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").show();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE SEA RELATED DATA
+			function seaRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").show();
+				$("#forward-import-code-div").show();
+				$("#brn-div").show();
+				$("#brn-file-div").show();
+				$("#container-number-div").show();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE ROAD RELATED DATA
+			function roadRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#brn-div").hide();
+				$("#brn-file-div").hide();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").show();
+				$("#transportation-company-div").show();
+				$("#transporting-driver-contact-number-div").show();				
+				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});	
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").show();
+			}
 		// TRANSPORT TYPE ONCHANGE END
 
 		// CUSTOMER NAME ONCHANGE START
 			$('#customer_name').on('change', function() {
-				var selectedCustomerName = $(this).val();
+				var selectedCustomerName = $(this).val(); 
 				setCustomerRelations(selectedCustomerName);
 			});
 		// CUSTOMER NAME ONCHANGE END
@@ -1438,7 +1496,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         $.validator.addMethod("validAddress", function(value, element) {
             return this.optional(element) || !/\s\s+/.test(value);
         }, "No more than one consecutive space is allowed in the address");
-
+		$.validator.addMethod("uniqueSO", 
+	       function(value, element) {
+	           var result = false;
+				var WoId = $("#wo_id").val(); console.log(WoId)
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',so_number: value,id:WoId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This SO Number is already taken! Try another."
+	   );
         // $.validator.addMethod("WONumberFormat", function(value, element) {
         // 	// Regular expression to match the format WO- followed by exactly 6 digits
         // 	return this.optional(element) || /^WO-\d{6}$/.test(value);
@@ -1461,6 +1536,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     noSpaces: true,
                     SONumberFormat: true,
                     notSO000000: true,
+					uniqueSO: true,
                 },
                 batch: {
                     required: true,
@@ -2525,6 +2601,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 	// CUSTOMER DETAILS SECTION START
         function checkValue() {
+			selectedCustomerEmail = $('#customer_email').val();
+			selectedCustomerAddress = $('#customer_address').val();
+			selectedCustomerContact = $('#customer_company_number').val();
             $('#customer_type').val('new');
             var textInput = document.getElementById('textInput');
             var Other = document.getElementById('Other');
@@ -2536,6 +2615,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             $('#customer_reference_id').val(selectedCustomerName);
             
             // Hide the select2 container and show the text input
+			// console.log( $('#customer_name').next('.select2-container'));
             $('#customer_name').next('.select2-container').hide();
             textInput.style.display = 'inline';
             Other.style.display = 'none';
@@ -2567,7 +2647,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             
             var selectedCustomerName = $('#customer_name').val();
             if (selectedCustomerName.length > 0) {
-                setCustomerRelations(selectedCustomerName);
+                // setCustomerRelations(selectedCustomerName);
+				$('#customer_address').val(selectedCustomerAddress);
+				$('#customer_email').val(selectedCustomerEmail);
+				$('#customer_company_number').val(selectedCustomerContact);
             }
 			else {
 				$('#customer_address').val('');
@@ -2577,25 +2660,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         }
 
         function setCustomerRelations(selectedCustomerName) {
+			// selectedCustomerEmail = $('#customer_email').val();
+			// selectedCustomerAddress = $('#customer_address').val();
+			// selectedCustomerContact = $('#customer_company_number').val();
             $('#customer_address').val('');
 			$('#customer_email').val('');
 			$('#customer_company_number').val('');
             // document.getElementById('customer_email').value = '';
             // document.getElementById('customer_company_number').value = '';
-            if (selectedCustomerName != '') {
+			
+			// console.log(selectedCustomerName);
+            if (selectedCustomerName != null || selectedCustomerName.length > 0) {
                 for (var i = 0; i < customerCount; i++) {
-                    if (customers[i].customer_name == selectedCustomerName[0]) {
+                    if (customers[i].customer_name == selectedCustomerName[0]) { 
                         if (customers[i].customer_address != null) {
                             $('#customer_address').val(customers[i]?.customer_address);
                         }
 						if (customers[i].customer_email != null) {
-							console.log(customers[i]?.customer_email);
                             $('#customer_email').val(customers[i]?.customer_email);
                         }
 						if (customers[i].customer_company_number != null) {
-							console.log(customers[i]?.customer_company_number);
-                            // $('#customer_company_number').val(customers[i]?.customer_company_number);
+							// console.log(customers[i]?.customer_company_number);
+                            // // $('#customer_company_number').val(customers[i]?.customer_company_number);
+							// // $('#customer_company_number').val(customers[i].customer_company_number);
 							$('#customer_company_number').val(customers[i].customer_company_number);
+							// // customer_company_number.setNumber(customers[i].customer_company_number);
+							// var input = document.querySelector("#customer_company_number");
+							// var iti = window.intlTelInput(input, {
+							// 	initialCountry: "auto",
+							// 	nationalMode: false,
+							// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+							// });
+
+							// // Simulating an AJAX request to fetch the phone number from the database
+							// var customerCompanyNumberFromDB = customers[i].customer_company_number; // This should come from your backend
+
+							// iti.setNumber(customerCompanyNumberFromDB);
+							// $('#customer_company_number').val(customerCompanyNumberFromDB);
                         }
                     }
                 }

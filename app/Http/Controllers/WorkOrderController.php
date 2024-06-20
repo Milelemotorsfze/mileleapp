@@ -22,6 +22,8 @@ use App\Http\Controllers\UserActivityController;
 use App\Http\Requests\StoreWorkOrderRequest;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Validator;
+use Exception;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -368,7 +370,9 @@ foreach ($fileFields as $fileField => $path) {
             // $workOrder = WorkOrder::create($validatedData);
 
             // Exclude specific fields and filter out non-NULL values and arrays
-            $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments'];
+            $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments','currency','wo_id',
+                'brn_file','signed_pfi','signed_contract','payment_receipts','noc','enduser_trade_license','enduser_passport','enduser_contract',
+                'vehicle_handover_person_id'];
             $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
                 return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
             }, ARRAY_FILTER_USE_BOTH);
@@ -382,7 +386,7 @@ foreach ($fileFields as $fileField => $path) {
             ];
 
             // Store each non-NULL, non-array field in the data history
-            foreach ($nonNullData as $field => $value) {
+            foreach ($nonNullData as $field => $value) { 
                 WORecordHistory::create([
                     'work_order_id' => $workOrder->id,
                     'field_name' => $field,
@@ -392,8 +396,18 @@ foreach ($fileFields as $fileField => $path) {
                     'user_id' => Auth::id(),
                     'changed_at' => Carbon::now(),
                 ]);
+                if($field == 'so_amount') {
+                    WORecordHistory::create([
+                        'work_order_id' => $workOrder->id,
+                        'field_name' => 'currency',
+                        'old_value' => NULL,
+                        'new_value' => $request->currency,
+                        'type' => 'SET',
+                        'user_id' => Auth::id(),
+                        'changed_at' => Carbon::now(),
+                    ]);
+                }
             }
-
             // Store specific nested fields if not null
             foreach ($nestedFields as $field => $subField) {
                 if (isset($request->$field[$subField]) && !is_null($request->$field[$subField])) {
@@ -576,15 +590,55 @@ foreach ($fileFields as $fileField => $path) {
     public function edit(WorkOrder $workOrder)
     {
         $type = $workOrder->type;
-        $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
-        $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
-        // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
+        // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
+        // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
+        // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
         
-        $customers = $dpCustomers->union($clients)->get();
-        // ->union($workOrders)
-        $customers = $customers->unique('customer_name');
-        // $errorMsg ="This page will coming very soon !";
-        // return view('hrm.notaccess',compact('errorMsg'));
+        // $customers = $dpCustomers->union($clients)->get();
+        // // ->union($workOrders)
+        // $customers = $customers->unique('customer_name');
+        // // $errorMsg ="This page will coming very soon !";
+        // // return view('hrm.notaccess',compact('errorMsg'));
+         // Select data from the WorkOrder table
+         $workOrders = WorkOrder::select(
+            'customer_name', 
+            'customer_email', 
+            'customer_company_number', 
+            'customer_address',
+            DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\WorkOrder' as reference_type"),
+        );
+
+        // Select and transform data from the Clients table
+        $clients = Clients::select(
+            DB::raw('name as customer_name'), 
+            DB::raw('email as customer_email'), 
+            DB::raw('phone as customer_company_number'), 
+            DB::raw('NULL as customer_address'),
+            DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\Clients' as reference_type"),
+        );
+
+        // Select and transform data from the Customer table
+        $dpCustomers = Customer::select(
+            DB::raw('name as customer_name'), 
+            DB::raw('NULL as customer_email'), 
+            DB::raw('NULL as customer_company_number'), 
+            DB::raw('address as customer_address'),
+            DB::raw('(IF(address IS NOT NULL, 1, 0)) as score'),
+            DB::raw("'App\\Models\\Customer' as reference_type"),
+        )->distinct();
+
+        // Combine the results
+        $combinedResults = $workOrders->union($clients)->union($dpCustomers)->get();
+
+        // Process combined results to remove duplicates based on customer_name
+        $customers = $combinedResults->groupBy('customer_name')->map(function($items) {
+            // Sort items by score in descending order and then take the first item
+            return $items->sortByDesc('score')->first();
+        })->values()->sortBy('customer_name');
+        // Get the count of customers
+        $customerCount = $customers->count();
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->get();
@@ -592,55 +646,357 @@ foreach ($fileFields as $fileField => $path) {
         
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('workOrder','type','customers','airlines','vins','users'));
+        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users'));
     }
 
     /**
      * Update the specified resource in storage.
      */
+    // public function update(Request $request, WorkOrder $workOrder)
+    // {
+    //     // dd($request->all());
+    //     DB::beginTransaction();
+
+    //     try {
+    //     $authId = Auth::id();
+    //     // $workOrder = WorkOrder::findOrFail($id);
+
+    //     $newData = $request->all();
+
+    //     $newData['customer_company_number'] = $request->customer_company_number['full'] ?? null;
+    //     $newData['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
+    //     $newData['freight_agent_contact_number'] = $request->freight_agent_contact_number['full'] ?? null;
+    //     $newData['transporting_driver_contact_number'] = $request->transporting_driver_contact_number['full'] ?? null;
+    //     $newData['updated_by'] = $authId;
+    //     $newData['so_total_amount'] = $request->so_total_amount ?? 0.00;
+    //     $newData['amount_received'] = $request->amount_received ?? 0.00;
+    //     $newData['balance_amount'] = $request->balance_amount ?? 0.00;
+
+    //     if ($request->customer_type == 'new') {
+    //         $newData['customer_name'] = $request->new_customer_name;
+    //     } else if ($request->customer_type == 'existing') {
+    //         $newData['customer_name'] = $request->existing_customer_name;
+    //     }
+
+    //     $fields = [
+    //         'air' => [
+    //             'brn', 'container_number', 'shipping_line', 'forward_import_code',
+    //             'trailer_number_plate', 'transportation_company',
+    //             'transporting_driver_contact_number', 'transportation_company_details'
+    //         ],
+    //         'sea' => [
+    //             'airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate',
+    //             'transportation_company', 'transporting_driver_contact_number',
+    //             'airway_details', 'transportation_company_details'
+    //         ],
+    //         'road' => [
+    //             'brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline',
+    //             'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code'
+    //         ]
+    //     ];
+        
+    //     $transportType = $request->transport_type;
+        
+    //     if (isset($fields[$transportType])) {
+    //         foreach ($fields[$transportType] as $field) {
+    //             $newData[$field] = NULL;
+    //         }
+    //     }
+
+    //     $fileFields = [
+    //         'brn_file' => 'wo/brn_file',
+    //         'signed_pfi' => 'wo/signed_pfi',
+    //         'signed_contract' => 'wo/signed_contract',
+    //         'payment_receipts' => 'wo/payment_receipts',
+    //         'noc' => 'wo/noc',
+    //         'enduser_trade_license' => 'wo/enduser_trade_license',
+    //         'enduser_passport' => 'wo/enduser_passport',
+    //         'enduser_contract' => 'wo/enduser_contract',
+    //         'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
+    //     ];
+    //     // Loop through each file field
+    //     foreach ($fileFields as $fileField => $path) {
+    //         if ($request->hasFile($fileField)) {
+    //             $file = $request->file($fileField);
+    //             if ($file->isValid() && $file->getError() == UPLOAD_ERR_OK) {
+    //                 $fileName = auth()->id() . '_' . time() . '.' . $file->extension();
+    //                 $file->move(public_path($path), $fileName);
+
+    //                 // Add the file name to the input array
+    //                 $newData[$fileField] = $fileName;
+
+    //                 // Collect file metadata for data history
+    //                 $fileData[] = [
+    //                     'file_name' => $fileName,
+    //                     'file_type' => $file->getClientMimeType(),
+    //                     // 'file_size' => $file->getSize(),
+    //                     'file_path' => $path . '/' . $fileName
+    //                 ];
+    //             }
+    //         }
+    //     }
+
+    //     $oldData = $workOrder->getOriginal();
+    
+    //     $changes = [];
+    
+
+    //     // Exclude specific fields and filter out non-NULL values and arrays
+    //     $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments','currency','wo_id'];
+    //     $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
+    //         return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
+    //     }, ARRAY_FILTER_USE_BOTH);
+
+    //     // Additional specific nested fields to store if not null
+    //     $nestedFields = [
+    //         'customer_company_number' => 'full',
+    //         'customer_representative_contact' => 'full',
+    //         'freight_agent_contact_number' => 'full',
+    //         'transporting_driver_contact_number' => 'full'
+    //     ];
+
+    //     // Store each non-NULL, non-array field in the data history
+    //     foreach ($nonNullData as $field => $value) { 
+    //         WORecordHistory::create([
+    //             'work_order_id' => $workOrder->id,
+    //             'field_name' => $field,
+    //             'old_value' => NULL,
+    //             'new_value' => $value,
+    //             'type' => 'SET',
+    //             'user_id' => Auth::id(),
+    //             'changed_at' => Carbon::now(),
+    //         ]);
+    //         if($field == 'so_amount') {
+    //             WORecordHistory::create([
+    //                 'work_order_id' => $workOrder->id,
+    //                 'field_name' => 'currency',
+    //                 'old_value' => NULL,
+    //                 'new_value' => $request->currency,
+    //                 'type' => 'SET',
+    //                 'user_id' => Auth::id(),
+    //                 'changed_at' => Carbon::now(),
+    //             ]);
+    //         }
+    //     }
+    //     // Store specific nested fields if not null
+    //     foreach ($nestedFields as $field => $subField) {
+    //         if (isset($request->$field[$subField]) && !is_null($request->$field[$subField])) {
+    //             WORecordHistory::create([
+    //                 'work_order_id' => $workOrder->id,
+    //                 'field_name' => $field . '.' . $subField,
+    //                 'old_value' => NULL,
+    //                 'new_value' => $request->$field[$subField],
+    //                 'type' => 'SET',
+    //                 'user_id' => Auth::id(),
+    //                 'changed_at' => Carbon::now(),
+    //             ]);
+    //         }
+    //     }
+
+
+    //     foreach ($newData as $field => $newValue) {
+    //         if (is_array($newValue)) {
+    //             $newValue = implode(',', $newValue);
+    //         }
+    
+    //         $oldValue = $oldData[$field] ?? null;
+    
+    //         if (is_array($oldValue)) {
+    //             $oldValue = implode(',', $oldValue);
+    //         }
+    
+    //         if ($oldValue != $newValue) {
+    //             $changes[] = [
+    //                 'work_order_id' => $workOrder->id,
+    //                 'user_id' => Auth::id(),
+    //                 'field_name' => $field,
+    //                 'old_value' => $oldValue,
+    //                 'new_value' => $newValue,
+    //                 'changed_at' => Carbon::now()
+    //             ];
+    //         }
+    //     }
+    
+    //     if (!empty($changes)) { dd($changes);
+    //         WORecordHistory::insert($changes);
+    //     }
+    
+    //     $workOrder->update($newData);
+    //     (new UserActivityController)->createActivity('Update '.$request->type.' work order');
+    //         // Commit the transaction
+    //         DB::commit();         
+    //         return response()->json(['success' => true, 'message' => 'Work order updated successfully.']);
+    //     } catch (\Exception $e) {
+    //         // Rollback the transaction
+    //         DB::rollBack();
+
+    //         // Log the error for debugging
+    //         Log::error('Error creating Work Order: ' . $e->getMessage());
+    //         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    //         // dd($nonNullData); dd($e);
+    //         // return response()->json(['error' => 'Failed to create Work Order. Please try again.'], 500);
+    //     }
+    // }
     public function update(Request $request, WorkOrder $workOrder)
     {
-        // $workOrder = WorkOrder::findOrFail($id);
-
-        $newData = $request->all();
-        $oldData = $workOrder->getOriginal();
+        DB::beginTransaction();
+        try {
+            $authId = Auth::id();
+            $newData = $request->all();
     
-        $changes = [];
-    
-        foreach ($newData as $field => $newValue) {
-            if (is_array($newValue)) {
-                $newValue = implode(',', $newValue);
+            // Extract full values for specific nested fields
+            $nestedFields = [
+                'customer_company_number',
+                'customer_representative_contact',
+                'freight_agent_contact_number',
+                'transporting_driver_contact_number'
+            ];
+            
+            foreach ($nestedFields as $field) {
+                $newData[$field] = $request->$field['full'] ?? null;
             }
     
-            $oldValue = $oldData[$field] ?? null;
+            // Additional data processing
+            $newData['updated_by'] = $authId;
+            $newData['so_total_amount'] = $request->so_total_amount ?? 0.00;
+            $newData['amount_received'] = $request->amount_received ?? 0.00;
+            $newData['balance_amount'] = $request->balance_amount ?? 0.00;
     
-            if (is_array($oldValue)) {
-                $oldValue = implode(',', $oldValue);
+            if ($request->customer_type == 'new') {
+                $newData['customer_name'] = $request->new_customer_name;
+            } else if ($request->customer_type == 'existing') {
+                $newData['customer_name'] = $request->existing_customer_name;
             }
     
-            if ($oldValue != $newValue) {
-                $changes[] = [
-                    'work_order_id' => $workOrder->id,
-                    'user_id' => Auth::id(),
-                    'field_name' => $field,
-                    'old_value' => $oldValue,
-                    'new_value' => $newValue,
-                    'changed_at' => Carbon::now()
-                ];
+            // Reset fields based on transport type
+            $fields = [
+                'air' => ['brn', 'container_number', 'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'transportation_company_details'],
+                'sea' => ['airline_reference_id', 'airline', 'airway_bill', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 'transportation_company_details'],
+                'road' => ['brn_file', 'brn', 'container_number', 'airline_reference_id', 'airline', 'airway_bill', 'shipping_line', 'airway_details', 'forward_import_code']
+            ];
+            
+            $transportType = $request->transport_type;
+            if (isset($fields[$transportType])) {
+                foreach ($fields[$transportType] as $field) {
+                    $newData[$field] = null;
+                }
             }
+    
+            // Handle file uploads
+            $fileFields = [
+                'brn_file' => 'wo/brn_file',
+                'signed_pfi' => 'wo/signed_pfi',
+                'signed_contract' => 'wo/signed_contract',
+                'payment_receipts' => 'wo/payment_receipts',
+                'noc' => 'wo/noc',
+                'enduser_trade_license' => 'wo/enduser_trade_license',
+                'enduser_passport' => 'wo/enduser_passport',
+                'enduser_contract' => 'wo/enduser_contract',
+                'vehicle_handover_person_id' => 'wo/vehicle_handover_person_id'
+            ];
+            
+            $fileData = [];
+            foreach ($fileFields as $fileField => $path) {
+                if ($request->hasFile($fileField)) {
+                    $file = $request->file($fileField);
+                    if ($file->isValid() && $file->getError() == UPLOAD_ERR_OK) {
+                        $fileName = auth()->id() . '_' . time() . '.' . $file->extension();
+                        $file->move(public_path($path), $fileName);
+                        $newData[$fileField] = $fileName;
+    
+                        $fileData[] = [
+                            'file_name' => $fileName,
+                            'file_type' => $file->getClientMimeType(),
+                            'file_path' => $path . '/' . $fileName
+                        ];
+                    }
+                }
+            }
+    
+            // Prepare old data for comparison
+            $oldData = $workOrder->getOriginal();
+            $changes = [];
+    
+            // Exclude specific fields and filter out non-NULL values and arrays
+            $excludeFields = ['_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 'wo_id'];
+            $nonNullData = array_filter($request->all(), function ($value, $key) use ($excludeFields) {
+                return !is_null($value) && !is_array($value) && !in_array($key, $excludeFields);
+            }, ARRAY_FILTER_USE_BOTH);
+    
+            // // Record history for non-NULL, non-array fields
+            // foreach ($nonNullData as $field => $value) {
+            //     WORecordHistory::create([
+            //         'work_order_id' => $workOrder->id,
+            //         'field_name' => $field,
+            //         'old_value' => null,
+            //         'new_value' => $value,
+            //         'type' => 'SET',
+            //         'user_id' => $authId,
+            //         'changed_at' => Carbon::now(),
+            //     ]);
+    
+            //     if ($field == 'so_amount') {
+            //         WORecordHistory::create([
+            //             'work_order_id' => $workOrder->id,
+            //             'field_name' => 'currency',
+            //             'old_value' => null,
+            //             'new_value' => $request->currency,
+            //             'type' => 'SET',
+            //             'user_id' => $authId,
+            //             'changed_at' => Carbon::now(),
+            //         ]);
+            //     }
+            // }
+    
+            // // Record history for specific nested fields
+            // foreach ($nestedFields as $field) {
+            //     if (isset($request->$field['full']) && !is_null($request->$field['full'])) {
+            //         WORecordHistory::create([
+            //             'work_order_id' => $workOrder->id,
+            //             'field_name' => $field . '.full',
+            //             'old_value' => null,
+            //             'new_value' => $request->$field['full'],
+            //             'type' => 'SET',
+            //             'user_id' => $authId,
+            //             'changed_at' => Carbon::now(),
+            //         ]);
+            //     }
+            // }
+    
+            // // Log changes
+            // foreach ($newData as $field => $newValue) {
+            //     $oldValue = $oldData[$field] ?? null;
+    
+            //     if ($oldValue != $newValue) {
+            //         $changes[] = [
+            //             'work_order_id' => $workOrder->id,
+            //             'user_id' => $authId,
+            //             'field_name' => $field,
+            //             'old_value' => $oldValue,
+            //             'new_value' => $newValue,
+            //             'type' => 'Change',
+            //             'changed_at' => Carbon::now()
+            //         ];
+            //     }
+            // }
+    
+            // if (!empty($changes)) {
+            //     WORecordHistory::insert($changes);
+            // }
+    
+            // Update the WorkOrder
+            $workOrder->update($newData);
+            (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
+            
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Work order updated successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating Work Order: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-    
-        if (!empty($changes)) {
-            WORecordHistory::insert($changes);
-        }
-    
-        $workOrder->update($newData);
-        return response()->json(['success' => true, 'message' => 'Work order updated successfully.']);
-        // return response()->json(['message' => 'Work order created successfully']);
-        // return redirect()->route('work-orders.index',$workOrder->type)->with('success', 'Work order updated successfully.');
-    
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */
@@ -714,8 +1070,34 @@ foreach ($fileFields as $fileField => $path) {
     //     return response()->json(['comments' => $comments]);
     // }
     public function getComments($workOrderId)
-{
-    $comments = WOComments::where('work_order_id', $workOrderId)->get();
-    return response()->json(['comments' => $comments]);
-}
+    {
+        $comments = WOComments::where('work_order_id', $workOrderId)->get();
+        return response()->json(['comments' => $comments]);
+    }
+    public function uniqueSO(Request $request) { 
+        $validator = Validator::make($request->all(), [
+            'so_number' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $wo = WorkOrder::where('so_number',$request->so_number);
+                if($request->id != NULL || $request->id != '') { 
+                    $wo = $wo->whereNot('id',$request->id);
+                }
+                $wo =$wo->get();
+                if(count($wo) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               dd($e);
+           }
+        }
+    }
 }
