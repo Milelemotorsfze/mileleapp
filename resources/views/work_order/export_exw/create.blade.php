@@ -2,22 +2,23 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.btn-style {
+		font-size:0.7rem!important;
+		line-height: 0.1!important;
+	}
 	.comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 30px; /* Indent replies by 40px */
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        }
-        .replies {
-            margin-left: 30px; /* Indent nested replies by 40px */
-        }
-	/* .border-top {
-		border-top: 1px solid #b3b3b3!important;
-	} */
+		margin-bottom: 20px;
+	}
+	.reply {
+		margin-left: 30px; 
+		margin-top: 10px;
+	}
+	.reply-button {
+		margin-top: 10px;
+	}
+	.replies {
+		margin-left: 30px; 
+	}
 	.currencyClass {
 		padding-top:5px!important;
 	}
@@ -31,20 +32,10 @@
     }
 	th {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
 	td {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
-	/* td {
-		padding-top: calc(.47rem + 1px);
-		padding-bottom: calc(.47rem + 1px);
-		margin-bottom: 0;
-		font-size: inherit;
-		line-height: 1.5;
-		font-weight: 500;
-	} */
     #work-order-history-table td, th{
         font-size: 14px !important;
     }
@@ -54,14 +45,10 @@
     #switchToDropdown {
         display: none;
     }
-    /* label{
-        font-size:12px!important;
-    } */
 	.addon_btn_round {
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -77,7 +64,6 @@
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -89,22 +75,20 @@
 		cursor: pointer;
 		padding-top:1px!important;
 	}
-	.btn_round
-	{
-	width: 20px!important;
-	height: 14px!important;
-	display: inline-block;
-	/* border-radius: 50%; */
-	text-align: center;
-	line-height: 10px!important;
-	margin-left: 0px!important;
-	margin-top: 0px!important;
-	border: 1px solid #ccc;
-	color:#fff;
-	background-color: #fd625e;
-	border-radius:5px;
-	cursor: pointer;
-	padding-top:1px!important;
+	.btn_round {
+		width: 20px!important;
+		height: 14px!important;
+		display: inline-block;
+		text-align: center;
+		line-height: 10px!important;
+		margin-left: 0px!important;
+		margin-top: 0px!important;
+		border: 1px solid #ccc;
+		color:#fff;
+		background-color: #fd625e;
+		border-radius:5px;
+		cursor: pointer;
+		padding-top:1px!important;
 	}
 	.btn_round_big {
 		margin-top: 37px!important; padding-top: 8px!important;
@@ -112,96 +96,20 @@
 			color:#fff; background-color: #fd625e; border-radius:5px; cursor: pointer; padding-top:7px;
 	}
 	.btn_round_big:hover {
-			color: #fff; background: #fd625e; border: 1px solid #fd625e;
-			}
-			/* .comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        } */
-
-			/* body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-} */
-
-/* .comment-section {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-}
-
-.comment-box {
-    display: flex;
-    flex-direction: column;
-}
-
-#comment-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    padding: 10px;
-    background: #007BFF;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-}  
-
-button:hover {
-    background: #0056b3;
-}
-
-#comment-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 20px;
-}
-
-.comment-item {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-}
-
-.mention {
-    color: #007BFF;
-    font-weight: bold;
-} */
-.card-header {
-	background-color:#e6f1ff!important;
-}
-.card-body {
-	background-color:#fafcff!important;
-}
-.no-border {
-	border:none!important;
-}
-
-     .select2-container {
+		color: #fff; background: #fd625e; border: 1px solid #fd625e;
+	}
+	.card-header {
+		background-color:#e6f1ff!important;
+	}
+	.card-body {
+		background-color:#fafcff!important;
+	}
+	.no-border {
+		border:none!important;
+	}
+    .select2-container {
         width: 100% !important;
     }
-
 </style>
 @include('layouts.formstyle')
 @section('content')
@@ -227,8 +135,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<div class="col-xxl-12 col-lg-12 col-md-12">
 		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 	</div>
-	<!-- <form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
-		@csrf -->
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
     @if(isset($workOrder))
@@ -269,19 +175,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<!-- <select name="batch" id="batch" class="form-control widthinput" autofocus>
-								<option value="">Choose Batch</option>
-								<option value="Batch 1">Batch 1</option>
-								<option value="Batch 2">Batch 2</option>
-								<option value="Batch 3">Batch 3</option>
-								<option value="Batch 4">Batch 4</option>
-								<option value="Batch 5">Batch 5</option>
-								<option value="Batch 6">Batch 6</option>
-								<option value="Batch 7">Batch 7</option>
-								<option value="Batch 8">Batch 8</option>
-								<option value="Batch 9">Batch 9</option>
-								<option value="Batch 10">Batch 10</option>
-							</select> -->
 							<select name="batch" id="batch" class="form-control widthinput" autofocus>
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 10; $i++)
@@ -401,22 +294,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
-						<!-- <fieldset style="margin-top:5px;" class="radio-div-container">
-							<div class="row some-class">
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" />
-									<label for="air">Air</label>
-								</div>
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" />
-									<label for="sea">Sea</label>
-								</div>
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" />
-									<label for="road">Road</label>
-								</div>
-							</div>
-						</fieldset> -->
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-4 col-lg-4 col-md-4">
@@ -456,11 +333,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
 							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
-							<!-- <select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
-								@foreach($airlines as $airline)
-								<option value="{{$airline->name}}">{{$airline->name}}</option>
-								@endforeach
-							</select> -->
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 									<option value="{{$airline->name}}" 
@@ -522,23 +394,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<div class="col-lg-12 col-md-12 col-sm-12 mt-2">
 								<span class="fw-bold col-form-label text-md-end" id="brn_file_label"></span>
 								<div id="brn_file_preview">
-									@if(isset($candidate->candidateDetails->image_path))
+									@if(isset($workOrder->brn_file))
 									<div id="brn_file_preview1">
 										<div class="row">
 											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
+												<h6 class="fw-bold text-center mb-1" style="float:left;">BRN File</h6>
 											</div>
 											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
 												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
+												<a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download class="text-white">
 												Download
 												</a>
 												</button>
 												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="PASSPORT"> Delete</button>
+													data-file-type="BRN_File"> Delete</button>
 											</div>
 										</div>
-										<iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+										<iframe src="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" alt="BRN File"></iframe>
 									</div>
 									@endif
 								</div>
@@ -587,20 +459,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
 						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
+							<input type="text" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
 							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
+								<span class="input-group-text widthinput" id="amount_received_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
+							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
 							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
+								<span class="input-group-text widthinput" id="balance_amount_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
@@ -765,23 +637,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="signed_pfi_label"></span>
                         <div id="signed_pfi_preview">
-                            @if(isset($candidate->candidateDetails->signed_contract))
+                            @if(isset($workOrder->signed_pfi))
                             <div id="signed_pfi_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">signed_contract</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed PFI</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" download class="text-white">
+                                        <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="signed_contract"> Delete</button>
+                                            data-file-type="Signed_PFI"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" alt="signed_contract"></iframe>
+                                <iframe src="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" alt="Signed PFI"></iframe>
                             </div>
                             @endif
                         </div>
@@ -789,23 +661,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="signed_contract_label"></span>
                         <div id="signed_contract_preview">
-                            @if(isset($candidate->candidateDetails->payment_receipts))
+                            @if(isset($workOrder->signed_contract))
                             <div id="signed_contract_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">payment_receipts</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed Contract</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" download class="text-white">
+                                        <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="payment_receipts"> Delete</button>
+                                            data-file-type="Signed_Contract"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" alt="payment_receipts"></iframe>
+                                <iframe src="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" alt="Signed Contract"></iframe>
                             </div>
                             @endif
                         </div>
@@ -813,23 +685,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="payment_receipts_label"></span>
                         <div id="payment_receipts_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->payment_receipts))
                             <div id="payment_receipts_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Payment Receipts</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Payment_Receipts"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" alt="Payment Receipts"></iframe>
                             </div>
                             @endif
                         </div>
@@ -837,23 +709,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="noc_label"></span>
                         <div id="noc_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->noc))
                             <div id="noc_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">NOC</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="NOC"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/noc/' . $workOrder->noc) }}" alt="NOC"></iframe>
                             </div>
                             @endif
                         </div>
@@ -861,23 +733,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_trade_license_label"></span>
                         <div id="enduser_trade_license_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_trade_license))
                             <div id="enduser_trade_license_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Trade License</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Trade_License"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" alt="Enduser Trade License"></iframe>
                             </div>
                             @endif
                         </div>
@@ -885,23 +757,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_passport_label"></span>
                         <div id="enduser_passport_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_passport))
                             <div id="enduser_passport_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Passport</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Passport"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" alt="Enduser Passport"></iframe>
                             </div>
                             @endif
                         </div>
@@ -909,23 +781,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_contract_label"></span>
                         <div id="enduser_contract_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_contract))
                             <div id="enduser_contract_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Contract</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Contract"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" alt="Enduser Contract"></iframe>
                             </div>
                             @endif
                         </div>
@@ -933,23 +805,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="vehicle_handover_person_id_label"></span>
                         <div id="vehicle_handover_person_id_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->vehicle_handover_person_id))
                             <div id="vehicle_handover_person_id_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Vehicle Handover Person ID</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Vehicle_Handover_Person_ID"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" alt="Vehicle Handover Person ID"></iframe>
                             </div>
                             @endif
                         </div>
@@ -964,6 +836,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 			</div>
 		</div>
+		<input type="hidden" id="brn-file-file-delete" name="is_brn_file_delete" value="">
+		<input type="hidden" id="signed-pfi-delete" name="is_signed_pfi_delete" value="">
+		<input type="hidden" id="signed-contract-delete" name="is_signed_contract_delete" value="">   
+		<input type="hidden" id="payment-receipts-file-delete" name="is_payment_receipts_delete" value=""> 
+		<input type="hidden" id="noc-file-delete" name="is_noc_delete" value="">
+		<input type="hidden" id="enduser-trade-license-delete" name="is_enduser_trade_license_delete" value="">
+		<input type="hidden" id="enduser-passport-delete" name="is_enduser_passport_delete" value="">   
+		<input type="hidden" id="enduser-contract-file-delete" name="is_enduser_contract_delete" value=""> 
+		<input type="hidden" id="vehicle-handover-person-id-file-delete" name="is_vehicle_handover_person_id_delete" value=""> 
 	</form>
 	</br>
 	<div class="card">
@@ -1039,6 +920,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 // dropdownAutoWidth : true,
                 // width: 'auto'
 			});
+
+
+			if(workOrder == null || workOrder.deposit_received_as == null) {
+				$("#amount-received-div").hide();
+				$("#balance-amount-div").hide();
+				$("#deposit-aganist-vehicle-div").hide();
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'total_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").hide();
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").show();
+				setDepositAganistVehicleDropdownOptions();
+			}
+
+			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
+			workOrder.enduser_trade_license != null || workOrder.enduser_passport != null || workOrder.enduser_contract != null || workOrder.vehicle_handover_person_id != null )) {
+				$('.preview-div').attr('hidden', false);
+			}
+			if(workOrder != null && (workOrder.brn_file != null )) {
+				$('.brn-preview-div').attr('hidden', false);
+			}
 			if (workOrder !== null && workOrder.customer_reference_id === null && workOrder.customer_name !== null) {
 				checkValue();
 				$('#textInput').val(workOrder.customer_name);
@@ -1194,7 +1101,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// CUSTOMER NAME ONCHANGE END
 
 		// DEPOSIT RECEIVED AS ONCHANGE START
-			$('.deposit_received_as').click(function() {
+			$('.deposit_received_as').click(function() { console.log('here');
 				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
 				if (selectedDepositReceivedValue == 'total_deposit') {
 					$("#amount-received-div").show();
@@ -1874,14 +1781,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	}
 
 	function setDepositBalance() {
-			var totalAmount = $('#so_total_amount').val();
-			var amountReceived = $('#amount_received').val();
-			var balanceAmount = '';
-			if(totalAmount != '' && amountReceived != '') {
-				balanceAmount = Number(totalAmount) - Number(amountReceived);
-			}
-			document.getElementById('balance_amount').value = balanceAmount;
+		var totalAmount = $('#so_total_amount').val();
+		var amountReceived = $('#amount_received').val();
+		var balanceAmount = '';
+		if(totalAmount != '' && amountReceived != '') {
+			balanceAmount = Number(totalAmount) - Number(amountReceived);
 		}
+		document.getElementById('balance_amount').value = balanceAmount;
+	}
 		
     function addComment(parentId = null) {
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
@@ -2593,9 +2500,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$("#transporting-driver-contact-number-div").hide();
 			$("#airway-details-div").hide();
 			$("#transportation-company-details-div").hide();
-			$("#amount-received-div").hide();
-			$("#balance-amount-div").hide();
-			$("#deposit-aganist-vehicle-div").hide();
 		}
 	// HIDE FIELDS END
 
@@ -2763,11 +2667,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         // Replace multiple spaces with a single space
         input.value = input.value.replace(/\s\s+/g, ' ');
     }
+
     function sanitizeNumberInput(input) {
         // Remove any non-numeric characters
         input.value = input.value.replace(/[^0-9]/g, '');
     }
+	$('.delete-button').on('click',function() {
+		var fileType = $(this).attr('data-file-type');
+		if (confirm('Are you sure you want to Delete this item ?')) {
+			if(fileType == 'BRN_File') {
+				$('#brn_file_preview1').remove();
+				$('#brn-file-file-delete').val(1);
 	
+			}else if(fileType == 'Signed_PFI') {
+				$('#signed_pfi_preview1').remove();
+				$('#signed-pfi-delete').val(1);
+	
+			}else if(fileType == 'Signed_Contract') {
+				$('#signed_contract_preview1').remove();
+				$('#signed-contract-delete').val(1);
+			}
+			else if(fileType == 'Payment_Receipts') {
+				$('#payment_receipts_preview1').remove();
+				$('#payment-receipts-file-delete').val(1);
+			}
+			else if(fileType == 'NOC') {
+				$('#noc_preview1').remove();
+				$('#noc-file-delete').val(1);
+	
+			}else if(fileType == 'Enduser_Trade_License') {
+				$('#enduser_trade_license_preview1').remove();
+				$('#enduser-trade-license-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Passport') {
+				$('#enduser_passport_preview1').remove();
+				$('#enduser-passport-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Contract') {
+				$('#enduser_contract_preview1').remove();
+				$('#enduser-contract-file-delete').val(1);
+			}
+			else if(fileType == 'Vehicle_Handover_Person_ID') {
+				$('#vehicle_handover_person_id_preview1').remove();
+				$('#vehicle-handover-person-id-file-delete').val(1);
+			}
+		}
+	});
 </script>
 
 @endsection

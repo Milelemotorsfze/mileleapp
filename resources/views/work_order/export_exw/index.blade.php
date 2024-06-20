@@ -133,7 +133,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                     <center>Transportation</center>
                                 </th>
                             @endif
-                            <th colspan="4" class="dark">
+                            <th colspan="5" class="dark">
 								<center>SO</center>
 							</th>
                             <th colspan="3" class="light">
@@ -179,6 +179,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td class="light">Details</td>
                             @endif
                             <td class="dark">Vehicle Qty</td>
+							<td class="dark">Currency</td>
                             <td class="dark">Amount</td>
                             <td class="dark">Deposit</td>
                             <td class="dark">Balance</td>
@@ -246,7 +247,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>
 									@if($data->brn_file)
 										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
-											<button class="btn btn-primary m-2 btn-style">View</button>
+											<button class="btn btn-primary mb-1 btn-style">View</button>
 										</a>
 										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
 											<button class="btn btn-info btn-style">Download</button>
@@ -270,6 +271,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>{{$data->transportation_company_details ?? ''}}</td>
                             @endif
                             <td>{{$data->so_vehicle_quantity ?? ''}}</td>
+							<td>{{$data->currency ?? ''}}</td>
 							<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
 							<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
 							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
@@ -279,7 +281,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td>
 								@if($data->signed_pfi)
 									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -289,7 +291,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->signed_contract)
 									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -299,7 +301,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->payment_receipts)
 									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -309,7 +311,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->noc)
 									<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/noc/' . $data->noc) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -319,7 +321,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->enduser_trade_license)
 									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -329,7 +331,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->enduser_passport)
 									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -339,7 +341,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td>
 								@if($data->enduser_contract)
 									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
 										<button class="btn btn-info btn-style">Download</button>
@@ -349,7 +351,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>
 								@if($data->vehicle_handover_person_id)
 									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
-										<button class="btn btn-primary m-2 btn-style">View</button>
+										<button class="btn btn-primary mb-1 btn-style">View</button>
 									</a>
 									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
 										<button class="btn btn-info btn-style">Download</button>

@@ -393,19 +393,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> SO Total Amount </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->so_total_amount != 0.00) {{$workOrder->so_total_amount ?? 'NA'}} @else NA @endif</span>
+                                                    <span class="data-font">@if($workOrder->so_total_amount != 0.00) {{$workOrder->so_total_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Amount Received </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->amount_received != 0.00) {{$workOrder->amount_received ?? 'NA'}} @else NA @endif</span>
+                                                    <span class="data-font">@if($workOrder->amount_received != 0.00) {{$workOrder->amount_received ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Balance Amount </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->balance_amount != 0.00) {{$workOrder->balance_amount ?? 'NA'}} @else NA @endif</span>
+                                                    <span class="data-font">@if($workOrder->balance_amount != 0.00) {{$workOrder->balance_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                     <label for="choices-single-default" class="form-label"> Delivery Location </label>
