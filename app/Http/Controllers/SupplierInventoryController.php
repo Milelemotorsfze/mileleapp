@@ -322,11 +322,11 @@ class SupplierInventoryController extends Controller
                         {
 //                            $exteriorColor = $extColourRow->name;
                             $exteriorColorId = $extColourRow->id;
-                            info("available exterior Colour");
-                            info($exteriorColorId);
+                            // info("available exterior Colour");
+                            // info($exteriorColorId);
                         }else{
-                            info("not available exterior Colour");
-                            info($extColour);
+                            // info("not available exterior Colour");
+                            // info($extColour);
                             $unavailableExtColours[]  = $extColour;
                         }
                     }
@@ -351,8 +351,8 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['veh_status'] = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                     $uploadFileContents[$i]['exterior_color_code_id'] = !empty($exteriorColorId) ? $exteriorColorId: NULL;
                     $uploadFileContents[$i]['interior_color_code_id'] = !empty($interiorColorId) ? $interiorColorId: NULL;
-                    info($uploadFileContents[$i]['exterior_color_code_id']);
-                    info($uploadFileContents[$i]['interior_color_code_id']);
+                    // info($uploadFileContents[$i]['exterior_color_code_id']);
+                    // info($uploadFileContents[$i]['interior_color_code_id']);
                     ////// finding model year //////////
 
                     if ($filedata[7]) {
@@ -416,7 +416,7 @@ class SupplierInventoryController extends Controller
             $excelPairs = [];
 
             foreach($uploadFileContents as $uploadFileContent) {
-                info($uploadFileContent['color_code']);
+                // info($uploadFileContent['color_code']);
                 // if(empty($uploadFileContent['chasis'])) {
                 $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
                 // }
@@ -449,9 +449,14 @@ class SupplierInventoryController extends Controller
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
                 }
-                $DN_WAITING = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_WAITING);
+                $DN_WAITING = strcasecmp($uploadFileContent['delivery_note'], 'WAITING');
+           
+                
                 $DN_RECEIVED = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED);
-                if(!empty($uploadFileContent['delivery_note']) ) {
+                if(!empty($uploadFileContent['delivery_note'])) {
+                    info($uploadFileContent['delivery_note']);
+                    info("DN VALUE");
+                    info($DN_WAITING);
                     if($country == SupplierInventory::COUNTRY_BELGIUM) {
                         if ($DN_WAITING != 0 ) {
                             if ($DN_RECEIVED != 0) {
@@ -459,11 +464,15 @@ class SupplierInventoryController extends Controller
                             }
                         }
                     }else{
-                        if ($DN_WAITING !== 0 || !is_numeric($uploadFileContent['delivery_note'])) {
-                            return redirect()->back()->with('error', "Delivery note should be a number or status should be Waiting");
+                        if ($DN_WAITING != 0) {
+                            if(!is_numeric($uploadFileContent['delivery_note'])) {
+                                return redirect()->back()->with('error', "Delivery note should be a number or status should be Waiting");
+                            }
                         }
                     }
 
+                }else{
+                    info("empty DN");
                 }
                 $j++;
             }
