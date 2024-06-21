@@ -140,6 +140,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     @if(isset($workOrder))
         @method('PUT')
     @endif
+		<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fa fa-check" aria-hidden="true"></i> Sales Support Data Confirmation
+		</a>
 		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
 		<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
 		</a>
@@ -1101,7 +1104,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// CUSTOMER NAME ONCHANGE END
 
 		// DEPOSIT RECEIVED AS ONCHANGE START
-			$('.deposit_received_as').click(function() { console.log('here');
+			$('.deposit_received_as').click(function() { 
 				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
 				if (selectedDepositReceivedValue == 'total_deposit') {
 					$("#amount-received-div").show();
@@ -1136,7 +1139,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 
 				// Enable the VIN options before removing the row
-				var selectedVINs = selectElement.val();
+				var selectedVINs = selectElement.val(); 
 				if (selectedVINs) {
 					selectedVINs.forEach(function(vin) {
 						$('select option[value="' + vin + '"]').prop('disabled', false);
@@ -1406,7 +1409,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		$.validator.addMethod("uniqueSO", 
 	       function(value, element) {
 	           var result = false;
-				var WoId = $("#wo_id").val(); console.log(WoId)
+				var WoId = $("#wo_id").val(); 
 	           $.ajax({
 	               type:"POST",
 	               async: false,
@@ -1849,7 +1852,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					_token: '{{ csrf_token() }}'
 				},
 				dataType: 'json',
-				success: function(response) {console.log(response.charges);
+				success: function(response) {
 					// Iterate over each dynamicselect2 element to update its options
 					$('.dynamicselect2').each(function() { 
 						var $dropdown = $(this);
@@ -2031,6 +2034,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 							var firstRow = document.createElement('tr');
 							firstRow.style.borderTop = '2px solid #a6a6a6';
+							firstRow.className = 'first-row';
 							var secondRow = document.createElement('tr');
 							var thirdRow = document.createElement('tr');
 							var lastRow = document.createElement('tr');
@@ -2190,11 +2194,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						}
 					}
 				}
-				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
 				if(index > 0) {
 					// Append selectedVIN data as dropdown option for all dynamicselect2 class
-					$(".dynamicselect2").each(function() {
-						var selectElement = $(this);
+					$(".dynamicselect2").each(function() { 
+						var selectElement = $(this); 
 						selectedVIN.forEach(function(vin) {
 							if (selectElement.find(`option[value='${vin}']`).length === 0) {
 								selectElement.append(`<option value="${vin}">${vin}</option>`);
@@ -2214,6 +2218,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
+
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
@@ -2229,7 +2234,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('select option[value="'+ vin +'"]').prop('disabled', false);
 			}
 			var rows = $(this).data('rows');
-			// console.log(rows);
 			if (rows) {
 				$(rows).each(function() {
 					$(this).remove();
@@ -2241,7 +2245,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		$('#myTable').on('click', '.remove-addon-row', function() {
 			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
 			addon.remove();
-			// console.log(addon);
 			// if (vin) {
 			// 	// Unselect and remove the VIN from all dynamicselect2 class elements
 			// 	$(".dynamicselect2").each(function() {
@@ -2267,7 +2270,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var addonQuantity = '';
 			var addonDescription = '';
 
-			// var addonId = $(this).attr('id').split('_')[2]; console.log(addonId);
+			// var addonId = $(this).attr('id').split('_')[2]; 
 			// var addonValue = $(`#addons_${addonId}`).val();
 
 			var removeAddonCell = createAddonRemoveButton();
@@ -2368,10 +2371,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
 			
 		});
-		function findAllVINs() {
+		function findAllVINs() { 
 			addedVins = [];
-			$('#myTable tbody tr').each(function() {
-				var addedVin = $(this).data('vin');
+			$('#myTable tbody .first-row').each(function() {
+				var addedVin = $(this).data('vin'); 
 				if (addedVin) {
 					addedVins.push(addedVin);
 				}
@@ -2519,7 +2522,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             $('#customer_reference_id').val(selectedCustomerName);
             
             // Hide the select2 container and show the text input
-			// console.log( $('#customer_name').next('.select2-container'));
             $('#customer_name').next('.select2-container').hide();
             textInput.style.display = 'inline';
             Other.style.display = 'none';
@@ -2573,7 +2575,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             // document.getElementById('customer_email').value = '';
             // document.getElementById('customer_company_number').value = '';
 			
-			// console.log(selectedCustomerName);
             if (selectedCustomerName != null || selectedCustomerName.length > 0) {
                 for (var i = 0; i < customerCount; i++) {
                     if (customers[i].customer_name == selectedCustomerName[0]) { 
@@ -2584,7 +2585,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                             $('#customer_email').val(customers[i]?.customer_email);
                         }
 						if (customers[i].customer_company_number != null) {
-							// console.log(customers[i]?.customer_company_number);
                             // // $('#customer_company_number').val(customers[i]?.customer_company_number);
 							// // $('#customer_company_number').val(customers[i].customer_company_number);
 							$('#customer_company_number').val(customers[i].customer_company_number);
@@ -2627,13 +2627,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
-		function setDepositAganistVehicleDropdownOptions() {
+		function setDepositAganistVehicleDropdownOptions() { 
 			// Get the previously selected values
 			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
 
 			// Empty the select element before adding new options
 			$('#deposit_aganist_vehicle').empty();
-
 			// Add new options to the select element
 			addedVins.forEach(function(vin) {
 				$('#deposit_aganist_vehicle').append(new Option(vin, vin));
