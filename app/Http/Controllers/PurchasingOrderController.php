@@ -15,6 +15,7 @@ use App\Models\PurchasingOrderSwiftCopies;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
+use App\Models\SupplierAccount;
 use App\Models\ColorCode;
 use App\Models\Brand;
 use App\Models\Country;
@@ -34,8 +35,12 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\CarbonTimeZone;
 use App\Models\UserActivities;
 use App\Models\Purchasinglog;
+use App\Models\PurchasedOrderPaidAmounts;
+use App\Models\VendorPaymentAdjustments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\SupplierAccountTransaction;
+
 
 class PurchasingOrderController extends Controller
 {
@@ -606,9 +611,6 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->pl_number = $request->input('pl_number');
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
-        $updateponum = PurchasingOrder::find($purchasingOrderId);
-        $updateponum->po_number = $request->input('po_number');
-        $updateponum->save();
         $variantNames = $request->input('variant_id');
         if($variantNames != null)
         {
@@ -769,6 +771,11 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingordereventsLog->created_by = auth()->user()->id;
         $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
         $purchasingordereventsLog->save();
+        $supplier_account_id = $request->input('vendors_id');
+        $purchasing_order_id = $purchasingOrder->id;
+        $updateponum = PurchasingOrder::find($purchasingOrderId);
+        $updateponum->po_number = $request->input('po_number');
+        $updateponum->save();
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
     /**
@@ -786,6 +793,13 @@ public function getBrandsAndModelLines(Request $request)
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
+        $vendorPaymentAdjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)
+        ->select('type', DB::raw('SUM(totalamount) as total_amount', 'amount', DB::raw('SUM(totalamount) as total_adjusted_amount')))
+        ->groupBy('type')
+        ->get();  
+        $totalSum = $vendorPaymentAdjustments->sum('total_amount');
+    $alreadypaidamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Paid')->sum('amount');
+    $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
     $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
@@ -794,6 +808,7 @@ public function getBrandsAndModelLines(Request $request)
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
+    $vendorstatus = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->value('current_balance') ?? 'Account Not Existing';
         $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
         $nextId = PurchasingOrder::where('id', '>', $id)->min('id');
 
@@ -843,7 +858,7 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorstatus', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum'));
     }
     public function edit($id)
     {
@@ -2065,6 +2080,22 @@ public function purchasingallupdateStatusrel(Request $request)
         ->where('payment_status', 'Payment Initiated')
         ->where('purchasing_order_id', $id)
         ->get();
+    if ($status == 'Approved') {
+        $vendorpaymentadjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)->latest()->first();
+        if($vendorpaymentadjustments->type == "Adjustment")
+        {
+            $supplieracc = SupplierAccount::where('suppliers_id', $vendorpaymentadjustments->supplier_account_id)->first();
+
+        }
+        elseif($vendorpaymentadjustments->type == "Pay Balance")
+        {
+          
+        }
+        else
+        {
+          
+        }
+        } 
     foreach ($vehicles as $vehicle) {
         if ($status == 'Approved') {
                 $paymentStatus = 'Payment Release Approved';
@@ -2136,7 +2167,7 @@ public function allpaymentreqss(Request $request)
         DB::table('vehicles')
             ->where('id', $vehicle->id)
             ->update(['status' => $status]);
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
@@ -2163,13 +2194,16 @@ public function allpaymentreqssfin(Request $request)
     ->where('status', 'Request for Payment')
     ->where('payment_status', '')
     ->get();
+    $totalCost = 0;
     foreach ($vehicles as $vehicle) {
         $status = 'Payment Requested';
         $payment_status = 'Payment Initiated Request';
         DB::table('vehicles')
             ->where('id', $vehicle->id)
             ->update(['status' => $status, 'payment_status' => $payment_status]);
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicle->id)->value('unit_price');
+            $totalCost += $vehicleCost;
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -2183,6 +2217,12 @@ public function allpaymentreqssfin(Request $request)
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
              }
+            $paymentinti = New PurchasedOrderPaidAmounts();
+            $paymentinti->amount = $totalCost;
+            $paymentinti->purchasing_order_id = $id;
+            $paymentinti->created_by = auth()->user()->id;
+            $paymentinti->status = "Request For Payment";
+            $paymentinti->save();
             }
             else
             {
@@ -2243,6 +2283,92 @@ public function allpaymentreqssfinpay(Request $request)
                 $vehicleslog->role = Auth::user()->selectedRole;
                 $vehicleslog->save();
             }
+            $purchasedorder = PurchasingOrder::where('id', $id)->first();
+            $selectedOption =  $request->input('selectedOption');
+            $adjustmentAmount =  $request->input('adjustmentAmount');
+            $remainingAmount = $request->input('remainingAmount');
+            if($selectedOption == 'adjustment')
+            {
+                $VendorPaymentAdjustments = New VendorPaymentAdjustments();
+                $VendorPaymentAdjustments->amount = $adjustmentAmount;
+                $VendorPaymentAdjustments->type = "Adjustment";
+                $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
+                $VendorPaymentAdjustments->purchasing_order_id = $id;
+                $VendorPaymentAdjustments->created_by = auth()->user()->id;
+                $VendorPaymentAdjustments->totalamount = $remainingAmount;
+                $VendorPaymentAdjustments->save();
+                $totalcost = $adjustmentAmount;
+            }
+            elseif($selectedOption == 'payBalance')
+            {
+                $supplier = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
+                $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
+                $VendorPaymentAdjustments = New VendorPaymentAdjustments();
+                $VendorPaymentAdjustments->amount = $adjustmentAmount - $intialamount;
+                $VendorPaymentAdjustments->type = "Pay Balance";
+                $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
+                $VendorPaymentAdjustments->purchasing_order_id = $id;
+                $VendorPaymentAdjustments->created_by = auth()->user()->id;
+                $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
+                $VendorPaymentAdjustments->save();
+                $totalcost = $adjustmentAmount;
+            }
+            else
+            {
+                $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
+                $VendorPaymentAdjustments = New VendorPaymentAdjustments();
+                $VendorPaymentAdjustments->amount = $intialamount;
+                $VendorPaymentAdjustments->type = "No Adjustment";
+                $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
+                $VendorPaymentAdjustments->purchasing_order_id = $id;
+                $VendorPaymentAdjustments->created_by = auth()->user()->id;
+                $VendorPaymentAdjustments->totalamount = $intialamount;
+                $VendorPaymentAdjustments->save();
+                $totalcost = $intialamount;
+            }
+            PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->update(['status' => 'Initiated Payment']);
+            $currency = $purchasedorder->currency;
+            $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
+            if (!$supplieraccountchange) {
+            $supplieraccountchange = new SupplierAccount();
+            $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
+            $supplieraccountchange->current_balance -= $totalcost;
+            $supplieraccountchange->currency = "AED";
+            $supplieraccountchange->opening_balance = 0;
+            $supplieraccountchange->save();
+            }
+        else{
+        switch ($currency) {
+    case "USD":
+        $totalcostconverted = $totalcost * 3.67;
+        break;
+    case "EUR":
+        $totalcostconverted = $totalcost * 3.94;
+        break;
+    case "GBP":
+        $totalcostconverted = $totalcost * 4.67;
+        break;
+    case "JPY":
+        $totalcostconverted = $totalcost * 0.023;
+        break;
+    case "CAD":
+        $totalcostconverted = $totalcost * 2.68;
+        break;
+    default:
+        $totalcostconverted = $totalcost;
+        }
+        $supplieraccountchange->current_balance -= $totalcostconverted;
+        $supplieraccountchange->save();
+        }
+        $supplieraccount = new SupplierAccountTransaction();
+        $supplieraccount->totalamount = $totalcost;
+        $supplieraccount->transaction_type = "Credit";
+        $supplieraccount->purchasing_order_id = $purchasedorder->id;
+        $supplieraccount->supplier_account_id = $supplieraccountchange->id;
+        $supplieraccount->created_by = auth()->user()->id;
+        $supplieraccount->account_currency = $currency;
+        $supplieraccount->transaction_amount = $totalcost;
+        $supplieraccount->save();
             return redirect()->back()->with('success', 'Payment Status Updated');
        }
        public function allpaymentreqssfinpaycomp(Request $request)
@@ -2666,5 +2792,18 @@ public function rerequestpayment(Request $request)
         return redirect()->back()->with('success', 'Payment Initiated Request Rejected confirmed');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
+}
+public function getSupplierAndAmount($orderId) {
+    $order = PurchasingOrder::find($orderId);
+    if ($order) {
+        $vendors_id = $order->vendors_id;
+        $supplier = SupplierAccount::where('suppliers_id', $vendors_id)->first();
+        $requestedcost = PurchasedOrderPaidAmounts::where('purchasing_order_id', $orderId)->where('status', 'Request For Payment')->sum('amount');
+        $current_amount = $supplier->current_balance;
+        $totalamount = $order->totalcost;
+        $requestedcost = $requestedcost;
+        return response()->json(['supplier_id' => $vendors_id, 'current_amount' => $current_amount, 'totalamount' => $totalamount, 'requestedcost' => $requestedcost]);
+    }
+    return response()->json(['error' => 'Order not found'], 404);
 }
 }

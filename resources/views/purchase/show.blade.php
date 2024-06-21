@@ -38,6 +38,58 @@
     }
 </style>
 @section('content')
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalLabel">Payment Information</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Supplier ID: <span id="supplierId"></span></p>
+        <p>Current Amount Status of the Vendor: <span id="currentAmount"></span></p>
+        <p>Total Amount: <span id="totalAmount"></span></p>
+        <p>Requested Amount: <span id="requestedCost"></span></p>
+        
+        
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="adjustmentOption" value="adjustment">
+          <label class="form-check-label" for="adjustmentOption">
+            Use the amount as adjustment
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="payBalanceOption" value="payBalance">
+          <label class="form-check-label" for="payBalanceOption">
+            Pay the balance with this PO
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="partialpayment" value="noAdjustment">
+          <label class="form-check-label" for="partialpayment">
+          Partial payment
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="noAdjustmentOption" value="noAdjustment" checked>
+          <label class="form-check-label" for="noAdjustmentOption">
+            No adjustment
+          </label>
+        </div>
+        <div id="adjustmentInputContainer" style="display:none;">
+          <label for="adjustmentAmount" id="adjustmentLabel">Adjustment Amount:</label>
+          <input type="number" id="adjustmentAmount" class="form-control" min="0">
+        </div>
+        <br>
+        <p>Initiated / Balance / Exceed Amount / : <span id="remainingAmount"></span></p>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="confirmPaymentButton">Confirm Payment</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal -->
 <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -61,9 +113,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Reject Payment Release</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="remarksRejForm">
@@ -76,7 +126,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="submitRemarksrej" class="btn btn-primary">Submit Remarks</button>
             </div>
         </div>
@@ -402,33 +452,79 @@
                             <span>{{ucfirst(strtolower($vendorsname))}}</span>
                         </div>
                     </div>
-
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>Total Vehicles</strong></label>
+                            <label for="choices-single-default" class="form-label"><strong>Vendor Account Status</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{ count($vehicles) }}</span>
+                            <span>{{$vendorstatus}}</span>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Total Vehicles / Cost</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                            <span>{{ count($vehicles) }} /  
+                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
+                        {{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}
+                        @else    
+                        {{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}
+                        @endif
+                        </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Already Paid Amount</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        @if (!is_null($alreadypaidamount) && !is_numeric($alreadypaidamount)) 
+                        <span>{{ isset($alreadypaidamount) ? number_format($alreadypaidamount, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
+                        @else    
+                        <span>{{ $alreadypaidamount }} - {{ $purchasingOrder->currency }}</span>
+                        @endif
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Requested Initiated Amount</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        @if (!is_null($intialamount) && !is_numeric($intialamount)) 
+                        <span>{{ isset($intialamount) ? number_format($intialamount, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
+                        @else    
+                        <span>{{ $intialamount }} - {{ $purchasingOrder->currency }}</span>
+                        @endif
+                        </div>
+                    </div>
+                    @if($vendorPaymentAdjustments)
+                    <div class="row">
+    <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Requested Released Amount</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        @if ($vendorPaymentAdjustments->isNotEmpty())
+            <span>
+                @foreach ($vendorPaymentAdjustments as $adjustment)
+                    {{ $adjustment->total_amount }} - {{ $purchasingOrder->currency }} 
+                        ({{ $adjustment->type }})
+                    @if (!$loop->last)
+                        , 
+                    @endif
+                                    @endforeach
+                                </span>
+                                <strong>Total : {{$totalSum}} - {{ $purchasingOrder->currency }} </strong>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Payment Terms</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                             <span>{{ $paymentterms->name }} - {{ $paymentterms->description }}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
-                        </div>
-                        <div class="col-lg-6 col-md-9 col-sm-12">
-                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
-                        <span>{{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
-                        @else    
-                        <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
-                        @endif
                         </div>
                     </div>
                     <div class="row">
@@ -1141,9 +1237,9 @@
                         @endphp
                         @if ($hasPermission)
                         <div style="display: flex; gap: 10px;">
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                        <!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
                         Approved
-                        </a>
+                        </a> -->
                         @endif
                         @endif
 										@php
@@ -2369,27 +2465,27 @@ function postUpdateStatus(status, orderId, remarks = '') {
                         window.location.reload();
                     });
             }
-            function allpaymentintreqfinpay(status, orderId) {
-                let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
-                let data = { status: status, orderId: orderId };
-                console.log(data);
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
-            }
+            // function allpaymentintreqfinpay(status, orderId) {
+            //     let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+            //     let data = { status: status, orderId: orderId };
+            //     console.log(data);
+            //     fetch(url, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            //         },
+            //         body: JSON.stringify(data),
+            //     })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             console.log('Status update successful');
+            //             window.location.reload();
+            //         })
+            //         .catch(error => {
+            //             window.location.reload();
+            //         });
+            // }
             function rerequestpayment(status, orderId) {
                 let url = '{{ route('purchasing.rerequestpayment') }}';
                 let data = { status: status, orderId: orderId };
@@ -2649,6 +2745,161 @@ function allpaymentintreqfinpaycompsingle(vehicleId) {
     form.setAttribute('action', action);
     // Open the modal
     $('#fileUploadModalsingle').modal('show');
+}
+</script>
+<script>
+function allpaymentintreqfinpay(status, orderId) {
+    // Open the modal
+    $('#paymentModal').modal('show');
+
+    // Fetch the supplier_id, current amount, and total amount
+    fetch(`/get-supplier-and-amount/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            const { supplier_id, current_amount, totalamount, requestedcost } = data;
+            const currentAmountNumber = Number(current_amount);
+            const requestedCostNumber = Number(requestedcost);
+
+            // Populate the modal with the supplier_id, current_amount, and totalamount
+            document.getElementById('supplierId').innerText = supplier_id;
+            document.getElementById('currentAmount').innerText = current_amount;
+            document.getElementById('totalAmount').innerText = totalamount;
+            document.getElementById('requestedCost').innerText = requestedcost;
+            document.getElementById('remainingAmount').innerText = requestedcost;
+
+            // Set initial state of adjustment input
+            const adjustmentInputContainer = document.getElementById('adjustmentInputContainer');
+            adjustmentInputContainer.style.display = 'none';
+
+            const adjustmentLabel = document.getElementById('adjustmentLabel');
+            const adjustmentAmountInput = document.getElementById('adjustmentAmount');
+            const remainingAmountSpan = document.getElementById('remainingAmount');
+            adjustmentAmountInput.value = '';
+
+            // Disable options based on current amount
+            const adjustmentOption = document.getElementById('adjustmentOption');
+            const payBalanceOption = document.getElementById('payBalanceOption');
+
+            adjustmentOption.disabled = current_amount <= 0;
+            payBalanceOption.disabled = current_amount >= 0;
+
+            // Function to update the remaining amount
+            function updateRemainingAmount() {
+                const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                if (document.getElementById('partialpayment').checked) {
+                    remainingAmountSpan.innerText = adjustmentAmount.toFixed(2);
+                } else if (document.getElementById('payBalanceOption').checked) {
+                    const remainingAmount = adjustmentAmount - requestedCostNumber;
+                    remainingAmountSpan.innerText = remainingAmount.toFixed(2);
+                } else {
+                    const remainingAmount = requestedCostNumber - adjustmentAmount;
+                    remainingAmountSpan.innerText = remainingAmount.toFixed(2); // Update remaining amount
+                }
+            }
+
+            // Attach event listeners to checkboxes and input fields
+            document.getElementById('adjustmentOption').onclick = function() {
+                if (current_amount > 0 && totalamount > 0) {
+                    adjustmentInputContainer.style.display = 'block';
+                    adjustmentLabel.innerText = 'Adjustment Amount:';
+                    adjustmentAmountInput.max = current_amount;
+                    adjustmentAmountInput.oninput = updateRemainingAmount;
+                } else {
+                    adjustmentInputContainer.style.display = 'none';
+                    alert('Insufficient balance or total amount.');
+                }
+            };
+
+            document.getElementById('payBalanceOption').onclick = function() {
+                adjustmentInputContainer.style.display = 'block';
+                adjustmentLabel.innerText = 'Adding Amount:';
+                adjustmentAmountInput.value = '';
+                adjustmentAmountInput.max = Number.MAX_SAFE_INTEGER;  // No limit on the entered amount
+                adjustmentAmountInput.oninput = function() {
+                    const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                        updateRemainingAmount();
+                };
+            };
+
+            document.getElementById('partialpayment').onclick = function() {
+                adjustmentInputContainer.style.display = 'block';
+                adjustmentLabel.innerText = 'Partial Payment Amount:';
+                adjustmentAmountInput.max = requestedCostNumber - 0.01; // Set max to less than the requested cost
+                adjustmentAmountInput.oninput = function() {
+                    const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                    if (adjustmentAmount >= requestedCostNumber) {
+                        alert('Partial payment amount cannot be equal to or greater than the requested amount.');
+                        adjustmentAmountInput.value = '';
+                    } else {
+                        updateRemainingAmount();
+                    }
+                };
+            };
+
+            document.getElementById('noAdjustmentOption').onclick = function() {
+                adjustmentInputContainer.style.display = 'none';
+                remainingAmountSpan.innerText = totalamount.toFixed(2); // Reset remaining amount
+            };
+
+            // Attach the confirm payment handler
+            document.getElementById('confirmPaymentButton').onclick = function() {
+                confirmPayment(status, orderId, current_amount, totalamount, remainingAmountSpan.innerText);
+            };
+        })
+        .catch(error => {
+            console.error('Error fetching supplier and amount:', error);
+        });
+}
+
+function confirmPayment(status, orderId, current_amount, totalamount, remainingAmount) {
+    const selectedOption = document.querySelector('input[name="paymentOption"]:checked').value;
+    let adjustmentAmount = 0;
+
+    if (selectedOption === 'adjustment' && current_amount > 0) {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+        if (adjustmentAmount > current_amount) {
+            alert('Adjustment amount cannot exceed the current amount.');
+            return;
+        }
+    } else if (selectedOption === 'payBalance') {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+       
+    } else if (selectedOption === 'partialpayment') {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+        if (adjustmentAmount >= requestedcost) {
+            alert('Partial payment amount cannot be equal to or greater than the requested amount.');
+            return;
+        }
+    }
+
+    let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+    let data = { 
+        status: status, 
+        orderId: orderId, 
+        selectedOption: selectedOption, 
+        adjustmentAmount: adjustmentAmount,
+        remainingAmount: parseFloat(remainingAmount)
+    };
+
+    console.log(data);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Status update successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.reload();
+    });
 }
 </script>
 @endsection
