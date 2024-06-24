@@ -65,7 +65,7 @@
           </label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="paymentOption" id="partialpayment" value="noAdjustment">
+          <input class="form-check-input" type="radio" name="paymentOption" id="partialpayment" value="partialpayment">
           <label class="form-check-label" for="partialpayment">
           Partial payment
           </label>
@@ -1179,12 +1179,12 @@
                         @endphp
                         @if ($hasPermission)
                         @if ($vehicles->payment_status === 'Payment Initiated')
-                        <div style="display: flex; gap: 10px;">
+                        <!-- <div style="display: flex; gap: 10px;">
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
                         <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
-                        </div>
+                        </div> -->
                         @endif
                         @endif
                         {{-- For Incoming Confirm  --}}
@@ -2866,10 +2866,6 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
        
     } else if (selectedOption === 'partialpayment') {
         adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
-        if (adjustmentAmount >= requestedcost) {
-            alert('Partial payment amount cannot be equal to or greater than the requested amount.');
-            return;
-        }
     }
 
     let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';

@@ -776,6 +776,15 @@ public function getBrandsAndModelLines(Request $request)
         $updateponum = PurchasingOrder::find($purchasingOrderId);
         $updateponum->po_number = $request->input('po_number');
         $updateponum->save();
+        $supplier_exists = SupplierAccount::where('suppliers_id', $vendors_id)->exists();
+        if (!$supplier_exists) {
+        $supplier_created = New SupplierAccount();
+        $supplier_created->opening_balance = 0;
+        $supplier_created->current_balance = 0;
+        $supplier_created->currency = "AED";
+        $supplier_created->suppliers_id = $vendors_id;
+        $supplier_created->save();
+        }
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
     /**
@@ -794,6 +803,7 @@ public function getBrandsAndModelLines(Request $request)
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
         $vendorPaymentAdjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)
+        ->where('status', '!=', 'Paid')
         ->select('type', DB::raw('SUM(totalamount) as total_amount', 'amount', DB::raw('SUM(totalamount) as total_adjusted_amount')))
         ->groupBy('type')
         ->get();  
@@ -1760,6 +1770,13 @@ public function paymentintconfirm($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+            $totalCost = VehiclePurchasingCost::where('vehicles_id', $vehicle->id)->value('unit_price');
+            $paymentinti = New PurchasedOrderPaidAmounts();
+            $paymentinti->amount = $totalCost;
+            $paymentinti->purchasing_order_id = $vehicle->purchasing_order_id;
+            $paymentinti->created_by = auth()->user()->id;
+            $paymentinti->status = "Request For Payment";
+            $paymentinti->save();
         return redirect()->back()->with('success', 'Payment Initiated Request confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -2081,19 +2098,28 @@ public function purchasingallupdateStatusrel(Request $request)
         ->where('purchasing_order_id', $id)
         ->get();
     if ($status == 'Approved') {
-        $vendorpaymentadjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)->latest()->first();
-        if($vendorpaymentadjustments->type == "Adjustment")
-        {
-            $supplieracc = SupplierAccount::where('suppliers_id', $vendorpaymentadjustments->supplier_account_id)->first();
-
-        }
-        elseif($vendorpaymentadjustments->type == "Pay Balance")
-        {
-          
-        }
-        else
-        {
-          
+        $PurchasingOrder = PurchasingOrder::find($id);
+        $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
+        if ($supplieracc) {
+            $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Suggested Payment')
+                ->sum('amount');
+            $supplieracc->current_balance += $paymentad;
+            $supplieracc->save();
+            PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Suggested Payment')
+                ->update(['status' => 'Paid']);
+            VendorPaymentAdjustments::where('purchasing_order_id', $id)
+                ->where('status', 'pending')
+                ->update(['status' => 'Paid']);
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $id;
+            $supplieraccount->supplier_account_id = $supplieracc->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $PurchasingOrder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
         }
         } 
     foreach ($vehicles as $vehicle) {
@@ -2287,6 +2313,7 @@ public function allpaymentreqssfinpay(Request $request)
             $selectedOption =  $request->input('selectedOption');
             $adjustmentAmount =  $request->input('adjustmentAmount');
             $remainingAmount = $request->input('remainingAmount');
+            $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
             if($selectedOption == 'adjustment')
             {
                 $VendorPaymentAdjustments = New VendorPaymentAdjustments();
@@ -2295,14 +2322,20 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
                 $VendorPaymentAdjustments->purchasing_order_id = $id;
                 $VendorPaymentAdjustments->created_by = auth()->user()->id;
-                $VendorPaymentAdjustments->totalamount = $remainingAmount;
+                $VendorPaymentAdjustments->totalamount = $adjustmentAmount + $remainingAmount;
+                $VendorPaymentAdjustments->remaining_amount = $remainingAmount;
                 $VendorPaymentAdjustments->save();
-                $totalcost = $adjustmentAmount;
+                $totalcost = $intialamount;
+                $paidaccount = New PurchasedOrderPaidAmounts();
+                $paidaccount->amount = $adjustmentAmount + $remainingAmount;
+                $paidaccount->created_by = auth()->user()->id;
+                $paidaccount->purchasing_order_id = $purchasedorder->id;
+                $paidaccount->status = "Suggested Payment";
+                $paidaccount->save();
             }
             elseif($selectedOption == 'payBalance')
             {
                 $supplier = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
-                $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
                 $VendorPaymentAdjustments = New VendorPaymentAdjustments();
                 $VendorPaymentAdjustments->amount = $adjustmentAmount - $intialamount;
                 $VendorPaymentAdjustments->type = "Pay Balance";
@@ -2310,14 +2343,39 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->purchasing_order_id = $id;
                 $VendorPaymentAdjustments->created_by = auth()->user()->id;
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
+                $VendorPaymentAdjustments->remaining_amount = $intialamount;
                 $VendorPaymentAdjustments->save();
-                $totalcost = $adjustmentAmount;
+                $totalcost = $intialamount;
+                $paidaccount = New PurchasedOrderPaidAmounts();
+                $paidaccount->amount = $adjustmentAmount;
+                $paidaccount->created_by = auth()->user()->id;
+                $paidaccount->purchasing_order_id = $purchasedorder->id;
+                $paidaccount->status = "Suggested Payment";
+                $paidaccount->save();
+            }
+            elseif($selectedOption == 'partialpayment')
+            {
+                $VendorPaymentAdjustments = New VendorPaymentAdjustments();
+                $VendorPaymentAdjustments->amount = $intialamount;
+                $VendorPaymentAdjustments->type = "Partial Payment";
+                $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
+                $VendorPaymentAdjustments->purchasing_order_id = $id;
+                $VendorPaymentAdjustments->created_by = auth()->user()->id;
+                $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
+                $VendorPaymentAdjustments->remaining_amount = $intialamount - $adjustmentAmount;
+                $VendorPaymentAdjustments->save();
+                $paidaccount = New PurchasedOrderPaidAmounts();
+                $paidaccount->amount = $adjustmentAmount;
+                $paidaccount->created_by = auth()->user()->id;
+                $paidaccount->purchasing_order_id = $purchasedorder->id;
+                $paidaccount->status = "Suggested Payment";
+                $paidaccount->save();
+                $totalcost = $intialamount;
             }
             else
             {
-                $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
                 $VendorPaymentAdjustments = New VendorPaymentAdjustments();
-                $VendorPaymentAdjustments->amount = $intialamount;
+                $VendorPaymentAdjustments->amount = $adjustmentAmount;
                 $VendorPaymentAdjustments->type = "No Adjustment";
                 $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
                 $VendorPaymentAdjustments->purchasing_order_id = $id;
@@ -2325,6 +2383,13 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $intialamount;
                 $VendorPaymentAdjustments->save();
                 $totalcost = $intialamount;
+                $adjustmentAmount = $intialamount;
+                $paidaccount = New PurchasedOrderPaidAmounts();
+                $paidaccount->amount = $adjustmentAmount;
+                $paidaccount->created_by = auth()->user()->id;
+                $paidaccount->purchasing_order_id = $purchasedorder->id;
+                $paidaccount->status = "Suggested Payment";
+                $paidaccount->save();
             }
             PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->update(['status' => 'Initiated Payment']);
             $currency = $purchasedorder->currency;
@@ -2361,7 +2426,6 @@ public function allpaymentreqssfinpay(Request $request)
         $supplieraccountchange->save();
         }
         $supplieraccount = new SupplierAccountTransaction();
-        $supplieraccount->totalamount = $totalcost;
         $supplieraccount->transaction_type = "Credit";
         $supplieraccount->purchasing_order_id = $purchasedorder->id;
         $supplieraccount->supplier_account_id = $supplieraccountchange->id;
