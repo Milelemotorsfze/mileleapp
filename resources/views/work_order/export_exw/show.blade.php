@@ -165,8 +165,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#comments_section"> Comments Section</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#data_history"> Data History</a>
-                            </li>                           
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
+                            </li>   
+                            <li class="nav-item">
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+                            </li>                          
                         </ul>
                     </div>
                     </br>
@@ -930,12 +933,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="data_history">
+                        <div class="tab-pane fade" id="wo_data_history">
                             <div class="card-header text-center">
-                                <center style="font-size:12px;">Data History</center>
+                                <center style="font-size:12px;">WO Data History</center>
                             </div>
                             <div class="card-body">
                                 @include('work_order.export_exw.data_history')
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="wo_vehicle_data_history">
+                            <div class="card-header text-center">
+                                <center style="font-size:12px;">WO Vehicle Data History</center>
+                            </div>
+                            <div class="card-body">
+                                @include('work_order.export_exw.vehicle_data_history')
                             </div>
                         </div>
                     </div>

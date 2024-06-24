@@ -930,4 +930,8 @@ class WorkOrderController extends Controller
            }
         }
     }
+    public function vehicleDataHistory($id) {
+        $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
+        return view('work_order.export_exw.show_vehicle_history',compact('datas'));
+    }
 }

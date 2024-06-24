@@ -103,6 +103,10 @@ class WorkOrder extends Model
     {
         return $this->hasMany(WOVehicles::class,'work_order_id','id');
     }
+    public function vehiclesWithTrashed()
+    {
+        return $this->hasMany(WOVehicles::class, 'work_order_id', 'id')->withTrashed();
+    }
     public function comments()
     {
         return $this->hasMany(WOComments::class,'work_order_id','id');

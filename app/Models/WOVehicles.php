@@ -67,4 +67,16 @@ class WOVehicles extends Model
     {
         return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
     }
+    public function CreatedBy()
+    {
+        return $this->hasOne(User::class,'id','created_by');
+    }
+    public function UpdatedBy()
+    {
+        return $this->hasOne(User::class,'id','updated_by');
+    }
+    public function DeletedBy()
+    {
+        return $this->hasOne(User::class,'id','deleted_by');
+    }
 }
