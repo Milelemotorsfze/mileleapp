@@ -54,8 +54,31 @@
                         <td>{{ $dataHistory->user->name }}</td> 
                         <td>{{ $dataHistory->type }}</td>
                         <td>{{ $dataHistory->field_name }}</td>
+                        @if(in_array($dataHistory->field_name, ['brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id']))
+                            <td>
+                                @if($dataHistory->old_value != '')
+                                    <a href="{{ url($dataHistory->old_value) }}" target="_blank">
+                                        <button class="btn btn-primary btn-style">View</button>
+                                    </a>
+                                    <a href="{{ url($dataHistory->old_value) }}" download>
+                                        <button class="btn btn-info btn-style">Download</button>
+                                    </a>
+                                @endif
+                            </td>
+                            <td> 
+                                @if($dataHistory->new_value != '')
+                                    <a href="{{ url($dataHistory->new_value) }}" target="_blank">
+                                        <button class="btn btn-primary btn-style">View</button>
+                                    </a>
+                                    <a href="{{ url($dataHistory->new_value) }}" download>
+                                        <button class="btn btn-info btn-style">Download</button>
+                                    </a>
+                                @endif
+                            </td>
+                        @else
                         <td>{{ $dataHistory->old_value }}</td>
                         <td>{{ $dataHistory->new_value }}</td>
+                        @endif
                     </tr>
                 @endforeach
             @else
@@ -67,3 +90,4 @@
         </table>
     </div>
 </div>
+

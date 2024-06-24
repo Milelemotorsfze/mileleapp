@@ -2,22 +2,23 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.btn-style {
+		font-size:0.7rem!important;
+		line-height: 0.1!important;
+	}
 	.comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 30px; /* Indent replies by 40px */
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        }
-        .replies {
-            margin-left: 30px; /* Indent nested replies by 40px */
-        }
-	/* .border-top {
-		border-top: 1px solid #b3b3b3!important;
-	} */
+		margin-bottom: 20px;
+	}
+	.reply {
+		margin-left: 30px; 
+		margin-top: 10px;
+	}
+	.reply-button {
+		margin-top: 10px;
+	}
+	.replies {
+		margin-left: 30px; 
+	}
 	.currencyClass {
 		padding-top:5px!important;
 	}
@@ -31,20 +32,10 @@
     }
 	th {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
 	td {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
-	/* td {
-		padding-top: calc(.47rem + 1px);
-		padding-bottom: calc(.47rem + 1px);
-		margin-bottom: 0;
-		font-size: inherit;
-		line-height: 1.5;
-		font-weight: 500;
-	} */
     #work-order-history-table td, th{
         font-size: 14px !important;
     }
@@ -54,14 +45,10 @@
     #switchToDropdown {
         display: none;
     }
-    /* label{
-        font-size:12px!important;
-    } */
 	.addon_btn_round {
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -77,7 +64,6 @@
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -89,22 +75,20 @@
 		cursor: pointer;
 		padding-top:1px!important;
 	}
-	.btn_round
-	{
-	width: 20px!important;
-	height: 14px!important;
-	display: inline-block;
-	/* border-radius: 50%; */
-	text-align: center;
-	line-height: 10px!important;
-	margin-left: 0px!important;
-	margin-top: 0px!important;
-	border: 1px solid #ccc;
-	color:#fff;
-	background-color: #fd625e;
-	border-radius:5px;
-	cursor: pointer;
-	padding-top:1px!important;
+	.btn_round {
+		width: 20px!important;
+		height: 14px!important;
+		display: inline-block;
+		text-align: center;
+		line-height: 10px!important;
+		margin-left: 0px!important;
+		margin-top: 0px!important;
+		border: 1px solid #ccc;
+		color:#fff;
+		background-color: #fd625e;
+		border-radius:5px;
+		cursor: pointer;
+		padding-top:1px!important;
 	}
 	.btn_round_big {
 		margin-top: 37px!important; padding-top: 8px!important;
@@ -112,96 +96,20 @@
 			color:#fff; background-color: #fd625e; border-radius:5px; cursor: pointer; padding-top:7px;
 	}
 	.btn_round_big:hover {
-			color: #fff; background: #fd625e; border: 1px solid #fd625e;
-			}
-			/* .comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        } */
-
-			/* body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-} */
-
-/* .comment-section {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-}
-
-.comment-box {
-    display: flex;
-    flex-direction: column;
-}
-
-#comment-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    padding: 10px;
-    background: #007BFF;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-}  
-
-button:hover {
-    background: #0056b3;
-}
-
-#comment-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 20px;
-}
-
-.comment-item {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-}
-
-.mention {
-    color: #007BFF;
-    font-weight: bold;
-} */
-.card-header {
-	background-color:#e6f1ff!important;
-}
-.card-body {
-	background-color:#fafcff!important;
-}
-.no-border {
-	border:none!important;
-}
-
-     .select2-container {
+		color: #fff; background: #fd625e; border: 1px solid #fd625e;
+	}
+	.card-header {
+		background-color:#e6f1ff!important;
+	}
+	.card-body {
+		background-color:#fafcff!important;
+	}
+	.no-border {
+		border:none!important;
+	}
+    .select2-container {
         width: 100% !important;
     }
-
 </style>
 @include('layouts.formstyle')
 @section('content')
@@ -227,13 +135,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<div class="col-xxl-12 col-lg-12 col-md-12">
 		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 	</div>
-	<!-- <form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
-		@csrf -->
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
     @if(isset($workOrder))
         @method('PUT')
     @endif
+		<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fa fa-check" aria-hidden="true"></i> Sales Support Data Confirmation
+		</a>
 		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
 		<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
 		</a>
@@ -249,6 +158,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			<div class="card-body">
 				<div class="row">
 					<input type="hidden" name="customerCount" id="customerCount" value={{$customerCount ?? ''}}>
+					<input type="hidden" name="wo_id" id="wo_id" value={{ isset($workOrder) ? $workOrder->id : '' }}>
 					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -261,26 +171,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 							<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
 								placeholder="Enter SO Number" value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" 
-								autocomplete="so_number" autofocus onkeyup="setWo()">
+								autocomplete="so_number" autofocus onkeyup="setWo()" @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<!-- <select name="batch" id="batch" class="form-control widthinput" autofocus>
-								<option value="">Choose Batch</option>
-								<option value="Batch 1">Batch 1</option>
-								<option value="Batch 2">Batch 2</option>
-								<option value="Batch 3">Batch 3</option>
-								<option value="Batch 4">Batch 4</option>
-								<option value="Batch 5">Batch 5</option>
-								<option value="Batch 6">Batch 6</option>
-								<option value="Batch 7">Batch 7</option>
-								<option value="Batch 8">Batch 8</option>
-								<option value="Batch 9">Batch 9</option>
-								<option value="Batch 10">Batch 10</option>
-							</select> -->
 							<select name="batch" id="batch" class="form-control widthinput" autofocus>
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 10; $i++)
@@ -302,11 +199,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
+                            <option value="{{$customer->customer_name ?? ''}}"
+							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
-                        </select>
-                        <input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
-                            class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
+                        </select> 
+						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
+							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
                     <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
                         <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
@@ -351,7 +249,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
-							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number"
+							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
 							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
 					</div>
 					@if(isset($type) && $type == 'export_exw')
@@ -399,22 +297,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
-						<!-- <fieldset style="margin-top:5px;" class="radio-div-container">
-							<div class="row some-class">
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" />
-									<label for="air">Air</label>
-								</div>
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" />
-									<label for="sea">Sea</label>
-								</div>
-								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" />
-									<label for="road">Road</label>
-								</div>
-							</div>
-						</fieldset> -->
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-4 col-lg-4 col-md-4">
@@ -454,11 +336,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
 							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
-							<!-- <select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
-								@foreach($airlines as $airline)
-								<option value="{{$airline->name}}">{{$airline->name}}</option>
-								@endforeach
-							</select> -->
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 									<option value="{{$airline->name}}" 
@@ -520,23 +397,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<div class="col-lg-12 col-md-12 col-sm-12 mt-2">
 								<span class="fw-bold col-form-label text-md-end" id="brn_file_label"></span>
 								<div id="brn_file_preview">
-									@if(isset($candidate->candidateDetails->image_path))
+									@if(isset($workOrder->brn_file))
 									<div id="brn_file_preview1">
 										<div class="row">
 											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
+												<h6 class="fw-bold text-center mb-1" style="float:left;">BRN File</h6>
 											</div>
 											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
 												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
+												<a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download class="text-white">
 												Download
 												</a>
 												</button>
 												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="PASSPORT"> Delete</button>
+													data-file-type="BRN_File"> Delete</button>
 											</div>
 										</div>
-										<iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+										<iframe src="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" alt="BRN File"></iframe>
 									</div>
 									@endif
 								</div>
@@ -585,20 +462,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
 						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
+							<input type="text" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
 							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
+								<span class="input-group-text widthinput" id="amount_received_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
+							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
 							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
+								<span class="input-group-text widthinput" id="balance_amount_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
@@ -763,23 +640,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="signed_pfi_label"></span>
                         <div id="signed_pfi_preview">
-                            @if(isset($candidate->candidateDetails->signed_contract))
+                            @if(isset($workOrder->signed_pfi))
                             <div id="signed_pfi_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">signed_contract</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed PFI</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" download class="text-white">
+                                        <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="signed_contract"> Delete</button>
+                                            data-file-type="Signed_PFI"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" alt="signed_contract"></iframe>
+                                <iframe src="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" alt="Signed PFI"></iframe>
                             </div>
                             @endif
                         </div>
@@ -787,23 +664,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="signed_contract_label"></span>
                         <div id="signed_contract_preview">
-                            @if(isset($candidate->candidateDetails->payment_receipts))
+                            @if(isset($workOrder->signed_contract))
                             <div id="signed_contract_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">payment_receipts</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed Contract</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" download class="text-white">
+                                        <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="payment_receipts"> Delete</button>
+                                            data-file-type="Signed_Contract"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" alt="payment_receipts"></iframe>
+                                <iframe src="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" alt="Signed Contract"></iframe>
                             </div>
                             @endif
                         </div>
@@ -811,23 +688,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="payment_receipts_label"></span>
                         <div id="payment_receipts_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->payment_receipts))
                             <div id="payment_receipts_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Payment Receipts</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Payment_Receipts"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" alt="Payment Receipts"></iframe>
                             </div>
                             @endif
                         </div>
@@ -835,23 +712,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="noc_label"></span>
                         <div id="noc_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->noc))
                             <div id="noc_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">NOC</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="NOC"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/noc/' . $workOrder->noc) }}" alt="NOC"></iframe>
                             </div>
                             @endif
                         </div>
@@ -859,23 +736,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_trade_license_label"></span>
                         <div id="enduser_trade_license_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_trade_license))
                             <div id="enduser_trade_license_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Trade License</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Trade_License"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" alt="Enduser Trade License"></iframe>
                             </div>
                             @endif
                         </div>
@@ -883,23 +760,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_passport_label"></span>
                         <div id="enduser_passport_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_passport))
                             <div id="enduser_passport_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Passport</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Passport"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" alt="Enduser Passport"></iframe>
                             </div>
                             @endif
                         </div>
@@ -907,23 +784,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="enduser_contract_label"></span>
                         <div id="enduser_contract_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->enduser_contract))
                             <div id="enduser_contract_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Contract</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Enduser_Contract"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" alt="Enduser Contract"></iframe>
                             </div>
                             @endif
                         </div>
@@ -931,23 +808,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                         <span class="fw-bold col-form-label text-md-end" id="vehicle_handover_person_id_label"></span>
                         <div id="vehicle_handover_person_id_preview">
-                            @if(isset($candidate->candidateDetails->noc_file))
+                            @if(isset($workOrder->vehicle_handover_person_id))
                             <div id="vehicle_handover_person_id_preview1">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Vehicle Handover Person ID</h6>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                         <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                        <a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
+                                        <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download class="text-white">
                                         Download
                                         </a>
                                         </button>
                                         <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-                                            data-file-type="EMIRATESID"> Delete</button>
+                                            data-file-type="Vehicle_Handover_Person_ID"> Delete</button>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
+                                <iframe src="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" alt="Vehicle Handover Person ID"></iframe>
                             </div>
                             @endif
                         </div>
@@ -962,6 +839,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 			</div>
 		</div>
+		<input type="hidden" id="brn-file-file-delete" name="is_brn_file_delete" value="">
+		<input type="hidden" id="signed-pfi-delete" name="is_signed_pfi_delete" value="">
+		<input type="hidden" id="signed-contract-delete" name="is_signed_contract_delete" value="">   
+		<input type="hidden" id="payment-receipts-file-delete" name="is_payment_receipts_delete" value=""> 
+		<input type="hidden" id="noc-file-delete" name="is_noc_delete" value="">
+		<input type="hidden" id="enduser-trade-license-delete" name="is_enduser_trade_license_delete" value="">
+		<input type="hidden" id="enduser-passport-delete" name="is_enduser_passport_delete" value="">   
+		<input type="hidden" id="enduser-contract-file-delete" name="is_enduser_contract_delete" value=""> 
+		<input type="hidden" id="vehicle-handover-person-id-file-delete" name="is_vehicle_handover_person_id_delete" value=""> 
 	</form>
 	</br>
 	<div class="card">
@@ -1017,11 +903,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var newCustomerEmail = '';
 	var newCustomerContact = '';
 	var newCustomerAddress = '';
+	var selectedCustomerEmail = '';
+	var selectedCustomerContact = '';
+	var selectedCustomerAddress = '';
 	var onChangeSelectedVins = [];
+	@if(isset($workOrder))
+        var workOrder = {!! json_encode($workOrder) !!};
+    @else
+        var workOrder = null;
+    @endif
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	$(document).ready(function () { 
-        hideDependentTransportType();
-		$("#boe-div").hide();
 		// SELECT 2 START
 			$('#customer_name').select2({
 				allowClear: true,
@@ -1030,6 +922,74 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 // dropdownAutoWidth : true,
                 // width: 'auto'
 			});
+
+
+			if(workOrder == null || workOrder.deposit_received_as == null) {
+				$("#amount-received-div").hide();
+				$("#balance-amount-div").hide();
+				$("#deposit-aganist-vehicle-div").hide();
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'total_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").hide();
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").show();
+				setDepositAganistVehicleDropdownOptions();
+			}
+
+			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
+			workOrder.enduser_trade_license != null || workOrder.enduser_passport != null || workOrder.enduser_contract != null || workOrder.vehicle_handover_person_id != null )) {
+				$('.preview-div').attr('hidden', false);
+			}
+			if(workOrder != null && (workOrder.brn_file != null )) {
+				$('.brn-preview-div').attr('hidden', false);
+			}
+			if (workOrder !== null && workOrder.customer_reference_id === null && workOrder.customer_name !== null) {
+				checkValue();
+				$('#textInput').val(workOrder.customer_name);
+			} else if (workOrder !== null && (workOrder.customer_reference_id !== null || workOrder.customer_reference_id === 0) && workOrder.customer_name !== null) {
+				$("#customer_name").val(workOrder.customer_name).change();
+			}
+			if(workOrder == null || workOrder.transport_type == null) {
+				hideDependentTransportType();
+			}
+			if(workOrder !== null) {
+				$('#customer_address').val(workOrder.customer_address);
+				$('#customer_email').val(workOrder.customer_email);
+				$('#customer_company_number').val(workOrder.customer_company_number);
+				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
+				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
+				if(workOrder.transport_type == 'air') {
+					airRelation();
+				}
+				else if(workOrder.transport_type == 'sea') {
+					seaRelation();
+				}
+				else if(workOrder.transport_type == 'road') {
+					roadRelation();
+					$('#transporting_driver_contact_number').val(workOrder.transporting_driver_contact_number);					
+				}
+			}
+			
+			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
+				for(var i=0; i<workOrder.vehicles.length; i++) {
+					drawTableRow(workOrder.vehicles[i]);
+					// Find the option and disable it
+					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
+					// Refresh the select2 control
+					$("#vin_multiple").trigger('change.select2');
+					addedVins.push(workOrder.vehicles[i].vin);
+				}
+				addChild();
+			}
+			else {
+				$("#boe-div").hide();
+			}
+			
 			$('#vin_multiple').select2({
 				allowClear: true,
 				// maximumSelectionLength: 1,
@@ -1048,6 +1008,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
+			
+			// var input = document.querySelector("#customer_company_number_main");
+			// var iti = window.intlTelInput(input, {
+			// 	initialCountry: "auto",
+			// 	nationalMode: false,
+			// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // just for formatting/placeholders etc
+			// });
 			var customer_company_number = window.intlTelInput(document.querySelector("#customer_company_number"), {
 				separateDialCode: true,
 				preferredCountries:["ae"],
@@ -1073,70 +1040,83 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// TRANSPORT TYPE ONCHANGE START
 			$('.transport_type').click(function() {
 				if($(this).val() == 'air') {
-					$("#airline-div").show();
-					$('#airline').select2({
-						allowClear: true,
-						maximumSelectionLength: 1,
-						placeholder:"Choose Airline",
-					});
-					$("#airway-bill-div").show();
-					$("#brn-div").hide();
-					$("#brn-file-div").show();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#shippingline-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").show();
-					$("#transportation-company-details-div").hide();
+					airRelation();
 				}
 				else if($(this).val() == 'sea') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").show();
-					$("#forward-import-code-div").show();
-					$("#brn-div").show();
-					$("#brn-file-div").show();
-					$("#container-number-div").show();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").hide();
+					seaRelation();
 				}
 				else if($(this).val() == 'road') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#brn-div").hide();
-					$("#brn-file-div").hide();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").show();
-					$("#transportation-company-div").show();
-					$("#transporting-driver-contact-number-div").show();				
-					var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-						separateDialCode: true,
-						preferredCountries:["ae"],
-						hiddenInput: "full",
-						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-					});	
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").show();
+					roadRelation();
 				}
 			});
+
+			// TRANSPORT TYPE AIR RELATED DATA
+			function airRelation() {
+				$("#airline-div").show();
+				$('#airline').select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder:"Choose Airline",
+				});
+				$("#airway-bill-div").show();
+				$("#brn-div").hide();
+				$("#brn-file-div").show();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#shippingline-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").show();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE SEA RELATED DATA
+			function seaRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").show();
+				$("#forward-import-code-div").show();
+				$("#brn-div").show();
+				$("#brn-file-div").show();
+				$("#container-number-div").show();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE ROAD RELATED DATA
+			function roadRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#brn-div").hide();
+				$("#brn-file-div").hide();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").show();
+				$("#transportation-company-div").show();
+				$("#transporting-driver-contact-number-div").show();				
+				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});	
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").show();
+			}
 		// TRANSPORT TYPE ONCHANGE END
 
 		// CUSTOMER NAME ONCHANGE START
 			$('#customer_name').on('change', function() {
-				var selectedCustomerName = $(this).val();
+				var selectedCustomerName = $(this).val(); 
 				setCustomerRelations(selectedCustomerName);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
 		// DEPOSIT RECEIVED AS ONCHANGE START
-			$('.deposit_received_as').click(function() {
+			$('.deposit_received_as').click(function() { 
 				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
 				if (selectedDepositReceivedValue == 'total_deposit') {
 					$("#amount-received-div").show();
@@ -1171,7 +1151,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 
 				// Enable the VIN options before removing the row
-				var selectedVINs = selectElement.val();
+				var selectedVINs = selectElement.val(); 
 				if (selectedVINs) {
 					selectedVINs.forEach(function(vin) {
 						$('select option[value="' + vin + '"]').prop('disabled', false);
@@ -1199,12 +1179,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				onChangeSelectedVins = $(this).val(); // Get selected VINs
 				var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 				if (onChangeSelectedVins && onChangeSelectedVins.length > 0) {
-					if(index == 1) {
-						addAddon();
-					}
-					else {
+					// if(index == 1) {
+					// 	addAddon();
+					// }
+					// else {
 						resetAddonDropdown();
-					}
+					// }
 					
 				} else {
 					// Clear addons dropdown if no VINs are selected
@@ -1398,7 +1378,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			}).catch(error => {
 				// Optionally display the error message to the user
-				// alert(`Error: ${error.message}`);
 			});
 		});
 	});
@@ -1438,7 +1417,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         $.validator.addMethod("validAddress", function(value, element) {
             return this.optional(element) || !/\s\s+/.test(value);
         }, "No more than one consecutive space is allowed in the address");
-
+		$.validator.addMethod("uniqueSO", 
+	       function(value, element) {
+	           var result = false;
+				var WoId = $("#wo_id").val(); 
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',so_number: value,id:WoId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This SO Number is already taken! Try another."
+	   );
         // $.validator.addMethod("WONumberFormat", function(value, element) {
         // 	// Regular expression to match the format WO- followed by exactly 6 digits
         // 	return this.optional(element) || /^WO-\d{6}$/.test(value);
@@ -1461,6 +1457,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     noSpaces: true,
                     SONumberFormat: true,
                     notSO000000: true,
+					uniqueSO: true,
                 },
                 batch: {
                     required: true,
@@ -1798,14 +1795,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	}
 
 	function setDepositBalance() {
-			var totalAmount = $('#so_total_amount').val();
-			var amountReceived = $('#amount_received').val();
-			var balanceAmount = '';
-			if(totalAmount != '' && amountReceived != '') {
-				balanceAmount = Number(totalAmount) - Number(amountReceived);
-			}
-			document.getElementById('balance_amount').value = balanceAmount;
+		var totalAmount = $('#so_total_amount').val();
+		var amountReceived = $('#amount_received').val();
+		var balanceAmount = '';
+		if(totalAmount != '' && amountReceived != '') {
+			balanceAmount = Number(totalAmount) - Number(amountReceived);
 		}
+		document.getElementById('balance_amount').value = balanceAmount;
+	}
 		
     function addComment(parentId = null) {
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
@@ -1866,9 +1863,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					_token: '{{ csrf_token() }}'
 				},
 				dataType: 'json',
-				success: function(response) {console.log(response.charges);
+				success: function(response) {
 					// Iterate over each dynamicselect2 element to update its options
-					$('.dynamicselect2').each(function() { 
+					$('.addondynamicselect2').each(function() { 
 						var $dropdown = $(this);
 						var currentVal = $dropdown.val(); // Store current selected values
 
@@ -1911,7 +1908,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<div class="row">
 								<div class="col-xxl-12 col-lg-12 col-md-12">
 									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
-									<select name="addons[]" id="addons_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
 									</select>
 								</div>
@@ -2043,175 +2040,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				for (var j = 0; j < selectedVIN.length; j++) {
 					for (var i = 0; i < vins.length; i++) {
 						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
-							// Get the table body element by ID
-							var tableBody = document.querySelector('#myTable tbody');
-
-							var firstRow = document.createElement('tr');
-							firstRow.style.borderTop = '2px solid #a6a6a6';
-							var secondRow = document.createElement('tr');
-							var thirdRow = document.createElement('tr');
-							var lastRow = document.createElement('tr');
-
-							// First Row Elements
-							var removeIconCell = createCellWithRemoveButton();
-							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vehicle['+i+'][vin]');
-							vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
-							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','vehicle['+i+'][brand]');
-							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','vehicle['+i+'][variant]');
-							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','vehicle['+i+'][engine]');
-							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','vehicle['+i+'][model_description]');
-							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','vehicle['+i+'][model_year]');
-							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','vehicle['+i+'][model_year_to_mention_on_documents]');
-							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','vehicle['+i+'][steering]');
-							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','vehicle['+i+'][exterior_colour]');
-							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','vehicle['+i+'][interior_colour]');
-							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','vehicle['+i+'][warehouse]');
-							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','vehicle['+i+'][territory]');
-							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','vehicle['+i+'][preferred_destination]');
-							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','vehicle['+i+'][import_document_type]');
-							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','vehicle['+i+'][ownership_name]');
-							var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
-
-							// Append cells to the first row
-							firstRow.appendChild(removeIconCell);
-							firstRow.appendChild(vinCell);
-							firstRow.appendChild(brandCell);
-							firstRow.appendChild(variantCell);
-							firstRow.appendChild(engineCell);
-							firstRow.appendChild(modelDescriptionCell);
-							firstRow.appendChild(modelYearCell);
-							firstRow.appendChild(modelYearToMentionOnDocumentsCell);
-							firstRow.appendChild(steeringCell);
-							firstRow.appendChild(exteriorCell);
-							firstRow.appendChild(interiorColorCell);
-							firstRow.appendChild(warehouseCell);
-							firstRow.appendChild(territoryCell);
-							firstRow.appendChild(preferredDestinationCell);
-							firstRow.appendChild(importTypeCell);
-							firstRow.appendChild(ownershipCell);
-							firstRow.appendChild(CertificationPerVINCell);
-							// firstRow.style.borderTop = '1px solid #b3b3b3';
-
-							// Second Row Elements
-							var emptyLabelCell = document.createElement('td');
-							emptyLabelCell.colSpan = 1;
-							emptyLabelCell.textContent = '';
-
-							var modificationLabelCell = document.createElement('td');
-							modificationLabelCell.colSpan = 1;
-							modificationLabelCell.textContent = 'Modification/Jobs';
-
-							var modificationInputCell = document.createElement('td');
-							modificationInputCell.colSpan = 15;
-							var modificationInputElement = document.createElement('input');
-							modificationInputElement.name ='vehicle['+i+'][modification_or_jobs_to_perform_per_vin]';
-							modificationInputElement.type = 'text';
-							modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
-							modificationInputElement.style.border = 'none';
-							modificationInputElement.style.width = '100%';
-							modificationInputCell.appendChild(modificationInputElement);
-
-							// Append cells to the second row
-							secondRow.appendChild(emptyLabelCell);
-							secondRow.appendChild(modificationLabelCell);
-							secondRow.appendChild(modificationInputCell);
-
-							// Third Row Elements
-							var emptyLabelThirdRowCell = document.createElement('td');
-							emptyLabelThirdRowCell.colSpan = 1;
-							emptyLabelThirdRowCell.textContent = '';
-
-							var specialRequestLabelCell = document.createElement('td');
-							specialRequestLabelCell.colSpan = 1
-							specialRequestLabelCell.textContent = 'Special Request/Remarks';
-
-							var specialRequestInputCell = document.createElement('td');
-							specialRequestInputCell.colSpan = 15;
-							var specialRequestInputElement = document.createElement('input');
-							specialRequestInputElement.name ='vehicle['+i+'][special_request_or_remarks]';
-							specialRequestInputElement.type = 'text';
-							specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
-							specialRequestInputElement.style.border = 'none';
-							specialRequestInputElement.style.width = '100%';
-							specialRequestInputCell.appendChild(specialRequestInputElement);
-
-
-							// Append cells to the third row
-							thirdRow.appendChild(emptyLabelThirdRowCell);
-							thirdRow.appendChild(specialRequestLabelCell);
-							thirdRow.appendChild(specialRequestInputCell);
-
-							// Last Row Elements
-							var createAddon = createAddonCell();
-							createAddon.colSpan = 17;
-							// Append cells to the last row
-							lastRow.appendChild(createAddon);
-
-							// Append rows to the table body
-							tableBody.appendChild(firstRow);
-							tableBody.appendChild(secondRow);
-							tableBody.appendChild(thirdRow);
-
-							// Store the VIN in the first row's data attribute for easy retrieval on click
-							$(firstRow).data('vin', vins[i]?.vin ?? '');
-
-							// Store the vin in the third row's data attribute for easy retrieval on click
-							$(thirdRow).data('vin', vins[i]?.vin ?? '');
-
-							var allVehicleRows = [firstRow, secondRow, thirdRow];
-							// Gather data from all dynamically added addon input fields
-							var addonIndex = 1; // Initialize addon index for each vehicle
-							$('.addon_input_outer_row').each(function() {
-								var addonId = $(this).attr('id').split('_')[2];
-								var addonValue = $(`#addons_${addonId}`).val();
-								var addonQuantity = $(`#addon_quantity_${addonId}`).val();
-								var addonDescription = $(`#addon_description_${addonId}`).val();
-
-								var removeAddonCell = createAddonRemoveButton();
-								// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
-								var addonRow = document.createElement('tr');
-
-								// Addon Row Label
-								var serviceBreakdownLabelCell = document.createElement('td');
-								serviceBreakdownLabelCell.colSpan = 1;
-								serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-								// Addon Row Elements
-								var addonValueCell = document.createElement('td');
-								addonValueCell.colSpan = 2;
-								addonValueCell.textContent = addonValue;
-
-								var addonQuantityCell = document.createElement('td');
-								addonQuantityCell.colSpan = 1;
-								addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+i+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+i+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
-
-								var addonDescriptionCell = document.createElement('td');
-								addonDescriptionCell.colSpan = 14;
-								addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+i+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
-
-								// Append cells to the addon row
-								addonRow.appendChild(removeAddonCell);
-								addonRow.appendChild(serviceBreakdownLabelCell);
-								addonRow.appendChild(addonValueCell);
-								addonRow.appendChild(addonQuantityCell);
-								addonRow.appendChild(addonDescriptionCell);
-								// Insert the new row into the array
-								allVehicleRows.push(addonRow);
-								// Append the addon row after the third row
-								thirdRow.insertAdjacentElement('afterend', addonRow);
-								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
-								addonIndex = addonIndex+1;
-							});
-							tableBody.appendChild(lastRow);
-							allVehicleRows.push(lastRow);
-							$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+							var data = { 
+								id: '',
+								vehicle_id : vins[i]?.id ?? '',
+								vin: vins[i].vin ?? '',
+								brand : vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '',
+								variant: vins[i]?.variant?.name ?? '',
+								engine : vins[i]?.engine ?? '',
+								model_description: vins[i]?.variant?.model_detail ?? '',
+								model_year : vins[i]?.variant?.my ?? '',
+								model_year_to_mention_on_documents: vins[i]?.variant?.my ?? '',
+								steering : vins[i]?.variant?.steering ?? '',
+								exterior_colour: vins[i]?.exterior?.name ?? '',
+								interior_colour : vins[i]?.interior?.name ?? '',
+								warehouse: vins[i]?.warehouse_location?.name ?? '',
+								territory : vins[i]?.territory ?? '',
+								preferred_destination: '',
+								import_document_type : vins[i]?.document?.import_type ?? '',
+								ownership_name: vins[i]?.document?.ownership ?? '',
+								certification_per_vin: '',
+								modification_or_jobs_to_perform_per_vin: '',
+								special_request_or_remarks: '',
+								shipment: '',
+							};
+							drawTableRow(data);
 						}
 					}
 				}
-				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
 				if(index > 0) {
 					// Append selectedVIN data as dropdown option for all dynamicselect2 class
-					$(".dynamicselect2").each(function() {
-						var selectElement = $(this);
+					$(".dynamicselect2").each(function() { 
+						var selectElement = $(this);  
 						selectedVIN.forEach(function(vin) {
 							if (selectElement.find(`option[value='${vin}']`).length === 0) {
 								selectElement.append(`<option value="${vin}">${vin}</option>`);
@@ -2231,6 +2091,178 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
+		function drawTableRow(data) {
+			// Get the table body element by ID
+			var tableBody = document.querySelector('#myTable tbody');
+
+			var firstRow = document.createElement('tr');
+			firstRow.style.borderTop = '2px solid #a6a6a6';
+			firstRow.className = 'first-row';
+			var secondRow = document.createElement('tr');
+			var thirdRow = document.createElement('tr');
+			var lastRow = document.createElement('tr');
+
+			// First Row Elements
+			var removeIconCell = createCellWithRemoveButton();
+
+			var vinCell = document.createElement('td');
+			vinCell.innerHTML = '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][id]" value="' + (data.id) + '">'
+				+'<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vehicle_id]" value="' + (data.vehicle_id) + '">'
+				+ '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vin]" value="' + (data.vin) + '">'
+				+ (data.vin);
+			vinCell.dataset.vin = data.vin; // Correctly setting the data-vin attribute
+
+			var brandCell = createEditableCell(data.brand, 'Enter Brand','vehicle['+data.vehicle_id+'][brand]');
+			var variantCell = createEditableCell(data.variant, 'Enter Variant','vehicle['+data.vehicle_id+'][variant]');
+			var engineCell = createEditableCell(data.engine, 'Enter Engine','vehicle['+data.vehicle_id+'][engine]');
+			var modelDescriptionCell = createEditableCell(data.model_description, 'Enter Model Description','vehicle['+data.vehicle_id+'][model_description]');
+			var modelYearCell = createEditableCell(data.model_year, 'Enter Model Year','vehicle['+data.vehicle_id+'][model_year]');
+			var modelYearToMentionOnDocumentsCell = createEditableCell(data.model_year_to_mention_on_documents, 'Enter Model Year to mention on Documents','vehicle['+data.vehicle_id+'][model_year_to_mention_on_documents]');
+			var steeringCell = createEditableCell(data.steering, 'Enter Steering','vehicle['+data.vehicle_id+'][steering]');
+			var exteriorCell = createEditableCell(data.exterior_colour, 'Enter Exterior Colour','vehicle['+data.vehicle_id+'][exterior_colour]');
+			var interiorColorCell = createEditableCell(data.interior_colour, 'Enter Interior Colour','vehicle['+data.vehicle_id+'][interior_colour]');
+			var warehouseCell = createEditableCell(data.warehouse, 'Enter Warehouse','vehicle['+data.vehicle_id+'][warehouse]');
+			var territoryCell = createEditableCell(data.territory, 'Enter Territory','vehicle['+data.vehicle_id+'][territory]');
+			var preferredDestinationCell = createEditableCell(data.preferred_destination, 'Enter Preferred Destination','vehicle['+data.vehicle_id+'][preferred_destination]');
+			var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type','vehicle['+data.vehicle_id+'][import_document_type]');
+			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
+			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
+
+			// Append cells to the first row
+			firstRow.appendChild(removeIconCell);
+			firstRow.appendChild(vinCell);
+			firstRow.appendChild(brandCell);
+			firstRow.appendChild(variantCell);
+			firstRow.appendChild(engineCell);
+			firstRow.appendChild(modelDescriptionCell);
+			firstRow.appendChild(modelYearCell);
+			firstRow.appendChild(modelYearToMentionOnDocumentsCell);
+			firstRow.appendChild(steeringCell);
+			firstRow.appendChild(exteriorCell);
+			firstRow.appendChild(interiorColorCell);
+			firstRow.appendChild(warehouseCell);
+			firstRow.appendChild(territoryCell);
+			firstRow.appendChild(preferredDestinationCell);
+			firstRow.appendChild(importTypeCell);
+			firstRow.appendChild(ownershipCell);
+			firstRow.appendChild(CertificationPerVINCell);
+			// firstRow.style.borderTop = '1px solid #b3b3b3';
+
+			// Second Row Elements
+			var emptyLabelCell = document.createElement('td');
+			emptyLabelCell.colSpan = 1;
+			emptyLabelCell.textContent = '';
+
+			var modificationLabelCell = document.createElement('td');
+			modificationLabelCell.colSpan = 1;
+			modificationLabelCell.textContent = 'Modification/Jobs';
+
+			var modificationInputCell = document.createElement('td');
+			modificationInputCell.colSpan = 15;
+			var modificationInputElement = document.createElement('input');
+			modificationInputElement.name ='vehicle['+data.vehicle_id+'][modification_or_jobs_to_perform_per_vin]';
+			modificationInputElement.type = 'text';
+			modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
+			modificationInputElement.style.border = 'none';
+			modificationInputElement.style.width = '100%';
+			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
+			modificationInputCell.appendChild(modificationInputElement);
+
+			// Append cells to the second row
+			secondRow.appendChild(emptyLabelCell);
+			secondRow.appendChild(modificationLabelCell);
+			secondRow.appendChild(modificationInputCell);
+
+			// Third Row Elements
+			var emptyLabelThirdRowCell = document.createElement('td');
+			emptyLabelThirdRowCell.colSpan = 1;
+			emptyLabelThirdRowCell.textContent = '';
+
+			var specialRequestLabelCell = document.createElement('td');
+			specialRequestLabelCell.colSpan = 1
+			specialRequestLabelCell.textContent = 'Special Request/Remarks';
+
+			var specialRequestInputCell = document.createElement('td');
+			specialRequestInputCell.colSpan = 15;
+			var specialRequestInputElement = document.createElement('input');
+			specialRequestInputElement.name ='vehicle['+data.vehicle_id+'][special_request_or_remarks]';
+			specialRequestInputElement.type = 'text';
+			specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
+			specialRequestInputElement.style.border = 'none';
+			specialRequestInputElement.style.width = '100%';
+			specialRequestInputElement.value = data.special_request_or_remarks;
+			specialRequestInputCell.appendChild(specialRequestInputElement);
+
+
+			// Append cells to the third row
+			thirdRow.appendChild(emptyLabelThirdRowCell);
+			thirdRow.appendChild(specialRequestLabelCell);
+			thirdRow.appendChild(specialRequestInputCell);
+
+			// Last Row Elements
+			var createAddon = createAddonCell();
+			createAddon.colSpan = 17;
+			// Append cells to the last row
+			lastRow.appendChild(createAddon);
+
+			// Append rows to the table body
+			tableBody.appendChild(firstRow);
+			tableBody.appendChild(secondRow);
+			tableBody.appendChild(thirdRow);
+
+			// Store the VIN in the first row's data attribute for easy retrieval on click
+			$(firstRow).data('vin', data.vin);
+
+			// Store the vin in the third row's data attribute for easy retrieval on click
+			$(thirdRow).data('vin', data.vin);
+
+			var allVehicleRows = [firstRow, secondRow, thirdRow];
+			// Gather data from all dynamically added addon input fields
+			var addonIndex = 1; // Initialize addon index for each vehicle
+			$('.addon_input_outer_row').each(function() {
+				var addonId = $(this).attr('id').split('_')[2];
+				var addonValue = $(`#addons_${addonId}`).val();
+				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
+				var addonDescription = $(`#addon_description_${addonId}`).val();
+
+				var removeAddonCell = createAddonRemoveButton();
+				// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+				var addonRow = document.createElement('tr');
+
+				// Addon Row Label
+				var serviceBreakdownLabelCell = document.createElement('td');
+				serviceBreakdownLabelCell.colSpan = 1;
+				serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+				// Addon Row Elements
+				var addonValueCell = document.createElement('td');
+				addonValueCell.colSpan = 2;
+				addonValueCell.textContent = addonValue;
+
+				var addonQuantityCell = document.createElement('td');
+				addonQuantityCell.colSpan = 1;
+				addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+
+				var addonDescriptionCell = document.createElement('td');
+				addonDescriptionCell.colSpan = 14;
+				addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+
+				// Append cells to the addon row
+				addonRow.appendChild(removeAddonCell);
+				addonRow.appendChild(serviceBreakdownLabelCell);
+				addonRow.appendChild(addonValueCell);
+				addonRow.appendChild(addonQuantityCell);
+				addonRow.appendChild(addonDescriptionCell);
+				// Insert the new row into the array
+				allVehicleRows.push(addonRow);
+				// Append the addon row after the third row
+				thirdRow.insertAdjacentElement('afterend', addonRow);
+				thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
+				addonIndex = addonIndex+1;
+			});
+			tableBody.appendChild(lastRow);
+			allVehicleRows.push(lastRow);
+			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+		}
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
@@ -2246,7 +2278,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('select option[value="'+ vin +'"]').prop('disabled', false);
 			}
 			var rows = $(this).data('rows');
-			// console.log(rows);
 			if (rows) {
 				$(rows).each(function() {
 					$(this).remove();
@@ -2258,7 +2289,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		$('#myTable').on('click', '.remove-addon-row', function() {
 			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
 			addon.remove();
-			// console.log(addon);
 			// if (vin) {
 			// 	// Unselect and remove the VIN from all dynamicselect2 class elements
 			// 	$(".dynamicselect2").each(function() {
@@ -2284,7 +2314,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var addonQuantity = '';
 			var addonDescription = '';
 
-			// var addonId = $(this).attr('id').split('_')[2]; console.log(addonId);
+			// var addonId = $(this).attr('id').split('_')[2]; 
 			// var addonValue = $(`#addons_${addonId}`).val();
 
 			var removeAddonCell = createAddonRemoveButton();
@@ -2385,10 +2415,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
 			
 		});
-		function findAllVINs() {
+		function findAllVINs() { 
 			addedVins = [];
-			$('#myTable tbody tr').each(function() {
-				var addedVin = $(this).data('vin');
+			$('#myTable tbody .first-row').each(function() {
+				var addedVin = $(this).data('vin'); 
 				if (addedVin) {
 					addedVins.push(addedVin);
 				}
@@ -2466,28 +2496,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			cell.appendChild(addButton);
 			return cell;
 		}
-		function createEditableSelect2Cell(vin) {
+		function createEditableSelect2Cell(vin, vehicle_id, certification_per_vin) {
 			var cell = document.createElement('td');
 			var selectElement = document.createElement('select');
-			selectElement.id = 'certification_per_vin_'+vin;
-			selectElement.name = 'certification_per_vin';
+			selectElement.id = 'certification_per_vin_' + vin;
+			selectElement.name = 'vehicle[' + vehicle_id + '][certification_per_vin]';
 			selectElement.className = 'form-control widthinput';
 			selectElement.multiple = true;
 			selectElement.style.width = '100%';
 
 			var options = [
-				'RTA Without Number Plate',
-				'RTA With Number Plate',
-				'Certificate Of Origin',
-				'Certificate Of Conformity',
-				'QISJ Inspection',
-				'EAA Inspection'
+				{ value: 'rta_without_number_plate', text: 'RTA Without Number Plate' },
+				{ value: 'rta_with_number_plate', text: 'RTA With Number Plate' },
+				{ value: 'certificate_of_origin', text: 'Certificate Of Origin' },
+				{ value: 'certificate_of_conformity', text: 'Certificate Of Conformity' },
+				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
+				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
 
-			options.forEach(function(optionText) {
+			// Ensure certification_per_vin is an array
+			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
+
+			options.forEach(function(optionData) {
 				var option = document.createElement('option');
-				option.value = optionText;
-				option.textContent = optionText;
+				option.value = optionData.value;
+				option.textContent = optionData.text;
+				
+				if (certification_per_vin.includes(optionData.value)) {
+					option.selected = true;
+				}
+				
 				selectElement.appendChild(option);
 			});
 
@@ -2495,12 +2533,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			$(selectElement).select2({
 				allowClear: true,
-				// maximumSelectionLength: 1, Certification Per VIN
+				maximumSelectionLength: 1,
 				placeholder: "Choose "
 			});
 
 			return cell;
 		}
+
+
 	// ADD AND REMOVE VEHICLE TO WO END
 
 	// HIDE FIELDS START
@@ -2517,14 +2557,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$("#transporting-driver-contact-number-div").hide();
 			$("#airway-details-div").hide();
 			$("#transportation-company-details-div").hide();
-			$("#amount-received-div").hide();
-			$("#balance-amount-div").hide();
-			$("#deposit-aganist-vehicle-div").hide();
 		}
 	// HIDE FIELDS END
 
 	// CUSTOMER DETAILS SECTION START
         function checkValue() {
+			selectedCustomerEmail = $('#customer_email').val();
+			selectedCustomerAddress = $('#customer_address').val();
+			selectedCustomerContact = $('#customer_company_number').val();
             $('#customer_type').val('new');
             var textInput = document.getElementById('textInput');
             var Other = document.getElementById('Other');
@@ -2567,7 +2607,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             
             var selectedCustomerName = $('#customer_name').val();
             if (selectedCustomerName.length > 0) {
-                setCustomerRelations(selectedCustomerName);
+                // setCustomerRelations(selectedCustomerName);
+				$('#customer_address').val(selectedCustomerAddress);
+				$('#customer_email').val(selectedCustomerEmail);
+				$('#customer_company_number').val(selectedCustomerContact);
             }
 			else {
 				$('#customer_address').val('');
@@ -2577,25 +2620,41 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         }
 
         function setCustomerRelations(selectedCustomerName) {
+			// selectedCustomerEmail = $('#customer_email').val();
+			// selectedCustomerAddress = $('#customer_address').val();
+			// selectedCustomerContact = $('#customer_company_number').val();
             $('#customer_address').val('');
 			$('#customer_email').val('');
 			$('#customer_company_number').val('');
             // document.getElementById('customer_email').value = '';
             // document.getElementById('customer_company_number').value = '';
-            if (selectedCustomerName != '') {
+			
+            if (selectedCustomerName != null || selectedCustomerName.length > 0) {
                 for (var i = 0; i < customerCount; i++) {
-                    if (customers[i].customer_name == selectedCustomerName[0]) {
+                    if (customers[i].customer_name == selectedCustomerName[0]) { 
                         if (customers[i].customer_address != null) {
                             $('#customer_address').val(customers[i]?.customer_address);
                         }
 						if (customers[i].customer_email != null) {
-							console.log(customers[i]?.customer_email);
                             $('#customer_email').val(customers[i]?.customer_email);
                         }
 						if (customers[i].customer_company_number != null) {
-							console.log(customers[i]?.customer_company_number);
-                            // $('#customer_company_number').val(customers[i]?.customer_company_number);
+                            // // $('#customer_company_number').val(customers[i]?.customer_company_number);
+							// // $('#customer_company_number').val(customers[i].customer_company_number);
 							$('#customer_company_number').val(customers[i].customer_company_number);
+							// // customer_company_number.setNumber(customers[i].customer_company_number);
+							// var input = document.querySelector("#customer_company_number");
+							// var iti = window.intlTelInput(input, {
+							// 	initialCountry: "auto",
+							// 	nationalMode: false,
+							// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+							// });
+
+							// // Simulating an AJAX request to fetch the phone number from the database
+							// var customerCompanyNumberFromDB = customers[i].customer_company_number; // This should come from your backend
+
+							// iti.setNumber(customerCompanyNumberFromDB);
+							// $('#customer_company_number').val(customerCompanyNumberFromDB);
                         }
                     }
                 }
@@ -2622,13 +2681,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
-		function setDepositAganistVehicleDropdownOptions() {
+		function setDepositAganistVehicleDropdownOptions() { 
 			// Get the previously selected values
 			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
 
 			// Empty the select element before adding new options
 			$('#deposit_aganist_vehicle').empty();
-
 			// Add new options to the select element
 			addedVins.forEach(function(vin) {
 				$('#deposit_aganist_vehicle').append(new Option(vin, vin));
@@ -2662,11 +2720,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         // Replace multiple spaces with a single space
         input.value = input.value.replace(/\s\s+/g, ' ');
     }
+
     function sanitizeNumberInput(input) {
         // Remove any non-numeric characters
         input.value = input.value.replace(/[^0-9]/g, '');
     }
+	$('.delete-button').on('click',function() {
+		var fileType = $(this).attr('data-file-type');
+		if (confirm('Are you sure you want to Delete this item ?')) {
+			if(fileType == 'BRN_File') {
+				$('#brn_file_preview1').remove();
+				$('#brn-file-file-delete').val(1);
 	
+			}else if(fileType == 'Signed_PFI') {
+				$('#signed_pfi_preview1').remove();
+				$('#signed-pfi-delete').val(1);
+	
+			}else if(fileType == 'Signed_Contract') {
+				$('#signed_contract_preview1').remove();
+				$('#signed-contract-delete').val(1);
+			}
+			else if(fileType == 'Payment_Receipts') {
+				$('#payment_receipts_preview1').remove();
+				$('#payment-receipts-file-delete').val(1);
+			}
+			else if(fileType == 'NOC') {
+				$('#noc_preview1').remove();
+				$('#noc-file-delete').val(1);
+	
+			}else if(fileType == 'Enduser_Trade_License') {
+				$('#enduser_trade_license_preview1').remove();
+				$('#enduser-trade-license-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Passport') {
+				$('#enduser_passport_preview1').remove();
+				$('#enduser-passport-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Contract') {
+				$('#enduser_contract_preview1').remove();
+				$('#enduser-contract-file-delete').val(1);
+			}
+			else if(fileType == 'Vehicle_Handover_Person_ID') {
+				$('#vehicle_handover_person_id_preview1').remove();
+				$('#vehicle-handover-person-id-file-delete').val(1);
+			}
+		}
+	});
 </script>
 
 @endsection

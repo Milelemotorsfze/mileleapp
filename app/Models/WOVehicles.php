@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WOVehicles extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "w_o_vehicles";
     protected $fillable = [
         'work_order_id',
@@ -37,6 +38,31 @@ class WOVehicles extends Model
         'deleted_by',
         'deposit_received',
     ];
+    protected $appends = [
+        'certification_per_vin_name',
+    ];
+    public function getCertificationPerVinNameAttribute() {
+        $certification = '';
+        if($this->certification_per_vin == 'rta_without_number_plate') {
+            $certification = 'RTA Without Number Plate';
+        }
+        else if($this->certification_per_vin == 'rta_with_number_plate') {
+            $certification = 'RTA With Number Plate';
+        }
+        else if($this->certification_per_vin == 'certificate_of_origin') {
+            $certification = 'Certificate Of Origin';
+        }
+        else if($this->certification_per_vin == 'certificate_of_conformity') {
+            $certification = 'Certificate Of Conformity';
+        }
+        else if($this->certification_per_vin == 'qisj_inspection') {
+            $certification = 'QISJ Inspection';
+        }
+        else if($this->certification_per_vin == 'eaa_inspection') {
+            $certification = 'EAA Inspection';
+        }
+        return $certification;
+    }
     public function addons()
     {
         return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
