@@ -689,7 +689,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         <td>{{$vehicle->preferred_destination ?? 'NA'}}</td>
                                                         <td>{{$vehicle->import_document_type ?? 'NA'}}</td>
                                                         <td>{{$vehicle->ownership_name ?? 'NA'}}</td>
-                                                        <td>{{$vehicle->certification_per_vin ?? 'NA'}}</td>
+                                                        <td>{{$vehicle->certification_per_vin_name ?? 'NA'}}</td>
                                                         @if(isset($type) && $type == 'export_cnf')
                                                         <td>{{$vehicle->shipment ?? 'NA'}}</td>
                                                         @endif

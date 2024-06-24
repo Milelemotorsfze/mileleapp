@@ -914,7 +914,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     @endif
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	$(document).ready(function () { 
-		$("#boe-div").hide();
 		// SELECT 2 START
 			$('#customer_name').select2({
 				allowClear: true,
@@ -976,7 +975,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			}
 			
-			
+			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
+				for(var i=0; i<workOrder.vehicles.length; i++) {
+					drawTableRow(workOrder.vehicles[i]);
+					// Find the option and disable it
+					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
+					// Refresh the select2 control
+					$("#vin_multiple").trigger('change.select2');
+					addedVins.push(workOrder.vehicles[i].vin);
+				}
+				addChild();
+			}
+			else {
+				$("#boe-div").hide();
+			}
 			
 			$('#vin_multiple').select2({
 				allowClear: true,
@@ -1167,12 +1179,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				onChangeSelectedVins = $(this).val(); // Get selected VINs
 				var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 				if (onChangeSelectedVins && onChangeSelectedVins.length > 0) {
-					if(index == 1) {
-						addAddon();
-					}
-					else {
+					// if(index == 1) {
+					// 	addAddon();
+					// }
+					// else {
 						resetAddonDropdown();
-					}
+					// }
 					
 				} else {
 					// Clear addons dropdown if no VINs are selected
@@ -1366,7 +1378,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			}).catch(error => {
 				// Optionally display the error message to the user
-				// alert(`Error: ${error.message}`);
 			});
 		});
 	});
@@ -1854,7 +1865,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				dataType: 'json',
 				success: function(response) {
 					// Iterate over each dynamicselect2 element to update its options
-					$('.dynamicselect2').each(function() { 
+					$('.addondynamicselect2').each(function() { 
 						var $dropdown = $(this);
 						var currentVal = $dropdown.val(); // Store current selected values
 
@@ -1897,7 +1908,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<div class="row">
 								<div class="col-xxl-12 col-lg-12 col-md-12">
 									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
-									<select name="addons[]" id="addons_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
 									</select>
 								</div>
@@ -2029,168 +2040,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				for (var j = 0; j < selectedVIN.length; j++) {
 					for (var i = 0; i < vins.length; i++) {
 						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
-							// Get the table body element by ID
-							var tableBody = document.querySelector('#myTable tbody');
-
-							var firstRow = document.createElement('tr');
-							firstRow.style.borderTop = '2px solid #a6a6a6';
-							firstRow.className = 'first-row';
-							var secondRow = document.createElement('tr');
-							var thirdRow = document.createElement('tr');
-							var lastRow = document.createElement('tr');
-
-							// First Row Elements
-							var removeIconCell = createCellWithRemoveButton();
-							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vehicle['+i+'][vin]');
-							vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
-							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','vehicle['+i+'][brand]');
-							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','vehicle['+i+'][variant]');
-							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','vehicle['+i+'][engine]');
-							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','vehicle['+i+'][model_description]');
-							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','vehicle['+i+'][model_year]');
-							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','vehicle['+i+'][model_year_to_mention_on_documents]');
-							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','vehicle['+i+'][steering]');
-							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','vehicle['+i+'][exterior_colour]');
-							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','vehicle['+i+'][interior_colour]');
-							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','vehicle['+i+'][warehouse]');
-							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','vehicle['+i+'][territory]');
-							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','vehicle['+i+'][preferred_destination]');
-							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','vehicle['+i+'][import_document_type]');
-							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','vehicle['+i+'][ownership_name]');
-							var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
-
-							// Append cells to the first row
-							firstRow.appendChild(removeIconCell);
-							firstRow.appendChild(vinCell);
-							firstRow.appendChild(brandCell);
-							firstRow.appendChild(variantCell);
-							firstRow.appendChild(engineCell);
-							firstRow.appendChild(modelDescriptionCell);
-							firstRow.appendChild(modelYearCell);
-							firstRow.appendChild(modelYearToMentionOnDocumentsCell);
-							firstRow.appendChild(steeringCell);
-							firstRow.appendChild(exteriorCell);
-							firstRow.appendChild(interiorColorCell);
-							firstRow.appendChild(warehouseCell);
-							firstRow.appendChild(territoryCell);
-							firstRow.appendChild(preferredDestinationCell);
-							firstRow.appendChild(importTypeCell);
-							firstRow.appendChild(ownershipCell);
-							firstRow.appendChild(CertificationPerVINCell);
-							// firstRow.style.borderTop = '1px solid #b3b3b3';
-
-							// Second Row Elements
-							var emptyLabelCell = document.createElement('td');
-							emptyLabelCell.colSpan = 1;
-							emptyLabelCell.textContent = '';
-
-							var modificationLabelCell = document.createElement('td');
-							modificationLabelCell.colSpan = 1;
-							modificationLabelCell.textContent = 'Modification/Jobs';
-
-							var modificationInputCell = document.createElement('td');
-							modificationInputCell.colSpan = 15;
-							var modificationInputElement = document.createElement('input');
-							modificationInputElement.name ='vehicle['+i+'][modification_or_jobs_to_perform_per_vin]';
-							modificationInputElement.type = 'text';
-							modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
-							modificationInputElement.style.border = 'none';
-							modificationInputElement.style.width = '100%';
-							modificationInputCell.appendChild(modificationInputElement);
-
-							// Append cells to the second row
-							secondRow.appendChild(emptyLabelCell);
-							secondRow.appendChild(modificationLabelCell);
-							secondRow.appendChild(modificationInputCell);
-
-							// Third Row Elements
-							var emptyLabelThirdRowCell = document.createElement('td');
-							emptyLabelThirdRowCell.colSpan = 1;
-							emptyLabelThirdRowCell.textContent = '';
-
-							var specialRequestLabelCell = document.createElement('td');
-							specialRequestLabelCell.colSpan = 1
-							specialRequestLabelCell.textContent = 'Special Request/Remarks';
-
-							var specialRequestInputCell = document.createElement('td');
-							specialRequestInputCell.colSpan = 15;
-							var specialRequestInputElement = document.createElement('input');
-							specialRequestInputElement.name ='vehicle['+i+'][special_request_or_remarks]';
-							specialRequestInputElement.type = 'text';
-							specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
-							specialRequestInputElement.style.border = 'none';
-							specialRequestInputElement.style.width = '100%';
-							specialRequestInputCell.appendChild(specialRequestInputElement);
-
-
-							// Append cells to the third row
-							thirdRow.appendChild(emptyLabelThirdRowCell);
-							thirdRow.appendChild(specialRequestLabelCell);
-							thirdRow.appendChild(specialRequestInputCell);
-
-							// Last Row Elements
-							var createAddon = createAddonCell();
-							createAddon.colSpan = 17;
-							// Append cells to the last row
-							lastRow.appendChild(createAddon);
-
-							// Append rows to the table body
-							tableBody.appendChild(firstRow);
-							tableBody.appendChild(secondRow);
-							tableBody.appendChild(thirdRow);
-
-							// Store the VIN in the first row's data attribute for easy retrieval on click
-							$(firstRow).data('vin', vins[i]?.vin ?? '');
-
-							// Store the vin in the third row's data attribute for easy retrieval on click
-							$(thirdRow).data('vin', vins[i]?.vin ?? '');
-
-							var allVehicleRows = [firstRow, secondRow, thirdRow];
-							// Gather data from all dynamically added addon input fields
-							var addonIndex = 1; // Initialize addon index for each vehicle
-							$('.addon_input_outer_row').each(function() {
-								var addonId = $(this).attr('id').split('_')[2];
-								var addonValue = $(`#addons_${addonId}`).val();
-								var addonQuantity = $(`#addon_quantity_${addonId}`).val();
-								var addonDescription = $(`#addon_description_${addonId}`).val();
-
-								var removeAddonCell = createAddonRemoveButton();
-								// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
-								var addonRow = document.createElement('tr');
-
-								// Addon Row Label
-								var serviceBreakdownLabelCell = document.createElement('td');
-								serviceBreakdownLabelCell.colSpan = 1;
-								serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-								// Addon Row Elements
-								var addonValueCell = document.createElement('td');
-								addonValueCell.colSpan = 2;
-								addonValueCell.textContent = addonValue;
-
-								var addonQuantityCell = document.createElement('td');
-								addonQuantityCell.colSpan = 1;
-								addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+i+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+i+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
-
-								var addonDescriptionCell = document.createElement('td');
-								addonDescriptionCell.colSpan = 14;
-								addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+i+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
-
-								// Append cells to the addon row
-								addonRow.appendChild(removeAddonCell);
-								addonRow.appendChild(serviceBreakdownLabelCell);
-								addonRow.appendChild(addonValueCell);
-								addonRow.appendChild(addonQuantityCell);
-								addonRow.appendChild(addonDescriptionCell);
-								// Insert the new row into the array
-								allVehicleRows.push(addonRow);
-								// Append the addon row after the third row
-								thirdRow.insertAdjacentElement('afterend', addonRow);
-								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
-								addonIndex = addonIndex+1;
-							});
-							tableBody.appendChild(lastRow);
-							allVehicleRows.push(lastRow);
-							$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+							var data = { 
+								id: '',
+								vehicle_id : vins[i]?.id ?? '',
+								vin: vins[i].vin ?? '',
+								brand : vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '',
+								variant: vins[i]?.variant?.name ?? '',
+								engine : vins[i]?.engine ?? '',
+								model_description: vins[i]?.variant?.model_detail ?? '',
+								model_year : vins[i]?.variant?.my ?? '',
+								model_year_to_mention_on_documents: vins[i]?.variant?.my ?? '',
+								steering : vins[i]?.variant?.steering ?? '',
+								exterior_colour: vins[i]?.exterior?.name ?? '',
+								interior_colour : vins[i]?.interior?.name ?? '',
+								warehouse: vins[i]?.warehouse_location?.name ?? '',
+								territory : vins[i]?.territory ?? '',
+								preferred_destination: '',
+								import_document_type : vins[i]?.document?.import_type ?? '',
+								ownership_name: vins[i]?.document?.ownership ?? '',
+								certification_per_vin: '',
+								modification_or_jobs_to_perform_per_vin: '',
+								special_request_or_remarks: '',
+								shipment: '',
+							};
+							drawTableRow(data);
 						}
 					}
 				}
@@ -2198,7 +2071,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				if(index > 0) {
 					// Append selectedVIN data as dropdown option for all dynamicselect2 class
 					$(".dynamicselect2").each(function() { 
-						var selectElement = $(this); 
+						var selectElement = $(this);  
 						selectedVIN.forEach(function(vin) {
 							if (selectElement.find(`option[value='${vin}']`).length === 0) {
 								selectElement.append(`<option value="${vin}">${vin}</option>`);
@@ -2218,7 +2091,178 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
+		function drawTableRow(data) {
+			// Get the table body element by ID
+			var tableBody = document.querySelector('#myTable tbody');
 
+			var firstRow = document.createElement('tr');
+			firstRow.style.borderTop = '2px solid #a6a6a6';
+			firstRow.className = 'first-row';
+			var secondRow = document.createElement('tr');
+			var thirdRow = document.createElement('tr');
+			var lastRow = document.createElement('tr');
+
+			// First Row Elements
+			var removeIconCell = createCellWithRemoveButton();
+
+			var vinCell = document.createElement('td');
+			vinCell.innerHTML = '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][id]" value="' + (data.id) + '">'
+				+'<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vehicle_id]" value="' + (data.vehicle_id) + '">'
+				+ '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vin]" value="' + (data.vin) + '">'
+				+ (data.vin);
+			vinCell.dataset.vin = data.vin; // Correctly setting the data-vin attribute
+
+			var brandCell = createEditableCell(data.brand, 'Enter Brand','vehicle['+data.vehicle_id+'][brand]');
+			var variantCell = createEditableCell(data.variant, 'Enter Variant','vehicle['+data.vehicle_id+'][variant]');
+			var engineCell = createEditableCell(data.engine, 'Enter Engine','vehicle['+data.vehicle_id+'][engine]');
+			var modelDescriptionCell = createEditableCell(data.model_description, 'Enter Model Description','vehicle['+data.vehicle_id+'][model_description]');
+			var modelYearCell = createEditableCell(data.model_year, 'Enter Model Year','vehicle['+data.vehicle_id+'][model_year]');
+			var modelYearToMentionOnDocumentsCell = createEditableCell(data.model_year_to_mention_on_documents, 'Enter Model Year to mention on Documents','vehicle['+data.vehicle_id+'][model_year_to_mention_on_documents]');
+			var steeringCell = createEditableCell(data.steering, 'Enter Steering','vehicle['+data.vehicle_id+'][steering]');
+			var exteriorCell = createEditableCell(data.exterior_colour, 'Enter Exterior Colour','vehicle['+data.vehicle_id+'][exterior_colour]');
+			var interiorColorCell = createEditableCell(data.interior_colour, 'Enter Interior Colour','vehicle['+data.vehicle_id+'][interior_colour]');
+			var warehouseCell = createEditableCell(data.warehouse, 'Enter Warehouse','vehicle['+data.vehicle_id+'][warehouse]');
+			var territoryCell = createEditableCell(data.territory, 'Enter Territory','vehicle['+data.vehicle_id+'][territory]');
+			var preferredDestinationCell = createEditableCell(data.preferred_destination, 'Enter Preferred Destination','vehicle['+data.vehicle_id+'][preferred_destination]');
+			var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type','vehicle['+data.vehicle_id+'][import_document_type]');
+			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
+			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
+
+			// Append cells to the first row
+			firstRow.appendChild(removeIconCell);
+			firstRow.appendChild(vinCell);
+			firstRow.appendChild(brandCell);
+			firstRow.appendChild(variantCell);
+			firstRow.appendChild(engineCell);
+			firstRow.appendChild(modelDescriptionCell);
+			firstRow.appendChild(modelYearCell);
+			firstRow.appendChild(modelYearToMentionOnDocumentsCell);
+			firstRow.appendChild(steeringCell);
+			firstRow.appendChild(exteriorCell);
+			firstRow.appendChild(interiorColorCell);
+			firstRow.appendChild(warehouseCell);
+			firstRow.appendChild(territoryCell);
+			firstRow.appendChild(preferredDestinationCell);
+			firstRow.appendChild(importTypeCell);
+			firstRow.appendChild(ownershipCell);
+			firstRow.appendChild(CertificationPerVINCell);
+			// firstRow.style.borderTop = '1px solid #b3b3b3';
+
+			// Second Row Elements
+			var emptyLabelCell = document.createElement('td');
+			emptyLabelCell.colSpan = 1;
+			emptyLabelCell.textContent = '';
+
+			var modificationLabelCell = document.createElement('td');
+			modificationLabelCell.colSpan = 1;
+			modificationLabelCell.textContent = 'Modification/Jobs';
+
+			var modificationInputCell = document.createElement('td');
+			modificationInputCell.colSpan = 15;
+			var modificationInputElement = document.createElement('input');
+			modificationInputElement.name ='vehicle['+data.vehicle_id+'][modification_or_jobs_to_perform_per_vin]';
+			modificationInputElement.type = 'text';
+			modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
+			modificationInputElement.style.border = 'none';
+			modificationInputElement.style.width = '100%';
+			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
+			modificationInputCell.appendChild(modificationInputElement);
+
+			// Append cells to the second row
+			secondRow.appendChild(emptyLabelCell);
+			secondRow.appendChild(modificationLabelCell);
+			secondRow.appendChild(modificationInputCell);
+
+			// Third Row Elements
+			var emptyLabelThirdRowCell = document.createElement('td');
+			emptyLabelThirdRowCell.colSpan = 1;
+			emptyLabelThirdRowCell.textContent = '';
+
+			var specialRequestLabelCell = document.createElement('td');
+			specialRequestLabelCell.colSpan = 1
+			specialRequestLabelCell.textContent = 'Special Request/Remarks';
+
+			var specialRequestInputCell = document.createElement('td');
+			specialRequestInputCell.colSpan = 15;
+			var specialRequestInputElement = document.createElement('input');
+			specialRequestInputElement.name ='vehicle['+data.vehicle_id+'][special_request_or_remarks]';
+			specialRequestInputElement.type = 'text';
+			specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
+			specialRequestInputElement.style.border = 'none';
+			specialRequestInputElement.style.width = '100%';
+			specialRequestInputElement.value = data.special_request_or_remarks;
+			specialRequestInputCell.appendChild(specialRequestInputElement);
+
+
+			// Append cells to the third row
+			thirdRow.appendChild(emptyLabelThirdRowCell);
+			thirdRow.appendChild(specialRequestLabelCell);
+			thirdRow.appendChild(specialRequestInputCell);
+
+			// Last Row Elements
+			var createAddon = createAddonCell();
+			createAddon.colSpan = 17;
+			// Append cells to the last row
+			lastRow.appendChild(createAddon);
+
+			// Append rows to the table body
+			tableBody.appendChild(firstRow);
+			tableBody.appendChild(secondRow);
+			tableBody.appendChild(thirdRow);
+
+			// Store the VIN in the first row's data attribute for easy retrieval on click
+			$(firstRow).data('vin', data.vin);
+
+			// Store the vin in the third row's data attribute for easy retrieval on click
+			$(thirdRow).data('vin', data.vin);
+
+			var allVehicleRows = [firstRow, secondRow, thirdRow];
+			// Gather data from all dynamically added addon input fields
+			var addonIndex = 1; // Initialize addon index for each vehicle
+			$('.addon_input_outer_row').each(function() {
+				var addonId = $(this).attr('id').split('_')[2];
+				var addonValue = $(`#addons_${addonId}`).val();
+				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
+				var addonDescription = $(`#addon_description_${addonId}`).val();
+
+				var removeAddonCell = createAddonRemoveButton();
+				// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+				var addonRow = document.createElement('tr');
+
+				// Addon Row Label
+				var serviceBreakdownLabelCell = document.createElement('td');
+				serviceBreakdownLabelCell.colSpan = 1;
+				serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+				// Addon Row Elements
+				var addonValueCell = document.createElement('td');
+				addonValueCell.colSpan = 2;
+				addonValueCell.textContent = addonValue;
+
+				var addonQuantityCell = document.createElement('td');
+				addonQuantityCell.colSpan = 1;
+				addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+
+				var addonDescriptionCell = document.createElement('td');
+				addonDescriptionCell.colSpan = 14;
+				addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+
+				// Append cells to the addon row
+				addonRow.appendChild(removeAddonCell);
+				addonRow.appendChild(serviceBreakdownLabelCell);
+				addonRow.appendChild(addonValueCell);
+				addonRow.appendChild(addonQuantityCell);
+				addonRow.appendChild(addonDescriptionCell);
+				// Insert the new row into the array
+				allVehicleRows.push(addonRow);
+				// Append the addon row after the third row
+				thirdRow.insertAdjacentElement('afterend', addonRow);
+				thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
+				addonIndex = addonIndex+1;
+			});
+			tableBody.appendChild(lastRow);
+			allVehicleRows.push(lastRow);
+			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+		}
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
@@ -2452,28 +2496,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			cell.appendChild(addButton);
 			return cell;
 		}
-		function createEditableSelect2Cell(vin) {
+		function createEditableSelect2Cell(vin, vehicle_id, certification_per_vin) {
 			var cell = document.createElement('td');
 			var selectElement = document.createElement('select');
-			selectElement.id = 'certification_per_vin_'+vin;
-			selectElement.name = 'certification_per_vin';
+			selectElement.id = 'certification_per_vin_' + vin;
+			selectElement.name = 'vehicle[' + vehicle_id + '][certification_per_vin]';
 			selectElement.className = 'form-control widthinput';
 			selectElement.multiple = true;
 			selectElement.style.width = '100%';
 
 			var options = [
-				'RTA Without Number Plate',
-				'RTA With Number Plate',
-				'Certificate Of Origin',
-				'Certificate Of Conformity',
-				'QISJ Inspection',
-				'EAA Inspection'
+				{ value: 'rta_without_number_plate', text: 'RTA Without Number Plate' },
+				{ value: 'rta_with_number_plate', text: 'RTA With Number Plate' },
+				{ value: 'certificate_of_origin', text: 'Certificate Of Origin' },
+				{ value: 'certificate_of_conformity', text: 'Certificate Of Conformity' },
+				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
+				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
 
-			options.forEach(function(optionText) {
+			// Ensure certification_per_vin is an array
+			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
+
+			options.forEach(function(optionData) {
 				var option = document.createElement('option');
-				option.value = optionText;
-				option.textContent = optionText;
+				option.value = optionData.value;
+				option.textContent = optionData.text;
+				
+				if (certification_per_vin.includes(optionData.value)) {
+					option.selected = true;
+				}
+				
 				selectElement.appendChild(option);
 			});
 
@@ -2481,12 +2533,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			$(selectElement).select2({
 				allowClear: true,
-				// maximumSelectionLength: 1, Certification Per VIN
+				maximumSelectionLength: 1,
 				placeholder: "Choose "
 			});
 
 			return cell;
 		}
+
+
 	// ADD AND REMOVE VEHICLE TO WO END
 
 	// HIDE FIELDS START

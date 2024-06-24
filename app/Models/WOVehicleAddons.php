@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WOVehicleAddons extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "w_o_vehicle_addons";
     protected $fillable = [
         'w_o_vehicle_id',

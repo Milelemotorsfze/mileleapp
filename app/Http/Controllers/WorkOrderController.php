@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WorkOrder;
 use App\Models\WOVehicles;
+use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
 use App\Models\WOComments;
 use App\Models\WORecordHistory;
@@ -97,7 +98,7 @@ class WorkOrderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreWorkOrderRequest $request)
-    {  
+    { 
         DB::beginTransaction();
 
         try {
@@ -283,7 +284,7 @@ class WorkOrderController extends Controller
                     foreach ($request->vehicle as $key => $vehicleData) {
                         $createWOVehicles = [];
                         $createWOVehicles['work_order_id'] = $workOrder->id;
-            
+                        $createWOVehicles['vehicle_id'] = $vehicleData['vehicle_id'] ?? null;
                         $createWOVehicles['vin'] = $vehicleData['vin'] ?? null;
                         $createWOVehicles['brand'] = $vehicleData['brand'] ?? null;
                         $createWOVehicles['variant'] = $vehicleData['variant'] ?? null;
@@ -306,6 +307,30 @@ class WorkOrderController extends Controller
                         $createWOVehicles['created_by'] = $authId;
             
                         $woVehicles = WOVehicles::create($createWOVehicles);
+
+                        // Define the fields to exclude
+                        $excludeVehicleFields = [
+                            'vehicle_id'
+                        ];
+
+                        // Filter out non-null, non-array values, and exclude specified fields
+                        $nonNullVehicleData = array_filter($vehicleData, function ($value, $key) use ($excludeVehicleFields) {
+                            return !is_null($value) && !is_array($value) && !in_array($key, $excludeVehicleFields);
+                        }, ARRAY_FILTER_USE_BOTH);
+
+                        // Store each non-null, non-array field in the data history
+                        foreach ($nonNullVehicleData as $field => $value) { 
+                            WOVehicleRecordHistory::create([
+                                'w_o_vehicle_id' => $woVehicles->id,
+                                'field_name' => $field,
+                                'old_value' => NULL,
+                                'new_value' => $value,
+                                'type' => 'Set',
+                                'user_id' => Auth::id(),
+                                'changed_at' => Carbon::now(),
+                            ]);
+                        }
+
                         if (isset($vehicleData['addons'])) {
                             if (count($vehicleData['addons']) > 0) {
                                 foreach ($vehicleData['addons'] as $key => $addonData) {
@@ -402,6 +427,7 @@ class WorkOrderController extends Controller
     public function edit(WorkOrder $workOrder)
     {
         $type = $workOrder->type;
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles')->first();
         // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
@@ -465,7 +491,7 @@ class WorkOrderController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, WorkOrder $workOrder)
-    {
+    { 
         DB::beginTransaction();
         try { 
             $authId = Auth::id();
@@ -692,6 +718,104 @@ class WorkOrderController extends Controller
             }
             // Update the WorkOrder
             $workOrder->update($newData);
+
+            // Assuming $request->vehicles is an array of vehicles with unique VINs
+            $vehiclesData = $request->vehicle ?? [];
+            // Ensure $vehiclesData is an array
+            if (!is_array($vehiclesData) || empty($vehiclesData)) {
+                // Handle the case where $vehiclesData is not an array or is empty
+                $vehiclesData = [];
+            }
+
+            // Extract the VINs from the incoming request data
+            $incomingIds = array_column($vehiclesData, 'id');
+
+            // Get the existing vehicles from the database
+            $existingVehicles = WOVehicles::whereIn('id', $incomingIds)->get()->keyBy('id');
+
+            // Track VINs that were processed
+            $processedIds = [];
+
+            foreach ($vehiclesData as $vehicleData) {
+                $id = $vehicleData['id'];
+                // Define the fields to exclude
+                $excludeVehicleFields = [
+                    'id','work_order_id','vehicle_id','updated_by','created_by',
+                ];
+                // Update if exists, otherwise create
+                if (isset($existingVehicles[$id])) {
+                    $vehicle = $existingVehicles[$id];
+                    $vehicleData['updated_by'] = Auth::id();
+                    // Filter out non-null, non-array values, and exclude specified fields
+                    $filterredVehicleData = array_filter($vehicleData, function ($value, $key) use ($excludeVehicleFields) {
+                        return !is_array($value) && !in_array($key, $excludeVehicleFields);
+                    }, ARRAY_FILTER_USE_BOTH);
+                    // Check and store only changed fields
+                    foreach ($filterredVehicleData as $field => $newValue) {
+                        $oldValue = $vehicle->$field;
+                        if ($oldValue !== $newValue) {
+                            $changeType = 'Change';
+                            if (is_null($oldValue) && !is_null($newValue)) {
+                                $changeType = 'Set';
+                            } elseif (!is_null($oldValue) && is_null($newValue)) {
+                                $changeType = 'Unset';
+                            }
+                            // Change the vehicle data
+                            $vehicle->$field = $newValue;
+
+                            // Store the change in history
+                            WOVehicleRecordHistory::create([
+                                'w_o_vehicle_id' => $vehicle->id,
+                                'field_name' => $field,
+                                'old_value' => $oldValue,
+                                'new_value' => $newValue,
+                                'type' => $changeType,
+                                'user_id' => Auth::id(),
+                                'changed_at' => Carbon::now(),
+                            ]);
+                        }
+                    }
+                    
+                    // Save the vehicle with updated data
+                    $vehicle->save();
+                } else {
+                    $vehicleData['work_order_id'] = $workOrder->id;
+                    $vehicleData['created_by'] = Auth::id();
+                    $woVehicles = WOVehicles::create($vehicleData);
+                    // Filter out non-null, non-array values, and exclude specified fields
+                    $nonNullVehicleData = array_filter($vehicleData, function ($value, $key) use ($excludeVehicleFields) {
+                        return !is_null($value) && !is_array($value) && !in_array($key, $excludeVehicleFields);
+                    }, ARRAY_FILTER_USE_BOTH);
+
+                    // Store each non-null, non-array field in the data history
+                    foreach ($nonNullVehicleData as $field => $value) { 
+                        WOVehicleRecordHistory::create([
+                            'w_o_vehicle_id' => $woVehicles->id,
+                            'field_name' => $field,
+                            'old_value' => NULL,
+                            'new_value' => $value,
+                            'type' => 'Set',
+                            'user_id' => Auth::id(),
+                            'changed_at' => Carbon::now(),
+                        ]);
+                    }
+                }
+
+                // Mark this VIN as processed
+                $processedIds[] = $id;
+            }
+
+            // Retrieve vehicles that were not in the incoming request and update deleted_by field
+            $vehiclesToDelete = WOVehicles::whereNotIn('id', $processedIds)->get();
+
+            foreach ($vehiclesToDelete as $vehicle) {
+                $vehicle->deleted_by = Auth::id();
+                $vehicle->save();
+            }
+
+            // Now delete the vehicles
+            WOVehicles::whereNotIn('id', $processedIds)->delete();
+
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
             
             DB::commit();
