@@ -9,6 +9,26 @@ class PurchasingOrder extends Model
 {
     use HasFactory;
     protected $table = 'purchasing_order';
+    protected $fillable = [
+        'po_number',
+        'po_date',
+        'is_demand_planning_po',
+        'created_by',
+        'status',
+        'po_type',
+        'vendors_id',
+        'payment_term_id',
+        'currency',
+        'shippingmethod',
+        'shippingcost',
+        'totalcost',
+        'pol',
+        'pod',
+        'fd',
+        'remarks',
+        'pl_number',
+        'pl_file_path',
+    ];
     protected $appends = [
         'is_demand_planning_purchase_order',
 

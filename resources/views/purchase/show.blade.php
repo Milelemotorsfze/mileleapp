@@ -38,6 +38,21 @@
     }
 </style>
 @section('content')
+<div class="modal fade" id="vehicleModal" tabindex="-1" role="dialog" aria-labelledby="vehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vehicleModalLabel">Active Vehicles Details</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePricesBtn">Update Prices</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -457,7 +472,7 @@
                             <label for="choices-single-default" class="form-label"><strong>Vendor Account Status</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{$vendorstatus}}</span>
+                            <span>{{ $vendorDisplay }}</span>
                         </div>
                     </div>
                     <div class="row">
@@ -466,11 +481,7 @@
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                             <span>{{ count($vehicles) }} /  
-                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
-                        {{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}
-                        @else    
-                        {{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}
-                        @endif
+                            {{ number_format($purchasingOrder->totalcost, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </span>
                         </div>
                     </div>
@@ -479,23 +490,39 @@
                             <label for="choices-single-default" class="form-label"><strong>Already Paid Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                        @if (!is_null($alreadypaidamount) && !is_numeric($alreadypaidamount)) 
-                        <span>{{ isset($alreadypaidamount) ? number_format($alreadypaidamount, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
-                        @else    
-                        <span>{{ $alreadypaidamount }} - {{ $purchasingOrder->currency }}</span>
-                        @endif
+                        <span> {{ number_format($alreadypaidamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
                         </div>
                     </div>
+                    @if($totalSurcharges)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Price Increase</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <div style="background-color: red; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
+                        {{ number_format($totalSurcharges, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        </div>
+                        </div>
+                    </div>
+                    @endif
+                    @if($totalDiscounts)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Discounts</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">  
+                        <div style="background-color: green; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
+                        {{ number_format($totalDiscounts, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        </div>
+                        </div>
+                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Requested Initiated Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                        @if (!is_null($intialamount) && !is_numeric($intialamount)) 
-                        <span>{{ isset($intialamount) ? number_format($intialamount, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
-                        @else    
-                        <span>{{ $intialamount }} - {{ $purchasingOrder->currency }}</span>
-                        @endif
+                        <span>{{ number_format($intialamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
                         </div>
                     </div>
                     @if($vendorPaymentAdjustments)
@@ -507,14 +534,14 @@
         @if ($vendorPaymentAdjustments->isNotEmpty())
             <span>
                 @foreach ($vendorPaymentAdjustments as $adjustment)
-                    {{ $adjustment->total_amount }} - {{ $purchasingOrder->currency }} 
+                {{ number_format($adjustment->total_amount, 0, '.', ',') }} - {{ $purchasingOrder->currency }} 
                         ({{ $adjustment->type }})
                     @if (!$loop->last)
                         , 
                     @endif
                                     @endforeach
                                 </span>
-                                <strong>Total : {{$totalSum}} - {{ $purchasingOrder->currency }} </strong>
+                                <strong>Total : {{ number_format($totalSum, 0, '.', ',') }} - {{ $purchasingOrder->currency }} </strong>
                             @endif
                         </div>
                     </div>
@@ -912,8 +939,14 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                     @endphp
                     @if ($hasPermission)
-                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
+                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn me-2">Edit</a>
+                    <a href="#" class="btn btn-sm btn-success float-end update-btn me-2" style="display: none;">Update</a>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
+                    @endphp
+                    @if ($hasPermission)
+                    <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -999,11 +1032,7 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
-                        @if (!is_null($vehicles->VehiclePurchasingCost->unit_price) && !is_numeric($vehicles->VehiclePurchasingCost->unit_price))
-                        <td>{{ isset($vehicles->VehiclePurchasingCost->unit_price) ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
-                        @else
-                        <td>{{ $vehicles->VehiclePurchasingCost->unit_price }}</td>
-                        @endif
+                        <td>{{ number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '.', ',') }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -2897,5 +2926,98 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
         window.location.reload();
     });
 }
+</script>
+<script>
+    $(document).ready(function(){
+        $('.updateprice-btn').click(function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            console.log(id);
+
+            $.ajax({
+                url: '{{ route("vehicles.vehiclesdatagetting", ["id" => ":id"]) }}'.replace(':id', id),
+                method: 'GET',
+                success: function(response) {
+                    var tableId = 'dtBasicExample6_' + id; // Unique table ID
+                    var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Current Price</th><th>New Price</th></tr></thead><tbody>';
+                    $.each(response, function(index, vehicle) {
+                        var vin = vehicle.vin ? vehicle.vin : '';
+                        tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + vehicle.price + '</td><td><input type="text" class="form-control new-price" data-vehicle-id="' + vehicle.vehicle_id + '" value="' + vehicle.price + '"></td></tr>';
+                    });
+                    tableHtml += '</tbody><tfoot><tr><th colspan="3" class="text-right">Total Price:</th><th id="totalPrice">0.00</th></tr></tfoot></table></div>';
+                    
+                    $('#vehicleModal .modal-body').html(tableHtml);
+                    $('#vehicleModal').modal('show');
+
+                    // Initialize DataTables for the unique table ID
+                    $('#' + tableId).DataTable({
+                        "paging": true,
+                        "searching": true,
+                        "ordering": true
+                    });
+
+                    // Add event listener for new price inputs
+                    $('.new-price').on('input', function() {
+                        calculateTotalPrice();
+                    });
+
+                    // Store the purchasing order id in the modal for later use
+                    $('#vehicleModal').data('purchasingOrderId', id);
+
+                    // Calculate initial total price
+                    calculateTotalPrice();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+
+        function calculateTotalPrice() {
+            var totalPrice = 0;
+            $('.new-price').each(function() {
+                var price = parseFloat($(this).val());
+                if (!isNaN(price)) {
+                    totalPrice += price;
+                }
+            });
+            $('#totalPrice').text(totalPrice.toFixed(2)); // Update the total price in the table footer
+        }
+
+        $('#savePricesBtn').click(function(){
+            var newPrices = [];
+            $('.new-price').each(function() {
+                var vehicleId = $(this).data('vehicle-id');
+                var newPrice = $(this).val();
+                newPrices.push({
+                    vehicle_id: vehicleId,
+                    new_price: newPrice
+                });
+            });
+
+            var totalPrice = $('#totalPrice').text();
+            var purchasingOrderId = $('#vehicleModal').data('purchasingOrderId'); // Retrieve the stored id
+
+            $.ajax({
+                url: '{{ route("vehicles.updatePrices") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    prices: newPrices,
+                    total_price: totalPrice,
+                    purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
+                },
+                success: function(response) {
+                    alert('Prices updated successfully!');
+                    $('#vehicleModal').modal('hide');
+                    $('#totalPriceDisplay').text(totalPrice);
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
 </script>
 @endsection

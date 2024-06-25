@@ -878,6 +878,11 @@ Route::get('/d', function () {
     Route::get('/account/{id}', [VendorAccountController::class, 'view'])->name('vendoraccount.view');
     Route::get('/get-supplier-and-amount/{orderId}', [PurchasingOrderController::class, 'getSupplierAndAmount']);
 
+    //Price Update Purchased Order
+    Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
+    Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
+
+
 
 
 

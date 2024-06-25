@@ -40,6 +40,8 @@ use App\Models\VendorPaymentAdjustments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SupplierAccountTransaction;
+use App\Models\PurchasedOrderPriceChanges;
+
 
 
 class PurchasingOrderController extends Controller
@@ -809,7 +811,17 @@ public function getBrandsAndModelLines(Request $request)
         ->get();  
         $totalSum = $vendorPaymentAdjustments->sum('total_amount');
     $alreadypaidamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Paid')->sum('amount');
-    $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
+    $totalSurcharges = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+    ->where('change_type', 'Surcharge')
+    ->sum('price_change'));
+    $totalDiscounts = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+    ->where('change_type', 'discount')
+    ->sum('price_change'));
+    $intialamount = DB::table('vehicles')
+    ->join('vehicle_purchasing_cost', 'vehicles.id', '=', 'vehicle_purchasing_cost.vehicles_id')
+    ->where('vehicles.purchasing_order_id', $id)
+    ->where('vehicles.payment_status', 'Payment Initiated Request')
+    ->sum('vehicle_purchasing_cost.unit_price');
     $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
@@ -818,7 +830,16 @@ public function getBrandsAndModelLines(Request $request)
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
-    $vendorstatus = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->value('current_balance') ?? 'Account Not Existing';
+    $vendorstatus = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)
+                               ->select('current_balance', 'currency')
+                               ->first();
+                               if ($vendorstatus) {
+                                $vendorBalance = number_format(intval($vendorstatus->current_balance), 0, '.', ',');
+                                $vendorCurrency = $vendorstatus->currency;
+                                $vendorDisplay = $vendorBalance . ' - ' . $vendorCurrency;
+                            } else {
+                                $vendorDisplay = 'Account Not Existing';
+                            }
         $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
         $nextId = PurchasingOrder::where('id', '>', $id)->min('id');
 
@@ -868,7 +889,7 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorstatus', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts'));
     }
     public function edit($id)
     {
@@ -2862,12 +2883,174 @@ public function getSupplierAndAmount($orderId) {
     if ($order) {
         $vendors_id = $order->vendors_id;
         $supplier = SupplierAccount::where('suppliers_id', $vendors_id)->first();
-        $requestedcost = PurchasedOrderPaidAmounts::where('purchasing_order_id', $orderId)->where('status', 'Request For Payment')->sum('amount');
+        $requestedcost = DB::table('vehicles')
+        ->join('vehicle_purchasing_cost', 'vehicles.id', '=', 'vehicle_purchasing_cost.vehicles_id')
+        ->where('vehicles.purchasing_order_id', $orderId)
+        ->where('vehicles.payment_status', 'Payment Initiated Request')
+        ->sum('vehicle_purchasing_cost.unit_price');
         $current_amount = $supplier->current_balance;
         $totalamount = $order->totalcost;
         $requestedcost = $requestedcost;
         return response()->json(['supplier_id' => $vendors_id, 'current_amount' => $current_amount, 'totalamount' => $totalamount, 'requestedcost' => $requestedcost]);
     }
     return response()->json(['error' => 'Order not found'], 404);
+}
+public function vehiclesdatagetting($id)
+{
+    $vehicles = Vehicles::where('purchasing_order_id', $id)->whereNull('deleted_at')->get();
+    $vehicleData = [];
+    foreach ($vehicles as $vehicle) {
+        $price = VehiclePurchasingCost::where('vehicles_id', $vehicle->id)->value('unit_price');
+        $vehicleData[] = [
+            'vehicle_id' => $vehicle->id,
+            'vin' => $vehicle->vin,
+            'price' => intval($price),
+        ];
+    }
+    return response()->json($vehicleData);
+}
+public function updatePrices(Request $request)
+{
+    $prices = $request->input('prices');
+    $totalPrice = intval($request->input('total_price'));
+    $purchasingOrderId = $request->input('purchasing_order_id');
+    $userId = auth()->id(); // Assuming you have user authentication and need the ID of the user making the request
+
+    // Fetch the purchasing order and its currency
+    $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+    $orderCurrency = $purchasingOrder->currency;
+    // Fetch the supplier account linked to this purchasing order
+    $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+    $accountCurrency = $supplierAccount->currency;
+    // Currency conversion rates
+    $conversionRates = [
+        'USD' => 3.67,
+        'EUR' => 3.94,
+        'GBP' => 4.66,
+        'JPY' => 0.023,
+        'CAD' => 2.69
+    ];
+    $totalDifference = 0;
+    foreach ($prices as $priceData) {
+        $vehicleId = $priceData['vehicle_id'];
+        $newPrice = $priceData['new_price'];
+        // Fetch the old price
+        $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
+        $oldPrice = $vehicleCost->unit_price;
+        // Calculate the price difference
+        $priceDifference = $oldPrice - $newPrice;
+        if ($priceDifference != 0) {
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update Vehicles Price';
+            $vehicleslog->vehicles_id = $vehicleId;
+            $vehicleslog->field = "Price";
+            $vehicleslog->old_value = $vehicleCost->unit_price;
+            $vehicleslog->new_value = $newPrice;
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+            $statuses = [
+                'Payment Release Approved', 
+                'Payment Completed', 
+                'Vendor Confirmed', 
+                'Incoming Stock'
+            ];
+            $vehiclesalreadypaid = Vehicles::where('id', $vehicleId)
+                               ->whereIn('payment_status', $statuses)
+                               ->first();
+            if($vehiclesalreadypaid)
+            {
+                if ($vehicleCost->unit_price > $newPrice) {
+                    $changeType = 'discount';
+                } else {
+                    $changeType = 'Surcharge';
+                }
+                $priceChange = abs($vehicleCost->unit_price - $newPrice);
+                $priceupdates = New PurchasedOrderPriceChanges ();
+                $priceupdates->purchasing_order_id = $purchasingOrderId;
+                $priceupdates->vehicles_id = $vehicleId;
+                $priceupdates->original_price = $vehicleCost->unit_price;
+                $priceupdates->new_price = $newPrice;
+                $priceupdates->price_change = $priceChange;
+                $priceupdates->change_type = $changeType;
+                $priceupdates->save();
+            }
+            $vehicleCost->update(['unit_price' => $newPrice]);
+            $updatepriceinpaid = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Request For Payment')->orderBy('created_at', 'desc')->first();
+            $updatePerformed = false;
+            if ($updatepriceinpaid) {
+                // Check if priceDifference is positive or negative 
+                if ($priceDifference > 0) {
+                    $updatepriceinpaid->amount -= $priceDifference; // Add priceDifference
+                } else {
+                    $updatepriceinpaid->amount += abs($priceDifference); // Subtract priceDifference
+                }
+                $updatepriceinpaid->save();
+                $updatePerformed = true;
+            }
+            $vehicles = Vehicles::where('id', $vehicleId)->first();
+            // Skip account updates if payment status is blank or 'Payment Initiated Request'
+            if ($vehicles && ($vehicles->payment_status == '' || $vehicles->payment_status == 'Payment Initiated Request')) {
+                continue;
+            }
+            if (!$updatePerformed) {
+            $updatepriceinpaidint = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Initiated Payment')->orderBy('created_at', 'desc')->first();
+            if ($updatepriceinpaidint) {
+                // Check if priceDifference is positive or negative 
+                if ($priceDifference > 0) {
+                    $updatepriceinpaidint->amount -= $priceDifference; // Add priceDifference
+                } else {
+                    $updatepriceinpaidint->amount += abs($priceDifference); // Subtract priceDifference
+                }
+                $updatepriceinpaidint->save();
+            }
+         }
+        }
+        // Convert the price difference to supplier account currency if needed
+        if ($orderCurrency !== $accountCurrency) {
+            $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
+        } else {
+            $priceDifferenceInAccountCurrency = $priceDifference;
+        }
+
+        // Accumulate the total difference
+        $totalDifference += $priceDifferenceInAccountCurrency;
+    }
+    // Update supplier account current balance if the total difference is not zero and not skipped
+    if ($totalDifference != 0) {
+        $supplierAccount->current_balance += $totalDifference;
+        $supplierAccount->save();
+
+        // Record the transaction
+        SupplierAccountTransaction::create([
+            'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
+            'purchasing_order_id' => $purchasingOrderId,
+            'supplier_account_id' => $supplierAccount->id,
+            'created_by' => $userId,
+            'account_currency' => $accountCurrency,
+            'transaction_amount' => abs($totalDifference),
+        ]);
+    }
+    // Update the total price in the purchasing order
+    $purchasingOrder->update(['totalcost' => $totalPrice]);
+    return response()->json(['message' => 'Prices updated successfully']);
+}
+private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
+{
+    if ($fromCurrency == 'AED') {
+        // Convert from AED to the target currency
+        return $amount / $conversionRates[$toCurrency];
+    } elseif ($toCurrency == 'AED') {
+        // Convert from the source currency to AED
+        return $amount * $conversionRates[$fromCurrency];
+    } else {
+        // Convert from source currency to AED, then from AED to target currency
+        $amountInAed = $amount * $conversionRates[$fromCurrency];
+        return $amountInAed / $conversionRates[$toCurrency];
+    }
 }
 }

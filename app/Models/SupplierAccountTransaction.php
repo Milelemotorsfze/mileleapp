@@ -9,6 +9,14 @@ class SupplierAccountTransaction extends Model
 {
     use HasFactory;
     protected $table = "supplier_account_transaction";
+    protected $fillable = [
+        'transaction_type',
+        'purchasing_order_id',
+        'supplier_account_id',
+        'created_by',
+        'account_currency',
+        'transaction_amount',
+    ];
     public function purchaseOrder()
     {
         return $this->belongsTo(PurchaseOrder::class, 'purchasing_order_id');
