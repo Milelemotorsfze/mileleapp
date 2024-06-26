@@ -514,8 +514,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; float:left;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+						<a  title="Add VIN" style="margin-top:38px; float:left;"
+							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
 					</div>
 				</div>
 				</br>
@@ -1166,9 +1166,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				addChild();
 			});
 			$("body").on("click", ".add-addon-btn", function () {
-				addAddon();
+				if (validateVINSelection()) {
+					addAddon();
+				}
 			});
-
+			$("body").on("click", ".add-vehicle-btn", function () {
+				if (validateVINSelection() && validateAddonSelection()) {
+					addVIN();
+				}
+			});
+			function validateVINSelection() {
+				var selectedVIN = $("#vin_multiple").val();
+				if (!selectedVIN || selectedVIN.length === 0) {
+					alert("Please select at least one VIN.");
+					return false;
+				}
+				return true;
+			}
+			function validateAddonSelection() {
+				var isValid = true;
+				$(".addondynamicselect2").each(function () {
+					if ($(this).val() === null || $(this).val().length === 0) {
+						isValid = false;
+						alert("Please select addon.");
+						return false; // Break out of the loop
+					}
+				});
+				return isValid;
+			}
 			// Event listener to remove form fields and reset indexes
 			$("body").on("click", ".remove_node_btn_frm_field", function () {
 				var row = $(this).closest(".form_field_outer_row");
@@ -1190,16 +1215,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				row.remove();
 				resetIndexes();
 			});
-			$("body").on("click", ".remove_node_btn_frm_field_addon", function () {
-				var row = $(this).closest(".addon_input_outer_row");
-				row.remove();
+			
+			// Event delegation for dynamically added elements
+			$(document).on('click', '.remove_node_btn_frm_field_addon', function () {
+				$(this).closest('.addon_input_outer_row').remove();
+				disableAddonSelectedOptions(); // Re-check disabled options after removing a row
 				resetRowIndexes();
 			});
 			// Event listener to handle change event for .dynamicselect2
 			$("body").on("change", ".dynamicselect2", function () {
 				disableSelectedOptions();
 			});
-
+			// Add change event listener for dynamically added .addondynamicselect2 elements
+			$(document).on('change', '.addondynamicselect2', function() {
+				disableAddonSelectedOptions();
+			});
+			
 		// BOE DYNAMICALLY ADD AND REMOVE END
 
 
@@ -1212,7 +1243,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					// 	addAddon();
 					// }
 					// else {
-						resetAddonDropdown();
+						// resetAddonDropdown();
 					// }
 					
 				} else {
@@ -1409,6 +1440,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				// Optionally display the error message to the user
 			});
 		});
+		$(document.body).on('select2:select', ".dynamicselectaddon", function (e) {
+            var dataId = $(this).attr('data-parant');
+			vehicleAddonDropdown(dataId)
+            // var currentId = 'selectModelLine'+index;
+            // var data = e.params.data.id;
+            // optionEnable(currentId,data);
+            // uniqueCheckAccessories()
+
+        });
+		$(document.body).on('select2:unselect', ".dynamicselectaddon", function (e) {
+            var dataId = $(this).attr('data-parant');
+			vehicleAddonDropdown(dataId)
+            // var currentId = 'selectModelLine'+index;
+            // var data = e.params.data.id;
+            // optionEnable(currentId,data);
+            // uniqueCheckAccessories()
+
+        });
 	});
 
 	// ADD CUSTOM VALIDATION RULES START
@@ -1874,17 +1923,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// ADDON DYNAMICALLY ADD AND REMOVE START
 		// Function to reset row indexes
 		function resetRowIndexes() {
-			$(".addon_outer .addon_input_outer_row").each(function(index) {
+			$(".addon_outer").find(".addon_input_outer_row").each(function (index, element) {
 				var newIndex = index + 1;
-				$(this).attr('id', `addon_row_${newIndex}`);
-				$(this).find('select').attr('id', `addons_${newIndex}`).data('index', newIndex);
-				$(this).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
-				$(this).find('textarea').attr('id', `addon_description_${newIndex}`);
+				$(element).attr('id', `addon_row_${newIndex}`);
+				$(element).find('select')
+					.attr('id', `addons_${newIndex}`)
+					.data('index', newIndex);
+				$(element).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
+				$(element).find('textarea').attr('id', `addon_description_${newIndex}`);
+
+				// Reinitialize Select2 for the updated elements
+				$(`#addons_${newIndex}`).select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder: "Choose Addon",
+				});
 			});
+			disableAddonSelectedOptions();
 		}
 
 		function resetAddonDropdown() {
-			$.ajax({
+			return $.ajax({
 				url: '{{ route('fetch-addons') }}',
 				type: 'POST',
 				data: {
@@ -1906,7 +1965,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							$("#addon-dynamic-div").show();
 							$.each(response.charges, function(index, charge) {
 								$dropdown.append(
-									$('<option></option>').val(charge.addon_code+" - "+charge.addon_name).text(charge.addon_code+" - "+charge.addon_name)
+									$('<option></option>').val(charge.addon_code + " - " + charge.addon_name).text(charge.addon_code + " - " + charge.addon_name)
 								);
 							});
 						}
@@ -1914,10 +1973,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							$("#addon-dynamic-div").show();
 							$.each(response.addons, function(index, addon) {
 								$dropdown.append(
-									$('<option></option>').val(addon.addon_code+" - "+addon.addon_name).text(addon.addon_code+" - "+addon.addon_name)
+									$('<option></option>').val(addon.addon_code + " - " + addon.addon_name).text(addon.addon_code + " - " + addon.addon_name)
 								);
 							});
 						}
+
+						// Re-initialize Select2 with options
+						$dropdown.select2({
+							allowClear: true,
+							maximumSelectionLength: 1,
+							placeholder: "Choose Addon",
+						});
+
 						// Re-set the previously selected values
 						$dropdown.val(currentVal).trigger('change');
 					});
@@ -1927,7 +1994,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			});
 		}
-
 		function addAddon() {
 			var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 			var newRow = $(`
@@ -1939,6 +2005,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
 									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
+										@foreach($addons as $addon)
+										<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>
+										@endforeach
+										@foreach($charges as $charge)
+										<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>
+										@endforeach
 									</select>
 								</div>
 								<div class="col-xxl-12 col-lg-12 col-md-12">
@@ -1959,7 +2031,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 				</div>
 			`);
-			
+
 			// Append the new row to the container
 			$(".addon_outer").append(newRow);
 
@@ -1970,9 +2042,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				placeholder: "Choose Addon",
 			});
 
-			disableSelectedOptions();
-			resetAddonDropdown();
+			// Call to update disabled options
+			disableAddonSelectedOptions();
 		}
+
 	// ADDON DYNAMICALLY ADD AND REMOVE END
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
@@ -2031,10 +2104,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				});
 			});
 
-			disableSelectedOptions();
+			disableAddonSelectedOptions();
+		}
+		function disableAddonSelectedOptions() {
+			// Get all selected options
+			var selectedOptions = [];
+			$(".addondynamicselect2").each(function () {
+				$(this).find('option:selected').each(function () {
+					selectedOptions.push($(this).val());
+				});
+			});
+
+			// Disable the selected options in all .addondynamicselect2 elements
+			$(".addondynamicselect2").each(function () {
+				var $select = $(this);
+				$select.find('option').each(function () {
+					if (selectedOptions.includes($(this).val())) {
+						if (!$(this).is(':selected')) {
+							$(this).prop('disabled', true);
+						}
+					} else {
+						$(this).prop('disabled', false);
+					}
+				});
+			});
 		}
 
-		function disableSelectedOptions() {
+		function disableSelectedOptions() { 
 			// Get all selected options
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
@@ -2229,7 +2325,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			thirdRow.appendChild(specialRequestInputCell);
 
 			// Last Row Elements
-			var createAddon = createAddonCell();
+			var createAddon = createAddonCell(data.vehicle_id);
 			createAddon.colSpan = 17;
 			// Append cells to the last row
 			lastRow.appendChild(createAddon);
@@ -2257,6 +2353,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				var removeAddonCell = createAddonRemoveButton();
 				// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
 				var addonRow = document.createElement('tr');
+				addonRow.className = data.vehicle_id; // Add the vehicle_id as a class for addonRow
 
 				// Addon Row Label
 				var serviceBreakdownLabelCell = document.createElement('td');
@@ -2269,11 +2366,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 				var addonQuantityCell = document.createElement('td');
 				addonQuantityCell.colSpan = 1;
-				addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+																										
+				addonQuantityCell.innerHTML = '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
+				+'<div class="input-group">'
+				+'<div class="input-group-append">'
+				+'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
+				+'</div>'
+				+'<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Addon Quantity">'
+				+'</div>';
 
 				var addonDescriptionCell = document.createElement('td');
 				addonDescriptionCell.colSpan = 14;
-				addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+				addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="'+addonDescription+'" class="form-control widthinput" id="addon_description_' + addonIndex + '"  placeholder="Enter Addon Description">';
 
 				// Append cells to the addon row
 				addonRow.appendChild(removeAddonCell);
@@ -2317,133 +2421,141 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// Event delegation to handle remove button click for remove addons row from vehicle table section
 		$('#myTable').on('click', '.remove-addon-row', function() {
 			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
+			var className = addon.attr('class'); // Get the class name of the tr
+			
 			addon.remove();
-			// if (vin) {
-			// 	// Unselect and remove the VIN from all dynamicselect2 class elements
-			// 	$(".dynamicselect2").each(function() {
-			// 		var selectElement = $(this);
-			// 		selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
-			// 		// Trigger change to update the Select2 UI
-			// 		selectElement.trigger('change');
-			// 	});
-			// 	$('select option[value="'+ vin +'"]').prop('disabled', false);
-			// }
-			// var rows = $(this).data('rows');
-			// if (rows) {
-			// 	$(rows).each(function() {
-			// 		$(this).remove();
-			// 	});
-			// }
-			// findAllVINs();
+
+			// Find all rows with the same class name and reset their indices
+			var allVehicleRows = $('#myTable tr.' + className);
+			allVehicleRows.each(function(index) {
+				var row = $(this);			
+				// Update hidden input field for addon_code
+				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
+
+				// Update quantity input field within the specific div structure
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][quantity]').attr('id','addon_quantity_' + className + '_' + index);
+
+				// Update description input field within the <td> element
+				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][description]').attr('id', 'addon_description_' + index);
+    		
+				// Update select element within the <td> element if it exists
+				var selectElement = row.find('td select[id^="addons_"]');
+				if (selectElement.length) {
+					selectElement.attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]');
+					selectElement.attr('id', 'addons_' + className + '_' + index);
+					selectElement.attr('data-select2-id', 'select2-data-addons_' + className + '_' + index);
+				}
+			});
+			vehicleAddonDropdown(className)
 		});
 		// Event delegation to handle add addon for vehicle in the vehicle line level
 		$('#myTable').on('click', '.create-addon-row', function() {
-			var addonId = '';
-			var addonValue = 'This is an addon value';
+			// Get the data-id for this td
+			var dataId = $(this).closest('td').data('id');
+			
+			// Find the next addon index for this particular dataId
+			var addonIndex = 0;
+			$('.' + dataId).each(function(index) {
+				addonIndex = index + 1; // Adjust the index based on 0 or 1 based indexing 
+			});
+			// console.log(addonIndex);
+			addonIndex++; // Increment to get the next available index
+
+			var addonValue = '';
 			var addonQuantity = '';
 			var addonDescription = '';
 
-			// var addonId = $(this).attr('id').split('_')[2]; 
-			// var addonValue = $(`#addons_${addonId}`).val();
-
 			var removeAddonCell = createAddonRemoveButton();
+
 			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
 			var addonRow = document.createElement('tr');
+			addonRow.className = dataId; // Add the vehicle_id as a class for addonRow
 
 			// Addon Row Label
 			var serviceBreakdownLabelCell = document.createElement('td');
 			serviceBreakdownLabelCell.colSpan = 1;
-			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-			// Addon Row Elements
-			// var addonValueCell = document.createElement('td');
-			// addonValueCell.colSpan = 2;
-			// addonValueCell.textContent = addonValue;
+			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
+			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
-			// addonValueCell.textContent = addonValue;
-			addonValueCell.innerHTML = '<select name="addons[]" id="addons_" class="form-control widthinput dynamicselectaddon" data-index="" multiple="true"></select>';
-
+			addonValueCell.innerHTML = '<select name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_code]" id="addons_'+dataId+'_'+addonIndex+'" class="child_addon_'+dataId+' form-control widthinput dynamicselectaddon" data-parant="'+dataId+'" multiple="true">'
+				+ '@foreach($addons as $addon)<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>@endforeach'
+				+ '@foreach($charges as $charge)<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>@endforeach'
+				+ '</select>';
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
-			addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+			addonQuantityCell.innerHTML = '<div class="input-group">'
+			+'<div class="input-group-append">'
+			+'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
+			+'</div>'
+			+'<input name="vehicle['+dataId+'][addons]['+addonIndex+'][quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+dataId+ '_'+ addonIndex + '" placeholder="Addon Quantity">'
+			+'</div>';
 
 			var addonDescriptionCell = document.createElement('td');
 			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
-
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
-			// Ensure the newly added select element is included in the AJAX response handling
-			var newDropdown = $(addonValueCell).find('.dynamicselectaddon');
-			var rowVin = [];
-			// Fetch addons via AJAX
-			$.ajax({
-					url: '{{ route('fetch-addons') }}',
-					type: 'POST',
-					data: {
-						vins: rowVin,
-						_token: '{{ csrf_token() }}'
-					},
-					dataType: 'json',
-					success: function(response) { 
-						// Populate the newDropdown with the response data
-						newDropdown.empty();
 
-						// Populate the dropdown with charges
-						if (response.charges && response.charges.length > 0) {
-							$.each(response.charges, function(index, charge) {
-								newDropdown.append(
-									$('<option></option>').val(charge.addon_code + " - " + charge.addon_name).text(charge.addon_code + " - " + charge.addon_name)
-								);
-							});
-						}
+			// Append the addon row after the last addon of the row VIN or before the add addon button
+			var parentElementRemove = $(this).closest('tr');
+			var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
 
-						// Populate the dropdown with addons
-						if (response.addons && response.addons.length > 0) {
-							$.each(response.addons, function(index, addon) {
-								newDropdown.append(
-									$('<option></option>').val(addon.addon_code + " - " + addon.addon_name).text(addon.addon_code + " - " + addon.addon_name)
-								);
-							});
-						}
-						$('.dynamicselectaddon').select2({
-							allowClear: true,
-							maximumSelectionLength: 1,
-							placeholder:"Choose Customer Name",
-							// dropdownAutoWidth : true,
-							// width: 'auto'
-						});
-					},
-					error: function(xhr, status, error) {
-						console.error("Error fetching add-ons:", error);
+			if (firstRemoveRowButton.length) {
+				firstRemoveRowButton.after(addonRow);
+
+				// Push addonRow element into data-rows array of firstRemoveRowButton element
+				var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
+				rowsData.push(addonRow);
+				firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
+			} else {
+				parentElementRemove.after(addonRow);
+			}
+			var parentElement = this.parentElement.parentElement;
+			parentElement.insertAdjacentElement('beforebegin', addonRow);
+
+			// Initialize select2 after appending the row to the DOM
+			$('#addons_' + dataId + '_' + addonIndex).select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder: "Choose Addon"
+			});
+			vehicleAddonDropdown(dataId);
+		});
+		function vehicleAddonDropdown(dataId) {
+			// Collect all selected addon values for the specific dataId
+			var selectedAddonValues = [];
+			$('.' + dataId).find('.child_addon_' + dataId).each(function() {
+				if ($(this).is('input')) {
+					selectedAddonValues.push($(this).val());
+				} else if ($(this).is('select') && $(this).val()[0] != undefined) {  
+					selectedAddonValues.push($(this).val()[0]);
+				}
+			});
+			// Disable the collected options in all select elements for the dataId
+			$('.' + dataId).find('select').each(function() {
+				var selectElement = $(this);
+				var currentSelectedValue = selectElement.val();
+				selectElement.find('option').each(function() {
+					var optionValue = $(this).val();
+					// Disable options that are in the selectedAddonValues array but are not the currently selected value
+					if (selectedAddonValues.includes(optionValue) && optionValue !== currentSelectedValue[0]) {
+						$(this).prop('disabled', true);
+					} else {
+						$(this).prop('disabled', false);
 					}
 				});
+				// Refresh select2 to show disabled options
+				selectElement.trigger('change.select2');
+			});
+		}
 
-			// WRITE CODE TO APPEND THE ADDON ROW AFTER THE LAST ADDON OF THE ROW VIN OR BEFORE THE ADD ADDON BUTTON
-
-			 var parentElementRemove = $(this).closest('tr');
-				var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
-
-				if (firstRemoveRowButton.length) {
-					firstRemoveRowButton.after(addonRow);
-
-					// Push addonRow element into data-rows array of firstRemoveRowButton element
-					var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
-					rowsData.push(addonRow);
-					firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
-				} 
-				else {
-					parentElementRemove.after(addonRow);
-				}
-				var parentElement = this.parentElement.parentElement;
-			parentElement.insertAdjacentElement('beforebegin', addonRow);
-			
-		});
 		function findAllVINs() { 
 			addedVins = [];
 			$('#myTable tbody .first-row').each(function() {
@@ -2516,8 +2628,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			cell.appendChild(removeButton);
 			return cell;
 		}
-		function createAddonCell() {
+		function createAddonCell(vehicle_id) {
 			var cell = document.createElement('td');
+			cell.setAttribute('data-id', vehicle_id); // Setting the data-id attribute
 			var addButton = document.createElement('a');
 			addButton.className = 'addon_btn_round create-addon-row';
 			addButton.title = 'Create Addon';

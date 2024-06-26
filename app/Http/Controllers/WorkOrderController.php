@@ -30,6 +30,40 @@ class WorkOrderController extends Controller
     public function workOrderCreate($type) {
         (new UserActivityController)->createActivity('Open '.$type.' work order create page');
 
+        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'K')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'P')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'SP')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
+                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
+                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            ->orderBy('master_charges.id', 'asc')
+            ->get();
+        // Merge collections
+        $addons = $accessories->merge($spareParts)->merge($kit);
+
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             'customer_name', 
@@ -75,7 +109,7 @@ class WorkOrderController extends Controller
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users'));
+        return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users','addons','charges'));
     }
     /**
      * Display a listing of the resource.
@@ -98,7 +132,7 @@ class WorkOrderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreWorkOrderRequest $request)
-    { 
+    {
         DB::beginTransaction();
 
         try {
@@ -334,19 +368,20 @@ class WorkOrderController extends Controller
                         if (isset($vehicleData['addons'])) {
                             if (count($vehicleData['addons']) > 0) {
                                 foreach ($vehicleData['addons'] as $key => $addonData) {
-                                    $createWOVehiclesAddons = [];
-                                    $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;
-                        
-                                    // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
-                                    // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
-                                    $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
-                                    // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
-                                    // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
-                                    $createWOVehiclesAddons['addon_quantity'] = $addonData['quantity'] ?? null;
-                                    $createWOVehiclesAddons['addon_description'] = $addonData['description'] ?? null;                                  
-                                    $createWOVehiclesAddons['created_by'] = $authId;
-                        
-                                    $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);
+                                    if (isset($addonData['addon_code']) && $addonData['addon_code'] != null) {
+                                        $createWOVehiclesAddons = [];
+                                        $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
+                                        // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
+                                        // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
+                                        $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
+                                        // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
+                                        // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
+                                        $createWOVehiclesAddons['addon_quantity'] = $addonData['quantity'] ?? null;
+                                        $createWOVehiclesAddons['addon_description'] = $addonData['description'] ?? null;                                  
+                                        $createWOVehiclesAddons['created_by'] = $authId;
+                                                                  
+                                        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);                                           
+                                    }
                                 }
                             }
                         }       
@@ -484,7 +519,40 @@ class WorkOrderController extends Controller
         
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users'));
+        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'K')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'P')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'SP')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
+                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
+                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            ->orderBy('master_charges.id', 'asc')
+            ->get();
+        // Merge collections
+        $addons = $accessories->merge($spareParts)->merge($kit);
+        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'));
     }
 
     /**
