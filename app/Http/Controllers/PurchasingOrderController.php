@@ -41,7 +41,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SupplierAccountTransaction;
 use App\Models\PurchasedOrderPriceChanges;
-
+use App\Models\PurchasedOrderMessages;
+use App\Models\PurchasedOrderReplies;
 
 
 class PurchasingOrderController extends Controller
@@ -3053,4 +3054,32 @@ private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversio
         return $amountInAed / $conversionRates[$toCurrency];
     }
 }
+public function storeMessages(Request $request)
+    {
+        $message = PurchasedOrderMessages::create([
+            'purchasing_order_id' => $request->purchase_order_id,
+            'user_id' => auth()->id(),
+            'message' => $request->message
+        ]);
+
+        return response()->json($message->load('user'));
+    }
+    public function storeReply(Request $request)
+    {
+        $reply = PurchasedOrderReplies::create([
+            'purchased_order_messages_id' => $request->message_id,
+            'user_id' => auth()->id(),
+            'reply' => $request->reply
+        ]);
+
+        return response()->json($reply->load('user'));
+    }
+    public function indexmessages($purchaseOrderId)
+    {
+        $messages = PurchasedOrderMessages::where('purchasing_order_id', $purchaseOrderId)
+                            ->with('user', 'replies.user')
+                            ->get();
+
+        return response()->json($messages);
+    }
 }

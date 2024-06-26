@@ -881,6 +881,9 @@ Route::get('/d', function () {
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
+    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
 
 
 

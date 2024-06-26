@@ -1,6 +1,106 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+.comments-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fixed-height {
+    height: 330px; /* Adjust the height as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.message-card, .message-reply {
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.message-card .card-body, .message-reply {
+    padding: 1rem;
+}
+
+.message-reply {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.reply-input {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.avatar-small {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-left: 5px;
+}
+
+.send-icon {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    border: none;
+    background: none;
+    font-size: 0.1rem;
+    color: #28a745;
+    cursor: pointer;
+}
+
+.send-icongt {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    border: none;
+    background: none;
+    font-size: 0.01rem;
+    color: #28a745;
+    cursor: pointer;
+}
+.message-input-wrapper, .reply-input-wrapper {
+    position: relative;
+}
+
+.message-input-wrapper textarea, .reply-input-wrapper textarea {
+    padding-right: 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
     .btn-danger {
     position: relative;
     z-index: 10;
@@ -432,7 +532,7 @@
             </div>
             </div>
             <div class="row">
-                <div class="col-lg-9 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Type</strong></label>
@@ -659,7 +759,138 @@
                     <br>
                     <br>
                     @endif
-                    <div class="row">
+                </div>
+                @php
+                            $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
+                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
+                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
+                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
+                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $serialNumber = 1;   
+                            @endphp
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                            <div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="comments-header">
+                <h6>Comments & Remarks</h6>
+            </div>
+            <div id="messages" class="fixed-height"></div>
+            <div class="message-input-wrapper mb-3">
+                <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
+                <button id="send-message" class="btn btn-success send-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+                        </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
+                        <thead class="bg-soft-secondary">
+                        <th style="font-size: 12px;">S.No</th>
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        <th style="font-size: 12px;">Pending With Department</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Not Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr> 
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;"> Vehicles Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Requested</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Request</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Initiated</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
+                            <td style="font-size: 12px;">CEO</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vendor Confirmed</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Incoming Stock</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">Vehicles Cancel</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
                         <div class="col-lg-1 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Status</strong></label>
                         </div>
@@ -818,119 +1049,8 @@
                             @endif
                             @endif
                     </div>
-                </div>
-                @php
-                            $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
-                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
-                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
-                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
-                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
-                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
-                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
-                            $serialNumber = 1;   
-                            @endphp
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
-                        <thead class="bg-soft-secondary">
-                        <th style="font-size: 12px;">S.No</th>
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        <th style="font-size: 12px;">Pending With Department</th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Not Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr> 
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;"> Vehicles Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Requested</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Request</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
-                            <td style="font-size: 12px;">Finance</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Initiated</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
-                            <td style="font-size: 12px;">CEO</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Released</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
-                            <td style="font-size: 12px;">Finance</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Released Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vendor Confirmed</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Incoming Stock</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
-                        <thead class="bg-soft-secondary" style="background-color: darkred;">
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="font-size: 12px;">Vehicles Cancel</td>
-                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <br>
+                    <br>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Active Vehicle's Details</h4>
@@ -3019,5 +3139,161 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
             });
         });
     });
+</script>
+<script>
+$(document).ready(function() {
+    const purchaseOrderId = {{ $purchasingOrder->id }};
+    const userId = {{ auth()->id() }};
+    const userName = "{{ auth()->user()->name }}";
+    const userAvatar = "{{ auth()->user()->avatar }}"; // Assuming user has an avatar field
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    function loadMessages() {
+        $.get(`/messages/${purchaseOrderId}`, function(data) {
+            $('#messages').empty();
+            data.forEach(function(message) {
+                displayMessage(message);
+            });
+            scrollToBottom();
+        });
+    }
+
+    function scrollToBottom() {
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+    }
+
+    function formatTimeAgo(date) {
+        const now = new Date();
+        const messageDate = new Date(date);
+        const diff = Math.floor((now - messageDate) / 1000);
+        if (diff < 60) return `${diff} seconds ago`;
+        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+        return `${Math.floor(diff / 86400)} days ago`;
+    }
+
+    function getInitials(name) {
+        return name.charAt(0).toUpperCase();
+    }
+
+    function getAvatarColor(name) {
+        const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'];
+        const charCode = name.charCodeAt(0);
+        return colors[charCode % colors.length];
+    }
+
+    function displayMessage(message) {
+        const replies = message.replies || [];
+        const messageTime = formatTimeAgo(message.created_at);
+        const userInitial = getInitials(message.user.name);
+        const userColor = getAvatarColor(message.user.name);
+        const messageHtml = `
+            <div class="card message-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="user-info">
+                            <div class="avatar" style="background-color: ${userColor};">${userInitial}</div>
+                            <strong class="user-name">${message.user.name}</strong>
+                        </div>
+                        <small class="text-muted">${messageTime}</small>
+                    </div>
+                    <p class="mt-2">${message.message}</p>
+                    <div id="replies-${message.id}">
+                        ${replies.map(reply => `
+                            <div class="message-reply">
+                                <div class="d-flex justify-content-between">
+                                    <div class="user-info">
+                                        <div class="avatar avatar-small" style="background-color: ${getAvatarColor(reply.user.name)};">${getInitials(reply.user.name)}</div>
+                                        <strong class="user-name">${reply.user.name}</strong>
+                                    </div>
+                                    <small class="text-muted">${formatTimeAgo(reply.created_at)}</small>
+                                </div>
+                                <p class="mt-1">${reply.reply}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <a href="javascript:void(0)" class="reply-link" data-message-id="${message.id}">Reply</a>
+                    <div class="reply-input-wrapper input-group mt-2" style="display:none;" id="reply-input-${message.id}">
+                        <textarea class="form-control reply-message" placeholder="Reply..." rows="1"></textarea>
+                        <button class="btn btn-success btn-sm send-reply send-icongt" data-message-id="${message.id}">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#messages').append(messageHtml);
+    }
+
+    function sendMessage() {
+        const message = $('#message').val();
+        if (message.trim() !== '') {
+            $.post('/messages', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
+                displayMessage(data);
+                $('#message').val('');
+                scrollToBottom();
+            });
+        }
+    }
+
+    function sendReply(messageId) {
+        const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
+        if (reply.trim() !== '') {
+            $.post('/replies', { message_id: messageId, reply: reply }, function(data) {
+                const replyHtml = `
+                    <div class="message-reply">
+                        <div class="d-flex justify-content-between">
+                            <div class="user-info">
+                                <div class="avatar avatar-small" style="background-color: ${getAvatarColor(data.user.name)};">${getInitials(data.user.name)}</div>
+                                <strong class="user-name">${data.user.name}</strong>
+                            </div>
+                            <small class="text-muted">${formatTimeAgo(data.created_at)}</small>
+                        </div>
+                        <p class="mt-1">${data.reply}</p>
+                    </div>
+                `;
+                $(`#replies-${messageId}`).append(replyHtml);
+                $(`#reply-input-${messageId}`).find('.reply-message').val('');
+                $(`#reply-input-${messageId}`).hide();
+            });
+        }
+    }
+
+    $('#send-message').on('click', function() {
+        sendMessage();
+    });
+
+    $('#message').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            sendMessage();
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.reply-link', function() {
+        const messageId = $(this).data('message-id');
+        $(`#reply-input-${messageId}`).toggle();
+    });
+
+    $(document).on('keypress', '.reply-message', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            const messageId = $(this).closest('.reply-input-wrapper').attr('id').split('-')[2];
+            sendReply(messageId);
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.send-reply', function() {
+        const messageId = $(this).data('message-id');
+        sendReply(messageId);
+    });
+
+    loadMessages();
+});
 </script>
 @endsection
