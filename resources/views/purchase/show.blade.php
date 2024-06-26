@@ -1,6 +1,106 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+.comments-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fixed-height {
+    height: 330px; /* Adjust the height as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.message-card, .message-reply {
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.message-card .card-body, .message-reply {
+    padding: 1rem;
+}
+
+.message-reply {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.reply-input {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.avatar-small {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-left: 5px;
+}
+
+.send-icon {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    border: none;
+    background: none;
+    font-size: 0.1rem;
+    color: #28a745;
+    cursor: pointer;
+}
+
+.send-icongt {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    border: none;
+    background: none;
+    font-size: 0.01rem;
+    color: #28a745;
+    cursor: pointer;
+}
+.message-input-wrapper, .reply-input-wrapper {
+    position: relative;
+}
+
+.message-input-wrapper textarea, .reply-input-wrapper textarea {
+    padding-right: 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
     .btn-danger {
     position: relative;
     z-index: 10;
@@ -38,6 +138,73 @@
     }
 </style>
 @section('content')
+<div class="modal fade" id="vehicleModal" tabindex="-1" role="dialog" aria-labelledby="vehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vehicleModalLabel">Active Vehicles Details</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePricesBtn">Update Prices</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalLabel">Payment Information</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Supplier ID: <span id="supplierId"></span></p>
+        <p>Current Amount Status of the Vendor: <span id="currentAmount"></span></p>
+        <p>Total Amount: <span id="totalAmount"></span></p>
+        <p>Requested Amount: <span id="requestedCost"></span></p>
+        
+        
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="adjustmentOption" value="adjustment">
+          <label class="form-check-label" for="adjustmentOption">
+            Use the amount as adjustment
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="payBalanceOption" value="payBalance">
+          <label class="form-check-label" for="payBalanceOption">
+            Pay the balance with this PO
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="partialpayment" value="partialpayment">
+          <label class="form-check-label" for="partialpayment">
+          Partial payment
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="paymentOption" id="noAdjustmentOption" value="noAdjustment" checked>
+          <label class="form-check-label" for="noAdjustmentOption">
+            No adjustment
+          </label>
+        </div>
+        <div id="adjustmentInputContainer" style="display:none;">
+          <label for="adjustmentAmount" id="adjustmentLabel">Adjustment Amount:</label>
+          <input type="number" id="adjustmentAmount" class="form-control" min="0">
+        </div>
+        <br>
+        <p>Initiated / Balance / Exceed Amount / : <span id="remainingAmount"></span></p>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="confirmPaymentButton">Confirm Payment</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal -->
 <div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -61,9 +228,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Reject Payment Release</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="remarksRejForm">
@@ -76,7 +241,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="submitRemarksrej" class="btn btn-primary">Submit Remarks</button>
             </div>
         </div>
@@ -367,9 +532,9 @@
             </div>
             </div>
             <div class="row">
-                <div class="col-lg-9 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Type</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -377,7 +542,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Date</strong></label>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-12">
@@ -386,33 +551,103 @@
                     </div>
                     @if($purchasingOrder->is_demand_planning_purchase_order == true)
                         <div class="row">
-                            <div class="col-lg-2 col-md-3 col-sm-12">
+                            <div class="col-lg-4 col-md-3 col-sm-12">
                                 <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                             </div>
-                            <div class="col-lg-2 col-md-3 col-sm-12">
+                            <div class="col-lg-6 col-md-3 col-sm-12">
                                 <span> {{ $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->pfi_reference_number ?? '' }} </span>
                             </div>
                         </div>
                     @endif
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Vendor Name</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
                             <span>{{ucfirst(strtolower($vendorsname))}}</span>
                         </div>
                     </div>
-
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>Total Vehicles</strong></label>
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Vendor Account Status</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{ count($vehicles) }}</span>
+                            <span>{{ $vendorDisplay }}</span>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Total Vehicles / Cost</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                            <span>{{ count($vehicles) }} /  
+                            {{ number_format($purchasingOrder->totalcost, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Already Paid Amount</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span> {{ number_format($alreadypaidamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
+                        </div>
+                    </div>
+                    @if($totalSurcharges)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Price Increase</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <div style="background-color: red; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
+                        {{ number_format($totalSurcharges, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        </div>
+                        </div>
+                    </div>
+                    @endif
+                    @if($totalDiscounts)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Discounts</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">  
+                        <div style="background-color: green; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
+                        {{ number_format($totalDiscounts, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
+                        </div>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Requested Initiated Amount</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span>{{ number_format($intialamount, 0, '.', ',') }} - {{ $purchasingOrder->currency }}</span>
+                        </div>
+                    </div>
+                    @if($vendorPaymentAdjustments)
+                    <div class="row">
+    <div class="col-lg-4 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Requested Released Amount</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        @if ($vendorPaymentAdjustments->isNotEmpty())
+            <span>
+                @foreach ($vendorPaymentAdjustments as $adjustment)
+                {{ number_format($adjustment->total_amount, 0, '.', ',') }} - {{ $purchasingOrder->currency }} 
+                        ({{ $adjustment->type }})
+                    @if (!$loop->last)
+                        , 
+                    @endif
+                                    @endforeach
+                                </span>
+                                <strong>Total : {{ number_format($totalSum, 0, '.', ',') }} - {{ $purchasingOrder->currency }} </strong>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    <div class="row">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Payment Terms</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -420,19 +655,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
-                        </div>
-                        <div class="col-lg-6 col-md-9 col-sm-12">
-                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
-                        <span>{{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
-                        @else    
-                        <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
-                        @endif
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Shipping Method</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -440,7 +663,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Shipping Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -448,7 +671,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>POL / POD / PD</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -457,7 +680,7 @@
                     </div>
                     @if ($purchasingOrder->pl_number)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -467,7 +690,7 @@
                     @endif
                     @if ($purchasingOrder->pl_file_path)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -536,7 +759,138 @@
                     <br>
                     <br>
                     @endif
-                    <div class="row">
+                </div>
+                @php
+                            $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
+                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
+                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
+                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
+                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $serialNumber = 1;   
+                            @endphp
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                            <div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="comments-header">
+                <h6>Comments & Remarks</h6>
+            </div>
+            <div id="messages" class="fixed-height"></div>
+            <div class="message-input-wrapper mb-3">
+                <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
+                <button id="send-message" class="btn btn-success send-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+                        </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
+                        <thead class="bg-soft-secondary">
+                        <th style="font-size: 12px;">S.No</th>
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        <th style="font-size: 12px;">Pending With Department</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Not Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr> 
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;"> Vehicles Approved</td>
+                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vehicles Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Requested</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Request</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Initiated</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
+                            <td style="font-size: 12px;">CEO</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
+                            <td style="font-size: 12px;">Finance</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Released Rejected</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Vendor Confirmed</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Incoming Stock</td>
+                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">Vehicles Cancel</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
                         <div class="col-lg-1 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Status</strong></label>
                         </div>
@@ -695,119 +1049,8 @@
                             @endif
                             @endif
                     </div>
-                </div>
-                @php
-                            $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
-                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
-                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
-                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
-                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
-                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
-                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
-                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
-                            $serialNumber = 1;   
-                            @endphp
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
-                        <thead class="bg-soft-secondary">
-                        <th style="font-size: 12px;">S.No</th>
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        <th style="font-size: 12px;">Pending With Department</th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Not Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr> 
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;"> Vehicles Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Requested</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Request</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
-                            <td style="font-size: 12px;">Finance</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Initiated</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
-                            <td style="font-size: 12px;">CEO</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Released</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
-                            <td style="font-size: 12px;">Finance</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Released Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vendor Confirmed</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Incoming Stock</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
-                        <thead class="bg-soft-secondary" style="background-color: darkred;">
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="font-size: 12px;">Vehicles Cancel</td>
-                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <br>
+                    <br>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Active Vehicle's Details</h4>
@@ -816,8 +1059,14 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                     @endphp
                     @if ($hasPermission)
-                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
+                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn me-2">Edit</a>
+                    <a href="#" class="btn btn-sm btn-success float-end update-btn me-2" style="display: none;">Update</a>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
+                    @endphp
+                    @if ($hasPermission)
+                    <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -903,11 +1152,7 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
-                        @if (!is_null($vehicles->VehiclePurchasingCost->unit_price) && !is_numeric($vehicles->VehiclePurchasingCost->unit_price))
-                        <td>{{ isset($vehicles->VehiclePurchasingCost->unit_price) ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
-                        @else
-                        <td>{{ $vehicles->VehiclePurchasingCost->unit_price }}</td>
-                        @endif
+                        <td>{{ number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '.', ',') }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -1083,12 +1328,12 @@
                         @endphp
                         @if ($hasPermission)
                         @if ($vehicles->payment_status === 'Payment Initiated')
-                        <div style="display: flex; gap: 10px;">
+                        <!-- <div style="display: flex; gap: 10px;">
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
                         <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
-                        </div>
+                        </div> -->
                         @endif
                         @endif
                         {{-- For Incoming Confirm  --}}
@@ -1141,9 +1386,9 @@
                         @endphp
                         @if ($hasPermission)
                         <div style="display: flex; gap: 10px;">
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                        <!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
                         Approved
-                        </a>
+                        </a> -->
                         @endif
                         @endif
 										@php
@@ -2369,27 +2614,27 @@ function postUpdateStatus(status, orderId, remarks = '') {
                         window.location.reload();
                     });
             }
-            function allpaymentintreqfinpay(status, orderId) {
-                let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
-                let data = { status: status, orderId: orderId };
-                console.log(data);
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
-            }
+            // function allpaymentintreqfinpay(status, orderId) {
+            //     let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+            //     let data = { status: status, orderId: orderId };
+            //     console.log(data);
+            //     fetch(url, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            //         },
+            //         body: JSON.stringify(data),
+            //     })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             console.log('Status update successful');
+            //             window.location.reload();
+            //         })
+            //         .catch(error => {
+            //             window.location.reload();
+            //         });
+            // }
             function rerequestpayment(status, orderId) {
                 let url = '{{ route('purchasing.rerequestpayment') }}';
                 let data = { status: status, orderId: orderId };
@@ -2650,5 +2895,405 @@ function allpaymentintreqfinpaycompsingle(vehicleId) {
     // Open the modal
     $('#fileUploadModalsingle').modal('show');
 }
+</script>
+<script>
+function allpaymentintreqfinpay(status, orderId) {
+    // Open the modal
+    $('#paymentModal').modal('show');
+
+    // Fetch the supplier_id, current amount, and total amount
+    fetch(`/get-supplier-and-amount/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            const { supplier_id, current_amount, totalamount, requestedcost } = data;
+            const currentAmountNumber = Number(current_amount);
+            const requestedCostNumber = Number(requestedcost);
+
+            // Populate the modal with the supplier_id, current_amount, and totalamount
+            document.getElementById('supplierId').innerText = supplier_id;
+            document.getElementById('currentAmount').innerText = current_amount;
+            document.getElementById('totalAmount').innerText = totalamount;
+            document.getElementById('requestedCost').innerText = requestedcost;
+            document.getElementById('remainingAmount').innerText = requestedcost;
+
+            // Set initial state of adjustment input
+            const adjustmentInputContainer = document.getElementById('adjustmentInputContainer');
+            adjustmentInputContainer.style.display = 'none';
+
+            const adjustmentLabel = document.getElementById('adjustmentLabel');
+            const adjustmentAmountInput = document.getElementById('adjustmentAmount');
+            const remainingAmountSpan = document.getElementById('remainingAmount');
+            adjustmentAmountInput.value = '';
+
+            // Disable options based on current amount
+            const adjustmentOption = document.getElementById('adjustmentOption');
+            const payBalanceOption = document.getElementById('payBalanceOption');
+
+            adjustmentOption.disabled = current_amount <= 0;
+            payBalanceOption.disabled = current_amount >= 0;
+
+            // Function to update the remaining amount
+            function updateRemainingAmount() {
+                const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                if (document.getElementById('partialpayment').checked) {
+                    remainingAmountSpan.innerText = adjustmentAmount.toFixed(2);
+                } else if (document.getElementById('payBalanceOption').checked) {
+                    const remainingAmount = adjustmentAmount - requestedCostNumber;
+                    remainingAmountSpan.innerText = remainingAmount.toFixed(2);
+                } else {
+                    const remainingAmount = requestedCostNumber - adjustmentAmount;
+                    remainingAmountSpan.innerText = remainingAmount.toFixed(2); // Update remaining amount
+                }
+            }
+
+            // Attach event listeners to checkboxes and input fields
+            document.getElementById('adjustmentOption').onclick = function() {
+                if (current_amount > 0 && totalamount > 0) {
+                    adjustmentInputContainer.style.display = 'block';
+                    adjustmentLabel.innerText = 'Adjustment Amount:';
+                    adjustmentAmountInput.max = current_amount;
+                    adjustmentAmountInput.oninput = updateRemainingAmount;
+                } else {
+                    adjustmentInputContainer.style.display = 'none';
+                    alert('Insufficient balance or total amount.');
+                }
+            };
+
+            document.getElementById('payBalanceOption').onclick = function() {
+                adjustmentInputContainer.style.display = 'block';
+                adjustmentLabel.innerText = 'Adding Amount:';
+                adjustmentAmountInput.value = '';
+                adjustmentAmountInput.max = Number.MAX_SAFE_INTEGER;  // No limit on the entered amount
+                adjustmentAmountInput.oninput = function() {
+                    const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                        updateRemainingAmount();
+                };
+            };
+
+            document.getElementById('partialpayment').onclick = function() {
+                adjustmentInputContainer.style.display = 'block';
+                adjustmentLabel.innerText = 'Partial Payment Amount:';
+                adjustmentAmountInput.max = requestedCostNumber - 0.01; // Set max to less than the requested cost
+                adjustmentAmountInput.oninput = function() {
+                    const adjustmentAmount = parseFloat(adjustmentAmountInput.value) || 0;
+                    if (adjustmentAmount >= requestedCostNumber) {
+                        alert('Partial payment amount cannot be equal to or greater than the requested amount.');
+                        adjustmentAmountInput.value = '';
+                    } else {
+                        updateRemainingAmount();
+                    }
+                };
+            };
+
+            document.getElementById('noAdjustmentOption').onclick = function() {
+                adjustmentInputContainer.style.display = 'none';
+                remainingAmountSpan.innerText = totalamount.toFixed(2); // Reset remaining amount
+            };
+
+            // Attach the confirm payment handler
+            document.getElementById('confirmPaymentButton').onclick = function() {
+                confirmPayment(status, orderId, current_amount, totalamount, remainingAmountSpan.innerText);
+            };
+        })
+        .catch(error => {
+            console.error('Error fetching supplier and amount:', error);
+        });
+}
+
+function confirmPayment(status, orderId, current_amount, totalamount, remainingAmount) {
+    const selectedOption = document.querySelector('input[name="paymentOption"]:checked').value;
+    let adjustmentAmount = 0;
+
+    if (selectedOption === 'adjustment' && current_amount > 0) {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+        if (adjustmentAmount > current_amount) {
+            alert('Adjustment amount cannot exceed the current amount.');
+            return;
+        }
+    } else if (selectedOption === 'payBalance') {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+       
+    } else if (selectedOption === 'partialpayment') {
+        adjustmentAmount = parseFloat(document.getElementById('adjustmentAmount').value);
+    }
+
+    let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+    let data = { 
+        status: status, 
+        orderId: orderId, 
+        selectedOption: selectedOption, 
+        adjustmentAmount: adjustmentAmount,
+        remainingAmount: parseFloat(remainingAmount)
+    };
+
+    console.log(data);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Status update successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        window.location.reload();
+    });
+}
+</script>
+<script>
+    $(document).ready(function(){
+        $('.updateprice-btn').click(function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            console.log(id);
+
+            $.ajax({
+                url: '{{ route("vehicles.vehiclesdatagetting", ["id" => ":id"]) }}'.replace(':id', id),
+                method: 'GET',
+                success: function(response) {
+                    var tableId = 'dtBasicExample6_' + id; // Unique table ID
+                    var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Current Price</th><th>New Price</th></tr></thead><tbody>';
+                    $.each(response, function(index, vehicle) {
+                        var vin = vehicle.vin ? vehicle.vin : '';
+                        tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + vehicle.price + '</td><td><input type="text" class="form-control new-price" data-vehicle-id="' + vehicle.vehicle_id + '" value="' + vehicle.price + '"></td></tr>';
+                    });
+                    tableHtml += '</tbody><tfoot><tr><th colspan="3" class="text-right">Total Price:</th><th id="totalPrice">0.00</th></tr></tfoot></table></div>';
+                    
+                    $('#vehicleModal .modal-body').html(tableHtml);
+                    $('#vehicleModal').modal('show');
+
+                    // Initialize DataTables for the unique table ID
+                    $('#' + tableId).DataTable({
+                        "paging": true,
+                        "searching": true,
+                        "ordering": true
+                    });
+
+                    // Add event listener for new price inputs
+                    $('.new-price').on('input', function() {
+                        calculateTotalPrice();
+                    });
+
+                    // Store the purchasing order id in the modal for later use
+                    $('#vehicleModal').data('purchasingOrderId', id);
+
+                    // Calculate initial total price
+                    calculateTotalPrice();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+
+        function calculateTotalPrice() {
+            var totalPrice = 0;
+            $('.new-price').each(function() {
+                var price = parseFloat($(this).val());
+                if (!isNaN(price)) {
+                    totalPrice += price;
+                }
+            });
+            $('#totalPrice').text(totalPrice.toFixed(2)); // Update the total price in the table footer
+        }
+
+        $('#savePricesBtn').click(function(){
+            var newPrices = [];
+            $('.new-price').each(function() {
+                var vehicleId = $(this).data('vehicle-id');
+                var newPrice = $(this).val();
+                newPrices.push({
+                    vehicle_id: vehicleId,
+                    new_price: newPrice
+                });
+            });
+
+            var totalPrice = $('#totalPrice').text();
+            var purchasingOrderId = $('#vehicleModal').data('purchasingOrderId'); // Retrieve the stored id
+
+            $.ajax({
+                url: '{{ route("vehicles.updatePrices") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    prices: newPrices,
+                    total_price: totalPrice,
+                    purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
+                },
+                success: function(response) {
+                    alert('Prices updated successfully!');
+                    $('#vehicleModal').modal('hide');
+                    $('#totalPriceDisplay').text(totalPrice);
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+<script>
+$(document).ready(function() {
+    const purchaseOrderId = {{ $purchasingOrder->id }};
+    const userId = {{ auth()->id() }};
+    const userName = "{{ auth()->user()->name }}";
+    const userAvatar = "{{ auth()->user()->avatar }}"; // Assuming user has an avatar field
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    function loadMessages() {
+        $.get(`/messages/${purchaseOrderId}`, function(data) {
+            $('#messages').empty();
+            data.forEach(function(message) {
+                displayMessage(message);
+            });
+            scrollToBottom();
+        });
+    }
+
+    function scrollToBottom() {
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+    }
+
+    function formatTimeAgo(date) {
+        const now = new Date();
+        const messageDate = new Date(date);
+        const diff = Math.floor((now - messageDate) / 1000);
+        if (diff < 60) return `${diff} seconds ago`;
+        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+        return `${Math.floor(diff / 86400)} days ago`;
+    }
+
+    function getInitials(name) {
+        return name.charAt(0).toUpperCase();
+    }
+
+    function getAvatarColor(name) {
+        const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'];
+        const charCode = name.charCodeAt(0);
+        return colors[charCode % colors.length];
+    }
+
+    function displayMessage(message) {
+        const replies = message.replies || [];
+        const messageTime = formatTimeAgo(message.created_at);
+        const userInitial = getInitials(message.user.name);
+        const userColor = getAvatarColor(message.user.name);
+        const messageHtml = `
+            <div class="card message-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div class="user-info">
+                            <div class="avatar" style="background-color: ${userColor};">${userInitial}</div>
+                            <strong class="user-name">${message.user.name}</strong>
+                        </div>
+                        <small class="text-muted">${messageTime}</small>
+                    </div>
+                    <p class="mt-2">${message.message}</p>
+                    <div id="replies-${message.id}">
+                        ${replies.map(reply => `
+                            <div class="message-reply">
+                                <div class="d-flex justify-content-between">
+                                    <div class="user-info">
+                                        <div class="avatar avatar-small" style="background-color: ${getAvatarColor(reply.user.name)};">${getInitials(reply.user.name)}</div>
+                                        <strong class="user-name">${reply.user.name}</strong>
+                                    </div>
+                                    <small class="text-muted">${formatTimeAgo(reply.created_at)}</small>
+                                </div>
+                                <p class="mt-1">${reply.reply}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <a href="javascript:void(0)" class="reply-link" data-message-id="${message.id}">Reply</a>
+                    <div class="reply-input-wrapper input-group mt-2" style="display:none;" id="reply-input-${message.id}">
+                        <textarea class="form-control reply-message" placeholder="Reply..." rows="1"></textarea>
+                        <button class="btn btn-success btn-sm send-reply send-icongt" data-message-id="${message.id}">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#messages').append(messageHtml);
+    }
+
+    function sendMessage() {
+        const message = $('#message').val();
+        if (message.trim() !== '') {
+            $.post('/messages', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
+                displayMessage(data);
+                $('#message').val('');
+                scrollToBottom();
+            });
+        }
+    }
+
+    function sendReply(messageId) {
+        const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
+        if (reply.trim() !== '') {
+            $.post('/replies', { message_id: messageId, reply: reply }, function(data) {
+                const replyHtml = `
+                    <div class="message-reply">
+                        <div class="d-flex justify-content-between">
+                            <div class="user-info">
+                                <div class="avatar avatar-small" style="background-color: ${getAvatarColor(data.user.name)};">${getInitials(data.user.name)}</div>
+                                <strong class="user-name">${data.user.name}</strong>
+                            </div>
+                            <small class="text-muted">${formatTimeAgo(data.created_at)}</small>
+                        </div>
+                        <p class="mt-1">${data.reply}</p>
+                    </div>
+                `;
+                $(`#replies-${messageId}`).append(replyHtml);
+                $(`#reply-input-${messageId}`).find('.reply-message').val('');
+                $(`#reply-input-${messageId}`).hide();
+            });
+        }
+    }
+
+    $('#send-message').on('click', function() {
+        sendMessage();
+    });
+
+    $('#message').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            sendMessage();
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.reply-link', function() {
+        const messageId = $(this).data('message-id');
+        $(`#reply-input-${messageId}`).toggle();
+    });
+
+    $(document).on('keypress', '.reply-message', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            const messageId = $(this).closest('.reply-input-wrapper').attr('id').split('-')[2];
+            sendReply(messageId);
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.send-reply', function() {
+        const messageId = $(this).data('message-id');
+        sendReply(messageId);
+    });
+
+    loadMessages();
+});
 </script>
 @endsection

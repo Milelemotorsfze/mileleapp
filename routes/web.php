@@ -107,6 +107,7 @@ use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
 use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\VendorAccountController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -874,6 +875,19 @@ Route::get('/d', function () {
     Route::post('purchasing_order/cancelpo/{id}', [PurchasingOrderController::class, 'cancelpo'])->name('purchasing_order.cancelpo');
     Route::post('/update-purchasing-status-cancel', [PurchasingOrderController::class, 'purchasingupdateStatuscancel'])->name('purchasing.updateStatuscancel');
     Route::post('/check-authorization', [DailyleadsController::class, 'checkAuthorization'])->name('checkAuthorization');
+
+    //Vendor Accounts
+    Route::resource('vendoraccount', VendorAccountController::class);
+    Route::get('/account/{id}', [VendorAccountController::class, 'view'])->name('vendoraccount.view');
+    Route::get('/get-supplier-and-amount/{orderId}', [PurchasingOrderController::class, 'getSupplierAndAmount']);
+
+    //Price Update Purchased Order
+    Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
+    Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
+    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+
 
 
 
