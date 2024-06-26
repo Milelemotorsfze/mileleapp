@@ -534,7 +534,7 @@
             <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Type</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -542,7 +542,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Date</strong></label>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-12">
@@ -551,16 +551,16 @@
                     </div>
                     @if($purchasingOrder->is_demand_planning_purchase_order == true)
                         <div class="row">
-                            <div class="col-lg-2 col-md-3 col-sm-12">
+                            <div class="col-lg-4 col-md-3 col-sm-12">
                                 <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                             </div>
-                            <div class="col-lg-2 col-md-3 col-sm-12">
+                            <div class="col-lg-6 col-md-3 col-sm-12">
                                 <span> {{ $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->pfi_reference_number ?? '' }} </span>
                             </div>
                         </div>
                     @endif
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Vendor Name</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -568,7 +568,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Vendor Account Status</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -576,7 +576,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Total Vehicles / Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -586,7 +586,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Already Paid Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -595,7 +595,7 @@
                     </div>
                     @if($totalSurcharges)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Price Increase</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -607,7 +607,7 @@
                     @endif
                     @if($totalDiscounts)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Discounts</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">  
@@ -618,7 +618,7 @@
                     </div>
                     @endif
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Requested Initiated Amount</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -627,7 +627,7 @@
                     </div>
                     @if($vendorPaymentAdjustments)
                     <div class="row">
-    <div class="col-lg-2 col-md-3 col-sm-12">
+    <div class="col-lg-4 col-md-3 col-sm-12">
         <label for="choices-single-default" class="form-label"><strong>Requested Released Amount</strong></label>
     </div>
     <div class="col-lg-6 col-md-9 col-sm-12">
@@ -647,7 +647,7 @@
                     </div>
                     @endif
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Payment Terms</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -655,7 +655,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Shipping Method</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -663,7 +663,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Shipping Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -671,7 +671,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>POL / POD / PD</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -680,7 +680,7 @@
                     </div>
                     @if ($purchasingOrder->pl_number)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
@@ -690,7 +690,7 @@
                     @endif
                     @if ($purchasingOrder->pl_file_path)
                     <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
