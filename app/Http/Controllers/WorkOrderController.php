@@ -6,6 +6,7 @@ use App\Models\WorkOrder;
 use App\Models\WOVehicles;
 use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
+use App\Models\WOVehicleAddonRecordHistory;
 use App\Models\WOComments;
 use App\Models\WORecordHistory;
 use App\Models\Customer;
@@ -132,7 +133,7 @@ class WorkOrderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreWorkOrderRequest $request)
-    {
+    { 
         DB::beginTransaction();
 
         try {
@@ -379,8 +380,26 @@ class WorkOrderController extends Controller
                                         $createWOVehiclesAddons['addon_quantity'] = $addonData['quantity'] ?? null;
                                         $createWOVehiclesAddons['addon_description'] = $addonData['description'] ?? null;                                  
                                         $createWOVehiclesAddons['created_by'] = $authId;
-                                                                  
-                                        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);                                           
+
+                                        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+                                        // Filter out non-null, non-array values, and exclude specified fields
+                                        $nonNullVehicleAddonData = array_filter($addonData, function ($value, $key) {
+                                            return !is_null($value);
+                                        }, ARRAY_FILTER_USE_BOTH);
+                                       
+
+                                        // Store each non-null, non-array field in the data history
+                                        foreach ($nonNullVehicleAddonData as $field => $value) {  
+                                            WOVehicleAddonRecordHistory::create([
+                                                'w_o_vehicle_addon_id' => $WOVehicleAddons->id,
+                                                'field_name' => $field,
+                                                'old_value' => NULL,
+                                                'new_value' => $value,
+                                                'type' => 'Set',
+                                                'user_id' => Auth::id(),
+                                                'changed_at' => Carbon::now(),
+                                            ]);
+                                        }
                                     }
                                 }
                             }

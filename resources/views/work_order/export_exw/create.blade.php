@@ -2343,7 +2343,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var allVehicleRows = [firstRow, secondRow, thirdRow];
 			// Gather data from all dynamically added addon input fields
-			var addonIndex = 1; // Initialize addon index for each vehicle
+			var addonIndex = 0; // Initialize addon index for each vehicle
 			$('.addon_input_outer_row').each(function() {
 				var addonId = $(this).attr('id').split('_')[2];
 				var addonValue = $(`#addons_${addonId}`).val();
@@ -2437,14 +2437,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 				// Update description input field within the <td> element
 				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][description]').attr('id', 'addon_description_' + index);
-    		
-				// Update select element within the <td> element if it exists
-				var selectElement = row.find('td select[id^="addons_"]');
-				if (selectElement.length) {
-					selectElement.attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]');
-					selectElement.attr('id', 'addons_' + className + '_' + index);
-					selectElement.attr('data-select2-id', 'select2-data-addons_' + className + '_' + index);
-				}
+				// Check if the element is a select element and re-initialize select2
+				if (row.find('select.child_addon_' + className).length > 0) {
+					$('#addons_' + className + '_' + index).select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder: "Choose Addon"
+					});
+				}				
 			});
 			vehicleAddonDropdown(className)
 		});
@@ -2458,9 +2458,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$('.' + dataId).each(function(index) {
 				addonIndex = index + 1; // Adjust the index based on 0 or 1 based indexing 
 			});
-			// console.log(addonIndex);
-			addonIndex++; // Increment to get the next available index
-
 			var addonValue = '';
 			var addonQuantity = '';
 			var addonDescription = '';
@@ -2519,7 +2516,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			}
 			var parentElement = this.parentElement.parentElement;
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
-
 			// Initialize select2 after appending the row to the DOM
 			$('#addons_' + dataId + '_' + addonIndex).select2({
 				allowClear: true,
