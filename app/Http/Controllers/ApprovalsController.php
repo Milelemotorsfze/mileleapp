@@ -547,7 +547,6 @@ class ApprovalsController extends Controller
             $incident->reported_date = $currentDateTime->toDateString();
             $incident->save();
             }
-            $incident = Incident::where('inspection_id', $inspectionId)->first();
             $vehicles = Vehicles::find($inspection->vehicle_id);
             if($inspection->stage == "GRN")
             {
@@ -576,23 +575,28 @@ class ApprovalsController extends Controller
         }
         $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
-        ->where('fuel_type', $request->input('fuel_type'))
-        ->where('engine', $request->input('engine'))
-        ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
-        ->where('drive_train', $request->input('drive_train'))
-        ->where('gearbox', $request->input('gearbox'))
-        ->where('steering', $request->input('steering'))
-        ->where('upholestry', $request->input('upholestry'))
-        ->where(function ($query) use ($selectedSpecifications) {
-            foreach ($selectedSpecifications as $specificationData) {
-                $query->whereHas('variantItems', function ($q) use ($specificationData) {
-                    $q->where('model_specification_id', $specificationData['specification_id'])
-                      ->where('model_specification_options_id', $specificationData['value']);
-                });
-            }
-        })
-        ->first();
+    ->where('fuel_type', $request->input('fuel_type'))
+    ->where('engine', $request->input('engine'))
+    ->where('coo', $request->input('coo'))
+    ->where('my', $request->input('my'))
+    ->where('drive_train', $request->input('drive_train'))
+    ->where('gearbox', $request->input('gearbox'))
+    ->where('steering', $request->input('steering'))
+    ->where('upholestry', $request->input('upholestry'))
+    ->whereExists(function ($query) use ($selectedSpecifications) {
+        $query->select(DB::raw(1))
+            ->from('variant_items')
+            ->whereColumn('variant_items.varaint_id', 'varaints.id')
+            ->where(function ($query) use ($selectedSpecifications) {
+                foreach ($selectedSpecifications as $specificationData) {
+                    $query->orWhere(function ($q) use ($specificationData) {
+                        $q->where('variant_items.model_specification_id', $specificationData['specification_id'])
+                          ->where('variant_items.model_specification_options_id', $specificationData['value']);
+                    });
+                }
+            });
+    })
+    ->first();
         if ($existingVariantop) {
             $existingVariantId = $existingVariantop->id;
             $vehicle = Vehicles::where('varaints_id', $existingVariantId)->where('id', $inspection->vehicle_id)->first();
@@ -624,13 +628,18 @@ class ApprovalsController extends Controller
             ->where('drive_train', $request->input('drive_train'))
             ->where('gearbox', $request->input('gearbox'))
             ->where('upholestry', $request->input('upholestry'))
-            ->where(function ($query) use ($selectedSpecifications) {
-                foreach ($selectedSpecifications as $specificationData) { 
-                    $query->whereHas('variantItems', function ($q) use ($specificationData) {
-                        $q->where('model_specification_id', $specificationData['specification_id'])
-                          ->where('model_specification_options_id', $specificationData['value']);
+            ->whereExists(function ($query) use ($selectedSpecifications) {
+                $query->select(DB::raw(1))
+                    ->from('variant_items')
+                    ->whereColumn('variant_items.varaint_id', 'varaints.id')
+                    ->where(function ($query) use ($selectedSpecifications) {
+                        foreach ($selectedSpecifications as $specificationData) {
+                            $query->orWhere(function ($q) use ($specificationData) {
+                                $q->where('variant_items.model_specification_id', $specificationData['specification_id'])
+                                  ->where('variant_items.model_specification_options_id', $specificationData['value']);
+                            });
+                        }
                     });
-                }
             })
             ->orderBy('created_at', 'desc')
             ->first();
@@ -862,8 +871,8 @@ class ApprovalsController extends Controller
         $variantlog->created_by = auth()->user()->id;
         $variantlog->save();
         $vehicle = Vehicles::where('id', $inspection->vehicle_id)->first();
-        $oldVariantName = Varaint::find($vehicle->varaints_id)->name;
-                $newVariantName = Varaint::find($variantId)->name;
+        $oldVariantName = Varaint::where('id', $vehicle->variants_id)->pluck('name')->first();
+        $newVariantName = Varaint::where('id', $variantId)->pluck('name')->first();
                 Vehicles::where('id', $inspection->vehicle_id)
                 ->update(['varaints_id' => $variantId]);
                 $vehicleslog = new Vehicleslog();

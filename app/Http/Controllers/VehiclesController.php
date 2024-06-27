@@ -26,6 +26,8 @@ use App\Models\Vehicleslog;
 use App\Models\Solog;
 use App\Models\Remarks;
 use App\Models\Warehouse;
+use App\Models\Inspection;
+use App\Models\VehicleExtraItems;
 use App\Models\VehiclePicture;
 use DataTables;
 use App\Models\MasterModelLines;
@@ -3125,6 +3127,10 @@ public function viewalls(Request $request)
     {
     $vehicleId = $request->vehicle_id;
     $vehicle = Vehicles::find($vehicleId);
+    $grn = Grn::where('id', $vehicle->grn_id);
+    $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
+    $inspection = Inspection::where('vehicle_id', $vehicleId);
+    $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId);
     if (!$vehicle) {
         abort(404);
     }
