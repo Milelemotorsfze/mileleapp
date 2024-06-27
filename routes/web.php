@@ -428,7 +428,8 @@ Route::get('/d', function () {
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
-        Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehiclesw.data-history');
+        Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
+        Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
     });
     // Demand & Planning Module
 

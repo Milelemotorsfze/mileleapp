@@ -67,6 +67,10 @@ class WOVehicles extends Model
     {
         return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
     }
+    public function addonsWithTrashed()
+    {
+        return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id')->withTrashed();
+    }
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');

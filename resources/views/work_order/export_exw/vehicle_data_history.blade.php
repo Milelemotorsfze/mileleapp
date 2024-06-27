@@ -77,7 +77,7 @@
                 @foreach($workOrder->vehiclesWithTrashed as $vehicle)
                     <tr>
                         <td><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Vehicle Data History" class="btn btn-sm btn-warning" 
-                        href="{{route('wo-vehiclesw.data-history',$vehicle->id ?? '')}}">
+                        href="{{route('wo-vehicles.data-history',$vehicle->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                             </a></td>
                         <td>{{ ++$i }}</td>
@@ -111,6 +111,24 @@
                         <td>{{$vehicle->DeletedBy->name ?? ''}}</td>
                         <td>@if($vehicle->deleted_at != ''){{\Carbon\Carbon::parse($vehicle->deleted_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
                     </tr>
+                    @if(isset($vehicle->addonsWithTrashed) && count($vehicle->addonsWithTrashed) > 0)
+                        <tr><th colspan="26">Service Breakdown</th></tr>
+                        @foreach($vehicle->addonsWithTrashed as $addon)
+                        <tr>
+                            <td><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Addon Data History" class="btn btn-sm btn-warning" 
+                        href="{{route('wo-vehicle-addon.data-history',$addon->id ?? '')}}">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                            </a></td>
+                            <td colspan="5">{{$addon->addon_code ?? 'NA'}}</td>
+                            <td colspan="2">Qty : {{$addon->addon_quantity ?? 'NA'}}</td>
+                            <td colspan="18">{{$addon->addon_description ?? 'NA'}}</td>
+                        </tr>
+                        @endforeach
+                    @else
+                    <tr>
+                        <td colspan="26">No addons available for this vehicle.</td>
+                    </tr>
+                    @endif
                 @endforeach
             @else
                 <tr>
