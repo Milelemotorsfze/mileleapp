@@ -29,8 +29,10 @@ use App\Models\Warehouse;
 use App\Models\Inspection;
 use App\Models\VehicleExtraItems;
 use App\Models\VehiclePicture;
+use App\Models\Incident;
 use DataTables;
 use App\Models\MasterModelLines;
+use App\Models\VariantItems;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -3126,15 +3128,26 @@ public function viewalls(Request $request)
     public function generategrnPDF(Request $request)
     {
     $vehicleId = $request->vehicle_id;
-    $vehicle = Vehicles::find($vehicleId);
-    $grn = Grn::where('id', $vehicle->grn_id);
+    $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
+    $grn = Grn::where('id', $vehicle->grn_id)->first();
     $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
-    $inspection = Inspection::where('vehicle_id', $vehicleId);
-    $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId);
+    $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
+    $inspection = Inspection::where('vehicle_id', $vehicleId)->first();
+    $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
+    $incident = Incident::where('vehicle_id', $vehicleId)->first();
     if (!$vehicle) {
         abort(404);
     }
-    $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
+    $data = [
+        'vehicle' => $vehicle,
+        'grn' => $grn,
+        'variant' => $variant,
+        'inspection' => $inspection,
+        'variantitems' => $variantitems,
+        'vehicleItems' => $vehicleitems,
+        'incident' => $incident,
+    ];
+    $pdf = PDF::loadView('Reports.Grn', $data);
     return $pdf->stream('vehicle-details.pdf');
     }
     public function fetchData(Request $request)
