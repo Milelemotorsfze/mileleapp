@@ -2342,60 +2342,85 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$(thirdRow).data('vin', data.vin);
 
 			var allVehicleRows = [firstRow, secondRow, thirdRow];
-			// Gather data from all dynamically added addon input fields
 			var addonIndex = 0; // Initialize addon index for each vehicle
-			$('.addon_input_outer_row').each(function() {
+			var currentRow = thirdRow; // Start with the thirdRow
+			if (data.addons && data.addons.length > 0) {
+				for (var j = 0; j < data.addons.length; j++) {
+					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
+					var addonValue = data.addons[j].addon_code;
+					var addonQuantity = data.addons[j].addon_quantity;
+					var addonDescription = data.addons[j].addon_description;
+					if(addonValue != null) {
+						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+						addonIndex++; // Increment addonIndex after calling drawTableAddon
+					}
+				}
+			}
+
+			// Gather data from all dynamically added addon input fields
+			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
 				var addonValue = $(`#addons_${addonId}`).val();
+				console.log(addonValue);
 				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
 				var addonDescription = $(`#addon_description_${addonId}`).val();
-
-				var removeAddonCell = createAddonRemoveButton();
-				// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
-				var addonRow = document.createElement('tr');
-				addonRow.className = data.vehicle_id; // Add the vehicle_id as a class for addonRow
-
-				// Addon Row Label
-				var serviceBreakdownLabelCell = document.createElement('td');
-				serviceBreakdownLabelCell.colSpan = 1;
-				serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-				// Addon Row Elements
-				var addonValueCell = document.createElement('td');
-				addonValueCell.colSpan = 2;
-				addonValueCell.textContent = addonValue;
-
-				var addonQuantityCell = document.createElement('td');
-				addonQuantityCell.colSpan = 1;
-																										
-				addonQuantityCell.innerHTML = '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
-				+'<div class="input-group">'
-				+'<div class="input-group-append">'
-				+'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
-				+'</div>'
-				+'<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Addon Quantity">'
-				+'</div>';
-
-				var addonDescriptionCell = document.createElement('td');
-				addonDescriptionCell.colSpan = 14;
-				addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="'+addonDescription+'" class="form-control widthinput" id="addon_description_' + addonIndex + '"  placeholder="Enter Addon Description">';
-
-				// Append cells to the addon row
-				addonRow.appendChild(removeAddonCell);
-				addonRow.appendChild(serviceBreakdownLabelCell);
-				addonRow.appendChild(addonValueCell);
-				addonRow.appendChild(addonQuantityCell);
-				addonRow.appendChild(addonDescriptionCell);
-				// Insert the new row into the array
-				allVehicleRows.push(addonRow);
-				// Append the addon row after the third row
-				thirdRow.insertAdjacentElement('afterend', addonRow);
-				thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
-				addonIndex = addonIndex+1;
+				if(addonValue != null) { 
+					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+					addonIndex++; // Increment addonIndex after calling drawTableAddon
+				}
 			});
 			tableBody.appendChild(lastRow);
 			allVehicleRows.push(lastRow);
 			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
 		}
+		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId, addonValue, addonQuantity, addonDescription) { 
+			var removeAddonCell = createAddonRemoveButton();
+			
+			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+			var addonRow = document.createElement('tr');
+			addonRow.className = data.vehicle_id; // Add the vehicle_id as a class for addonRow
+
+			// Addon Row Label
+			var serviceBreakdownLabelCell = document.createElement('td');
+			serviceBreakdownLabelCell.colSpan = 1;
+			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+
+			// Addon Row Elements
+			var addonValueCell = document.createElement('td');
+			addonValueCell.colSpan = 2;
+			addonValueCell.textContent = addonValue;
+
+			var addonQuantityCell = document.createElement('td');
+			addonQuantityCell.colSpan = 1;
+			addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
+				+ '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
+				+ '<div class="input-group">'
+				+ '<div class="input-group-append">'
+				+ '<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
+				+ '</div>'
+				+ '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Addon Quantity">'
+				+ '</div>';
+
+			var addonDescriptionCell = document.createElement('td');
+			addonDescriptionCell.colSpan = 14;
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+
+			// Append cells to the addon row
+			addonRow.appendChild(removeAddonCell);
+			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(addonValueCell);
+			addonRow.appendChild(addonQuantityCell);
+			addonRow.appendChild(addonDescriptionCell);
+			
+			// Insert the new row into the array
+			allVehicleRows.push(addonRow);
+			
+			// Append the addon row after the third row
+			thirdRow.insertAdjacentElement('afterend', addonRow);
+			
+			return addonRow; // Return the newly created addonRow to be used as the next reference row
+		}
+
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
@@ -2433,10 +2458,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
 
 				// Update quantity input field within the specific div structure
-				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][quantity]').attr('id','addon_quantity_' + className + '_' + index);
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
 
 				// Update description input field within the <td> element
-				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][description]').attr('id', 'addon_description_' + index);
+				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + index);
 				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {
 					$('#addons_' + className + '_' + index).select2({
@@ -2486,12 +2511,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			+'<div class="input-group-append">'
 			+'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
 			+'</div>'
-			+'<input name="vehicle['+dataId+'][addons]['+addonIndex+'][quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+dataId+ '_'+ addonIndex + '" placeholder="Addon Quantity">'
+			+'<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+dataId+ '_'+ addonIndex + '" placeholder="Addon Quantity">'
 			+'</div>';
 
 			var addonDescriptionCell = document.createElement('td');
 			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
