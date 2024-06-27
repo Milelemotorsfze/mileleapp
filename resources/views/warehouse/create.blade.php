@@ -408,6 +408,10 @@ $(document).ready(function() {
                 $(this).removeClass('row-space');
             }
         });
+        totalUnitPrice = 0;
+        $('input[name="unit_prices[]"]').each(function() {
+            totalUnitPrice += parseFloat($(this).val());
+        });
         $('#totalUnitPriceInput').text(totalUnitPrice);
         $('#totalUnitPriceInputHidden').val(totalUnitPrice);
         if ($('#variantRowsContainer').find('.row').length === 1) {
