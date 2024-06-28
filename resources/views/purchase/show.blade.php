@@ -153,6 +153,21 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="vehicleModalvariant" tabindex="-1" role="dialog" aria-labelledby="vehicleModalvariantLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vehicleModalvariantLabel">Active Vehicles Details</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savevariantBtn">Update Variant</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -415,6 +430,12 @@
         <div class="modal-body p-3">
     <div class="container">
         <div class="row">
+        <div class="col-md-4 p-3">
+                <label for="netsuitpo" class="form-label font-size-13 text-center">Netsuit PO:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" value="{{$purchasingOrder->po_number}}">
+            </div>
             <div class="col-md-4 p-3">
                 <label for="vendorName" class="form-label font-size-13 text-center">Vendor Name:</label>
             </div>
@@ -1067,6 +1088,12 @@
                     @endphp
                     @if ($hasPermission)
                     <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-variant-vehicles');
+                    @endphp
+                    @if ($hasPermission)
+                    <a href="#" class="btn btn-sm btn-primary float-left updatevariant-btn me-2" data-id="{{ $purchasingOrder->id }}">Variant Update</a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -3092,7 +3119,83 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
                 }
             });
         });
+        var preloadedVariants = @json($variants->map(function($variant) {
+    return [
+        'id' => $variant->id,
+        'name' => $variant->name
+    ];
+}));
+$('.updatevariant-btn').click(function(e){
+    e.preventDefault();
+    var id = $(this).data('id');
+    $.ajax({
+        url: '{{ route("vehicles.vehiclesdatagettingvariants", ["id" => ":id"]) }}'.replace(':id', id),
+        method: 'GET',
+        success: function(response) {
+            var tableId = 'dtBasicExample8_' + id; // Unique table ID
+            var tableHtml = '<div class="table-responsive"><table id="' + tableId + '" class="table table-striped table-editable table-edits table-bordered"><thead class="bg-soft-secondary"><tr><th>Ref No</th><th>VIN</th><th>Variant</th><th>New Variant</th></tr></thead><tbody>';
+            $.each(response, function(index, vehicle) {
+                var vin = vehicle.vin ? vehicle.vin : '';
+                tableHtml += '<tr><td>' + vehicle.vehicle_id + '</td><td>' + vin + '</td><td>' + vehicle.variant_name + '</td><td><select class="form-control variant-select" data-vehicle-id="' + vehicle.vehicle_id + '">';
+                $.each(preloadedVariants, function(i, variant) {
+                    var selected = variant.name === vehicle.variant_name ? 'selected' : '';
+                    tableHtml += '<option value="' + variant.id + '" ' + selected + '>' + variant.name + '</option>';
+                });
+                tableHtml += '</select></td></tr>';
+            });
+            tableHtml += '</tbody></table></div>';
 
+            $('#vehicleModalvariant .modal-body').html(tableHtml);
+            $('#vehicleModalvariant').modal('show');
+
+            // Initialize DataTables for the unique table ID
+            $('#' + tableId).DataTable({
+                "paging": true,
+                "searching": true,
+                "ordering": true
+            });
+            $('#vehicleModalvariant').data('purchasingOrderId', id);
+            // Initialize Select2 for the dropdowns with z-index adjustment
+            $('.variant-select').select2({
+                dropdownParent: $('#vehicleModalvariant')
+            });
+
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+});
+$('#savevariantBtn').click(function(){
+    var selectedVariants = [];
+    $('.variant-select').each(function() {
+        var vehicleId = $(this).data('vehicle-id');
+        var selectedVariant = $(this).val();
+        selectedVariants.push({
+            vehicle_id: vehicleId,
+            variant_id: selectedVariant
+        });
+    });
+    var purchasingOrderId = $('#vehicleModalvariant').data('purchasingOrderId'); // Retrieve the stored id
+
+    $.ajax({
+        url: '{{ route("vehicles.updateVariants") }}',
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            variants: selectedVariants,
+            purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
+        },
+        success: function(response) {
+            alert('Variants updated successfully!');
+            $('#vehicleModalvariant').modal('hide');
+            window.location.reload();
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+});
         function calculateTotalPrice() {
             var totalPrice = 0;
             $('.new-price').each(function() {
