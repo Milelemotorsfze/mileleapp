@@ -668,80 +668,84 @@
             }
         });
         var table3 = $('#dtBasicExample3').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+    columns: [
+        { data: 'brand_name', name: 'brands.brand_name' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'model_detail', name: 'varaints.model_detail' },
+        { 
+            data: 'variant', 
+            name: 'varaints.name',
+            render: function(data, type, row) {
+                return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+            }
+        },
+        {
+            data: 'variant_detail',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
                 }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
+        { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-               
-                { 
+        { data: 'engine', name: 'vehicles.engine' },
+        { data: 'my', name: 'varaints.my' },
+        { data: 'steering', name: 'varaints.steering' },
+        { data: 'fuel_type', name: 'varaints.fuel_type' },
+        { data: 'gearbox', name: 'varaints.gearbox' },
+        { data: 'exterior_color', name: 'ex_color.name' },
+        { data: 'interior_color', name: 'int_color.name' },
+        { data: 'upholestry', name: 'varaints.upholestry' },
+        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+        { data: 'location', name: 'warehouse.name' },
+        { data: 'territory', name: 'vehicles.territory' },
+        { data: 'fd', name: 'purchasing_order.fd' },
+        { data: 'po_number', name: 'purchasing_order.po_number' },
+        { data: 'po_date', name: 'purchasing_order.po_date' },
+        { data: 'grn_number', name: 'grn.grn_number' },
+        { data: 'date', name: 'grn.date' },
+        { data: 'inspection_date', name: 'inspection_date' },
+        { data: 'grn_remark', name: 'vehicles.grn_remark' },
+        { 
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                if (row.inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
             }
         }
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table3.on('draw', function () {
-            var rowCount = table3.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge3').text(rowCount).show();
-            } else {
-                $('.row-badge3').hide();
-            }
-        });
+    ],
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+});
+
+table3.on('draw', function () {
+    var rowCount = table3.page.info().recordsDisplay;
+    if (rowCount > 0) {
+        $('.row-badge3').text(rowCount).show();
+    } else {
+        $('.row-badge3').hide();
+    }
+});
         var table4 = $('#dtBasicExample4').DataTable({
           processing: true,
             serverSide: true,
