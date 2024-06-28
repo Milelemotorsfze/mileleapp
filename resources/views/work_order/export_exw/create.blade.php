@@ -962,11 +962,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#amount-received-div").show();
 				$("#balance-amount-div").show();
 				$("#deposit-aganist-vehicle-div").hide();
+				selectedDepositReceivedValue = 'total_deposit';
 			}
 			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
 				$("#amount-received-div").show();
 				$("#balance-amount-div").show();
 				$("#deposit-aganist-vehicle-div").show();
+				selectedDepositReceivedValue = 'custom_deposit';
 				setDepositAganistVehicleDropdownOptions();
 			}
 
@@ -1007,23 +1009,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
 				// Initialize an object to track VINs by BOE number
 				var boeVins = {};
+				var allVins = []; // Array to keep track of all VINs
+
 				for (var i = 0; i < workOrder.vehicles.length; i++) {
 					drawTableRow(workOrder.vehicles[i]);
 
-					// Find the option and disable it
+					// Find the option and disable it in the vin_multiple dropdown
 					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
 
 					// Refresh the select2 control
 					$("#vin_multiple").trigger('change.select2');
 
 					addedVins.push(workOrder.vehicles[i].vin);
+					allVins.push(workOrder.vehicles[i].vin); // Track all VINs
 
+					// Handle the deposit_aganist_vehicle dropdown
+					var $depositSelect = $("#deposit_aganist_vehicle");
 					if (workOrder.vehicles[i].deposit_received == 'yes') {
-						// Add the VIN to the deposit_aganist_vehicle select
-						var $depositSelect = $("#deposit_aganist_vehicle");
+						// Add the VIN as a selected option
 						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, true, true);
 						$depositSelect.append(newOption).trigger('change');
+					} else {
+						// Add the VIN as an unselected option
+						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, false, false);
+						$depositSelect.append(newOption).trigger('change');
 					}
+
 					if (workOrder.vehicles[i].boe_number != null) {
 						var boeNumber = workOrder.vehicles[i].boe_number;
 						if (!boeVins[boeNumber]) {
@@ -1032,15 +1043,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						boeVins[boeNumber].push(workOrder.vehicles[i].vin);
 					}
 				}
+				var newBoeOption = '';
+				allVins.forEach(function(vin) { 
+					var newBoeOption = new Option(vin, vin, false, false);
+				});
 				// Add rows for each BOE number and set the corresponding VINs
 				Object.keys(boeVins).forEach(function (boeNumber) {
 					addChild();
 					var index = $(".form_field_outer").find(".form_field_outer_row").length;
 					var $boeSelect = $(`#boe_vin_${index}`);
-					boeVins[boeNumber].forEach(function (vin) {
-						var newOption = new Option(vin, vin, true, true);
-						$boeSelect.append(newOption).trigger('change');
+					$boeSelect.append(newBoeOption);
+
+					// Set the corresponding VINs for this BOE as selected
+					boeVins[boeNumber].forEach(function(vin) {
+						$boeSelect.find('option[value="' + vin + '"]').prop('selected', true);
 					});
+
+					// Refresh the select2 control
+					$boeSelect.trigger('change');
+				});
+
+				// Disable options in each BOE select2 if they are selected in at least one dropdown
+				$(".form_field_outer").find(".form_field_outer_row select").each(function() {
+					var $select = $(this);
+					var selectedVins = [];
+
+					// Collect selected VINs in this select element
+					$select.find('option:selected').each(function() {
+						selectedVins.push($(this).val());
+					});
+
+					// Disable options that are selected in other dropdowns
+					allVins.forEach(function(vin) {
+						if (selectedVins.indexOf(vin) === -1) { // Don't disable the option if it's selected in this dropdown
+							$select.find('option[value="' + vin + '"]').prop('disabled', true);
+						}
+					});
+					$select.trigger('change.select2');
 				});
 			}
 			else {
@@ -2137,7 +2176,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(element).find('label').attr('for', `boe_vin_${newIndex}`).text(`VIN per BOE: ${newIndex}`);
 				$(element).find('select')
 					.attr('id', `boe_vin_${newIndex}`)
-					.attr('name', `boe[${newIndex}][vin]`)
+					.attr('name', `boe[${newIndex}][vin][]`)
 					.data('index', newIndex);
 
 				// Reinitialize Select2
@@ -2404,7 +2443,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
 				var addonValue = $(`#addons_${addonId}`).val();
-				console.log(addonValue);
 				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
 				var addonDescription = $(`#addon_description_${addonId}`).val();
 				if(addonValue != null) { 
@@ -2620,7 +2658,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
 		}
 
-		function findAllVINs() { 
+		function findAllVINs() {
 			addedVins = [];
 			$('#myTable tbody .first-row').each(function() {
 				var addedVin = $(this).data('vin'); 
@@ -2887,10 +2925,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
-		function setDepositAganistVehicleDropdownOptions() { 
+		function setDepositAganistVehicleDropdownOptions() {
 			// Get the previously selected values
 			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
-
 			// Empty the select element before adding new options
 			$('#deposit_aganist_vehicle').empty();
 			// Add new options to the select element

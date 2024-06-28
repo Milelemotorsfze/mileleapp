@@ -411,7 +411,7 @@ class WorkOrderController extends Controller
                             $vinUpdate->save();
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $vinUpdate->id,
-                                'field_name' => 'boe_number',
+                                'field_name' => 'deposit_received',
                                 'old_value' => NULL,
                                 'new_value' => 'yes',
                                 'type' => 'Set',
@@ -1120,7 +1120,153 @@ class WorkOrderController extends Controller
             WOVehicles::whereNotIn('id', $processedIds)->where('work_order_id',$workOrder->id)->delete();
 
             // VEHICLES END ........................................
+            // BOE
+            if (isset($request->boe) && count($request->boe) > 0) {
+                DB::transaction(function() use ($request, $workOrder) {
+                    // Step 1: Fetch all WOVehicles associated with the work order
+                    $woVehiclesForBOE = WOVehicles::where('work_order_id', $workOrder->id)->get();
+            
+                    // Step 2: Create a list of all VINs provided in the request
+                    $requestVins = [];
+                    foreach ($request->boe as $boeNumber => $boe) {
+                        if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                            foreach ($boe['vin'] as $vin) {
+                                $requestVins[] = $vin;
+                            }
+                        }
+                    }
+            
+                    // Step 3: Iterate through each WOVehicle and check if its VIN exists in the provided list
+                    foreach ($woVehiclesForBOE as $woVehicle) {
+                        if (!in_array($woVehicle->vin, $requestVins)) {
+                            // Step 4: If a VIN does not exist in the list, update the boe_number to NULL and log the change
+                            $oldBoeNumber = $woVehicle->boe_number;
+                            if ($oldBoeNumber !== null) {
+                                $woVehicle->boe_number = null;
+                                $woVehicle->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $woVehicle->id,
+                                    'field_name' => 'boe_number',
+                                    'old_value' => $oldBoeNumber,
+                                    'new_value' => null,
+                                    'type' => 'Unset',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+            
+                    // Existing logic to update the boe_number for the provided VINs
+                    foreach ($request->boe as $boeNumber => $boe) {
+                        if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                            foreach ($boe['vin'] as $vin) {
+                                $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id', $workOrder->id)->first();
+                                if ($vinUpdate && $vinUpdate->boe_number != $boeNumber) {
+                                    $oldBoeNumber = $vinUpdate->boe_number;
+                                    $vinUpdate->boe_number = $boeNumber;
+                                    $vinUpdate->save();
+            
+                                    // Determine the change type
+                                    $changeType = 'Change';
+                                    if (is_null($oldBoeNumber) && !is_null($boeNumber)) {
+                                        $changeType = 'Set';
+                                    } elseif (!is_null($oldBoeNumber) && is_null($boeNumber)) {
+                                        $changeType = 'Unset';
+                                    }
+            
+                                    // Create history record
+                                    WOVehicleRecordHistory::create([
+                                        'w_o_vehicle_id' => $vinUpdate->id,
+                                        'field_name' => 'boe_number',
+                                        'old_value' => $oldBoeNumber,
+                                        'new_value' => $boeNumber,
+                                        'type' => $changeType,
+                                        'user_id' => Auth::id(),
+                                        'changed_at' => Carbon::now(),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+                     
 
+            // Deposit against vehicles
+            if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
+                DB::transaction(function() use ($request, $workOrder) {
+                    // Fetch all WOVehicles associated with the work order
+                    $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
+            
+                    // Create a list of all VINs provided in the request
+                    $requestVins = isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) ? $request->deposit_aganist_vehicle : [];
+            
+                    // Iterate through each WOVehicle
+                    foreach ($woVehicles as $woVehicle) {
+                        if (!in_array($woVehicle->vin, $requestVins)) {
+                            // Update deposit_received to 'no' if VIN does not exist in the request list
+                            if ($woVehicle->deposit_received != 'no') {
+                                $oldDepositReceived = $woVehicle->deposit_received;
+                                $woVehicle->deposit_received = 'no';
+                                $woVehicle->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $woVehicle->id,
+                                    'field_name' => 'deposit_received',
+                                    'old_value' => $oldDepositReceived,
+                                    'new_value' => 'no',
+                                    'type' => 'Change',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        } else {
+                            // If the VIN exists in the request list, set deposit_received to 'yes'
+                            $vinUpdate = WOVehicles::where('vin', $woVehicle->vin)->where('work_order_id', $workOrder->id)->first();
+                            if ($vinUpdate && $vinUpdate->deposit_received != 'yes') {
+                                $oldDepositReceived = $vinUpdate->deposit_received;
+                                $vinUpdate->deposit_received = 'yes';
+                                $vinUpdate->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $vinUpdate->id,
+                                    'field_name' => 'deposit_received',
+                                    'old_value' => $oldDepositReceived,
+                                    'new_value' => 'yes',
+                                    'type' => 'Change',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+                });
+            }
+            else if ((isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') OR 
+            (isset($request->deposit_received_as) && $request->deposit_received_as === null) OR !isset($request->deposit_received_as)) {
+                $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
+                foreach ($woVehicles as $woVehicle) {
+                    if($woVehicle->deposit_received == 'yes') {
+                        // Create history record
+                        WOVehicleRecordHistory::create([
+                            'w_o_vehicle_id' => $woVehicle->id,
+                            'field_name' => 'deposit_received',
+                            'old_value' => $oldDepositReceived,
+                            'new_value' => 'no',
+                            'type' => 'Change',
+                            'user_id' => Auth::id(),
+                            'changed_at' => Carbon::now(),
+                        ]);
+                    }
+                    $woVehicle->deposit_received = 'no';
+                    $woVehicle->save();
+                }
+            }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
             
             DB::commit();
