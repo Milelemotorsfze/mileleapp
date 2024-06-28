@@ -6,6 +6,7 @@ use App\Models\WorkOrder;
 use App\Models\WOVehicles;
 use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
+use App\Models\WOVehicleAddonRecordHistory;
 use App\Models\WOComments;
 use App\Models\WORecordHistory;
 use App\Models\Customer;
@@ -29,6 +30,40 @@ class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
         (new UserActivityController)->createActivity('Open '.$type.' work order create page');
+
+        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'K')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'P')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'SP')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
+                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
+                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            ->orderBy('master_charges.id', 'asc')
+            ->get();
+        // Merge collections
+        $addons = $accessories->merge($spareParts)->merge($kit);
 
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
@@ -75,7 +110,7 @@ class WorkOrderController extends Controller
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users'));
+        return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users','addons','charges'));
     }
     /**
      * Display a listing of the resource.
@@ -330,29 +365,63 @@ class WorkOrderController extends Controller
                                 'changed_at' => Carbon::now(),
                             ]);
                         }
-
                         if (isset($vehicleData['addons'])) {
                             if (count($vehicleData['addons']) > 0) {
                                 foreach ($vehicleData['addons'] as $key => $addonData) {
-                                    $createWOVehiclesAddons = [];
-                                    $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;
-                        
-                                    // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
-                                    // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
-                                    $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
-                                    // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
-                                    // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
-                                    $createWOVehiclesAddons['addon_quantity'] = $addonData['quantity'] ?? null;
-                                    $createWOVehiclesAddons['addon_description'] = $addonData['description'] ?? null;                                  
-                                    $createWOVehiclesAddons['created_by'] = $authId;
-                        
-                                    $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons);
+                                    if (isset($addonData['addon_code']) && $addonData['addon_code'] != null) {
+                                        $this->processNewAddons($woVehicles,$addonData,$authId);
+                                    }
                                 }
                             }
                         }       
                     }
                 }
             }  
+            // BOE
+            if (isset($request->boe) && count($request->boe) > 0) {
+                foreach ($request->boe as $boeNumber => $boe) {
+                    if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                        foreach ($boe['vin'] as $vin) {
+                            $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                            if ($vinUpdate) {
+                                $vinUpdate->boe_number = $boeNumber;
+                                $vinUpdate->save();
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $vinUpdate->id,
+                                    'field_name' => 'boe_number',
+                                    'old_value' => NULL,
+                                    'new_value' => $boeNumber,
+                                    'type' => 'Set',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Deposit against vehicles
+            if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
+                if (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) && count($request->deposit_aganist_vehicle) > 0) {
+                    foreach ($request->deposit_aganist_vehicle as $vin) {
+                        $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                        if ($vinUpdate) {
+                            $vinUpdate->deposit_received = 'yes';
+                            $vinUpdate->save();
+                            WOVehicleRecordHistory::create([
+                                'w_o_vehicle_id' => $vinUpdate->id,
+                                'field_name' => 'deposit_received',
+                                'old_value' => NULL,
+                                'new_value' => 'yes',
+                                'type' => 'Set',
+                                'user_id' => Auth::id(),
+                                'changed_at' => Carbon::now(),
+                            ]);
+                        }
+                    }
+                }
+            }
             // Initialize an array to keep track of old to new comment IDs
             $commentIdMap = [];
 
@@ -390,7 +459,42 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-
+    public function processNewAddons($woVehicles,$addonData,$authId) { 
+        $createWOVehiclesAddons = [];
+        $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
+        // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
+        // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
+        $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
+        // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
+        // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
+        $createWOVehiclesAddons['addon_quantity'] = $addonData['addon_quantity'] ?? null;
+        $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;                                  
+        $createWOVehiclesAddons['created_by'] = $authId;
+    
+        $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+        // Filter out non-null, non-array values, and exclude specified fields
+        $excludeVehicleAddonFields = [
+            'id','w_o_vehicle_id',
+        ];
+        $nonNullVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
+            return !is_null($value) && !in_array($key, $excludeVehicleAddonFields);
+        }, ARRAY_FILTER_USE_BOTH);
+       
+    
+        // Store each non-null, non-array field in the data history
+        foreach ($nonNullVehicleAddonData as $field => $value) {  
+            WOVehicleAddonRecordHistory::create([
+                'w_o_vehicle_addon_id' => $WOVehicleAddons->id,
+                'field_name' => $field,
+                'old_value' => NULL,
+                'new_value' => $value,
+                'type' => 'Set',
+                'user_id' => Auth::id(),
+                'changed_at' => Carbon::now(),
+            ]);
+        }
+    }
+   
     /**
      * Handle file upload.
      *
@@ -427,7 +531,7 @@ class WorkOrderController extends Controller
     public function edit(WorkOrder $workOrder)
     {
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles')->first();
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles.addons')->first();
         // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
@@ -484,7 +588,40 @@ class WorkOrderController extends Controller
         
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users'));
+        $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'K')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $accessories = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'P')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $spareParts = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
+                IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
+                "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
+            ->join('addon_descriptions', 'addon_details.description', '=', 'addon_descriptions.id')
+            ->join('addons', 'addon_descriptions.addon_id', '=', 'addons.id')
+            ->where('addon_details.addon_type_name', 'SP')
+            ->orderBy('addon_details.id', 'asc')
+            ->get();
+        $charges = MasterCharges::select('master_charges.id','master_charges.addon_code',DB::raw("CONCAT(
+                IF(master_charges.name IS NOT NULL, master_charges.name, ''), 
+                IF(master_charges.name IS NOT NULL AND master_charges.description IS NOT NULL, ' - ', ''), 
+                IF(master_charges.description IS NOT NULL, master_charges.description, '')) as addon_name"),
+                DB::raw("'App\\Models\\Masters\\MasterCharges' as reference_type"))
+            ->orderBy('master_charges.id', 'asc')
+            ->get();
+        // Merge collections
+        $addons = $accessories->merge($spareParts)->merge($kit);
+        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'));
     }
 
     /**
@@ -601,8 +738,6 @@ class WorkOrderController extends Controller
             foreach ($filesToHandle as $fileKey => $path) {
                 handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete');
             }
-
-            $changes = [];
     
             // List of fields to exclude
             $excludeFields = [
@@ -719,6 +854,8 @@ class WorkOrderController extends Controller
             // Update the WorkOrder
             $workOrder->update($newData);
 
+            // VEHICLES START.....................................
+
             // Assuming $request->vehicles is an array of vehicles with unique VINs
             $vehiclesData = $request->vehicle ?? [];
             // Ensure $vehiclesData is an array
@@ -727,13 +864,13 @@ class WorkOrderController extends Controller
                 $vehiclesData = [];
             }
 
-            // Extract the VINs from the incoming request data
+            // Extract the id of vehicles from the incoming request data
             $incomingIds = array_column($vehiclesData, 'id');
 
             // Get the existing vehicles from the database
             $existingVehicles = WOVehicles::whereIn('id', $incomingIds)->get()->keyBy('id');
 
-            // Track VINs that were processed
+            // Track vehicles that were processed
             $processedIds = [];
 
             foreach ($vehiclesData as $vehicleData) {
@@ -744,6 +881,9 @@ class WorkOrderController extends Controller
                 ];
                 // Update if exists, otherwise create
                 if (isset($existingVehicles[$id])) {
+                    
+                    // Mark this VIN as processed
+                    $processedIds[] = $id; 
                     $vehicle = $existingVehicles[$id];
                     $vehicleData['updated_by'] = Auth::id();
                     // Filter out non-null, non-array values, and exclude specified fields
@@ -778,7 +918,123 @@ class WorkOrderController extends Controller
                     
                     // Save the vehicle with updated data
                     $vehicle->save();
-                } else {
+                 // ADDON START....................
+
+                // Assuming $vehicleData['addons'] is an array of vehicle addons with unique id
+                $vehicleAddonsData = $vehicleData['addons'] ?? [];
+                // Ensure $vehicleAddonsData is an array
+                if (!is_array($vehicleAddonsData) || empty($vehicleAddonsData)) {
+                    // Handle the case where $vehicleAddonsData is not an array or is empty
+                    $vehicleAddonsData = [];
+                }
+                // Extract the ID of addons from the incoming request data
+                $incomingAddonIds = array_column($vehicleAddonsData, 'id');
+                // Get the existing addons from the database
+                $existingAddons = WOVehicleAddons::whereIn('id', $incomingAddonIds)->get()->keyBy('id');
+
+                // Track addons that were processed
+                $processedAddonIds = [];
+                foreach ($vehicleAddonsData as $addonData) {
+                    $addonId = $addonData['id'] ?? null;
+                    // Define the fields to exclude
+                    $excludeVehicleAddonFields = [
+                        'id','work_order_id','w_o_vehicle_id', 'w_o_vehicle_addon_id','vehicle_id','updated_by','created_by',
+                    ];
+                    // Update if exists, otherwise create
+                    if (isset($existingAddons[$addonId])) { 
+                        $processedAddonIds[] = $addonId; // Append ID to array
+                        $addon = $existingAddons[$addonId];
+                        $addonData['updated_by'] = Auth::id();
+                        // Filter out non-null, non-array values, and exclude specified fields
+                        $filterredVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
+                            return !is_array($value) && !in_array($key, $excludeVehicleAddonFields);
+                        }, ARRAY_FILTER_USE_BOTH);
+                        // Check and store only changed fields
+                        foreach ($filterredVehicleAddonData as $field => $newValue) {
+                            $oldValue = $addon->$field;
+                            
+                            // Trim string values
+                            if (is_string($oldValue)) {
+                                $oldValue = trim($oldValue);
+                            }
+                            if (is_string($newValue)) {
+                                $newValue = trim($newValue);
+                            }
+                            
+                            // Convert numeric strings to numbers
+                            if (is_numeric($oldValue) && is_numeric($newValue)) {
+                                $oldValue = (float)$oldValue;
+                                $newValue = (float)$newValue;
+                            }
+                        
+                            if ($oldValue !== $newValue) {
+                                
+                                $changeType = 'Change';
+                                if (is_null($oldValue) && !is_null($newValue)) {
+                                    $changeType = 'Set';
+                                } elseif (!is_null($oldValue) && is_null($newValue)) {
+                                    $changeType = 'Unset';
+                                }
+                        
+                                // Change the vehicle data
+                                $addon->$field = $newValue;
+                        
+                                // Store the change in history
+                                WOVehicleAddonRecordHistory::create([
+                                    'w_o_vehicle_addon_id' => $addon->id,
+                                    'field_name' => $field,
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue,
+                                    'type' => $changeType,
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                        
+                        // Save the vehicle with updated data
+                        $addon->save();
+                    } else {
+                        $addonData['w_o_vehicle_id'] = $vehicle->id;
+                        $addonData['created_by'] = Auth::id();
+                        $woVehicleAddon = WOVehicleAddons::create($addonData);
+                        $processedAddonIds[] = $woVehicleAddon->id; // Append ID to array
+                        // Filter out non-null, non-array values, and exclude specified fields
+                        $nonNullVehicleData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
+                            return !is_null($value) && !is_array($value) && !in_array($key, $excludeVehicleAddonFields);
+                        }, ARRAY_FILTER_USE_BOTH);
+
+                        // Store each non-null, non-array field in the data history
+                        foreach ($nonNullVehicleData as $field => $value) { 
+                            WOVehicleAddonRecordHistory::create([
+                                'w_o_vehicle_addon_id' => $woVehicleAddon->id,
+                                'field_name' => $field,
+                                'old_value' => NULL,
+                                'new_value' => $value,
+                                'type' => 'Set',
+                                'user_id' => Auth::id(),
+                                'changed_at' => Carbon::now(),
+                            ]);
+                        }
+                    }
+                }
+
+                // Ensure $processedIds only contains valid IDs
+                $processedAddonIds = array_filter($processedAddonIds, function($id) {
+                    return !is_null($id);
+                });
+                // Retrieve addons that were not in the incoming request and update deleted_by field
+                $addonsToDelete = WOVehicleAddons::whereNotIn('id', $processedAddonIds)->where('w_o_vehicle_id', $vehicle->id)->get();
+                foreach ($addonsToDelete as $addon) {
+                    $addon->deleted_by = Auth::id();
+                    $addon->save();
+                }
+
+                // Now delete the addons
+                WOVehicleAddons::whereNotIn('id', $processedAddonIds)->where('w_o_vehicle_id', $vehicle->id)->delete();
+
+                // ADDON END..............................
+                } else { 
                     $vehicleData['work_order_id'] = $workOrder->id;
                     $vehicleData['created_by'] = Auth::id();
                     $woVehicles = WOVehicles::create($vehicleData);
@@ -799,23 +1055,218 @@ class WorkOrderController extends Controller
                             'changed_at' => Carbon::now(),
                         ]);
                     }
+
+
+                    // ADDON START.................
+                    if (isset($vehicleData['addons'])) {
+                        if (count($vehicleData['addons']) > 0) {
+                            foreach ($vehicleData['addons'] as $key => $addonData) {
+                                if (isset($addonData['addon_code']) && $addonData['addon_code'] != null) {
+                                    // $this->processNewAddons($woVehicles,$addonData,$authId);
+                                    $createWOVehiclesAddons = [];
+                                    $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
+                                    // $createWOVehiclesAddons['addon_reference_id'] = $addonData['vin'] ?? null;
+                                    // $createWOVehiclesAddons['addon_reference_type'] = $addonData['brand'] ?? null;
+                                    $createWOVehiclesAddons['addon_code'] = $addonData['addon_code'] ?? null;
+                                    // $createWOVehiclesAddons['addon_name'] = $addonData['addon_name'] ?? null;
+                                    // $createWOVehiclesAddons['addon_name_description'] = $addonData['addon_name_description'] ?? null;
+                                    $createWOVehiclesAddons['addon_quantity'] = $addonData['addon_quantity'] ?? null;
+                                    $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;                                  
+                                    $createWOVehiclesAddons['created_by'] = $authId;
+                                
+                                    $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+                                    // Filter out non-null, non-array values, and exclude specified fields
+                                    $excludeVehicleAddonFields = [
+                                        'id','w_o_vehicle_id',
+                                    ];
+                                    $nonNullVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
+                                        return !is_null($value) && !in_array($key, $excludeVehicleAddonFields);
+                                    }, ARRAY_FILTER_USE_BOTH);
+                                   
+                                
+                                    // Store each non-null, non-array field in the data history
+                                    foreach ($nonNullVehicleAddonData as $field => $value) {  
+                                        WOVehicleAddonRecordHistory::create([
+                                            'w_o_vehicle_addon_id' => $WOVehicleAddons->id,
+                                            'field_name' => $field,
+                                            'old_value' => NULL,
+                                            'new_value' => $value,
+                                            'type' => 'Set',
+                                            'user_id' => Auth::id(),
+                                            'changed_at' => Carbon::now(),
+                                        ]);
+                                    }
+                                    // Mark this addon as processed
+                                }
+                            }
+                        }
+                    }  
+                    // ADDON END ..................  
+                    $processedIds[] = $woVehicles->id;
                 }
-
-                // Mark this VIN as processed
-                $processedIds[] = $id;
             }
+           // Ensure $processedIds only contains valid IDs
+            $processedIds = array_filter($processedIds, function($id) {
+                return !is_null($id);
+            });
 
-            // Retrieve vehicles that were not in the incoming request and update deleted_by field
-            $vehiclesToDelete = WOVehicles::whereNotIn('id', $processedIds)->get();
-
+            $vehiclesToDelete = WOVehicles::whereNotIn('id', $processedIds)->where('work_order_id', $workOrder->id)->get();
             foreach ($vehiclesToDelete as $vehicle) {
                 $vehicle->deleted_by = Auth::id();
                 $vehicle->save();
             }
 
             // Now delete the vehicles
-            WOVehicles::whereNotIn('id', $processedIds)->delete();
+            WOVehicles::whereNotIn('id', $processedIds)->where('work_order_id',$workOrder->id)->delete();
 
+            // VEHICLES END ........................................
+            // BOE
+            if (isset($request->boe) && count($request->boe) > 0) {
+                DB::transaction(function() use ($request, $workOrder) {
+                    // Step 1: Fetch all WOVehicles associated with the work order
+                    $woVehiclesForBOE = WOVehicles::where('work_order_id', $workOrder->id)->get();
+            
+                    // Step 2: Create a list of all VINs provided in the request
+                    $requestVins = [];
+                    foreach ($request->boe as $boeNumber => $boe) {
+                        if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                            foreach ($boe['vin'] as $vin) {
+                                $requestVins[] = $vin;
+                            }
+                        }
+                    }
+            
+                    // Step 3: Iterate through each WOVehicle and check if its VIN exists in the provided list
+                    foreach ($woVehiclesForBOE as $woVehicle) {
+                        if (!in_array($woVehicle->vin, $requestVins)) {
+                            // Step 4: If a VIN does not exist in the list, update the boe_number to NULL and log the change
+                            $oldBoeNumber = $woVehicle->boe_number;
+                            if ($oldBoeNumber !== null) {
+                                $woVehicle->boe_number = null;
+                                $woVehicle->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $woVehicle->id,
+                                    'field_name' => 'boe_number',
+                                    'old_value' => $oldBoeNumber,
+                                    'new_value' => null,
+                                    'type' => 'Unset',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+            
+                    // Existing logic to update the boe_number for the provided VINs
+                    foreach ($request->boe as $boeNumber => $boe) {
+                        if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                            foreach ($boe['vin'] as $vin) {
+                                $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id', $workOrder->id)->first();
+                                if ($vinUpdate && $vinUpdate->boe_number != $boeNumber) {
+                                    $oldBoeNumber = $vinUpdate->boe_number;
+                                    $vinUpdate->boe_number = $boeNumber;
+                                    $vinUpdate->save();
+            
+                                    // Determine the change type
+                                    $changeType = 'Change';
+                                    if (is_null($oldBoeNumber) && !is_null($boeNumber)) {
+                                        $changeType = 'Set';
+                                    } elseif (!is_null($oldBoeNumber) && is_null($boeNumber)) {
+                                        $changeType = 'Unset';
+                                    }
+            
+                                    // Create history record
+                                    WOVehicleRecordHistory::create([
+                                        'w_o_vehicle_id' => $vinUpdate->id,
+                                        'field_name' => 'boe_number',
+                                        'old_value' => $oldBoeNumber,
+                                        'new_value' => $boeNumber,
+                                        'type' => $changeType,
+                                        'user_id' => Auth::id(),
+                                        'changed_at' => Carbon::now(),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+                     
+
+            // Deposit against vehicles
+            if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
+                DB::transaction(function() use ($request, $workOrder) {
+                    // Fetch all WOVehicles associated with the work order
+                    $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
+            
+                    // Create a list of all VINs provided in the request
+                    $requestVins = isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) ? $request->deposit_aganist_vehicle : [];
+            
+                    // Iterate through each WOVehicle
+                    foreach ($woVehicles as $woVehicle) {
+                        if (!in_array($woVehicle->vin, $requestVins)) {
+                            // Update deposit_received to 'no' if VIN does not exist in the request list
+                            if ($woVehicle->deposit_received != 'no') {
+                                $oldDepositReceived = $woVehicle->deposit_received;
+                                $woVehicle->deposit_received = 'no';
+                                $woVehicle->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $woVehicle->id,
+                                    'field_name' => 'deposit_received',
+                                    'old_value' => $oldDepositReceived,
+                                    'new_value' => 'no',
+                                    'type' => 'Change',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        } else {
+                            // If the VIN exists in the request list, set deposit_received to 'yes'
+                            $vinUpdate = WOVehicles::where('vin', $woVehicle->vin)->where('work_order_id', $workOrder->id)->first();
+                            if ($vinUpdate && $vinUpdate->deposit_received != 'yes') {
+                                $oldDepositReceived = $vinUpdate->deposit_received;
+                                $vinUpdate->deposit_received = 'yes';
+                                $vinUpdate->save();
+            
+                                // Create history record
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $vinUpdate->id,
+                                    'field_name' => 'deposit_received',
+                                    'old_value' => $oldDepositReceived,
+                                    'new_value' => 'yes',
+                                    'type' => 'Change',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+                });
+            }
+            else if ((isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') OR 
+            (isset($request->deposit_received_as) && $request->deposit_received_as === null) OR !isset($request->deposit_received_as)) {
+                $woVehicles = WOVehicles::where('work_order_id', $workOrder->id)->get();
+                foreach ($woVehicles as $woVehicle) {
+                    if($woVehicle->deposit_received == 'yes') {
+                        // Create history record
+                        WOVehicleRecordHistory::create([
+                            'w_o_vehicle_id' => $woVehicle->id,
+                            'field_name' => 'deposit_received',
+                            'old_value' => $oldDepositReceived,
+                            'new_value' => 'no',
+                            'type' => 'Change',
+                            'user_id' => Auth::id(),
+                            'changed_at' => Carbon::now(),
+                        ]);
+                    }
+                    $woVehicle->deposit_received = 'no';
+                    $woVehicle->save();
+                }
+            }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
             
             DB::commit();
@@ -928,6 +1379,164 @@ class WorkOrderController extends Controller
            catch (\Exception $e) {
                dd($e);
            }
+        }
+    }
+    public function vehicleDataHistory($id) {
+        $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
+        return view('work_order.export_exw.show_vehicle_history',compact('datas'));
+    }
+    public function vehicleAddonDataHistory($id) {
+        $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
+        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas'));
+    }
+    public function salesApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
+                    $wo->sales_support_data_confirmation_at = Carbon::now();
+                    $wo->sales_support_data_confirmation_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->sales_support_data_confirmation_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
+    public function financeApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->finance_approved_at == '' && $wo->finance_approval_by == '') {
+                    $wo->finance_approved_at = Carbon::now();
+                    $wo->finance_approval_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'finance_approved_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'finance_approval_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->finance_approved_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
+    public function coeOfficeApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->coe_office_approved_at == '' && $wo->coe_office_approval_by == '') {
+                    $wo->coe_office_approved_at = Carbon::now();
+                    $wo->coe_office_approval_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'coe_office_approved_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'coe_office_approval_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->coe_office_approved_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
         }
     }
 }
