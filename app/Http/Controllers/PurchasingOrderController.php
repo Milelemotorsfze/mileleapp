@@ -3080,7 +3080,7 @@ public function storeMessages(Request $request)
     }
     public function vehiclesdatagettingvariants($id)
 {
-    $vehicles = Vehicles::with('variant')->where('purchasing_order_id', $id)->whereNull('deleted_at')->get();
+    $vehicles = Vehicles::with('variant')->where('purchasing_order_id', $id)->whereNull('deleted_at')->whereNull('grn_id')->get();
     $vehicleData = [];
     foreach ($vehicles as $vehicle) {
         $vehicleData[] = [
