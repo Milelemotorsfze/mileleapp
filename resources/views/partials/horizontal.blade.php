@@ -1333,7 +1333,7 @@
                                         @if ($hasPermission)
                                         <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vendoraccount.index') }}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Accounts </span>
+                                                <span data-key="t-utility">Vendor Accounts</span>
                                             </a>
                                         </div>
                                         @endif
