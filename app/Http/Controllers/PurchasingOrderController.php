@@ -2000,8 +2000,8 @@ public function paymentrelconfirmvendors($id)
 {
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
-        $vehicle->status = 'Vendor Confirmed';
-        $vehicle->payment_status = 'Vendor Confirmed';
+        $vehicle->status = 'Incoming Stock';
+        $vehicle->payment_status = 'Incoming Stock';
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -2012,7 +2012,7 @@ public function paymentrelconfirmvendors($id)
             $vehicleslog->vehicles_id = $id;
             $vehicleslog->field = "Vehicle Status, Payment Status";
             $vehicleslog->old_value = "Payment Completed";
-            $vehicleslog->new_value = "Vendor Confirmed";
+            $vehicleslog->new_value = "Incoming Stock";
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
@@ -2521,8 +2521,8 @@ public function allpaymentreqssfinpay(Request $request)
                   ->where('payment_status', 'Payment Completed')
                   ->get();
                   foreach ($vehicles as $vehicle) {
-                      $status = 'Vendor Confirmed';
-                      $payment_status = 'Vendor Confirmed';
+                    $status = 'Incoming Stock';
+                    $payment_status = 'Incoming Stock';
                       DB::table('vehicles')
                           ->where('id', $vehicle->id)
                           ->update(['status' => $status, 'payment_status' => $payment_status]);
@@ -2535,7 +2535,7 @@ public function allpaymentreqssfinpay(Request $request)
             $vehicleslog->vehicles_id = $vehicle->id;
             $vehicleslog->field = "Vehicle Status, Payment Status";
             $vehicleslog->old_value = "Payment Completed";
-            $vehicleslog->new_value = "Vendor Confirmed";
+            $vehicleslog->new_value = "Incoming Stock";
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
