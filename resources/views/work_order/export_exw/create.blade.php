@@ -140,15 +140,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     @if(isset($workOrder))
         @method('PUT')
     @endif
-		<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fa fa-check" aria-hidden="true"></i> Sales Support Data Confirmation
+		@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
+		<a  title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
 		</a>
-		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
+		@else
+		<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+		<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
 		</a>
-		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fa fa-check" aria-hidden="true"></i> COE Office Approval
+		@endif
+		@if(isset($workOrder) && $workOrder->finance_approved_at != '')
+		<a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
 		</a>
+		@else
+		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+		<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
+		</a>
+		@endif
+		@if(isset($workOrder) && $workOrder->coe_office_approved_at != '')
+		<a  title="COE Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fas fa-check-circle" title="COE Office"></i> COE Office Approved
+		</a>
+		@else
+		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> COE Office Approval
+		</a>
+		@endif
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
@@ -1525,6 +1543,88 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
             // uniqueCheckAccessories()
 
         });
+
+		$('.btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {	console.log(data);						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Verify, It was verified already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.btn-finance-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.finance-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {	console.log(data);						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Verify, It was verified already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.btn-coe-office-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.coe-office-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {	console.log(data);						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Verify, It was verified already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
 	});
 
 	// ADD CUSTOM VALIDATION RULES START

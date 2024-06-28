@@ -430,6 +430,9 @@ Route::get('/d', function () {
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
         Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
         Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
+        Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
+        Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
+        Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
     });
     // Demand & Planning Module
 

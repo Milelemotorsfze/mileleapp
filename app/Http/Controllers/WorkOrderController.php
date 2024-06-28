@@ -1389,5 +1389,154 @@ class WorkOrderController extends Controller
         $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
         return view('work_order.export_exw.show_vehicle_addon_history',compact('datas'));
     }
-    
+    public function salesApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
+                    $wo->sales_support_data_confirmation_at = Carbon::now();
+                    $wo->sales_support_data_confirmation_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->sales_support_data_confirmation_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
+    public function financeApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->finance_approved_at == '' && $wo->finance_approval_by == '') {
+                    $wo->finance_approved_at = Carbon::now();
+                    $wo->finance_approval_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'finance_approved_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'finance_approval_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->finance_approved_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
+    public function coeOfficeApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->coe_office_approved_at == '' && $wo->coe_office_approval_by == '') {
+                    $wo->coe_office_approved_at = Carbon::now();
+                    $wo->coe_office_approval_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'coe_office_approved_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now(),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'coe_office_approval_by',
+                        'old_value' => NULL,
+                        'new_value' => $authId,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->coe_office_approved_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
 }
