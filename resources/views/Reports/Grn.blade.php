@@ -178,16 +178,44 @@
         @if($incident)
         <div class="extra-items">
             <h3>Incident:</h3>
-            
+            <table class="checklist">
+            <table class="basic-info-table">
+                <tr>
+                    <th>Incident Type:</th>
+                    <td>{{ $incident->type }}</td>
+                </tr>
+                <tr>
+                    <th>Narration of Accident / Damage:</th>
+                    <td>{{ $incident->narration }}</td>
+                </tr>
+                <tr>
+                    <th>Damage Details:</th>
+                    <td>{{ $incident->detail }}</td>
+                </tr>
+                <tr>
+                    <th>Driven By:</th>
+                    <td>{{ $incident->driven_by }}</td>
+                </tr>
+                <tr>
+                <th>Responsibility for Recover the Damages:</th>
+                <td>{{ $incident->responsivity }}</td>
+            </tr>
+            <tr>
+                <th>Reasons:</th>
+                <td>{{ $incident->reason }}</td>
+            </tr>
+            </table>
         </div>
+        <br>
+        <img src="{{ public_path('qc/' . $incident->file_path) }}" alt="Incident Picture" style="width: 100%; height: auto;">
+        <br>
         @endif
         <div class="footer">
             <p><strong>Receiving Remarks:</strong> {{$vehicle->grn_remark}}</p>
         </div>
-
         <div class="signature">
             <div>
-                <p><strong>Created By:</strong> Dahiru</p>
+                <p><strong>Created By: </strong>{{$created_by}}</p>
             </div>
         </div>
     </div>
