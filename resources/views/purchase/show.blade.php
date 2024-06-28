@@ -942,8 +942,8 @@
                                     <button id="approval-btn" class="btn btn-success" onclick="updateStatus('Approved', {{ $purchasingOrder->id }})">Approve</button>
                                     <button id="rejection-btn" class="btn btn-danger" onclick="updateStatus('Rejected', {{ $purchasingOrder->id }})">Reject</button>
                                     @elseif ($purchasingOrder->status === 'Cancel Request')
-                                    <button id="approvalrej-btn" class="btn btn-danger" onclick="updateStatusrej('Approved', {{ $purchasingOrder->id }})">Approve</button>
-                                    <button id="rejectionrej-btn" class="btn btn-success" onclick="updateStatusrej('Rejected', {{ $purchasingOrder->id }})">Reject</button>
+                                    <button id="approvalrej-btn" class="btn btn-success" onclick="updateStatusrej('Approved', {{ $purchasingOrder->id }})">Approve</button>
+                                    <button id="rejectionrej-btn" class="btn btn-danger" onclick="updateStatusrej('Rejected', {{ $purchasingOrder->id }})">Reject</button>
                                 @endif
                             @endif
                         </div>
