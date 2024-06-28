@@ -624,10 +624,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasingOrderItem = new PurchasingOrderItems();
                 $purchasingOrderItem->variant_id = $variantId;
                 $purchasingOrderItem->purchasing_order_id = $purchasingOrderId;
-                    if($request->po_from == 'DEMAND_PLANNING') {
-                        $purchasingOrderItem->qty = $variantsQuantity[$variant->name];
-                    }
-
+                $purchasingOrderItem->qty = $variantsQuantity[$variant->name];
                 $purchasingOrderItem->save();
             }
             $vins = $request->input('vin');
@@ -924,15 +921,13 @@ public function getBrandsAndModelLines(Request $request)
                 $variant = Varaint::find($variantId);
                 $purchasingOrderItem = new PurchasingOrderItems();
                 $variantQuantity = $variantsQuantity[$variant->name];
-                if($request->po_from == 'DEMAND_PLANNING') {
                     $IsExistpurchasingOrderItem = PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)
                                                      ->where('variant_id', $variantId)->first();
                     if($IsExistpurchasingOrderItem) {
                         $purchasingOrderItem =  $IsExistpurchasingOrderItem;
                         $variantQuantity = $IsExistpurchasingOrderItem->qty + $variantQuantity;
                     }
-                    $purchasingOrderItem->qty = $variantQuantity;
-                }
+                $purchasingOrderItem->qty = $variantQuantity;
                 $purchasingOrderItem->variant_id = $variantId;
                 $purchasingOrderItem->purchasing_order_id = $purchasingOrderId;
 
@@ -2663,6 +2658,7 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->pod = $request->input('pod');
             $purchasingOrder->fd = $request->input('fd');
             $purchasingOrder->pl_number = $request->input('pl_number');
+            $purchasingOrder->po_number = $request->input('po_number');
             $purchasingOrder->status = "Pending Approval";
             info($request->hasFile('uploadPL'));
             if ($request->hasFile('uploadPL')) {
@@ -3082,4 +3078,44 @@ public function storeMessages(Request $request)
 
         return response()->json($messages);
     }
+    public function vehiclesdatagettingvariants($id)
+{
+    $vehicles = Vehicles::with('variant')->where('purchasing_order_id', $id)->whereNull('deleted_at')->get();
+    $vehicleData = [];
+    foreach ($vehicles as $vehicle) {
+        $vehicleData[] = [
+            'vehicle_id' => $vehicle->id,
+            'vin' => $vehicle->vin,
+            'variant_name' => $vehicle->variant->name ?? 'N/A',
+        ];
+    }
+    return response()->json($vehicleData);
+}
+public function updateVariants(Request $request)
+{
+    $variants = $request->input('variants');
+    $purchasingOrderId = $request->input('purchasing_order_id');
+    foreach ($variants as $variant) {
+        $vehicle = Vehicles::where('id', $variant['vehicle_id'])
+            ->where('purchasing_order_id', $purchasingOrderId)
+            ->first();
+        if ($vehicle) {
+            $vehicle->varaints_id = $variant['variant_id'];
+            $vehicle->save();
+        }
+    }
+    PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)->delete();
+    $vehiclesGroupedByVariant = Vehicles::where('purchasing_order_id', $purchasingOrderId)
+        ->selectRaw('varaints_id, COUNT(*) as qty')
+        ->groupBy('varaints_id')
+        ->get();
+    foreach ($vehiclesGroupedByVariant as $group) {
+        $purchasedorderitems = New PurchasingOrderItems();
+        $purchasedorderitems->purchasing_order_id = $purchasingOrderId;
+        $purchasedorderitems->variant_id = $variant['variant_id'];
+        $purchasedorderitems->qty = $group->qty;
+        $purchasedorderitems->save();
+    }
+    return response()->json(['success' => true]);
+}
 }

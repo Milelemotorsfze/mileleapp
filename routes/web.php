@@ -884,6 +884,10 @@ Route::get('/d', function () {
     Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
     Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
     Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+    Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
+    Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
+
+
 
 
 
