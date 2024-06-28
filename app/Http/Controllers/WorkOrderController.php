@@ -377,6 +377,51 @@ class WorkOrderController extends Controller
                     }
                 }
             }  
+            // BOE
+            if (isset($request->boe) && count($request->boe) > 0) {
+                foreach ($request->boe as $boeNumber => $boe) {
+                    if (isset($boe['vin']) && count($boe['vin']) > 0) {
+                        foreach ($boe['vin'] as $vin) {
+                            $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                            if ($vinUpdate) {
+                                $vinUpdate->boe_number = $boeNumber;
+                                $vinUpdate->save();
+                                WOVehicleRecordHistory::create([
+                                    'w_o_vehicle_id' => $vinUpdate->id,
+                                    'field_name' => 'boe_number',
+                                    'old_value' => NULL,
+                                    'new_value' => $boeNumber,
+                                    'type' => 'Set',
+                                    'user_id' => Auth::id(),
+                                    'changed_at' => Carbon::now(),
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Deposit against vehicles
+            if (isset($request->deposit_received_as) && $request->deposit_received_as === 'custom_deposit') {
+                if (isset($request->deposit_aganist_vehicle) && is_array($request->deposit_aganist_vehicle) && count($request->deposit_aganist_vehicle) > 0) {
+                    foreach ($request->deposit_aganist_vehicle as $vin) {
+                        $vinUpdate = WOVehicles::where('vin', $vin)->where('work_order_id',$workOrder->id)->first();
+                        if ($vinUpdate) {
+                            $vinUpdate->deposit_received = 'yes';
+                            $vinUpdate->save();
+                            WOVehicleRecordHistory::create([
+                                'w_o_vehicle_id' => $vinUpdate->id,
+                                'field_name' => 'boe_number',
+                                'old_value' => NULL,
+                                'new_value' => 'yes',
+                                'type' => 'Set',
+                                'user_id' => Auth::id(),
+                                'changed_at' => Carbon::now(),
+                            ]);
+                        }
+                    }
+                }
+            }
             // Initialize an array to keep track of old to new comment IDs
             $commentIdMap = [];
 

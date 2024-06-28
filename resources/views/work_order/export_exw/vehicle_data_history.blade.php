@@ -40,7 +40,7 @@
                 <tr>
                     <th>Action</th>
                     <th>Sl No</th>
-                    <!-- <th>boe_number</th> -->
+                    <th>BOE Number</th>
                     <th>VIN</th>
                     <th>Brand</th>
                     <th>Variant</th>
@@ -62,7 +62,7 @@
                     @if(isset($type) && $type == 'export_cnf')
                     <th>Shipment</th>
                     @endif
-                    <!-- <th>deposit_received</th> -->
+                    <th>Deposit Received</th>
                     <th>Created At</th>
                     <th>Created By</th>
                     <th>Last Updated At</th>
@@ -81,7 +81,7 @@
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                             </a></td>
                         <td>{{ ++$i }}</td>
-                        <!-- <td>{{ $vehicle->boe_number }}</td> -->
+                        <td>{{ $vehicle->boe_number }}</td>
                         <td>{{ $vehicle->vin ?? '' }}</td> 
                         <td>{{ $vehicle->brand ?? ''}}</td>
                         <td>{{ $vehicle->variant ?? '' }}</td>
@@ -103,7 +103,7 @@
                         @if(isset($type) && $type == 'export_cnf')
                         <td>{{ $vehicle->shipment ?? ''}}</td>
                         @endif
-                        <!-- <td>{{ $vehicle->deposit_received ?? ''}}</td> -->
+                        <td>{{ $vehicle->deposit_received ?? ''}}</td>
                         <td>{{$vehicle->CreatedBy->name ?? ''}}</td>
                         <td>@if($vehicle->created_at != ''){{\Carbon\Carbon::parse($vehicle->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
                         <td>{{$vehicle->UpdatedBy->name ?? ''}}</td>

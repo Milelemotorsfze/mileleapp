@@ -672,6 +672,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     @if(isset($type) && $type == 'export_cnf')
                                                     <th>Shipment</th>
                                                     @endif
+                                                    <th>Deposit Received</th>
                                                 </tr>
                                                 @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
                                                     @foreach($workOrder->vehicles as $vehicle)
@@ -696,38 +697,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         @if(isset($type) && $type == 'export_cnf')
                                                         <td>{{$vehicle->shipment ?? 'NA'}}</td>
                                                         @endif
+                                                        <td>{{$vehicle->deposit_received ?? 'NA'}}</td>
                                                     </tr>
                                                     <tr>
                                                         <th colspan="2">Modification/Jobs</th>
-                                                        <td colspan="16">{{$vehicle->modification_or_jobs_to_perform_per_vin ?? 'NA'}}</td>
+                                                        <td colspan="17">{{$vehicle->modification_or_jobs_to_perform_per_vin ?? 'NA'}}</td>
                                                     </tr>
                                                     <tr>
                                                         <th colspan="2">Special Request/Remarks</th>
-                                                        <td colspan="16">{{$vehicle->special_request_or_remarks ?? 'NA'}}</td>
+                                                        <td colspan="17">{{$vehicle->special_request_or_remarks ?? 'NA'}}</td>
                                                     </tr>
                                                         @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
                                                         <tr>
-                                                            <th colspan="18">Service Breakdown</th>
+                                                            <th colspan="19">Service Breakdown</th>
                                                         </tr>
                                                         <tr>
                                                             <th colspan="1">Addon Code</th>
                                                             <th colspan="2">Addon Name</th>
                                                             <th colspan="1">Quantity</th>
-                                                            <th colspan="14">Addon Description</th>
+                                                            <th colspan="15">Addon Description</th>
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>
                                                                 <td colspan="1">{{$addon->addon_code ?? 'NA'}}</td>
                                                                 <td colspan="2">{{$addon->addon_name ?? 'NA'}}</td>
                                                                 <td colspan="1">{{$addon->addon_quantity ?? 'NA'}}</td>
-                                                                <td colspan="14">{{$addon->addon_description ?? 'NA'}}</td>
+                                                                <td colspan="15">{{$addon->addon_description ?? 'NA'}}</td>
                                                             </tr>
                                                             @endforeach
                                                         @endif
                                                     @endforeach
                                                 @else
                                                 <tr>
-                                                    <td colspan="18">
+                                                    <td colspan="19">
                                                         <center style="font-size:12px;">No vehilces and addons available</center>
                                                     </td>
                                                 </tr>

@@ -118,7 +118,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
+	<h4 class="card-title"> @if(isset($workOrder)) Edit @else Create @endif @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
 </div>
 <div class="card-body">
@@ -481,7 +481,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
 						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
-						<select name="deposit_aganist_vehicle" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
+						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
 						</select>
 					</div>
 				</div>
@@ -1005,15 +1005,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			}
 			
 			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
-				for(var i=0; i<workOrder.vehicles.length; i++) {
+				// Initialize an object to track VINs by BOE number
+				var boeVins = {};
+				for (var i = 0; i < workOrder.vehicles.length; i++) {
 					drawTableRow(workOrder.vehicles[i]);
+
 					// Find the option and disable it
 					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
+
 					// Refresh the select2 control
 					$("#vin_multiple").trigger('change.select2');
+
 					addedVins.push(workOrder.vehicles[i].vin);
+
+					if (workOrder.vehicles[i].deposit_received == 'yes') {
+						// Add the VIN to the deposit_aganist_vehicle select
+						var $depositSelect = $("#deposit_aganist_vehicle");
+						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, true, true);
+						$depositSelect.append(newOption).trigger('change');
+					}
+					if (workOrder.vehicles[i].boe_number != null) {
+						var boeNumber = workOrder.vehicles[i].boe_number;
+						if (!boeVins[boeNumber]) {
+							boeVins[boeNumber] = [];
+						}
+						boeVins[boeNumber].push(workOrder.vehicles[i].vin);
+					}
 				}
-				addChild();
+				// Add rows for each BOE number and set the corresponding VINs
+				Object.keys(boeVins).forEach(function (boeNumber) {
+					addChild();
+					var index = $(".form_field_outer").find(".form_field_outer_row").length;
+					var $boeSelect = $(`#boe_vin_${index}`);
+					boeVins[boeNumber].forEach(function (vin) {
+						var newOption = new Option(vin, vin, true, true);
+						$boeSelect.append(newOption).trigger('change');
+					});
+				});
 			}
 			else {
 				$("#boe-div").hide();
@@ -2050,40 +2078,55 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
 		function addChild() {
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
-			if (index <= addedVins.length) { 
-				var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
-				var newRow = $(`
-					<div class="row form_field_outer_row" id="${index}">
-						<div class="col-xxl-11 col-lg-11 col-md-11">
-							<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-							<select name="boe[${index}][vin]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-								${options}
-							</select>
+			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+
+			// Check if there are any available options
+			if (getAvailableOptions().length > 0) {
+				if (index <= addedVins.length) {
+					var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+					var newRow = $(`
+						<div class="row form_field_outer_row" id="${index}">
+							<div class="col-xxl-11 col-lg-11 col-md-11">
+								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									${options}
+								</select>
+							</div>
+							<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+								<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
 						</div>
-						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-							<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-								<i class="fas fa-trash-alt"></i>
-							</a>
-						</div>
-					</div>
-				`);
+					`);
 
-				// Append the new row to the container
-				$(".form_field_outer").append(newRow);
+					// Append the new row to the container
+					$(".form_field_outer").append(newRow);
 
-				// Initialize Select2 only on the newly added element
-				$(`#boe_vin_${index}`).select2({
-					allowClear: true,
-					placeholder: "Choose VIN Per BOE",
-				});
+					// Initialize Select2 only on the newly added element
+					$(`#boe_vin_${index}`).select2({
+						allowClear: true,
+						placeholder: "Choose VIN Per BOE",
+					});
 
-				disableSelectedOptions();
+					disableSelectedOptions();
+				} else {
+					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+				}
 			} else {
-				alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+				alert("Sorry! No available options to select.");
 			}
 		}
+		function getAvailableOptions() {
+			var selectedOptions = [];
+			$(".dynamicselect2").each(function() {
+				$(this).find('option:selected').each(function() {
+					selectedOptions.push($(this).val());
+				});
+			});
 
+			return addedVins.filter(vin => !selectedOptions.includes(vin));
+		}
 		function resetIndexes() {
 			// Loop through each .form_field_outer_row and reset the index
 			$(".form_field_outer").find(".form_field_outer_row").each(function(index, element) {
