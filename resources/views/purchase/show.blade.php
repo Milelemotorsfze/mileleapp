@@ -10,7 +10,7 @@
 }
 
 .fixed-height {
-    height: 330px; /* Adjust the height as needed */
+    height: 280px; /* Adjust the height as needed */
     overflow-y: auto;
     border: 1px solid #dee2e6;
     padding: 10px;
@@ -800,6 +800,7 @@
                             $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
                             $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
                             $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $vendorandincomingconfirm = $vendorpaymentconfirm + $vendorpaymentincoming ;
                             $serialNumber = 1;   
                             @endphp
                             <div class="col-lg-3 col-md-3 col-sm-12">
@@ -849,7 +850,7 @@
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Requested</td>
+                            <td style="font-size: 12px;">Payment Initiation Requested</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
                             <td style="font-size: 12px;">Procurement</td>
                         </tr>
@@ -873,27 +874,20 @@
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Released Rejected</td>
+                            <td style="font-size: 12px;">Payment Release Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
                             <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
+                            <td style="font-size: 12px;">Payment Acknowledged</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
                             <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vendor Confirmed</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Incoming Stock</td>
-                            <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
+                            <td colspan="2" style="font-size: 12px;">{{ $vendorandincomingconfirm }}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -1011,7 +1005,7 @@
                             @if ($purchasingOrder->status === 'Approved')
                                 @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Payment Completed'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <label for="choices-single-default" class="form-label"><strong>Vendor Confirmed</strong></label>
+                                        <label for="choices-single-default" class="form-label"><strong>Vendor Confirmed & Incoming</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                         <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqpocomp('Approved', {{ $purchasingOrder->id }})">Confirmed All</button>
@@ -1385,7 +1379,7 @@
 											@if ($purchasingOrder->status === 'Approved')
 											@if ($vehicles->payment_status === 'Payment Completed')
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Vendor Confirmed
+											Incoming Confirmed
 											</a>
                                            @endif
 											@endif
