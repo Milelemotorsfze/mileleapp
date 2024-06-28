@@ -21,4 +21,8 @@ class SupplierAccountTransaction extends Model
     {
         return $this->belongsTo(PurchasingOrder::class, 'purchasing_order_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

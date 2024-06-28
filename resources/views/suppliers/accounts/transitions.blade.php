@@ -32,14 +32,14 @@
             <tbody>
             @foreach ($transitions as $transition)
                 <tr>
-                    <td>{{ $transition->created_at }}</td>
-                    <td>{{ $transition->purchaseOrder->order_number ?? 'No Order Number' }}</td>
+                <td>{{ $transition->created_at->format('d M Y') }}</td>
+                    <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }}</td>
                     <td>{{ $transition->transaction_type }}</td>
                     <td>{{ $transition->account_currency }}</td>
                     <td>{{ $transition->transaction_amount }}</td>
                     <td>{{ $transition->adjustamount }}</td>
                     <td>{{ $transition->totalamount }}</td>
-                    <td>{{ $transition->created_by }}</td>
+                    <td>{{ $transition->user->name }}</td>
                     <td>{{ $transition->remarks }}</td>
                 </tr>
                 @endforeach
