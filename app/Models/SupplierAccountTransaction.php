@@ -19,6 +19,6 @@ class SupplierAccountTransaction extends Model
     ];
     public function purchaseOrder()
     {
-        return $this->belongsTo(PurchaseOrder::class, 'purchasing_order_id');
+        return $this->belongsTo(PurchasingOrder::class, 'purchasing_order_id');
     }
 }
