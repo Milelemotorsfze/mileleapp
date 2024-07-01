@@ -30,6 +30,7 @@ use App\Models\Inspection;
 use App\Models\VehicleExtraItems;
 use App\Models\VehiclePicture;
 use App\Models\Incident;
+use App\Models\Pdi;
 use DataTables;
 use App\Models\MasterModelLines;
 use App\Models\VariantItems;
@@ -3295,5 +3296,58 @@ private function fetchPost($variant, $exteriorColor)
                 ];
             }
             return response()->json(['data' => $data]);
-        }        
+        }
+        public function generatepfiPDF(Request $request)
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open The PDI Inspection";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    $vehicleId = $request->vehicle_id;
+    $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'PDI')->first();
+    if (!$inspection) {
+        return response()->json(['message' => 'Inspection not found'], 404);
+    }
+
+    $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
+                            ->where('inspection_id', $inspection->id)
+                            ->get();
+
+    $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 
+                            'int_color.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
+        ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+        ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+        ->leftJoin('color_codes as ext_color', 'vehicles.ex_colour', '=', 'ext_color.id')
+        ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+        ->where('vehicles.id', $inspection->vehicle_id)
+        ->first();
+
+    $incident = Incident::where('inspection_id', $inspection->id)->first();
+    $vehicle = Vehicles::find($inspection->vehicle_id);
+
+    $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
+    $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
+    $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
+    $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
+    $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
+
+    $data = [
+        'inspection' => $inspection,
+        'PdiInspectionData' => $PdiInspectionData,
+        'additionalInfo' => $additionalInfo,
+        'grnpicturelink' => $grnpicturelink,
+        'secgrnpicturelink' => $secgrnpicturelink,
+        'PDIpicturelink' => $PDIpicturelink,
+        'modificationpicturelink' => $modificationpicturelink,
+        'Incidentpicturelink' => $Incidentpicturelink,
+        'incident' => $incident,
+        'remarks' => $inspection->remarks,
+        'created_by' => Auth::user()->name,
+    ];
+
+    $pdf = PDF::loadView('Reports.pdi', $data);
+    return $pdf->stream('vehicle-details-pdi.pdf');
+}
     }

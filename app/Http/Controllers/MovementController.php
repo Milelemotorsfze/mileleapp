@@ -149,6 +149,9 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'vin' => 'required',
+        ]);
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
         $vin = $request->input('vin');

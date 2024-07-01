@@ -65,7 +65,7 @@ class VendorAccountController extends Controller
     }
     public function view($id)
     {
-        $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)->with('purchaseOrder')->get();
+        $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)->where('transaction_amount', '!=', 0)->with('purchaseOrder')->get();
         $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
         return view('suppliers.accounts.transitions', compact('transitions', 'accounts'));
     }

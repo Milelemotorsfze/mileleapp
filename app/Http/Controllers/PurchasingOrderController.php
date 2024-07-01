@@ -2129,6 +2129,8 @@ public function purchasingallupdateStatusrel(Request $request)
             VendorPaymentAdjustments::where('purchasing_order_id', $id)
                 ->where('status', 'pending')
                 ->update(['status' => 'Paid']);
+            if($paymentad != 0)
+            {
             $supplieraccount = new SupplierAccountTransaction();
             $supplieraccount->transaction_type = "Debit";
             $supplieraccount->purchasing_order_id = $id;
@@ -2137,6 +2139,7 @@ public function purchasingallupdateStatusrel(Request $request)
             $supplieraccount->account_currency = $PurchasingOrder->currency;
             $supplieraccount->transaction_amount = $paymentad;
             $supplieraccount->save();
+            }
         }
         } 
     foreach ($vehicles as $vehicle) {
@@ -2420,6 +2423,8 @@ public function allpaymentreqssfinpay(Request $request)
             $supplieraccountchange->save();
             }
         else{
+        if($totalcost != 0)
+        {
         switch ($currency) {
     case "USD":
         $totalcostconverted = $totalcost * 3.67;
@@ -2450,6 +2455,7 @@ public function allpaymentreqssfinpay(Request $request)
         $supplieraccount->account_currency = $currency;
         $supplieraccount->transaction_amount = $totalcost;
         $supplieraccount->save();
+    }
             return redirect()->back()->with('success', 'Payment Status Updated');
        }
        public function allpaymentreqssfinpaycomp(Request $request)

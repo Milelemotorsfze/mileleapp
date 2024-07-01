@@ -891,7 +891,7 @@ Route::get('/d', function () {
     Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
     Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
-
+    Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
 
 
 
