@@ -411,6 +411,7 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>PDI Report</th>
                 </tr>
               </thead>
               <tbody>
@@ -944,7 +945,18 @@ table3.on('draw', function () {
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' }
+                { data: 'gdndate', name: 'gdn.date' },
+                { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.id) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -1195,6 +1207,10 @@ function exportToExcel(tableId) {
 }
   function generatePDF(vehicleId) {
     var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
+    window.open(url, '_blank');
+}
+function generatePDFpdi(vehicleId) {
+    var url = `/viewpdireport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');
 }
 function openModal(id) {
