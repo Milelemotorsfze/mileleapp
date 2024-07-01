@@ -347,12 +347,12 @@ class PFIController extends Controller
             $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
 
             // change the status to previous while deleting PO
-            if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
-                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-            }else{
-                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-            }
-            $letterOfIndent->save();
+            // if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
+            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+            // }else{
+            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+            // }
+            // $letterOfIndent->save();
         }
         $pfi->delete();
         (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');

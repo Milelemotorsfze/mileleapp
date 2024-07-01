@@ -13,6 +13,8 @@
             overflow: hidden;
         }
     </style>
+    
+
     @can('LOI-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
@@ -27,6 +29,9 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
                     @endphp
                     @if ($hasPermission)
+                    <!-- <a  class="btn btn-sm btn-secondary float-end mr-2" href="{{ route('migrations.index') }}" >
+                    <i class="fa fa-check" aria-hidden="true"></i> Migration Check</a> -->
+
                         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
@@ -55,6 +60,7 @@
                     </div>
                 @endif
             </div>
+
             <div class="portfolio">
                 <ul class="nav nav-pills nav-fill" id="my-tab">
                     <li class="nav-item">
@@ -180,7 +186,7 @@
                                                                                 <dt>SFX </dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year </dt>
+                                                                                <dt>Model Line </dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -207,8 +213,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl>  {{ $LOIItem->masterModel->modelLine->model_line ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
@@ -554,7 +560,7 @@
                                                                                 <dt>SFX </dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year </dt>
+                                                                                <dt>Model Line </dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -581,8 +587,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->modelLine->model_line ?? '' }}</dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
@@ -737,7 +743,7 @@
                                                                                 <dt>SFX</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year</dt>
+                                                                                <dt>Model Line</dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -764,8 +770,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl>  {{ $LOIItem->masterModel->modelLine->model_line ?? '' }}</dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">LOI Description</dt>
@@ -849,6 +855,7 @@
                                     <th>Status</th>
                                     <th>Total Quantity</th>
                                     <th>Utilized Quantity</th>
+                                    <th>Update Utilized Quantity</th>
                                     <th width="200">LOI </th>
                                     <th width="150px">Actions</th>
                                 </tr>
@@ -874,6 +881,12 @@
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
+                                        <td>
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-secondary btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                         </td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
                                                 <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
@@ -917,7 +930,7 @@
                                                                                 <dt>SFX</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year</dt>
+                                                                                <dt>Model Line</dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -944,8 +957,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->modelLine->model_line ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
@@ -1002,6 +1015,31 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade " id="update-utilization-quantity-{{$letterOfIndent->id}}" data-bs-backdrop="static" 
+                                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog ">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Utilized Quantity</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('utilization-quantity-update', $letterOfIndent->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$letterOfIndent->total_quantity}}" name="utilized_quantity" class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

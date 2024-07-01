@@ -120,9 +120,10 @@ class DemandController extends Controller
         }
 
         $data = $data->groupBy('sfx')->pluck('sfx');
+    
         return $data;
     }
-    public function getModelYear(Request $request) {
+    public function getModelLine(Request $request) {
 
         $data = MasterModel::where('model', $request->model)
             ->where('sfx', $request->sfx);
@@ -139,7 +140,8 @@ class DemandController extends Controller
 
         $masterModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)
-                                    ->where('model_year', $request->model_year)->first();
+                                    // ->where('model_year', $request->model_year)
+                                    ->first();
         if($masterModel) {
             if($request->dealer == 'Milele Motors') {
                 $data['loi_description'] = $masterModel->milele_loi_description;
@@ -156,7 +158,7 @@ class DemandController extends Controller
                 ->whereHas('masterModel', function ($query) use($request) {
                     $query->where('sfx', $request->sfx);
                     $query->where('model', $request->model);
-                    $query->where('model_year', $request->model_year);
+                    // $query->where('model_year', $request->model_year);
                 })
                 ->first();
             if($inventory) {
@@ -168,7 +170,8 @@ class DemandController extends Controller
         if($request->module == 'DEMAND') {
           $data['variant'] = $masterModel->variant->name ?? '';
         }
-
+        $data['model_line'] = $masterModel->modelLine->model_line ?? '';
+        info($data);
         return $data;
     }
 

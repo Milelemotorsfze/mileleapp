@@ -106,8 +106,10 @@ use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -442,7 +444,7 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
+    // Route::get('demand-planning/get-model-line', [DemandController::class,'getModelLine'])->name('demand.get-model-line');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
     Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
 
@@ -461,6 +463,7 @@ Route::get('/d', function () {
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
+    Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
@@ -894,6 +897,9 @@ Route::get('/d', function () {
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
 
 
+
+    // Migration Data check Route
+    Route::resource('migrations', MigrationDataCheckController::class);
 
 
 

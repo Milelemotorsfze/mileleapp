@@ -151,24 +151,7 @@
                                     <td  style="background-color: black;color: black"></td>
                                     <td  style="background-color: black;color: black"></td>
                                 </tr>
-                                {{--                            <?php--}}
-                                {{--                            if($letterOfIndentItems->count() >= 7) {--}}
-                                {{--                                $count = 5;--}}
-                                {{--                            }else--}}
-                                {{--                            {--}}
-                                {{--                                $count = 10;--}}
-                                {{--                            }--}}
-                                {{--                            ?>--}}
-                                {{--                            @for($i=0;$i<$count;$i++)--}}
-                                {{--                                <tr>--}}
-                                {{--                                    <td></td>--}}
-                                {{--                                    <td>--}}
-
-                                {{--                                    </td>--}}
-                                {{--                                    <td  style="background-color: black;color: black"></td>--}}
-                                {{--                                    <td  style="background-color: black;color: black"></td>--}}
-                                {{--                                </tr>--}}
-                                {{--                            @endfor--}}
+                              
                                 <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                                     <td colspan="2" style="border: none;">Name:
                                         <span style="margin-left: 10px"> {{ $letterOfIndent->customer->name ?? '' }} </span>
@@ -193,7 +176,7 @@
                                 <tr style=";background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                                     <td colspan="2" style="border: none">
                                         @if($letterOfIndent->signature)
-                                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 100px;width: 150px">
                                         @endif
                                     </td>
 

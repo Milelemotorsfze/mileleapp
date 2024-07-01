@@ -55,8 +55,8 @@ class LetterOfIndentController extends Controller
                         LetterOfIndent::LOI_STATUS_APPROVED])
             ->get();
         foreach ($partialApprovedLOIs as $partialApprovedLOI) {
-            $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
-                ->sum('utilized_quantity');
+            // $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
+            //     ->sum('utilized_quantity');
             $partialApprovedLOI->total_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
                 ->sum('quantity');
         }
@@ -94,7 +94,8 @@ class LetterOfIndentController extends Controller
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-            'dealers' => 'required',
+            'dealers' => 'required'
+          
         ]);
 
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
@@ -170,8 +171,9 @@ class LetterOfIndentController extends Controller
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
-                    ->where('model_year', $request->model_year[$key])
+                    ->orderBy('model_year','DESC')
                     ->first();
+                    
                 if($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
                     $length = 7;
@@ -506,7 +508,7 @@ class LetterOfIndentController extends Controller
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
-                    ->where('model_year', $request->model_year[$key])
+                    ->orderBy('model_year','DESC')
                     ->first();
                 if ($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
@@ -611,6 +613,14 @@ class LetterOfIndentController extends Controller
 
         return response(true);
 
+    }
+    public function utilizationQuantityUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('LOI Utilization quantity updated.');
+
+        $LOI = LetterOfIndent::find($id);
+        $LOI->utilized_quantity = $request->utilized_quantity;
+        $LOI->save();
+        return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
     }
 
 }

@@ -271,11 +271,13 @@
                                             @enderror
                                         </div>
                                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                            <label class="form-label">Model Year</label>
-                                            <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
+                                            <label class="form-label">Model Line</label>
+                                            <!-- <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
                                                 <option value="">Select Model Year</option>
-                                            </select>
-                                            @error('model_year')
+                                            </select> -->
+                                            <input type="text" readonly placeholder="Model Line"
+                                            class="form-control widthinput text-dark model-lines"  data-index="1" id="model-line-1">
+                                            @error('model_line')
                                             <div role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </div>
@@ -523,13 +525,13 @@
         }).on('change', function() {
             $(this).valid();
         });
-        $('#model-year-1').select2({
-            placeholder : 'Select Model Year',
-            allowClear: true,
-            maximumSelectionLength: 1
-        }).on('change', function() {
-            $(this).valid();
-        });
+        // $('#model-year-1').select2({
+        //     placeholder : 'Select Model Year',
+        //     allowClear: true,
+        //     maximumSelectionLength: 1
+        // }).on('change', function() {
+        //     $(this).valid();
+        // });
 
         $('#dealer').change(function () {
             var value = $('#dealer').val();
@@ -746,11 +748,10 @@
                         @enderror
                         </div>
                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                <select class="form-select widthinput text-dark model-years" multiple  name="model_year[]" data-index="${index}" id="model-year-${index}">
-                                <option value="">Select Model Year</option>
-                            </select>
-                            @error('model_year')
-                        <div role="alert">
+                             <input type="text" readonly placeholder="Model Line" class="form-control widthinput text-dark model-lines"  
+                             data-index="${index}" id="model-line-${index}">
+                            @error('model_line')
+                            <div role="alert">
                             <strong>{{ $message }}</strong>
                             </div>
                             @enderror
@@ -784,11 +785,11 @@
                             allowClear: true,
                             maximumSelectionLength: 1
                         });
-                        $('#model-year-' + index).select2({
-                            placeholder: 'Select Model Year',
-                            allowClear: true,
-                            maximumSelectionLength: 1
-                        });
+                        // $('#model-year-' + index).select2({
+                        //     placeholder: 'Select Model Year',
+                        //     allowClear: true,
+                        //     maximumSelectionLength: 1
+                        // });
 
                     let type = 'add-new';
                     getModels(index,type);
@@ -799,12 +800,16 @@
             if(rowCount > 1) {
 
                 var indexNumber = $(this).attr('data-index');
-                var modelYear = $('#model-year-'+indexNumber).val();
+                // var modelYear = $('#model-year-'+indexNumber).val();
+                var modelLine = $('#model-line-'+indexNumber).val()
                 var model = $('#model-'+indexNumber).val();
                 var sfx = $('#sfx-'+indexNumber).val();
-                if(modelYear[0]) {
-                    appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
-                }
+                // if(modelYear[0]) {
+                //     appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
+                // }
+                // if(modelLine) {
+                //     appendModelLine(indexNumber, model[0],sfx[0],modelLine);
+                // }
                 if(model[0]) {
                     appendModel(indexNumber,model[0]);
                 }
@@ -823,8 +828,8 @@
                     $(this).find('.sfx').attr('id', 'sfx-'+index);
                     $(this).find('.loi-descriptions').attr('data-index', index);
                     $(this).find('.loi-descriptions').attr('id', 'loi-description-'+index);
-                    $(this).find('.model-years').attr('data-index', index);
-                    $(this).find('.model-years').attr('id', 'model-year-'+index);
+                    $(this).find('.model-lines').attr('data-index', index);
+                    $(this).find('.model-lines').attr('id', 'model-line-'+index);
                     $(this).find('.quantities').attr('data-index', index);
                     $(this).find('.quantities').attr('id', 'quantity-'+index);
                     $(this).find('.inventory-qty').attr('data-index', index);
@@ -845,12 +850,12 @@
                         maximumSelectionLength:1,
                         allowClear: true
                     });
-                    $('#model-year-'+index).select2
-                    ({
-                        placeholder: 'Select Model Year',
-                        maximumSelectionLength:1,
-                        allowClear: true
-                    });
+                    // $('#model-year-'+index).select2
+                    // ({
+                    //     placeholder: 'Select Model Year',
+                    //     maximumSelectionLength:1,
+                    //     allowClear: true
+                    // });
                 });
                 checkCountryCriterias();
 
@@ -870,68 +875,73 @@
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('data-index');
             $('#sfx-'+index+'-error').remove();
-            getModelYear(index);
-        });
-        $(document.body).on('select2:select', ".model-years", function (e) {
-            let index = $(this).attr('data-index');
-            $('#model-year-'+index+'-error').remove();
             getLOIDescription(index);
-            var value = e.params.data.text;
-            hideModelYear(index, value);
-
+            // getModelYear(index);
+            // getModelLine(index);
         });
+        // $(document.body).on('select2:select', ".model-years", function (e) {
+        //     let index = $(this).attr('data-index');
+        //     $('#model-year-'+index+'-error').remove();
+        //     getLOIDescription(index);
+        //     var value = e.params.data.text;
+        //     // hideModelYear(index, value);
+
+        // });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
             $('#loi-description-'+index).val("");
+            $('#model-line-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
-            var modelYear =  $('#model-year-'+index).val();
+            // var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            if(modelYear[0]) {
-                appendModelYear(index, model[0],sfx,modelYear[0])
-            }
+            // if(modelYear[0]) {
+            //     appendModelYear(index, model[0],sfx,modelYear[0])
+            // }
             appendSFX(index,model[0],sfx);
-            $('#model-year-'+index).empty();
-
+            // $('#model-year-'+index).empty();
+        
+           
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
             console.log("unselected");
             let index = $(this).attr('data-index');
 
-            var modelYear =  $('#model-year-'+index).val();
+            // var modelYear =  $('#model-year-'+index).val();
             var sfx = $('#sfx-'+index).val();
             var model = e.params.data.id;
-            if(modelYear[0]){
-                appendModelYear(index, model,sfx[0],modelYear[0])
-            }
+            // if(modelYear[0]){
+            //     appendModelYear(index, model,sfx[0],modelYear[0])
+            // }
+            $('#model-line-'+index).val("");
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
             enableDealer();
 
             $('#sfx-'+index).empty();
-            $('#model-year-'+index).empty();
-
+            // $('#model-year-'+index).empty();
+            $('#model-line-'+index).empty();
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
             $('#quantity-'+index).val("");
         });
-        $(document.body).on('select2:unselect', ".model-years", function (e) {
-            let index = $(this).attr('data-index');
-            $('#loi-description-'+index).val("");
-            $('#master-model-id-'+index).val("");
-            $('#inventory-quantity-'+index).val("");
-            $('#quantity-'+index).val("");
+        // $(document.body).on('select2:unselect', ".model-years", function (e) {
+        //     let index = $(this).attr('data-index');
+        //     $('#loi-description-'+index).val("");
+        //     $('#master-model-id-'+index).val("");
+        //     $('#inventory-quantity-'+index).val("");
+        //     $('#quantity-'+index).val("");
 
-            var modelYear = e.params.data.id;
-            var model = $('#model-'+index).val();
-            var sfx = $('#sfx-'+index).val();
-            appendModelYear(index, model[0],sfx[0],modelYear);
-            // get the unseleted index and match with each row item if model and sfx is matching append that row
-        });
+        //     var modelYear = e.params.data.id;
+        //     var model = $('#model-'+index).val();
+        //     var sfx = $('#sfx-'+index).val();
+        //     appendModelYear(index, model[0],sfx[0],modelYear);
+        //     // get the unseleted index and match with each row item if model and sfx is matching append that row
+        // });
 
        function getSfx(index) {
 
@@ -961,53 +971,22 @@
                     $('#inventory-quantity-'+index).val(0);
                     $('#sfx-'+index).empty();
                     $('#loi-description-'+index).val("");
+                    $('#model-line-'+index).val("");
                     $('#sfx-'+index).html('<option value=""> Select SFX </option>');
-                    $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
+                    // $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
 
                     jQuery.each(data, function(key,value){
                         $('#sfx-'+index).append('<option value="'+ value +'">'+ value +'</option>');
                     });
+                  
                 }
             });
+           
        }
-       function getModelYear(index){
-
-           let model = $('#model-'+index).val();
-           let sfx = $('#sfx-'+index).val();
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
-           var selectedModelIds = [];
-           for(let i=1; i<=totalIndex; i++)
-           {
-               var eachSelectedModelId = $('#master-model-id-'+i).val();
-               if(eachSelectedModelId) {
-                   selectedModelIds.push(eachSelectedModelId);
-               }
-           }
-
-           let url = '{{ route('demand.get-model-year') }}';
-           $.ajax({
-               type: "GET",
-               url: url,
-               dataType: "json",
-               data: {
-                   sfx: sfx[0],
-                   model:model[0],
-                   selectedModelIds:selectedModelIds,
-               },
-               success:function (data) {
-                   $('#model-year-'+index).empty();
-                   $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
-                   $('#loi-description-'+index).html('<option value=""> Select LOI Description </option>');
-                   // $('#inventory-quantity').val(quantity);
-                   jQuery.each(data, function(key,value){
-                       $('#model-year-'+index).append('<option value="'+ value +'">'+ value +'</option>');
-                   });
-               }
-           });
-        }
+  
        function getLOIDescription(index) {
-           let model_year = $('#model-year-'+index).val();
+    
+        //    let model_year = $('#model-year-'+index).val();
            let model = $('#model-'+index).val();
            let sfx = $('#sfx-'+index).val();
            let dealer = $('#dealer').val();
@@ -1020,11 +999,12 @@
                data: {
                    sfx: sfx[0],
                    model:model[0],
-                   model_year: model_year[0],
+                //    model_year: model_year[0],
                    dealer:dealer,
                    module: 'LOI',
                },
                success:function (data) {
+                console.log(data);
                    $('#loi-description-'+index).val("");
 
                    let quantity = data.quantity;
@@ -1033,43 +1013,45 @@
                    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
-                    $('#master-model-id-'+index).val(modelId);
+                   $('#master-model-id-'+index).val(modelId);
+                   $('#model-line-'+index).val(data.model_line);
                }
            });
         }
-       function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
+        
+    //    function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
 
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+    //        var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
-            for(let i=1; i<=totalIndex; i++)
-            {
-                if(i != index) {
-                    var model = $('#model-'+i).val();
-                    var sfx = $('#sfx-'+i).val();
-                    if(unSelectedmodel == model[0] && unSelectedsfx == sfx[0]) {
-                        $('#model-year-'+i).append($('<option>', {value: unSelectedmodelYear, text : unSelectedmodelYear}))
-                    }
-                }
-            }
-       }
-       function hideModelYear(index, value) {
-           var selectedModel = $('#model-'+index).val();
-           var selectedSFX = $('#sfx-'+index).val();
+    //         for(let i=1; i<=totalIndex; i++)
+    //         {
+    //             if(i != index) {
+    //                 var model = $('#model-'+i).val();
+    //                 var sfx = $('#sfx-'+i).val();
+    //                 if(unSelectedmodel == model[0] && unSelectedsfx == sfx[0]) {
+    //                     $('#model-year-'+i).append($('<option>', {value: unSelectedmodelYear, text : unSelectedmodelYear}))
+    //                 }
+    //             }
+    //         }
+    //    }
+    //    function hideModelYear(index, value) {
+    //        var selectedModel = $('#model-'+index).val();
+    //        var selectedSFX = $('#sfx-'+index).val();
 
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-           for(let i=1; i<=totalIndex; i++)
-           {
-               if(i != index) {
-                   var model = $('#model-'+i).val();
-                   var sfx = $('#sfx-'+i).val();
+    //        var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+    //        for(let i=1; i<=totalIndex; i++)
+    //        {
+    //            if(i != index) {
+    //                var model = $('#model-'+i).val();
+    //                var sfx = $('#sfx-'+i).val();
 
-                   if(selectedModel[0] == model[0] && selectedSFX[0] == sfx[0]) {
-                       var currentId = 'model-year-' + i;
-                       $('#' + currentId + ' option[value=' + value + ']').detach();
-                   }
-               }
-           }
-       }
+    //                if(selectedModel[0] == model[0] && selectedSFX[0] == sfx[0]) {
+    //                    var currentId = 'model-year-' + i;
+    //                    $('#' + currentId + ' option[value=' + value + ']').detach();
+    //                }
+    //            }
+    //        }
+    //    }
        function appendSFX(index,unSelectedmodel,sfx){
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 

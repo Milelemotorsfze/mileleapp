@@ -12,7 +12,7 @@ class LetterOfIndentItem extends Model
 //    public $timestamps = false;
     protected $appends = [
         'steering',
-        'balance_quantity',
+        // 'balance_quantity',
         'inventory_quantity',
         'loi_description',
     ];
@@ -52,14 +52,14 @@ class LetterOfIndentItem extends Model
 
         return $loiDescription;
     }
-    public function getBalanceQuantityAttribute()
-    {
-       $totalQuantity = $this->quantity;
-       $approvedQuantity = $this->approved_quantity;
-       $balanceQuantity = $totalQuantity - $approvedQuantity;
+    // public function getBalanceQuantityAttribute()
+    // {
+    //    $totalQuantity = $this->quantity;
+    //    $approvedQuantity = $this->approved_quantity;
+    //    $balanceQuantity = $totalQuantity - $approvedQuantity;
 
-       return $balanceQuantity;
-    }
+    //    return $balanceQuantity;
+    // }
     public function getInventoryQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);
