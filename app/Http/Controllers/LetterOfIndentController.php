@@ -94,7 +94,8 @@ class LetterOfIndentController extends Controller
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-            'dealers' => 'required',
+            'dealers' => 'required'
+          
         ]);
 
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
@@ -170,8 +171,9 @@ class LetterOfIndentController extends Controller
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
-                    ->where('model_year', $request->model_year[$key])
+                    ->orderBy('model_year','DESC')
                     ->first();
+                    
                 if($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
                     $length = 7;
@@ -506,7 +508,7 @@ class LetterOfIndentController extends Controller
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
-                    ->where('model_year', $request->model_year[$key])
+                    ->orderBy('model_year','DESC')
                     ->first();
                 if ($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();

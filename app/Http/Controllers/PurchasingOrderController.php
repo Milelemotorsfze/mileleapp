@@ -1721,7 +1721,7 @@ public function paymentreleasesconfirm($id)
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
                     if(in_array($item->master_model_id, $possibleIds)) {
-                        if($item->utilized_quantity < $item->approved_quantity) {
+                        if($item->utilized_quantity < $item->total_loi_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;
@@ -1960,7 +1960,7 @@ public function purchasingallupdateStatusrel(Request $request)
                     if(in_array($item->master_model_id, $possibleIds)) {
                         info("master model id including li item");
                         if($item->utilized_quantity < $item->approved_quantity) {
-                            info("approved_quantity < utilized_quantity");
+                            info("total quantity < utilized_quantity");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;

@@ -105,6 +105,7 @@ use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\MigrationDataCheckController;
 
 /*
 /*
@@ -420,7 +421,7 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
+    // Route::get('demand-planning/get-model-line', [DemandController::class,'getModelLine'])->name('demand.get-model-line');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
     Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
 
@@ -848,6 +849,9 @@ Route::get('/d', function () {
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
     Route::get('/get-agents/{quotationId}', [QuotationController::class, 'getAgentsByQuotationId']);
     Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
+
+    // Migration Data check Route
+    Route::resource('migrations', MigrationDataCheckController::class);
 
 
 
