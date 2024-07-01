@@ -985,7 +985,7 @@
        }
   
        function getLOIDescription(index) {
-        alert("ok");
+    
         //    let model_year = $('#model-year-'+index).val();
            let model = $('#model-'+index).val();
            let sfx = $('#sfx-'+index).val();

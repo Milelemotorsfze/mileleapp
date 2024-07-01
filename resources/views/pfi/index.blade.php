@@ -25,6 +25,7 @@
                             <th>S.NO</th>
                             <th>PFI Number</th>
                             <th>Vendor</th>
+                            <th>Dealer</th>
                             <th>Delivery Location</th>
                             <th>Currency</th>
                             <th>Customer Name </th>
@@ -47,6 +48,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $pfi->pfi_reference_number }}</td>
                                 <td>{{ $pfi->supplier->supplier ?? '' }}</td>
+                                <td>{{ $pfi->letterOfIndent->dealers ?? ''}}</td>
                                 <td>{{ $pfi->delivery_location }}</td>
                                 <td>{{ $pfi->currency }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->name }}</td>

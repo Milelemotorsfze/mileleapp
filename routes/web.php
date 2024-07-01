@@ -440,6 +440,7 @@ Route::get('/d', function () {
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
+    Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);

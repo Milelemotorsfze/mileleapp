@@ -244,28 +244,29 @@
                 }
             });
 
-            $('#dtBasicExample3 tbody td').on('change', '.model-year', function () {
+            $('#dtBasicExample3 tbody').on('change', '.model-year', function () {
+                alert("clicked");
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
             });
-            $('#dtBasicExample3 tbody td').on('change', '.supplier', function () {
+            $('#dtBasicExample3 tbody').on('change', '.supplier', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
             });
-            $('#dtBasicExample3 tbody td').on('change', '.eta-import', function () {
+            $('#dtBasicExample3 tbody').on('change', '.eta-import', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
             });
-            $('#dtBasicExample3 tbody td').on('change', '.upload_status', function () {
+            $('#dtBasicExample3 tbody').on('change', '.upload_status', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 console.log(id);
@@ -274,7 +275,7 @@
                     addUpdatedData(id, field);
                 }
             });
-            $('#dtBasicExample3 tbody td').on('change', '.country', function () {
+            $('#dtBasicExample3 tbody').on('change', '.country', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 let country = $('#country-editable-'+id).val();
@@ -286,7 +287,8 @@
                     addUpdatedData(id, field);
                 }
             });
-            $('#dtBasicExample3 tbody td').on('change', '.whole_sales', function () {
+            $('#dtBasicExample3 tbody').on('change', '.whole_sales', function () {
+               
                 var id = $(this).data('id');
                 var field = $(this).data('field');
 
@@ -469,6 +471,7 @@
 
                      });
 
+                     console.log(selectedUpdatedDatas);
                      let url = '{{ route('update-inventory') }}';
                      $.ajax({
                          type:"POST",

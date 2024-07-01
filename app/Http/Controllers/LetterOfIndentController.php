@@ -55,8 +55,8 @@ class LetterOfIndentController extends Controller
                         LetterOfIndent::LOI_STATUS_APPROVED])
             ->get();
         foreach ($partialApprovedLOIs as $partialApprovedLOI) {
-            $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
-                ->sum('utilized_quantity');
+            // $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
+            //     ->sum('utilized_quantity');
             $partialApprovedLOI->total_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
                 ->sum('quantity');
         }
@@ -613,6 +613,14 @@ class LetterOfIndentController extends Controller
 
         return response(true);
 
+    }
+    public function utilizationQuantityUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('LOI Utilization quantity updated.');
+
+        $LOI = LetterOfIndent::find($id);
+        $LOI->utilized_quantity = $request->utilized_quantity;
+        $LOI->save();
+        return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
     }
 
 }
