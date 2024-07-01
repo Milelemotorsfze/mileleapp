@@ -169,7 +169,8 @@
       @csrf
       <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title fs-5" id="adoncode">Add New Agent</h5>
+        <h5 class="modal-title fs-5 mb-1" id="adoncode">Add New Agent</h5>
+        <h6 class="modal-subtitle text-muted" id="adoncode">(Please avoid adding dummy or duplicate details)</h6>
           <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
@@ -1405,10 +1406,16 @@
     }
 $(document).ready(function () {
     $('#cb_name').change(function () {
+        console.log("pouch");
         var selectedAgentId = $(this).val();
         var selectedAgentName = $(this).find(':selected').text();
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
+        if (selectedAgentId) {
+                        $('.system-code').removeAttr('disabled');
+                    } else {
+                        $('.system-code').attr('disabled', 'disabled');
+                    }
     });
     fetchAgentData();
     function fetchAgentData() {
@@ -1445,6 +1452,12 @@ $(document).ready(function () {
 
     // Intercept form submission and handle it through AJAX
     $('#form-update2_492').submit(function (e) {
+        var name = $('#name').val().trim();
+        var phone = $('#phone').val().trim();
+    if (name === "" || phone === "") {
+        alert('Name and phone number cannot be blank.');
+        return false;
+    }
         e.preventDefault();
         var formData = new FormData($(this)[0]);
         $.ajax({
@@ -2356,26 +2369,21 @@ $('#shipping_port').select2();
                 }
             },
             {
-    targets: -5,
-    data: null,
-    render: function (data, type, row) {
-        // Check if agent id is selected
-        var agentId = $("#agents_id").val();
-        if (agentId) {
-            return '<div class="input-group"> ' +
-                        '<input type="text" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
-                        '<div class="input-group-append"> ' +
-                            '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
-                                '<option value="A">A</option><option value="U">U</option>' +
-                            '</select>' +
-                        '</div> ' +
-                    '</div>';
-        } else {
-            // If agent id is not selected, return empty string to hide the column
-            return '';
-             }
-            }
-        },
+                targets: -5,
+                data: null,
+                render: function (data, type, row) {
+                    var agentId = $("#agents_id").val();
+                    var disabledAttr = agentId ? '' : 'disabled';
+                    return '<div class="input-group"> ' +
+                               '<input type="text" min="0" value="1" step="1" class="system-code form-control" name="system_code_amount[]" id="system-code-amount-'+ row['index'] +'" ' + disabledAttr + ' />' +
+                               '<div class="input-group-append"> ' +
+                                   '<select class="form-control system-code-currency" name="system_code_currency[]" id="system-code-currency-'+ row['index'] +'">' +
+                                       '<option value="A">A</option><option value="U">U</option>' +
+                                   '</select>' +
+                               '</div> ' +
+                           '</div>';
+                }
+            },
             {
                 targets: -3,
                 data: null,
@@ -2932,7 +2940,6 @@ $('#shipping_port').select2();
     $('#search-button').on('click', function() {
         var modelLineId = $('#model_line').val();
         var brandId = $('#brand').val();
-
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();

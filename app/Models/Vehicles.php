@@ -109,6 +109,10 @@ public function latestRemarkSales()
     {
         return $this->belongsTo(Warehouse::class, 'latest_location');
     }
+    public function warehouseLocation()
+    {
+        return $this->belongsTo(Warehouse::class, 'latest_location','id');
+    }
     // public function getSimilarVehiclesWithInactiveStockAttribute()
     // {
     //     // dd($this->varaints_id);

@@ -15,7 +15,7 @@
     <h4 class="card-title">
      PDI Report
      <center><b>Vehicle Identification Number:
-                    {{$vehicleDetails->vin}}
+                    {{$vehicleDetails->vin ?? ''}}
                 </b></center>
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>

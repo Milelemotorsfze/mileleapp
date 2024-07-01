@@ -9,4 +9,9 @@ class VehiclePurchasingCost extends Model
 {
     use HasFactory;
     protected $table = 'vehicle_purchasing_cost';
+    protected $fillable = [
+        'currency',
+        'unit_price',
+        'vehicles_id',
+    ];
 }

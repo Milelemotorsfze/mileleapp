@@ -1,6 +1,20 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+  .text-container {
+        display: inline-block; /* Inline block to handle overflow */
+        max-width: 300px; /* Adjust this width as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .read-more-btn {
+        color: blue;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: underline;
+    }
     div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
@@ -161,6 +175,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -201,6 +216,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -242,6 +258,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -283,6 +300,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -326,6 +344,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -369,6 +388,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -391,6 +411,7 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>PDI Report</th>
                 </tr>
               </thead>
               <tbody>
@@ -413,6 +434,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -457,6 +479,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -522,10 +545,30 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
+        }},        
+        { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -572,6 +615,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -606,60 +669,84 @@
             }
         });
         var table3 = $('#dtBasicExample3').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+    columns: [
+        { data: 'brand_name', name: 'brands.brand_name' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'model_detail', name: 'varaints.model_detail' },
+        { 
+            data: 'variant', 
+            name: 'varaints.name',
+            render: function(data, type, row) {
+                return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+            }
+        },
+        {
+            data: 'variant_detail',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
                 }
-            },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
+        { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-               
-                { 
+        { data: 'engine', name: 'vehicles.engine' },
+        { data: 'my', name: 'varaints.my' },
+        { data: 'steering', name: 'varaints.steering' },
+        { data: 'fuel_type', name: 'varaints.fuel_type' },
+        { data: 'gearbox', name: 'varaints.gearbox' },
+        { data: 'exterior_color', name: 'ex_color.name' },
+        { data: 'interior_color', name: 'int_color.name' },
+        { data: 'upholestry', name: 'varaints.upholestry' },
+        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+        { data: 'location', name: 'warehouse.name' },
+        { data: 'territory', name: 'vehicles.territory' },
+        { data: 'fd', name: 'purchasing_order.fd' },
+        { data: 'po_number', name: 'purchasing_order.po_number' },
+        { data: 'po_date', name: 'purchasing_order.po_date' },
+        { data: 'grn_number', name: 'grn.grn_number' },
+        { data: 'date', name: 'grn.date' },
+        { data: 'inspection_date', name: 'inspection_date' },
+        { data: 'grn_remark', name: 'vehicles.grn_remark' },
+        { 
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                if (row.inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
             }
         }
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table3.on('draw', function () {
-            var rowCount = table3.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge3').text(rowCount).show();
-            } else {
-                $('.row-badge3').hide();
-            }
-        });
+    ],
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+});
+
+table3.on('draw', function () {
+    var rowCount = table3.page.info().recordsDisplay;
+    if (rowCount > 0) {
+        $('.row-badge3').text(rowCount).show();
+    } else {
+        $('.row-badge3').hide();
+    }
+});
         var table4 = $('#dtBasicExample4').DataTable({
           processing: true,
             serverSide: true,
@@ -673,6 +760,26 @@
                 name: 'varaints.name',
                 render: function(data, type, row) {
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                    }
+                },
+                {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
                     }
                 },
                 { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
@@ -725,6 +832,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -775,6 +902,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -798,7 +945,18 @@
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' }
+                { data: 'gdndate', name: 'gdn.date' },
+                { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.id) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -827,6 +985,24 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -901,6 +1077,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -986,30 +1182,35 @@ function exportToExcel(tableId) {
     var rows = table.rows;
     var csvContent = "";
     for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      for (var j = 0; j < row.cells.length; j++) {
-        csvContent += row.cells[j].innerText + ",";
-      }
-      csvContent += "\n";
+        var row = rows[i];
+        for (var j = 0; j < row.cells.length; j++) {
+            var cellText = row.cells[j].innerText || row.cells[j].textContent;
+            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+        }
+        csvContent += "\n";
     }
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
-      navigator.msSaveBlob(blob, 'export.csv');
+        navigator.msSaveBlob(blob, 'export.csv');
     } else {
-      var link = document.createElement("a");
-      if (link.download !== undefined) {
-        var url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "export.csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+        var link = document.createElement("a");
+        if (link.download !== undefined) {
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "export.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
-  }
+}
   function generatePDF(vehicleId) {
     var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
+    window.open(url, '_blank');
+}
+function generatePDFpdi(vehicleId) {
+    var url = `/viewpdireport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');
 }
 function openModal(id) {
@@ -1196,5 +1397,11 @@ function displayGallery(imageUrls) {
         carouselImages.appendChild(div);
     });
 }
+</script>
+<script>
+    function showFullText(button) {
+        var fullText = button.getAttribute('data-fulltext');
+        alert(fullText);
+    }
 </script>
 @endsection

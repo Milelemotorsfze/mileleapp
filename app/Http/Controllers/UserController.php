@@ -84,7 +84,7 @@ namespace App\Http\Controllers;
                 $salesmanstatus->sale_person_id = $user->id;
                 $salesmanstatus->status = "Active";
                 $salesmanstatus->remarks = "Account Created";
-                $salesmanstatus->created_by = Auth::user();
+                $salesmanstatus->created_by = Auth::id();
                 $salesmanstatus->save();
                 $languages = $request->input('lauguages');
                 foreach ($languages as $language) {

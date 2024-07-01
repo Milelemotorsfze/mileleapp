@@ -26,9 +26,14 @@ use App\Models\Vehicleslog;
 use App\Models\Solog;
 use App\Models\Remarks;
 use App\Models\Warehouse;
+use App\Models\Inspection;
+use App\Models\VehicleExtraItems;
 use App\Models\VehiclePicture;
+use App\Models\Incident;
+use App\Models\Pdi;
 use DataTables;
 use App\Models\MasterModelLines;
+use App\Models\VariantItems;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -2714,7 +2719,7 @@ public function viewalls(Request $request)
                         'varaints.model_detail',
                         'purchasing_order.fd',
                         'varaints.id as variant_id',
-                        'varaints.detail',
+                        'varaints.detail as variant_detail',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2760,7 +2765,7 @@ public function viewalls(Request $request)
                         'varaints.name as variant',
                         'varaints.id as variant_id',
                         'varaints.model_detail',
-                        'varaints.detail',
+                        'varaints.detail as variant_detail',
                         'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2804,13 +2809,14 @@ public function viewalls(Request $request)
                         'vehicles.vin',
                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                         'vehicles.engine',
+                        'inspection.id as inspectionid',
                         'vehicles.territory',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
                         'varaints.id as variant_id',
-                        'varaints.detail',
+                        'varaints.detail as variant_detail',
                         'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2867,7 +2873,7 @@ public function viewalls(Request $request)
                         'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
-                        'varaints.model_detail',
+                        'varaints.detail as variant_detail',
                         'varaints.id as variant_id',
                         'varaints.detail',
                         'varaints.seat',
@@ -2921,7 +2927,7 @@ public function viewalls(Request $request)
                          'varaints.name as variant',
                          'varaints.id as variant_id',
                          'varaints.model_detail',
-                         'varaints.detail',
+                         'varaints.detail as variant_detail',
                          'varaints.seat',
                          'varaints.upholestry',
                          'varaints.steering',
@@ -3024,6 +3030,7 @@ public function viewalls(Request $request)
                         'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.detail as variant_detail',
                         'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
@@ -3077,6 +3084,7 @@ public function viewalls(Request $request)
                         'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.detail as variant_detail',
                         'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
@@ -3122,11 +3130,28 @@ public function viewalls(Request $request)
     public function generategrnPDF(Request $request)
     {
     $vehicleId = $request->vehicle_id;
-    $vehicle = Vehicles::find($vehicleId);
+    $vehicle = Vehicles::with(['interior', 'exterior'])->where('id', $vehicleId)->first();
+    $grn = Grn::where('id', $vehicle->grn_id)->first();
+    $variant = Varaint::with(['master_model_lines', 'brand'])->where('id', $vehicle->varaints_id)->first();
+    $variantitems = VariantItems::with(['model_specification', 'model_specification_option'])->where('varaint_id', $variant->id)->get();
+    $vehicleitems = VehicleExtraItems::where('vehicle_id', $vehicleId)->get();
+    $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'GRN')->first();
+    $incident = Incident::where('vehicle_id', $vehicleId)->where('inspection_id', $inspection->id)->first();
+    $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
     if (!$vehicle) {
         abort(404);
     }
-    $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
+    $data = [
+        'vehicle' => $vehicle,
+        'grn' => $grn,
+        'variant' => $variant,
+        'inspection' => $inspection,
+        'variantitems' => $variantitems,
+        'vehicleItems' => $vehicleitems,
+        'created_by' => $createdby,
+        'incident' => $incident,
+    ];
+    $pdf = PDF::loadView('Reports.Grn', $data);
     return $pdf->stream('vehicle-details.pdf');
     }
     public function fetchData(Request $request)
@@ -3185,5 +3210,144 @@ private function fetchPost($variant, $exteriorColor)
 
     return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
         ->first();
+    }
+        public function currentstatus ()
+        {
+            return view('vehicles.currentstatus');
+        }
+        public function statussreach(Request $request)
+        {
+            $searchQuery = $request->input('search');
+            $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
+            $data = [];
+            foreach ($vehicles as $vehicle) {
+                $status = $vehicle->status;
+                $previous_status = '';
+                $current_status = '';
+                $next_stage = '';
+                switch ($status) {
+                    case 'Approved':
+                        $previous_status = 'Pending Approval From Vehicle Procurement Manager';
+                        $current_status = 'Vehicle is Approved For Initiated Payment';
+                        $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
+                        break;
+                    case 'Not Approved':
+                        $previous_status = 'Created PO By Vehicle Procurement Executive';
+                        $current_status = 'Vehicle is Not Approved By the Vehicle Procurement Manager';
+                        $next_stage = 'Approved Vehicle By Procurement Manager';
+                        break;
+                    case 'Request for Payment':
+                        $previous_status = 'Approved Vehicle By Procurement Manager';
+                        $current_status = 'Initiated Payment By Vehicle Procurement Executive';
+                        $next_stage = 'Procurement Manager Forward Request for Payment To Finance Department';
+                        break;
+                    case 'Payment Requested':
+                        $previous_status = 'Procurement Manager Forward Request for Payment To Finance Department';
+                        $current_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                        $next_stage = 'CEO Office Payment Released';
+                        break;
+                    case 'Payment Completed':
+                        $previous_status = 'CEO Office Payment Released';
+                        $current_status = 'Finance Department Complete the Payments';
+                        $next_stage = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                        break;
+                    case 'Payment Rejected':
+                        $previous_status = 'Request to CEO Office for Payment Release';
+                        $current_status = 'Payment Rejected By CEO Office';
+                        $next_stage = 'Procurement Manager Forward Again Request for Payment To Finance Department';
+                        break;
+                    default:
+                        break;
+                }
+                if ($vehicle->status == 'Payment Requested' && $vehicle->payment_status == 'Payment Initiated') {
+                    $previous_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                    $current_status = 'Request to CEO Office for Payment Release';
+                    $next_stage = 'CEO Office Payment Released';
+                }
+                if ($vehicle->status == 'Incoming Stock' && $vehicle->grn_id == NULL) {
+                    $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                    $current_status = 'Incoming Vehicles / Pending GRN';
+                    $next_stage = 'GRN Done';
+                }
+                if ($vehicle->grn_id != NULL && $vehicle->inspection_date == null) {
+                    $previous_status = 'GRN Done';
+                    $current_status = 'Pending Inspection';
+                    $next_stage = 'Available Stock';
+                }
+                if ($vehicle->inspection_date != NULL) {
+                    $previous_status = 'Inspection Done';
+                    $current_status = 'Available Stock';
+                    $next_stage = 'Create SO, Pending PDI, Pending GDN';
+                }
+                if ($vehicle->pdi_date == NULL && $vehicle->gdn == NULL && $vehicle->so_id != NULL) {
+                    $previous_status = 'Available Stock';
+                    $current_status = 'Pending PDI Inspection';
+                    $next_stage = 'GDN';
+                }
+                if ($vehicle->gdn_id != NULL) {
+                    $previous_status = 'PDI Inspection';
+                    $current_status = 'GDN Done';
+                    $next_stage = '';
+                }
+                $data[] = [
+                    'previous_status' => $previous_status,
+                    'current_status' => $current_status,
+                    'next_stage' => $next_stage
+                ];
+            }
+            return response()->json(['data' => $data]);
+        }
+        public function generatepfiPDF(Request $request)
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open The PDI Inspection";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    $vehicleId = $request->vehicle_id;
+    $inspection = Inspection::where('vehicle_id', $vehicleId)->where('stage', 'PDI')->first();
+    if (!$inspection) {
+        return response()->json(['message' => 'Inspection not found'], 404);
+    }
+
+    $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
+                            ->where('inspection_id', $inspection->id)
+                            ->get();
+
+    $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 
+                            'int_color.name as int_colour', 'ext_color.name as ext_colour', 'warehouse.name as location')
+        ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+        ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+        ->leftJoin('color_codes as ext_color', 'vehicles.ex_colour', '=', 'ext_color.id')
+        ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+        ->where('vehicles.id', $inspection->vehicle_id)
+        ->first();
+
+    $incident = Incident::where('inspection_id', $inspection->id)->first();
+    $vehicle = Vehicles::find($inspection->vehicle_id);
+
+    $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
+    $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
+    $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
+    $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
+    $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
+
+    $data = [
+        'inspection' => $inspection,
+        'PdiInspectionData' => $PdiInspectionData,
+        'additionalInfo' => $additionalInfo,
+        'grnpicturelink' => $grnpicturelink,
+        'secgrnpicturelink' => $secgrnpicturelink,
+        'PDIpicturelink' => $PDIpicturelink,
+        'modificationpicturelink' => $modificationpicturelink,
+        'Incidentpicturelink' => $Incidentpicturelink,
+        'incident' => $incident,
+        'remarks' => $inspection->remarks,
+        'created_by' => Auth::user()->name,
+    ];
+
+    $pdf = PDF::loadView('Reports.pdi', $data);
+    return $pdf->stream('vehicle-details-pdi.pdf');
 }
     }

@@ -82,6 +82,10 @@ class Supplier extends Model
     {
         return $this->hasMany(SupplierAddons::class,'supplier_id','id');
     }
+    public function accounts()
+    {
+        return $this->hasMany(SupplierAccount::class, 'suppliers_id');
+    }
     public function supplierTypes()
     {
         return $this->hasMany(SupplierType::class);

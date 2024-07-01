@@ -353,7 +353,18 @@ class DivisionController extends Controller
                         }
                     } 
                     $data->name = $request->name;
-                    $data->division_head_id = $request->division_head_id;
+                    if($data->division_head_id != $request->division_head_id) {
+                        // $updateEmpLeads = EmployeeProfile::where('team_lead_or_reporting_manager',$data->division_head_id)->whereNot('user_id',$request->division_head_id)->get();
+                        // if(count($updateEmpLeads) > 0) {
+                        //     foreach($updateEmpLeads as $updateEmpLeadsData) {
+                        //         $updateEmpLeadsData->team_lead_or_reporting_manager = $request->division_head_id;
+                        //         $updateEmpLeadsData->updated_by = $authId;
+                        //         $updateEmpLeadsData->update();
+                        //     }
+                        // }
+                        // $updateMasterDept = MasterDepartment::where()
+                        $data->division_head_id = $request->division_head_id;
+                    }            
                     $data->approval_handover_to = $request->approval_handover_to;
                     $data->updated_by = $authId;
                     $data->update();

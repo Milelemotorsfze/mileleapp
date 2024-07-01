@@ -9,6 +9,26 @@ class PurchasingOrder extends Model
 {
     use HasFactory;
     protected $table = 'purchasing_order';
+    protected $fillable = [
+        'po_number',
+        'po_date',
+        'is_demand_planning_po',
+        'created_by',
+        'status',
+        'po_type',
+        'vendors_id',
+        'payment_term_id',
+        'currency',
+        'shippingmethod',
+        'shippingcost',
+        'totalcost',
+        'pol',
+        'pod',
+        'fd',
+        'remarks',
+        'pl_number',
+        'pl_file_path',
+    ];
     protected $appends = [
         'is_demand_planning_purchase_order',
 
@@ -32,5 +52,18 @@ class PurchasingOrder extends Model
         }
         return false;
     }
+    public function polPort()
+    {
+        return $this->belongsTo(MasterShippingPorts::class, 'pol');
+    }
 
+    public function podPort()
+    {
+        return $this->belongsTo(MasterShippingPorts::class, 'pod');
+    }
+
+    public function fdCountry()
+    {
+        return $this->belongsTo(Country::class, 'fd');
+    }
 }
