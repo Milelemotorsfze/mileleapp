@@ -136,15 +136,6 @@ namespace App\Http\Controllers;
         }
         public function update(Request $request, $id)
 {
-    $this->validate($request, [
-        'name' => 'required',
-        'email' => 'required|email|unique:users,email,' . $id,
-        'roles' => 'required',
-        'department' => 'required',
-        'designation' => 'required',
-        'languages' => 'required',
-    ]);
-
     $user = User::find($id);
     $user->name = $request->input('name');
     $user->email = $request->input('email');
@@ -158,17 +149,17 @@ namespace App\Http\Controllers;
     $empProfile->department_id = $request->input('department');
     $empProfile->designation_id = $request->input('designation');
     $empProfile->save();
-
     SalesPersonStatus::updateOrCreate(
         ['sale_person_id' => $user->id],
         ['status' => "Active", 'remarks' => "Account Updated", 'created_by' => Auth::id()]
     );
-
     SalesPersonLaugauges::where('sales_person', $user->id)->delete();
     $languages = $request->input('languages');
+    if($languages){
     foreach ($languages as $language) {
         SalesPersonLaugauges::create(['sales_person' => $user->id, 'language' => $language]);
     }
+}
     DB::table('model_has_roles')->where('model_id',$id)->delete();
             $user->assignRole($request->input('roles'));
             (new UserActivityController)->createActivity('User Updated');
