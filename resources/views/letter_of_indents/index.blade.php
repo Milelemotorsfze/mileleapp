@@ -72,9 +72,9 @@
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI"> Utilization Initiated LOI</a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
             <div class="tab-content">
@@ -661,7 +661,6 @@
                             <table id="supplier-response-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                                 <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>S.NO:</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
                                     <th>Customer</th>
@@ -670,11 +669,11 @@
                                     <th>So Number</th>
                                     <th>Country</th>
                                     <th>LOI Quantity</th>
+                                    <th>Utilized QQuantity</th>
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>LOI</th>
                                     <th>Remarks</th>
-                                    <th>PFI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -683,7 +682,7 @@
                                 </div>
                                 @foreach ($supplierApprovedLOIs as $key => $letterOfIndent)
                                     <tr>
-                                        <td> {{ ++$i }}</td>
+                                       
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
@@ -697,6 +696,8 @@
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->total_loi_quantity }}</td>
+                                        <td> {{ $letterOfIndent->utilized_quantity }} </td>
+                                       
                                         <td>{{ $letterOfIndent->submission_status }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
                                         <td>
@@ -707,14 +708,24 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->review }}</td>
+                                    
                                         <td>
-                                            @if($letterOfIndent->is_pfi_pending_for_loi == true)
-                                                <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                                    <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
-                                                </a>
-                                            @endif
-                                        </td>
-                                        <td>
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
+                                                <i class="fa fa-save"></i>
+                                            </button>
+                                            <!-- @can('PFI-create')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                                                @endphp
+                                                @if ($hasPermission) -->
+                                                   <!-- @if($letterOfIndent->is_pfi_pending_for_loi == true) -->
+                                                        <!-- <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                                            <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
+                                                        </a> -->
+                                                    <!-- @endif -->
+                                                <!-- @endif
+                                            @endcan -->
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
@@ -838,7 +849,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="milele-partial-approved-LOI">
+                <!-- <div class="tab-pane fade" id="milele-partial-approved-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -882,7 +893,7 @@
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                         <td>
-                                            <button type="button" title="Update Utilization Quantity" class="btn btn-secondary btn-sm" data-bs-toggle="modal" 
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
                                             data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-edit"></i>
                                             </button>
@@ -900,9 +911,7 @@
                                                     <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
                                                 </a>
                                             @endif
-        {{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
-        {{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
-        {{--                                    </a>--}}
+       
                                             <button type="button" title="View LOI Items list" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
@@ -1049,7 +1058,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         @endif
     @endcan
