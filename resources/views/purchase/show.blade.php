@@ -1799,7 +1799,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">PO's Log Details</h4>
                 </div>
@@ -1926,10 +1926,10 @@
                         </table>
                     </div>
                 </div>
-            </div>
-            <!-- <div class="card">
+            </div> -->
+            <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">All Events Log</h4>
+                    <h4 class="card-title">PO Events Log</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -1952,7 +1952,7 @@
                                         $username = DB::table('users')->where('id', $purchasedorderevents->created_by)->first();
                                         $usernames = $username->name;
                             @endphp
-                                <td>{{$purchasedorderevents->created_at }}</td>
+                            <td>{{ $purchasedorderevents->created_at->format('d-M-Y') }}</td>
                                 <td>{{$usernames }}</td>
                                 <td>{{$purchasedorderevents->event_type }}</td>
                                 <td>{{$purchasedorderevents->field }}</td>
@@ -1965,7 +1965,7 @@
                         </table>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
         <script>
             let targetUrl;
