@@ -132,28 +132,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
-	<div class="col-xxl-12 col-lg-12 col-md-12">
-		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
-	</div>
-		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
-    @csrf
-    @if(isset($workOrder))
-        @method('PUT')
-    @endif
-		@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
-		<a  title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
-		</a>
-		@else
-		<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
-		</a>
+	@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
+			@if($workOrder->finance_approved_at != '' || $workOrder->coe_office_approved_at != '')
+				<a title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+					<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
+				</a>
+			@elseif($workOrder->finance_approved_at == '' && $workOrder->coe_office_approved_at == '')
+				<a title="Revert Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
+					<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
+				</a>
+			@endif
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
+			<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+			<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
+			</a>
 		@endif
 		@if(isset($workOrder) && $workOrder->finance_approved_at != '')
 		<a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
 		<i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
 		</a>
-		@else
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->coe_office_approved_at == '')
 		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
 		<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
 		</a>
@@ -162,11 +160,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		<a  title="COE Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
 		<i class="fas fa-check-circle" title="COE Office"></i> COE Office Approved
 		</a>
-		@else
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at != '')
 		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> COE Office Approval
+		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
+		COE Office Approval
 		</a>
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at == '')
+			<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-direct-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+			<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
+			COE Office Direct Approval
+			</a>
 		@endif
+
+		<!-- Modal -->
+		<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="approvalModalLabel">COE Office Direct Approval</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<!-- <span aria-hidden="true">&times;</span> -->
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					<label for="approvalComments">Comments</label>
+					<textarea class="form-control" id="approvalComments" rows="3"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+					<button type="button" class="btn btn-primary" id="submitApproval">Submit</button>
+				</div>
+				</div>
+			</div>
+		</div>
+	<!-- <div class="col-xxl-12 col-lg-12 col-md-12">
+		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+	</div> -->
+		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
+    @csrf
+    @if(isset($workOrder))
+        @method('PUT')
+    @endif 
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
@@ -181,8 +217,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
-						<input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
-							value="{{ isset($workOrder) ? $workOrder->date : '' }}" autocomplete="date" autofocus>
+						<!-- <input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
+							value="{{ isset($workOrder) ? $workOrder->date : '' }}" autocomplete="date" autofocus> -->
+						<!-- <input type="text" class="form-control widthinput" name="date" 
+						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('Y-m-d') : \Carbon\Carbon::now()->format('Y-m-d') }}" hidden> -->
+						<input type="text" class="form-control widthinput" readonly 
+						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -194,6 +234,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
+							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 							<select name="batch" id="batch" class="form-control widthinput" autofocus>
@@ -933,6 +974,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
+<!-- <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.9.45/bundle/libphonenumber-js.min.js"></script> -->
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
@@ -1103,6 +1145,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			else {
 				$("#boe-div").hide();
 			}
+			// if(workOrder != null && workOrder.comments && workOrder.comments.length > 0) {
+			// 	renderComments(workOrder.comments); // Assuming the response contains an array of comments
+			// }
+			// console.log(workOrder);
 			
 			$('#vin_multiple').select2({
 				allowClear: true,
@@ -1223,7 +1269,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// TRANSPORT TYPE ONCHANGE END
 
 		// CUSTOMER NAME ONCHANGE START
-			$('#customer_name').on('change', function() {
+			$('#customer_name').on('change', function() { 
 				var selectedCustomerName = $(this).val(); 
 				setCustomerRelations(selectedCustomerName);
 			});
@@ -1359,20 +1405,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			const previewFileEnduserContract = document.querySelector("#enduser_contract_preview");
             const previewFileVehicleHandoverPersonID = document.querySelector("#vehicle_handover_person_id_preview");
 
-            fileInputBRNFile.addEventListener("change", function(event) { 
-			    $('.brn-preview-div').attr('hidden', false);
-			    const files = event.target.files;
-			    while (previewFileBRNFile.firstChild) {
-			        previewFileBRNFile.removeChild(previewFileBRNFile.firstChild);
-			    }
-			    const file = files[0];
-                document.getElementById('brn_file_label').textContent="BRN File";
-                const objectUrl = URL.createObjectURL(file);
-                const iframe = document.createElement("iframe");
-                iframe.src = objectUrl;
-                previewFileBRNFile.appendChild(iframe);
-			});
-
+			if(type =='export_exw' || type == 'export_cnf') {
+				fileInputBRNFile.addEventListener("change", function(event) { 
+					$('.brn-preview-div').attr('hidden', false);
+					const files = event.target.files;
+					while (previewFileBRNFile.firstChild) {
+						previewFileBRNFile.removeChild(previewFileBRNFile.firstChild);
+					}
+					const file = files[0];
+					document.getElementById('brn_file_label').textContent="BRN File";
+					const objectUrl = URL.createObjectURL(file);
+					const iframe = document.createElement("iframe");
+					iframe.src = objectUrl;
+					previewFileBRNFile.appendChild(iframe);
+				});
+			}
+           
             fileInputSignedPFI.addEventListener("change", function(event) {
 			    $('.preview-div').attr('hidden', false);
 			    const files = event.target.files;
@@ -1486,45 +1534,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
         // SHOW FILE UPLOAD DATA END
 
-		document.getElementById('WOForm').addEventListener('submit', function(event) {
-			event.preventDefault(); // Prevent default form submission
+		// document.getElementById('WOForm').addEventListener('submit', function(event) {
+		// 	event.preventDefault(); // Prevent default form submission
 
-			// Collect all comments
-			const comments = [];
-			document.querySelectorAll('#comments-section .comment').forEach(comment => {
-				const commentId = comment.getAttribute('data-comment-id');
-				const parentId = comment.getAttribute('data-parent-id');
-				const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+		// 	// Collect all comments
+		// 	const comments = [];
+		// 	document.querySelectorAll('#comments-section .comment').forEach(comment => {
+		// 		const commentId = comment.getAttribute('data-comment-id');
+		// 		const parentId = comment.getAttribute('data-parent-id');
+		// 		const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
 
-				comments.push({ commentId, parentId, text });
-			});
+		// 		comments.push({ commentId, parentId, text });
+		// 	});
 
-			// Append comments to form data
-			const formData = new FormData(this);
-			formData.append('comments', JSON.stringify(comments));
+		// 	// Append comments to form data
+		// 	const formData = new FormData(this);
+		// 	formData.append('comments', JSON.stringify(comments));
 
-			// Send form data via AJAX
-			fetch(this.action, {
-				method: this.method,
-				body: formData,
-				headers: {
-					'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-				}
-			}).then(response => {
-				if (!response.ok) {
-					return response.text().then(text => { throw new Error(text) });
-				}
-				return response.json();
-			}).then(data => {
-				if (data.success) {
-					window.location.href = `{{ url('work-order-info') }}/${type}`;
-				} else {
-					throw new Error(data.message);
-				}
-			}).catch(error => {
-				// Optionally display the error message to the user
-			});
-		});
+		// 	// Send form data via AJAX
+		// 	fetch(this.action, {
+		// 		method: this.method,
+		// 		body: formData,
+		// 		headers: {
+		// 			'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+		// 		}
+		// 	}).then(response => { console.log('not OK');
+		// 		if (!response.ok) {
+		// 			return response.text().then(text => { throw new Error(text) });
+		// 		}
+		// 		return response.json();
+		// 	}).then(data => {
+		// 		if (data.success) { console.log('OK');
+		// 			window.location.href = `{{ url('work-order-info') }}/${type}`;
+		// 		} else { console.log('msg');
+		// 			throw new Error(data.message);
+		// 		}
+		// 	}).catch(error => {
+		// 		// Optionally display the error message to the user
+		// 	});
+		// });
 		$(document.body).on('select2:select', ".dynamicselectaddon", function (e) {
             var dataId = $(this).attr('data-parant');
 			vehicleAddonDropdown(dataId)
@@ -1557,14 +1605,41 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							id: id,
 							_token: '{{ csrf_token() }}'
 						},
-						success: function (data) {	console.log(data);						
+						success: function (data) {						
 							if(data == 'success') {
 								window.location.reload();
 								alertify.success(status + " Successfully")
 							}
 							else if(data == 'error') {
 								window.location.reload();
-								alertify.error("Can't Verify, It was verified already..")
+								alertify.error("Can't Confirm, It was Confirmed already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.revert-btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.revert-sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Revert, It was reverted already..")
 							}
 						}
 					});
@@ -1584,14 +1659,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							id: id,
 							_token: '{{ csrf_token() }}'
 						},
-						success: function (data) {	console.log(data);						
+						success: function (data) {						
 							if(data == 'success') {
 								window.location.reload();
 								alertify.success(status + " Successfully")
 							}
 							else if(data == 'error') {
 								window.location.reload();
-								alertify.error("Can't Verify, It was verified already..")
+								alertify.error("Can't Approve, It was approved already..")
 							}
 						}
 					});
@@ -1611,39 +1686,131 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							id: id,
 							_token: '{{ csrf_token() }}'
 						},
-						success: function (data) {	console.log(data);						
+						success: function (data) {						
 							if(data == 'success') {
 								window.location.reload();
 								alertify.success(status + " Successfully")
 							}
 							else if(data == 'error') {
 								window.location.reload();
-								alertify.error("Can't Verify, It was verified already..")
+								alertify.error("Can't Approve, It was approved already..")
 							}
 						}
 					});
 				}
 			}).set({title:"Confirmation"})
 		})
+		$('.btn-coe-office-direct-approval').click(function (e) {
+			var id = $(this).attr('data-id');
+			$('#approvalModal').data('id', id).modal('show');
+		});
+
+		$('#submitApproval').click(function (e) {
+			var id = $('#approvalModal').data('id');
+			var comments = $('#approvalComments').val();
+			let url = '{{ route('work-order.coe-office-approval') }}';
+
+			if (!comments) {
+			alertify.error("Please add comments.");
+			return;
+			}
+
+			var confirm = alertify.confirm('Are you sure you want to approve this work order?', function (e) {
+			if (e) {
+				$.ajax({
+				type: "POST",
+				url: url,
+				dataType: "json",
+				data: {
+					id: id,
+					comments: comments,
+					_token: '{{ csrf_token() }}'
+				},
+				success: function (data) {
+					$('#approvalModal').modal('hide');
+					if (data == 'success') {
+					window.location.reload();
+					alertify.success("Successfully Approved");
+					} else if (data == 'error') {
+					window.location.reload();
+					alertify.error("Can't Approve, It was approved already.");
+					}
+				}
+				});
+			}
+			}).set({ title: "Confirmation" });
+		});
+		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
+			// Select all input, select, and textarea elements and disable them
+			var elements = document.querySelectorAll('#WOForm button');
+			// #WOForm input, #WOForm select, #WOForm textarea, 
+			console.log(elements);
+			elements.forEach(function(element) {
+				element.disabled = true;
+			});
+		}
 	});
 
+	// function renderComments(comments) {
+	// 	comments.forEach(comment => addExistingComment(comment));
+	// }
+	// function addExistingComment(commentData = {}) {
+	// 	// console.log('Adding comment:', commentData); // Log the comment data
+
+	// 	const { text = '', parent_id = null, id = null, created_at = new Date().toISOString() } = commentData;
+
+	// 	if (!text || !id) {
+	// 		console.error('Invalid comment data:', commentData);
+	// 		return;
+	// 	}
+
+	// 	const commentHtml = `
+	// 		<div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
+	// 			<div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
+	// 				<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+	// 			</div>
+	// 			<div class="col-xxl-11 col-lg-11 col-md-11">${text}</br>
+	// 				<span style="color:gray;">Rejitha R Prasad</span>
+	// 				<span style="color:gray;"> - ${new Date(created_at).toLocaleString()}</span></br>
+	// 				<button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})">Reply</button></br>
+	// 				<div class="reply-form" id="reply-form-${id}" style="display: none;">
+	// 					<textarea class="form-control reply" id="reply-input-${id}" rows="2" placeholder="Write a reply..."></textarea>
+	// 					<button class="btn btn-sm btn-info mt-2" onclick="addCommentFromInput(${id})">Send Reply</button>
+	// 				</div>
+	// 				<div class="replies" id="replies-${id}"></div>
+	// 			</div>
+	// 		</div>
+	// 	`;
+
+	// 	if (parent_id === null) {
+	// 		$('#comments-section').append(commentHtml);
+	// 		$('#new-comment').val('');
+	// 	} else {
+	// 		$(`#replies-${parent_id}`).append(commentHtml);
+	// 		$(`#reply-input-${parent_id}`).val('');
+	// 		$(`#reply-form-${parent_id}`).hide();
+	// 	}
+	// }
 	// ADD CUSTOM VALIDATION RULES START
         // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
             return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
         }, "Please enter a valid email address");
-        $.validator.addMethod("SONumberFormat", function(value, element) {
-            // Regular expression to match the format SO- followed by exactly 6 digits
-            return this.optional(element) || /^SO-\d{6}$/.test(value);
-        }, "Please enter a valid order number in the format SO-######");
+        // Custom method to validate SO number format
+		$.validator.addMethod("SONumberFormat", function(value, element) {
+			// Regular expression to match the format SO- followed by exactly 6 digits
+			return this.optional(element) || /^SO-\d{6}$/.test(value);
+		}, "Please enter a valid order number in the format SO-######");
 
-        $.validator.addMethod("notSO000000", function(value, element) {
-            return this.optional(element) || value !== "SO-000000";
-        }, "SO Number cannot be SO-000000");
+        // Custom method to ensure SO number is not SO-000000
+		$.validator.addMethod("notSO000000", function(value, element) {
+			return this.optional(element) || value !== "SO-000000";
+		}, "SO Number cannot be SO-000000");
 
-        $.validator.addMethod("noSpaces", function(value, element) {
-            return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
-        }, "No leading or trailing spaces allowed");
+        // Custom method to ensure no leading or trailing spaces
+		$.validator.addMethod("noSpaces", function(value, element) {
+			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
+		}, "No leading or trailing spaces allowed");
         // Add custom validation method for contact number
         // $.validator.addMethod("validContactNumber", function(value, element) {
         // 	return this.optional(element) || /^[0-9]$/.test(value);
@@ -1662,24 +1829,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         $.validator.addMethod("validAddress", function(value, element) {
             return this.optional(element) || !/\s\s+/.test(value);
         }, "No more than one consecutive space is allowed in the address");
-		$.validator.addMethod("uniqueSO", 
-	       function(value, element) {
-	           var result = false;
-				var WoId = $("#wo_id").val(); 
-	           $.ajax({
-	               type:"POST",
-	               async: false,
-	               url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
-	               data: {_token: '{{csrf_token()}}',so_number: value,id:WoId},
-	               success: function(data) {
-	                   result = (data == true) ? true : false;
-	               }
-	           });
-	           // return true if username is exist in database
-	           return result; 
-	       }, 
-	       "This SO Number is already taken! Try another."
-	   );
+		// Custom method to check if the SO number is unique
+		$.validator.addMethod("uniqueSO", function(value, element) {
+			var result = false;
+			var WoId = $("#wo_id").val(); 
+			$.ajax({
+				type: "POST",
+				async: false,
+				url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
+				data: {_token: '{{csrf_token()}}', so_number: value, id: WoId},
+				success: function(data) {
+					result = (data == true) ? true : false;
+				}
+			});
+			return result; 
+		}, "This SO Number is already taken! Try another.");
         // $.validator.addMethod("WONumberFormat", function(value, element) {
         // 	// Regular expression to match the format WO- followed by exactly 6 digits
         // 	return this.optional(element) || /^WO-\d{6}$/.test(value);
@@ -1693,17 +1857,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 type: {
                     required: true,
                 },
-                date: {
-                    required: true,
-                    date: true,
-                },
+                // date: {
+                //     required: true,
+                //     // date: true,
+                // },
                 so_number: {
-                    required: true,
-                    noSpaces: true,
-                    SONumberFormat: true,
-                    notSO000000: true,
+					required: true,
+					noSpaces: true,
+					SONumberFormat: true,
+					notSO000000: true,
 					uniqueSO: true,
-                },
+				},
                 batch: {
                     required: true,
                 },
@@ -1774,7 +1938,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
                 port_of_loading: {
                     required: true,
-                    noSpaces: true,
+                    // noSpaces: true,
                 },
                 port_of_discharge: {
                     required: true,
@@ -1990,7 +2154,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
                 vehicle_handover_person_id: {
                     filesize:" file size must be less than 1 GB.",
-                }
+                },
+				// so_number: {
+				// 	required: "SO Number is required.",
+				// 	noSpaces: "No leading or trailing spaces allowed.",
+				// 	SONumberFormat: "Please enter a valid order number in the format SO-######.",
+				// 	notSO000000: "SO Number cannot be SO-000000.",
+				// 	uniqueSO: "This SO Number is already taken! Try another.",
+				// },
             },
 			errorPlacement: function(error, element) {
 				error.appendTo(element.parent()); 
@@ -2015,6 +2186,48 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				if (!$(element).hasClass(errorClass)) {
 					$(element).removeClass('is-invalid');
 				}
+			},
+			submitHandler: function(form) { 
+				// Prevent default form submission
+				event.preventDefault();
+
+				// Collect all comments
+				const comments = [];
+				if(workOrder == null) {
+					document.querySelectorAll('#comments-section .comment').forEach(comment => {
+						const commentId = comment.getAttribute('data-comment-id');
+						const parentId = comment.getAttribute('data-parent-id');
+						const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+
+						comments.push({ commentId, parentId, text });
+					});
+				}
+
+				// Append comments to form data
+				const formData = new FormData(form);
+				formData.append('comments', JSON.stringify(comments));
+
+				// Send form data via AJAX
+				fetch(form.action, {
+					method: form.method,
+					body: formData,
+					headers: {
+						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					}
+				}).then(response => {
+					if (!response.ok) {
+						return response.text().then(text => { throw new Error(text) });
+					}
+					return response.json();
+				}).then(data => {
+					if (data.success) {
+						window.location.href = `{{ url('work-order-info') }}/${type}`;
+					} else {
+						throw new Error(data.message);
+					}
+				}).catch(error => {
+					// Optionally display the error message to the user
+				});
 			}
         });
     // CLIENT SIDE VALIDATION END
@@ -2982,28 +3195,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						if (customers[i].customer_email != null) {
                             $('#customer_email').val(customers[i]?.customer_email);
                         }
-						if (customers[i].customer_company_number != null) {
-                            // // $('#customer_company_number').val(customers[i]?.customer_company_number);
-							// // $('#customer_company_number').val(customers[i].customer_company_number);
-							$('#customer_company_number').val(customers[i].customer_company_number);
-							// // customer_company_number.setNumber(customers[i].customer_company_number);
-							// var input = document.querySelector("#customer_company_number");
-							// var iti = window.intlTelInput(input, {
-							// 	initialCountry: "auto",
-							// 	nationalMode: false,
-							// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-							// });
-
-							// // Simulating an AJAX request to fetch the phone number from the database
-							// var customerCompanyNumberFromDB = customers[i].customer_company_number; // This should come from your backend
-
-							// iti.setNumber(customerCompanyNumberFromDB);
-							// $('#customer_company_number').val(customerCompanyNumberFromDB);
+						if (customers[i].customer_company_number != null) { 
+							console.log(customers[i].customer_company_number); // value is +91346723782
+							
                         }
                     }
                 }
             }
         }
+		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
