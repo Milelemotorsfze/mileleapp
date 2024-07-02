@@ -136,6 +136,13 @@ namespace App\Http\Controllers;
         }
         public function update(Request $request, $id)
 {
+    $this->validate($request, [
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'roles' => 'required',
+        'department' => 'required',
+        'designation' => 'required',
+    ]);
     $user = User::find($id);
     $user->name = $request->input('name');
     $user->email = $request->input('email');
