@@ -1181,7 +1181,8 @@
                                         @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer','list-master-models','list-color-code'])
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
-                                                'model-year-calculation-categories-list','list-customer','list-master-models','list-color-code']);
+                                                'model-year-calculation-categories-list','list-customer','list-master-models','list-color-code',
+                                                'list-list-loi-expiry-conditions']);
                                             @endphp
                                             @if ($hasPermission)
                                                 <div class="dropdown">
@@ -1228,6 +1229,14 @@
                                                             @endphp
                                                             @if ($hasPermission)
                                                                 <a href="{{route('loi-country-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Country Criterias </a>
+                                                            @endif
+                                                        @endcan
+                                                        @can('list-loi-expiry-conditions')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-expiry-conditions');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('loi-expiry-conditions.index')}}" class="dropdown-item" data-key="t-login"> LOI Expiry Conditions</a>
                                                             @endif
                                                         @endcan
                                                         <div class="dropdown">

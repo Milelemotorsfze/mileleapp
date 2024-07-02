@@ -109,6 +109,7 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
+use App\Http\Controllers\LOIExpiryConditionController;
 
 /*
 /*
@@ -464,6 +465,7 @@ Route::get('/d', function () {
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
+    Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
