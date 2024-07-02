@@ -245,7 +245,7 @@
             });
 
             $('#dtBasicExample3 tbody').on('change', '.model-year', function () {
-                alert("clicked");
+            
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
