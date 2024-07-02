@@ -217,10 +217,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
-						<!-- <input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
-							value="{{ isset($workOrder) ? $workOrder->date : '' }}" autocomplete="date" autofocus> -->
-						<!-- <input type="text" class="form-control widthinput" name="date" 
-						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('Y-m-d') : \Carbon\Carbon::now()->format('Y-m-d') }}" hidden> -->
 						<input type="text" class="form-control widthinput" readonly 
 						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
 					</div>
@@ -971,7 +967,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-<!-- <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.9.45/bundle/libphonenumber-js.min.js"></script> -->
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
@@ -1005,8 +1000,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				allowClear: true,
 				maximumSelectionLength: 1,
 				placeholder:"Choose Customer Name",
-                // dropdownAutoWidth : true,
-                // width: 'auto'
 			});
 
 
@@ -1064,6 +1057,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			}
 			
 			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
+				if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length == 1) {
+					$("#boe-div").hide();
+				}
 				// Initialize an object to track VINs by BOE number
 				var boeVins = {};
 				var allVins = []; // Array to keep track of all VINs
@@ -1142,14 +1138,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			else {
 				$("#boe-div").hide();
 			}
-			// if(workOrder != null && workOrder.comments && workOrder.comments.length > 0) {
-			// 	renderComments(workOrder.comments); // Assuming the response contains an array of comments
-			// }
-			// console.log(workOrder);
 			
 			$('#vin_multiple').select2({
 				allowClear: true,
-				// maximumSelectionLength: 1,
 				placeholder:"VIN",
 			});
 			$('#vin').select2({
@@ -1165,13 +1156,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
-			
-			// var input = document.querySelector("#customer_company_number_main");
-			// var iti = window.intlTelInput(input, {
-			// 	initialCountry: "auto",
-			// 	nationalMode: false,
-			// 	utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // just for formatting/placeholders etc
-			// });
 			var customer_company_number = window.intlTelInput(document.querySelector("#customer_company_number"), {
 				separateDialCode: true,
 				preferredCountries:["ae"],
@@ -1531,62 +1515,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
         // SHOW FILE UPLOAD DATA END
 
-		// document.getElementById('WOForm').addEventListener('submit', function(event) {
-		// 	event.preventDefault(); // Prevent default form submission
-
-		// 	// Collect all comments
-		// 	const comments = [];
-		// 	document.querySelectorAll('#comments-section .comment').forEach(comment => {
-		// 		const commentId = comment.getAttribute('data-comment-id');
-		// 		const parentId = comment.getAttribute('data-parent-id');
-		// 		const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
-
-		// 		comments.push({ commentId, parentId, text });
-		// 	});
-
-		// 	// Append comments to form data
-		// 	const formData = new FormData(this);
-		// 	formData.append('comments', JSON.stringify(comments));
-
-		// 	// Send form data via AJAX
-		// 	fetch(this.action, {
-		// 		method: this.method,
-		// 		body: formData,
-		// 		headers: {
-		// 			'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-		// 		}
-		// 	}).then(response => { console.log('not OK');
-		// 		if (!response.ok) {
-		// 			return response.text().then(text => { throw new Error(text) });
-		// 		}
-		// 		return response.json();
-		// 	}).then(data => {
-		// 		if (data.success) { console.log('OK');
-		// 			window.location.href = `{{ url('work-order-info') }}/${type}`;
-		// 		} else { console.log('msg');
-		// 			throw new Error(data.message);
-		// 		}
-		// 	}).catch(error => {
-		// 		// Optionally display the error message to the user
-		// 	});
-		// });
 		$(document.body).on('select2:select', ".dynamicselectaddon", function (e) {
             var dataId = $(this).attr('data-parant');
 			vehicleAddonDropdown(dataId)
-            // var currentId = 'selectModelLine'+index;
-            // var data = e.params.data.id;
-            // optionEnable(currentId,data);
-            // uniqueCheckAccessories()
-
         });
 		$(document.body).on('select2:unselect', ".dynamicselectaddon", function (e) {
             var dataId = $(this).attr('data-parant');
 			vehicleAddonDropdown(dataId)
-            // var currentId = 'selectModelLine'+index;
-            // var data = e.params.data.id;
-            // optionEnable(currentId,data);
-            // uniqueCheckAccessories()
-
         });
 
 		$('.btn-sales-approval').click(function (e) { 
@@ -1747,47 +1682,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
 		}
 	});
-
-	// function renderComments(comments) {
-	// 	comments.forEach(comment => addExistingComment(comment));
-	// }
-	// function addExistingComment(commentData = {}) {
-	// 	// console.log('Adding comment:', commentData); // Log the comment data
-
-	// 	const { text = '', parent_id = null, id = null, created_at = new Date().toISOString() } = commentData;
-
-	// 	if (!text || !id) {
-	// 		console.error('Invalid comment data:', commentData);
-	// 		return;
-	// 	}
-
-	// 	const commentHtml = `
-	// 		<div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
-	// 			<div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-	// 				<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-	// 			</div>
-	// 			<div class="col-xxl-11 col-lg-11 col-md-11">${text}</br>
-	// 				<span style="color:gray;">Rejitha R Prasad</span>
-	// 				<span style="color:gray;"> - ${new Date(created_at).toLocaleString()}</span></br>
-	// 				<button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})">Reply</button></br>
-	// 				<div class="reply-form" id="reply-form-${id}" style="display: none;">
-	// 					<textarea class="form-control reply" id="reply-input-${id}" rows="2" placeholder="Write a reply..."></textarea>
-	// 					<button class="btn btn-sm btn-info mt-2" onclick="addCommentFromInput(${id})">Send Reply</button>
-	// 				</div>
-	// 				<div class="replies" id="replies-${id}"></div>
-	// 			</div>
-	// 		</div>
-	// 	`;
-
-	// 	if (parent_id === null) {
-	// 		$('#comments-section').append(commentHtml);
-	// 		$('#new-comment').val('');
-	// 	} else {
-	// 		$(`#replies-${parent_id}`).append(commentHtml);
-	// 		$(`#reply-input-${parent_id}`).val('');
-	// 		$(`#reply-form-${parent_id}`).hide();
-	// 	}
-	// }
 	// ADD CUSTOM VALIDATION RULES START
         // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
@@ -1808,14 +1702,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		$.validator.addMethod("noSpaces", function(value, element) {
 			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 		}, "No leading or trailing spaces allowed");
-        // Add custom validation method for contact number
-        // $.validator.addMethod("validContactNumber", function(value, element) {
-        // 	return this.optional(element) || /^[0-9]$/.test(value);
-        // }, "Please enter a valid contact number");
-
-        // $.validator.addMethod("noMultipleSpaces", function(value, element) {
-        //     return this.optional(element) || !/\s\s+/.test(value);
-        // }, "No more than one consecutive space is allowed");
 
         // Add custom validation rule for numeric input only (excluding spaces)
         $.validator.addMethod("numericOnly", function(value, element) {
@@ -1841,10 +1727,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
-        // $.validator.addMethod("WONumberFormat", function(value, element) {
-        // 	// Regular expression to match the format WO- followed by exactly 6 digits
-        // 	return this.optional(element) || /^WO-\d{6}$/.test(value);
-        // }, "Please enter a valid order number in the format WO-######");
+
+		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
+		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
+			if (selectedDepositReceivedValue === 'custom_deposit') {
+				return $('select[name="deposit_aganist_vehicle[]"]').val().length > 0;
+			}
+			return true;
+		}, "At least one vehicle must be selected if deposit is received as custom deposit");
+
+		// Custom method to check if at least one element with the class `dynamicselect2` has a value
+		$.validator.addMethod("atLeastOneBOE", function(value, element) {
+			let isValid = false;
+			$('.dynamicselect2').each(function() {
+				if ($(this).val()) {
+					isValid = true;
+					return false; // break out of the loop once a value is found
+				}
+			});
+			return isValid;
+		}, "At least one BOE must be selected");
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
@@ -1854,10 +1756,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 type: {
                     required: true,
                 },
-                // date: {
-                //     required: true,
-                //     // date: true,
-                // },
                 so_number: {
 					required: true,
 					noSpaces: true,
@@ -1868,10 +1766,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 batch: {
                     required: true,
                 },
-                // wo_number: {
-                // 	required: true,
-                // 	WONumberFormat: true
-                // },
                 // customer_reference_id: {
 
                 // },
@@ -1946,7 +1840,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     noSpaces: true,
                 },
                 // transport_type: {
-                // 	// required: true,
                 // },
                 brn_file: {
                     // required: true,
@@ -1962,21 +1855,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     noSpaces: true,
                 },
                 // airline_reference_id: {
-
                 // }
                 // airline: {
-                // 	// required: true,
                 // },
                 airway_bill: {
-                    // required: true,
                     noSpaces: true,
                 },
                 shipping_line: {
-                    // required: true,
                     noSpaces: true,
                 },
                 forward_import_code: {
-                    // required: true,
                     noSpaces: true,
                 },
                 trailer_number_plate: {
@@ -1997,7 +1885,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     noSpaces: true,
                 },
                 // currency: {
-
                 // },
                 so_total_amount: {
 					noSpaces: true,
@@ -2008,59 +1895,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					digits: true,
 					min: 1 // Ensure it's a positive integer
                 },
-                // deposit_received_as: {
-
-                // },
+				"deposit_aganist_vehicle[]": {
+					customDepositVehicleRequired: true
+				},
                 // amount_received: {
-
                 // },
                 // balance_amount: {
-
                 // },				
                 delivery_location: {
-                    // required: true,
                     noSpaces: true,
                 },
                 delivery_contact_person: {
-                    // required: true,
                     noSpaces: true,
                 },
                 delivery_date: {
-                    // required: true,
                     date: true,
                 },
+				dynamicselect2: {
+					atLeastOneBOE: true
+				},
                 signed_pfi: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 signed_contract: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 payment_receipts: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 noc: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 enduser_trade_license: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 enduser_passport: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 enduser_contract: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
@@ -2152,13 +2030,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 vehicle_handover_person_id: {
                     filesize:" file size must be less than 1 GB.",
                 },
-				// so_number: {
-				// 	required: "SO Number is required.",
-				// 	noSpaces: "No leading or trailing spaces allowed.",
-				// 	SONumberFormat: "Please enter a valid order number in the format SO-######.",
-				// 	notSO000000: "SO Number cannot be SO-000000.",
-				// 	uniqueSO: "This SO Number is already taken! Try another.",
-				// },
             },
 			errorPlacement: function(error, element) {
 				error.appendTo(element.parent()); 
@@ -3138,15 +3009,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         }
 
         function setCustomerRelations(selectedCustomerName) {
-			// selectedCustomerEmail = $('#customer_email').val();
-			// selectedCustomerAddress = $('#customer_address').val();
-			// selectedCustomerContact = $('#customer_company_number').val();
             $('#customer_address').val('');
 			$('#customer_email').val('');
-			$('#customer_company_number').val('');
-            // document.getElementById('customer_email').value = '';
-            // document.getElementById('customer_company_number').value = '';
-			
+			$('#customer_company_number').val('');			
             if (selectedCustomerName != null || selectedCustomerName.length > 0) {
                 for (var i = 0; i < customerCount; i++) {
                     if (customers[i].customer_name == selectedCustomerName[0]) { 
@@ -3214,7 +3079,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		function updateCurrency() {
 			var currency = document.getElementById("currency").value;
 			var currencyText = document.querySelector("#currency option:checked").textContent;
-			// document.getElementById("currency-label").textContent = currencyText;
 			document.getElementById("amount_received_currency").textContent = currencyText;
 			document.getElementById("balance_amount_currency").textContent = currencyText;
 		}
