@@ -169,9 +169,9 @@ namespace App\Http\Controllers;
     foreach ($languages as $language) {
         SalesPersonLaugauges::create(['sales_person' => $user->id, 'language' => $language]);
     }
-
-    $user->syncRoles($request->roles[0]);
-
+    DB::table('model_has_roles')->where('model_id',$id)->delete();
+            $user->assignRole($request->input('roles'));
+            (new UserActivityController)->createActivity('User Updated');
     return redirect()->route('users.index')
         ->with('success', 'User updated successfully');
 }
