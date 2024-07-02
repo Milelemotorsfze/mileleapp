@@ -301,17 +301,22 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
-    <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'followUp')">FollowUp</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'prospecting')">Prospecting</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'uniqueInquiry')">Unique Inquiry / Demand</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'quotation')">Quotation</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li>
+    <!-- <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li> -->
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li> -->
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
-      <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
+      <!-- <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li> -->
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
-      <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li> -->
     </ul>
   </div>
                     </td>
@@ -358,11 +363,11 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
             <select class="form-select" id="method">
+            <option value="WhatsApp">WhatsApp</option>
             <option value="Email">Email</option>
             <option value="Call">Call</option>
             <option value="Direct">Direct</option>
             <option value="SMS">SMS</option>
-            <option value="WhatsApp">WhatsApp</option>
           </select>
             </div>
           </div>
@@ -1808,7 +1813,7 @@ $(document).ready(function () {
   var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
   columnDefs: [
-    { type: 'date', targets: [0] },
+    { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
   initComplete: function() {
@@ -1905,7 +1910,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Prospecting']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at' },
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -1915,8 +1933,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
                 {
-    data: 'remarks',
-    name: 'remarks',
+                data: 'remarks',
+                name: 'remarks',
     searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
@@ -1935,7 +1953,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -1956,7 +1987,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-{ data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2037,14 +2081,30 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                   }
                   }
                 },
-            ]
+            ],
+            columnDefs: [
+              { type: 'date', targets: [0] }
+    ]
         });
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'New Demand']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at' },
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -2074,7 +2134,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2095,7 +2168,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2142,7 +2228,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at' },
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -2172,7 +2271,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2193,7 +2305,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false },
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2214,7 +2339,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2305,7 +2443,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Negotiation']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at' },
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 { data: 'phone', name: 'phone' },
@@ -2335,7 +2486,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false },
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2356,7 +2520,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate, searchable: false' },
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2377,7 +2554,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false },
+{
+            data: 'qdate',
+            name: 'qdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2413,7 +2603,17 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ndate', name: 'ndate', searchable: false },
+{
+            data: 'ndate',
+            name: 'ndate',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    // Convert the date to your desired format
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
                 {
     data: 'nsalesnotes',
@@ -2463,7 +2663,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                 <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
                                 <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -2478,7 +2677,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Closed']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at' },
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
                 // { data: 'brand', name: 'brand' },
@@ -2507,7 +2719,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2528,7 +2753,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false},
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2548,7 +2786,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
     data: 'qsalesnotes',
@@ -2620,7 +2871,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 //         }
 //     }
 // },
-                { data: 'cdate', name: 'cdate', searchable: false},
+{
+            data: 'cdate',
+            name: 'cdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
                 {
     data: 'csalesnotes',
@@ -2662,7 +2926,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
             columns: [
-                { data: 'created_at', name: 'created_at'},
+              {
+            data: 'created_at',
+            name: 'created_at',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'type', name: 'type'},
                 { data: 'name', name: 'name'},
                 { data: 'phone', name: 'phone'},
@@ -2692,7 +2969,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'date', name: 'date', searchable: false},
+{
+            data: 'date',
+            name: 'date',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'salesnotes',
     name: 'salesnotes',
@@ -2713,7 +3003,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'ddate', name: 'ddate', searchable: false},
+{
+            data: 'ddate',
+            name: 'ddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 {
     data: 'dsalesnotes',
     name: 'dsalesnotes',
@@ -2734,7 +3037,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'qdate', name: 'qdate', searchable: false},
+{
+            data: 'qdate',
+            name: 'qdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
     data: 'qsalesnotes',
@@ -2806,7 +3122,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
 //         }
 //     }
 // },
-                { data: 'rdate', name: 'rdate', searchable: false},
+{
+            data: 'rdate',
+            name: 'rdate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
                 { data: 'reason', name: 'reason', searchable: false },
                 {
     data: 'rsalesnotes',
@@ -2835,7 +3164,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
     columns: [
         { data: 'quotationsid', name: 'quotationsid' },
-        { data: 'date_formatted', name: 'date_formatted' },
+        {
+            data: 'date_formatted',
+            name: 'date_formatted',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
         { data: 'deal_value', name: 'quotations.deal_value' },
         { data: 'sales_notes', name: 'quotations.sales_notes' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -2853,7 +3195,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     serverSide: true,
     ajax: "{{ route('dailyleads.index', ['status' => 'followup']) }}",
     columns: [
-        { data: 'leaddate', name: 'leaddate' },
+      {
+            data: 'leaddate',
+            name: 'leaddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
         { data: 'type', name: 'calls.type' },
         { data: 'name', name: 'calls.name' },
         { data: 'phone', name: 'calls.phone' },
@@ -2862,7 +3217,20 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         { data: 'remarks', name: 'calls.remarks' },
-        { data: 'datefol', name: 'datefol' },
+        {
+            data: 'datefol',
+            name: 'datefol',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            // Convert the date to your desired format
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
         { data: 'sales_notes', name: 'fellow_up.sales_notes' },
@@ -2915,9 +3283,7 @@ document.getElementById('reason-reject').addEventListener('change', function() {
 });
 </script>
 <script>
-
 function updateRemainingTime() {
-
     document.querySelectorAll('[id^="remaining-time-"]').forEach(function(element) {
 
         var assignTime = new Date(element.getAttribute('data-assign-time'));
@@ -2947,10 +3313,53 @@ function updateRemainingTime() {
     });
 
 }
-
 setInterval(updateRemainingTime, 1000);
-
 </script>
+<script>
+      function checkAuthorization(callId, action) {
+        $.ajax({
+            url: '{{ route("checkAuthorization") }}', // Define this route in your web.php
+            type: 'POST',
+            data: {
+                call_id: callId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.authorized) {
+                    performAction(callId, action);
+                } else {
+                  alertify.error('Sorry, Lead Already Assign to Another Sales Person By auto System');
+                    location.reload();
+                }
+            },
+            error: function() {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    function performAction(callId, action) {
+        switch(action) {
+            case 'followUp':
+                openModalfellowup(callId);
+                break;
+            case 'prospecting':
+                openModalp(callId);
+                break;
+            case 'uniqueInquiry':
+                openModald(callId);
+                break;
+            case 'quotation':
+              window.location.href = `{{ route('qoutation.proforma_invoice', ['callId' => '__CALL_ID__']) }}`.replace('__CALL_ID__', callId);
+                break;
+            case 'rejected':
+                openModalr(callId);
+                break;
+            default:
+                console.log('Unknown action');
+        }
+    }
+  </script>
 @else
     @php
         redirect()->route('home')->send();

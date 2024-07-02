@@ -42,8 +42,8 @@
                         <td>{{ $warehouselist->name ?? ''}}</td>
                         <td>
                         @php
-                        $names = DB::table('users')->where('id', $warehouselist->created_by )->first();
-                        $created_bys = $names->name;
+                        $names = $warehouselist->created_by ? DB::table('users')->where('id', $warehouselist->created_by )->first() : null;;
+                        $created_bys = $names ? $names->name : null;
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>

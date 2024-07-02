@@ -25,6 +25,7 @@ use App\Http\Controllers\HRM\Employee\OverTimeController;
 use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
+use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -106,6 +107,8 @@ use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
 use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\MigrationDataCheckController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\VendorAccountController;
 
 /*
 /*
@@ -118,6 +121,7 @@ use App\Http\Controllers\MigrationDataCheckController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/session-status', [SessionController::class, 'status']);
 Route::get('/auth/google', [GoogleOAuthController::class, 'redirectToGoogle']);
 Route::get('/callback', [GoogleOAuthController::class, 'handleGoogleCallback']);
 Route::get('clientsignature/{uniqueNumber}/{quotationId}', [QuotationController::class, 'showBySignature'])->name('quotation.showBySignature');
@@ -413,6 +417,25 @@ Route::get('/d', function () {
     });
      // Employee Overtime Application
      Route::resource('separation-handover', SeparationController::class);
+
+    // Work Order Module
+    Route::resource('work-order', WorkOrderController::class)->only([
+        'show','store','edit','update'
+    ]);
+    // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
+    Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
+    Route::controller(WorkOrderController::class)->group(function(){
+        Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        Route::get('work-order-info/{type}', 'index')->name('work-order.index');
+        Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
+        Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
+        Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
+        Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
+        Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
+        Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
+        Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
+        Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
+    });
     // Demand & Planning Module
 
     // suppliers
@@ -587,6 +610,8 @@ Route::get('/d', function () {
     Route::resource('Vehicles', VehiclesController::class);
     Route::get('vehicles/filter', [VehiclesController::class, 'index'])->name('vehicles.filter');
     Route::get('vehicles/statuswise', [VehiclesController::class, 'statuswise'])->name('vehicles.statuswise');
+    Route::get('vehicles/currentstatus', [VehiclesController::class, 'currentstatus'])->name('vehicles.currentstatus');
+    Route::post('vehicles/statussreach', [VehiclesController::class, 'statussreach'])->name('vehicles.statussearch');
     // Route::get('/search-data', [VehiclesController::class, 'searchData'])->name('vehicles.search-data');
     Route::post('purchasing-order/check-po-number', [PurchasingOrderController::class, 'checkPONumber'])->name('purchasing-order.checkPONumber');
     Route::post('purchasing-order/updatebasicdetails', [PurchasingOrderController::class, 'updatebasicdetails'])->name('purchasing-order.updatebasicdetails');
@@ -621,24 +646,26 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::post('/update-warehouse-remarks', [WarehouseController::class, 'updatewarehouseremarks'])->name('warehouse.updatewarehouseremarks');
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
-    Route::get('/vehicles/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
+    Route::post('purchasing_order/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
     Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
     Route::get('/vehicles/approvedcancel/{id}', [PurchasingOrderController::class, 'approvedcancel'])->name('vehicles.approvedcancel');
     Route::get('/vehicles/unrejecteds/{id}', [PurchasingOrderController::class, 'unrejecteds'])->name('vehicles.unrejecteds');
     Route::get('/vehicles/deletevehicles/{id}', [PurchasingOrderController::class, 'deletevehicles'])->name('vehicles.deletevehicles');
     Route::get('vehicles/paymentintconfirm/{id}', [PurchasingOrderController::class, 'paymentintconfirm'])->name('vehicles.paymentintconfirm');
+    Route::get('vehicles/paymentintconfirmrej/{id}', [PurchasingOrderController::class, 'paymentintconfirmrej'])->name('vehicles.paymentintconfirmrej');
     Route::get('vehicles/repaymentintiation/{id}', [PurchasingOrderController::class, 'repaymentintiation'])->name('vehicles.repaymentintiation');
     Route::get('vehicles/paymentreleaserejected/{id}', [PurchasingOrderController::class, 'paymentreleaserejected'])->name('vehicles.paymentreleaserejected');
     Route::get('vehicles/paymentreleaseconfirm/{id}', [PurchasingOrderController::class, 'paymentreleaseconfirm'])->name('vehicles.paymentreleaseconfirm');
     Route::get('vehicles/paymentrelconfirm/{id}', [PurchasingOrderController::class, 'paymentrelconfirm'])->name('vehicles.paymentrelconfirm');
     Route::get('vehicles/paymentreleasesconfirm/{id}', [PurchasingOrderController::class, 'paymentreleasesconfirm'])->name('vehicles.paymentreleasesconfirm');
     Route::post('vehicles/paymentreleasesrejected/{id}', [PurchasingOrderController::class, 'paymentreleasesrejected'])->name('vehicles.paymentreleasesrejected');
-    Route::get('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
+    Route::post('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
     Route::post('/update-purchasing-allstatus', [PurchasingOrderController::class, 'purchasingallupdateStatus'])->name('purchasing.updateallStatus');
     Route::get('vehicles/paymentrelconfirmvendors/{id}', [PurchasingOrderController::class, 'paymentrelconfirmvendors'])->name('vehicles.paymentrelconfirmvendors');
     Route::get('vehicles/paymentrelconfirmincoming/{id}', [PurchasingOrderController::class, 'paymentrelconfirmincoming'])->name('vehicles.paymentrelconfirmincoming');
 
     Route::get('/purcahsing-order-filter/{status}', [PurchasingOrderController::class, 'filter'])->name('purchasing.filter');
+    Route::get('/purcahsing-order-filter-cancel/{status}', [PurchasingOrderController::class, 'filtercancel'])->name('purchasing.filtercancel');
     Route::get('/purcahsing-order-filterpayment/{status}', [PurchasingOrderController::class, 'filterpayment'])->name('purchasing.filterpayment');
     Route::get('/purcahsing-order-filterpaymentrejectioned/{status}', [PurchasingOrderController::class, 'filterpaymentrejectioned'])->name('purchasing.filterpaymentrejectioned');
     Route::get('/purcahsing-order-filterpaymentrel/{status}', [PurchasingOrderController::class, 'filterpaymentrel'])->name('purchasing.filterpaymentrel');
@@ -850,6 +877,26 @@ Route::get('/d', function () {
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
     Route::get('/get-agents/{quotationId}', [QuotationController::class, 'getAgentsByQuotationId']);
     Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
+    Route::post('purchasing_order/cancelpo/{id}', [PurchasingOrderController::class, 'cancelpo'])->name('purchasing_order.cancelpo');
+    Route::post('/update-purchasing-status-cancel', [PurchasingOrderController::class, 'purchasingupdateStatuscancel'])->name('purchasing.updateStatuscancel');
+    Route::post('/check-authorization', [DailyleadsController::class, 'checkAuthorization'])->name('checkAuthorization');
+
+    //Vendor Accounts
+    Route::resource('vendoraccount', VendorAccountController::class);
+    Route::get('/account/{id}', [VendorAccountController::class, 'view'])->name('vendoraccount.view');
+    Route::get('/get-supplier-and-amount/{orderId}', [PurchasingOrderController::class, 'getSupplierAndAmount']);
+
+    //Price Update Purchased Order
+    Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
+    Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
+    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+    Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
+    Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
+    Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
+
+
 
     // Migration Data check Route
     Route::resource('migrations', MigrationDataCheckController::class);

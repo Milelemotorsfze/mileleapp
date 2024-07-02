@@ -68,7 +68,29 @@
 }
     }
 </style>
+<script>
+        function checkSession() {
+            fetch('/session-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session status:', error);
+                });
+        }
 
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkSession(); // Check session when the page becomes visible again
+            }
+        });
+
+        checkSession(); // Initial check immediately on page load
+        setInterval(checkSession, 15000); // Check every 15 seconds
+    </script>
 <div class="container">
     <div class="row topnav">
         <!-- <div class="topnav" style="overflow: unset;"> -->
@@ -100,6 +122,95 @@
                                         <span data-key="t-extra-pages">Dashboard</span>
                                     </a>
                                 </li>
+                                @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="file-text"></i>
+                                        <span data-key="t-extra-pages">Work Order</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Create Work Order</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','export_exw')}}" class="dropdown-item" data-key="t-login">Export EXW</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Export CNF</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Local Sale</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-lto-wo']);
+                                                @endphp
+                                                <!-- @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','lto')}}" class="dropdown-item" data-key="t-login">LTO</a>
+                                                @endif -->
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Work Order Info</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('work-order.index','export_exw') }}" class="dropdown-item" data-key="t-login">Export EXW</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-cnf-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('work-order.index','export_cnf') }}" class="dropdown-item" data-key="t-login">Export CNF</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-local-sale-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('work-order.index','local_sale') }}" class="dropdown-item" data-key="t-login">Local Sale</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-lto-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <!-- <a href="{{ route('work-order.index','lto') }}" class="dropdown-item" data-key="t-login">LTO</a> -->
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </li>
+                                @endif
                                 <!-- HRM -->
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
@@ -540,7 +651,10 @@
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
                             @endphp
-                            @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
+                            <!-- UNCOMMENT BELOW LINE WHEN HR MODULE GO LIVE -->
+                            <!-- OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true  -->
+                            @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true 
+                            OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
@@ -651,8 +765,8 @@
                                         </div>
                                     </div>
                                     @endif -->
-
-                                    @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
+                                    <!-- CAN UNCOMMENT WHEN PASSPORT REQUEST MODULE GET USE -->
+                                    <!-- @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Passport Request @if((Auth::user()->passport_submit_request_approval['count']) > 0 OR (Auth::user()->passport_release_request_approval['count']) > 0)
@@ -674,7 +788,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    @endif
+                                    @endif -->
 
                                     @if(Auth::user()->liability_request_approval['can'] == true OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->overtime_request_approval['can'] == true)
                                     <div class="dropdown">
@@ -732,7 +846,7 @@
                                 </div>
                             </li>
                             @endif
-
+                          
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -895,7 +1009,6 @@
                                 </li>
                                 @endif
                                 @endcan -->
-                                @can('part-input-incident')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
                                 @endphp
@@ -907,8 +1020,6 @@
                                     </a>
                                 </li>
                                 @endif
-                                @endcan
-                                @can('inspection-edit')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
                                 @endphp
@@ -920,8 +1031,6 @@
                                     </a>
                                 </li>
                                 @endif
-                                @endcan
-
                                 @can('demand-list')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
@@ -1219,6 +1328,16 @@
                                         </div>
                                         @endif
                                         @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-accounts');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vendoraccount.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Vendor Accounts</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
                                         @endphp
                                             @if ($hasPermission)
@@ -1328,6 +1447,11 @@
                                                 <span data-key="t-utility">Status Wise</span>
                                             </a>
                                             </div>
+                                            <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.currentstatus')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-vehicles">Vehicle Current Status</span>
+                                            </a>
+                                            </div>        
                                             </div>
                                 </li>
                                 @endif

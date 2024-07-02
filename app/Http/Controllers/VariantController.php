@@ -394,6 +394,7 @@ $existingspecifications = Varaint::with('VariantItems')
         }
         $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
     }
+    $name = str_replace(' ', '', $name);
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
     $variant->netsuite_name = $request->input('netsuite_name');

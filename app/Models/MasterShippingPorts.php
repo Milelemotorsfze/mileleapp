@@ -9,4 +9,8 @@ class MasterShippingPorts extends Model
 {
     use HasFactory;
     protected $table = "master_shipping_ports";
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
 }
