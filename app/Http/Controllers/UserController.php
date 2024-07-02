@@ -72,6 +72,7 @@ namespace App\Http\Controllers;
             $empProfile = new Profile();
             $empProfile->user_id = $user->id;
             $empProfile->first_name = $request->input('name');
+            $empProfile->company_number = $request->input('phone');
             $empProfile->save();
             $empJob = new EmpJob();
             $empProfileId = $empProfile->id;
@@ -121,35 +122,59 @@ namespace App\Http\Controllers;
         }
         public function edit($id)
         {
+            $language = Language::pluck('name', 'name')->all();
+            $jobposition = MasterJobPosition::where('status', 'active')->get();
+            $departments = MasterDepartment::where('status', 'active')->get();
             $user = User::find($id);
-            $roles = Role::pluck('name','name')->all();
-            $userRole = $user->roles->pluck('name','name')->all();
-
-            return view('users.edit',compact('user','roles','userRole'));
+            $roles = Role::all();
+            $userRole = $user->roles->pluck('id')->toArray();
+            $userLanguages = SalesPersonLaugauges::where('sales_person', $user->id)->pluck('language')->toArray();
+            $userDepartmentId = $user->empProfile->department_id ?? null;
+            $userDesignationId = $user->empProfile->designation_id ?? null;
+        
+            return view('users.edit', compact('user', 'roles', 'userRole', 'departments', 'jobposition', 'language', 'userLanguages', 'userDepartmentId', 'userDesignationId'));
         }
         public function update(Request $request, $id)
-        {
-            $this->validate($request, [
-                'name' => 'required',
-                'email' => 'required|email|unique:users,email,'.$id,
-                'password' => 'same:confirm-password',
-                'roles' => 'required'
-            ]);
+{
+    $this->validate($request, [
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'roles' => 'required',
+        'department' => 'required',
+        'designation' => 'required',
+        'languages' => 'required',
+    ]);
 
-            $input = $request->all();
-            if(!empty($input['password'])){
-                $input['password'] = Hash::make($input['password']);
-            }else{
-                $input = Arr::except($input,array('password'));
-            }
-            $user = User::find($id);
-            $user->update($input);
-            DB::table('model_has_roles')->where('model_id',$id)->delete();
-            $user->assignRole($request->input('roles'));
-            (new UserActivityController)->createActivity('User Updated');
-            return redirect()->route('users.index')
-                            ->with('success','User updated successfully');
-        }
+    $user = User::find($id);
+    $user->name = $request->input('name');
+    $user->email = $request->input('email');
+    $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
+    $user->selected_role = $request->roles[0];
+    $user->save();
+
+    $empProfile = $user->empProfile;
+    $empProfile->first_name = $request->input('name');
+    $empProfile->company_number = $request->input('phone');
+    $empProfile->department_id = $request->input('department');
+    $empProfile->designation_id = $request->input('designation');
+    $empProfile->save();
+
+    SalesPersonStatus::updateOrCreate(
+        ['sale_person_id' => $user->id],
+        ['status' => "Active", 'remarks' => "Account Updated", 'created_by' => Auth::id()]
+    );
+
+    SalesPersonLaugauges::where('sales_person', $user->id)->delete();
+    $languages = $request->input('languages');
+    foreach ($languages as $language) {
+        SalesPersonLaugauges::create(['sales_person' => $user->id, 'language' => $language]);
+    }
+
+    $user->syncRoles($request->roles[0]);
+
+    return redirect()->route('users.index')
+        ->with('success', 'User updated successfully');
+}
         public function delete($id)
         {
             User::find($id)->delete();
