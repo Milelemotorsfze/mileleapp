@@ -1,17 +1,17 @@
 @extends('layouts.table')
 @section('content')
     <style>
-        .modal {
+        /* .modal {
             position: absolute;
             min-height: 500px;
-        }
+        } */
         .widthinput{
             height:32px!important;
 
         }
-        body.modal-open {
+        /* body.modal-open {
             overflow: hidden;
-        }
+        } */
     </style>
     
 
@@ -158,7 +158,7 @@
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
                                                     @endphp
                                                     @if ($hasPermission)
-                                                        <button type="button" class="btn btn-danger btn-sm loi-button-delete" title="Delete LOI"
+                                                        <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI"
                                                                 data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
                                                             <i class="fa fa-trash"></i>
                                                         </button>
@@ -282,7 +282,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show " id="waiting-for-approval-LOI">
+                <div class="tab-pane fade show" id="waiting-for-approval-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="waiting-for-approval-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -361,7 +361,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                             @can('LOI-delete')
@@ -369,7 +369,7 @@
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                    <button type="button" class="btn btn-danger btn-sm loi-button-delete" title="Delete LOI"
+                                                    <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI"
                                                             data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
@@ -669,9 +669,10 @@
                                     <th>So Number</th>
                                     <th>Country</th>
                                     <th>LOI Quantity</th>
-                                    <th>Utilized QQuantity</th>
+                                    <th>Utilized Quantity</th>
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
+                                    <th>Is Expired</th>
                                     <th>LOI</th>
                                     <th>Remarks</th>
                                     <th width="150px">Actions</th>
@@ -700,6 +701,9 @@
                                        
                                         <td>{{ $letterOfIndent->submission_status }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
+                                       <td>  @if($letterOfIndent->is_loi_expired == true)
+                                             Expired  @else  Not Expired @endif
+                                        </td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
                                                 <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
@@ -707,29 +711,29 @@
                                                 </a>
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->review }}</td>
-                                    
+                                        <td>{{ $letterOfIndent->review }}</td>                                   
                                         <td>
                                             <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
                                             data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-save"></i>
                                             </button>
-                                            <!-- @can('PFI-create')
+                                            <!-- allow only not expired LOI to ctreate PFI -->
+                                            @can('PFI-create')
                                                 @php
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
                                                 @endphp
-                                                @if ($hasPermission) -->
-                                                   <!-- @if($letterOfIndent->is_pfi_pending_for_loi == true) -->
-                                                        <!-- <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                                @if ($hasPermission)
+                                                   @if($letterOfIndent->is_loi_expired == false)
+                                                        <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                                                             <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
-                                                        </a> -->
-                                                    <!-- @endif -->
-                                                <!-- @endif
-                                            @endcan -->
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            @endcan
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -839,6 +843,31 @@
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade " id="update-utilization-quantity-{{$letterOfIndent->id}}" data-bs-backdrop="static" 
+                                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog  modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Utilized Quantity</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('utilization-quantity-update', $letterOfIndent->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$letterOfIndent->total_quantity}}" name="utilized_quantity" class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

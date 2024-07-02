@@ -107,7 +107,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                                <select class="form-control widthinput" name="category" id="choices-single-default">
+                                <select class="form-control widthinput" name="category" id="loi-category">
                                     <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
                                         {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
                                     </option>
@@ -455,7 +455,13 @@
                 e.preventDefault();
             }
         });
-
+        
+        $('#loi-category').select2({
+            placeholder : 'Select LOI Category',
+            allowClear: true,
+        }).on('change', function() {
+            $('#loi-category-error').remove();
+        });
         $('#template-type').select2({
             placeholder : 'Select Template Type',
             allowClear: true,

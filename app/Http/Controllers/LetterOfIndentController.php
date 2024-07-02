@@ -43,10 +43,12 @@ class LetterOfIndentController extends Controller
 
         $newLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
+            ->where('is_expired', false)
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
         $approvalWaitingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
+            ->where('is_expired', false)
             ->where('status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL)
             ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
