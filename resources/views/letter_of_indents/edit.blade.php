@@ -176,7 +176,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
-                                <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
+                                <input type="file" name="files[]" class="form-control widthinput mb-3" multiple accept="image/*" 
                                     autofocus id="file-upload" >
                             </div>
                         </div>
@@ -229,7 +229,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3" id="signature-preview">
                                 @if($letterOfIndent->signature)
-                                <h6>Signature File</h4>
+                                <label class="form-label fw-bold">Signature File</label>
                                     <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
                                     <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
                                 @endif
@@ -375,13 +375,14 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                if (file.type.match("application/pdf"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const iframe = document.createElement("iframe");
-                    iframe.src = objectUrl;
-                    previewFile.appendChild(iframe);
-                }else if (file.type.match("image/*"))
+                // if (file.type.match("application/pdf"))
+                // {
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const iframe = document.createElement("iframe");
+                //     iframe.src = objectUrl;
+                //     previewFile.appendChild(iframe);
+                // }else
+                 if (file.type.match("image/*"))
                 {
                     const objectUrl = URL.createObjectURL(file);
                     const image = new Image();
@@ -702,7 +703,7 @@
                 },
                 "files[]": {
                     fileCheck:true,
-                    extension: "pdf|png|jpeg|jpg"
+                    extension: "png|jpeg|jpg"
                 },
                 loi_signature: {
                     required:function(element) {
@@ -710,16 +711,16 @@
                         return $("#dealer").val() == 'Milele Motors' && currentDealer == 'Trans Cars'
                     },
                     extension: "png|jpeg|jpg|svg"
-                },
+                }
+            },
                 messages: {
                     "files[]": {
-                        extension: "Please upload file  format (Pdf,png,jpeg,jpg)"
+                        extension: "Please upload file  format (png,jpeg,jpg)"
                     },
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
                 }
-            },
         });
 
         $.validator.prototype.checkForm = function (){

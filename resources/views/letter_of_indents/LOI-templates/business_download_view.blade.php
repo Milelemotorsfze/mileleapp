@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
     <style>
         /*@page { size: 700pt }*/
         .content{
@@ -87,7 +88,7 @@
         <div class="page_break"></div>
         <div class="row">
             @foreach($imageFiles as $imageFile)
-            <img src="{{ public_path($imageFile) }}">
+            <img src="{{ public_path($imageFile) }}"  class="mt-2">
             @endforeach
         </div>
     @endif

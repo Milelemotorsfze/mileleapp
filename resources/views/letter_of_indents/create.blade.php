@@ -338,13 +338,14 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                if (file.type.match("application/pdf"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const iframe = document.createElement("iframe");
-                    iframe.src = objectUrl;
-                    previewFile.appendChild(iframe);
-                }else if (file.type.match("image/*"))
+                // if (file.type.match("application/pdf"))
+                // {
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const iframe = document.createElement("iframe");
+                //     iframe.src = objectUrl;
+                //     previewFile.appendChild(iframe);
+                // }else
+                 if (file.type.match("image/*"))
                 {
                     const objectUrl = URL.createObjectURL(file);
                     const image = new Image();
@@ -407,7 +408,7 @@
                 },
                 "files[]": {
                     required:true,
-                    extension: "pdf|png|jpeg|jpg"
+                    extension: "png|jpeg|jpg"
                 },
                 "template_type[]":{
                     required:true
@@ -417,16 +418,18 @@
                         return $("#dealer").val() == 'Milele Motors'
                     },
                     extension: "png|jpeg|jpg|svg"
+                }
+            },
+                
+            messages: {
+                file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
                 },
-                messages: {
-                    file: {
-                        extension: "Please upload file format (Pdf,png,jpeg,jpg)"
-                    },
-                    loi_signature:{
-                        extension: "Please upload Image file format (png,jpeg,jpg,svg)"
-                    }
-                },
-            }
+                loi_signature:{
+                    extension: "Please upload Image file format (png,jpeg,jpg,svg)"
+                }
+            },
+            
         });
 
         $.validator.prototype.checkForm = function (){
