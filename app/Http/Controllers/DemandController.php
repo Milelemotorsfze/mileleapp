@@ -116,24 +116,27 @@ class DemandController extends Controller
 
         $data = MasterModel::where('model', $request->model);
         if($request->selectedModelIds) {
-            $data = $data->whereNotIn('id', $request->selectedModelIds);
+            $restrictedModelIds = [];
+            foreach($request->selectedModelIds as $selectedModelId){
+                $masterModel = MasterModel::find($selectedModelId);
+                $possibleModels = MasterModel::where('model', $masterModel->model)
+                                        ->where('sfx', $masterModel->sfx)
+                                        ->get();
+                foreach($possibleModels as $possibleModel) {
+                    $restrictedModelIds[] = $possibleModel->id;
+                }                  
+            }
+            if($restrictedModelIds) {
+                $data = $data->whereNotIn('id', $restrictedModelIds);
+            }
+         
         }
 
         $data = $data->groupBy('sfx')->pluck('sfx');
     
         return $data;
     }
-    public function getModelLine(Request $request) {
-
-        $data = MasterModel::where('model', $request->model)
-            ->where('sfx', $request->sfx);
-        if($request->selectedModelIds) {
-            $data = $data->whereNotIn('id', $request->selectedModelIds);
-        }
-        $data = $data->pluck('model_year');
-
-        return $data;
-    }
+   
     public function getLOIDescription(Request $request)
     {
 //        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
@@ -183,7 +186,20 @@ class DemandController extends Controller
         }
 
         if($request->selectedModelIds) {
-            $data = $data->whereNotIn('id', $request->selectedModelIds);
+            $restrictedModelIds = [];
+            foreach($request->selectedModelIds as $selectedModelId){
+                $masterModel = MasterModel::find($selectedModelId);
+                $possibleModels = MasterModel::where('model', $masterModel->model)
+                                        ->where('sfx', $masterModel->sfx)
+                                        ->get();
+                foreach($possibleModels as $possibleModel) {
+                    $restrictedModelIds[] = $possibleModel->id;
+                }                  
+            }
+            if($restrictedModelIds) {
+                $data = $data->whereNotIn('id', $restrictedModelIds);
+            }
+         
         }
 
         $data = $data->groupBy('model')->orderBy('id','ASC')->get();
