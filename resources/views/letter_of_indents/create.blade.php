@@ -885,12 +885,21 @@
             let index = $(this).attr('data-index');
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
+
             var value = e.params.data.text;
             hideSFX(index, value);
             // getModelYear(index);
             // getModelLine(index);
         });
         
+
+            let value = e.params.data.text;
+            hideSFX(index,value);
+
+            // getModelYear(index);
+            // getModelLine(index);
+        });
+
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -1010,7 +1019,7 @@
                }
            });
         }
-    
+
        function appendSFX(index,unSelectedmodel,sfx){
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 

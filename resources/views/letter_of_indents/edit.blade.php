@@ -889,9 +889,11 @@
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
             var value = e.params.data.text;
+
             hideSFX(index, value)
         });
        
+
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
@@ -932,7 +934,7 @@
             $('#inventory-quantity-'+index).val("");
 
         });
-       
+
         function showSignatureRemoveButton(value) {
             if(value == 'Trans Cars') {
                 $('.remove-signature-button').attr('hidden', false);
@@ -954,7 +956,7 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
-
+            console.log(selectedModelIds);
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",
                 type: "GET",
@@ -1032,7 +1034,6 @@
                     $('#sfx-'+index).empty();
                     $('#loi-description-'+index).val("");
                     $('#sfx-'+index).html('<option value=""> Select SFX </option>');
-                    // $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
 
                     jQuery.each(data, function(key,value){
                         $('#sfx-'+index).append('<option value="'+ value +'">'+ value +'</option>');
@@ -1042,7 +1043,6 @@
         }
       
         function getLOIDescription(index) {
-            // let model_year = $('#model-year-'+index).val();
             let model = $('#model-'+index).val();
             let sfx = $('#sfx-'+index).val();
             let dealer = $('#dealer').val();
@@ -1072,7 +1072,7 @@
                 }
             });
         }
-       
+
         function appendSFX(index,unSelectedmodel,sfx){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1101,7 +1101,7 @@
             }
         }
         function hideSFX(index, value) {
-         
+        
          var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
          for(let i=1; i<=totalIndex; i++)
          {
@@ -1111,6 +1111,7 @@
              }
          }
      }
+
         function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 

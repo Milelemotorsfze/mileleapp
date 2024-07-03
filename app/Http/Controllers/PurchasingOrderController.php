@@ -8,6 +8,8 @@ use App\Models\LetterOfIndent;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PriceChangeNotification;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -2367,6 +2369,15 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $description = "Adjustment the payment";
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Adjustment";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->field = "Price";
+                $purchasingordereventsLog->new_value = $adjustmentAmount + $remainingAmount;
+                $purchasingordereventsLog->description = $description;
+                $purchasingordereventsLog->save();
             }
             elseif($selectedOption == 'payBalance')
             {
@@ -2387,6 +2398,15 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $description = "Pay the Balance of with this PO";
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Adjustment";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->field = "Price";
+                $purchasingordereventsLog->new_value = $adjustmentAmount;
+                $purchasingordereventsLog->description = $description;
+                $purchasingordereventsLog->save();
             }
             elseif($selectedOption == 'partialpayment')
             {
@@ -2406,6 +2426,15 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
                 $totalcost = $intialamount;
+                $description = "Partial Payment to the Vendor";
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Adjustment";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->field = "Price";
+                $purchasingordereventsLog->new_value = $adjustmentAmount;
+                $purchasingordereventsLog->description = $description;
+                $purchasingordereventsLog->save();
             }
             else
             {
@@ -2425,6 +2454,15 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $description = "Payment to the vendor without any adjustment";
+                $purchasingordereventsLog = new PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Adjustment";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->field = "Price";
+                $purchasingordereventsLog->new_value = $adjustmentAmount;
+                $purchasingordereventsLog->description = $description;
+                $purchasingordereventsLog->save();
             }
             PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->update(['status' => 'Initiated Payment']);
             $currency = $purchasedorder->currency;
@@ -2487,14 +2525,11 @@ public function allpaymentreqssfinpay(Request $request)
             $file = $request->file('file');
             $fileNameToStore = time() . '_' . $file->getClientOriginalName();
             $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
-            
             $latestBatch = DB::table('purchasing_order_swift_copies')
                 ->where('purchasing_order_id', $id)
                 ->orderBy('created_at', 'desc')
                 ->first();
-            
             $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
-            
             $swiftcopy = new PurchasingOrderSwiftCopies();
             $swiftcopy->purchasing_order_id = $id;
             $swiftcopy->uploaded_by = auth()->user()->id;
@@ -2665,45 +2700,115 @@ public function allpaymentreqssfinpay(Request $request)
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
         public function updatebasicdetails(Request $request)
-        {
-            $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
-            if (!$purchasingOrder) {
-                return response()->json(['error' => 'Purchasing order not found'], 404);
-            }
-            $purchasingOrder->vendors_id = $request->input('vendors_id');
-            $purchasingOrder->payment_term_id = $request->input('payment_term_id');
-            $purchasingOrder->currency = $request->input('currency');
-            $purchasingOrder->shippingmethod = $request->input('shippingmethod');
-            $purchasingOrder->shippingcost = $request->input('shippingcost');
-            $purchasingOrder->pol = $request->input('pol');
-            $purchasingOrder->pod = $request->input('pod');
-            $purchasingOrder->fd = $request->input('fd');
-            $purchasingOrder->pl_number = $request->input('pl_number');
-            $purchasingOrder->po_number = $request->input('po_number');
-            $purchasingOrder->status = "Pending Approval";
-            info($request->hasFile('uploadPL'));
-            if ($request->hasFile('uploadPL')) {
-                // Get file with extension
-                $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
-        
-                // Get just the filename
-                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-        
-                // Get just the extension
-                $extension = $request->file('uploadPL')->getClientOriginalExtension();
-        
-                // Create a unique filename to store
-                $fileNameToStore = $filename.'_'.time().'.'.$extension;
-        
-                // Move the file to the public storage path
-                $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
-        
-                // Update the file path in the purchasing order
-                $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
-            }
-            $purchasingOrder->save();
-            return response()->json(['message' => 'Purchase order details updated successfully'], 200);
+{
+    $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
+    if (!$purchasingOrder) {
+        return response()->json(['error' => 'Purchasing order not found'], 404);
+    }
+
+    // Define the fields to be updated
+    $fieldsToUpdate = [
+        'vendors_id',
+        'payment_term_id',
+        'currency',
+        'shippingmethod',
+        'shippingcost',
+        'pol',
+        'pod',
+        'fd',
+        'pl_number',
+        'po_number',
+    ];
+
+    // Store old values
+    $oldValues = $purchasingOrder->only($fieldsToUpdate);
+
+    // Update purchasing order details
+    foreach ($fieldsToUpdate as $field) {
+        if ($request->has($field)) {
+            $purchasingOrder->$field = $request->input($field);
         }
+    }
+    $purchasingOrder->status = "Pending Approval";
+
+    if ($request->hasFile('uploadPL')) {
+        // Get file with extension
+        $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+
+        // Get just the filename
+        $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+
+        // Get just the extension
+        $extension = $request->file('uploadPL')->getClientOriginalExtension();
+
+        // Create a unique filename to store
+        $fileNameToStore = $filename.'_'.time().'.'.$extension;
+
+        // Move the file to the public storage path
+        $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
+
+        // Update the file path in the purchasing order
+        $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+    }
+
+    // Save the purchasing order
+    $purchasingOrder->save();
+
+    // Log changes
+    foreach ($fieldsToUpdate as $field) {
+        if ($oldValues[$field] != $purchasingOrder->$field) {
+            $oldValue = $oldValues[$field];
+            $newValue = $purchasingOrder->$field;
+            $description = "Changed $field from $oldValue to $newValue";
+
+            if ($field == 'vendors_id') {
+                $oldVendorName = Supplier::find($oldValue)->supplier ?? 'Unknown';
+                $newVendorName = Supplier::find($newValue)->supplier ?? 'Unknown';
+                $description = "Changed Vendor from $oldVendorName to $newVendorName";
+                $oldValue = $oldVendorName;
+                $newValue = $newVendorName;
+            } elseif ($field == 'payment_term_id') {
+                $oldPaymentTerm = PaymentTerms::find($oldValue)->name ?? 'Unknown';
+                $newPaymentTerm = PaymentTerms::find($newValue)->name ?? 'Unknown';
+                $description = "Changed Payment Term from $oldPaymentTerm to $newPaymentTerm";
+                $oldValue = $oldPaymentTerm;
+                $newValue = $newPaymentTerm;
+            }
+            elseif ($field == 'pol') {
+                $oldport = MasterShippingPorts::find($oldValue)->name ?? 'Unknown';
+                $newport = MasterShippingPorts::find($newValue)->name ?? 'Unknown';
+                $description = "Changed Port of Loading from $oldport to $newport";
+                $oldValue = $oldport;
+                $newValue = $newport;
+            }
+            elseif ($field == 'pod') {
+                $oldport = MasterShippingPorts::find($oldValue)->name ?? 'Unknown';
+                $newport = MasterShippingPorts::find($newValue)->name ?? 'Unknown';
+                $description = "Changed Port of Delivery from $oldport to $newport";
+                $oldValue = $oldport;
+                $newValue = $newport;
+            }
+            elseif ($field == 'fd') {
+                $oldport = Country::find($oldValue)->name ?? 'Unknown';
+                $newport = Country::find($newValue)->name ?? 'Unknown';
+                $description = "Changed Final Delivery from $oldport to $newport";
+                $oldValue = $oldport;
+                $newValue = $newport;
+            }
+            $purchasingordereventsLog = new PurchasingOrderEventsLog();
+            $purchasingordereventsLog->event_type = "Update PO Basic Details";
+            $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+            $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->field = ucfirst(str_replace('_', ' ', $field)) . " Changed";
+            $purchasingordereventsLog->old_value = $oldValue;
+            $purchasingordereventsLog->new_value = $newValue;
+            $purchasingordereventsLog->description = $description;
+            $purchasingordereventsLog->save();
+        }
+    }
+
+    return response()->json(['message' => 'Purchase order details updated successfully'], 200);
+}       
         public function pendingvins($status)
 {
 $userId = auth()->user()->id;
@@ -2932,15 +3037,11 @@ public function updatePrices(Request $request)
     $prices = $request->input('prices');
     $totalPrice = intval($request->input('total_price'));
     $purchasingOrderId = $request->input('purchasing_order_id');
-    $userId = auth()->id(); // Assuming you have user authentication and need the ID of the user making the request
-
-    // Fetch the purchasing order and its currency
+    $userId = auth()->id();
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderCurrency = $purchasingOrder->currency;
-    // Fetch the supplier account linked to this purchasing order
     $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
     $accountCurrency = $supplierAccount->currency;
-    // Currency conversion rates
     $conversionRates = [
         'USD' => 3.67,
         'EUR' => 3.94,
@@ -2949,13 +3050,14 @@ public function updatePrices(Request $request)
         'CAD' => 2.69
     ];
     $totalDifference = 0;
+    $priceChanges = [];
+    $totalAmountOfChanges = 0;
+    $totalVehiclesChanged = 0;
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
-        // Fetch the old price
         $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
         $oldPrice = $vehicleCost->unit_price;
-        // Calculate the price difference
         $priceDifference = $oldPrice - $newPrice;
         if ($priceDifference != 0) {
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -3001,49 +3103,51 @@ public function updatePrices(Request $request)
             $updatepriceinpaid = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Request For Payment')->orderBy('created_at', 'desc')->first();
             $updatePerformed = false;
             if ($updatepriceinpaid) {
-                // Check if priceDifference is positive or negative 
                 if ($priceDifference > 0) {
-                    $updatepriceinpaid->amount -= $priceDifference; // Add priceDifference
+                    $updatepriceinpaid->amount -= $priceDifference; 
                 } else {
-                    $updatepriceinpaid->amount += abs($priceDifference); // Subtract priceDifference
+                    $updatepriceinpaid->amount += abs($priceDifference);
                 }
                 $updatepriceinpaid->save();
                 $updatePerformed = true;
             }
             $vehicles = Vehicles::where('id', $vehicleId)->first();
-            // Skip account updates if payment status is blank or 'Payment Initiated Request'
             if ($vehicles && ($vehicles->payment_status == '' || $vehicles->payment_status == 'Payment Initiated Request')) {
                 continue;
             }
             if (!$updatePerformed) {
             $updatepriceinpaidint = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Initiated Payment')->orderBy('created_at', 'desc')->first();
             if ($updatepriceinpaidint) {
-                // Check if priceDifference is positive or negative 
                 if ($priceDifference > 0) {
-                    $updatepriceinpaidint->amount -= $priceDifference; // Add priceDifference
+                    $updatepriceinpaidint->amount -= $priceDifference;
                 } else {
-                    $updatepriceinpaidint->amount += abs($priceDifference); // Subtract priceDifference
+                    $updatepriceinpaidint->amount += abs($priceDifference);
                 }
                 $updatepriceinpaidint->save();
             }
          }
+         $vehicle = Vehicles::find($vehicleId);
+         $priceChanges[] = [
+             'vehicle_reference' => $vehicle->id,
+             'Vin' => $vehicle->vin,
+             'variant_name' => $vehicle->variant->name,
+             'old_price' => abs($oldPrice),
+             'new_price' => $newPrice,
+             'changed_by' => auth()->user()->name,
+         ];
+         $totalAmountOfChanges += $priceDifference;
+         $totalVehiclesChanged++;
         }
-        // Convert the price difference to supplier account currency if needed
         if ($orderCurrency !== $accountCurrency) {
             $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
         } else {
             $priceDifferenceInAccountCurrency = $priceDifference;
         }
-
-        // Accumulate the total difference
         $totalDifference += $priceDifferenceInAccountCurrency;
     }
-    // Update supplier account current balance if the total difference is not zero and not skipped
     if ($totalDifference != 0) {
         $supplierAccount->current_balance += $totalDifference;
         $supplierAccount->save();
-
-        // Record the transaction
         SupplierAccountTransaction::create([
             'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
             'purchasing_order_id' => $purchasingOrderId,
@@ -3053,8 +3157,10 @@ public function updatePrices(Request $request)
             'transaction_amount' => abs($totalDifference),
         ]);
     }
-    // Update the total price in the purchasing order
     $purchasingOrder->update(['totalcost' => $totalPrice]);
+    $ponumber = $purchasingOrder->po_number;
+    $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
+    Mail::to($recipients)->send(new PriceChangeNotification($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
     return response()->json(['message' => 'Prices updated successfully']);
 }
 private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
@@ -3121,6 +3227,19 @@ public function updateVariants(Request $request)
             ->where('purchasing_order_id', $purchasingOrderId)
             ->first();
         if ($vehicle) {
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update Vehicles Varaint';
+            $vehicleslog->vehicles_id = $vehicleId;
+            $vehicleslog->field = "Varaint";
+            $vehicleslog->old_value = $vehicle->varaints_id;
+            $vehicleslog->new_value = $variant['variant_id'];
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
         }

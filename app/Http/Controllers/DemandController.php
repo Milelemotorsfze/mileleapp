@@ -132,6 +132,7 @@ class DemandController extends Controller
          
         }
 
+
         $data = $data->groupBy('sfx')->pluck('sfx');
     
         return $data;
@@ -174,7 +175,6 @@ class DemandController extends Controller
           $data['variant'] = $masterModel->variant->name ?? '';
         }
         $data['model_line'] = $masterModel->modelLine->model_line ?? '';
-        info($data);
         return $data;
     }
 
