@@ -885,17 +885,12 @@
             let index = $(this).attr('data-index');
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
+            var value = e.params.data.text;
+            hideSFX(index, value);
             // getModelYear(index);
             // getModelLine(index);
         });
-        // $(document.body).on('select2:select', ".model-years", function (e) {
-        //     let index = $(this).attr('data-index');
-        //     $('#model-year-'+index+'-error').remove();
-        //     getLOIDescription(index);
-        //     var value = e.params.data.text;
-        //     // hideModelYear(index, value);
-
-        // });
+        
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -938,19 +933,7 @@
             $('#inventory-quantity-'+index).val("");
             $('#quantity-'+index).val("");
         });
-        // $(document.body).on('select2:unselect', ".model-years", function (e) {
-        //     let index = $(this).attr('data-index');
-        //     $('#loi-description-'+index).val("");
-        //     $('#master-model-id-'+index).val("");
-        //     $('#inventory-quantity-'+index).val("");
-        //     $('#quantity-'+index).val("");
-
-        //     var modelYear = e.params.data.id;
-        //     var model = $('#model-'+index).val();
-        //     var sfx = $('#sfx-'+index).val();
-        //     appendModelYear(index, model[0],sfx[0],modelYear);
-        //     // get the unseleted index and match with each row item if model and sfx is matching append that row
-        // });
+       
 
        function getSfx(index) {
 
@@ -1027,40 +1010,7 @@
                }
            });
         }
-        
-    //    function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
-
-    //        var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
-    //         for(let i=1; i<=totalIndex; i++)
-    //         {
-    //             if(i != index) {
-    //                 var model = $('#model-'+i).val();
-    //                 var sfx = $('#sfx-'+i).val();
-    //                 if(unSelectedmodel == model[0] && unSelectedsfx == sfx[0]) {
-    //                     $('#model-year-'+i).append($('<option>', {value: unSelectedmodelYear, text : unSelectedmodelYear}))
-    //                 }
-    //             }
-    //         }
-    //    }
-    //    function hideModelYear(index, value) {
-    //        var selectedModel = $('#model-'+index).val();
-    //        var selectedSFX = $('#sfx-'+index).val();
-
-    //        var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-    //        for(let i=1; i<=totalIndex; i++)
-    //        {
-    //            if(i != index) {
-    //                var model = $('#model-'+i).val();
-    //                var sfx = $('#sfx-'+i).val();
-
-    //                if(selectedModel[0] == model[0] && selectedSFX[0] == sfx[0]) {
-    //                    var currentId = 'model-year-' + i;
-    //                    $('#' + currentId + ' option[value=' + value + ']').detach();
-    //                }
-    //            }
-    //        }
-    //    }
+    
        function appendSFX(index,unSelectedmodel,sfx){
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1089,6 +1039,17 @@
                }
            }
        }
+       function hideSFX(index, value) {
+         
+         var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         for(let i=1; i<=totalIndex; i++)
+         {
+             if(i != index) {
+                 var currentId = 'sfx-' + i;
+                 $('#' + currentId + ' option[value=' + value + ']').detach();       
+             }
+         }
+     }
        function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
