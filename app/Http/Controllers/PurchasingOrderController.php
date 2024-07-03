@@ -3114,6 +3114,7 @@ public function updatePrices(Request $request)
          $vehicle = Vehicles::find($vehicleId);
          $priceChanges[] = [
              'vehicle_reference' => $vehicle->id,
+             'Vin' => $vehicle->vin,
              'variant_name' => $vehicle->variant->name,
              'old_price' => abs($oldPrice),
              'new_price' => $newPrice,

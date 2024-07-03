@@ -11,6 +11,7 @@
         <thead>
             <tr>
                 <th>Vehicle Reference #</th>
+                <th>VIN</th>
                 <th>Variant Name</th>
                 <th>Old Price ({{ $orderCurrency }})</th>
                 <th>New Price ({{ $orderCurrency }})</th>
@@ -21,6 +22,7 @@
             @foreach($priceChanges as $change)
                 <tr>
                     <td>{{ $change['vehicle_reference'] }}</td>
+                    <td>{{ $change['Vin'] }}</td>
                     <td>{{ $change['variant_name'] }}</td>
                     <td>{{ $change['old_price'] }}</td>
                     <td>{{ $change['new_price'] }}</td>
