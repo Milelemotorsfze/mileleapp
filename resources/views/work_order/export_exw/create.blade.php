@@ -215,7 +215,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<input type="hidden" name="wo_id" id="wo_id" value={{ isset($workOrder) ? $workOrder->id : '' }}>
 					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<span class="error">* </span>
+						<!-- <span class="error">* </span> -->
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
 						<input type="text" class="form-control widthinput" readonly 
 						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
@@ -305,11 +305,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								placeholder="Enter Customer Representative Email ID" value="{{ isset($workOrder) ? $workOrder->customer_representative_email : '' }}" autocomplete="customer_representative_email" autofocus>
 						</div>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
 							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
 							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					@if(isset($type) && $type == 'export_exw')
 					<div class="col-xxl-4 col-lg-6 col-md-6">
@@ -325,11 +327,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							name="freight_agent_email" 
 							placeholder="Enter Freight Agent Email ID" value="{{ isset($workOrder) ? $workOrder->freight_agent_email : '' }}" autocomplete="freight_agent_email" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
 						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
 							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
 							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
@@ -434,11 +438,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							name="transportation_company" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Transportation Company" value="{{ isset($workOrder) ? $workOrder->transportation_company : '' }}" autocomplete="transportation_company" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6" id="transporting-driver-contact-number-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="transporting-driver-contact-number-div">
+					<div class="dropdown-option-div">
 						<label for="transporting_driver_contact_number" class="col-form-label text-md-end">{{ __('Transporting Driver Contact Number') }}</label>
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
 							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
 							value="" autocomplete="transporting_driver_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
 						<label for="airway_details" class="col-form-label text-md-end">{{ __('Airway Details') }}</label>
@@ -2807,7 +2813,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonDescriptionCell = document.createElement('td');
 			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
@@ -2838,6 +2844,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				maximumSelectionLength: 1,
 				placeholder: "Choose Addon"
 			});
+				// Add validation rules for all dynamicselectaddon elements
+				$('.dynamicselectaddon').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+                        messages: {
+                            required: "This field is required."
+                        }
+                    });
+                });
+				$("#addon_quantity_"+dataId+"_"+addonIndex).rules('add', {
+					digits: true,
+					min: 1 // Ensure it's a positive integer
+				});
+				$("#addon_description_"+dataId+"_"+addonIndex).rules('add', {
+					noSpaces: true,
+				});
 			vehicleAddonDropdown(dataId);
 		});
 		function vehicleAddonDropdown(dataId) {
