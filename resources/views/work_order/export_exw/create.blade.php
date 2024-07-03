@@ -1770,6 +1770,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			return true;
 		}, "At least one vehicle must be selected if deposit is received as custom deposit");
 
+		$.validator.addMethod("allVinsSelected", function(value, element) {
+			// Get all selected VINs across all dynamicselect2 elements
+			let selectedVins = new Set();
+			$('.dynamicselect2').each(function() {
+				$(this).val().forEach(vin => selectedVins.add(vin));
+			});
+
+			// Check if each VIN in addedVins is in the selectedVins set
+			for (let vin of addedVins) {
+				if (!selectedVins.has(vin)) {
+					return false;
+				}
+			}
+
+			return true;
+		}, "All work order vehicles should be selected under one BOE per VIN field.");
 		// Custom method to ensure every element with the class `dynamicselect2` has a value
 		// $.validator.addMethod("allBOERequired", function(value, element) {
 		// 	let isValid = true;
@@ -2335,6 +2351,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 $('.dynamicselect2').each(function() {
                     $(this).rules('add', {
                         required: true,
+						allVinsSelected: true,
                         messages: {
                             required: "This field is required."
                         }
