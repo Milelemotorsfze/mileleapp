@@ -23,7 +23,7 @@ class StoreWorkOrderRequest extends FormRequest
     {
         return [
             'type' => 'required|string',
-            'date' => 'required|date',
+            // 'date' => 'required|date',
             'so_number' => 'required|string|regex:/^SO-\d{6}$/|not_in:SO-000000',
             // 'batch' =>'required',
             // 'wo_number' =>'required',

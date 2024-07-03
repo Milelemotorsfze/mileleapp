@@ -436,6 +436,7 @@ Route::get('/d', function () {
         Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
         Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
+        Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
     // Demand & Planning Module
 

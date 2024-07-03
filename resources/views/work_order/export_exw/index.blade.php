@@ -271,7 +271,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>{{$data->transportation_company_details ?? ''}}</td>
                             @endif
                             <td>{{$data->so_vehicle_quantity ?? ''}}</td>
-							<td>{{$data->currency ?? ''}}</td>
+							<td>
+								@if($data->so_total_amount != 0.00 || $data->amount_received != 0.00 || $data->balance_amount != 0.00)
+								{{$data->currency ?? ''}}
+								@endif
+							</td>
 							<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
 							<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
 							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
