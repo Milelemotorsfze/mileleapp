@@ -7,6 +7,8 @@ use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PriceChangeNotification;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -3020,15 +3022,11 @@ public function updatePrices(Request $request)
     $prices = $request->input('prices');
     $totalPrice = intval($request->input('total_price'));
     $purchasingOrderId = $request->input('purchasing_order_id');
-    $userId = auth()->id(); // Assuming you have user authentication and need the ID of the user making the request
-
-    // Fetch the purchasing order and its currency
+    $userId = auth()->id();
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderCurrency = $purchasingOrder->currency;
-    // Fetch the supplier account linked to this purchasing order
     $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
     $accountCurrency = $supplierAccount->currency;
-    // Currency conversion rates
     $conversionRates = [
         'USD' => 3.67,
         'EUR' => 3.94,
@@ -3037,13 +3035,14 @@ public function updatePrices(Request $request)
         'CAD' => 2.69
     ];
     $totalDifference = 0;
+    $priceChanges = [];
+    $totalAmountOfChanges = 0;
+    $totalVehiclesChanged = 0;
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
-        // Fetch the old price
         $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
         $oldPrice = $vehicleCost->unit_price;
-        // Calculate the price difference
         $priceDifference = $oldPrice - $newPrice;
         if ($priceDifference != 0) {
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -3089,49 +3088,50 @@ public function updatePrices(Request $request)
             $updatepriceinpaid = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Request For Payment')->orderBy('created_at', 'desc')->first();
             $updatePerformed = false;
             if ($updatepriceinpaid) {
-                // Check if priceDifference is positive or negative 
                 if ($priceDifference > 0) {
-                    $updatepriceinpaid->amount -= $priceDifference; // Add priceDifference
+                    $updatepriceinpaid->amount -= $priceDifference; 
                 } else {
-                    $updatepriceinpaid->amount += abs($priceDifference); // Subtract priceDifference
+                    $updatepriceinpaid->amount += abs($priceDifference);
                 }
                 $updatepriceinpaid->save();
                 $updatePerformed = true;
             }
             $vehicles = Vehicles::where('id', $vehicleId)->first();
-            // Skip account updates if payment status is blank or 'Payment Initiated Request'
             if ($vehicles && ($vehicles->payment_status == '' || $vehicles->payment_status == 'Payment Initiated Request')) {
                 continue;
             }
             if (!$updatePerformed) {
             $updatepriceinpaidint = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Initiated Payment')->orderBy('created_at', 'desc')->first();
             if ($updatepriceinpaidint) {
-                // Check if priceDifference is positive or negative 
                 if ($priceDifference > 0) {
-                    $updatepriceinpaidint->amount -= $priceDifference; // Add priceDifference
+                    $updatepriceinpaidint->amount -= $priceDifference;
                 } else {
-                    $updatepriceinpaidint->amount += abs($priceDifference); // Subtract priceDifference
+                    $updatepriceinpaidint->amount += abs($priceDifference);
                 }
                 $updatepriceinpaidint->save();
             }
          }
+         $vehicle = Vehicles::find($vehicleId);
+         $priceChanges[] = [
+             'vehicle_reference' => $vehicle->id,
+             'variant_name' => $vehicle->variant->name,
+             'old_price' => abs($oldPrice),
+             'new_price' => $newPrice,
+             'changed_by' => auth()->user()->name,
+         ];
+         $totalAmountOfChanges += $priceDifference;
+         $totalVehiclesChanged++;
         }
-        // Convert the price difference to supplier account currency if needed
         if ($orderCurrency !== $accountCurrency) {
             $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
         } else {
             $priceDifferenceInAccountCurrency = $priceDifference;
         }
-
-        // Accumulate the total difference
         $totalDifference += $priceDifferenceInAccountCurrency;
     }
-    // Update supplier account current balance if the total difference is not zero and not skipped
     if ($totalDifference != 0) {
         $supplierAccount->current_balance += $totalDifference;
         $supplierAccount->save();
-
-        // Record the transaction
         SupplierAccountTransaction::create([
             'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
             'purchasing_order_id' => $purchasingOrderId,
@@ -3141,8 +3141,10 @@ public function updatePrices(Request $request)
             'transaction_amount' => abs($totalDifference),
         ]);
     }
-    // Update the total price in the purchasing order
     $purchasingOrder->update(['totalcost' => $totalPrice]);
+    $ponumber = $purchasingOrder->po_number;
+    $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
+    Mail::to($recipients)->send(new PriceChangeNotification($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
     return response()->json(['message' => 'Prices updated successfully']);
 }
 private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
