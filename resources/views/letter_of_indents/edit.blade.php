@@ -889,9 +889,11 @@
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
             var value = e.params.data.text;
-            hideSFX(index, value);
+
+            hideSFX(index, value)
         });
-      
+       
+
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
@@ -932,7 +934,7 @@
             $('#inventory-quantity-'+index).val("");
 
         });
-        
+
         function showSignatureRemoveButton(value) {
             if(value == 'Trans Cars') {
                 $('.remove-signature-button').attr('hidden', false);
@@ -1070,7 +1072,7 @@
                 }
             });
         }
-        
+
         function appendSFX(index,unSelectedmodel,sfx){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1099,16 +1101,17 @@
             }
         }
         function hideSFX(index, value) {
-         
-            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-            for(let i=1; i<=totalIndex; i++)
-            {
-                if(i != index) {
-                    var currentId = 'sfx-' + i;
-                    $('#' + currentId + ' option[value=' + value + ']').detach();       
-                }
-            }
-        }
+        
+         var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         for(let i=1; i<=totalIndex; i++)
+         {
+             if(i != index) {
+                 var currentId = 'sfx-' + i;
+                 $('#' + currentId + ' option[value=' + value + ']').detach();       
+             }
+         }
+     }
+
         function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
