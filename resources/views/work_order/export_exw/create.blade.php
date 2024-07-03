@@ -1,6 +1,6 @@
 @extends('layouts.main')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
 <style>
 	.btn-style {
 		font-size:0.7rem!important;
@@ -223,9 +223,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
-							<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
-								placeholder="Enter SO Number" value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" 
-								autocomplete="so_number" autofocus onkeyup="setWo()" @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
+						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
+							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()"
+							@if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
@@ -277,9 +277,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
-						<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
+						<!-- <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
 							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
-							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)"> -->
+							<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]') is-invalid @enderror" 
+							name="customer_company_number[main]" placeholder="Enter Customer Contact Number" value="" autocomplete="customer_company_number[full]" autofocus 
+							onkeyup="sanitizeNumberInput(this)">
+
 					</div></div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
@@ -970,7 +974,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <script type="text/javascript">
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
@@ -1156,12 +1161,40 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
-			var customer_company_number = window.intlTelInput(document.querySelector("#customer_company_number"), {
+			var input = document.querySelector("#customer_company_number");
+			var iti = window.intlTelInput(input, {
 				separateDialCode: true,
-				preferredCountries:["ae"],
+				preferredCountries: ["ae"],
 				hiddenInput: "full",
 				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 			});
+			// Function to set customer relations
+			function setCustomerRelations(selectedCustomerName) {
+				$('#customer_address').val('');
+				$('#customer_email').val('');
+				$('#customer_company_number').val('');            
+				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+					for (var i = 0; i < customerCount; i++) {
+						if (customers[i].customer_name == selectedCustomerName[0]) { 
+							if (customers[i].customer_address != null) {
+								$('#customer_address').val(customers[i]?.customer_address);
+							}
+							if (customers[i].customer_email != null) {
+								$('#customer_email').val(customers[i]?.customer_email);
+							}
+							if (customers[i].customer_company_number != null) { 
+								var fullPhoneNumber = customers[i].customer_company_number.replace(/\s+/g, '');
+								console.log("Full Phone Number (no spaces):", fullPhoneNumber); // Debugging log
+
+								// Use intlTelInput instance to set the full phone number without spaces
+								iti.setNumber(fullPhoneNumber);
+								// Call sanitizeNumberInput on the current input
+								sanitizeNumberInput(input);
+							}
+						}
+					}
+				}
+			}
 			var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
 				separateDialCode: true,
 				preferredCountries:["ae"],
@@ -1250,7 +1283,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// TRANSPORT TYPE ONCHANGE END
 
 		// CUSTOMER NAME ONCHANGE START
-			$('#customer_name').on('change', function() { 
+			 // Handle customer name change
+			 $('#customer_name').on('change', function() { 
 				var selectedCustomerName = $(this).val(); 
 				setCustomerRelations(selectedCustomerName);
 			});
@@ -1730,23 +1764,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
 		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
-			if (selectedDepositReceivedValue === 'custom_deposit') {
+			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
 				return $('select[name="deposit_aganist_vehicle[]"]').val().length > 0;
 			}
 			return true;
 		}, "At least one vehicle must be selected if deposit is received as custom deposit");
 
-		// Custom method to check if at least one element with the class `dynamicselect2` has a value
-		$.validator.addMethod("atLeastOneBOE", function(value, element) {
-			let isValid = false;
-			$('.dynamicselect2').each(function() {
-				if ($(this).val()) {
-					isValid = true;
-					return false; // break out of the loop once a value is found
-				}
-			});
-			return isValid;
-		}, "At least one BOE must be selected");
+		// Custom method to ensure every element with the class `dynamicselect2` has a value
+		// $.validator.addMethod("allBOERequired", function(value, element) {
+		// 	let isValid = true;
+		// 	$('.dynamicselect2').each(function() {
+		// 		if (!$(this).val()) {
+		// 			isValid = false; // If any element doesn't have a value, set isValid to false
+		// 			return false; // break out of the loop once a value is found missing
+		// 		}
+		// 	});
+		// 	return isValid;
+		// }, "Every BOE must be selected");
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
@@ -1911,9 +1945,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 delivery_date: {
                     date: true,
                 },
-				dynamicselect2: {
-					atLeastOneBOE: true
-				},
+				// "boe[1][vin][]": {
+				// 	required:true,
+				// },
+				//  id="boe_vin_${index}" 
+				// dynamicselect2: {
+				// 	allBOERequired: true
+				// },
                 signed_pfi: {
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
@@ -2261,46 +2299,56 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// ADDON DYNAMICALLY ADD AND REMOVE END
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
-		function addChild() {
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+	function addChild() {
+        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-			// Check if there are any available options
-			if (getAvailableOptions().length > 0) {
-				if (index <= addedVins.length) {
-					var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
-					var newRow = $(`
-						<div class="row form_field_outer_row" id="${index}">
-							<div class="col-xxl-11 col-lg-11 col-md-11">
-								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-									${options}
-								</select>
-							</div>
-							<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-								<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-									<i class="fas fa-trash-alt"></i>
-								</a>
-							</div>
-						</div>
-					`);
+        // Check if there are any available options
+        if (getAvailableOptions().length > 0) {
+            if (index <= addedVins.length) {
+                var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+                var newRow = $(`
+                    <div class="row form_field_outer_row" id="${index}">
+                        <div class="col-xxl-11 col-lg-11 col-md-11">
+                            <label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+                            <select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+                                ${options}
+                            </select>
+                        </div>
+                        <div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                            <a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                `);
 
-					// Append the new row to the container
-					$(".form_field_outer").append(newRow);
+                // Append the new row to the container
+                $(".form_field_outer").append(newRow);
 
-					// Initialize Select2 only on the newly added element
-					$(`#boe_vin_${index}`).select2({
-						allowClear: true,
-						placeholder: "Choose VIN Per BOE",
-					});
+                // Initialize Select2 only on the newly added element
+                $(`#boe_vin_${index}`).select2({
+                    allowClear: true,
+                    placeholder: "Choose VIN Per BOE",
+                });
 
-					disableSelectedOptions();
-				} else {
-					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
-				}
-			} else {
-				alert("Sorry! No available options to select.");
-			}
-		}
+                // Add validation rules for all dynamicselect2 elements
+                $('.dynamicselect2').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+                        messages: {
+                            required: "This field is required."
+                        }
+                    });
+                });
+
+                disableSelectedOptions();
+            } else {
+                alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+            }
+        } else {
+            alert("Sorry! No available options to select.");
+        }
+    }
 		function getAvailableOptions() {
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
@@ -3008,27 +3056,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			}
         }
 
-        function setCustomerRelations(selectedCustomerName) {
-            $('#customer_address').val('');
-			$('#customer_email').val('');
-			$('#customer_company_number').val('');			
-            if (selectedCustomerName != null || selectedCustomerName.length > 0) {
-                for (var i = 0; i < customerCount; i++) {
-                    if (customers[i].customer_name == selectedCustomerName[0]) { 
-                        if (customers[i].customer_address != null) {
-                            $('#customer_address').val(customers[i]?.customer_address);
-                        }
-						if (customers[i].customer_email != null) {
-                            $('#customer_email').val(customers[i]?.customer_email);
-                        }
-						if (customers[i].customer_company_number != null) { 
-							console.log(customers[i].customer_company_number); // value is +91346723782
-							
-                        }
-                    }
-                }
-            }
-        }
+       
 		
 	// CUSTOMER DETAILS SECTION END
 
@@ -3093,6 +3121,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
         // Remove any non-numeric characters
         input.value = input.value.replace(/[^0-9]/g, '');
     }
+	
 	$('.delete-button').on('click',function() {
 		var fileType = $(this).attr('data-file-type');
 		if (confirm('Are you sure you want to Delete this item ?')) {
