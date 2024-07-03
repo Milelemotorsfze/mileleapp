@@ -445,7 +445,6 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
-    // Route::get('demand-planning/get-model-line', [DemandController::class,'getModelLine'])->name('demand.get-model-line');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
     Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
 
