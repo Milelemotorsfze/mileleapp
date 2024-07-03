@@ -150,6 +150,7 @@ class WorkOrderController extends Controller
             $input['so_total_amount'] = $request->so_total_amount ?? 0.00;
             $input['amount_received'] = $request->amount_received ?? 0.00;
             $input['balance_amount'] = $request->balance_amount ?? 0.00;
+            $input['date'] = Carbon::now()->format('Y-m-d');
 
             if ($request->customer_type == 'new') {
                 $input['customer_name'] = $request->new_customer_name;
@@ -427,30 +428,35 @@ class WorkOrderController extends Controller
 
             // Handle comments
             $comments = json_decode($request->input('comments'), true);
-            foreach ($comments as $comment) {
-                $newComment = WOComments::create([
-                    'work_order_id' => $workOrder->id,
-                    'text' => $comment['text'],
-                    'parent_id' => null, // Temporary null, will update later
-                    'user_id' => auth()->id(),
-                ]);
-                // Map the old comment ID to the new comment ID
-                $commentIdMap[$comment['commentId']] = $newComment->id;
-            }
-
-            // Update parent IDs
-            foreach ($comments as $comment) {
-                if (!empty($comment['parentId'])) {
-                    $newCommentId = $commentIdMap[$comment['commentId']];
-                    $newParentId = $commentIdMap[$comment['parentId']];
-                    WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
+            if(isset($comments) && $comments != null) {
+                foreach ($comments as $comment) {
+                    $newComment = WOComments::create([
+                        'work_order_id' => $workOrder->id,
+                        'text' => $comment['text'],
+                        'parent_id' => null, // Temporary null, will update later
+                        'user_id' => auth()->id(),
+                    ]);
+                    // Map the old comment ID to the new comment ID
+                    $commentIdMap[$comment['commentId']] = $newComment->id;
                 }
-            }    
+            }
+            
+            // Update parent IDs
+            if(isset($comments) && $comments != null) {
+                foreach ($comments as $comment) {
+                    if (!empty($comment['parentId'])) {
+                        $newCommentId = $commentIdMap[$comment['commentId']];
+                        $newParentId = $commentIdMap[$comment['parentId']];
+                        WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
+                    }
+                }  
+            }  
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
             DB::commit(); 
+            
             return response()->json(['success' => true, 'message' => 'Work order created successfully.']);
-        } catch (\Exception $e) {
+        } catch (\Exception $e) {  
             // Rollback the transaction
             DB::rollBack();
 
@@ -531,7 +537,7 @@ class WorkOrderController extends Controller
     public function edit(WorkOrder $workOrder)
     {
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles.addons')->first();
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles.addons','comments')->first();
         // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
@@ -632,6 +638,8 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
         try { 
             $authId = Auth::id();
+            // Initialize newData array
+            $newData = [];
             $newData = $request->all();
     
             // Extract full values for specific nested fields
@@ -718,9 +726,6 @@ class WorkOrderController extends Controller
 
             // Prepare old data for comparison
             $oldData = $workOrder->getOriginal();
-
-            // Initialize newData array
-            $newData = [];
 
             // Handle file uploads and history for various files
             $filesToHandle = [
@@ -1439,6 +1444,56 @@ class WorkOrderController extends Controller
             }
         }
     }
+    public function revertSalesApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->sales_support_data_confirmation_at != '' && $wo->sales_support_data_confirmation_by != '') {
+                    $wo->sales_support_data_confirmation_at = NULL;
+                    $wo->sales_support_data_confirmation_by = NULL;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_at',
+                        'old_value' => $wo->sales_support_data_confirmation_at,
+                        'new_value' => NULL,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_by',
+                        'old_value' => $wo->sales_support_data_confirmation_by,
+                        'new_value' => NULL,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->sales_support_data_confirmation_at == '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
     public function financeApproval(Request $request) {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
@@ -1504,6 +1559,9 @@ class WorkOrderController extends Controller
                 if($wo && $wo->coe_office_approved_at == '' && $wo->coe_office_approval_by == '') {
                     $wo->coe_office_approved_at = Carbon::now();
                     $wo->coe_office_approval_by = $authId;
+                    if(isset($request->comments) && $request->comments != '') {
+                        $wo->coe_office_direct_approval_comments = $request->comments;
+                    }
                     $wo->update();
                     WORecordHistory::create([
                         'work_order_id' => $wo->id,
@@ -1523,6 +1581,17 @@ class WorkOrderController extends Controller
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
+                    if(isset($request->comments) && $request->comments != '') {
+                        WORecordHistory::create([
+                            'work_order_id' => $wo->id,
+                            'user_id' => $authId,
+                            'field_name' => 'coe_office_direct_approval_comments',
+                            'old_value' => NULL,
+                            'new_value' => $request->comments,
+                            'type' => 'Set',
+                            'changed_at' => Carbon::now()
+                        ]);
+                    }
                     DB::commit();
                     return response()->json('success');
                 }

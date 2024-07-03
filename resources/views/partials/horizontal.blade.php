@@ -958,12 +958,17 @@
                                         <span data-key="t-extra-pages">Purchase Order</span>
                                     </a>
                                 </li>
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('pre-order');
+                                @endphp
+                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('preorder.index') }}" id="topnav-more" role="button">
                                         <i data-feather="award"></i>
                                         <span data-key="t-extra-pages">Pre Order</span>
                                     </a>
                                 </li>
+                                @endif
                                 @endif
                                 @endcan
                                 @can('variants-view')

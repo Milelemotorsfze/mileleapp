@@ -14,7 +14,8 @@
         <label class="col-form-label">User</label>
     </div>
     <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
+        <select name="user_id" id="user_id" class="form-control widthinput">
+        <!-- multiple="true" -->
             @foreach($users as $user)
             <option value="{{$user->id ?? ''}}">{{$user->name ?? ''}}</option>
             @endforeach

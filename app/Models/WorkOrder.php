@@ -78,6 +78,7 @@ class WorkOrder extends Model
 
         'coe_office_approval_by',
         'coe_office_approved_at',
+        'coe_office_direct_approval_comments',
 
         'created_by',
         'updated_by',

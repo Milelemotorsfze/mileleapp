@@ -102,6 +102,48 @@ class MovementController extends Controller
      */
     public function create()
     {
+        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
+        $movementsReferenceId = MovementsReference::max('id') + 1;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        if($hasPermission)
+        {
+            $vehicles = Vehicles::whereNotNull('vin')
+            ->where('status', '!=', 'cancel')
+            ->where('vin', '!=', '')
+            ->whereNull('grn_id')
+            ->where(function ($query) {
+                $query->where('latest_location', '!=', '2')
+                      ->orWhereNull('latest_location');
+            })
+            ->where('payment_status', '=', 'Incoming Stock')
+            ->pluck('vin');
+    $purchasing_order = PurchasingOrder::where('status', 'Approved')
+            ->whereHas('vehicles', function ($query) {
+            $query->whereNull('grn_id')
+            ->whereNotNull('vin')
+            ->where('status', 'Incoming Stock');
+            })
+    ->get();
+    $po = PurchasingOrder::where('status', 'Approved')
+    ->whereDoesntHave('vehicles', function ($query) {
+        $query->whereNull('grn_id')
+        ->where('status', 'Incoming Stock');
+    })
+    ->pluck('po_number');
+    $so_number = So::whereDoesntHave('vehicles', function ($query) {
+        $query->whereNull('grn_id')
+        ->whereNotNull('vin')
+                ->where('status', 'Incoming Stock');
+    })
+    ->pluck('so_number');
+    $so = So::whereHas('vehicles', function ($query) {
+        $query->whereNull('grn_id')
+              ->where('status', 'Incoming Stock');
+    })
+    ->get();     
+        }
+        else
+        {
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->where('vin', '!=', '')
@@ -111,12 +153,11 @@ class MovementController extends Controller
                   ->orWhereNull('latest_location');
         })
         ->where('payment_status', '=', 'Incoming Stock')
-        ->pluck('vin');       
-    $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
-    $movementsReferenceId = MovementsReference::max('id') + 1;
-    $purchasing_order = PurchasingOrder::where('status', 'Approved')
+        ->pluck('vin'); 
+        $purchasing_order = PurchasingOrder::where('status', 'Approved')
     ->whereHas('vehicles', function ($query) {
         $query->whereNull('gdn_id')
+        ->whereNotNull('vin')
               ->where('status', 'Incoming Stock');
     })
     ->get();
@@ -128,6 +169,7 @@ class MovementController extends Controller
     ->pluck('po_number');
     $so_number = So::whereDoesntHave('vehicles', function ($query) {
         $query->whereNotNull('gdn_id')
+        ->whereNotNull('vin')
                 ->where('status', 'Incoming Stock');
     })
     ->pluck('so_number');
@@ -136,6 +178,7 @@ class MovementController extends Controller
               ->where('status', 'Incoming Stock');
     })
     ->get();
+        }      
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
     $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
     return view('movement.create', [
@@ -443,12 +486,25 @@ public function grnfilepost(Request $request)
     public function getVehiclesDataformovement(Request $request)
     {
         $selectedPOId = $request->input('po_id');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        if($hasPermission)
+        {
+            $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
+            ->whereNotNull('vin')
+            ->where('status', '!=', 'cancel')
+            ->whereNull('grn_id')
+            ->where('payment_status', '=', 'Incoming Stock')
+            ->pluck('id');
+        }
+        else
+        {
         $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             ->where('payment_status', '=', 'Incoming Stock')
             ->pluck('id');
+        }
         info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
