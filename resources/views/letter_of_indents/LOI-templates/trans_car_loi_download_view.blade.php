@@ -149,7 +149,7 @@
         <div class="page_break"></div>
         <div class="row">
             @foreach($imageFiles as $imageFile)
-            <img src="{{ public_path($imageFile) }}">
+            <img src="{{ public_path($imageFile) }}" class="mt-2">
             @endforeach
         </div>
     @endif
