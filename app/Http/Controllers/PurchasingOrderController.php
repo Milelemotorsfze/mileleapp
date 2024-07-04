@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Carbon\CarbonTimeZone;
 use App\Models\UserActivities;
+use App\Models\BankAccounts;
 use App\Models\Purchasinglog;
 use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\VendorPaymentAdjustments;
@@ -55,6 +56,28 @@ class PurchasingOrderController extends Controller
      */
     public function index()
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $useractivities =  New UserActivities();
         $useractivities->activity = "Purchasing Order Index Page View";
         $useractivities->users_id = Auth::id();
@@ -130,7 +153,7 @@ class PurchasingOrderController extends Controller
             ->get();
         }
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filter($status)
     {

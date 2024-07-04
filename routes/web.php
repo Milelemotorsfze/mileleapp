@@ -109,8 +109,8 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
+use App\Http\Controllers\BankAccountsController;
 use App\Http\Controllers\LOIExpiryConditionController;
-
 /*
 /*
 |--------------------------------------------------------------------------
@@ -898,6 +898,10 @@ Route::get('/d', function () {
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
 
+    //Bank Accounts
+    Route::resource('bankaccounts', BankAccountsController::class);
+    Route::post('/bankaccounts/update_balance', [BankAccountsController::class, 'updateBalance'])->name('bankaccounts.update_balance');
+    Route::get('/bankaccount/{id}', [BankAccountsController::class, 'show'])->name('bankaccount.show');
 
 
     // Migration Data check Route
