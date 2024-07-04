@@ -63,7 +63,7 @@ class LetterOfIndentController extends Controller
                 ->sum('quantity');
         }
         $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
+            ->orderBy('updated_at','DESC')
             ->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,
              LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
             ->cursor();
@@ -221,6 +221,7 @@ class LetterOfIndentController extends Controller
                     $LOITemplate->save();
                 }
             }
+            
 
             DB::commit();
 

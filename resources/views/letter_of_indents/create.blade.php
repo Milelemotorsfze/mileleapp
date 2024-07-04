@@ -891,15 +891,6 @@
             // getModelYear(index);
             // getModelLine(index);
         });
-        
-
-            let value = e.params.data.text;
-            hideSFX(index,value);
-
-            // getModelYear(index);
-            // getModelLine(index);
-        });
-
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
