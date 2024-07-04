@@ -1,6 +1,6 @@
 @extends('layouts.main')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
 	.btn-style {
 		font-size:0.7rem!important;
@@ -277,13 +277,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
-						<!-- <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
-							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
-							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)"> -->
 							<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]') is-invalid @enderror" 
 							name="customer_company_number[main]" placeholder="Enter Customer Contact Number" value="" autocomplete="customer_company_number[full]" autofocus 
 							onkeyup="sanitizeNumberInput(this)">
-
+							<input type="hidden" id="customer_company_number_full" name="customer_company_number[full]" value="{{ isset($workOrder) ? $workOrder->customer_company_number : '' }}">
 					</div></div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
@@ -311,6 +308,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
 							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
 							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="customer_representative_contact_full" name="customer_representative_contact[full]" value="{{ isset($workOrder) ? $workOrder->customer_representative_contact : '' }}">
 					</div>
 					</div>
 					@if(isset($type) && $type == 'export_exw')
@@ -333,6 +331,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
 							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
 							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
 					</div>
 					</div>
 					@endif
@@ -444,6 +443,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
 							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
 							value="" autocomplete="transporting_driver_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="transporting_driver_contact_number_full" name="transporting_driver_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->transporting_driver_contact_number : '' }}">
 					</div>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
@@ -980,8 +980,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script> -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <script type="text/javascript">
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
@@ -1004,7 +1002,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     @else
         var workOrder = null;
     @endif
+
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
+	var input = document.querySelector("#customer_company_number");
+	var iti = window.intlTelInput(input, {
+		separateDialCode: true,
+		preferredCountries: ["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
+	var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
+		separateDialCode: true,
+		preferredCountries:["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
+	if(type == 'export_exw') {
+		var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
+			separateDialCode: true,
+			preferredCountries:["ae"],
+			hiddenInput: "full",
+			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+		});
+	}
+	var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});	
 	$(document).ready(function () { 
 		// SELECT 2 START
 			$('#customer_name').select2({
@@ -1052,7 +1078,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-				$('#customer_company_number').val(workOrder.customer_company_number);
+
+				var fullPhoneNumber = workOrder.customer_company_number.replace(/\s+/g, '');
+				iti.setNumber(fullPhoneNumber);
+				sanitizeNumberInput(input);
+
+				var customer_representative_contactFull = workOrder.customer_representative_contact.replace(/\s+/g, '');
+				customer_representative_contact.setNumber(customer_representative_contactFull);
+				sanitizeNumberInput(input);
+
+				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number.replace(/\s+/g, '');
+				freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+				sanitizeNumberInput(input);
+
 				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
 				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
 				if(workOrder.transport_type == 'air') {
@@ -1063,7 +1101,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 				else if(workOrder.transport_type == 'road') {
 					roadRelation();
-					$('#transporting_driver_contact_number').val(workOrder.transporting_driver_contact_number);					
+					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number.replace(/\s+/g, '');
+					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
+					sanitizeNumberInput(input);				
 				}
 			}
 			
@@ -1167,13 +1207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
-			var input = document.querySelector("#customer_company_number");
-			var iti = window.intlTelInput(input, {
-				separateDialCode: true,
-				preferredCountries: ["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
+			
 			// Function to set customer relations
 			function setCustomerRelations(selectedCustomerName) {
 				$('#customer_address').val('');
@@ -1201,20 +1235,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					}
 				}
 			}
-			var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
-			if(type == 'export_exw') {
-				var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});
-			}
+			
 		// INTEL INPUT END
 
 		// TRANSPORT TYPE ONCHANGE START
@@ -1276,13 +1297,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#container-number-div").hide();
 				$("#trailer-number-plate-div").show();
 				$("#transportation-company-div").show();
-				$("#transporting-driver-contact-number-div").show();				
-				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});	
+				$("#transporting-driver-contact-number-div").show();
 				$("#airway-details-div").hide();
 				$("#transportation-company-details-div").show();
 			}
@@ -1792,17 +1807,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			return true;
 		}, "All work order vehicles should be selected under one BOE per VIN field.");
-		// Custom method to ensure every element with the class `dynamicselect2` has a value
-		// $.validator.addMethod("allBOERequired", function(value, element) {
-		// 	let isValid = true;
-		// 	$('.dynamicselect2').each(function() {
-		// 		if (!$(this).val()) {
-		// 			isValid = false; // If any element doesn't have a value, set isValid to false
-		// 			return false; // break out of the loop once a value is found missing
-		// 		}
-		// 	});
-		// 	return isValid;
-		// }, "Every BOE must be selected");
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
@@ -1829,63 +1833,51 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
                 // },
                 new_customer_name: {
-                    // required: true,
                     noSpaces: true,
                 },
                 // existing_customer_name: {
 
                 // }
                 customer_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "customer_company_number[main]": {
-                    // validContactNumber: true,
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 customer_address: {
-                    // required: true,
 					noSpaces: true,
                     validAddress: true,
                     maxlength: 255
                 },
                 customer_representative_name: {
-                    // required: true,
                     noSpaces: true,
                 },
                 customer_representative_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "customer_representative_contact[main]": {
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 freight_agent_name: {
-                    // required: true,
                     noSpaces: true,
                 },
                 freight_agent_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "freight_agent_contact_number[main]": {
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 port_of_loading: {
                     required: true,
-                    // noSpaces: true,
                 },
                 port_of_discharge: {
                     required: true,
@@ -1898,16 +1890,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 // transport_type: {
                 // },
                 brn_file: {
-                    // required: true,
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
                 brn: {
-                    // required: true,
                     noSpaces: true,
                 },
                 container_number: {
-                    // required: true,
                     noSpaces: true,
                 },
                 // airline_reference_id: {
@@ -1945,11 +1934,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 so_total_amount: {
 					noSpaces: true,
 					number: true,
-					min: 0 // Ensures the price is a non-negative number
+					min: 0
                 },
                 so_vehicle_quantity: {
 					digits: true,
-					min: 1 // Ensure it's a positive integer
+					min: 1 
                 },
 				"deposit_aganist_vehicle[]": {
 					customDepositVehicleRequired: true
@@ -1967,13 +1956,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 delivery_date: {
                     date: true,
                 },
-				// "boe[1][vin][]": {
-				// 	required:true,
-				// },
-				//  id="boe_vin_${index}" 
-				// dynamicselect2: {
-				// 	allBOERequired: true
-				// },
                 signed_pfi: {
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
@@ -2130,7 +2112,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						comments.push({ commentId, parentId, text });
 					});
 				}
-
+				$('#customer_company_number_full').val(iti.getNumber());
+                $('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
+                $('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
+                $('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
+          
 				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));

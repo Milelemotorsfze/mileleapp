@@ -698,7 +698,7 @@ class WorkOrderController extends Controller
                 $oldValue = $oldData[$fileKey] ?? NULL;
                 $newValue = $newData[$fileKey] ?? NULL;
 
-                if ($oldValue != $newValue) {
+                if ($oldValue != $newValue && $newValue != NULL) {
                     if ($oldValue != NULL && $newValue != NULL) {
                         $type = 'Change';
                         $newFilePath = 'wo/' . $fileKey . '/' . $newValue;
