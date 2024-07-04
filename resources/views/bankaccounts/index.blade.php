@@ -9,8 +9,11 @@
   <a class="btn btn-sm btn-secondary me-2" href="#" style="text-align: right;">
      Total Current Balance is {{ number_format($totalBalanceAED, 0, '', ',') }} AED
   </a>
-  <a class="btn btn-sm btn-success" href="#" style="text-align: right;">
+  <a class="btn btn-sm btn-info" href="#" style="text-align: right;">
      Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED
+  </a>
+  <a class="btn btn-sm btn-success" href="#" style="text-align: right;">
+  <i class="fa fa-plus" aria-hidden="true"></i> Create Bank Account
   </a>
 </div>
     <br>

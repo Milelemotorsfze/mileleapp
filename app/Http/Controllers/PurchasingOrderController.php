@@ -157,16 +157,82 @@ class PurchasingOrderController extends Controller
     }
     public function filter($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filtercancel($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterapprovedonly($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -196,10 +262,32 @@ class PurchasingOrderController extends Controller
         ->groupBy('purchasing_order.id')
         ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterapproved($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -248,10 +336,32 @@ class PurchasingOrderController extends Controller
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterincomings($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -283,10 +393,32 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-    return view('warehouse.index', compact('data'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
     public function filterpayment($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -308,10 +440,32 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpaymentrejectioned($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -333,10 +487,32 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpaymentrel($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -362,10 +538,32 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterintentreq($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -391,10 +589,32 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingrelease($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -420,10 +640,32 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingdebits($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -446,10 +688,32 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingfellow($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -482,10 +746,32 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-    return view('warehouse.index', compact('data'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function filterconfirmation($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -518,10 +804,32 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function paymentinitiation($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -554,7 +862,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
     /**
      * Show the form for creating a new resource.
@@ -2834,6 +3142,28 @@ public function allpaymentreqssfinpay(Request $request)
 }       
         public function pendingvins($status)
 {
+    $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -2864,7 +3194,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function rerequestpayment(Request $request)
 {
