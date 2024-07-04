@@ -347,14 +347,15 @@ class PFIController extends Controller
             $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
 
             // change the status to previous while deleting PO
-            if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
-                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-            }else{
-                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-            }
-            $letterOfIndent->save();
+            // if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
+            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+            // }else{
+            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+            // }
+            // $letterOfIndent->save();
         }
         $pfi->delete();
+        (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');
 
         DB::commit();
 
@@ -412,10 +413,21 @@ class PFIController extends Controller
 
     }
     public function paymentStatusUpdate(Request $request, $id) {
-        info($id);
+
+        (new UserActivityController)->createActivity('PFI payment status updated.');
+
         $pfi = PFI::find($id);
         $pfi->payment_status = $request->payment_status;
         $pfi->save();
         return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
+    }
+    public function relaesedAmountUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('PFI released amount updated.');
+
+        $pfi = PFI::find($id);
+        $pfi->released_amount = $request->released_amount;
+        $pfi->released_date = $request->released_date;
+        $pfi->save();
+        return redirect()->back()->with('success', 'Payment released amount Successfully.');
     }
 }

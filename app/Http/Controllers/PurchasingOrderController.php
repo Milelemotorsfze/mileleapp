@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\LetterOfIndentItem;
+use App\Models\LetterOfIndent;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
@@ -2236,9 +2237,15 @@ public function paymentreleasesconfirm($id)
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
                     if(in_array($item->master_model_id, $possibleIds)) {
-                        if($item->utilized_quantity < $item->approved_quantity) {
+                        if($item->utilized_quantity < $item->total_loi_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
+                            // get the total utilized qty and update against LOI
+                            // $LOI = LetterOfIndent::find($item->letter_of_indent_id);
+                            // $utilized_quantity =  LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
+                            //                         ->sum('utilized_quantity');
+                            // $LOI->utilized_quantity  = $utilized_quantity;
+                            // $LOI->save();
                             break;
                         }
                     }
@@ -2521,9 +2528,17 @@ public function purchasingallupdateStatusrel(Request $request)
                     if(in_array($item->master_model_id, $possibleIds)) {
                         info("master model id including li item");
                         if($item->utilized_quantity < $item->approved_quantity) {
-                            info("approved_quantity < utilized_quantity");
+                            info("total quantity < utilized_quantity");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
+
+                              // get the total utilized qty and update against LOI
+                            // $LOI = LetterOfIndent::find($item->letter_of_indent_id);
+                            // $utilized_quantity =  LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
+                            //                         ->sum('utilized_quantity');
+                            // $LOI->utilized_quantity  = $utilized_quantity;
+                            // $LOI->save();
+                           
                             break;
                         }
                     }

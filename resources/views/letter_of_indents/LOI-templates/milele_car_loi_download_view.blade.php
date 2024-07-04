@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
     <style>
         @page { size: A4; }
         .content{
@@ -21,7 +22,6 @@
         }
         .overlay-image {
             position: absolute;
-            {{--top: {{ $height }}px;--}}
             left: {{ $width }}px;
             /*bottom: 50px;*/
             z-index: 1;
@@ -53,8 +53,8 @@
             padding-left: 10px;
         }.
          #fullpage{height: 0;}
+         .page_break { page-break-before: always; }
     </style>
-
 </head>
 <body>
 <div class="row" id="fullpage">
@@ -205,6 +205,14 @@
     <p style="font-weight: bold">THANK YOU FOR YOUR BUSINESS</p>
 </div>
 </div>
+@if(!empty($imageFiles))
+        <div class="page_break"></div>
+        <div class="row">
+            @foreach($imageFiles as $imageFile)
+            <img src="{{ public_path($imageFile) }}" class="mt-2">
+            @endforeach
+        </div>
+    @endif
 
 </body>
 </html>

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class LetterOfIndent extends Model
 {
@@ -27,8 +28,9 @@ class LetterOfIndent extends Model
 
     protected $appends = [
         'total_loi_quantity',
-        'total_approved_quantity',
-        'is_pfi_pending_for_loi'
+        // 'total_approved_quantity',
+        'is_pfi_pending_for_loi',
+        'is_loi_expired'
     ];
 
     public function customer()
@@ -61,16 +63,17 @@ class LetterOfIndent extends Model
         if(!$letterOfIndentItemQty) {
             return 0;
         }
+    
         return $letterOfIndentItemQty;
     }
-    public function getTotalApprovedQuantityAttribute() {
-        $letterOfIndentItemApprovedQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
-            ->sum('approved_quantity');
-        if(!$letterOfIndentItemApprovedQty) {
-            return 0;
-        }
-        return $letterOfIndentItemApprovedQty;
-    }
+    // public function getTotalApprovedQuantityAttribute() {
+    //     $letterOfIndentItemApprovedQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
+    //         ->sum('approved_quantity');
+    //     if(!$letterOfIndentItemApprovedQty) {
+    //         return 0;
+    //     }
+    //     return $letterOfIndentItemApprovedQty;
+    // }
     public function getIsPfiPendingForLoiAttribute() {
         $approvedloiItem = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $this->id);
 
@@ -81,5 +84,23 @@ class LetterOfIndent extends Model
             }
         }
          return false;
+    }
+    public function getIsLoiExpiredAttribute() {
+        $LOI = LetterOfIndent::find($this->id);
+       
+        $LOItype = $LOI->customer->type;
+        $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
+        if($LOIExpiryCondition) {
+            $loiYear = Carbon::parse($LOI->date)->format('Y');
+          
+            $expiryYear = Carbon::now()->addYears(2);
+        
+            if($loiYear > $expiryYear) {
+                $LOI->is_expired = true;
+                $LOI->save();
+                return true;
+            }
+        }
+        return $LOI->is_expired;
     }
 }

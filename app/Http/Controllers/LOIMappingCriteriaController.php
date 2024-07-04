@@ -142,6 +142,7 @@ class LOIMappingCriteriaController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted LOI Mapping Criteria.');
 
         $loiMappingCriteria = LOIMappingCriteria::find($id);
         $loiMappingCriteria->delete();

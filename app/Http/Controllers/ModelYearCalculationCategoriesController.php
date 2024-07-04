@@ -14,7 +14,9 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function index(Builder $builder)
     {
-       $modelYearCategories = ModelYearCalculationCategory::all();
+        (new UserActivityController)->createActivity('Open the listing of model year calculation categories.');
+
+        $modelYearCategories = ModelYearCalculationCategory::all();
         return view('model-year-settings.categories.index', compact('modelYearCategories'));
 
     }
@@ -24,8 +26,9 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function create()
     {
-        $modelYearCalculationRules = ModelYearCalculationRule::all();
+        (new UserActivityController)->createActivity('Open the create page of model year calculation category.');
 
+        $modelYearCalculationRules = ModelYearCalculationRule::all();
         return view('model-year-settings.categories.create', compact('modelYearCalculationRules'));
     }
 
@@ -43,6 +46,7 @@ class ModelYearCalculationCategoriesController extends Controller
         $modelYearCalculationCategory->name = $request->name;
         $modelYearCalculationCategory->model_year_rule_id = $request->model_year_rule_id;
         $modelYearCalculationCategory->save();
+        (new UserActivityController)->createActivity('Created new model year calculation category.');
 
         return redirect()->route('model-year-calculation-categories.index')->with('success', "Model Year Calculation Category created successfully.");
     }
@@ -60,6 +64,8 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the create page of model year calculation category.');
+
         $modelYearCalculationCategory = ModelYearCalculationCategory::findOrFail($id);
         $modelYearCalculationRules = ModelYearCalculationRule::all();
 
@@ -81,6 +87,7 @@ class ModelYearCalculationCategoriesController extends Controller
         $modelYearCalculationCategory->name = $request->name;
         $modelYearCalculationCategory->model_year_rule_id = $request->model_year_rule_id;
         $modelYearCalculationCategory->save();
+        (new UserActivityController)->createActivity('Updated new model year calculation category.');
 
         return redirect()->route('model-year-calculation-categories.index')->with('success', "Model Year Calculation Category updated successfully.");
     }
@@ -90,6 +97,8 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted model year calculation category.');
+        
         $modelYearCalculationCategory = ModelYearCalculationCategory::findOrFail($id);
         $modelYearCalculationCategory->delete();
 
