@@ -13,7 +13,7 @@
             height:32px!important;
         }
         .error {
-            color: #FF0000;
+            color: #fd625e;
         }
 
     </style>
@@ -107,7 +107,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                                <select class="form-control widthinput" name="category" id="choices-single-default">
+                                <select class="form-control widthinput" name="category" id="loi-category">
                                     <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
                                         {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
                                     </option>
@@ -175,7 +175,7 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
-                                    autofocus accept="application/pdf">
+                                    autofocus>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -203,10 +203,10 @@
                                 <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-1">
                                     <div class="row mt-2">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                                            <input id="so_number_1" type="text" class="form-control widthinput so_number" name="so_number[1]"
-                                                placeholder="SO Number" value="{{ old('so_number') }}"
-                                                autocomplete="so_number" >
-                                            <span id="soNumberError_1" class="invalid-feedback soNumberError"></span>
+                                            <input id="so_number_1" type="text" class="form-control widthinput so_number"
+                                                oninput=uniqueCheckSoNumber()  name="so_number[1]"
+                                                placeholder="SO Number" value="{{ old('so_number') }}" >
+                                            <span id="soNumberError_1" class="error is-invalid soNumberError"></span>
                                         </div>
 
                                         <div class="col-lg-1 col-md-6 col-sm-12">
@@ -234,7 +234,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                    <div class="alert m-2" role="alert" hidden id="country-comment-div">
                         <span id="country-comment"></span>
                     </div>
                     <div class="row">
@@ -271,11 +271,13 @@
                                             @enderror
                                         </div>
                                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                            <label class="form-label">Model Year</label>
-                                            <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
+                                            <label class="form-label">Model Line</label>
+                                            <!-- <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
                                                 <option value="">Select Model Year</option>
-                                            </select>
-                                            @error('model_year')
+                                            </select> -->
+                                            <input type="text" readonly placeholder="Model Line"
+                                            class="form-control widthinput text-dark model-lines"  data-index="1" id="model-line-1">
+                                            @error('model_line')
                                             <div role="alert">
                                                 <strong>{{ $message }}</strong>
                                             </div>
@@ -324,9 +326,10 @@
 
     <script type="text/javascript">
         let formValid = true;
+        let previousSelected = $('#customer-type').val();
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
-        // const previewImage = document.querySelector("#image-preview");
+      
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
             while (previewFile.firstChild) {
@@ -335,12 +338,19 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                if (file.type.match("application/pdf"))
+                // if (file.type.match("application/pdf"))
+                // {
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const iframe = document.createElement("iframe");
+                //     iframe.src = objectUrl;
+                //     previewFile.appendChild(iframe);
+                // }else
+                 if (file.type.match("image/*"))
                 {
                     const objectUrl = URL.createObjectURL(file);
-                    const iframe = document.createElement("iframe");
-                    iframe.src = objectUrl;
-                    previewFile.appendChild(iframe);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile.appendChild(image);
                 }
             }
         });
@@ -362,11 +372,13 @@
             signaturePreviewFile.appendChild(iframe);
 
         });
-        getCustomers();
 
         $("#form-create").validate({
             ignore: [],
             rules: {
+                country: {
+                    required: true,
+                },
                 customer_id: {
                     required: true,
                 },
@@ -396,9 +408,9 @@
                 },
                 "files[]": {
                     required:true,
-                    extension: "pdf"
+                    extension: "png|jpeg|jpg"
                 },
-                template_type:{
+                "template_type[]":{
                     required:true
                 },
                 loi_signature: {
@@ -406,16 +418,18 @@
                         return $("#dealer").val() == 'Milele Motors'
                     },
                     extension: "png|jpeg|jpg|svg"
+                }
+            },
+                
+            messages: {
+                file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
                 },
-                messages: {
-                    file: {
-                        extension: "Please upload pdf file"
-                    },
-                    loi_signature:{
-                        extension: "Please upload Image file format (png,jpeg,jpg,svg)"
-                    }
-                },
-            }
+                loi_signature:{
+                    extension: "Please upload Image file format (png,jpeg,jpg,svg)"
+                }
+            },
+            
         });
 
         $.validator.prototype.checkForm = function (){
@@ -432,9 +446,10 @@
             }
             return this.valid();
         };
-
+       
         $('#submit-button').click(function (e) {
             e.preventDefault();
+            uniqueCheckSoNumber();
             if (formValid == true) {
                 if($("#form-create").valid()) {
                     $('#form-create').unbind('submit').submit();
@@ -442,6 +457,13 @@
             }else{
                 e.preventDefault();
             }
+        });
+        
+        $('#loi-category').select2({
+            placeholder : 'Select LOI Category',
+            allowClear: true,
+        }).on('change', function() {
+            $('#loi-category-error').remove();
         });
         $('#template-type').select2({
             placeholder : 'Select Template Type',
@@ -460,12 +482,16 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             $('#customer-error').remove();
+            checkCountryCriterias();
         });
         $('#customer-type').select2({
             placeholder : 'Select Customer Type',
             allowClear: true,
             maximumSelectionLength: 1
+        }).on('change', function() {
+            $('#customer-type-error').remove();
         });
+       
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
@@ -473,11 +499,15 @@
         }).on('change', function() {
             getCustomers();
             checkCountryCriterias();
+            $('#country-error').remove();
         });
 
+        $('#date').change(function (){
+            checkCountryCriterias();
+        });
         $('#customer-type').change(function (){
             getCustomers();
-            checkCountryCriterias();
+           
             let customerType = $('#customer-type').val();
             $('#template-type').val('').trigger('change');
             if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
@@ -488,6 +518,7 @@
                 $('#template-type option[value=individual]').prop('disabled',false);
                 $('#template-type option[value=business]').prop('disabled',false);
             }
+            checkCountryCriterias();
         });
         $('#model-1').select2({
             placeholder: 'Select Model',
@@ -503,13 +534,13 @@
         }).on('change', function() {
             $(this).valid();
         });
-        $('#model-year-1').select2({
-            placeholder : 'Select Model Year',
-            allowClear: true,
-            maximumSelectionLength: 1
-        }).on('change', function() {
-            $(this).valid();
-        });
+        // $('#model-year-1').select2({
+        //     placeholder : 'Select Model Year',
+        //     allowClear: true,
+        //     maximumSelectionLength: 1
+        // }).on('change', function() {
+        //     $(this).valid();
+        // });
 
         $('#dealer').change(function () {
             var value = $('#dealer').val();
@@ -526,18 +557,14 @@
             }
         });
 
-        $('#customer-type').change(function () {
-            checkCountryCriterias();
-        });
-
         $(document.body).on('input', ".quantities", function (e) {
             checkCountryCriterias();
         });
 
         function checkCountryCriterias() {
-
             let url = '{{ route('loi-country-criteria.check') }}';
-            var country = $('#country').val();
+            var customer = $('#customer').val();
+            var date = $('#date').val();
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
             $(".quantities ").each(function(){
@@ -545,15 +572,15 @@
                     total_quantities += parseInt($(this).val());
                 }
             });
-
-            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
                 $.ajax({
                     type: "GET",
                     url: url,
                     dataType: "json",
                     data: {
-                        country_id: country,
-                        customer_type: customer_type,
+                        loi_date:date,
+                        customer_id: customer[0],
+                        customer_type: customer_type[0],
                         total_quantities:total_quantities
                     },
                     success:function (data) {
@@ -566,48 +593,54 @@
                             $('#country-comment-div').attr('hidden', true);
                         }
                         formValid = true;
+                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
+
                         if(data.customer_type_error) {
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
                             $('#customer-type-error').attr('hidden', false);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }
                         else{
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
                             formValid = false;
-                            // $('#quantity-error-div').attr('hidden', false);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                        } else {
-                            // formValid = true;
-                            // $('#quantity-error-div').attr('hidden', true);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
+
+                        } else { 
                             $('#max-individual-quantity-error').html('');
                         }
                         if(data.min_qty_per_company_error) {
-                            formValid = false;
+                            formValid = false;                          
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+
                             $('#min-company-quantity-error').html('');
+                            console.log("min company qty error not found");
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
+                          
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
-                            formValid = false;
+                            formValid = false;                           
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
+                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
-                            // formValid = true;
                             $('#company-only-allowed-error').html('');
                         }
                     }
                 });
             }
         }
+       
         function getCustomers() {
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
@@ -724,11 +757,10 @@
                         @enderror
                         </div>
                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                <select class="form-select widthinput text-dark model-years" multiple  name="model_year[]" data-index="${index}" id="model-year-${index}">
-                                <option value="">Select Model Year</option>
-                            </select>
-                            @error('model_year')
-                        <div role="alert">
+                             <input type="text" readonly placeholder="Model Line" class="form-control widthinput text-dark model-lines"  
+                             data-index="${index}" id="model-line-${index}">
+                            @error('model_line')
+                            <div role="alert">
                             <strong>{{ $message }}</strong>
                             </div>
                             @enderror
@@ -762,11 +794,11 @@
                             allowClear: true,
                             maximumSelectionLength: 1
                         });
-                        $('#model-year-' + index).select2({
-                            placeholder: 'Select Model Year',
-                            allowClear: true,
-                            maximumSelectionLength: 1
-                        });
+                        // $('#model-year-' + index).select2({
+                        //     placeholder: 'Select Model Year',
+                        //     allowClear: true,
+                        //     maximumSelectionLength: 1
+                        // });
 
                     let type = 'add-new';
                     getModels(index,type);
@@ -777,12 +809,16 @@
             if(rowCount > 1) {
 
                 var indexNumber = $(this).attr('data-index');
-                var modelYear = $('#model-year-'+indexNumber).val();
+                // var modelYear = $('#model-year-'+indexNumber).val();
+                var modelLine = $('#model-line-'+indexNumber).val()
                 var model = $('#model-'+indexNumber).val();
                 var sfx = $('#sfx-'+indexNumber).val();
-                if(modelYear[0]) {
-                    appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
-                }
+                // if(modelYear[0]) {
+                //     appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
+                // }
+                // if(modelLine) {
+                //     appendModelLine(indexNumber, model[0],sfx[0],modelLine);
+                // }
                 if(model[0]) {
                     appendModel(indexNumber,model[0]);
                 }
@@ -801,8 +837,8 @@
                     $(this).find('.sfx').attr('id', 'sfx-'+index);
                     $(this).find('.loi-descriptions').attr('data-index', index);
                     $(this).find('.loi-descriptions').attr('id', 'loi-description-'+index);
-                    $(this).find('.model-years').attr('data-index', index);
-                    $(this).find('.model-years').attr('id', 'model-year-'+index);
+                    $(this).find('.model-lines').attr('data-index', index);
+                    $(this).find('.model-lines').attr('id', 'model-line-'+index);
                     $(this).find('.quantities').attr('data-index', index);
                     $(this).find('.quantities').attr('id', 'quantity-'+index);
                     $(this).find('.inventory-qty').attr('data-index', index);
@@ -823,13 +859,14 @@
                         maximumSelectionLength:1,
                         allowClear: true
                     });
-                    $('#model-year-'+index).select2
-                    ({
-                        placeholder: 'Select Model Year',
-                        maximumSelectionLength:1,
-                        allowClear: true
-                    });
+                    // $('#model-year-'+index).select2
+                    // ({
+                    //     placeholder: 'Select Model Year',
+                    //     maximumSelectionLength:1,
+                    //     allowClear: true
+                    // });
                 });
+                checkCountryCriterias();
 
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one LOI Item Required',function (e) {
@@ -847,68 +884,56 @@
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('data-index');
             $('#sfx-'+index+'-error').remove();
-            getModelYear(index);
-        });
-        $(document.body).on('select2:select', ".model-years", function (e) {
-            let index = $(this).attr('data-index');
-            $('#model-year-'+index+'-error').remove();
             getLOIDescription(index);
-            var value = e.params.data.text;
-            hideModelYear(index, value);
 
+            var value = e.params.data.text;
+            hideSFX(index, value);
+            // getModelYear(index);
+            // getModelLine(index);
         });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
             $('#loi-description-'+index).val("");
+            $('#model-line-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
-            var modelYear =  $('#model-year-'+index).val();
+            // var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            if(modelYear[0]) {
-                appendModelYear(index, model[0],sfx,modelYear[0])
-            }
+            // if(modelYear[0]) {
+            //     appendModelYear(index, model[0],sfx,modelYear[0])
+            // }
             appendSFX(index,model[0],sfx);
-            $('#model-year-'+index).empty();
-
+            // $('#model-year-'+index).empty();
+        
+           
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
             console.log("unselected");
             let index = $(this).attr('data-index');
 
-            var modelYear =  $('#model-year-'+index).val();
+            // var modelYear =  $('#model-year-'+index).val();
             var sfx = $('#sfx-'+index).val();
             var model = e.params.data.id;
-            if(modelYear[0]){
-                appendModelYear(index, model,sfx[0],modelYear[0])
-            }
+            // if(modelYear[0]){
+            //     appendModelYear(index, model,sfx[0],modelYear[0])
+            // }
+            $('#model-line-'+index).val("");
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
             enableDealer();
 
             $('#sfx-'+index).empty();
-            $('#model-year-'+index).empty();
-
+            // $('#model-year-'+index).empty();
+            $('#model-line-'+index).empty();
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
             $('#quantity-'+index).val("");
         });
-        $(document.body).on('select2:unselect', ".model-years", function (e) {
-            let index = $(this).attr('data-index');
-            $('#loi-description-'+index).val("");
-            $('#master-model-id-'+index).val("");
-            $('#inventory-quantity-'+index).val("");
-            $('#quantity-'+index).val("");
-
-            var modelYear = e.params.data.id;
-            var model = $('#model-'+index).val();
-            var sfx = $('#sfx-'+index).val();
-            appendModelYear(index, model[0],sfx[0],modelYear);
-            // get the unseleted index and match with each row item if model and sfx is matching append that row
-        });
+       
 
        function getSfx(index) {
 
@@ -938,53 +963,22 @@
                     $('#inventory-quantity-'+index).val(0);
                     $('#sfx-'+index).empty();
                     $('#loi-description-'+index).val("");
+                    $('#model-line-'+index).val("");
                     $('#sfx-'+index).html('<option value=""> Select SFX </option>');
-                    $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
+                    // $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
 
                     jQuery.each(data, function(key,value){
                         $('#sfx-'+index).append('<option value="'+ value +'">'+ value +'</option>');
                     });
+                  
                 }
             });
+           
        }
-       function getModelYear(index){
-
-           let model = $('#model-'+index).val();
-           let sfx = $('#sfx-'+index).val();
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
-           var selectedModelIds = [];
-           for(let i=1; i<=totalIndex; i++)
-           {
-               var eachSelectedModelId = $('#master-model-id-'+i).val();
-               if(eachSelectedModelId) {
-                   selectedModelIds.push(eachSelectedModelId);
-               }
-           }
-
-           let url = '{{ route('demand.get-model-year') }}';
-           $.ajax({
-               type: "GET",
-               url: url,
-               dataType: "json",
-               data: {
-                   sfx: sfx[0],
-                   model:model[0],
-                   selectedModelIds:selectedModelIds,
-               },
-               success:function (data) {
-                   $('#model-year-'+index).empty();
-                   $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
-                   $('#loi-description-'+index).html('<option value=""> Select LOI Description </option>');
-                   // $('#inventory-quantity').val(quantity);
-                   jQuery.each(data, function(key,value){
-                       $('#model-year-'+index).append('<option value="'+ value +'">'+ value +'</option>');
-                   });
-               }
-           });
-        }
+  
        function getLOIDescription(index) {
-           let model_year = $('#model-year-'+index).val();
+    
+        //    let model_year = $('#model-year-'+index).val();
            let model = $('#model-'+index).val();
            let sfx = $('#sfx-'+index).val();
            let dealer = $('#dealer').val();
@@ -997,11 +991,12 @@
                data: {
                    sfx: sfx[0],
                    model:model[0],
-                   model_year: model_year[0],
+                //    model_year: model_year[0],
                    dealer:dealer,
                    module: 'LOI',
                },
                success:function (data) {
+                console.log(data);
                    $('#loi-description-'+index).val("");
 
                    let quantity = data.quantity;
@@ -1010,43 +1005,12 @@
                    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
-                    $('#master-model-id-'+index).val(modelId);
+                   $('#master-model-id-'+index).val(modelId);
+                   $('#model-line-'+index).val(data.model_line);
                }
            });
         }
-       function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
 
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
-            for(let i=1; i<=totalIndex; i++)
-            {
-                if(i != index) {
-                    var model = $('#model-'+i).val();
-                    var sfx = $('#sfx-'+i).val();
-                    if(unSelectedmodel == model[0] && unSelectedsfx == sfx[0]) {
-                        $('#model-year-'+i).append($('<option>', {value: unSelectedmodelYear, text : unSelectedmodelYear}))
-                    }
-                }
-            }
-       }
-       function hideModelYear(index, value) {
-           var selectedModel = $('#model-'+index).val();
-           var selectedSFX = $('#sfx-'+index).val();
-
-           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-           for(let i=1; i<=totalIndex; i++)
-           {
-               if(i != index) {
-                   var model = $('#model-'+i).val();
-                   var sfx = $('#sfx-'+i).val();
-
-                   if(selectedModel[0] == model[0] && selectedSFX[0] == sfx[0]) {
-                       var currentId = 'model-year-' + i;
-                       $('#' + currentId + ' option[value=' + value + ']').detach();
-                   }
-               }
-           }
-       }
        function appendSFX(index,unSelectedmodel,sfx){
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1075,6 +1039,17 @@
                }
            }
        }
+       function hideSFX(index, value) {
+         
+         var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         for(let i=1; i<=totalIndex; i++)
+         {
+             if(i != index) {
+                 var currentId = 'sfx-' + i;
+                 $('#' + currentId + ' option[value=' + value + ']').detach();       
+             }
+         }
+     }
        function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1126,9 +1101,8 @@
                                     <div class="row">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
-                                            placeholder="So Number" value="{{ old('so_number') }}"
-                                            autocomplete="so_number" >
-                                            <span id="soNumberError_${index}" class="invalid-feedback soNumberError"></span>
+                                            placeholder="So Number" value="{{ old('so_number') }}" oninput=uniqueCheckSoNumber() >
+                                            <span id="soNumberError_${index}" class="error is-invalid soNumberError"></span>
                                         </div>
                                         <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
                                             <a class="btn btn-sm btn-danger removeSoNumber" data-index="${index}" >
@@ -1143,8 +1117,8 @@
         $(document.body).on('click', ".removeSoNumber", function (e)
 	    {
             var indexNumber = $(this).attr('data-index');
-            var deletedValue = '';
-            deletedValue = $("#so_number_"+indexNumber).val();
+        
+           
             $(this).closest('#row-'+indexNumber).remove();
             $('.soNumberApendHere').each(function(i) {
                 var index = +i + +1;
@@ -1153,10 +1127,69 @@
                 $(this).find('.so_number').attr('id', 'so_number_'+index);
                 $(this).find('.removeSoNumber').attr('data-index',index);
                 $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
-
+                
             });
 
-	})
+            uniqueCheckSoNumber();
+           
+	});
+
+   
+ 
+    function uniqueCheckSoNumber() {
+        var totalIndex = $(".soNumberMain").find(".soNumberApendHere").length;
+        var isValid = [];
+        for(var j = 1; j <= totalIndex; j++)
+        {
+            soNumberInput = $('#so_number_'+j).val();
+            if(soNumberInput != '')
+            {
+                var existingSoNumbers = [];
+                for(var m = 1; m <= totalIndex; m++)
+                {
+                    if(m != j)
+                    {
+                        var soNumberInputOther = '';
+                        var soNumberInputOther = $('#so_number_'+m).val();
+                        existingSoNumbers.push(soNumberInputOther);
+                    }
+                }
+                if(existingSoNumbers.includes(soNumberInput))
+                {
+                    $msg = "SO Number is already exist";
+                    isValid.push(false);
+                    showSoNumberError($msg,j);
+                }
+                else
+                {
+                    $msg = "";
+                    removeSoNumberError($msg,j);
+                }
+            }
+        }
+        if(isValid.includes(false))
+        {
+            formValid = false;
+        }else{
+           
+            formValid = true;
+        }
+       
+    }
+    
+    function showSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent=$msg;
+	    document.getElementById("so_number_"+i).classList.add("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.add("paragraph-class");
+      
+	}
+	function removeSoNumberError($msg,i)
+	{
+	    document.getElementById("soNumberError_"+i).textContent="";
+	    document.getElementById("so_number_"+i).classList.remove("is-invalid");
+	    document.getElementById("soNumberError_"+i).classList.remove("paragraph-class");
+	}
     </script>
 @endpush
 

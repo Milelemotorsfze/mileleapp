@@ -1,18 +1,20 @@
 @extends('layouts.table')
 @section('content')
     <style>
-        .modal {
+        /* .modal {
             position: absolute;
             min-height: 500px;
-        }
+        } */
         .widthinput{
             height:32px!important;
 
         }
-        body.modal-open {
+        /* body.modal-open {
             overflow: hidden;
-        }
+        } */
     </style>
+    
+
     @can('LOI-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
@@ -27,6 +29,9 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
                     @endphp
                     @if ($hasPermission)
+                    <!-- <a  class="btn btn-sm btn-secondary float-end mr-2" href="{{ route('migrations.index') }}" >
+                    <i class="fa fa-check" aria-hidden="true"></i> Migration Check</a> -->
+
                         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
@@ -55,6 +60,7 @@
                     </div>
                 @endif
             </div>
+
             <div class="portfolio">
                 <ul class="nav nav-pills nav-fill" id="my-tab">
                     <li class="nav-item">
@@ -66,9 +72,9 @@
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI"> Utilization Initiated LOI</a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
             <div class="tab-content">
@@ -86,8 +92,6 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>Supplier Approval</th>
                                     <th>LOI</th>
@@ -112,8 +116,6 @@
                                             @endforeach
                                          </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             @can('LOI-approve')
@@ -156,7 +158,7 @@
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
                                                     @endphp
                                                     @if ($hasPermission)
-                                                        <button type="button" class="btn btn-danger btn-sm loi-button-delete" title="Delete LOI"
+                                                        <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI"
                                                                 data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
                                                             <i class="fa fa-trash"></i>
                                                         </button>
@@ -184,7 +186,7 @@
                                                                                 <dt>SFX </dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year </dt>
+                                                                                <dt>Model Line </dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -211,8 +213,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl>  {{ $LOIItem->masterModel->modelLine->model_line ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
@@ -280,13 +282,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade show " id="waiting-for-approval-LOI">
+                <div class="tab-pane fade show" id="waiting-for-approval-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="waiting-for-approval-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                                 <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>S.NO</th>
+                                    <th>S.NO:</th>
                                     <th>LOI Number</th>
                                     <th>Date</th>
                                     <th>Customer</th>
@@ -294,10 +296,10 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
-                                    <th> Status</th>
+                                    <th>LOI Quantity</th>
+                                    <th>Status</th>
                                     <th>LOI</th>
+                                    <th>Remarks</th>
                                     <th>Approve/Reject</th>
                                     <th>Actions</th>
                                 </tr>
@@ -320,8 +322,7 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
+                                        <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
@@ -330,6 +331,7 @@
                                                 </a>
                                             @endforeach
                                         </td>
+                                        <td>{{ $letterOfIndent->review }}</td>
                                         <td>
                                             @can('loi-supplier-approve')
                                                 @php
@@ -359,7 +361,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                             @can('LOI-delete')
@@ -367,7 +369,7 @@
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                    <button type="button" class="btn btn-danger btn-sm loi-button-delete" title="Delete LOI"
+                                                    <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI"
                                                             data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
@@ -558,7 +560,7 @@
                                                                                 <dt>SFX </dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year </dt>
+                                                                                <dt>Model Line </dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -585,8 +587,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->modelLine->model_line ?? '' }}</dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
@@ -659,7 +661,6 @@
                             <table id="supplier-response-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                                 <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>S.NO:</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
                                     <th>Customer</th>
@@ -667,10 +668,13 @@
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
+                                    <th>LOI Quantity</th>
+                                    <th>Utilized Quantity</th>
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
+                                    <th>Is Expired</th>
                                     <th>LOI</th>
-                                    <th>PFI</th>
+                                    <th>Remarks</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -679,7 +683,7 @@
                                 </div>
                                 @foreach ($supplierApprovedLOIs as $key => $letterOfIndent)
                                     <tr>
-                                        <td> {{ ++$i }}</td>
+                                       
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
@@ -692,8 +696,14 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->total_loi_quantity }}</td>
+                                        <td> {{ $letterOfIndent->utilized_quantity }} </td>
+                                       
                                         <td>{{ $letterOfIndent->submission_status }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
+                                       <td>  @if($letterOfIndent->is_loi_expired == true)
+                                             Expired  @else  Not Expired @endif
+                                        </td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
                                                 <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
@@ -701,18 +711,29 @@
                                                 </a>
                                             @endforeach
                                         </td>
+                                        <td>{{ $letterOfIndent->review }}</td>                                   
                                         <td>
-                                            @if($letterOfIndent->is_pfi_pending_for_loi == true)
-                                                <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                                    <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
-                                                </a>
-                                            @endif
-                                        </td>
-                                        <td>
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
+                                                <i class="fa fa-save"></i>
+                                            </button>
+                                            <!-- allow only not expired LOI to ctreate PFI -->
+                                            @can('PFI-create')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                   @if($letterOfIndent->is_loi_expired == false)
+                                                        <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                                            <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            @endcan
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -737,7 +758,7 @@
                                                                                 <dt>SFX</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year</dt>
+                                                                                <dt>Model Line</dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -764,8 +785,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl>  {{ $LOIItem->masterModel->modelLine->model_line ?? '' }}</dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">LOI Description</dt>
@@ -825,6 +846,31 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="modal fade " id="update-utilization-quantity-{{$letterOfIndent->id}}" data-bs-backdrop="static" 
+                                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog  modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Utilized Quantity</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('utilization-quantity-update', $letterOfIndent->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$letterOfIndent->total_quantity}}" name="utilized_quantity" class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -832,7 +878,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="milele-partial-approved-LOI">
+                <!-- <div class="tab-pane fade" id="milele-partial-approved-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -846,19 +892,10 @@
                                     <th>Dealer</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
-                                    @can('LOI-approve')
-                                        @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                        @endphp
-                                        @if ($hasPermission)
-                                            <th>Utilization Qty Update</th>
-                                        @endif
-                                    @endcan
                                     <th>Total Quantity</th>
                                     <th>Utilized Quantity</th>
+                                    <th>Update Utilized Quantity</th>
                                     <th width="200">LOI </th>
                                     <th width="150px">Actions</th>
                                 </tr>
@@ -881,29 +918,15 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
-
-                                        @can('LOI-approve')
-                                            @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <td>
-                                                @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
-                                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                                        <button type="button" class="btn btn-soft-green btn-sm" title="Utilization Quantity Update" >
-                                                            <i class="fa fa-edit"></i>
-                                                        </button>
-                                                    </a>
-                                                 @endif
-                                            </td>
-                                            @endif
-                                        @endcan
-
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
+                                        <td>
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                         </td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
                                                 <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
@@ -917,9 +940,7 @@
                                                     <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
                                                 </a>
                                             @endif
-        {{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
-        {{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
-        {{--                                    </a>--}}
+       
                                             <button type="button" title="View LOI Items list" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
@@ -947,7 +968,7 @@
                                                                                 <dt>SFX</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year</dt>
+                                                                                <dt>Model Line</dt>
                                                                             </div>
                                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                 <dt>LOI Description</dt>
@@ -974,8 +995,8 @@
                                                                                     <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Line</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->modelLine->model_line ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                     <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
@@ -1035,13 +1056,38 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="modal fade " id="update-utilization-quantity-{{$letterOfIndent->id}}" data-bs-backdrop="static" 
+                                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog ">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Utilized Quantity</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('utilization-quantity-update', $letterOfIndent->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                    <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$letterOfIndent->total_quantity}}" name="utilized_quantity" class="form-control" >
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         @endif
     @endcan

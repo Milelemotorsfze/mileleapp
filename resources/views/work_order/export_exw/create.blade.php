@@ -1,23 +1,24 @@
 @extends('layouts.main')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
 <style>
+	.btn-style {
+		font-size:0.7rem!important;
+		line-height: 0.1!important;
+	}
 	.comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 30px; /* Indent replies by 40px */
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        }
-        .replies {
-            margin-left: 30px; /* Indent nested replies by 40px */
-        }
-	/* .border-top {
-		border-top: 1px solid #b3b3b3!important;
-	} */
+		margin-bottom: 20px;
+	}
+	.reply {
+		margin-left: 30px; 
+		margin-top: 10px;
+	}
+	.reply-button {
+		margin-top: 10px;
+	}
+	.replies {
+		margin-left: 30px; 
+	}
 	.currencyClass {
 		padding-top:5px!important;
 	}
@@ -31,20 +32,10 @@
     }
 	th {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
 	td {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
-	/* td {
-		padding-top: calc(.47rem + 1px);
-		padding-bottom: calc(.47rem + 1px);
-		margin-bottom: 0;
-		font-size: inherit;
-		line-height: 1.5;
-		font-weight: 500;
-	} */
     #work-order-history-table td, th{
         font-size: 14px !important;
     }
@@ -54,14 +45,10 @@
     #switchToDropdown {
         display: none;
     }
-    /* label{
-        font-size:12px!important;
-    } */
 	.addon_btn_round {
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -77,7 +64,6 @@
 		width: 20px!important;
 		height: 14px!important;
 		display: inline-block;
-		/* border-radius: 50%; */
 		text-align: center;
 		line-height: 10px!important;
 		margin-left: 0px!important;
@@ -89,22 +75,20 @@
 		cursor: pointer;
 		padding-top:1px!important;
 	}
-	.btn_round
-	{
-	width: 20px!important;
-	height: 14px!important;
-	display: inline-block;
-	/* border-radius: 50%; */
-	text-align: center;
-	line-height: 10px!important;
-	margin-left: 0px!important;
-	margin-top: 0px!important;
-	border: 1px solid #ccc;
-	color:#fff;
-	background-color: #fd625e;
-	border-radius:5px;
-	cursor: pointer;
-	padding-top:1px!important;
+	.btn_round {
+		width: 20px!important;
+		height: 14px!important;
+		display: inline-block;
+		text-align: center;
+		line-height: 10px!important;
+		margin-left: 0px!important;
+		margin-top: 0px!important;
+		border: 1px solid #ccc;
+		color:#fff;
+		background-color: #fd625e;
+		border-radius:5px;
+		cursor: pointer;
+		padding-top:1px!important;
 	}
 	.btn_round_big {
 		margin-top: 37px!important; padding-top: 8px!important;
@@ -112,96 +96,20 @@
 			color:#fff; background-color: #fd625e; border-radius:5px; cursor: pointer; padding-top:7px;
 	}
 	.btn_round_big:hover {
-			color: #fff; background: #fd625e; border: 1px solid #fd625e;
-			}
-			/* .comment {
-            margin-bottom: 20px;
-        }
-        .reply {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-        .reply-button {
-            margin-top: 10px;
-        } */
-
-			/* body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-} */
-
-/* .comment-section {
-    background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-}
-
-.comment-box {
-    display: flex;
-    flex-direction: column;
-}
-
-#comment-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    padding: 10px;
-    background: #007BFF;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-}  
-
-button:hover {
-    background: #0056b3;
-}
-
-#comment-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 20px;
-}
-
-.comment-item {
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-}
-
-.mention {
-    color: #007BFF;
-    font-weight: bold;
-} */
-.card-header {
-	background-color:#e6f1ff!important;
-}
-.card-body {
-	background-color:#fafcff!important;
-}
-.no-border {
-	border:none!important;
-}
-
-     .select2-container {
+		color: #fff; background: #fd625e; border: 1px solid #fd625e;
+	}
+	.card-header {
+		background-color:#e6f1ff!important;
+	}
+	.card-body {
+		background-color:#fafcff!important;
+	}
+	.no-border {
+		border:none!important;
+	}
+    .select2-container {
         width: 100% !important;
     }
-
 </style>
 @include('layouts.formstyle')
 @section('content')
@@ -210,8 +118,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
+	<h4 class="card-title"> @if(isset($workOrder)) Edit @else Create @endif @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -224,17 +132,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
-	<div class="col-xxl-12 col-lg-12 col-md-12">
+	@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
+			@if($workOrder->finance_approved_at != '' || $workOrder->coe_office_approved_at != '')
+				<a title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+					<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
+				</a>
+			@elseif($workOrder->finance_approved_at == '' && $workOrder->coe_office_approved_at == '')
+				<a title="Revert Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
+					<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
+				</a>
+			@endif
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
+			<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+			<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
+			</a>
+		@endif
+		@if(isset($workOrder) && $workOrder->finance_approved_at != '')
+		<a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
+		</a>
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->coe_office_approved_at == '')
+		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+		<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
+		</a>
+		@endif
+		@if(isset($workOrder) && $workOrder->coe_office_approved_at != '')
+		<a  title="COE Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+		<i class="fas fa-check-circle" title="COE Office"></i> COE Office Approved
+		</a>
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at != '')
+		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
+		COE Office Approval
+		</a>
+		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at == '')
+			<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-direct-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+			<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
+			COE Office Direct Approval
+			</a>
+		@endif
+
+		<!-- Modal -->
+		<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="approvalModalLabel">COE Office Direct Approval</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<!-- <span aria-hidden="true">&times;</span> -->
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					<label for="approvalComments">Comments</label>
+					<textarea class="form-control" id="approvalComments" rows="3"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+					<button type="button" class="btn btn-primary" id="submitApproval">Submit</button>
+				</div>
+				</div>
+			</div>
+		</div>
+	<!-- <div class="col-xxl-12 col-lg-12 col-md-12">
 		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
-	</div>
-	<form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
-		@csrf
-		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-			<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
-		</a>
-		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-			<i class="fa fa-check" aria-hidden="true"></i> COE Office Approval
-		</a>
+	</div> -->
+		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
+    @csrf
+    @if(isset($workOrder))
+        @method('PUT')
+    @endif 
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
@@ -243,36 +211,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
-                    <input type="hidden" name="type" id="type" value={{$type ?? ''}}>
+					<input type="hidden" name="customerCount" id="customerCount" value={{$customerCount ?? ''}}>
+					<input type="hidden" name="wo_id" id="wo_id" value={{ isset($workOrder) ? $workOrder->id : '' }}>
+					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<span class="error">* </span>
+						<!-- <span class="error">* </span> -->
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
-						<input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
-                         value="" autocomplete="date" autofocus>
+						<input type="text" class="form-control widthinput" readonly 
+						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
-						<input id="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" name="so_number"
-							placeholder="Enter SO Number" value="SO-00" autocomplete="so_number" autofocus onkeyup="setWo()">
+						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
+							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()"
+							@if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
+							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 							<select name="batch" id="batch" class="form-control widthinput" autofocus>
-								<option>Choose Batch</option>
-								<option value="Batch 1">Batch 1</option>
-                                <option value="Batch 2">Batch 2</option>
-                                <option value="Batch 3">Batch 3</option>
-                                <option value="Batch 4">Batch 4</option>
-                                <option value="Batch 5">Batch 5</option>
-                                <option value="Batch 6">Batch 6</option>
-                                <option value="Batch 7">Batch 7</option>
-                                <option value="Batch 8">Batch 8</option>
-                                <option value="Batch 9">Batch 9</option>
-                                <option value="Batch 10">Batch 10</option>
+								<option value="">Choose Batch</option>
+								@for ($i = 1; $i <= 10; $i++)
+									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
+								@endfor
 							</select>
 						</div>
 					</div>
@@ -280,115 +245,136 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="wo_number" class="col-form-label text-md-end">{{ __('WO Number') }}</label>
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
-							placeholder="Enter WO" value="WO-" autocomplete="wo_number" autofocus disabled>
+							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
-                    <div class="col-xxl-5 col-lg-11 col-md-11">
+					<div class="col-xxl-5 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
+                        <input hidden id="customer_type" name="customer_type" value="existing">
+                        <input hidden id="customer_reference_id" name="customer_reference_id" value="">
+                        <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
+                            <option value="{{$customer->customer_name ?? ''}}"
+							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
-                        </select>
-                        <input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
-                        class="form-control widthinput @error('customer_name') is-invalid @enderror">
-                    </div>
+                        </select> 
+						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
+							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
+					</div>
                     <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
-                        <a  title="Create New Customer" onclick=checkValue() style="margin-top:38px; width:100%;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
+                        <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
+                            class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
                     </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown" >
-                        <a title="Choose Customer Name" onclick=switchToDropdown() style="margin-top:38px; width:100%;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
+                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown">
+                        <a title="Choose Customer Name" onclick="switchToDropdown()" style="margin-top:38px; width:100%;"
+                            class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
                     </div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="customer_email" class="col-form-label text-md-end">{{ __('Customer Email ID') }}</label>
 						<input id="customer_email" type="text" class="form-control widthinput @error('customer_email') is-invalid @enderror" name="customer_email"
-							placeholder="Enter Customer Email ID" value="" autocomplete="customer_email" autofocus>
+							placeholder="Enter Customer Email ID" value="{{ isset($workOrder) ? $workOrder->customer_email : '' }}" autocomplete="customer_email" autofocus>
 					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
-                        <label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
-                        <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
-                                is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="customer_company_number[full]" autofocus>
-                    </div>
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
+						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
+						<!-- <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
+							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
+							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)"> -->
+							<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]') is-invalid @enderror" 
+							name="customer_company_number[main]" placeholder="Enter Customer Contact Number" value="" autocomplete="customer_company_number[full]" autofocus 
+							onkeyup="sanitizeNumberInput(this)">
+
+					</div></div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
-                        <textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
-							name="customer_address" placeholder="Address in UAE" value="{{ old('customer_address') }}"  autocomplete="customer_address"
-							autofocus></textarea>
+						<textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
+							name="customer_address" placeholder="Address in UAE" value="{{ isset($workOrder) ? $workOrder->customer_address : '' }}"  autocomplete="customer_address"
+							autofocus onkeyup="sanitizeInput(this)"></textarea>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_name" class="col-form-label text-md-end">{{ __("Customer Representative Name" ) }}</label>
 						<input id="customer_representative_name" type="text" class="form-control widthinput @error('customer_representative_name') is-invalid @enderror" name="customer_representative_name"
-							placeholder="Enter Customer Representative Name" value="" autocomplete="customer_representative_name" autofocus>
-					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
-						<label for="customer_representative_email" class="col-form-label text-md-end">{{ __('Customer Representative Email ID') }}</label>
-						<div class="dropdown-option-div">
-                        <input id="customer_representative_email" type="text" class="form-control widthinput @error('customer_representative_email') is-invalid @enderror"
-                         name="customer_representative_email"
-							placeholder="Enter Customer Representative Email ID" value="" autocomplete="customer_representative_email" autofocus>
-                        </div>
+							placeholder="Enter Customer Representative Name" value="{{ isset($workOrder) ? $workOrder->customer_representative_name : '' }}" 
+							autocomplete="customer_representative_name" autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
+						<label for="customer_representative_email" class="col-form-label text-md-end">{{ __('Customer Representative Email ID') }}</label>
+						<div class="dropdown-option-div">
+							<input id="customer_representative_email" type="text" class="form-control widthinput @error('customer_representative_email') is-invalid @enderror"
+								name="customer_representative_email"
+								placeholder="Enter Customer Representative Email ID" value="{{ isset($workOrder) ? $workOrder->customer_representative_email : '' }}" autocomplete="customer_representative_email" autofocus>
+						</div>
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
-                        <input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
-                                is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="customer_representative_contact[full]" autofocus>
+						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
+							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
+							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					@if(isset($type) && $type == 'export_exw')
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_name" class="col-form-label text-md-end">{{ __('Freight Agent Name') }}</label>
 						<input id="freight_agent_name" type="text" class="form-control widthinput @error('freight_agent_name') is-invalid @enderror"
-                         name="freight_agent_name"
-							placeholder="Enter Freight Agent Name" value="" autocomplete="freight_agent_name" autofocus>
+							name="freight_agent_name"
+							placeholder="Enter Freight Agent Name" value="{{ isset($workOrder) ? $workOrder->freight_agent_name : '' }}" autocomplete="freight_agent_name" 
+							autofocus onkeyup="sanitizeInput(this)">
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_email" class="col-form-label text-md-end">{{ __('Freight Agent Email ID') }}</label>
 						<input id="freight_agent_email" type="text" class="form-control widthinput @error('freight_agent_email') is-invalid @enderror"
-                         name="freight_agent_email"
-							placeholder="Enter Freight Agent Email ID" value="" autocomplete="freight_agent_email" autofocus>
+							name="freight_agent_email" 
+							placeholder="Enter Freight Agent Email ID" value="{{ isset($workOrder) ? $workOrder->freight_agent_email : '' }}" autocomplete="freight_agent_email" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
 						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
-                                is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="freight_agent_contact_number[full]" autofocus>
+							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
+							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
-                         name="port_of_loading"
-							placeholder="Enter Port of Loading" value="" autocomplete="port_of_loading" autofocus>
+							name="port_of_loading" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
-                         name="port_of_discharge"
-							placeholder="Enter Port of Discharge" value="" autocomplete="port_of_discharge" autofocus>
+							name="port_of_discharge" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Port of Discharge" value="{{ isset($workOrder) ? $workOrder->port_of_discharge : '' }}" autocomplete="port_of_discharge" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
-                         name="final_destination"
-							placeholder="Enter Final Destination" value="" autocomplete="final_destination" autofocus>
+							name="final_destination" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Final Destination" value="{{ isset($workOrder) ? $workOrder->final_destination : '' }}" autocomplete="final_destination" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" />
+									<input type="radio" class="transport_type" name="transport_type" value="air" id="air" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'air' ? 'checked' : '' }} />
 									<label for="air">Air</label>
 								</div>
 								<div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" />
+									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'sea' ? 'checked' : '' }} />
 									<label for="sea">Sea</label>
 								</div>
-                                <div class="col-xxl-4 col-lg-4 col-md-4">
-									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" />
+								<div class="col-xxl-4 col-lg-4 col-md-4">
+									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" 
+										{{ isset($workOrder) && $workOrder->transport_type == 'road' ? 'checked' : '' }} />
 									<label for="road">Road</label>
 								</div>
 							</div>
@@ -401,94 +387,116 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="brn-div">
 						<label for="brn" class="col-form-label text-md-end">{{ __('BRN') }}</label>
-						<input id="brn" type="text" class="form-control widthinput @error('brn') is-invalid @enderror" name="brn"
-						placeholder="Enter BRN" autocomplete="brn" autofocus>
+						<input id="brn" type="text" class="form-control widthinput @error('brn') is-invalid @enderror" name="brn" onkeyup="sanitizeInput(this)"
+							placeholder="Enter BRN" autocomplete="brn" value="{{ isset($workOrder) ? $workOrder->brn : '' }}" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="container-number-div">
 						<label for="container_number" class="col-form-label text-md-end">{{ __('Container Number') }}</label>
 						<input id="container_number" type="text" class="form-control widthinput @error('container_number') is-invalid @enderror" name="container_number"
-						placeholder="Enter Container Number" autocomplete="container_number" autofocus>
+							placeholder="Enter Container Number" autocomplete="container_number" value="{{ isset($workOrder) ? $workOrder->container_number : '' }}" autofocus
+							onkeyup="sanitizeInput(this)">
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
 							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
-								<option value="{{$airline->id}}">{{$airline->name}}</option>
+									<option value="{{$airline->name}}" 
+										{{ isset($workOrder) && $workOrder->airline == $airline->name ? 'selected' : '' }}>{{$airline->name}}
+									</option>
 								@endforeach
 							</select>
 						</div>
-					</div>					
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
 						<label for="airway_bill" class="col-form-label text-md-end">{{ __('Airway Bill') }}</label>
 						<input id="airway_bill" type="text" class="form-control widthinput @error('airway_bill') is-invalid @enderror"
-                         name="airway_bill"
-							placeholder="Enter Airway Bill" value="" autocomplete="airway_bill" autofocus>
+							name="airway_bill" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Airway Bill" value="{{ isset($workOrder) ? $workOrder->airway_bill : '' }}" autocomplete="airway_bill" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="shippingline-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="shippingline-div">
 						<label for="shipping_line" class="col-form-label text-md-end">{{ __('Shipping Line') }}</label>
 						<input id="shipping_line" type="text" class="form-control widthinput @error('shipping_line') is-invalid @enderror"
-                         name="shipping_line"
-							placeholder="Enter Shipping Line" value="" autocomplete="shipping_line" autofocus>
+							name="shipping_line" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Shipping Line" value="{{ isset($workOrder) ? $workOrder->shipping_line : '' }}" autocomplete="shipping_line" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
 						<label for="forward_import_code" class="col-form-label text-md-end">{{ __('Forward Import Code') }}</label>
 						<input id="forward_import_code" type="text" class="form-control widthinput @error('forward_import_code') is-invalid @enderror"
-                         name="forward_import_code"
-							placeholder="Enter Forward Import Code" value="" autocomplete="forward_import_code" autofocus>
-					</div>					
+							name="forward_import_code" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Forward Import Code" value="{{ isset($workOrder) ? $workOrder->forward_import_code : '' }}" autocomplete="forward_import_code" autofocus>
+					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="trailer-number-plate-div">
 						<label for="trailer_number_plate" class="col-form-label text-md-end">{{ __('Trailer Number Plate') }}</label>
 						<input id="trailer_number_plate" type="text" class="form-control widthinput @error('trailer_number_plate') is-invalid @enderror"
-                         name="trailer_number_plate"
-							placeholder="Enter Trailer Number Plate" value="" autocomplete="trailer_number_plate" autofocus>
+							name="trailer_number_plate" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Trailer Number Plate" value="{{ isset($workOrder) ? $workOrder->trailer_number_plate : '' }}" autocomplete="trailer_number_plate" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="transportation-company-div">
 						<label for="transportation_company" class="col-form-label text-md-end">{{ __('Transportation Company') }}</label>
 						<input id="transportation_company" type="text" class="form-control widthinput @error('transportation_company') is-invalid @enderror"
-                         name="transportation_company"
-							placeholder="Enter Transportation Company" value="" autocomplete="transportation_company" autofocus>
+							name="transportation_company" onkeyup="sanitizeInput(this)"
+							placeholder="Enter Transportation Company" value="{{ isset($workOrder) ? $workOrder->transportation_company : '' }}" autocomplete="transportation_company" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6" id="transporting-driver-contact-number-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="transporting-driver-contact-number-div">
+					<div class="dropdown-option-div">
 						<label for="transporting_driver_contact_number" class="col-form-label text-md-end">{{ __('Transporting Driver Contact Number') }}</label>
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
-							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number" oninput="validationOnKeyUp(this)"
-							value="" autocomplete="transporting_driver_contact_number[full]" autofocus>
+							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
+							value="" autocomplete="transporting_driver_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+					</div>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
 						<label for="airway_details" class="col-form-label text-md-end">{{ __('Airway Details') }}</label>
 						<input id="airway_details" type="text" class="widthinput contact form-control @error('airway_details')
-							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details" oninput="validationOnKeyUp(this)"
-							value="" autocomplete="airway_details" autofocus>
+							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details"  onkeyup="sanitizeInput(this)"
+							value="{{ isset($workOrder) ? $workOrder->airway_details : '' }}" autocomplete="airway_details" autofocus>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="transportation-company-details-div">
 						<label for="transportation_company_details" class="col-form-label text-md-end">{{ __('Transportation Company Details') }}</label>
 						<input id="transportation_company_details" type="text" class="widthinput contact form-control @error('transportation_company_details')
-							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details" oninput="validationOnKeyUp(this)"
-							value="" autocomplete="transportation_company_details" autofocus>
+							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details"  onkeyup="sanitizeInput(this)"
+							value="{{ isset($workOrder) ? $workOrder->transportation_company_details : '' }}" autocomplete="transportation_company_details" autofocus>
 					</div>
+                        <div class="row brn-preview-div" hidden>
+							<div class="col-lg-12 col-md-12 col-sm-12 mt-2">
+								<span class="fw-bold col-form-label text-md-end" id="brn_file_label"></span>
+								<div id="brn_file_preview">
+									@if(isset($workOrder->brn_file))
+									<div id="brn_file_preview1">
+										<div class="row">
+											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+												<h6 class="fw-bold text-center mb-1" style="float:left;">BRN File</h6>
+											</div>
+											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+												<a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download class="text-white">
+												Download
+												</a>
+												</button>
+												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+													data-file-type="BRN_File"> Delete</button>
+											</div>
+										</div>
+										<iframe src="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" alt="BRN File"></iframe>
+									</div>
+									@endif
+								</div>
+							</div>
+						</div>
 					@endif
 				</div>
 				<hr>
 				<div class="row">
-					<!-- <div class="col-xxl-2 col-lg-2 col-md-2">
-						<label for="so_total_amount" class="col-form-label text-md-end"> SO Total Amount :</label>
-						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
-							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
-							</div>
-						</div>
-					</div> -->
-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
 						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" 
+							class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
-								<select id="currency" class="form-control widthinput currencyClass" onchange="updateCurrency()">
-									<option value="AED">AED</option>
-									<option value="USD">USD</option>
+								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
+									<option value="AED" {{ isset($workOrder) && $workOrder->currency == 'AED' ? 'selected' : '' }}>AED</option>
+									<option value="USD" {{ isset($workOrder) && $workOrder->currency == 'USD' ? 'selected' : '' }}>USD</option>
 								</select>
 							</div>
 						</div>
@@ -496,18 +504,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
 						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="so_vehicle_quantity" autofocus>
+							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
+							autofocus onkeyup="sanitizeQuantity(this)">
 					</div>
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" />
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" 
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'total_deposit' ? 'checked' : '' }} />
 									<label for="total_deposit">Total Deposit</label>
 								</div>
 								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit" />
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit"
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'custom_deposit' ? 'checked' : '' }} />
 									<label for="custom_deposit">Custom Deposit</label>
 								</div>
 							</div>
@@ -516,24 +527,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
 						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" onkeyup="setDepositBalance()">
+							<input type="text" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
+							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
+								<span class="input-group-text widthinput" id="amount_received_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="balance_amount" placeholder="Enter Balance Amount" readonly>
+							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
+							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
 							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
+								<span class="input-group-text widthinput" id="balance_amount_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
 							</div>
 						</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
-						<label for="amount_received" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
-						<select name="deposit_aganist_vehicle" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
+						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
+						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
 						</select>
 					</div>
 				</div>
@@ -558,63 +571,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
-
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<a  title="Add VIN" style="margin-top:38px;float:right;"
-								class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
+							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12">
-					<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; float:left;"
-								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+						<a  title="Add VIN" style="margin-top:38px; float:left;"
+							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
 					</div>
 				</div>
-				<!-- <div class="row">
-					<div class="col-xxl-5 col-lg-5 col-md-5">
-						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
-						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
-							<option value="p001">P001 - rear mirror</option>
-						</select>	
-					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-					<input id="addon_quantity" type="number" class="form-control widthinput @error('addon_quantity') is-invalid @enderror" name="addon_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="addon_quantity" autofocus>
-					</div>
-					<div class="col-xxl-5 col-lg-5 col-md-5">
-						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
-						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
-							<option value="p001">P001 - rear mirror</option>
-						</select>	
-					</div>
-				</div> -->
 				</br>
 				<div class="row">
 					<div class="table-responsive">
 						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
-								<tr style="border-bottom:1px solid #b3b3b3;">
-									<th>Action</th>
-									<th>VIN</th>
-									<th>Brand</th>
-									<th>Variant</th>
-									<th>Engine</th>
-									<th>Model Description</th>
-									<th>Model Year</th>
-									<th>Model Year to mention on Documents</th>
-									<th>Steering</th>
-									<th>Exterior Colour</th>
-									<th>Interior Coloure</th>
-									<th>Warehouse</th>
-									<th>Territory</th>
-									<th>Preferred Destination</th>
-									<th>Import Document Type</th>
-									<th>Ownership Name</th>
-									<th>Certification Per VIN</th>
-									@if(isset($type) && $type == 'export_cnf')
-									<th>Shipment</th>
-									@endif
-								</tr>
+							<tr style="border-bottom:1px solid #b3b3b3;">
+								<th>Action</th>
+								<th>VIN</th>
+								<th>Brand</th>
+								<th>Variant</th>
+								<th>Engine</th>
+								<th>Model Description</th>
+								<th>Model Year</th>
+								<th>Model Year to mention on Documents</th>
+								<th>Steering</th>
+								<th>Exterior Colour</th>
+								<th>Interior Colour</th>
+								<th>Warehouse</th>
+								<th>Territory</th>
+								<th>Preferred Destination</th>
+								<th>Import Document Type</th>
+								<th>Ownership Name</th>
+								<th>Certification Per VIN</th>
+								@if(isset($type) && $type == 'export_cnf')
+								<th>Shipment</th>
+								@endif
+							</tr>
 						</table>
 					</div>
 				</div>
@@ -631,22 +625,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_location" class="col-form-label text-md-end"> Delivery Location :</label>
 						<input id="delivery_location" type="text" class="form-control widthinput @error('delivery_location') is-invalid @enderror" name="delivery_location"
-							placeholder="Enter Delivery Location" value="" autocomplete="delivery_location" autofocus>
+							placeholder="Enter Delivery Location" value="{{ isset($workOrder) ? $workOrder->delivery_location : '' }}" autocomplete="delivery_location" 
+							autofocus  onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
-							placeholder="Enter Delivery Contact Person" value="" autocomplete="delivery_contact_person" autofocus>
+							placeholder="Enter Delivery Contact Person" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
+							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<label for="delivery_date" class="col-form-label text-md-end"> Delivery Date  :</label>
 						<input id="delivery_date" type="date" class="form-control widthinput @error('delivery_date') is-invalid @enderror" name="delivery_date"
-							placeholder="Enter Delivery Date " value="" autocomplete="delivery_date" autofocus>
+							placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
+							onkeyup="sanitizeInput(this)">
 					</div>
 				</div>
 				<div class="row" id="boe-div">
 					<div class="col-xxl-12 col-lg-12 col-md-12 form_field_outer" id="child">
-
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn">
@@ -664,8 +660,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			<div class="card-body">
 				<div class="row">
 					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<label for="signed_pdf" class="col-form-label text-md-end">{{ __('Signed PFI') }}</label>
-						<input type="file" class="form-control" id="signed_pdf" name="signed_pdf"
+						<label for="signed_pfi" class="col-form-label text-md-end">{{ __('Signed PFI') }}</label>
+						<input type="file" class="form-control" id="signed_pfi" name="signed_pfi"
 							accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
@@ -685,212 +681,220 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_trade_license" class="col-form-label text-md-end">{{ __('End User Trade License') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_trade_license" name="enduser_trade_license[]"
+						<input type="file" class="form-control" multiple id="enduser_trade_license" name="enduser_trade_license"
 							placeholder="Upload End User Trade License" accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_passport" class="col-form-label text-md-end">{{ __('End User Passport Copy') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_passport" name="enduser_passport[]"
+						<input type="file" class="form-control" multiple id="enduser_passport" name="enduser_passport"
 							placeholder="Upload National ID (First & Second page)" accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_contract" class="col-form-label text-md-end">{{ __('End User Contract') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_contract" name="enduser_contract[]"
+						<input type="file" class="form-control" multiple id="enduser_contract" name="enduser_contract"
+							placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
+					</div>
+					<div class="col-xxl-3 col-lg-6 col-md-6">
+						<label for="vehicle_handover_person_id" class="col-form-label text-md-end">{{ __('ID For The Person To Handover The Vehicle') }}</label>
+						<input type="file" class="form-control" multiple id="vehicle_handover_person_id" name="vehicle_handover_person_id"
 							placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
 					</div>
 				</div>
-				<div class="card preview-div" hidden>
-					<div class="card-body">
-						<div class="row">
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="signed_pdf-label"></span>
-								<div id="signed_pdf-preview">
-									@if(isset($candidate->candidateDetails->image_path))
-									<div id="signed_pdf-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="PASSPORT"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="signed_contract-label"></span>
-								<div id="signed_contract-preview">
-									@if(isset($candidate->candidateDetails->signed_contract))
-									<div id="signed_contract-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">signed_contract</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="signed_contract"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/signed_contract/' . $candidate->candidateDetails->signed_contract) }}" alt="signed_contract"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="payment_receipts-label"></span>
-								<div id="payment_receipts-preview">
-									@if(isset($candidate->candidateDetails->payment_receipts))
-									<div id="payment_receipts-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">payment_receipts</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="payment_receipts"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/payment_receipts/' . $candidate->candidateDetails->payment_receipts) }}" alt="payment_receipts"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="emirates-id-label"></span>
-								<div id="noc-preview">
-									@if(isset($candidate->candidateDetails->noc_file))
-									<div id="noc-preview1">
-										<div class="row">
-											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-												<h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
-											</div>
-											<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
-												<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-												<a href="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" download class="text-white">
-												Download
-												</a>
-												</button>
-												<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
-													data-file-type="EMIRATESID"> Delete</button>
-											</div>
-										</div>
-										<iframe src="{{ url('hrm/employee/noc/' . $candidate->candidateDetails->noc_file) }}" alt="Emirates ID"></iframe>
-									</div>
-									@endif
-								</div>
-							</div>
-						</div>
-						<div class="row mt-4">
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="passport-label">
-								@if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0) Passport @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0)
-								@foreach($candidate->candidateDetails->candidatePassport as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/passport/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" class="mt-2" alt="Passport"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_trade_license-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="national-id-label">
-								@if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0) National ID @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0)
-								@foreach($candidate->candidateDetails->candidateNationalId as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/enduser_passport/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/enduser_passport/' . $document->document_path) }}" class="mt-2" alt="National ID"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_passport-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="enduser_contract-label">
-								@if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0) Attested Educational Documents @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0)
-								@foreach($candidate->candidateDetails->candidateEduDocs as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/enduser_contract/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/enduser_contract/' . $document->document_path) }}" class="mt-2" alt="Attested Educational Documents"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="enduser_contract-preview">
-								</div>
-							</div>
-							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="professional-diploma-certificates-label">
-								@if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0) Professional / Diploma Certificates @endif
-								</span>
-								@if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0)
-								@foreach($candidate->candidateDetails->candidateProDipCerti as $document)
-								<div id="preview-div-{{$document->id}}">
-									<button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
-									<a href="{{url('hrm/employee/professional_diploma_certificates/' . $document->document_path)}}" download class="text-white">
-									Download
-									</a>
-									</button>
-									<button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}">
-									Delete
-									</button>
-									<iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" class="mt-2" alt="Professional / Diploma Certificates"></iframe>
-								</div>
-								@endforeach
-								@endif
-								<div id="professional-diploma-certificates-preview">
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+                <br>
+                <div class="row preview-div" hidden>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="signed_pfi_label"></span>
+                        <div id="signed_pfi_preview">
+                            @if(isset($workOrder->signed_pfi))
+                            <div id="signed_pfi_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed PFI</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Signed_PFI"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" alt="Signed PFI"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="signed_contract_label"></span>
+                        <div id="signed_contract_preview">
+                            @if(isset($workOrder->signed_contract))
+                            <div id="signed_contract_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Signed Contract</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Signed_Contract"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" alt="Signed Contract"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="payment_receipts_label"></span>
+                        <div id="payment_receipts_preview">
+                            @if(isset($workOrder->payment_receipts))
+                            <div id="payment_receipts_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Payment Receipts</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Payment_Receipts"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" alt="Payment Receipts"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="noc_label"></span>
+                        <div id="noc_preview">
+                            @if(isset($workOrder->noc))
+                            <div id="noc_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">NOC</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="NOC"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/noc/' . $workOrder->noc) }}" alt="NOC"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_trade_license_label"></span>
+                        <div id="enduser_trade_license_preview">
+                            @if(isset($workOrder->enduser_trade_license))
+                            <div id="enduser_trade_license_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Trade License</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Enduser_Trade_License"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" alt="Enduser Trade License"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_passport_label"></span>
+                        <div id="enduser_passport_preview">
+                            @if(isset($workOrder->enduser_passport))
+                            <div id="enduser_passport_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Passport</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Enduser_Passport"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" alt="Enduser Passport"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="enduser_contract_label"></span>
+                        <div id="enduser_contract_preview">
+                            @if(isset($workOrder->enduser_contract))
+                            <div id="enduser_contract_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Enduser Contract</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Enduser_Contract"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" alt="Enduser Contract"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
+                        <span class="fw-bold col-form-label text-md-end" id="vehicle_handover_person_id_label"></span>
+                        <div id="vehicle_handover_person_id_preview">
+                            @if(isset($workOrder->vehicle_handover_person_id))
+                            <div id="vehicle_handover_person_id_preview1">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left;">Vehicle Handover Person ID</h6>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                        <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                        <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download class="text-white">
+                                        Download
+                                        </a>
+                                        </button>
+                                        <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                            data-file-type="Vehicle_Handover_Person_ID"> Delete</button>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" alt="Vehicle Handover Person ID"></iframe>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 			</div>
 		</div>
 		<div class="card  no-border">
@@ -900,42 +904,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 			</div>
 		</div>
+		<input type="hidden" id="brn-file-file-delete" name="is_brn_file_delete" value="">
+		<input type="hidden" id="signed-pfi-delete" name="is_signed_pfi_delete" value="">
+		<input type="hidden" id="signed-contract-delete" name="is_signed_contract_delete" value="">   
+		<input type="hidden" id="payment-receipts-file-delete" name="is_payment_receipts_delete" value=""> 
+		<input type="hidden" id="noc-file-delete" name="is_noc_delete" value="">
+		<input type="hidden" id="enduser-trade-license-delete" name="is_enduser_trade_license_delete" value="">
+		<input type="hidden" id="enduser-passport-delete" name="is_enduser_passport_delete" value="">   
+		<input type="hidden" id="enduser-contract-file-delete" name="is_enduser_contract_delete" value=""> 
+		<input type="hidden" id="vehicle-handover-person-id-file-delete" name="is_vehicle_handover_person_id_delete" value=""> 
 	</form>
 	</br>
-	<!-- <div class="card">
-		<div class="card-header">
-			<h4 class="card-title">
-				<center>Comments Section</center>
-			</h4>
-		</div>
-		<div class="card-body">
-			<div class="row">
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-				</div>
-				<div class="col-xxl-11 col-lg-11 col-md-11">
-					aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-					</br> <span style="color:gray;">
-					Rejitha R Prasad
-					</span><span style="color:gray; float:right;">
-					30 May 2024, 18:00:00
-					</span>
-				</div>
-			</div>
-			</br>
-			<div class="row">
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-				</div>
-				<div class="col-xxl-10 col-lg-10 col-md-10">
-				<textarea id="comment-input" placeholder="Write a comment..."></textarea>
-				</div>
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<button onclick="postComment()">Post</button>
-				</div>
-			</div>
-		</div>
-	</div> -->
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">
@@ -943,79 +922,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</h4>
 		</div>
 		<div class="card-body">
-			<div class="row" id="comments-section">
-				<!-- Comments will be dynamically inserted here -->
-			</div>
-			<div class="form-group">
-				<label for="new-comment">Add a comment:</label>
-				<textarea class="form-control" id="new-comment" rows="3"></textarea>
-				<button class="btn btn-sm btn-primary mt-2" onclick="addComment()">Add Comment</button>
-			</div>
+			@if(isset($workOrder))
+			@include('work_order.export_exw.comments')
+			@else
+			@include('work_order.export_exw.createComments')
+			@endif
 		</div>
-    </div>
+	</div>
 	<br>
 	<div class="card mt-3">
 		<div class="card-header text-center">
-			<h4 class="card-title">Record History</h4>
+			<h4 class="card-title">Data History</h4>
 		</div>
 		<div class="card-body">
-			<div class="row m-0">
-				<div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #e6f1ff" >
-					<label class="col-form-label">Filter Region</label>
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">User</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
-						@foreach($users as $user)
-						<option value="{{$user->id ?? ''}}">{{$user->name ?? ''}}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">Field</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<input type="text" class="form-control widthinput" placeholder="Field">
-				</div>
-				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-					<label class="col-form-label">History Type</label>
-				</div>
-				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-					<input type="text" class="form-control widthinput" placeholder="History Type">
-				</div>
+			<div class="portfolio">
+				<ul class="nav nav-pills nav-fill" id="my-tab">
+					<li class="nav-item">
+						<a class="nav-link form-label active" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
+					</li>   
+					<li class="nav-item">
+						<a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+					</li>                          
+				</ul>
 			</div>
-			<div class="row mt-1">
-				<div class="table-responsive">
-					<table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
-						<thead style="background-color: #e6f1ff">
-						<tr>
-							<th>Date</th>
-							<th>User</th>
-							<th>History Type</th>
-							<th>Old Value</th>
-							<th>New Value</th>
-						</tr>
-						</thead>
-						<tbody>
-						<tr>
-							<td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
-							<td> Jacob</td>
-							<td>Test Type</td>
-							<td>TEST</td>
-							<td></td>
-						</tr>
-						</tbody>
-					</table>
+			</br>
+			<div class="tab-content">
+				<div class="tab-pane fade show active" id="wo_data_history">
+					<div class="card-header text-center">
+						<center style="font-size:12px;">WO Data History</center>
+					</div>
+					<div class="card-body">
+						@include('work_order.export_exw.data_history')
+					</div>
 				</div>
-			</div>
+				<div class="tab-pane fade" id="wo_vehicle_data_history">
+					<div class="card-header text-center">
+						<center style="font-size:12px;">WO Vehicle Data History</center>
+					</div>
+					<div class="card-body">
+						@include('work_order.export_exw.vehicle_data_history')
+					</div>
+				</div>
 
+			</div>
 		</div>
 	</div>
 </div>
 <br>
-
 <div class="overlay"></div>
 @else
 <div class="card-header">
@@ -1027,32 +980,178 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script> -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <script type="text/javascript">
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
     $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
+	var customerCount =  $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
 	var selectedDepositReceivedValue = '';
+	var newCustomerEmail = '';
+	var newCustomerContact = '';
+	var newCustomerAddress = '';
+	var selectedCustomerEmail = '';
+	var selectedCustomerContact = '';
+	var selectedCustomerAddress = '';
 	var onChangeSelectedVins = [];
+	@if(isset($workOrder))
+        var workOrder = {!! json_encode($workOrder) !!};
+    @else
+        var workOrder = null;
+    @endif
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	$(document).ready(function () { 
-        hideDependentTransportType();
-		$("#boe-div").hide();
 		// SELECT 2 START
 			$('#customer_name').select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
 				placeholder:"Choose Customer Name",
-                // dropdownAutoWidth : true,
-                // width: 'auto'
 			});
+
+
+			if(workOrder == null || workOrder.deposit_received_as == null) {
+				$("#amount-received-div").hide();
+				$("#balance-amount-div").hide();
+				$("#deposit-aganist-vehicle-div").hide();
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'total_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").hide();
+				selectedDepositReceivedValue = 'total_deposit';
+			}
+			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").show();
+				selectedDepositReceivedValue = 'custom_deposit';
+				setDepositAganistVehicleDropdownOptions();
+			}
+
+			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
+			workOrder.enduser_trade_license != null || workOrder.enduser_passport != null || workOrder.enduser_contract != null || workOrder.vehicle_handover_person_id != null )) {
+				$('.preview-div').attr('hidden', false);
+			}
+			if(workOrder != null && (workOrder.brn_file != null )) {
+				$('.brn-preview-div').attr('hidden', false);
+			}
+			if (workOrder !== null && workOrder.customer_reference_id === null && workOrder.customer_name !== null) {
+				checkValue();
+				$('#textInput').val(workOrder.customer_name);
+			} else if (workOrder !== null && (workOrder.customer_reference_id !== null || workOrder.customer_reference_id === 0) && workOrder.customer_name !== null) {
+				$("#customer_name").val(workOrder.customer_name).change();
+			}
+			if(workOrder == null || workOrder.transport_type == null) {
+				hideDependentTransportType();
+			}
+			if(workOrder !== null) {
+				$('#customer_address').val(workOrder.customer_address);
+				$('#customer_email').val(workOrder.customer_email);
+				$('#customer_company_number').val(workOrder.customer_company_number);
+				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
+				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
+				if(workOrder.transport_type == 'air') {
+					airRelation();
+				}
+				else if(workOrder.transport_type == 'sea') {
+					seaRelation();
+				}
+				else if(workOrder.transport_type == 'road') {
+					roadRelation();
+					$('#transporting_driver_contact_number').val(workOrder.transporting_driver_contact_number);					
+				}
+			}
+			
+			if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length > 0) {
+				if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length == 1) {
+					$("#boe-div").hide();
+				}
+				// Initialize an object to track VINs by BOE number
+				var boeVins = {};
+				var allVins = []; // Array to keep track of all VINs
+
+				for (var i = 0; i < workOrder.vehicles.length; i++) {
+					drawTableRow(workOrder.vehicles[i]);
+
+					// Find the option and disable it in the vin_multiple dropdown
+					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
+
+					// Refresh the select2 control
+					$("#vin_multiple").trigger('change.select2');
+
+					addedVins.push(workOrder.vehicles[i].vin);
+					allVins.push(workOrder.vehicles[i].vin); // Track all VINs
+
+					// Handle the deposit_aganist_vehicle dropdown
+					var $depositSelect = $("#deposit_aganist_vehicle");
+					if (workOrder.vehicles[i].deposit_received == 'yes') {
+						// Add the VIN as a selected option
+						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, true, true);
+						$depositSelect.append(newOption).trigger('change');
+					} else {
+						// Add the VIN as an unselected option
+						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, false, false);
+						$depositSelect.append(newOption).trigger('change');
+					}
+
+					if (workOrder.vehicles[i].boe_number != null) {
+						var boeNumber = workOrder.vehicles[i].boe_number;
+						if (!boeVins[boeNumber]) {
+							boeVins[boeNumber] = [];
+						}
+						boeVins[boeNumber].push(workOrder.vehicles[i].vin);
+					}
+				}
+				var newBoeOption = '';
+				allVins.forEach(function(vin) { 
+					var newBoeOption = new Option(vin, vin, false, false);
+				});
+				// Add rows for each BOE number and set the corresponding VINs
+				Object.keys(boeVins).forEach(function (boeNumber) {
+					addChild();
+					var index = $(".form_field_outer").find(".form_field_outer_row").length;
+					var $boeSelect = $(`#boe_vin_${index}`);
+					$boeSelect.append(newBoeOption);
+
+					// Set the corresponding VINs for this BOE as selected
+					boeVins[boeNumber].forEach(function(vin) {
+						$boeSelect.find('option[value="' + vin + '"]').prop('selected', true);
+					});
+
+					// Refresh the select2 control
+					$boeSelect.trigger('change');
+				});
+
+				// Disable options in each BOE select2 if they are selected in at least one dropdown
+				$(".form_field_outer").find(".form_field_outer_row select").each(function() {
+					var $select = $(this);
+					var selectedVins = [];
+
+					// Collect selected VINs in this select element
+					$select.find('option:selected').each(function() {
+						selectedVins.push($(this).val());
+					});
+
+					// Disable options that are selected in other dropdowns
+					allVins.forEach(function(vin) {
+						if (selectedVins.indexOf(vin) === -1) { // Don't disable the option if it's selected in this dropdown
+							$select.find('option[value="' + vin + '"]').prop('disabled', true);
+						}
+					});
+					$select.trigger('change.select2');
+				});
+			}
+			else {
+				$("#boe-div").hide();
+			}
+			
 			$('#vin_multiple').select2({
 				allowClear: true,
-				// maximumSelectionLength: 1,
 				placeholder:"VIN",
 			});
 			$('#vin').select2({
@@ -1068,12 +1167,40 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
-			var customer_company_number = window.intlTelInput(document.querySelector("#customer_company_number"), {
+			var input = document.querySelector("#customer_company_number");
+			var iti = window.intlTelInput(input, {
 				separateDialCode: true,
-				preferredCountries:["ae"],
+				preferredCountries: ["ae"],
 				hiddenInput: "full",
 				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 			});
+			// Function to set customer relations
+			function setCustomerRelations(selectedCustomerName) {
+				$('#customer_address').val('');
+				$('#customer_email').val('');
+				$('#customer_company_number').val('');            
+				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+					for (var i = 0; i < customerCount; i++) {
+						if (customers[i].customer_name == selectedCustomerName[0]) { 
+							if (customers[i].customer_address != null) {
+								$('#customer_address').val(customers[i]?.customer_address);
+							}
+							if (customers[i].customer_email != null) {
+								$('#customer_email').val(customers[i]?.customer_email);
+							}
+							if (customers[i].customer_company_number != null) { 
+								var fullPhoneNumber = customers[i].customer_company_number.replace(/\s+/g, '');
+								console.log("Full Phone Number (no spaces):", fullPhoneNumber); // Debugging log
+
+								// Use intlTelInput instance to set the full phone number without spaces
+								iti.setNumber(fullPhoneNumber);
+								// Call sanitizeNumberInput on the current input
+								sanitizeNumberInput(input);
+							}
+						}
+					}
+				}
+			}
 			var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
 				separateDialCode: true,
 				preferredCountries:["ae"],
@@ -1093,70 +1220,84 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// TRANSPORT TYPE ONCHANGE START
 			$('.transport_type').click(function() {
 				if($(this).val() == 'air') {
-					$("#airline-div").show();
-					$('#airline').select2({
-						allowClear: true,
-						maximumSelectionLength: 1,
-						placeholder:"Choose Airline",
-					});
-					$("#airway-bill-div").show();
-					$("#brn-div").hide();
-					$("#brn-file-div").show();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#shippingline-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").show();
-					$("#transportation-company-details-div").hide();
+					airRelation();
 				}
 				else if($(this).val() == 'sea') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").show();
-					$("#forward-import-code-div").show();
-					$("#brn-div").show();
-					$("#brn-file-div").show();
-					$("#container-number-div").show();
-					$("#trailer-number-plate-div").hide();
-					$("#transportation-company-div").hide();
-					$("#transporting-driver-contact-number-div").hide();
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").hide();
+					seaRelation();
 				}
 				else if($(this).val() == 'road') {
-					$("#airline-div").hide();
-					$("#airway-bill-div").hide();
-					$("#shippingline-div").hide();
-					$("#forward-import-code-div").hide();
-					$("#brn-div").hide();
-					$("#brn-file-div").hide();
-					$("#container-number-div").hide();
-					$("#trailer-number-plate-div").show();
-					$("#transportation-company-div").show();
-					$("#transporting-driver-contact-number-div").show();				
-					var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-						separateDialCode: true,
-						preferredCountries:["ae"],
-						hiddenInput: "full",
-						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-					});	
-					$("#airway-details-div").hide();
-					$("#transportation-company-details-div").show();
+					roadRelation();
 				}
 			});
+
+			// TRANSPORT TYPE AIR RELATED DATA
+			function airRelation() {
+				$("#airline-div").show();
+				$('#airline').select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder:"Choose Airline",
+				});
+				$("#airway-bill-div").show();
+				$("#brn-div").hide();
+				$("#brn-file-div").show();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#shippingline-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").show();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE SEA RELATED DATA
+			function seaRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").show();
+				$("#forward-import-code-div").show();
+				$("#brn-div").show();
+				$("#brn-file-div").show();
+				$("#container-number-div").show();
+				$("#trailer-number-plate-div").hide();
+				$("#transportation-company-div").hide();
+				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").hide();
+			}
+			// TRANSPORT TYPE ROAD RELATED DATA
+			function roadRelation() {
+				$("#airline-div").hide();
+				$("#airway-bill-div").hide();
+				$("#shippingline-div").hide();
+				$("#forward-import-code-div").hide();
+				$("#brn-div").hide();
+				$("#brn-file-div").hide();
+				$("#container-number-div").hide();
+				$("#trailer-number-plate-div").show();
+				$("#transportation-company-div").show();
+				$("#transporting-driver-contact-number-div").show();				
+				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});	
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").show();
+			}
 		// TRANSPORT TYPE ONCHANGE END
 
 		// CUSTOMER NAME ONCHANGE START
-			$('#customer_name').on('change', function() {
-				var selectedCustomerName = $(this).val();
+			 // Handle customer name change
+			 $('#customer_name').on('change', function() { 
+				var selectedCustomerName = $(this).val(); 
 				setCustomerRelations(selectedCustomerName);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
 		// DEPOSIT RECEIVED AS ONCHANGE START
-			$('.deposit_received_as').click(function() {
+			$('.deposit_received_as').click(function() { 
 				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
 				if (selectedDepositReceivedValue == 'total_deposit') {
 					$("#amount-received-div").show();
@@ -1177,9 +1318,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				addChild();
 			});
 			$("body").on("click", ".add-addon-btn", function () {
-				addAddon();
+				if (validateVINSelection()) {
+					addAddon();
+				}
 			});
-
+			$("body").on("click", ".add-vehicle-btn", function () {
+				if (validateVINSelection() && validateAddonSelection()) {
+					addVIN();
+				}
+			});
+			function validateVINSelection() {
+				var selectedVIN = $("#vin_multiple").val();
+				if (!selectedVIN || selectedVIN.length === 0) {
+					alert("Please select at least one VIN.");
+					return false;
+				}
+				return true;
+			}
+			function validateAddonSelection() {
+				var isValid = true;
+				$(".addondynamicselect2").each(function () {
+					if ($(this).val() === null || $(this).val().length === 0) {
+						isValid = false;
+						alert("Please select addon.");
+						return false; // Break out of the loop
+					}
+				});
+				return isValid;
+			}
 			// Event listener to remove form fields and reset indexes
 			$("body").on("click", ".remove_node_btn_frm_field", function () {
 				var row = $(this).closest(".form_field_outer_row");
@@ -1191,7 +1357,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 
 				// Enable the VIN options before removing the row
-				var selectedVINs = selectElement.val();
+				var selectedVINs = selectElement.val(); 
 				if (selectedVINs) {
 					selectedVINs.forEach(function(vin) {
 						$('select option[value="' + vin + '"]').prop('disabled', false);
@@ -1201,16 +1367,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				row.remove();
 				resetIndexes();
 			});
-			$("body").on("click", ".remove_node_btn_frm_field_addon", function () {
-				var row = $(this).closest(".addon_input_outer_row");
-				row.remove();
+			
+			// Event delegation for dynamically added elements
+			$(document).on('click', '.remove_node_btn_frm_field_addon', function () {
+				$(this).closest('.addon_input_outer_row').remove();
+				disableAddonSelectedOptions(); // Re-check disabled options after removing a row
 				resetRowIndexes();
 			});
 			// Event listener to handle change event for .dynamicselect2
 			$("body").on("change", ".dynamicselect2", function () {
 				disableSelectedOptions();
 			});
-
+			// Add change event listener for dynamically added .addondynamicselect2 elements
+			$(document).on('change', '.addondynamicselect2', function() {
+				disableAddonSelectedOptions();
+			});
+			
 		// BOE DYNAMICALLY ADD AND REMOVE END
 
 
@@ -1219,12 +1391,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				onChangeSelectedVins = $(this).val(); // Get selected VINs
 				var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 				if (onChangeSelectedVins && onChangeSelectedVins.length > 0) {
-					if(index == 1) {
-						addAddon();
-					}
-					else {
-						resetAddonDropdown();
-					}
+					// if(index == 1) {
+					// 	addAddon();
+					// }
+					// else {
+						// resetAddonDropdown();
+					// }
 					
 				} else {
 					// Clear addons dropdown if no VINs are selected
@@ -1232,113 +1404,818 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			});
 		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS END
+
+        // SHOW FILE UPLOAD DATA START
+            const fileInputBRNFile = document.querySelector("#brn_file");            
+			const fileInputSignedPFI = document.querySelector("#signed_pfi");
+			const fileInputSignedContract = document.querySelector("#signed_contract");            
+			const fileInputPaymentReceipts = document.querySelector("#payment_receipts");
+			const fileInputNOC = document.querySelector("#noc");
+			const fileInputEnduserTradeLicense = document.querySelector("#enduser_trade_license");
+			const fileInputEnduserPassport = document.querySelector("#enduser_passport");
+			const fileInputEnduserContract = document.querySelector("#enduser_contract");
+            const fileInputVehicleHandoverPersonID = document.querySelector("#vehicle_handover_person_id");
+
+            const previewFileBRNFile = document.querySelector("#brn_file_preview");
+			const previewFileSignedPFI = document.querySelector("#signed_pfi_preview");
+			const previewFileSignedContract = document.querySelector("#signed_contract_preview");
+			const previewFilePaymentReceipts = document.querySelector("#payment_receipts_preview");
+			const previewFileNOC = document.querySelector("#noc_preview");
+			const previewFileEnduserTradeLicense = document.querySelector("#enduser_trade_license_preview");
+			const previewFileEnduserPassport = document.querySelector("#enduser_passport_preview");
+			const previewFileEnduserContract = document.querySelector("#enduser_contract_preview");
+            const previewFileVehicleHandoverPersonID = document.querySelector("#vehicle_handover_person_id_preview");
+
+			if(type =='export_exw' || type == 'export_cnf') {
+				fileInputBRNFile.addEventListener("change", function(event) { 
+					$('.brn-preview-div').attr('hidden', false);
+					const files = event.target.files;
+					while (previewFileBRNFile.firstChild) {
+						previewFileBRNFile.removeChild(previewFileBRNFile.firstChild);
+					}
+					const file = files[0];
+					document.getElementById('brn_file_label').textContent="BRN File";
+					const objectUrl = URL.createObjectURL(file);
+					const iframe = document.createElement("iframe");
+					iframe.src = objectUrl;
+					previewFileBRNFile.appendChild(iframe);
+				});
+			}
+           
+            fileInputSignedPFI.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileSignedPFI.firstChild) {
+			        previewFileSignedPFI.removeChild(previewFileSignedPFI.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('signed_pfi_label').textContent="Signed PFI";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileSignedPFI.appendChild(iframe);
+			});
+
+            fileInputSignedContract.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileSignedContract.firstChild) {
+			        previewFileSignedContract.removeChild(previewFileSignedContract.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('signed_contract_label').textContent="Signed Contract";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileSignedContract.appendChild(iframe);
+			});
+
+            fileInputPaymentReceipts.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFilePaymentReceipts.firstChild) {
+			        previewFilePaymentReceipts.removeChild(previewFilePaymentReceipts.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('payment_receipts_label').textContent="Payment Receipts";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFilePaymentReceipts.appendChild(iframe);
+			});
+
+            fileInputNOC.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileNOC.firstChild) {
+			        previewFileNOC.removeChild(previewFileNOC.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('noc_label').textContent="NOC";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileNOC.appendChild(iframe);
+			});
+
+            fileInputEnduserTradeLicense.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserTradeLicense.firstChild) {
+			        previewFileEnduserTradeLicense.removeChild(previewFileEnduserTradeLicense.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_trade_license_label').textContent="Enduser Trade License";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserTradeLicense.appendChild(iframe);
+			});
+
+            fileInputEnduserPassport.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserPassport.firstChild) {
+			        previewFileEnduserPassport.removeChild(previewFileEnduserPassport.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_passport_label').textContent="Enduser Passport";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserPassport.appendChild(iframe);
+			});
+
+            fileInputEnduserContract.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileEnduserContract.firstChild) {
+			        previewFileEnduserContract.removeChild(previewFileEnduserContract.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('enduser_contract_label').textContent="Enduser Contract";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileEnduserContract.appendChild(iframe);
+			});
+
+            fileInputVehicleHandoverPersonID.addEventListener("change", function(event) {
+			    $('.preview-div').attr('hidden', false);
+			    const files = event.target.files;
+			    while (previewFileVehicleHandoverPersonID.firstChild) {
+			        previewFileVehicleHandoverPersonID.removeChild(previewFileVehicleHandoverPersonID.firstChild);
+			    }
+			    const file = files[0];
+                document.getElementById('vehicle_handover_person_id_label').textContent="Vehicle Handover Person ID";
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFileVehicleHandoverPersonID.appendChild(iframe);
+			});
+        // SHOW FILE UPLOAD DATA END
+
+		$(document.body).on('select2:select', ".dynamicselectaddon", function (e) {
+            var dataId = $(this).attr('data-parant');
+			vehicleAddonDropdown(dataId)
+        });
+		$(document.body).on('select2:unselect', ".dynamicselectaddon", function (e) {
+            var dataId = $(this).attr('data-parant');
+			vehicleAddonDropdown(dataId)
+        });
+
+		$('.btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Confirm, It was Confirmed already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.revert-btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.revert-sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Revert, It was reverted already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.btn-finance-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.finance-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Approve, It was approved already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.btn-coe-office-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.coe-office-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Approve, It was approved already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.btn-coe-office-direct-approval').click(function (e) {
+			var id = $(this).attr('data-id');
+			$('#approvalModal').data('id', id).modal('show');
+		});
+
+		$('#submitApproval').click(function (e) {
+			var id = $('#approvalModal').data('id');
+			var comments = $('#approvalComments').val();
+			let url = '{{ route('work-order.coe-office-approval') }}';
+
+			if (!comments) {
+			alertify.error("Please add comments.");
+			return;
+			}
+
+			var confirm = alertify.confirm('Are you sure you want to approve this work order?', function (e) {
+			if (e) {
+				$.ajax({
+				type: "POST",
+				url: url,
+				dataType: "json",
+				data: {
+					id: id,
+					comments: comments,
+					_token: '{{ csrf_token() }}'
+				},
+				success: function (data) {
+					$('#approvalModal').modal('hide');
+					if (data == 'success') {
+					window.location.reload();
+					alertify.success("Successfully Approved");
+					} else if (data == 'error') {
+					window.location.reload();
+					alertify.error("Can't Approve, It was approved already.");
+					}
+				}
+				});
+			}
+			}).set({ title: "Confirmation" });
+		});
+		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
+			// Select all input, select, and textarea elements and disable them
+			var elements = document.querySelectorAll('#WOForm button');
+			// #WOForm input, #WOForm select, #WOForm textarea, 
+			console.log(elements);
+			elements.forEach(function(element) {
+				element.disabled = true;
+			});
+		}
 	});
+	// ADD CUSTOM VALIDATION RULES START
+        // Add custom validation rule for email
+        $.validator.addMethod("customEmail", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
+        }, "Please enter a valid email address");
+        // Custom method to validate SO number format
+		$.validator.addMethod("SONumberFormat", function(value, element) {
+			// Regular expression to match the format SO- followed by exactly 6 digits
+			return this.optional(element) || /^SO-\d{6}$/.test(value);
+		}, "Please enter a valid order number in the format SO-######");
 
-	function addComment(parentId = null) {
-            const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
-            if (commentText.trim() === '') return;
+        // Custom method to ensure SO number is not SO-000000
+		$.validator.addMethod("notSO000000", function(value, element) {
+			return this.optional(element) || value !== "SO-000000";
+		}, "SO Number cannot be SO-000000");
 
-            const commentId = commentIdCounter++;
-            const commentHtml = `
-                <div class="comment mt-2" id="comment-${commentId}">
-						<div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-							<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-						</div>
-						<div class="col-xxl-11 col-lg-11 col-md-11">${commentText}</br>
-							<span style="color:gray;">Rejitha R Prasad</span>
-							<span style="color:gray;"> - 30 May 2024, 18:00:00</span></br>
-							<button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentId})">Reply</button></br>
-							<div class="reply-form" id="reply-form-${commentId}" style="display: none;">
-								<textarea class="form-control reply" id="reply-input-${commentId}" rows="2" placeholder="Write a reply..."></textarea>
-								<button class="btn btn-sm btn-info mt-2" onclick="addComment(${commentId})">Send Reply</button>
-							</div>
-                    		<div class="replies" id="replies-${commentId}"></div>
-						</div>
-                </div>
-            `;
+        // Custom method to ensure no leading or trailing spaces
+		$.validator.addMethod("noSpaces", function(value, element) {
+			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
+		}, "No leading or trailing spaces allowed");
 
-            if (parentId === null) {
-                $('#comments-section').append(commentHtml);
-                $('#new-comment').val('');
-            } else {
-                $(`#replies-${parentId}`).append(commentHtml);
-                $(`#reply-input-${parentId}`).val('');
-                $(`#reply-form-${parentId}`).hide();
-            }
-        }
+        // Add custom validation rule for numeric input only (excluding spaces)
+        $.validator.addMethod("numericOnly", function(value, element) {
+            return this.optional(element) || /^[0-9+]+$/.test(value);
+        }, "Please enter a valid number");
 
-        function showReplyForm(commentId) {
-            $(`#reply-form-${commentId}`).toggle();
-        }
-	// // SHOW MENTION IN COMMENTS SECTION START
-	// 	document.getElementById('comment-input').addEventListener('input', showMentions);
+        // Add custom validation rule for address field (no multiple consecutive spaces)
+        $.validator.addMethod("validAddress", function(value, element) {
+            return this.optional(element) || !/\s\s+/.test(value);
+        }, "No more than one consecutive space is allowed in the address");
+		// Custom method to check if the SO number is unique
+		$.validator.addMethod("uniqueSO", function(value, element) {
+			var result = false;
+			var WoId = $("#wo_id").val(); 
+			$.ajax({
+				type: "POST",
+				async: false,
+				url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
+				data: {_token: '{{csrf_token()}}', so_number: value, id: WoId},
+				success: function(data) {
+					result = (data == true) ? true : false;
+				}
+			});
+			return result; 
+		}, "This SO Number is already taken! Try another.");
 
-	// 	function showMentions(event) {
-	// 		const input = event.target.value;
-	// 		const mentionList = document.getElementById('mentions-list');
-	// 		const mentionTrigger = input.match(/@\w*$/);
-			
-	// 		if (mentionTrigger) {
-	// 			const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
-	// 			const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
-				
-	// 			mentionList.innerHTML = '';
-	// 			filteredMentions.forEach(mention => {
-	// 				const mentionItem = document.createElement('div');
-	// 				mentionItem.textContent = mention;
-	// 				mentionItem.addEventListener('click', () => selectMention(mention));
-	// 				mentionList.appendChild(mentionItem);
-	// 			});
-				
-	// 			mentionList.style.display = 'block';
-	// 		} else {
-	// 			mentionList.style.display = 'none';
-	// 		}
-	// 	}
+		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
+		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
+			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
+				return $('select[name="deposit_aganist_vehicle[]"]').val().length > 0;
+			}
+			return true;
+		}, "At least one vehicle must be selected if deposit is received as custom deposit");
 
-	// 	function selectMention(mention) {
-	// 		const inputField = document.getElementById('comment-input');
-	// 		const inputText = inputField.value;
-	// 		const newText = inputText.replace(/@\w*$/, mention + ' ');
-	// 		inputField.value = newText;
-	// 		document.getElementById('mentions-list').style.display = 'none';
-	// 		inputField.focus();
-	// 	}
+		$.validator.addMethod("allVinsSelected", function(value, element) {
+			// Get all selected VINs across all dynamicselect2 elements
+			let selectedVins = new Set();
+			$('.dynamicselect2').each(function() {
+				$(this).val().forEach(vin => selectedVins.add(vin));
+			});
 
-	// 	function postComment() {
-	// 		const commentInput = document.getElementById('comment-input');
-	// 		const commentText = commentInput.value;
-			
-	// 		if (commentText.trim()) {
-	// 			const commentList = document.getElementById('comment-list');
-	// 			const commentItem = document.createElement('li');
-	// 			commentItem.className = 'comment-item';
-				
-	// 			const mentionRegex = /@\w+/g;
-	// 			const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
-				
-	// 			commentItem.innerHTML = formattedText;
-	// 			commentList.appendChild(commentItem);
-				
-	// 			commentInput.value = '';
-	// 		}
-	// 	}
-	// // SHOW MENTION IN COMMENTS SECTION END
+			// Check if each VIN in addedVins is in the selectedVins set
+			for (let vin of addedVins) {
+				if (!selectedVins.has(vin)) {
+					return false;
+				}
+			}
+
+			return true;
+		}, "All work order vehicles should be selected under one BOE per VIN field.");
+		// Custom method to ensure every element with the class `dynamicselect2` has a value
+		// $.validator.addMethod("allBOERequired", function(value, element) {
+		// 	let isValid = true;
+		// 	$('.dynamicselect2').each(function() {
+		// 		if (!$(this).val()) {
+		// 			isValid = false; // If any element doesn't have a value, set isValid to false
+		// 			return false; // break out of the loop once a value is found missing
+		// 		}
+		// 	});
+		// 	return isValid;
+		// }, "Every BOE must be selected");
+    // ADD CUSTOM VALIDATION RULE END
+
+	// CLIENT SIDE VALIDATION START
+	
+        $('#WOForm').validate({ // initialize the plugin 
+            rules: {
+                type: {
+                    required: true,
+                },
+                so_number: {
+					required: true,
+					noSpaces: true,
+					SONumberFormat: true,
+					notSO000000: true,
+					uniqueSO: true,
+				},
+                batch: {
+                    required: true,
+                },
+                // customer_reference_id: {
+
+                // },
+                // customer_reference_type: {
+
+                // },
+                new_customer_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                // existing_customer_name: {
+
+                // }
+                customer_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "customer_company_number[main]": {
+                    // validContactNumber: true,
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                customer_address: {
+                    // required: true,
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+                customer_representative_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                customer_representative_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "customer_representative_contact[main]": {
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                freight_agent_name: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                freight_agent_email: {
+                    // required: true,
+                    noSpaces: true,
+                    customEmail: true,
+                },
+                "freight_agent_contact_number[main]": {
+                    // noMultipleSpaces: true,
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                port_of_loading: {
+                    required: true,
+                    // noSpaces: true,
+                },
+                port_of_discharge: {
+                    required: true,
+                    noSpaces: true,
+                },
+                final_destination: {
+                    required: true,
+                    noSpaces: true,
+                },
+                // transport_type: {
+                // },
+                brn_file: {
+                    // required: true,
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                brn: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                container_number: {
+                    // required: true,
+                    noSpaces: true,
+                },
+                // airline_reference_id: {
+                // }
+                // airline: {
+                // },
+                airway_bill: {
+                    noSpaces: true,
+                },
+                shipping_line: {
+                    noSpaces: true,
+                },
+                forward_import_code: {
+                    noSpaces: true,
+                },
+                trailer_number_plate: {
+                    noSpaces: true,
+                },
+                transportation_company: {
+                    noSpaces: true,
+                },
+                "transporting_driver_contact_number[main]": {
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },
+                airway_details: {
+                    noSpaces: true,
+                },
+                transportation_company_details: {
+                    noSpaces: true,
+                },
+                // currency: {
+                // },
+                so_total_amount: {
+					noSpaces: true,
+					number: true,
+					min: 0 // Ensures the price is a non-negative number
+                },
+                so_vehicle_quantity: {
+					digits: true,
+					min: 1 // Ensure it's a positive integer
+                },
+				"deposit_aganist_vehicle[]": {
+					customDepositVehicleRequired: true
+				},
+                // amount_received: {
+                // },
+                // balance_amount: {
+                // },				
+                delivery_location: {
+                    noSpaces: true,
+                },
+                delivery_contact_person: {
+                    noSpaces: true,
+                },
+                delivery_date: {
+                    date: true,
+                },
+				// "boe[1][vin][]": {
+				// 	required:true,
+				// },
+				//  id="boe_vin_${index}" 
+				// dynamicselect2: {
+				// 	allBOERequired: true
+				// },
+                signed_pfi: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                signed_contract: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                payment_receipts: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                noc: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_trade_license: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_passport: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                enduser_contract: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                vehicle_handover_person_id: {
+                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    maxsize : 1073741824,
+                },
+                // DYNAMIC FIELDS
+                // vin: {
+                // 	// required: true,
+                // },
+                // brand: {
+                // 	// required: true,
+                // },
+                // variant: {
+                // 	// required: true,
+                // },
+                // engine: {
+                // 	// required: true,
+                // },
+                // model_description: {
+                // 	// required: true,
+                // },
+                // model_year: {
+                // 	// required: true,
+                // },
+                // model_year: {
+                // 	// required: true,
+                // },
+                // steering: {
+                // 	// required: true,
+                // },
+                // exterior_colour: {
+                // 	// required: true,
+                // },
+                // interior_colour: {
+                // 	// required: true,
+                // },
+                // warehouse: {
+                // 	// required: true,
+                // },
+                // territory: {
+                // 	// required: true,
+                // },
+                // preferred_destination: {
+                // 	// required: true,
+                // },
+                // import_document_type: {
+                // 	// required: true,
+                // },
+                // ownership_name: {
+                // 	// required: true,
+                // },
+                // modification_or_jobs_to_perform_per_vin: {
+                // 	// required: true,
+                // },
+                // certification_per_vin: {
+                // 	// required: true,
+                // },
+                // special_request_or_remarks: {
+                // 	// required: true,
+                // },
+            },
+            messages: {
+                brn_file:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                signed_pfi:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                signed_contract:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                payment_receipts:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                noc:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_trade_license:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_passport:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                enduser_contract:{
+                    filesize:" file size must be less than 1 GB.",
+                },
+                vehicle_handover_person_id: {
+                    filesize:" file size must be less than 1 GB.",
+                },
+            },
+			errorPlacement: function(error, element) {
+				error.appendTo(element.parent()); 
+				element.addClass('is-invalid');
+				if ( element.prop( "type" ) === "tel" && element.closest('.select-button-main-div').length > 0 ) {
+					if (!element.val() || element.val().length === 0 || element.val().length > 0) {
+						console.log("Error is here with length", element.val().length);
+						error.addClass('select-error');
+						error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+					} else {
+						console.log("No error");
+					}
+				}
+			},
+			highlight: function (element, errorClass, validClass) {
+				$(element).addClass(errorClass).removeClass(validClass);
+				$(element).next('p.invalid-feedback').show();
+			},
+			unhighlight: function (element, errorClass, validClass) {
+				$(element).removeClass(errorClass).addClass(validClass);
+				$(element).next('p.invalid-feedback').hide();
+				if (!$(element).hasClass(errorClass)) {
+					$(element).removeClass('is-invalid');
+				}
+			},
+			submitHandler: function(form) { 
+				// Prevent default form submission
+				event.preventDefault();
+
+				// Collect all comments
+				const comments = [];
+				if(workOrder == null) {
+					document.querySelectorAll('#comments-section .comment').forEach(comment => {
+						const commentId = comment.getAttribute('data-comment-id');
+						const parentId = comment.getAttribute('data-parent-id');
+						const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+
+						comments.push({ commentId, parentId, text });
+					});
+				}
+
+				// Append comments to form data
+				const formData = new FormData(form);
+				formData.append('comments', JSON.stringify(comments));
+
+				// Send form data via AJAX
+				fetch(form.action, {
+					method: form.method,
+					body: formData,
+					headers: {
+						'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					}
+				}).then(response => {
+					if (!response.ok) {
+						return response.text().then(text => { throw new Error(text) });
+					}
+					return response.json();
+				}).then(data => {
+					if (data.success) {
+						window.location.href = `{{ url('work-order-info') }}/${type}`;
+					} else {
+						throw new Error(data.message);
+					}
+				}).catch(error => {
+					// Optionally display the error message to the user
+				});
+			}
+        });
+    // CLIENT SIDE VALIDATION END
+	function sanitizeQuantity(input) {
+		let value = input.value;
+		// Remove non-numeric characters and ensure it's a positive integer
+		value = value.replace(/[^0-9]/g, '');
+		input.value = value;
+	}
+	function sanitizeAmount(input) {
+		let value = input.value;
+		// Remove non-numeric characters except for dots
+		value = value.replace(/[^0-9.]/g, '');
+
+		// Remove multiple dots
+		const parts = value.split('.');
+		if (parts.length > 2) {
+			value = parts[0] + '.' + parts.slice(1).join('');
+		}
+
+		input.value = value;
+		setDepositBalance();
+	}
+
+	function setDepositBalance() {
+		var totalAmount = $('#so_total_amount').val();
+		var amountReceived = $('#amount_received').val();
+		var balanceAmount = '';
+		if(totalAmount != '' && amountReceived != '') {
+			balanceAmount = Number(totalAmount) - Number(amountReceived);
+		}
+		document.getElementById('balance_amount').value = balanceAmount;
+	}
+		
+  
 
 	// ADDON DYNAMICALLY ADD AND REMOVE START
 		// Function to reset row indexes
 		function resetRowIndexes() {
-			$(".addon_outer .addon_input_outer_row").each(function(index) {
+			$(".addon_outer").find(".addon_input_outer_row").each(function (index, element) {
 				var newIndex = index + 1;
-				$(this).attr('id', `addon_row_${newIndex}`);
-				$(this).find('select').attr('id', `addons_${newIndex}`).data('index', newIndex);
-				$(this).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
-				$(this).find('textarea').attr('id', `addon_description_${newIndex}`);
+				$(element).attr('id', `addon_row_${newIndex}`);
+				$(element).find('select')
+					.attr('id', `addons_${newIndex}`)
+					.data('index', newIndex);
+				$(element).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
+				$(element).find('textarea').attr('id', `addon_description_${newIndex}`);
+
+				// Reinitialize Select2 for the updated elements
+				$(`#addons_${newIndex}`).select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder: "Choose Addon",
+				});
 			});
+			disableAddonSelectedOptions();
 		}
 
 		function resetAddonDropdown() {
-			$.ajax({
+			return $.ajax({
 				url: '{{ route('fetch-addons') }}',
 				type: 'POST',
 				data: {
@@ -1348,7 +2225,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				dataType: 'json',
 				success: function(response) {
 					// Iterate over each dynamicselect2 element to update its options
-					$('.dynamicselect2').each(function() {
+					$('.addondynamicselect2').each(function() { 
 						var $dropdown = $(this);
 						var currentVal = $dropdown.val(); // Store current selected values
 
@@ -1356,14 +2233,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						$dropdown.empty();
 
 						// Populate the addons dropdown with new options
-						if (response && response.length > 0) {
+						if (response.charges && response.charges.length > 0) {
 							$("#addon-dynamic-div").show();
-							$.each(response, function(index, addon) {
+							$.each(response.charges, function(index, charge) {
 								$dropdown.append(
-									$('<option></option>').val(addon.addon_code+" - Test Addon Name").text(addon.addon_code+" - Test Addon Name")
+									$('<option></option>').val(charge.addon_code + " - " + charge.addon_name).text(charge.addon_code + " - " + charge.addon_name)
 								);
 							});
 						}
+						if (response.addons && response.addons.length > 0) {
+							$("#addon-dynamic-div").show();
+							$.each(response.addons, function(index, addon) {
+								$dropdown.append(
+									$('<option></option>').val(addon.addon_code + " - " + addon.addon_name).text(addon.addon_code + " - " + addon.addon_name)
+								);
+							});
+						}
+
+						// Re-initialize Select2 with options
+						$dropdown.select2({
+							allowClear: true,
+							maximumSelectionLength: 1,
+							placeholder: "Choose Addon",
+						});
 
 						// Re-set the previously selected values
 						$dropdown.val(currentVal).trigger('change');
@@ -1374,7 +2266,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			});
 		}
-
 		function addAddon() {
 			var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 			var newRow = $(`
@@ -1384,8 +2275,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<div class="row">
 								<div class="col-xxl-12 col-lg-12 col-md-12">
 									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
-									<select name="addons[]" id="addons_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
+										@foreach($addons as $addon)
+										<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>
+										@endforeach
+										@foreach($charges as $charge)
+										<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>
+										@endforeach
 									</select>
 								</div>
 								<div class="col-xxl-12 col-lg-12 col-md-12">
@@ -1406,57 +2303,85 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 				</div>
 			`);
-			
+
 			// Append the new row to the container
 			$(".addon_outer").append(newRow);
 
 			// Initialize Select2 only on the newly added element
 			$(`#addons_${index}`).select2({
 				allowClear: true,
+				maximumSelectionLength: 1,
 				placeholder: "Choose Addon",
 			});
 
-			disableSelectedOptions();
-			resetAddonDropdown();
+			// Call to update disabled options
+			disableAddonSelectedOptions();
 		}
+
 	// ADDON DYNAMICALLY ADD AND REMOVE END
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
-		function addChild() {
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
-			if (index <= addedVins.length) { 
-				var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
-				var newRow = $(`
-					<div class="row form_field_outer_row" id="${index}">
-						<div class="col-xxl-11 col-lg-11 col-md-11">
-							<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-							<select name="boe[${index}][vin]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-								${options}
-							</select>
-						</div>
-						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-							<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-								<i class="fas fa-trash-alt"></i>
-							</a>
-						</div>
-					</div>
-				`);
+	function addChild() {
+        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-				// Append the new row to the container
-				$(".form_field_outer").append(newRow);
+        // Check if there are any available options
+        if (getAvailableOptions().length > 0) {
+            if (index <= addedVins.length) {
+                var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+                var newRow = $(`
+                    <div class="row form_field_outer_row" id="${index}">
+                        <div class="col-xxl-11 col-lg-11 col-md-11">
+                            <label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+                            <select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+                                ${options}
+                            </select>
+                        </div>
+                        <div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                            <a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                `);
 
-				// Initialize Select2 only on the newly added element
-				$(`#boe_vin_${index}`).select2({
-					allowClear: true,
-					placeholder: "Choose VIN Per BOE",
+                // Append the new row to the container
+                $(".form_field_outer").append(newRow);
+
+                // Initialize Select2 only on the newly added element
+                $(`#boe_vin_${index}`).select2({
+                    allowClear: true,
+                    placeholder: "Choose VIN Per BOE",
+                });
+
+                // Add validation rules for all dynamicselect2 elements
+                $('.dynamicselect2').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+						allVinsSelected: true,
+                        messages: {
+                            required: "This field is required."
+                        }
+                    });
+                });
+
+                disableSelectedOptions();
+            } else {
+                alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+            }
+        } else {
+            alert("Sorry! No available options to select.");
+        }
+    }
+		function getAvailableOptions() {
+			var selectedOptions = [];
+			$(".dynamicselect2").each(function() {
+				$(this).find('option:selected').each(function() {
+					selectedOptions.push($(this).val());
 				});
+			});
 
-				disableSelectedOptions();
-			} else {
-				alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
-			}
+			return addedVins.filter(vin => !selectedOptions.includes(vin));
 		}
-
 		function resetIndexes() {
 			// Loop through each .form_field_outer_row and reset the index
 			$(".form_field_outer").find(".form_field_outer_row").each(function(index, element) {
@@ -1467,7 +2392,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(element).find('label').attr('for', `boe_vin_${newIndex}`).text(`VIN per BOE: ${newIndex}`);
 				$(element).find('select')
 					.attr('id', `boe_vin_${newIndex}`)
-					.attr('name', `boe[${newIndex}][vin]`)
+					.attr('name', `boe[${newIndex}][vin][]`)
 					.data('index', newIndex);
 
 				// Reinitialize Select2
@@ -1477,10 +2402,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				});
 			});
 
-			disableSelectedOptions();
+			disableAddonSelectedOptions();
+		}
+		function disableAddonSelectedOptions() {
+			// Get all selected options
+			var selectedOptions = [];
+			$(".addondynamicselect2").each(function () {
+				$(this).find('option:selected').each(function () {
+					selectedOptions.push($(this).val());
+				});
+			});
+
+			// Disable the selected options in all .addondynamicselect2 elements
+			$(".addondynamicselect2").each(function () {
+				var $select = $(this);
+				$select.find('option').each(function () {
+					if (selectedOptions.includes($(this).val())) {
+						if (!$(this).is(':selected')) {
+							$(this).prop('disabled', true);
+						}
+					} else {
+						$(this).prop('disabled', false);
+					}
+				});
+			});
 		}
 
-		function disableSelectedOptions() {
+		function disableSelectedOptions() { 
 			// Get all selected options
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
@@ -1515,171 +2463,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				for (var j = 0; j < selectedVIN.length; j++) {
 					for (var i = 0; i < vins.length; i++) {
 						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
-							// Get the table body element by ID
-							var tableBody = document.querySelector('#myTable tbody');
-
-							var firstRow = document.createElement('tr');
-							firstRow.style.borderTop = '2px solid #a6a6a6';
-							var secondRow = document.createElement('tr');
-							var thirdRow = document.createElement('tr');
-							var lastRow = document.createElement('tr');
-
-							// First Row Elements
-							var removeIconCell = createCellWithRemoveButton();
-							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vin');
-							vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
-							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','brand');
-							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','variant');
-							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','engine');
-							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','model_description');
-							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','model_year');
-							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','model_year_to_mention_on_documents');
-							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','steering');
-							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','exterior_colour');
-							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','interior_colour');
-							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','warehouse');
-							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','territory');
-							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','preferred_destination');
-							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','import_document_type');
-							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','ownership_name');
-							var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
-
-							// Append cells to the first row
-							firstRow.appendChild(removeIconCell);
-							firstRow.appendChild(vinCell);
-							firstRow.appendChild(brandCell);
-							firstRow.appendChild(variantCell);
-							firstRow.appendChild(engineCell);
-							firstRow.appendChild(modelDescriptionCell);
-							firstRow.appendChild(modelYearCell);
-							firstRow.appendChild(modelYearToMentionOnDocumentsCell);
-							firstRow.appendChild(steeringCell);
-							firstRow.appendChild(exteriorCell);
-							firstRow.appendChild(interiorColorCell);
-							firstRow.appendChild(warehouseCell);
-							firstRow.appendChild(territoryCell);
-							firstRow.appendChild(preferredDestinationCell);
-							firstRow.appendChild(importTypeCell);
-							firstRow.appendChild(ownershipCell);
-							firstRow.appendChild(CertificationPerVINCell);
-							// firstRow.style.borderTop = '1px solid #b3b3b3';
-
-							// Second Row Elements
-							var emptyLabelCell = document.createElement('td');
-							emptyLabelCell.colSpan = 1;
-							emptyLabelCell.textContent = '';
-
-							var modificationLabelCell = document.createElement('td');
-							modificationLabelCell.colSpan = 1;
-							modificationLabelCell.textContent = 'Modification/Jobs';
-
-							var modificationInputCell = document.createElement('td');
-							modificationInputCell.colSpan = 15;
-							var modificationInputElement = document.createElement('input');
-							modificationInputElement.type = 'text';
-							modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
-							modificationInputElement.style.border = 'none';
-							modificationInputElement.style.width = '100%';
-							modificationInputCell.appendChild(modificationInputElement);
-
-							// Append cells to the second row
-							secondRow.appendChild(emptyLabelCell);
-							secondRow.appendChild(modificationLabelCell);
-							secondRow.appendChild(modificationInputCell);
-
-							// Third Row Elements
-							var emptyLabelThirdRowCell = document.createElement('td');
-							emptyLabelThirdRowCell.colSpan = 1;
-							emptyLabelThirdRowCell.textContent = '';
-
-							var specialRequestLabelCell = document.createElement('td');
-							specialRequestLabelCell.colSpan = 1
-							specialRequestLabelCell.textContent = 'Special Request/Remarks';
-
-							var specialRequestInputCell = document.createElement('td');
-							specialRequestInputCell.colSpan = 15;
-							var specialRequestInputElement = document.createElement('input');
-							specialRequestInputElement.type = 'text';
-							specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
-							specialRequestInputElement.style.border = 'none';
-							specialRequestInputElement.style.width = '100%';
-							specialRequestInputCell.appendChild(specialRequestInputElement);
-
-
-							// Append cells to the third row
-							thirdRow.appendChild(emptyLabelThirdRowCell);
-							thirdRow.appendChild(specialRequestLabelCell);
-							thirdRow.appendChild(specialRequestInputCell);
-
-							// Last Row Elements
-							var createAddon = createAddonCell();
-							createAddon.colSpan = 17;
-							// Append cells to the last row
-							lastRow.appendChild(createAddon);
-
-							// Append rows to the table body
-							tableBody.appendChild(firstRow);
-							tableBody.appendChild(secondRow);
-							tableBody.appendChild(thirdRow);
-
-							// Store the VIN in the first row's data attribute for easy retrieval on click
-							$(firstRow).data('vin', vins[i]?.vin ?? '');
-
-							// Store the vin in the third row's data attribute for easy retrieval on click
-							$(thirdRow).data('vin', vins[i]?.vin ?? '');
-
-							var allVehicleRows = [firstRow, secondRow, thirdRow];
-							// Gather data from all dynamically added addon input fields
-							$('.addon_input_outer_row').each(function() {
-								var addonId = $(this).attr('id').split('_')[2];
-								var addonValue = $(`#addons_${addonId}`).val();
-								var addonQuantity = $(`#addon_quantity_${addonId}`).val();
-								var addonDescription = $(`#addon_description_${addonId}`).val();
-
-								var removeAddonCell = createAddonRemoveButton();
-								// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
-								var addonRow = document.createElement('tr');
-
-								// Addon Row Label
-								var serviceBreakdownLabelCell = document.createElement('td');
-								serviceBreakdownLabelCell.colSpan = 1;
-								serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-								// Addon Row Elements
-								var addonValueCell = document.createElement('td');
-								addonValueCell.colSpan = 2;
-								addonValueCell.textContent = addonValue;
-
-								var addonQuantityCell = document.createElement('td');
-								addonQuantityCell.colSpan = 1;
-								addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
-
-								var addonDescriptionCell = document.createElement('td');
-								addonDescriptionCell.colSpan = 14;
-								addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
-
-								// Append cells to the addon row
-								addonRow.appendChild(removeAddonCell);
-								addonRow.appendChild(serviceBreakdownLabelCell);
-								addonRow.appendChild(addonValueCell);
-								addonRow.appendChild(addonQuantityCell);
-								addonRow.appendChild(addonDescriptionCell);
-								// Insert the new row into the array
-								allVehicleRows.push(addonRow);
-								// Append the addon row after the third row
-								thirdRow.insertAdjacentElement('afterend', addonRow);
-								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
-							});
-							tableBody.appendChild(lastRow);
-							allVehicleRows.push(lastRow);
-							$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+							var data = { 
+								id: '',
+								vehicle_id : vins[i]?.id ?? '',
+								vin: vins[i].vin ?? '',
+								brand : vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '',
+								variant: vins[i]?.variant?.name ?? '',
+								engine : vins[i]?.engine ?? '',
+								model_description: vins[i]?.variant?.model_detail ?? '',
+								model_year : vins[i]?.variant?.my ?? '',
+								model_year_to_mention_on_documents: vins[i]?.variant?.my ?? '',
+								steering : vins[i]?.variant?.steering ?? '',
+								exterior_colour: vins[i]?.exterior?.name ?? '',
+								interior_colour : vins[i]?.interior?.name ?? '',
+								warehouse: vins[i]?.warehouse_location?.name ?? '',
+								territory : vins[i]?.territory ?? '',
+								preferred_destination: '',
+								import_document_type : vins[i]?.document?.import_type ?? '',
+								ownership_name: vins[i]?.document?.ownership ?? '',
+								certification_per_vin: '',
+								modification_or_jobs_to_perform_per_vin: '',
+								special_request_or_remarks: '',
+								shipment: '',
+							};
+							drawTableRow(data);
 						}
 					}
 				}
-				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
 				if(index > 0) {
 					// Append selectedVIN data as dropdown option for all dynamicselect2 class
-					$(".dynamicselect2").each(function() {
-						var selectElement = $(this);
+					$(".dynamicselect2").each(function() { 
+						var selectElement = $(this);  
 						selectedVIN.forEach(function(vin) {
 							if (selectElement.find(`option[value='${vin}']`).length === 0) {
 								selectElement.append(`<option value="${vin}">${vin}</option>`);
@@ -1699,6 +2514,210 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
+		function drawTableRow(data) {
+			// Get the table body element by ID
+			var tableBody = document.querySelector('#myTable tbody');
+
+			var firstRow = document.createElement('tr');
+			firstRow.style.borderTop = '2px solid #a6a6a6';
+			firstRow.className = 'first-row';
+			var secondRow = document.createElement('tr');
+			var thirdRow = document.createElement('tr');
+			var lastRow = document.createElement('tr');
+
+			// First Row Elements
+			var removeIconCell = createCellWithRemoveButton();
+
+			var vinCell = document.createElement('td');
+			vinCell.innerHTML = '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][id]" value="' + (data.id) + '">'
+				+'<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vehicle_id]" value="' + (data.vehicle_id) + '">'
+				+ '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vin]" value="' + (data.vin) + '">'
+				+ (data.vin);
+			vinCell.dataset.vin = data.vin; // Correctly setting the data-vin attribute
+
+			var brandCell = createEditableCell(data.brand, 'Enter Brand','vehicle['+data.vehicle_id+'][brand]');
+			var variantCell = createEditableCell(data.variant, 'Enter Variant','vehicle['+data.vehicle_id+'][variant]');
+			var engineCell = createEditableCell(data.engine, 'Enter Engine','vehicle['+data.vehicle_id+'][engine]');
+			var modelDescriptionCell = createEditableCell(data.model_description, 'Enter Model Description','vehicle['+data.vehicle_id+'][model_description]');
+			var modelYearCell = createEditableCell(data.model_year, 'Enter Model Year','vehicle['+data.vehicle_id+'][model_year]');
+			var modelYearToMentionOnDocumentsCell = createEditableCell(data.model_year_to_mention_on_documents, 'Enter Model Year to mention on Documents','vehicle['+data.vehicle_id+'][model_year_to_mention_on_documents]');
+			var steeringCell = createEditableCell(data.steering, 'Enter Steering','vehicle['+data.vehicle_id+'][steering]');
+			var exteriorCell = createEditableCell(data.exterior_colour, 'Enter Exterior Colour','vehicle['+data.vehicle_id+'][exterior_colour]');
+			var interiorColorCell = createEditableCell(data.interior_colour, 'Enter Interior Colour','vehicle['+data.vehicle_id+'][interior_colour]');
+			var warehouseCell = createEditableCell(data.warehouse, 'Enter Warehouse','vehicle['+data.vehicle_id+'][warehouse]');
+			var territoryCell = createEditableCell(data.territory, 'Enter Territory','vehicle['+data.vehicle_id+'][territory]');
+			var preferredDestinationCell = createEditableCell(data.preferred_destination, 'Enter Preferred Destination','vehicle['+data.vehicle_id+'][preferred_destination]');
+			var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type','vehicle['+data.vehicle_id+'][import_document_type]');
+			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
+			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
+
+			// Append cells to the first row
+			firstRow.appendChild(removeIconCell);
+			firstRow.appendChild(vinCell);
+			firstRow.appendChild(brandCell);
+			firstRow.appendChild(variantCell);
+			firstRow.appendChild(engineCell);
+			firstRow.appendChild(modelDescriptionCell);
+			firstRow.appendChild(modelYearCell);
+			firstRow.appendChild(modelYearToMentionOnDocumentsCell);
+			firstRow.appendChild(steeringCell);
+			firstRow.appendChild(exteriorCell);
+			firstRow.appendChild(interiorColorCell);
+			firstRow.appendChild(warehouseCell);
+			firstRow.appendChild(territoryCell);
+			firstRow.appendChild(preferredDestinationCell);
+			firstRow.appendChild(importTypeCell);
+			firstRow.appendChild(ownershipCell);
+			firstRow.appendChild(CertificationPerVINCell);
+			// firstRow.style.borderTop = '1px solid #b3b3b3';
+
+			// Second Row Elements
+			var emptyLabelCell = document.createElement('td');
+			emptyLabelCell.colSpan = 1;
+			emptyLabelCell.textContent = '';
+
+			var modificationLabelCell = document.createElement('td');
+			modificationLabelCell.colSpan = 1;
+			modificationLabelCell.textContent = 'Modification/Jobs';
+
+			var modificationInputCell = document.createElement('td');
+			modificationInputCell.colSpan = 15;
+			var modificationInputElement = document.createElement('input');
+			modificationInputElement.name ='vehicle['+data.vehicle_id+'][modification_or_jobs_to_perform_per_vin]';
+			modificationInputElement.type = 'text';
+			modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
+			modificationInputElement.style.border = 'none';
+			modificationInputElement.style.width = '100%';
+			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
+			modificationInputCell.appendChild(modificationInputElement);
+
+			// Append cells to the second row
+			secondRow.appendChild(emptyLabelCell);
+			secondRow.appendChild(modificationLabelCell);
+			secondRow.appendChild(modificationInputCell);
+
+			// Third Row Elements
+			var emptyLabelThirdRowCell = document.createElement('td');
+			emptyLabelThirdRowCell.colSpan = 1;
+			emptyLabelThirdRowCell.textContent = '';
+
+			var specialRequestLabelCell = document.createElement('td');
+			specialRequestLabelCell.colSpan = 1
+			specialRequestLabelCell.textContent = 'Special Request/Remarks';
+
+			var specialRequestInputCell = document.createElement('td');
+			specialRequestInputCell.colSpan = 15;
+			var specialRequestInputElement = document.createElement('input');
+			specialRequestInputElement.name ='vehicle['+data.vehicle_id+'][special_request_or_remarks]';
+			specialRequestInputElement.type = 'text';
+			specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
+			specialRequestInputElement.style.border = 'none';
+			specialRequestInputElement.style.width = '100%';
+			specialRequestInputElement.value = data.special_request_or_remarks;
+			specialRequestInputCell.appendChild(specialRequestInputElement);
+
+
+			// Append cells to the third row
+			thirdRow.appendChild(emptyLabelThirdRowCell);
+			thirdRow.appendChild(specialRequestLabelCell);
+			thirdRow.appendChild(specialRequestInputCell);
+
+			// Last Row Elements
+			var createAddon = createAddonCell(data.vehicle_id);
+			createAddon.colSpan = 17;
+			// Append cells to the last row
+			lastRow.appendChild(createAddon);
+
+			// Append rows to the table body
+			tableBody.appendChild(firstRow);
+			tableBody.appendChild(secondRow);
+			tableBody.appendChild(thirdRow);
+
+			// Store the VIN in the first row's data attribute for easy retrieval on click
+			$(firstRow).data('vin', data.vin);
+
+			// Store the vin in the third row's data attribute for easy retrieval on click
+			$(thirdRow).data('vin', data.vin);
+
+			var allVehicleRows = [firstRow, secondRow, thirdRow];
+			var addonIndex = 0; // Initialize addon index for each vehicle
+			var currentRow = thirdRow; // Start with the thirdRow
+			if (data.addons && data.addons.length > 0) {
+				for (var j = 0; j < data.addons.length; j++) {
+					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
+					var addonValue = data.addons[j].addon_code;
+					var addonQuantity = data.addons[j].addon_quantity;
+					var addonDescription = data.addons[j].addon_description;
+					if(addonValue != null) {
+						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+						addonIndex++; // Increment addonIndex after calling drawTableAddon
+					}
+				}
+			}
+
+			// Gather data from all dynamically added addon input fields
+			$('.addon_input_outer_row').each(function() { 
+				var addonId = $(this).attr('id').split('_')[2];
+				var addonValue = $(`#addons_${addonId}`).val();
+				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
+				var addonDescription = $(`#addon_description_${addonId}`).val();
+				if(addonValue != null) { 
+					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+					addonIndex++; // Increment addonIndex after calling drawTableAddon
+				}
+			});
+			tableBody.appendChild(lastRow);
+			allVehicleRows.push(lastRow);
+			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
+		}
+		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId, addonValue, addonQuantity, addonDescription) { 
+			var removeAddonCell = createAddonRemoveButton();
+			
+			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+			var addonRow = document.createElement('tr');
+			addonRow.className = data.vehicle_id; // Add the vehicle_id as a class for addonRow
+
+			// Addon Row Label
+			var serviceBreakdownLabelCell = document.createElement('td');
+			serviceBreakdownLabelCell.colSpan = 1;
+			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+
+			// Addon Row Elements
+			var addonValueCell = document.createElement('td');
+			addonValueCell.colSpan = 2;
+			addonValueCell.textContent = addonValue;
+
+			var addonQuantityCell = document.createElement('td');
+			addonQuantityCell.colSpan = 1;
+			addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
+				+ '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
+				+ '<div class="input-group">'
+				+ '<div class="input-group-append">'
+				+ '<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
+				+ '</div>'
+				+ '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Addon Quantity">'
+				+ '</div>';
+
+			var addonDescriptionCell = document.createElement('td');
+			addonDescriptionCell.colSpan = 14;
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+
+			// Append cells to the addon row
+			addonRow.appendChild(removeAddonCell);
+			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(addonValueCell);
+			addonRow.appendChild(addonQuantityCell);
+			addonRow.appendChild(addonDescriptionCell);
+			
+			// Insert the new row into the array
+			allVehicleRows.push(addonRow);
+			
+			// Append the addon row after the third row
+			thirdRow.insertAdjacentElement('afterend', addonRow);
+			
+			return addonRow; // Return the newly created addonRow to be used as the next reference row
+		}
+
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
@@ -1714,7 +2733,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('select option[value="'+ vin +'"]').prop('disabled', false);
 			}
 			var rows = $(this).data('rows');
-			// console.log(rows);
 			if (rows) {
 				$(rows).each(function() {
 					$(this).remove();
@@ -1725,62 +2743,78 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// Event delegation to handle remove button click for remove addons row from vehicle table section
 		$('#myTable').on('click', '.remove-addon-row', function() {
 			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
+			var className = addon.attr('class'); // Get the class name of the tr
+			
 			addon.remove();
-			// console.log(addon);
-			// if (vin) {
-			// 	// Unselect and remove the VIN from all dynamicselect2 class elements
-			// 	$(".dynamicselect2").each(function() {
-			// 		var selectElement = $(this);
-			// 		selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
-			// 		// Trigger change to update the Select2 UI
-			// 		selectElement.trigger('change');
-			// 	});
-			// 	$('select option[value="'+ vin +'"]').prop('disabled', false);
-			// }
-			// var rows = $(this).data('rows');
-			// if (rows) {
-			// 	$(rows).each(function() {
-			// 		$(this).remove();
-			// 	});
-			// }
-			// findAllVINs();
+
+			// Find all rows with the same class name and reset their indices
+			var allVehicleRows = $('#myTable tr.' + className);
+			allVehicleRows.each(function(index) {
+				var row = $(this);			
+				// Update hidden input field for addon_code
+				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
+
+				// Update quantity input field within the specific div structure
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
+
+				// Update description input field within the <td> element
+				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + index);
+				// Check if the element is a select element and re-initialize select2
+				if (row.find('select.child_addon_' + className).length > 0) {
+					$('#addons_' + className + '_' + index).select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder: "Choose Addon"
+					});
+				}				
+			});
+			vehicleAddonDropdown(className)
 		});
 		// Event delegation to handle add addon for vehicle in the vehicle line level
 		$('#myTable').on('click', '.create-addon-row', function() {
-			var addonId = '';
-			var addonValue = 'This is an addon value';
+			// Get the data-id for this td
+			var dataId = $(this).closest('td').data('id');
+			
+			// Find the next addon index for this particular dataId
+			var addonIndex = 0;
+			$('.' + dataId).each(function(index) {
+				addonIndex = index + 1; // Adjust the index based on 0 or 1 based indexing 
+			});
+			var addonValue = '';
 			var addonQuantity = '';
 			var addonDescription = '';
 
-			// var addonId = $(this).attr('id').split('_')[2]; console.log(addonId);
-			// var addonValue = $(`#addons_${addonId}`).val();
-
 			var removeAddonCell = createAddonRemoveButton();
+
 			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
 			var addonRow = document.createElement('tr');
+			addonRow.className = dataId; // Add the vehicle_id as a class for addonRow
 
 			// Addon Row Label
 			var serviceBreakdownLabelCell = document.createElement('td');
 			serviceBreakdownLabelCell.colSpan = 1;
-			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
-			// Addon Row Elements
-			// var addonValueCell = document.createElement('td');
-			// addonValueCell.colSpan = 2;
-			// addonValueCell.textContent = addonValue;
+			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
+			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
-			// addonValueCell.textContent = addonValue;
-			addonValueCell.innerHTML = '<select name="addons[]" id="addons_" class="form-control widthinput dynamicselectaddon" data-index="" multiple="true"><option>P000 test addon</option><option>P001 test addon</option></select>';
-
+			addonValueCell.innerHTML = '<select name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_code]" id="addons_'+dataId+'_'+addonIndex+'" class="child_addon_'+dataId+' form-control widthinput dynamicselectaddon" data-parant="'+dataId+'" multiple="true">'
+				+ '@foreach($addons as $addon)<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>@endforeach'
+				+ '@foreach($charges as $charge)<option value="{{$charge->addon_code}} - {{$charge->addon_name}}">{{$charge->addon_code}} - {{$charge->addon_name}}</option>@endforeach'
+				+ '</select>';
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
-			addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+			addonQuantityCell.innerHTML = '<div class="input-group">'
+			+'<div class="input-group-append">'
+			+'<span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span>'
+			+'</div>'
+			+'<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_quantity]" style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity_'+dataId+ '_'+ addonIndex + '" placeholder="Addon Quantity">'
+			+'</div>';
 
 			var addonDescriptionCell = document.createElement('td');
 			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
-
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
+			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
@@ -1788,34 +2822,78 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
 
-			// WRITE CODE TO APPEND THE ADDON ROW AFTER THE LAST ADDON OF THE ROW VIN OR BEFORE THE ADD ADDON BUTTON
+			// Append the addon row after the last addon of the row VIN or before the add addon button
+			var parentElementRemove = $(this).closest('tr');
+			var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
 
-			 var parentElementRemove = $(this).closest('tr');
-				var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
+			if (firstRemoveRowButton.length) {
+				firstRemoveRowButton.after(addonRow);
 
-				if (firstRemoveRowButton.length) {
-					firstRemoveRowButton.after(addonRow);
-
-					// Push addonRow element into data-rows array of firstRemoveRowButton element
-					var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
-					rowsData.push(addonRow);
-					firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
-				} 
-				else {
-					parentElementRemove.after(addonRow);
-				}
-				var parentElement = this.parentElement.parentElement;
+				// Push addonRow element into data-rows array of firstRemoveRowButton element
+				var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
+				rowsData.push(addonRow);
+				firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
+			} else {
+				parentElementRemove.after(addonRow);
+			}
+			var parentElement = this.parentElement.parentElement;
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
-			$(`.dynamicselectaddon`).select2({
+			// Initialize select2 after appending the row to the DOM
+			$('#addons_' + dataId + '_' + addonIndex).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
-				placeholder: "Choose Addon",
+				placeholder: "Choose Addon"
 			});
+				// Add validation rules for all dynamicselectaddon elements
+				$('.dynamicselectaddon').each(function() {
+                    $(this).rules('add', {
+                        required: true,
+                        messages: {
+                            required: "This field is required."
+                        }
+                    });
+                });
+				$("#addon_quantity_"+dataId+"_"+addonIndex).rules('add', {
+					digits: true,
+					min: 1 // Ensure it's a positive integer
+				});
+				$("#addon_description_"+dataId+"_"+addonIndex).rules('add', {
+					noSpaces: true,
+				});
+			vehicleAddonDropdown(dataId);
 		});
+		function vehicleAddonDropdown(dataId) {
+			// Collect all selected addon values for the specific dataId
+			var selectedAddonValues = [];
+			$('.' + dataId).find('.child_addon_' + dataId).each(function() {
+				if ($(this).is('input')) {
+					selectedAddonValues.push($(this).val());
+				} else if ($(this).is('select') && $(this).val()[0] != undefined) {  
+					selectedAddonValues.push($(this).val()[0]);
+				}
+			});
+			// Disable the collected options in all select elements for the dataId
+			$('.' + dataId).find('select').each(function() {
+				var selectElement = $(this);
+				var currentSelectedValue = selectElement.val();
+				selectElement.find('option').each(function() {
+					var optionValue = $(this).val();
+					// Disable options that are in the selectedAddonValues array but are not the currently selected value
+					if (selectedAddonValues.includes(optionValue) && optionValue !== currentSelectedValue[0]) {
+						$(this).prop('disabled', true);
+					} else {
+						$(this).prop('disabled', false);
+					}
+				});
+				// Refresh select2 to show disabled options
+				selectElement.trigger('change.select2');
+			});
+		}
+
 		function findAllVINs() {
 			addedVins = [];
-			$('#myTable tbody tr').each(function() {
-				var addedVin = $(this).data('vin');
+			$('#myTable tbody .first-row').each(function() {
+				var addedVin = $(this).data('vin'); 
 				if (addedVin) {
 					addedVins.push(addedVin);
 				}
@@ -1884,8 +2962,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			cell.appendChild(removeButton);
 			return cell;
 		}
-		function createAddonCell() {
+		function createAddonCell(vehicle_id) {
 			var cell = document.createElement('td');
+			cell.setAttribute('data-id', vehicle_id); // Setting the data-id attribute
 			var addButton = document.createElement('a');
 			addButton.className = 'addon_btn_round create-addon-row';
 			addButton.title = 'Create Addon';
@@ -1893,28 +2972,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			cell.appendChild(addButton);
 			return cell;
 		}
-		function createEditableSelect2Cell(vin) {
+		function createEditableSelect2Cell(vin, vehicle_id, certification_per_vin) {
 			var cell = document.createElement('td');
 			var selectElement = document.createElement('select');
-			selectElement.id = 'certification_per_vin_'+vin;
-			selectElement.name = 'certification_per_vin';
+			selectElement.id = 'certification_per_vin_' + vin;
+			selectElement.name = 'vehicle[' + vehicle_id + '][certification_per_vin]';
 			selectElement.className = 'form-control widthinput';
 			selectElement.multiple = true;
 			selectElement.style.width = '100%';
 
 			var options = [
-				'RTA Without Number Plate',
-				'RTA With Number Plate',
-				'Certificate Of Origin',
-				'Certificate Of Conformity',
-				'QISJ Inspection',
-				'EAA Inspection'
+				{ value: 'rta_without_number_plate', text: 'RTA Without Number Plate' },
+				{ value: 'rta_with_number_plate', text: 'RTA With Number Plate' },
+				{ value: 'certificate_of_origin', text: 'Certificate Of Origin' },
+				{ value: 'certificate_of_conformity', text: 'Certificate Of Conformity' },
+				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
+				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
 
-			options.forEach(function(optionText) {
+			// Ensure certification_per_vin is an array
+			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
+
+			options.forEach(function(optionData) {
 				var option = document.createElement('option');
-				option.value = optionText;
-				option.textContent = optionText;
+				option.value = optionData.value;
+				option.textContent = optionData.text;
+				
+				if (certification_per_vin.includes(optionData.value)) {
+					option.selected = true;
+				}
+				
 				selectElement.appendChild(option);
 			});
 
@@ -1922,12 +3009,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			$(selectElement).select2({
 				allowClear: true,
-				// maximumSelectionLength: 1, Certification Per VIN
+				maximumSelectionLength: 1,
 				placeholder: "Choose "
 			});
 
 			return cell;
 		}
+
+
 	// ADD AND REMOVE VEHICLE TO WO END
 
 	// HIDE FIELDS START
@@ -1944,50 +3033,70 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$("#transporting-driver-contact-number-div").hide();
 			$("#airway-details-div").hide();
 			$("#transportation-company-details-div").hide();
-			$("#amount-received-div").hide();
-			$("#balance-amount-div").hide();
-			$("#deposit-aganist-vehicle-div").hide();
 		}
 	// HIDE FIELDS END
 
 	// CUSTOMER DETAILS SECTION START
-		function checkValue() {
-			var textInput = document.getElementById('textInput');
-			var Other = document.getElementById('Other');
-			var switchToDropdown = document.getElementById('switchToDropdown');
-			$('#customer_name').next('.select2-container').hide();
-			textInput.style.display = 'inline';
-			Other.style.display = 'none';
-			switchToDropdown.style.display = 'inline';
-			$('#customer_address').val('');
-		}
-		function switchToDropdown() {
-			var textInput = document.getElementById('textInput');
-			var Other = document.getElementById('Other');
-			var switchToDropdown = document.getElementById('switchToDropdown');
-			$('#customer_name').next('.select2-container').show();
-			textInput.style.display = 'none';
-			Other.style.display = 'inline';
-			switchToDropdown.style.display = 'none';
-			var selectedCustomerName = $('#customer_name').val();
-			if(selectedCustomerName.length > 0) {
-				setCustomerRelations(selectedCustomerName);
+        function checkValue() {
+			selectedCustomerEmail = $('#customer_email').val();
+			selectedCustomerAddress = $('#customer_address').val();
+			selectedCustomerContact = $('#customer_company_number').val();
+            $('#customer_type').val('new');
+            var textInput = document.getElementById('textInput');
+            var Other = document.getElementById('Other');
+            var switchToDropdown = document.getElementById('switchToDropdown');
+            
+            // Store the current select value
+            var selectedCustomerName = $('#customer_name').val();
+            // $('#customer_reference_type').val('select');
+            $('#customer_reference_id').val(selectedCustomerName);
+            
+            // Hide the select2 container and show the text input
+            $('#customer_name').next('.select2-container').hide();
+            textInput.style.display = 'inline';
+            Other.style.display = 'none';
+            switchToDropdown.style.display = 'inline';
+            $('#customer_address').val(newCustomerAddress);
+			$('#customer_email').val(newCustomerEmail);
+			$('#customer_company_number').val(newCustomerContact);
+        }
+
+        function switchToDropdown() {
+			newCustomerEmail = $('#customer_email').val();
+			newCustomerAddress = $('#customer_address').val();
+			newCustomerContact = $('#customer_company_number').val();
+            $('#customer_type').val('existing');
+            var textInput = document.getElementById('textInput');
+            var Other = document.getElementById('Other');
+            var switchToDropdown = document.getElementById('switchToDropdown');
+            
+            // Store the current text input value
+            var newCustomerName = $('#textInput').val();
+            // $('#customer_reference_type').val('input');
+            $('#customer_reference_id').val(newCustomerName);
+            
+            // Show the select2 container and hide the text input
+            $('#customer_name').next('.select2-container').show();
+            textInput.style.display = 'none';
+            Other.style.display = 'inline';
+            switchToDropdown.style.display = 'none';
+            
+            var selectedCustomerName = $('#customer_name').val();
+            if (selectedCustomerName.length > 0) {
+                // setCustomerRelations(selectedCustomerName);
+				$('#customer_address').val(selectedCustomerAddress);
+				$('#customer_email').val(selectedCustomerEmail);
+				$('#customer_company_number').val(selectedCustomerContact);
+            }
+			else {
+				$('#customer_address').val('');
+				$('#customer_email').val('');
+				$('#customer_company_number').val('');
 			}
-		}
-		function setCustomerRelations(selectedCustomerName) {
-			$('#customer_address').val('');
-			// document.getElementById('customer_email').value = '';
-			// document.getElementById('customer_company_number').value = '';
-			if(selectedCustomerName != '') {
-				for (var i = 0; i < customers.length; i++) {
-					if (customers[i].name == selectedCustomerName) {
-						if(customers[i].address != null) {
-							$('#customer_address').val(customers[i]?.address);
-						}
-					}
-				}
-			}
-		}
+        }
+
+       
+		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
@@ -2012,10 +3121,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		function setDepositAganistVehicleDropdownOptions() {
 			// Get the previously selected values
 			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
-
 			// Empty the select element before adding new options
 			$('#deposit_aganist_vehicle').empty();
-
 			// Add new options to the select element
 			addedVins.forEach(function(vin) {
 				$('#deposit_aganist_vehicle').append(new Option(vin, vin));
@@ -2032,242 +3139,69 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				return addedVins.includes(value);
 			})).trigger('change');
 		}
-		function setDepositBalance() {
-			var totalAmount = $('#so_total_amount').val();
-			var amountReceived = $('#amount_received').val();
-			var balanceAmount = '';
-			if(totalAmount != '' && amountReceived != '') {
-				balanceAmount = Number(totalAmount) - Number(amountReceived);
-			}
-			document.getElementById('balance_amount').value = balanceAmount;
-		}
+		
 	// SET DEPOSIT BALANCE END
 
 	// CURRENCY UPDATE START
 		function updateCurrency() {
 			var currency = document.getElementById("currency").value;
 			var currencyText = document.querySelector("#currency option:checked").textContent;
-			// document.getElementById("currency-label").textContent = currencyText;
 			document.getElementById("amount_received_currency").textContent = currencyText;
 			document.getElementById("balance_amount_currency").textContent = currencyText;
 		}
 	// CURRENCY UPDATE END
 
-	// CLIENT SIDE VALIDATION START
-		$.validator.addMethod("SONumberFormat", function(value, element) {
-			// Regular expression to match the format SO- followed by exactly 6 digits
-			return this.optional(element) || /^SO-\d{6}$/.test(value);
-		}, "Please enter a valid order number in the format SO-######");
-		// $.validator.addMethod("WONumberFormat", function(value, element) {
-		// 	// Regular expression to match the format WO- followed by exactly 6 digits
-		// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
-		// }, "Please enter a valid order number in the format WO-######");
-		jQuery.validator.setDefaults({
-			errorClass: "is-invalid",
-			errorElement: "p",
-			errorPlacement: function ( error, element ) {
-				error.addClass( "invalid-feedback font-size-13" );
-				if ( element.prop( "type" ) === "checkbox" ) {
-					error.insertAfter( element.parent( "label" ) );
-				}
-				else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-					if (!element.val() || element.val().length === 0) {
-						console.log("Error is here with length", element.val().length);
-						error.addClass('select-error');
-						error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-					} else {
-						console.log("No error");
-					}
-				}
-			else if (element.parent().hasClass('input-group')) {
-					error.insertAfter(element.parent());
-				}
-				else {
-					error.insertAfter( element );
-				}
+    function sanitizeInput(input) {
+        // Replace multiple spaces with a single space
+        input.value = input.value.replace(/\s\s+/g, ' ');
+    }
+
+    function sanitizeNumberInput(input) {
+        // Remove any non-numeric characters
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+	
+	$('.delete-button').on('click',function() {
+		var fileType = $(this).attr('data-file-type');
+		if (confirm('Are you sure you want to Delete this item ?')) {
+			if(fileType == 'BRN_File') {
+				$('#brn_file_preview1').remove();
+				$('#brn-file-file-delete').val(1);
+	
+			}else if(fileType == 'Signed_PFI') {
+				$('#signed_pfi_preview1').remove();
+				$('#signed-pfi-delete').val(1);
+	
+			}else if(fileType == 'Signed_Contract') {
+				$('#signed_contract_preview1').remove();
+				$('#signed-contract-delete').val(1);
 			}
-		});
-		$('#WOForm').validate({ // initialize the plugin
-			rules: {
-				type: {
-					required: true,
-				},
-				date: {
-					required: true,
-					date: true,
-				},
-				so_number: {
-					required: true,
-					SONumberFormat: true
-				},
-				batch: {
-					required: true,
-				},
-				// wo_number: {
-				// 	required: true,
-				// 	WONumberFormat: true
-				// },
-				customer_name: {
-					// required: true,
-				},
-				customer_email: {
-					// required: true,
-					email: true,
-				},
-				customer_company_number: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-				},
-				customer_address: {
-					// required: true,
-					// money: true,
-					// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
-				},
-				customer_representative_name: {
-					// required: true,
-				},
-				customer_representative_email: {
-					// required: true,
-					email: true,
-				},
-				customer_representative_contact: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-				},
-				freight_agent_name: {
-					// required: true,
-				},
-				freight_agent_email: {
-					// required: true,
-					email: true,
-				},
-				freight_agent_contact_number: {
-					// required: true,
-					minlength: 5,
-					maxlength: 20,
-				},
-				port_of_loading: {
-					// required: true,
-				},
-				port_of_discharge: {
-					// required: true,
-				},
-				final_destination: {
-					// required: true,
-				},
-				transport_type: {
-					// required: true,
-				},
-				airline: {
-					// required: true,
-				},
-				airway_bill: {
-					// required: true,
-				},
-				shipping_line: {
-					// required: true,
-				},
-				forward_import_code: {
-					// required: true,
-				},
-				brn: {
-					// required: true,
-				},
-				brn_file: {
-					// required: true,
-				},
-				container_number: {
-					// required: true,
-				},
-				// vin: {
-				// 	// required: true,
-				// },
-				// brand: {
-				// 	// required: true,
-				// },
-				// variant: {
-				// 	// required: true,
-				// },
-				// engine: {
-				// 	// required: true,
-				// },
-				// model_description: {
-				// 	// required: true,
-				// },
-				// model_year: {
-				// 	// required: true,
-				// },
-				// model_year: {
-				// 	// required: true,
-				// },
-				// steering: {
-				// 	// required: true,
-				// },
-				// exterior_colour: {
-				// 	// required: true,
-				// },
-				// interior_colour: {
-				// 	// required: true,
-				// },
-				// warehouse: {
-				// 	// required: true,
-				// },
-				// territory: {
-				// 	// required: true,
-				// },
-				// preferred_destination: {
-				// 	// required: true,
-				// },
-				// import_document_type: {
-				// 	// required: true,
-				// },
-				// ownership_name: {
-				// 	// required: true,
-				// },
-				// modification_or_jobs_to_perform_per_vin: {
-				// 	// required: true,
-				// },
-				// certification_per_vin: {
-				// 	// required: true,
-				// },
-				// special_request_or_remarks: {
-				// 	// required: true,
-				// },
-				delivery_location: {
-					// required: true,
-				},
-				delivery_contact_person: {
-					// required: true,
-				},
-				delivery_date: {
-					// required: true,
-				},
-				signed_pdf: {
-					// required: true,
-				},
-				signed_contract: {
-					// required: true,
-				},
-				payment_receipts: {
-					// required: true,
-				},
-				noc: {
-					// required: true,
-				},
-				enduser_trade_license: {
-					// required: true,
-				},
-				enduser_passport: {
-					// required: true,
-				},
-				enduser_contract: {
-					// required: true,
-				},
-			},
-		});
-	// CLIENT SIDE VALIDATION END
+			else if(fileType == 'Payment_Receipts') {
+				$('#payment_receipts_preview1').remove();
+				$('#payment-receipts-file-delete').val(1);
+			}
+			else if(fileType == 'NOC') {
+				$('#noc_preview1').remove();
+				$('#noc-file-delete').val(1);
+	
+			}else if(fileType == 'Enduser_Trade_License') {
+				$('#enduser_trade_license_preview1').remove();
+				$('#enduser-trade-license-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Passport') {
+				$('#enduser_passport_preview1').remove();
+				$('#enduser-passport-delete').val(1);
+			}
+			else if(fileType == 'Enduser_Contract') {
+				$('#enduser_contract_preview1').remove();
+				$('#enduser-contract-file-delete').val(1);
+			}
+			else if(fileType == 'Vehicle_Handover_Person_ID') {
+				$('#vehicle_handover_person_id_preview1').remove();
+				$('#vehicle-handover-person-id-file-delete').val(1);
+			}
+		}
+	});
 </script>
 
 @endsection

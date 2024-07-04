@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Models\Customer;
+use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\MasterModelLines;
 use Carbon\Carbon;
@@ -80,6 +83,8 @@ class LoiCountryCriteriasController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open LOI Restricted Counties Create Page');
+
         $LOIRestrictedCountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->pluck('country_id');
         $countries = Country::whereNotIn('id', $LOIRestrictedCountries)->get();
         $modelLines = MasterModelLines::all();
@@ -111,6 +116,8 @@ class LoiCountryCriteriasController extends Controller
 
         $loiCountryCriteria->save();
 
+        (new UserActivityController)->createActivity('Created Entry in  LOI Restricted Counties.');
+
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Restricted Country Added Successfully.');
 
     }
@@ -128,6 +135,7 @@ class LoiCountryCriteriasController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the Edit page LOI Restricted Counties.');
         $loiCountryCriteria = LoiCountryCriteria::find($id);
 
         $modelLines = MasterModelLines::all();
@@ -159,6 +167,9 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->save();
 
+        (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
+
+
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Country Criteria Updated Successfully.');
     }
 
@@ -167,12 +178,16 @@ class LoiCountryCriteriasController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted Entry in  LOI Restricted Counties.');
+
         $loiCountryCriteria = LoiCountryCriteria::find($id);
         $loiCountryCriteria->delete();
 
         return response(true);
     }
     public function statusChange(Request $request) {
+
+        (new UserActivityController)->createActivity('Status change don in  LOI restricted counties.');
 
         $loiCountryCriteria = LoiCountryCriteria::find($request->id);
         $loiCountryCriteria->status = $request->status;
@@ -182,34 +197,53 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-//        info($request->all());
-        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
+    
+        $customer = Customer::find($request->customer_id);
+        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
         $data = [];
+
+        // get the loi count for this customer for thid=s year;
+        $year = Carbon::parse($request->loi_date)->format('Y');
+        $totalUnitCountUsed = LetterOfIndentItem::with('LOI')
+                                    ->whereHas('LOI', function($query) use($year, $request){
+                                        $query->where('customer_id', $request->customer_id)
+                                        ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+                                        ->whereYear('date', $year);
+                                    })
+                                    ->sum('quantity');
+
+        $quantity = $totalUnitCountUsed + $request->total_quantities;
+
         if(!empty($LoiCountryCriteria->comment)) {
             $data['comment'] = $LoiCountryCriteria->comment;
         }
-        if(!empty($LoiCountryCriteria->is_only_company_allowed)) {
-            if($LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES ) {
-                if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY ) {
-                    $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
-                    $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
-                }
+    
+        if(!empty($LoiCountryCriteria->is_only_company_allowed && $LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES)) {
+          
+            if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            
+                $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
+                $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
             }
         }
-        if($request->total_quantities) {
+        if($quantity > 0) {
+            $msg = "";
+            if($totalUnitCountUsed > 0) {
+               $msg = 'Already ' .$totalUnitCountUsed.' unit is used by this customer!';    
+            }
             if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
-                if($request->total_quantities > $LoiCountryCriteria->max_qty_per_passport) {
-                    $data['max_qty_per_passport_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_per_passport;
+                if($quantity > $LoiCountryCriteria->max_qty_per_passport) {
+                    $data['max_qty_per_passport_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
                 }
             }
             if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
-                if($LoiCountryCriteria->min_qty_for_company > $request->total_quantities) {
-                    $data['min_qty_per_company_error'] = 'Quantity should be greater than '.$LoiCountryCriteria->min_qty_for_company;
+                if($LoiCountryCriteria->min_qty_for_company > $quantity) {
+                    $data['min_qty_per_company_error'] = 'Total Quantity should be greater than allowed quantity( '.$LoiCountryCriteria->min_qty_for_company.' ). '.$msg;
                 }
             }
             if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
-                if($LoiCountryCriteria->max_qty_for_company < $request->total_quantities) {
-                    $data['max_qty_per_company_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_for_company;
+                if($LoiCountryCriteria->max_qty_for_company < $quantity) {
+                    $data['max_qty_per_company_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_for_company.' ). '.$msg;
                 }
             }
         }

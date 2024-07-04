@@ -164,6 +164,8 @@ class CustomerController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Customer Detail Deleted');
+
         $customer = Customer::find($id);
         $customer->delete();
         

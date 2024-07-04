@@ -43,7 +43,6 @@
 <div class="row">
     <div class="container mb-4 "  >
         <form action="{{ route('letter-of-indents.generate-loi') }}" class="mb-3">
-            <input type="hidden" name="height" id="total-height" value="">
             <input type="hidden" name="width" id="width" value="">
             <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
             <input type="hidden" name="type" value="trans_cars">
@@ -133,7 +132,7 @@
                     <td colspan="5"  >1B. LOGISTICS </td>
                     </tr>
                     <tr>
-                        <td> </td>
+                        <td>  <img src="{{ url('images/LOI/transcar_seal.png') }}" class="overlay-image" style="height: 125px;width: 140px"> </td>
                         <td>CNF - Shipment Method </td>
                         <td></td>
                         <td></td>
@@ -146,7 +145,7 @@
                             <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                             <p>NET TOTAL VALUE (USD) TOTAL </p>
                             <p>INVOICE VALUE (AED) </p>
-                            <img src="{{ url('images/LOI/transcar_seal.png') }}" class="overlay-image" style="height: 125px;width: 140px">
+                         
                         </td>
                         <td class="bg-light-grey text-dark fw-bold"> </td>
                         <td class="bg-light-grey text-dark fw-bold" ></td>
@@ -159,29 +158,28 @@
                     </div>
                     <p id="test"></p>
             </div>
-            </div>
-            @if($letterOfIndent->LOIDocuments->count() > 0)
+        </div>
+        <span class="pt-5">
+        @if($letterOfIndent->LOIDocuments->count() > 0)
                 <h5 class="fw-bold text-center">Customer Document</h5>
             @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                    <div class="mt-3" id="remove-doc-{{$letterOfIndentDocument->id}}">
-                        <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  height="500px;" ></iframe>
-                    </div>
-                @endforeach
-            @endif
-        </div>
+                <div class="mt-3" id="remove-doc-{{$letterOfIndentDocument->id}}">
+                    <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  height="500px;" ></iframe>
+                </div>
+            @endforeach
+        @endif
+        </span>
+          
+    </div>
 </div>
     <script type="text/javascript">
-        var height = document.getElementById('full-page').offsetHeight;
-        const values = ["240", "260", "220"];
+        const values = ["240", "260", "280","310"];
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
         console.log(imageWidth);
-        var imageHeight = height - 150;
-        $('#total-height').val(imageHeight);
+    
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');
-        $('.overlay-image').css('top', imageHeight+'px' )
-
     </script>
 @endsection
 

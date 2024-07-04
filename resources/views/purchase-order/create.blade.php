@@ -264,7 +264,7 @@
 
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label">Prefered Destination:</label>
-                            <input type="text" id="fd" name="fd" class="form-control" readonly value="{{ $pfi->letterOfIndent->prefered_location ?? '' }}" placeholder="Prefered Destination" >
+                            <input type="text" id="fd" name="fd" class="form-control" value="{{old('fd')}}" placeholder="Prefered Destination" >
                         </div>
 
                     </div>

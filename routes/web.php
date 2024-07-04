@@ -64,7 +64,6 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
-use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\Repeatedcustomers;
 use App\Http\Controllers\ProfileController;
@@ -107,9 +106,11 @@ use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
 use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
 use App\Http\Controllers\BankAccountsController;
+use App\Http\Controllers\LOIExpiryConditionController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -420,14 +421,22 @@ Route::get('/d', function () {
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'index', 'show','store'
+        'show','store','edit','update'
     ]);
+    // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
+    Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        Route::get('work-order-info/{type}', 'index')->name('work-order.index');
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
-        // Route::get('export-cnf-work-order-create', 'exportCnfWorkOrderCreate')->name('export-cnf.createWO');
-        // Route::get('local-sale-work-order-create', 'exportLocalSaleWorkOrderCreate')->name('local-sale.createWO');
-        // Route::get('lto-work-order-create', 'exportLtoWorkOrderCreate')->name('lto.createWO');
+        Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
+        Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
+        Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
+        Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
+        Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
+        Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
+        Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
+        Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
     // Demand & Planning Module
 
@@ -437,7 +446,6 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
     Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
 
@@ -447,8 +455,7 @@ Route::get('/d', function () {
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
-    Route::post('letter-of-indents/supplier-approval', [LOIItemsController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
-    Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
+    Route::post('letter-of-indents/supplier-approval', [LetterOfIndentController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
@@ -456,13 +463,15 @@ Route::get('/d', function () {
         ->name('letter-of-indent.request-supplier-approval');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
-    Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
+    Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
+    Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
+    Route::post('pfi-released-amount/update/{id}', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
@@ -894,6 +903,9 @@ Route::get('/d', function () {
     Route::post('/bankaccounts/update_balance', [BankAccountsController::class, 'updateBalance'])->name('bankaccounts.update_balance');
     Route::get('/bankaccount/{id}', [BankAccountsController::class, 'show'])->name('bankaccount.show');
 
+
+    // Migration Data check Route
+    Route::resource('migrations', MigrationDataCheckController::class);
 
 
 

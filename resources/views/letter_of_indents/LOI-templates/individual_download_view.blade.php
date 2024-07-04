@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
     <style>
         /*@page { size: 700pt }*/
         .content{
@@ -25,6 +26,7 @@
         p{
             font-size: 14px;
         }
+        .page_break { page-break-before: always; }
     </style>
 
 </head>
@@ -68,9 +70,16 @@
         @if($letterOfIndent->signature)
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
-
     </div>
 </div>
+    <!-- @if(!empty($imageFiles)) -->
+        <!-- <div class="page_break"></div> -->
+        <div class="row">
+            @foreach($imageFiles as $imageFile)
+            <img src="{{ public_path($imageFile) }}"  class="mt-2">
+            @endforeach
+        </div>
+    <!-- @endif -->
 </body>
 </html>
 

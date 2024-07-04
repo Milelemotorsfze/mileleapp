@@ -19,6 +19,8 @@ class MasterModelController extends Controller
      */
     public function index(Builder $builder)
     {
+        (new UserActivityController)->createActivity('Open the listing page of Master Models.');
+
         $masterModel = MasterModel::orderBy('id','DESC')->get();
 
         if (request()->ajax()) {
@@ -68,6 +70,7 @@ class MasterModelController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Opened the create page of Master Models.');
         $variants = Varaint::all();
         return view('master-models.create', compact('variants'));
     }
@@ -110,6 +113,7 @@ class MasterModelController extends Controller
         $model->created_by = Auth::id();
 
         $model->save();
+        (new UserActivityController)->createActivity('Created new Master Model.');
 
         return redirect()->route('master-models.index')->with('success','Model Created Successfully.');
 
@@ -128,6 +132,8 @@ class MasterModelController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open the edit page of Master Model.');
+
         $masterModel = MasterModel::find($id);
         $variants = Varaint::all();
 
@@ -172,6 +178,7 @@ class MasterModelController extends Controller
         $model->transcar_loi_description = $request->transcar_loi_description;
         $model->updated_by = Auth::id();
         $model->save();
+        (new UserActivityController)->createActivity('Upadated new Master Model.');
 
         return redirect()->route('master-models.index')->with('success','Model Updated Successfully.');
     }
@@ -181,6 +188,8 @@ class MasterModelController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Deleted Master Model.');
+
         $masterModel = MasterModel::find($id);
         $masterModel->delete();
 

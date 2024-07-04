@@ -31,7 +31,7 @@
 </head>
 <body>
 
-<h2 style="text-align: center">Please Add the following Models in Your Master Model List</h2>
+<h2 style="text-align: center">Please Add the following Models in Your Master Model List to Upload this Inventory!</h2>
 <table class="new-models">
     <tr>
         <td colspan="3" class="heading">New Models - {{ count($newModels) }}</td>

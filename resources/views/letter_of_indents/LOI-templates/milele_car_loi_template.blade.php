@@ -57,7 +57,6 @@
         <div class="container" style="padding-bottom: 0px;">
             <div class="content" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
                 <form action="{{ route('letter-of-indents.generate-loi') }}">
-                    <input type="hidden" name="height" id="total-height" value="">
                     <input type="hidden" name="width" id="width" value="">
                     <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
                     <input type="hidden" name="type" value="milele_cars">
@@ -152,24 +151,7 @@
                                     <td  style="background-color: black;color: black"></td>
                                     <td  style="background-color: black;color: black"></td>
                                 </tr>
-                                {{--                            <?php--}}
-                                {{--                            if($letterOfIndentItems->count() >= 7) {--}}
-                                {{--                                $count = 5;--}}
-                                {{--                            }else--}}
-                                {{--                            {--}}
-                                {{--                                $count = 10;--}}
-                                {{--                            }--}}
-                                {{--                            ?>--}}
-                                {{--                            @for($i=0;$i<$count;$i++)--}}
-                                {{--                                <tr>--}}
-                                {{--                                    <td></td>--}}
-                                {{--                                    <td>--}}
-
-                                {{--                                    </td>--}}
-                                {{--                                    <td  style="background-color: black;color: black"></td>--}}
-                                {{--                                    <td  style="background-color: black;color: black"></td>--}}
-                                {{--                                </tr>--}}
-                                {{--                            @endfor--}}
+                              
                                 <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                                     <td colspan="2" style="border: none;">Name:
                                         <span style="margin-left: 10px"> {{ $letterOfIndent->customer->name ?? '' }} </span>
@@ -194,7 +176,7 @@
                                 <tr style=";background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                                     <td colspan="2" style="border: none">
                                         @if($letterOfIndent->signature)
-                                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 100px;width: 150px">
                                         @endif
                                     </td>
 
@@ -230,21 +212,12 @@
     </div>
 
     <script type="text/javascript">
-        var height = document.getElementById('full-page').offsetHeight;
-        var tableFooterHeight = document.getElementById('footer-table').offsetHeight;
-
         const values = ["200", "290", "310","250", "350"];
         const random = Math.floor(Math.random() * values.length);
 
         var imageWidth = values[random];
         console.log(imageWidth);
-        var headerHeight = (6 * tableFooterHeight);
-
-        var imageHeight = height - headerHeight;
-        $('#total-height').val(imageHeight - 80);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');
-        $('.overlay-image').css('top', imageHeight+'px' )
-
     </script>
 @endsection

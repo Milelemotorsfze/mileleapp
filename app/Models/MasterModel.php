@@ -24,6 +24,10 @@ class MasterModel extends Model
     {
         return $this->belongsTo(User::class,'created_by','id');
     }
+    public function modelLine()
+    {
+        return $this->belongsTo(MasterModelLines::class,'master_model_line_id','id');
+    }
     public function getIsDeletableAttribute() {
 
         $isExistinInventory = SupplierInventory::where('master_model_id', $this->id)->count();
