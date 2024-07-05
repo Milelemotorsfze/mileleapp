@@ -930,6 +930,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</div>
 	</div>
 	<br>
+	@if(isset($workOrder))
 	<div class="card mt-3">
 		<div class="card-header text-center">
 			<h4 class="card-title">Data History</h4>
@@ -967,6 +968,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 		</div>
 	</div>
+	@endif
 </div>
 <br>
 <div class="overlay"></div>
@@ -977,13 +979,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-<script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script type="text/javascript">
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
-    $('#work-order-history-table').DataTable();
+    // $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
 	var customerCount =  $("#customerCount").val();
@@ -1005,7 +1005,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	var input = document.querySelector("#customer_company_number");
-	var iti = window.intlTelInput(input, {
+	var iti = window.intlTelInput(input, { 
 		separateDialCode: true,
 		preferredCountries: ["ae"],
 		hiddenInput: "full",
@@ -1030,7 +1030,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					preferredCountries:["ae"],
 					hiddenInput: "full",
 					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});	
+				});	console.log('in intel');
 	$(document).ready(function () { 
 		// SELECT 2 START
 			$('#customer_name').select2({
@@ -1079,15 +1079,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
 
-				var fullPhoneNumber = workOrder.customer_company_number.replace(/\s+/g, '');
+				// Check if workOrder.customer_company_number is not null or undefined
+				var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+
 				iti.setNumber(fullPhoneNumber);
 				sanitizeNumberInput(input);
 
-				var customer_representative_contactFull = workOrder.customer_representative_contact.replace(/\s+/g, '');
+				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
 				sanitizeNumberInput(input);
 
-				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number.replace(/\s+/g, '');
+				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
 				freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
 				sanitizeNumberInput(input);
 
@@ -1101,7 +1103,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 				else if(workOrder.transport_type == 'road') {
 					roadRelation();
-					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number.replace(/\s+/g, '');
+					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
 					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
 					sanitizeNumberInput(input);				
 				}
@@ -1223,7 +1225,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								$('#customer_email').val(customers[i]?.customer_email);
 							}
 							if (customers[i].customer_company_number != null) { 
-								var fullPhoneNumber = customers[i].customer_company_number.replace(/\s+/g, '');
+								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
 
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
@@ -2099,26 +2101,47 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$(element).removeClass('is-invalid');
 				}
 			},
-			submitHandler: function(form) { 
+			submitHandler: function(form) {  console.log('inside submit handler')
 				// Prevent default form submission
 				event.preventDefault();
 
 				// Collect all comments
 				const comments = [];
-				if(workOrder == null) {
-					document.querySelectorAll('#comments-section .comment').forEach(comment => {
-						const commentId = comment.getAttribute('data-comment-id');
-						const parentId = comment.getAttribute('data-parent-id');
-						const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+				if (workOrder == null) {
+					const commentElements = document.querySelectorAll('#comments-section .comment');
+					
+					if (commentElements.length > 0) {
+						commentElements.forEach(comment => {
+							const commentId = comment.getAttribute('data-comment-id');
+							const parentId = comment.getAttribute('data-parent-id');
+							const textElement = comment.querySelector('.col-xxl-11');
 
-						comments.push({ commentId, parentId, text });
-					});
+							if (textElement && textElement.childNodes[0]) {
+								const text = textElement.childNodes[0].textContent.trim();
+								comments.push({ commentId, parentId, text });
+							} else {
+								console.warn('Text element or its first child is missing for a comment:', comment);
+							}
+						});
+					} else {
+						console.warn('No comments found in #comments-section.');
+					}
 				}
-				$('#customer_company_number_full').val(iti.getNumber());
-                $('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
-                $('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
-                $('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
-          
+
+				// Update phone numbers if elements are defined
+				if (typeof iti !== 'undefined') {
+					$('#customer_company_number_full').val(iti.getNumber());
+				}
+				if (typeof customer_representative_contact !== 'undefined') {
+					$('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
+				}
+				if (typeof freight_agent_contact_number !== 'undefined') {
+					$('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
+				}
+				if (typeof transporting_driver_contact_number !== 'undefined') {
+					$('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
+				}
+
 				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));
@@ -2142,7 +2165,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						throw new Error(data.message);
 					}
 				}).catch(error => {
-					// Optionally display the error message to the user
+					console.error('Form submission error:', error);
 				});
 			}
         });
