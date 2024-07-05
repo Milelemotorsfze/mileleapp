@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 use App\Models\BankAccounts;
 use App\Models\BankAccountLog;
+use App\Models\BankMaster;
 use App\Models\PurchasedOrderPaidAmounts;
 use Yajra\DataTables\DataTables;
+use App\Http\Controllers\UserActivityController;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class BankAccountsController extends Controller
@@ -45,7 +48,9 @@ class BankAccountsController extends Controller
      */
     public function create()
     {
-        //
+        (new UserActivityController)->createActivity('Create Bank Account');
+        $banks = BankMaster::all();
+        return view('bankaccounts.create', compact('banks'));
     }
 
     /**
@@ -53,7 +58,33 @@ class BankAccountsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'entity' => 'required|string|max:255',
+            'bank_master_id' => 'required|integer|exists:bank_master,id',
+            'account_number' => 'required|string|max:255|unique:bank_accounts,account_number',
+            'currency' => 'required|string|in:USD,EUR,JPY,CAD,AED',
+            'current_balance' => 'required|numeric|min:0',
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Create a new bank account
+        $bankAccount = new BankAccounts();
+        $bankAccount->entity = $request->input('entity');
+        $bankAccount->bank_master_id = $request->input('bank_master_id');
+        $bankAccount->account_number = $request->input('account_number');
+        $bankAccount->currency = $request->input('currency');
+        $bankAccount->current_balance = $request->input('current_balance');
+        $bankAccount->save();
+
+        // Redirect to a success page or the index page
+        return redirect()->route('bankaccounts.index')->with('success', 'Bank account created successfully.');
     }
 
     /**
@@ -61,6 +92,7 @@ class BankAccountsController extends Controller
      */
     public function show($id)
     {
+    (new UserActivityController)->createActivity('View Bank account Transitions');
     $bankaccount = BankAccounts::findOrFail($id);
     if (request()->ajax()) {
         $transactions = $bankaccount->transactions;
@@ -85,28 +117,50 @@ class BankAccountsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $bankAccount = BankAccounts::findOrFail($id);
+        $banks = BankMaster::all();
+        return view('bankaccounts.edit', compact('bankAccount', 'banks'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'entity' => 'required|string|max:255',
+            'bank_master_id' => 'required|integer',
+            'account_number' => 'required|string|max:255',
+            'currency' => 'required|string|max:3',
+        ]);
+        $bankAccount = BankAccounts::findOrFail($id);
+        $bankAccount->entity = $request->input('entity');
+        $bankAccount->bank_master_id = $request->input('bank_master_id');
+        $bankAccount->account_number = $request->input('account_number');
+        $bankAccount->currency = $request->input('currency');
+        $bankAccount->save();
+        return redirect()->route('bankaccounts.index')->with('success', 'Bank account updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $bankAccount = BankAccounts::findOrFail($id);
+    // Check if there are any related logs
+    $hasLogs = \DB::table('bank_account_log')->where('bank_accounts_id', $id)->exists();
+    if ($hasLogs) {
+        return redirect()->route('bankaccounts.index')->with('error', 'Cannot delete bank account as there are related logs.');
+    }
+    $bankAccount->delete();
+    return redirect()->route('bankaccounts.index')->with('success', 'Bank account deleted successfully');
     }
     public function updateBalance(Request $request)
     {
+        (new UserActivityController)->createActivity('Update the Current Balance');
         $request->validate([
             'id' => 'required|exists:bank_accounts,id',
             'new_balance' => 'required|numeric'
