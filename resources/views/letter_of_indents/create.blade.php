@@ -584,7 +584,7 @@
                         total_quantities:total_quantities
                     },
                     success:function (data) {
-                        console.log(data);
+                        // console.log(data);
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -619,7 +619,7 @@
                         }else{
 
                             $('#min-company-quantity-error').html('');
-                            console.log("min company qty error not found");
+                            // console.log("min company qty error not found");
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
@@ -911,7 +911,7 @@
            
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
-            console.log("unselected");
+            // console.log("unselected");
             let index = $(this).attr('data-index');
 
             // var modelYear =  $('#model-year-'+index).val();
@@ -996,13 +996,13 @@
                    module: 'LOI',
                },
                success:function (data) {
-                console.log(data);
+                // console.log(data);
                    $('#loi-description-'+index).val("");
 
                    let quantity = data.quantity;
                    let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;
-                   console.log(LOIDescription);
+                //    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
                    $('#master-model-id-'+index).val(modelId);
@@ -1029,7 +1029,7 @@
                                return false;
                            }
                        });
-                       console.log(isOptionExist);
+                    //    console.log(isOptionExist);
                        if(isOptionExist == 'no'){
                            $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}))
 
@@ -1042,9 +1042,14 @@
        function hideSFX(index, value) {
          
          var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         let model = $('#model-'+index).val();
+         console.log(model);
          for(let i=1; i<=totalIndex; i++)
          {
-             if(i != index) {
+            let currentmodel = $('#model-'+i).val();
+            console.log(currentmodel);
+             if(i != index && currentmodel == model) {
+                console.log("detach sfx");
                  var currentId = 'sfx-' + i;
                  $('#' + currentId + ' option[value=' + value + ']').detach();       
              }
@@ -1067,7 +1072,7 @@
                                 return false;
                             }
                         });
-                        console.log(isOptionExist);
+                        // console.log(isOptionExist);
                         if(isOptionExist == 'no'){
                             $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
 

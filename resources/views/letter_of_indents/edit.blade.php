@@ -1103,9 +1103,11 @@
         function hideSFX(index, value) {
         
          var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         let model = $('#model-'+index).val();
          for(let i=1; i<=totalIndex; i++)
          {
-             if(i != index) {
+            let currentmodel = $('#model-'+i).val();
+             if(i != index && currentModel == model) {
                  var currentId = 'sfx-' + i;
                  $('#' + currentId + ' option[value=' + value + ']').detach();       
              }
