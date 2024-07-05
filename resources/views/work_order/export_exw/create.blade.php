@@ -2563,6 +2563,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type','vehicle['+data.vehicle_id+'][import_document_type]');
 			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
 			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
+			if(type == 'export_cnf') {
+				var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+			}
 
 			// Append cells to the first row
 			firstRow.appendChild(removeIconCell);
@@ -2582,6 +2585,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			firstRow.appendChild(importTypeCell);
 			firstRow.appendChild(ownershipCell);
 			firstRow.appendChild(CertificationPerVINCell);
+			if(type == 'export_cnf') {
+				firstRow.appendChild(shipmentCell);
+			}
 			// firstRow.style.borderTop = '1px solid #b3b3b3';
 
 			// Second Row Elements
@@ -2594,7 +2600,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			modificationLabelCell.textContent = 'Modification/Jobs';
 
 			var modificationInputCell = document.createElement('td');
-			modificationInputCell.colSpan = 15;
+			if(type == 'export_cnf') {
+				modificationInputCell.colSpan = 16;
+			}
+			else {
+				modificationInputCell.colSpan = 15;
+			}
 			var modificationInputElement = document.createElement('input');
 			modificationInputElement.name ='vehicle['+data.vehicle_id+'][modification_or_jobs_to_perform_per_vin]';
 			modificationInputElement.type = 'text';
@@ -2627,7 +2638,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			specialRequestLabelCell.textContent = 'Special Request/Remarks';
 
 			var specialRequestInputCell = document.createElement('td');
-			specialRequestInputCell.colSpan = 15;
+			if(type == 'export_cnf') {
+				specialRequestInputCell.colSpan = 16;
+			}
+			else {
+				specialRequestInputCell.colSpan = 15;
+			}
 			var specialRequestInputElement = document.createElement('input');
 			specialRequestInputElement.name ='vehicle['+data.vehicle_id+'][special_request_or_remarks]';
 			specialRequestInputElement.type = 'text';
@@ -2651,7 +2667,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			// Last Row Elements
 			var createAddon = createAddonCell(data.vehicle_id);
-			createAddon.colSpan = 17;
+			if(type == 'export_cnf') {
+				createAddon.colSpan = 18;
+			}
+			else {
+				createAddon.colSpan = 17;
+			}
 			// Append cells to the last row
 			lastRow.appendChild(createAddon);
 
@@ -2726,7 +2747,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				+ '</div>';
 
 			var addonDescriptionCell = document.createElement('td');
-			addonDescriptionCell.colSpan = 14;
+			if(type == 'export_cnf') {
+				addonDescriptionCell.colSpan = 15;
+			}
+			else {
+				addonDescriptionCell.colSpan = 14;
+			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
 
 			// Append cells to the addon row
@@ -2850,7 +2876,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			+'</div>';
 
 			var addonDescriptionCell = document.createElement('td');
-			addonDescriptionCell.colSpan = 14;
+			if(type == 'export_cnf') {
+				addonDescriptionCell.colSpan = 14;
+			}
+			else {
+				addonDescriptionCell.colSpan = 15;
+			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
 			
 			// Append cells to the addon row
