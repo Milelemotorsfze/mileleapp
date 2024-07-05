@@ -64,9 +64,23 @@ class VendorAccountController extends Controller
         //
     }
     public function view($id)
-    {
-        $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)->where('transaction_amount', '!=', 0)->with('purchaseOrder')->get();
-        $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
-        return view('suppliers.accounts.transitions', compact('transitions', 'accounts'));
+{
+    // Retrieve the transactions with the associated purchase order
+    $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)
+                    ->where('transaction_amount', '!=', 0)
+                    ->with('purchaseOrder')
+                    ->orderBy('created_at', 'asc') // Order by date in ascending order
+                    ->get();
+
+    // Group transactions by po_number and assign row numbers within each group
+    $groupedTransitions = $transitions->groupBy('purchaseOrder.po_number');
+    foreach ($groupedTransitions as $po_number => $transactions) {
+        foreach ($transactions as $index => $transaction) {
+            $transaction->row_number = $index + 1;
+        }
     }
+
+    $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
+    return view('suppliers.accounts.transitions', compact('transitions', 'accounts'));
+}
 }
