@@ -1025,12 +1025,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 		});
 	}
-	var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});	console.log('in intel');
+	if(type == 'export_exw' || type == 'export_cnf') {
+		var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+			separateDialCode: true,
+			preferredCountries:["ae"],
+			hiddenInput: "full",
+			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+		});	
+	}
 	$(document).ready(function () { 
 		// SELECT 2 START
 			$('#customer_name').select2({
