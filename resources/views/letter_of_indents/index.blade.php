@@ -683,7 +683,7 @@
                                 </div>
                                 @foreach ($supplierApprovedLOIs as $key => $letterOfIndent)
                                     <tr>
-                                       
+                                     
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>

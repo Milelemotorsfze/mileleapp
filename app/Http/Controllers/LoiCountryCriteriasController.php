@@ -8,6 +8,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\MasterModelLines;
+use App\Models\LoiAllowedOrRestrictedModelLines;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,7 +65,7 @@ class LoiCountryCriteriasController extends Controller
             ['data' => 'id', 'name' => 'id','title' => 'S.No'],
             ['data' => 'country.name', 'name' => 'country.name','title' => 'Country'],
             ['data' => 'status', 'name' => 'status','title' => 'Status'],
-            ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Restricted Model Line'],
+            // ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Restricted Model Line'],
             ['data' => 'is_loi_restricted', 'name' => 'is_loi_restricted','title' => 'Is LOI Restricted'],
             ['data' => 'is_only_company_allowed', 'name' => 'is_only_company_allowed','title' => 'Is Only Company Allowed'],
             ['data' => 'max_qty_per_passport', 'name' => 'max_qty_per_passport','title' => 'Maximum QTY/ Passport'],
@@ -113,6 +114,28 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
         $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->status = LoiCountryCriteria::STATUS_ACTIVE;
+        if($request->allowed_master_model_line_ids) {
+           
+            foreach($request->allowed_master_model_line_ids as $allowedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $allowedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_allowed = true;
+                $loiModelLine->save();
+            }
+        }
+        if($request->restricted_master_model_line_ids) {
+            foreach($request->restricted_master_model_line_ids as $restrictedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $restrictedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_restricted = true;
+                $loiModelLine->save();
+            }
+
+        }
 
         $loiCountryCriteria->save();
 
@@ -166,6 +189,28 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
         $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->save();
+        if($request->allowed_master_model_line_ids) {
+           
+            foreach($request->allowed_master_model_line_ids as $allowedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $allowedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_allowed = true;
+                $loiModelLine->save();
+            }
+        }
+        if($request->restricted_master_model_line_ids) {
+            foreach($request->restricted_master_model_line_ids as $restrictedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $restrictedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_restricted = true;
+                $loiModelLine->save();
+            }
+
+        }
 
         (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
 
