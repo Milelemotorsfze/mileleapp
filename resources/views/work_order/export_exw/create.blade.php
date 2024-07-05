@@ -2437,7 +2437,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				});
 
 				// Refresh Select2 to apply changes
-				$select.select2();
+				// $select.select2(); // COMMENTED BECAUSE OF UNSELECT OF  VIN PER BOE CAUSE ERROR IN CONSOLE
 			});
 		}
 	// BOE DYNAMICALLY ADD AND REMOVE END
