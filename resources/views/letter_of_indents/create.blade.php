@@ -15,6 +15,16 @@
         .error {
             color: #fd625e;
         }
+        .overlay
+        {
+            position: fixed; /* Positioning and size */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); /* color */
+            display: none; /* making it hidden by default */
+        }
 
     </style>
   @can('LOI-create')
@@ -107,7 +117,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                                <select class="form-control widthinput" name="category" id="loi-category">
+                                <select class="form-control widthinput" multiple name="category" id="loi-category">
                                     <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
                                         {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
                                     </option>
@@ -319,6 +329,8 @@
                 </form>
             </div>
             </div>
+            <input type="hidden" id="is-country-validation-error" value="0">
+            <div class="overlay"></div>
         @endif
     @endcan
 @endsection
@@ -338,13 +350,7 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                // if (file.type.match("application/pdf"))
-                // {
-                //     const objectUrl = URL.createObjectURL(file);
-                //     const iframe = document.createElement("iframe");
-                //     iframe.src = objectUrl;
-                //     previewFile.appendChild(iframe);
-                // }else
+               
                  if (file.type.match("image/*"))
                 {
                     const objectUrl = URL.createObjectURL(file);
@@ -447,21 +453,12 @@
             return this.valid();
         };
        
-        $('#submit-button').click(function (e) {
-            e.preventDefault();
-            uniqueCheckSoNumber();
-            if (formValid == true) {
-                if($("#form-create").valid()) {
-                    $('#form-create').unbind('submit').submit();
-                }
-            }else{
-                e.preventDefault();
-            }
-        });
+       
         
         $('#loi-category').select2({
             placeholder : 'Select LOI Category',
             allowClear: true,
+            maximumSelectionLength: 1
         }).on('change', function() {
             $('#loi-category-error').remove();
         });
@@ -534,14 +531,7 @@
         }).on('change', function() {
             $(this).valid();
         });
-        // $('#model-year-1').select2({
-        //     placeholder : 'Select Model Year',
-        //     allowClear: true,
-        //     maximumSelectionLength: 1
-        // }).on('change', function() {
-        //     $(this).valid();
-        // });
-
+       
         $('#dealer').change(function () {
             var value = $('#dealer').val();
             $('#dealer-input').val(value);
@@ -561,7 +551,8 @@
             checkCountryCriterias();
         });
 
-        function checkCountryCriterias() {
+        function checkCountryCriterias(e) {
+          
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
             var date = $('#date').val();
@@ -573,6 +564,7 @@
                 }
             });
             if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
+                $('.overlay').show();
                 $.ajax({
                     type: "GET",
                     url: url,
@@ -584,7 +576,8 @@
                         total_quantities:total_quantities
                     },
                     success:function (data) {
-                        // console.log(data);
+                        $('#is-country-validation-error').val(0);
+                        console.log(data);
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -592,11 +585,12 @@
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
-                        formValid = true;
+                        // formValid = true;
                         $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
 
                         if(data.customer_type_error) {
-                            formValid = false;
+                            // formValid = false;
+                            $('#is-country-validation-error').val(1);
                             $('#customer-type-error').html(data.customer_type_error);
                             $('#customer-type-error').attr('hidden', false);
                             $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
@@ -605,7 +599,8 @@
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
-                            formValid = false;
+                            // formValid = false;
+                            $('#is-country-validation-error').val(1);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
                             $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
 
@@ -613,7 +608,8 @@
                             $('#max-individual-quantity-error').html('');
                         }
                         if(data.min_qty_per_company_error) {
-                            formValid = false;                          
+                            // formValid = false;            
+                            $('#is-country-validation-error').val(1);              
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
                             $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
@@ -622,7 +618,8 @@
                             // console.log("min company qty error not found");
                         }
                         if(data.max_qty_per_company_error) {
-                            formValid = false;
+                            // formValid = false;
+                            $('#is-country-validation-error').val(1);
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
                             $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
@@ -630,18 +627,24 @@
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
-                            formValid = false;                           
+                            // formValid = false;               
+                                        
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
                             $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
                         }else{
                             $('#company-only-allowed-error').html('');
                         }
+                        $('.overlay').hide();
+
+                        console.log(formValid);
+                           
                     }
                 });
             }
         }
        
         function getCustomers() {
+            $('.overlay').show();
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
 
@@ -660,11 +663,13 @@
                     jQuery.each(data, function(key,value){
                         $('#customer').append('<option value="'+ value.id +'">'+ value.name +'</option>');
                     });
+                    $('.overlay').hide();
                 }
             });
         }
 
         function getModels(index,type) {
+            $('.overlay').show();
 
             let dealer = $('#dealer').val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
@@ -723,6 +728,7 @@
                             }
                         }
                     }
+                    $('.overlay').hide();
                 }
             });
         }
@@ -794,12 +800,7 @@
                             allowClear: true,
                             maximumSelectionLength: 1
                         });
-                        // $('#model-year-' + index).select2({
-                        //     placeholder: 'Select Model Year',
-                        //     allowClear: true,
-                        //     maximumSelectionLength: 1
-                        // });
-
+                    
                     let type = 'add-new';
                     getModels(index,type);
         });
@@ -809,16 +810,10 @@
             if(rowCount > 1) {
 
                 var indexNumber = $(this).attr('data-index');
-                // var modelYear = $('#model-year-'+indexNumber).val();
                 var modelLine = $('#model-line-'+indexNumber).val()
                 var model = $('#model-'+indexNumber).val();
                 var sfx = $('#sfx-'+indexNumber).val();
-                // if(modelYear[0]) {
-                //     appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
-                // }
-                // if(modelLine) {
-                //     appendModelLine(indexNumber, model[0],sfx[0],modelLine);
-                // }
+               
                 if(model[0]) {
                     appendModel(indexNumber,model[0]);
                 }
@@ -859,12 +854,6 @@
                         maximumSelectionLength:1,
                         allowClear: true
                     });
-                    // $('#model-year-'+index).select2
-                    // ({
-                    //     placeholder: 'Select Model Year',
-                    //     maximumSelectionLength:1,
-                    //     allowClear: true
-                    // });
                 });
                 checkCountryCriterias();
 
@@ -888,8 +877,7 @@
 
             var value = e.params.data.text;
             hideSFX(index, value);
-            // getModelYear(index);
-            // getModelLine(index);
+            console.log(" unselected");
         });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -899,34 +887,24 @@
             $('#model-line-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
-            // var modelYear =  $('#model-year-'+index).val();
+         
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            // if(modelYear[0]) {
-            //     appendModelYear(index, model[0],sfx,modelYear[0])
-            // }
             appendSFX(index,model[0],sfx);
-            // $('#model-year-'+index).empty();
-        
-           
+          
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
-            // console.log("unselected");
+           
             let index = $(this).attr('data-index');
-
-            // var modelYear =  $('#model-year-'+index).val();
             var sfx = $('#sfx-'+index).val();
             var model = e.params.data.id;
-            // if(modelYear[0]){
-            //     appendModelYear(index, model,sfx[0],modelYear[0])
-            // }
+           
             $('#model-line-'+index).val("");
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
             enableDealer();
 
             $('#sfx-'+index).empty();
-            // $('#model-year-'+index).empty();
             $('#model-line-'+index).empty();
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
@@ -936,6 +914,7 @@
        
 
        function getSfx(index) {
+            $('.overlay').show();
 
             let model = $('#model-'+index).val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
@@ -965,11 +944,11 @@
                     $('#loi-description-'+index).val("");
                     $('#model-line-'+index).val("");
                     $('#sfx-'+index).html('<option value=""> Select SFX </option>');
-                    // $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
-
+                    
                     jQuery.each(data, function(key,value){
                         $('#sfx-'+index).append('<option value="'+ value +'">'+ value +'</option>');
                     });
+                    $('.overlay').hide();
                   
                 }
             });
@@ -977,8 +956,7 @@
        }
   
        function getLOIDescription(index) {
-    
-        //    let model_year = $('#model-year-'+index).val();
+            $('.overlay').show();
            let model = $('#model-'+index).val();
            let sfx = $('#sfx-'+index).val();
            let dealer = $('#dealer').val();
@@ -991,22 +969,20 @@
                data: {
                    sfx: sfx[0],
                    model:model[0],
-                //    model_year: model_year[0],
                    dealer:dealer,
                    module: 'LOI',
                },
                success:function (data) {
-                // console.log(data);
                    $('#loi-description-'+index).val("");
-
                    let quantity = data.quantity;
                    let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;
-                //    console.log(LOIDescription);
+
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
                    $('#master-model-id-'+index).val(modelId);
                    $('#model-line-'+index).val(data.model_line);
+                   $('.overlay').hide();
                }
            });
         }
@@ -1016,26 +992,10 @@
 
            for(let i=1; i<=totalIndex; i++)
            {
-               if(i != index) {
-                   var model = $('#model-'+i).val();
-                   if(unSelectedmodel == model[0] ) {
-                       // chcek this option value alredy exist in dropdown list or not.
-                       var currentId = 'sfx-' + i;
-                       var isOptionExist = 'no';
-                       $('#' + currentId +' option').each(function () {
-
-                           if (this.text == sfx) {
-                                isOptionExist = 'yes';
-                               return false;
-                           }
-                       });
-                    //    console.log(isOptionExist);
-                       if(isOptionExist == 'no'){
-                           $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}))
-
-                       }
-
-                   }
+            var model = $('#model-'+i).val();
+               if(i != index && unSelectedmodel == model[0] ) {  
+                   // chcek the model is same as unselected model,
+                   $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}));     
                }
            }
        }
@@ -1043,25 +1003,28 @@
          
          var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
          let model = $('#model-'+index).val();
-         console.log(model);
-         for(let i=1; i<=totalIndex; i++)
-         {
-            let currentmodel = $('#model-'+i).val();
-            console.log(currentmodel);
-             if(i != index && currentmodel == model) {
-                console.log("detach sfx");
-                 var currentId = 'sfx-' + i;
-                 $('#' + currentId + ' option[value=' + value + ']').detach();       
-             }
-         }
-     }
+        
+            for(let i=1; i<=totalIndex; i++)
+            {
+                let currentmodel = $('#model-'+i).val();
+                
+                if(i != index && currentmodel == model[0]) {
+                    console.log(i);
+                    console.log("detach sfx");
+                    var currentId = 'sfx-' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();       
+                }
+            }
+        }
        function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
             for(let i=1; i<=totalIndex; i++)
             {
                 if(i != index) {
-                    // if(unSelectedmodel == model[0] ) {
+                    let model = $('#model-'+i).val();
+        
+                    if(unSelectedmodel == model[0] ) {
                         // chcek this option value alredy exist in dropdown list or not.
                         var currentId = 'model-' + i;
                         var isOptionExist = 'no';
@@ -1078,7 +1041,7 @@
 
                         }
 
-                    // }
+                    }
                 }
             }
         }
@@ -1195,6 +1158,24 @@
 	    document.getElementById("so_number_"+i).classList.remove("is-invalid");
 	    document.getElementById("soNumberError_"+i).classList.remove("paragraph-class");
 	}
+
+    $('#submit-button').click(function (e) {
+            e.preventDefault();
+            uniqueCheckSoNumber();
+            let isvalidCountryCheck = $('#is-country-validation-error').val();
+            if (formValid == true && isvalidCountryCheck == 0) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                    // alert("submit");
+                    e.preventDefault();
+                }
+            }else{
+                e.preventDefault();
+            }
+        
+            // alert(formValid);
+           
+        });
     </script>
 @endpush
 
