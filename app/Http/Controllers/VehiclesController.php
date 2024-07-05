@@ -2701,6 +2701,68 @@ public function viewalls(Request $request)
         $useractivities->activity = "View the Stock Status Wise";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
+        // Variant detail computation
+$variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+->orderBy('id', 'DESC')
+->get();
+
+$sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+$normalizationMap = [
+'COO' => 'COO',
+'SFX' => 'SFX',
+'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+'HeadLamp Type' => 'HeadLamp Type',
+'infotainment type' => 'infotainment type',
+'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+'Speakers' => 'Speakers',
+'sunroof' => 'sunroof'
+];
+
+foreach ($variants as $variant) {
+$details = [];
+$otherDetails = [];
+foreach ($variant->variantItems as $item) {
+    $modelSpecification = $item->model_specification;
+    $modelSpecificationOption = $item->model_specification_option;
+    if ($modelSpecification && $modelSpecificationOption) {
+        $name = $modelSpecification->name;
+        $optionName = $modelSpecificationOption->name;
+        $normalized = null;
+        foreach ($normalizationMap as $key => $values) {
+            if (is_array($values)) {
+                if (in_array($name, $values)) {
+                    $normalized = $key;
+                    break;
+                }
+            } elseif ($name === $values) {
+                $normalized = $key;
+                break;
+            }
+        }
+
+        if ($normalized) {
+            $name = $normalized;
+        }
+        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+            if (strtolower($optionName) === 'yes') {
+                $optionName = $name;
+            } else {
+                continue;
+            }
+        }
+        if (in_array($name, $sequence)) {
+            $index = array_search($name, $sequence);
+            $details[$index] = $optionName;
+        } else {
+            $otherDetails[] = $optionName;
+        }
+    }
+}
+ksort($details);
+$variant->detail = implode(', ', array_merge($details, $otherDetails));
+$variant->save();
+}
         if ($request->ajax()) {
             $status = $request->input('status');
             if($status === "Incoming")
