@@ -1224,7 +1224,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							}
 							if (customers[i].customer_company_number != null) { 
 								var fullPhoneNumber = customers[i].customer_company_number.replace(/\s+/g, '');
-								console.log("Full Phone Number (no spaces):", fullPhoneNumber); // Debugging log
 
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
@@ -1731,7 +1730,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			// Select all input, select, and textarea elements and disable them
 			var elements = document.querySelectorAll('#WOForm button');
 			// #WOForm input, #WOForm select, #WOForm textarea, 
-			console.log(elements);
 			elements.forEach(function(element) {
 				element.disabled = true;
 			});
@@ -1807,6 +1805,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			return true;
 		}, "All work order vehicles should be selected under one BOE per VIN field.");
+		// Add a custom validator method for checking if the value is a year with 4 digits
+		$.validator.addMethod("year4digits", function(value, element) {
+			return this.optional(element) || /^\d{4}$/.test(value);
+		}, "Please enter a valid year with 4 digits.");
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
@@ -2260,7 +2262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<div class="col-xxl-2 col-lg-2 col-md-2">
 							<div class="row">
 								<div class="col-xxl-12 col-lg-12 col-md-12">
-									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
+									<label class="col-form-label text-md-end">Addon :</label>
 									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
 										@foreach($addons as $addon)
@@ -2272,13 +2274,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									</select>
 								</div>
 								<div class="col-xxl-12 col-lg-12 col-md-12">
-									<label for="addon_quantity_${index}" class="col-form-label text-md-end">Quantity :</label>
+									<label class="col-form-label text-md-end">Quantity :</label>
 									<input type="number" name="addon_quantity[]" id="addon_quantity_${index}" class="form-control widthinput" placeholder="Enter Quantity">
 								</div>
 							</div>
 						</div>
 						<div class="col-xxl-9 col-lg-9 col-md-9">
-							<label for="addon_description_${index}" class="col-form-label text-md-end">Addon Description :</label>
+							<label class="col-form-label text-md-end">Addon Description :</label>
 							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Description"></textarea>
 						</div>
 						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer_addon">
@@ -2307,57 +2309,57 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// ADDON DYNAMICALLY ADD AND REMOVE END
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
-	function addChild() {
-        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+		function addChild() {
+			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-        // Check if there are any available options
-        if (getAvailableOptions().length > 0) {
-            if (index <= addedVins.length) {
-                var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
-                var newRow = $(`
-                    <div class="row form_field_outer_row" id="${index}">
-                        <div class="col-xxl-11 col-lg-11 col-md-11">
-                            <label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-                            <select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-                                ${options}
-                            </select>
-                        </div>
-                        <div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                            <a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                `);
+			// Check if there are any available options
+			if (getAvailableOptions().length > 0) {
+				if (index <= addedVins.length) {
+					var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+					var newRow = $(`
+						<div class="row form_field_outer_row" id="${index}">
+							<div class="col-xxl-11 col-lg-11 col-md-11">
+								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									${options}
+								</select>
+							</div>
+							<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+								<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
+						</div>
+					`);
 
-                // Append the new row to the container
-                $(".form_field_outer").append(newRow);
+					// Append the new row to the container
+					$(".form_field_outer").append(newRow);
 
-                // Initialize Select2 only on the newly added element
-                $(`#boe_vin_${index}`).select2({
-                    allowClear: true,
-                    placeholder: "Choose VIN Per BOE",
-                });
+					// Initialize Select2 only on the newly added element
+					$(`#boe_vin_${index}`).select2({
+						allowClear: true,
+						placeholder: "Choose VIN Per BOE",
+					});
 
-                // Add validation rules for all dynamicselect2 elements
-                $('.dynamicselect2').each(function() {
-                    $(this).rules('add', {
-                        required: true,
-						allVinsSelected: true,
-                        messages: {
-                            required: "This field is required."
-                        }
-                    });
-                });
+					// Add validation rules for all dynamicselect2 elements
+					$('.dynamicselect2').each(function() {
+						$(this).rules('add', {
+							required: true,
+							allVinsSelected: true,
+							messages: {
+								required: "This field is required."
+							}
+						});
+					});
 
-                disableSelectedOptions();
-            } else {
-                alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
-            }
-        } else {
-            alert("Sorry! No available options to select.");
-        }
-    }
+					disableSelectedOptions();
+				} else {
+					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+				}
+			} else {
+				alert("Sorry! No available options to select.");
+			}
+		}
 		function getAvailableOptions() {
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
@@ -2577,6 +2579,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
 			modificationInputCell.appendChild(modificationInputElement);
 
+			// Add validation rule for modificationInputElement
+			$(modificationInputElement).rules('add', {
+				noSpaces: true,
+				messages: {
+					noSpaces: "No leading or trailing spaces allowed."
+				}
+			});
+
 			// Append cells to the second row
 			secondRow.appendChild(emptyLabelCell);
 			secondRow.appendChild(modificationLabelCell);
@@ -2601,7 +2611,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			specialRequestInputElement.style.width = '100%';
 			specialRequestInputElement.value = data.special_request_or_remarks;
 			specialRequestInputCell.appendChild(specialRequestInputElement);
-
+			// Add validation rule for specialRequestInputCell
+			$(specialRequestInputCell).rules('add', {
+				noSpaces: true,
+				messages: {
+					noSpaces: "No leading or trailing spaces allowed."
+				}
+			});
 
 			// Append cells to the third row
 			thirdRow.appendChild(emptyLabelThirdRowCell);
@@ -2686,7 +2702,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonDescriptionCell = document.createElement('td');
 			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
 
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
@@ -2700,7 +2716,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			
 			// Append the addon row after the third row
 			thirdRow.insertAdjacentElement('afterend', addonRow);
-			
+			// Add validation rules for all dynamicselectaddon elements
+			$("#addon_quantity_"+data.vehicle_id+"_"+addonIndex).rules('add', {
+				digits: true,
+				min: 1 // Ensure it's a positive integer
+			});
+			$("#addon_description_"+data.vehicle_id+"_"+addonIndex).rules('add', {
+				noSpaces: true,
+			});
 			return addonRow; // Return the newly created addonRow to be used as the next reference row
 		}
 
@@ -2744,7 +2767,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
 
 				// Update description input field within the <td> element
-				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + index);
+				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + className + '_' + index);
+				
+				// Update hidden input field for addon ID
+				row.find('input[type="hidden"][name^="vehicle[' + className + '][addons]"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
+
 				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {
 					$('#addons_' + className + '_' + index).select2({
@@ -2924,11 +2951,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			inputElement.name = name;
 			inputElement.value = value;
 			inputElement.style.border = 'none';
-			// inputElement.style.width = '100%';
+
+			// Generate a unique ID for the input element
+			var uniqueId = name.replace(/[\[\]]+/g, '_'); // Replace square brackets with underscores
+			inputElement.id = uniqueId;
+
+			// Append the input element to the cell
 			cell.appendChild(inputElement);
+
+			// Add validation rules using the ID as the selector
+			setTimeout(function() {
+				var rules = {
+					noSpaces: true,
+					messages: {
+						noSpaces: "No leading or trailing spaces allowed."
+					}
+				};
+				
+				// Add custom validation for model year fields
+				if (name.includes('model_year') || name.includes('model_year_to_mention_on_documents')) {
+					rules.year4digits = true;
+				}
+				
+				// Apply the validation rules
+				$('#'+uniqueId).rules('add', rules);
+			}, 0);
+
 			return cell;
 		}
-
 		function createCellWithRemoveButton() {
 			var cell = document.createElement('td');
 			var removeButton = document.createElement('a');
