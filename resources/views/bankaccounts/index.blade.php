@@ -1,20 +1,28 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 @section('content')
   <div class="card-header">
     <h4 class="card-title">
      Bank Accounts
     </h4>
-    <div class="d-flex justify-content-end">
-  <a class="btn btn-sm btn-secondary me-2" href="#" style="text-align: right;">
-     Total Current Balance is {{ number_format($totalBalanceAED, 0, '', ',') }} AED
-  </a>
-  <a class="btn btn-sm btn-info" href="#" style="text-align: right;">
-     Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED
-  </a>
-  <a class="btn btn-sm btn-success" href="#" style="text-align: right;">
-  <i class="fa fa-plus" aria-hidden="true"></i> Create Bank Account
-  </a>
+    <div class="d-flex justify-content-between">
+  <div class="d-flex">
+    <a class="btn btn-sm btn-secondary me-2" href="#" style="text-align: left;">
+      Total Current Balance is {{ number_format($totalBalanceAED, 0, '', ',') }} AED
+    </a>
+    <a class="btn btn-sm btn-info" href="#" style="text-align: left;">
+      Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED
+    </a>
+  </div>
+  <div class="d-flex">
+    <a class="btn btn-sm btn-success me-2" href="{{ route('bankaccounts.create') }}" style="text-align: right;">
+      <i class="fa fa-plus" aria-hidden="true"></i> Create Bank Account
+    </a>
+    <a class="btn btn-sm btn-primary" href="{{ route('banks.index') }}" style="text-align: right;">
+      Banks <i class="fa fa-arrow-right" aria-hidden="true"></i> 
+    </a>
+  </div>
 </div>
     <br>
   </div>
@@ -45,6 +53,16 @@
     </div>
 </div>
   <div class="card-body">
+  @if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
     <div class="table-responsive">
     <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
     <thead class="bg-soft-secondary">
@@ -56,6 +74,7 @@
             <th>Currency</th>
             <th>Update Balance</th>
             <th>View Updates Log</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -72,6 +91,14 @@
             <td>
                 <a href="{{ route('bankaccount.show', ['id' => $bankaccount->id]) }}" class="btn btn-sm btn-success shadow-sm">View</a>
             </td>
+            <td>
+            <a href="{{ route('bankaccounts.edit', ['bankaccount' => $bankaccount->id]) }}" class="btn btn-sm btn-warning shadow-sm">Edit</a>
+            <form action="{{ route('bankaccounts.destroy', ['bankaccount' => $bankaccount->id]) }}" method="POST" class="d-inline">
+    @csrf
+    @method('DELETE')
+    <button type="submit" class="btn btn-sm btn-danger shadow-sm">Delete</button>
+</form>
+</td>
         </tr>
         @endforeach
     </tbody>
@@ -107,6 +134,7 @@
                 success: function (response) {
                     alert('Balance updated successfully.');
                     $('#updateBalanceModal').modal('hide');
+                    alertify.success('Current Balance Update Successfully');
                     location.reload();
                 },
                 error: function (response) {
@@ -114,6 +142,14 @@
                 }
             });
         });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Automatically close alerts after 5 seconds
+        setTimeout(function() {
+            $(".alert").alert('close');
+        }, 5000);
     });
 </script>
 @endsection
