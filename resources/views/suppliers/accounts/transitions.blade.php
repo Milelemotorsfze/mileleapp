@@ -18,6 +18,7 @@
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
+                    <th>Transaction Number</th>
                     <th>Transaction AT</th>
                     <th>PO Number</th>
                     <th>Transaction Type</th>
@@ -32,8 +33,17 @@
             <tbody>
             @foreach ($transitions as $transition)
                 <tr>
+                <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
                 <td>{{ $transition->created_at->format('d M Y') }}</td>
-                    <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }}</td>
+                <td>
+                    @if($transition->purchaseOrder)
+                        <a href="{{ route('purchasing-order.show', $transition->purchaseOrder->id) }}">
+                            {{ $transition->purchaseOrder->po_number }}
+                        </a>
+                    @else
+                        No Order Number
+                    @endif
+                </td>
                     <td>{{ $transition->transaction_type }}</td>
                     <td>{{ $transition->account_currency }}</td>
                     <td>{{ $transition->transaction_amount }}</td>
