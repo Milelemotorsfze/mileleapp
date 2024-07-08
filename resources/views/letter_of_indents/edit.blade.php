@@ -530,8 +530,22 @@
                     total_quantities += parseInt($(this).val());
                 }
             });
-            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
-                console.log("ok");
+
+                var model_lines = $('.model_lines').val();
+                var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+                console.log(totalIndex);
+                var selectedModelLineIds = [];
+                for(let i=1; i<=totalIndex; i++)
+                {
+                    var eachSelectedModelLineId = $('#model-line-'+i).val();
+
+                    if(eachSelectedModelLineId) {
+                        selectedModelLineIds.push(eachSelectedModelLineId);
+                    }
+                }
+                console.log(selectedModelLineIds);
+            if(customer.length > 0 && customer_type.length > 0 && date.length > 0) {
+              
                 $('.overlay').show();
                 $.ajax({
                     type: "GET",
@@ -541,12 +555,13 @@
                         loi_date:date,
                         customer_id: customer[0],
                         customer_type: customer_type,
-                        total_quantities:total_quantities
+                        total_quantities:total_quantities,
+                        selectedModelLineIds:selectedModelLineIds
                     },
                     success:function (data) {
                         console.log(data);
+                        $('#is-country-validation-error').val(data.error);
                        
-                        $('#is-country-validation-error').val(0);  
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -554,50 +569,29 @@
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
+                        if(data.error == 1) {
+                           
+                            $('.country-validation').removeClass('alert-success').addClass("alert-danger");
+                            $('#loi-country-validation-div').attr('hidden', false);
+                           
+                        }else{
+                           
+                            $('.country-validation').removeClass('alert-danger').addClass("alert-success");
+                            $('#loi-country-validation-div').attr('hidden', true);
+                        }
                        
-                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
-
-                        if(data.customer_type_error) {
-                            $('#is-country-validation-error').val(1);  
-                            $('#customer-type-error').html(data.customer_type_error);
-                            $('#customer-type-error').attr('hidden', false);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
+                        if(data.validation_error) {
+                         console.log(data.validation_error);
+                            $('#validation-error').html(data.validation_error);
+                            $('#validation-error').attr('hidden', false);
+                         
                         }
                         else{
-                            $('#customer-type-error').attr('hidden', true);
+                            $('#validation-error').attr('hidden', true);
                         }
-                        if (data.max_qty_per_passport_error) {
-                            $('#is-country-validation-error').val(1);  
-                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
 
-                        } else { 
-                            $('#max-individual-quantity-error').html('');
-                        }
-                        if(data.min_qty_per_company_error) {
-                            $('#is-country-validation-error').val(1);                
-                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
 
-                            $('#min-company-quantity-error').html('');
-                            // console.log("min company qty error not found");
-                        }
-                        if(data.max_qty_per_company_error) {
-                            $('#is-country-validation-error').val(1);  
-                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                          
-                            $('#max-company-quantity-error').html('');
-                        }
-                        if(data.company_only_allowed_error) {
-                            $('#is-country-validation-error').val(1);                            
-                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                            $('#company-only-allowed-error').html('');
-                        }
+                       
                         $('.overlay').hide();
                     }
                 });
@@ -893,7 +887,7 @@
             getLOIDescription(index);
             var value = e.params.data.text;
             hideSFX(index, value);
-            checkCountryCriterias();
+         
         });
        
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -1063,6 +1057,7 @@
                     $('#master-model-id-'+index).val(modelId);
                     $('#model-line-'+index).val(data.model_line);
                     $('.overlay').hide();
+                    checkCountryCriterias();
                 }
             });
         }

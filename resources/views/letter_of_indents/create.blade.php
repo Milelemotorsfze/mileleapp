@@ -571,7 +571,7 @@
                     }
                 }
                
-            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
+            if(customer.length > 0 && customer_type.length > 0  && date.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     type: "GET",
@@ -855,7 +855,7 @@
 
             var value = e.params.data.text;
             hideSFX(index, value);
-            checkCountryCriterias();
+           
         });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -959,8 +959,9 @@
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
                    $('#master-model-id-'+index).val(modelId);
-                   $('#model-line-'+index).val(data.model_line);
+                   $('#model-line-'+index).val(data.model_line);                   
                    $('.overlay').hide();
+                   checkCountryCriterias();
                }
            });
         }
