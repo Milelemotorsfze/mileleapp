@@ -61,7 +61,8 @@
                                     <label for="choices-single-default" class="form-label">Restricted Model Lines </label>
                                     <select class="form-control widthinput" multiple name="restricted_master_model_line_ids[]" id="restricted_model_line" autofocus>
                                         @foreach($modelLines as $modelLine)
-                                            <option value="{{ $modelLine->id }}"> {{ $modelLine->model_line }} </option>
+                                            <option value="{{ $modelLine->id }}"
+                                            {{ (in_array ($modelLine->model_line, $loiCountryCriteria->restricted_model_lines)) ? 'selected' : ''  }}>  {{ $modelLine->model_line }} </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -71,7 +72,8 @@
                                     <label for="choices-single-default" class="form-label">Allowed Model Lines </label>
                                     <select class="form-control widthinput" multiple name="allowed_master_model_line_ids[]" id="allowed_model_line" autofocus>
                                         @foreach($modelLines as $modelLine)
-                                            <option value="{{ $modelLine->id }}"> {{ $modelLine->model_line }} </option>
+                                            <option value="{{ $modelLine->id }}"
+                                            {{ (in_array ($modelLine->model_line, $loiCountryCriteria->allowed_model_lines)) ? 'selected' : ''  }}> {{ $modelLine->model_line }} </option>
                                         @endforeach
                                     </select>
                                 </div>
