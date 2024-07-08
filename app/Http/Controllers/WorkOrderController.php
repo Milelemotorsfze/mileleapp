@@ -1387,12 +1387,14 @@ class WorkOrderController extends Controller
         }
     }
     public function vehicleDataHistory($id) {
+        $woVehicle = WOVehicles::where('id',$id)->first();
         $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_history',compact('datas'));
+        return view('work_order.export_exw.show_vehicle_history',compact('datas','woVehicle'));
     }
     public function vehicleAddonDataHistory($id) {
+        $woVehicleAddon = WOVehicleAddons::where('id',$id)->first();
         $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas'));
+        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas','woVehicleAddon'));
     }
     public function salesApproval(Request $request) {
         $validator = Validator::make($request->all(), [

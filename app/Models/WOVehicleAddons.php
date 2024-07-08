@@ -23,4 +23,8 @@ class WOVehicleAddons extends Model
         'updated_by',
         'deleted_by',
     ];
+    public function workOrderVehicle()
+    {
+        return $this->hasOne(WOVehicles::class,'id','w_o_vehicle_id');
+    }
 }

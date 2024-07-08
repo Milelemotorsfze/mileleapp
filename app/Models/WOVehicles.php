@@ -83,4 +83,8 @@ class WOVehicles extends Model
     {
         return $this->hasOne(User::class,'id','deleted_by');
     }
+    public function workOrder()
+    {
+        return $this->hasOne(WorkOrder::class,'id','work_order_id');
+    }
 }

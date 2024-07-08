@@ -15,6 +15,18 @@ class WOVehicleAddonRecordHistory extends Model
     protected $casts = [
         'changed_at' => 'datetime',
     ];
+    protected $appends = [
+        'field',
+    ];
+    public function getFieldAttribute() {
+        $fieldMapping = [
+            'addon_code' => 'Addon Code',
+            'addon_description' => 'Addon Description',
+            'addon_quantity' => 'Addon Quantity',
+        ];
+    
+        return $fieldMapping[$this->field_name] ?? '';
+    }
     public function user()
     {
         return $this->hasOne(User::class,'id','user_id');
