@@ -65,11 +65,10 @@ class VendorAccountController extends Controller
     }
     public function view($id)
 {
-    // Retrieve the transactions with the associated purchase order
     $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)
                     ->where('transaction_amount', '!=', 0)
                     ->with('purchaseOrder')
-                    ->orderBy('created_at', 'asc') // Order by date in ascending order
+                    ->orderBy('created_at', 'desc') // Order by date in ascending order
                     ->get();
 
     // Group transactions by po_number and assign row numbers within each group

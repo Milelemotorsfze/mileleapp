@@ -346,6 +346,7 @@ $(document).ready(function() {
         return;
     }
     var detail = variantOption.data('detail');
+    console.log(detail);
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');
     $('.bar').show();
@@ -358,7 +359,7 @@ $(document).ready(function() {
             var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
             var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
             var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-            var detailCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+            var detailCol = $('<div class="col-lg-1 col-md-6"><textarea name="detail[]" class="form-control" readonly style="width: 100%;">' + detail + '</textarea></div>'); // Changed to textarea for full text display
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
             var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_prices[]" value="' + unitPrice + '" class="form-control" readonly></div>'); // Add unit price
