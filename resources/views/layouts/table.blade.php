@@ -96,6 +96,7 @@
             $('#supplier-rejected-LOI-table').DataTable();
             $('#milele-partial-approved-LOI-table').DataTable();
             $('#vehicle-pictures-table').DataTable();
+            $('#loi-criteria-country-table').DataTable();
             $('#PFI-table').DataTable();
             $('#warranty-table').DataTable();
             $('#warranty-brands-table').DataTable();

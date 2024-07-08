@@ -260,13 +260,12 @@
                         </div>
                     </div>
 
-            <div class="alert m-2" role="alert" hidden id="country-comment-div">
-                <span id="country-comment"></span><br>
-                <span class="error" id="max-individual-quantity-error"></span>
-                <span class="error" id="min-company-quantity-error"></span>
-                <span class="error" id="max-company-quantity-error"></span>
-                <span class="error" id="company-only-allowed-error"></span>
-            </div>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
+                        <span id="country-comment"></span><br>
+                    </div>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="loi-country-validation-div">                       
+                        <span class="error" id="validation-error"></span>
+                    </div>
                     <div class="card mt-2" >
                             <div class="card-header">
                                 <h4 class="card-title">LOI Items</h4>
@@ -280,7 +279,7 @@
                                         <label class="form-label">SFX</label>
                                     </div>
                                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                        <label class="form-label">Model Year</label>
+                                        <label class="form-label">Model Line</label>
                                     </div>
                                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                                         <label class="form-label">LOI Description</label>
@@ -499,11 +498,13 @@
                             $('#template-type option[value=individual]').prop('disabled', false);
                             $('#template-type option[value=business]').prop('disabled', false);
                         }
-                        checkCountryCriterias();
+                       
                     }
                 }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){ 
                     $('#customer-type').val(previousSelected);
                 } );
+
+                checkCountryCriterias();
              
             });
 
@@ -783,7 +784,7 @@
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                           <input type="text" readonly placeholder="Model Line" class="form-control widthinput text-dark model-lines"
-                          value="{{$letterOfIndentItem->masterModel->modelLine->model_line ?? ''}}" data-index="${index}" id="model-line-${index}">
+                           data-index="${index}" id="model-line-${index}">
 
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
@@ -891,7 +892,8 @@
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
             var value = e.params.data.text;
-            hideSFX(index, value)
+            hideSFX(index, value);
+            checkCountryCriterias();
         });
        
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -903,7 +905,8 @@
             $('#inventory-quantity-'+index).val("");
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            appendSFX(index,model[0],sfx)
+            appendSFX(index,model[0],sfx);
+            $('#quantity-'+index).val("");
 
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
@@ -919,6 +922,7 @@
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
+            $('#quantity-'+index).val("");
 
         });
 

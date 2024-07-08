@@ -184,7 +184,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
-                                <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
+                                <input type="file" name="files[]" id="file-upload" accept="image/*" class="form-control widthinput text-dark" multiple
                                     autofocus>
                             </div>
                         </div>
@@ -195,14 +195,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
-                        <span id="country-comment"></span><br>
-                        <span class="error" id="max-individual-quantity-error"></span>
-                        <span class="error" id="min-company-quantity-error"></span>
-                        <span class="error" id="max-company-quantity-error"></span>
-                        <span class="error" id="company-only-allowed-error"></span>
-                    </div>
-                    <div class="card" id="soNumberDiv" >
+                   
+                    <div class="card" id="soNumberDiv">
                         <div class="card-header">
                             <h4 class="card-title">
                                  SO Numbers
@@ -244,8 +238,11 @@
                         </div>
                     </div>
 
-                    <div class="alert m-2" role="alert" hidden id="country-comment-div">
-                        <span id="country-comment"></span>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
+                        <span id="country-comment"></span><br>
+                    </div>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="loi-country-validation-div">                       
+                        <span class="error" id="validation-error"></span>
                     </div>
                     <div class="row">
                         <div class="card p-2" >
@@ -282,9 +279,7 @@
                                         </div>
                                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                             <label class="form-label">Model Line</label>
-                                            <!-- <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
-                                                <option value="">Select Model Year</option>
-                                            </select> -->
+                                            
                                             <input type="text" readonly placeholder="Model Line"
                                             class="form-control widthinput text-dark model-lines"  data-index="1" id="model-line-1">
                                             @error('model_line')
@@ -551,18 +546,31 @@
             checkCountryCriterias();
         });
 
-        function checkCountryCriterias(e) {
+        function checkCountryCriterias() {
           
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
             var date = $('#date').val();
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
-            $(".quantities ").each(function(){
+            $(".quantities").each(function(){
                 if($(this).val() > 0) {
                     total_quantities += parseInt($(this).val());
                 }
             });
+                var model_lines = $('.model_lines').val();
+                var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+                var selectedModelLineIds = [];
+                for(let i=1; i<=totalIndex; i++)
+                {
+                    var eachSelectedModelLineId = $('#model-line-'+i).val();
+
+                    if(eachSelectedModelLineId) {
+                        selectedModelLineIds.push(eachSelectedModelLineId);
+                    }
+                }
+               
             if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
                 $('.overlay').show();
                 $.ajax({
@@ -573,11 +581,12 @@
                         loi_date:date,
                         customer_id: customer[0],
                         customer_type: customer_type[0],
-                        total_quantities:total_quantities
+                        total_quantities:total_quantities,
+                        selectedModelLineIds:selectedModelLineIds
                     },
                     success:function (data) {
-                        $('#is-country-validation-error').val(0);
-                        console.log(data);
+                        $('#is-country-validation-error').val(data.error);
+                       
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -585,59 +594,28 @@
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
-                        // formValid = true;
-                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
-
-                        if(data.customer_type_error) {
-                            // formValid = false;
-                            $('#is-country-validation-error').val(1);
-                            $('#customer-type-error').html(data.customer_type_error);
-                            $('#customer-type-error').attr('hidden', false);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
+                        if(data.error == 1) {
+                           
+                            $('.country-validation').removeClass('alert-success').addClass("alert-danger");
+                            $('#loi-country-validation-div').attr('hidden', false);
+                           
+                        }else{
+                           
+                            $('.country-validation').removeClass('alert-danger').addClass("alert-success");
+                            $('#loi-country-validation-div').attr('hidden', true);
+                        }
+                       
+                        if(data.validation_error) {
+                         console.log(data.validation_error);
+                            $('#validation-error').html(data.validation_error);
+                            $('#validation-error').attr('hidden', false);
+                         
                         }
                         else{
-                            $('#customer-type-error').attr('hidden', true);
+                            $('#validation-error').attr('hidden', true);
                         }
-                        if (data.max_qty_per_passport_error) {
-                            // formValid = false;
-                            $('#is-country-validation-error').val(1);
-                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-
-                        } else { 
-                            $('#max-individual-quantity-error').html('');
-                        }
-                        if(data.min_qty_per_company_error) {
-                            // formValid = false;            
-                            $('#is-country-validation-error').val(1);              
-                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-
-                            $('#min-company-quantity-error').html('');
-                            // console.log("min company qty error not found");
-                        }
-                        if(data.max_qty_per_company_error) {
-                            // formValid = false;
-                            $('#is-country-validation-error').val(1);
-                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                          
-                            $('#max-company-quantity-error').html('');
-                        }
-                        if(data.company_only_allowed_error) {
-                            // formValid = false;               
-                                        
-                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                            $('#company-only-allowed-error').html('');
-                        }
-                        $('.overlay').hide();
-
-                        console.log(formValid);
-                           
+                        
+                        $('.overlay').hide();   
                     }
                 });
             }
@@ -877,7 +855,7 @@
 
             var value = e.params.data.text;
             hideSFX(index, value);
-            console.log(" unselected");
+            checkCountryCriterias();
         });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
