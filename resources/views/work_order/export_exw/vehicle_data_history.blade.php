@@ -128,8 +128,8 @@
 
 <script type="text/javascript">
      $(document).ready(function() {
-        // Initialize an empty Set to store unique VINs
-        const uniqueVins = new Set();
+       // Initialize an empty Set to store unique VINs
+       const uniqueVins = new Set();
 
         // Loop through each element with the class 'vin-class' to extract VINs
         $('.vin-class').each(function() {
@@ -139,8 +139,11 @@
             }
         });
 
-        // Populate the dropdown with the unique VINs
-        uniqueVins.forEach(function(vin) {
+        // Convert the Set to an array and sort it
+        const sortedVins = Array.from(uniqueVins).sort();
+
+        // Populate the dropdown with the sorted unique VINs
+        sortedVins.forEach(function(vin) {
             $('#vin-filter').append(new Option(vin, vin));
         });
 
