@@ -33,9 +33,6 @@
 		margin-left: 30px; 
 		margin-top: 10px;
 	}
-	.reply-button {
-		margin-top: 10px;
-	}
 	.replies {
 		margin-left: 30px; 
 	}
@@ -944,7 +941,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script type="text/javascript">
 	
 	// Declare commentIdCounter only once
