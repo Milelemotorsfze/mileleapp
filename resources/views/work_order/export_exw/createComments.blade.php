@@ -36,13 +36,32 @@
     .hover-options button i {
         pointer-events: none;
     }
+    .mention-dropdown {
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .mention-dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .mention-dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
 </style>
 
 <div class="row" id="comments-section">
     <!-- Comments will be dynamically inserted here -->
 </div>
 
-<textarea class="form-control" id="new-comment" rows="2" placeholder="Add a comment..."></textarea>
+<textarea class="form-control" id="new-comment" rows="2" placeholder="Add a comment..." oninput="handleInput(event)"></textarea>
+<div id="mention-suggestions" class="mention-dropdown" style="display:none;"></div>
 <div class="row mt-2">
     <div class="col-xxl-11 col-lg-11 col-md-11">
         <div id="file-previews" class="ml-2 d-flex flex-wrap"></div>
@@ -56,8 +75,21 @@
     </div>
 </div>
 
+
 <script type="text/javascript">
-    document.getElementById('comment-files').addEventListener('change', function() {
+      let users = ["Alice", "Bob", "Charlie", "David", "Eve"]; // Example users
+      let mentionStartIndex = -1;
+    function selectMention(user, cursorPosition, textarea) {
+        const textBeforeCursor = textarea.value.slice(0, cursorPosition);
+        const textAfterCursor = textarea.value.slice(cursorPosition);
+        const updatedTextBeforeCursor = textBeforeCursor.slice(0, mentionStartIndex) + `@${user} `;
+        textarea.value = updatedTextBeforeCursor + textAfterCursor;
+
+        textarea.focus();
+        textarea.setSelectionRange(updatedTextBeforeCursor.length, updatedTextBeforeCursor.length);
+        hideMentionSuggestions();
+    }
+document.getElementById('comment-files').addEventListener('change', function() {
         previewFiles(this.files, 'file-previews');
     });
 
@@ -88,8 +120,7 @@
             reader.readAsDataURL(file);
         }
     }
-
-    function viewImage(src) {
+function viewImage(src) {
         const newWindow = window.open();
         newWindow.document.write(`<img src="${src}" style="max-width: 100%; height: auto;">`);
     }
@@ -102,8 +133,23 @@
         link.click();
         document.body.removeChild(link);
     }
+function showReplyForm(commentId) {
+        $(`#reply-form-${commentId}`).toggle();
 
-    function addComment(parentId = null) {
+        // Add event listener for reply file input
+        $(`#reply-files-${commentId}`).off('change').on('change', function() {
+            previewFiles(this.files, `reply-previews-${commentId}`);
+        });
+    }
+function formatDateTime(date) {
+        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        return date.toLocaleString('en-GB', options).replace(/,/g, '');
+    }
+function hideMentionSuggestions() {
+        const mentionDropdown = document.getElementById('mention-suggestions');
+        mentionDropdown.style.display = 'none';
+    }
+function addComment(parentId = null) {
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
         const commentFiles = parentId ? $(`#reply-files-${parentId}`).prop('files') : $('#comment-files').prop('files');
 
@@ -151,7 +197,7 @@
                             <span style="color:gray;"> - ${formattedDateTime}</span>
                             <br>
                             <div class="reply-form" id="reply-form-${commentIdCounter}" style="display: none;">
-                                <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..."></textarea>
+                                <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..." oninput="handleInput(event)></textarea>
                                 <div class="row">
                                     <div class="col-xxl-11 col-lg-11 col-md-11">
                                         <div id="reply-previews-${commentIdCounter}" class="reply ml-2 d-flex flex-wrap"></div>
@@ -190,17 +236,33 @@
         });
     }
 
+    function handleInput(event) { 
+        const textarea = event.target; 
+        const cursorPosition = textarea.selectionStart; 
+        const textBeforeCursor = textarea.value.slice(0, cursorPosition); 
 
-    function showReplyForm(commentId) {
-        $(`#reply-form-${commentId}`).toggle();
-
-        // Add event listener for reply file input
-        $(`#reply-files-${commentId}`).off('change').on('change', function() {
-            previewFiles(this.files, `reply-previews-${commentId}`);
-        });
+        const mentionMatch = textBeforeCursor.match(/@(\w*)$/); console.log(mentionMatch);
+        if (mentionMatch) {
+            mentionStartIndex = mentionMatch.index;
+            const mentionQuery = mentionMatch[1].toLowerCase();
+            showMentionSuggestions(mentionQuery, cursorPosition, textarea);
+        } else {
+            mentionStartIndex = -1;
+            hideMentionSuggestions();
+        }
     }
-    function formatDateTime(date) {
-        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        return date.toLocaleString('en-GB', options).replace(/,/g, '');
+    function showMentionSuggestions(query, cursorPosition, textarea) {
+        const suggestions = users.filter(user => user.toLowerCase().startsWith(query)).slice(0, 5);
+        const mentionDropdown = document.getElementById('mention-suggestions');
+        mentionDropdown.innerHTML = suggestions.map(user => `<div class="mention-dropdown-item" onclick="selectMention('${user}', ${cursorPosition}, document.getElementById('new-comment'))">${user}</div>`).join('');
+        
+        if (suggestions.length > 0) {
+            const rect = textarea.getBoundingClientRect();
+            mentionDropdown.style.display = 'block';
+            mentionDropdown.style.left = `${rect.left}px`;
+            mentionDropdown.style.top = `${rect.bottom + window.scrollY}px`;
+        } else {
+            hideMentionSuggestions();
+        }
     }
 </script>
