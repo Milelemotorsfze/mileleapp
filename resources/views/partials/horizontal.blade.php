@@ -1128,34 +1128,42 @@
                                                                     <a href="{{route('loi-expiry-conditions.index')}}" class="dropdown-item" data-key="t-login"> LOI Expiry Conditions</a>
                                                                 @endif
                                                             @endcan
-                                                            <div class="dropdown">
-                                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                                    <span data-key="t-utility">Model Year</span>
-                                                                    <div class="arrow-down"></div>
-                                                                </a>
-                                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                                    @can('model-year-calculation-rules-list')
-                                                                        @php
-                                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
-                                                                        @endphp
-                                                                        @if ($hasPermission)
-                                                                            <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">
-                                                                                List Rules
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
-                                                                    @can('model-year-calculation-categories-list')
-                                                                        @php
-                                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
-                                                                        @endphp
-                                                                        @if ($hasPermission)
-                                                                            <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">
-                                                                                List Categories
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
+                                                            @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list'])
+                                                                @php
+                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list','model-year-calculation-categories-list']);
+                                                                @endphp
+                                                                @if ($hasPermission)
+                                                                <div class="dropdown">
+                                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                                        <span data-key="t-utility">Model Year</span>
+                                                                        <div class="arrow-down"></div>
+                                                                    </a>
+                                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                                        @can('model-year-calculation-rules-list')
+                                                                            @php
+                                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                                            @endphp
+                                                                            @if ($hasPermission)
+                                                                                <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">
+                                                                                    List Rules
+                                                                                </a>
+                                                                            @endif
+                                                                        @endcan
+                                                                        @can('model-year-calculation-categories-list')
+                                                                            @php
+                                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                                            @endphp
+                                                                            @if ($hasPermission)
+                                                                                <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">
+                                                                                    List Categories
+                                                                                </a>
+                                                                            @endif
+                                                                        @endcan
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+                                                                @endif
+                                                            @endcan
+                                                           
                                                         </div>
                                                     </div>
                                                 @endif
