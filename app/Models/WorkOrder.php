@@ -100,6 +100,10 @@ class WorkOrder extends Model
     {
         return $this->hasOne(User::class,'id','finance_approval_by');
     }
+    public function COOApprovalBy()
+    {
+        return $this->hasOne(User::class,'id','coe_office_approval_by');
+    }
     public function vehicles()
     {
         return $this->hasMany(WOVehicles::class,'work_order_id','id');

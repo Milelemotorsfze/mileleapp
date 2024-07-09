@@ -698,7 +698,7 @@ class WorkOrderController extends Controller
                 $oldValue = $oldData[$fileKey] ?? NULL;
                 $newValue = $newData[$fileKey] ?? NULL;
 
-                if ($oldValue != $newValue) {
+                if ($oldValue != $newValue && $newValue != NULL) {
                     if ($oldValue != NULL && $newValue != NULL) {
                         $type = 'Change';
                         $newFilePath = 'wo/' . $fileKey . '/' . $newValue;
@@ -1387,12 +1387,14 @@ class WorkOrderController extends Controller
         }
     }
     public function vehicleDataHistory($id) {
+        $woVehicle = WOVehicles::where('id',$id)->first();
         $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_history',compact('datas'));
+        return view('work_order.export_exw.show_vehicle_history',compact('datas','woVehicle'));
     }
     public function vehicleAddonDataHistory($id) {
+        $woVehicleAddon = WOVehicleAddons::where('id',$id)->first();
         $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
-        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas'));
+        return view('work_order.export_exw.show_vehicle_addon_history',compact('datas','woVehicleAddon'));
     }
     public function salesApproval(Request $request) {
         $validator = Validator::make($request->all(), [
@@ -1415,7 +1417,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'sales_support_data_confirmation_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1424,7 +1426,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'sales_support_data_confirmation_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1515,7 +1517,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'finance_approved_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1524,7 +1526,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'finance_approval_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1568,7 +1570,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'coe_office_approved_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1577,7 +1579,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'coe_office_approval_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
