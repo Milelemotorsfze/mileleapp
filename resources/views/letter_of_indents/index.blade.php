@@ -142,15 +142,15 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                     <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
-                                                        <button type="button" class="btn btn-soft-green btn-sm " title="Edit LOI"><i class="fa fa-edit"></i></button>
+                                                        <button type="button" class="btn btn-soft-green btn-sm mt-1" title="Edit LOI"><i class="fa fa-edit"></i></button>
                                                     </a>
                                                 @endif
                                             @endcan
 
-                                            <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-soft-violet btn-sm mt-1" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                                 @can('LOI-delete')
@@ -713,7 +713,7 @@
                                         </td>
                                         <td>{{ $letterOfIndent->review }}</td>                                   
                                         <td>
-                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm" data-bs-toggle="modal" 
+                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm mt-1" data-bs-toggle="modal" 
                                             data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-save"></i>
                                             </button>
@@ -725,12 +725,12 @@
                                                 @if ($hasPermission)
                                                    @if($letterOfIndent->is_loi_expired == false)
                                                         <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                                            <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
+                                                            <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
                                                         </a>
                                                     @endif
                                                 @endif
                                             @endcan
-                                            <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
                                             <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
