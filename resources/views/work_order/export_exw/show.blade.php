@@ -107,6 +107,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	@endif
 </div>
 <div class="card-body">
+    <div class="row">
+        <div class="col-lg-11 col-md-11 col-sm-11 col-11">    
+            @include('work_order.export_exw.approvals')
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-1">
+            <a style="margin-top:2px; margin-bottom:2px; float:right;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
+                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+            </a>
+        </div>
+    </div>
+   
 	<div class="tab-content">
 		<div class="tab-pane fade show active" id="requests">
 			<br>
@@ -617,13 +628,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <span class="data-font">@if($workOrder->finance_approved_at != ''){{\Carbon\Carbon::parse($workOrder->finance_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COE Office Approval By </label>
+                                                    <label for="choices-single-default" class="form-label"> COO Office Approval By </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->coeOfficeApprovalBy->name ?? 'NA'}}</span>
+                                                    <span class="data-font">{{$workOrder->COOApprovalBy->name ?? 'NA'}}</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COE Office Approved At </label>
+                                                    <label for="choices-single-default" class="form-label"> COO Office Approved At </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                     <span class="data-font">@if($workOrder->coe_office_approved_at != ''){{\Carbon\Carbon::parse($workOrder->coe_office_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>

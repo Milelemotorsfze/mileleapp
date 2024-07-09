@@ -1417,7 +1417,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'sales_support_data_confirmation_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1426,7 +1426,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'sales_support_data_confirmation_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1517,7 +1517,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'finance_approved_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1526,7 +1526,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'finance_approval_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1570,7 +1570,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'coe_office_approved_at',
                         'old_value' => NULL,
-                        'new_value' => Carbon::now(),
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
@@ -1579,7 +1579,7 @@ class WorkOrderController extends Controller
                         'user_id' => $authId,
                         'field_name' => 'coe_office_approval_by',
                         'old_value' => NULL,
-                        'new_value' => $authId,
+                        'new_value' => Auth::user()->name,
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);

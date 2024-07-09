@@ -2,6 +2,26 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	#overlay {
+		position: fixed;
+		display: none;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0,0,0,0.5);
+		z-index: 2;
+		cursor: wait;
+	}
+	#overlay-content {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: white;
+	}
 	.btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;
@@ -132,72 +152,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
-	@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
-			@if($workOrder->finance_approved_at != '' || $workOrder->coe_office_approved_at != '')
-				<a title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-					<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
-				</a>
-			@elseif($workOrder->finance_approved_at == '' && $workOrder->coe_office_approved_at == '')
-				<a title="Revert Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
-					<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
-				</a>
-			@endif
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
-			<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-			<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
-			</a>
-		@endif
-		@if(isset($workOrder) && $workOrder->finance_approved_at != '')
-		<a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->coe_office_approved_at == '')
-		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
-		</a>
-		@endif
-		@if(isset($workOrder) && $workOrder->coe_office_approved_at != '')
-		<a  title="COE Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fas fa-check-circle" title="COE Office"></i> COE Office Approved
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at != '')
-		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
-		COE Office Approval
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at == '')
-			<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-direct-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-			<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
-			COE Office Direct Approval
-			</a>
-		@endif
-
-		<!-- Modal -->
-		<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="approvalModalLabel">COE Office Direct Approval</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<!-- <span aria-hidden="true">&times;</span> -->
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-					<label for="approvalComments">Comments</label>
-					<textarea class="form-control" id="approvalComments" rows="3"></textarea>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-					<button type="button" class="btn btn-primary" id="submitApproval">Submit</button>
-				</div>
-				</div>
-			</div>
+	@include('work_order.export_exw.approvals')
+	<div class="row">
+		<div class="col-xxl-12 col-lg-12 col-md-12">
+			<button style="float:right;" class="btn btn-sm btn-success" id="submit-from-top">Submit</button>
 		</div>
-	<!-- <div class="col-xxl-12 col-lg-12 col-md-12">
-		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
-	</div> -->
+	</div>
+	</br>
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
     @if(isset($workOrder))
@@ -507,7 +468,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
 							autofocus onkeyup="sanitizeQuantity(this)">
 					</div>
-					<div class="col-xxl-2 col-lg-2 col-md-2">
+					<div class="col-xxl-3 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
@@ -971,7 +932,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	@endif
 </div>
 <br>
-<div class="overlay"></div>
+<div id="overlay">
+	<div id="overlay-content">
+		<h2>Submitting, please wait...</h2>
+	</div>
+</div>
 @else
 <div class="card-header">
 	<p class="card-title">Sorry ! You don't have permission to access this page</p>
@@ -981,6 +946,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 @endif
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script type="text/javascript">
+	
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
     // $('#work-order-history-table').DataTable();
@@ -1034,6 +1000,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		});	
 	}
 	$(document).ready(function () { 
+		document.getElementById('submit-from-top').addEventListener('click', function() { 
+			  // Trigger a click on the submit button of the form
+			  document.getElementById('submit').click();
+		});
 		// SELECT 2 START
 			$('#customer_name').select2({
 				allowClear: true,
@@ -1582,157 +1552,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			vehicleAddonDropdown(dataId)
         });
 
-		$('.btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Confirm, It was Confirmed already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.revert-btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.revert-sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Revert, It was reverted already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-finance-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.finance-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Approve, It was approved already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-coe-office-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.coe-office-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Approve, It was approved already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-coe-office-direct-approval').click(function (e) {
-			var id = $(this).attr('data-id');
-			$('#approvalModal').data('id', id).modal('show');
-		});
-
-		$('#submitApproval').click(function (e) {
-			var id = $('#approvalModal').data('id');
-			var comments = $('#approvalComments').val();
-			let url = '{{ route('work-order.coe-office-approval') }}';
-
-			if (!comments) {
-			alertify.error("Please add comments.");
-			return;
-			}
-
-			var confirm = alertify.confirm('Are you sure you want to approve this work order?', function (e) {
-			if (e) {
-				$.ajax({
-				type: "POST",
-				url: url,
-				dataType: "json",
-				data: {
-					id: id,
-					comments: comments,
-					_token: '{{ csrf_token() }}'
-				},
-				success: function (data) {
-					$('#approvalModal').modal('hide');
-					if (data == 'success') {
-					window.location.reload();
-					alertify.success("Successfully Approved");
-					} else if (data == 'error') {
-					window.location.reload();
-					alertify.error("Can't Approve, It was approved already.");
-					}
-				}
-				});
-			}
-			}).set({ title: "Confirmation" });
-		});
+		
 		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
 			// Select all input, select, and textarea elements and disable them
-			var elements = document.querySelectorAll('#WOForm button');
+			var elements = document.querySelectorAll('#WOForm #submit');
 			// #WOForm input, #WOForm select, #WOForm textarea, 
 			elements.forEach(function(element) {
 				element.disabled = true;
@@ -2103,10 +1926,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$(element).removeClass('is-invalid');
 				}
 			},
-			submitHandler: function(form) {  console.log('inside submit handler')
+			submitHandler: function(form) {  
 				// Prevent default form submission
 				event.preventDefault();
-
+				// Show the overlay
+				$('#overlay').show();
 				// Collect all comments
 				const comments = [];
 				if (workOrder == null) {
@@ -2168,6 +1992,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					}
 				}).catch(error => {
 					console.error('Form submission error:', error);
+				}).finally(() => {
+					// Hide the overlay
+					$('#overlay').hide();
 				});
 			}
         });
@@ -2344,6 +2171,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					var newRow = $(`
 						<div class="row form_field_outer_row" id="${index}">
 							<div class="col-xxl-11 col-lg-11 col-md-11">
+								<span class="error">* </span>
 								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
 								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
 									${options}
@@ -3192,21 +3020,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
-		function setWo() {
-			var SONumber = $('#so_number').val();
-			// Step 1: Split the string to get the part after "SO-"
-			let parts = SONumber.split("SO-");
-			if (parts.length < 2) {
-				throw new Error("Invalid SO Number format");
-			}
-			// Step 2: Remove leading zeros from the part after "SO-"
-			let numberPart = parts[1].replace(/^0+/, '');
-			var WONumber = "WO-";
-			if(numberPart != '') {
-				WONumber = WONumber+numberPart;
-			}
-			document.getElementById('wo_number').value = WONumber;
-		}
+	function setWo() {
+        var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+
+        if (SONumber === '') { // Check if the input is empty
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        // Step 1: Split the string to get the part after "SO-"
+        let parts = SONumber.split("SO-");
+        if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        // Step 2: Remove leading zeros from the part after "SO-"
+        let numberPart = parts[1].replace(/^0+/, '');
+        if (numberPart === '') { // Check if the number part is empty after removing leading zeros
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        var WONumber = "WO-" + numberPart; // Construct the WO Number
+        document.getElementById('wo_number').value = WONumber; // Set the WO Number field
+    }
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START

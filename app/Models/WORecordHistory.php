@@ -16,7 +16,7 @@ class WORecordHistory extends Model
         'changed_at' => 'datetime',
     ];
     protected $appends = [
-        'field',
+        'field'
     ];
     
     public function getFieldAttribute() {
@@ -29,6 +29,8 @@ class WORecordHistory extends Model
             'batch' => 'Batch',
             'brn' => 'BRN',
             'brn_file' => 'BRN File',
+            'coe_office_approval_by' => 'COO Office Approval By',
+            'coe_office_approved_at' => 'COO Office Approved At',
             'container_number' => 'Container Number',
             'currency' => 'Currency',
             'customer_address' => 'Customer Address',
@@ -51,6 +53,8 @@ class WORecordHistory extends Model
             'enduser_trade_license' => 'Enduser Trade License',
             'existing_customer_name' => 'Existing Customer Name',
             'final_destination' => 'Final Destination',
+            'finance_approved_at' =>'Finance Approved At',
+            'finance_approval_by' => 'Finance Approval By',
             'forward_import_code' => 'Forward Import Code',
             'freight_agent_contact_number' => 'Freight Agent Contact Number',
             'freight_agent_contact_number.full' => 'Freight Agent Contact Number',

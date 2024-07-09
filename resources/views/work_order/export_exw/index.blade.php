@@ -155,8 +155,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="light">Sales Support Data Confirmation At</th>
                             <th rowspan="2" class="dark">Finance Approval By</th>
                             <th rowspan="2" class="dark">Finance Approval At</th>
-                            <th rowspan="2" class="light">COE Office Approval By</th>
-                            <th rowspan="2" class="light">COE Office Approval At</th>
+                            <th rowspan="2" class="light">COO Office Approval By</th>
+                            <th rowspan="2" class="light">COO Office Approval At</th>
 							<th rowspan="2" class="dark">Total Number Of BOE</th>
 						</tr>
 						<tr>
@@ -367,7 +367,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
-                            <td>@if($data->updated_at != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                            <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 
                             <td>{{$data->salesSupportDataConfirmationBy->name ?? ''}}</td>
                             <td>@if($data->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($data->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
@@ -375,7 +375,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->financeApprovalBy->name ?? ''}}</td>
                             <td>@if($data->finance_approved_at != ''){{\Carbon\Carbon::parse($data->finance_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
                             
-							<td>{{$data->coeOfficeApprovalBy->name ?? ''}}</td>
+							<td>{{$data->COOApprovalBy->name ?? ''}}</td>
                             <td>@if($data->coe_office_approved_at != ''){{\Carbon\Carbon::parse($data->coe_office_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 							<td></td>
 						</tr>
