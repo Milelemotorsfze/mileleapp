@@ -7,7 +7,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">
-                    LOI Mapping Criteria
+                    LOI Expiry Criteria
                 </h4>
                 <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
