@@ -138,6 +138,25 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-4" >
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Netsuite Name :
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <dl id="netsuite-name"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        Model Detail :
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <dl id="model-detail"></dl>
+                                    </div>
+                                </div>
+                    
+                            </div>
                             <div class="col-sm-4">
                                 <div class="row">
                                     <div class="col-sm-3">
@@ -176,18 +195,18 @@
                             </div>
                             <div class="col-sm-4" >
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         Seat :
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-8">
                                         <dl id="seat"></dl>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-4">
                                         COO :
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-8">
                                         <dl id="coo"></dl>
                                     </div>
                                 </div>
@@ -219,19 +238,13 @@
                                         <dl id="detail"></dl>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        Model Detail :
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <dl id="model-detail"></dl>
-                                    </div>
-                                </div>
+                               
                             </div>
+                            
                         </div>
-                        <div class="row" id="variant-items">
+                        <!-- <div class="row" id="variant-items">
 
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -333,7 +346,7 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
-
+                    console.log(data);
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{
@@ -356,20 +369,21 @@
                     $('#coo').html(data.variant.coo);
                     $('#detail').html(data.variant.detail);
                     $('#model-detail').html(data.variant.model_detail);
-                    if(data.variant_items) {
-                        jQuery.each(data.variant_items, function(key,value){
-                            $("#variant-items").append('<div class="col-sm-4"> ' +
-                                '<div class="row mt-2"> ' +
-                                '<div class="col-sm-3">' +
-                                ' <dl id="variant-specification"> '+ value.model_specification.name ?? '' +' : </dl> ' +
-                                '</div> ' +
-                                '<div class="col-sm-9"> ' +
-                                '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
-                                '</div> ' +
-                                '</div> ' +
-                                '</div>');
-                        });
-                    }
+                    $('#netsuite-name').html(data.variant.netsuite_name);
+                    // if(data.variant_items) {
+                    //     jQuery.each(data.variant_items, function(key,value){
+                    //         $("#variant-items").append('<div class="col-sm-4"> ' +
+                    //             '<div class="row mt-2"> ' +
+                    //             '<div class="col-sm-3">' +
+                    //             ' <dl id="variant-specification"> '+ value.model_specification.name ?? '' +' : </dl> ' +
+                    //             '</div> ' +
+                    //             '<div class="col-sm-9"> ' +
+                    //             '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
+                    //             '</div> ' +
+                    //             '</div> ' +
+                    //             '</div>');
+                    //     });
+                    // }
                 }
             });
         }
