@@ -978,8 +978,6 @@ $(document).ready(function() {
         });
     });
 });
-
-
 </script>
     </div>
     @else

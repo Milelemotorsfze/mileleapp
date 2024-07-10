@@ -115,7 +115,7 @@ class MovementController extends Controller
                 $query->where('latest_location', '!=', '2')
                       ->orWhereNull('latest_location');
             })
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Incoming Stock')
             ->pluck('vin');
     $purchasing_order = PurchasingOrder::where('status', 'Approved')
             ->whereHas('vehicles', function ($query) {
@@ -152,7 +152,7 @@ class MovementController extends Controller
             $query->where('latest_location', '!=', '2')
                   ->orWhereNull('latest_location');
         })
-        ->where('payment_status', '=', 'Incoming Stock')
+        ->where('status', '=', 'Incoming Stock')
         ->pluck('vin'); 
         $purchasing_order = PurchasingOrder::where('status', 'Approved')
     ->whereHas('vehicles', function ($query) {
@@ -493,7 +493,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('grn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Incoming Stock')
             ->pluck('id');
         }
         else
@@ -502,7 +502,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Incoming Stock')
             ->pluck('id');
         }
         info($vehicles);
@@ -555,7 +555,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Incoming Stock')
             ->pluck('id');
             info($vehicles);
             $vehicleDetails = [];
