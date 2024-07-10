@@ -1359,8 +1359,22 @@ class WorkOrderController extends Controller
             'parent_id' => $request->input('parent_id'),
             'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
         ]);
-
-        return response()->json($comment, 201);
+        $files = [];
+        if($request->hasFile('files')) {
+            foreach($request->file('files') as $file) {
+                $fileData = base64_encode(file_get_contents($file->getRealPath()));
+                $files[] = [
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . $fileData
+                ];
+            }
+        }
+    
+        // Assuming you have a relation set up for files on the comment model
+        $comment->files()->createMany($files);
+    
+        // Respond with the comment and files data
+        return response()->json($comment->load('files'), 201);
     }
     // public function getComments($workOrderId)
     // {
@@ -1368,9 +1382,10 @@ class WorkOrderController extends Controller
     //     $comments = WOComments::where('work_order_id', $workOrderId)->get();
     //     return response()->json(['comments' => $comments]);
     // }
+    
     public function getComments($workOrderId)
     {
-        $comments = WOComments::where('work_order_id', $workOrderId)->get();
+        $comments = WOComments::where('work_order_id', $workOrderId)->with('files','user')->get();
         return response()->json(['comments' => $comments]);
     }
     public function uniqueSO(Request $request) { 

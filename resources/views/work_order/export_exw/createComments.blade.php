@@ -46,7 +46,6 @@
 </div>
 
 <textarea class="form-control" id="new-comment" rows="2" placeholder="Add a comment..."></textarea>
-<div id="mention-suggestions" class="mention-dropdown" style="display:none;"></div>
 <div class="row mt-2">
     <div class="col-xxl-11 col-lg-11 col-md-11">
         <div id="file-previews" class="ml-2 d-flex flex-wrap"></div>
@@ -145,14 +144,14 @@
                             <img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
                         </div>
                         <div class="col-xxl-11 col-lg-11 col-md-11">
-                            <div class="comment-text">${commentText}</div><br>
-                            <div class="d-flex flex-wrap">${filePreviews.join('')}</div><br>
+                            <div class="comment-text">${commentText}</div>
+                            <div class="d-flex flex-wrap">${filePreviews.join('')}</div>
                             <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentIdCounter})" title="Reply">
                                 <i class="fa fa-reply" aria-hidden="true"></i>
                             </button>
                             <span style="color:gray;">{{ Auth::user()->name }}</span>
                             <span style="color:gray;"> - ${formattedDateTime}</span>
-                            <br>
+                            
                             <div class="reply-form" id="reply-form-${commentIdCounter}" style="display: none;">
                                 <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..."></textarea>
                                 <div class="row">
