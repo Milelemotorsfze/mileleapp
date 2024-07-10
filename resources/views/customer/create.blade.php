@@ -76,13 +76,13 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
-                                <input type="file" class="form-control" name="passport_file" id="file1-upload"  placeholder="Upload Passport">
+                                <input type="file" class="form-control" accept='image/*' name="passport_file" id="file1-upload"  placeholder="Upload Passport">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Trade License</label>
-                                <input type="file" class="form-control" id="file2-upload" name="trade_license_file" placeholder="Upload Trade License">
+                                <input type="file" class="form-control" id="file2-upload"  accept='image/*'  name="trade_license_file" placeholder="Upload Trade License">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -194,7 +194,21 @@
                 country_id: {
                     required: true,
                 },
-            }
+                passport_file:{
+                      extension: "png|jpeg|jpg"
+                },
+                trade_license_file:{
+                     extension: "png|jpeg|jpg"
+                }
+            },
+            messages: {
+                trade_license_file: {
+                    extension: "Please upload image file format (png,jpeg,jpg)"
+                },
+                passport_file:{
+                    extension: "Please upload Image file format (png,jpeg,jpg)"
+                }
+            },
         });
     </script>
 @endpush

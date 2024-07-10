@@ -110,7 +110,7 @@
                                                         <h4>Passport</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('Customers/passports/'.$customer->passport) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/passports/'.$customer->passport) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -120,7 +120,7 @@
                                                         <h4>Trade License</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('Customers/trade_licenses/'.$customer->tradelicense) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/tradelicenses/'.$customer->tradelicense) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>
