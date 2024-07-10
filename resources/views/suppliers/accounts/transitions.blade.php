@@ -31,7 +31,7 @@
             </thead>
             <tbody>
             @foreach ($transitions as $transition)
-                <tr>
+                <tr data-transition-id="{{ $transition->id }}">
                 <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
                 <td>{{ $transition->created_at->format('d M Y') }}</td>
                 <td>
@@ -48,12 +48,85 @@
                     <td>{{ $transition->account_currency }}</td>
                     <td>{{ $transition->user->name }}</td>
                     <td>{{ $transition->remarks }}</td>
-                    <td>{{ $transition->remarks }}</td>
+                    <td>
+                    @if($transition->transaction_type == "Post-Debit" && $transition->status == "pending")
+                        <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
+                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                    @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Modal for rejection remarks -->
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModalLabel">Reject Transaction</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="rejectForm">
+          <input type="hidden" id="rejectTransitionId">
+          <div class="form-group">
+            <label for="remarks">Remarks</label>
+            <textarea class="form-control" id="remarks" rows="3" required></textarea>
+          </div>
+</br>
+          <button type="submit" class="btn btn-danger">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+function handleAction(action, transitionId, remarks = '') {
+    $.ajax({
+        url: '{{ route("transition.action") }}', // Update this route to your controller method
+        type: 'POST',
+        data: {
+            id: transitionId,
+            action: action,
+            remarks: remarks
+        },
+        success: function(response) {
+            alertify.success('Transitions Updated Successfully');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
+function showRejectModal(transitionId) {
+    $('#rejectTransitionId').val(transitionId);
+    $('#rejectModal').modal('show');
+}
+
+$('#rejectForm').on('submit', function(event) {
+    event.preventDefault();
+    var transitionId = $('#rejectTransitionId').val();
+    var remarks = $('#remarks').val();
+    handleAction('reject', transitionId, remarks);
+    $('#rejectModal').modal('hide');
+});
+
+$(document).ready(function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+});
+</script>
+@endsection
+@section('scripts')
 @endsection
