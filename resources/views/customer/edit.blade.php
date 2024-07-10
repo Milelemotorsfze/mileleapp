@@ -110,7 +110,7 @@
                             <div id="file1-preview">
                                 @if($customer->passport)
                                     <h6 class="fw-bold text-center">Passport</h6>
-                                    <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
+                                    <iframe src="{{ url('Customers/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
 
                                 @endif
 
@@ -120,7 +120,7 @@
                             <div id="file2-preview">
                                 @if($customer->tradelicense)
                                     <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
+                                    <iframe src="{{ url('Customers/trade_licenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
                                 @endif
                             </div>
                         </div>
