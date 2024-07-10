@@ -48,6 +48,7 @@ use App\Models\PurchasedOrderPriceChanges;
 use App\Models\PurchasedOrderMessages;
 use App\Models\PurchasedOrderReplies;
 use App\Models\Purchasedorderoldplfiles;
+use App\Models\VehiclesSupplierAccountTransaction;
 
 
 
@@ -2888,6 +2889,13 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 $supplieraccount->account_currency = $currency;
                 $supplieraccount->transaction_amount = $totalcost;
                 $supplieraccount->save();
+                $supplieraccountid = $supplieraccount->id;
+                foreach ($vehicles as $vehicle) {
+                    $updatevehicle = New VehiclesSupplierAccountTransaction();
+                    $updatevehicle->vehicles_id =  $vehicle->id;
+                    $updatevehicle->sat_id = $supplieraccountid ;
+                    $updatevehicle->save();
+                }
             }
                     return redirect()->back()->with('success', 'Payment Status Updated');
        }

@@ -891,6 +891,7 @@ Route::get('/d', function () {
     Route::resource('vendoraccount', VendorAccountController::class);
     Route::get('/account/{id}', [VendorAccountController::class, 'view'])->name('vendoraccount.view');
     Route::get('/get-supplier-and-amount/{orderId}', [PurchasingOrderController::class, 'getSupplierAndAmount']);
+    Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
