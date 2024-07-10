@@ -209,7 +209,7 @@
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_1" type="text" class="form-control widthinput so_number"
                                                 oninput=uniqueCheckSoNumber()  name="so_number[1]"
-                                                placeholder="SO Number" value="{{ old('so_number') }}" >
+                                                placeholder="SO Number" >
                                             <span id="soNumberError_1" class="error is-invalid soNumberError"></span>
                                         </div>
 
@@ -1048,7 +1048,7 @@
                                     <div class="row">
                                         <div class="col-xxl-9 col-lg-6 col-md-12">
                                             <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
-                                            placeholder="So Number" value="{{ old('so_number') }}" oninput=uniqueCheckSoNumber() >
+                                            placeholder="So Number" oninput=uniqueCheckSoNumber() >
                                             <span id="soNumberError_${index}" class="error is-invalid soNumberError"></span>
                                         </div>
                                         <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
