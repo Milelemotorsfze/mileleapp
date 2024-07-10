@@ -650,6 +650,7 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::post('/update-warehouse-remarks', [WarehouseController::class, 'updatewarehouseremarks'])->name('warehouse.updatewarehouseremarks');
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
+    Route::get('vehicles/payment-paymentremanings/{id}', [PurchasingOrderController::class, 'paymentremanings'])->name('vehicles.paymentremanings');
     Route::post('purchasing_order/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
     Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
     Route::get('/vehicles/approvedcancel/{id}', [PurchasingOrderController::class, 'approvedcancel'])->name('vehicles.approvedcancel');
@@ -683,6 +684,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-allstatusrel', [PurchasingOrderController::class, 'purchasingallupdateStatusrel'])->name('purchasing.updateallStatusrel');
     Route::post('/update-purchasing-allpaymentreqss', [PurchasingOrderController::class, 'allpaymentreqss'])->name('purchasing.allpaymentreqss');
     Route::post('/update-purchasing-allpaymentreqssfin', [PurchasingOrderController::class, 'allpaymentreqssfin'])->name('purchasing.allpaymentreqssfin');
+    Route::post('/update-purchasing-allpaymentreqssfinremainig', [PurchasingOrderController::class, 'allpaymentreqssfinremainig'])->name('purchasing.allpaymentreqssfinremainig');
     Route::post('/update-purchasing-allpaymentreqssfinpay', [PurchasingOrderController::class, 'allpaymentreqssfinpay'])->name('purchasing.allpaymentreqssfinpay');
     Route::post('/update-purchasing-rerequestpayment', [PurchasingOrderController::class, 'rerequestpayment'])->name('purchasing.rerequestpayment');
     Route::post('/update-purchasing-allpaymentreqssfinpaycomp', [PurchasingOrderController::class, 'allpaymentreqssfinpaycomp'])->name('purchasing.allpaymentreqssfinpaycomp');

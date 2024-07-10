@@ -138,6 +138,72 @@
     }
 </style>
 @section('content')
+<div id="percentageModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="percentageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Percentage</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="percentageForm">
+          <div class="form-group">
+            <label for="percentageSelect">Percentage</label>
+            <select class="form-control" id="percentageSelect">
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="submitPercentage">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="repercentageModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="repercentageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Percentage</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="percentageForm">
+          <div class="form-group">
+            <label for="percentageSelect">Percentage</label>
+            <select class="form-control" id="repercentageSelect">
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="resubmitPercentage">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="percentageModalremaining" class="modal" tabindex="-1" role="dialog" aria-labelledby="percentageModalremainingLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Percentage</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="percentageForm">
+          <div class="form-group">
+            <label for="percentageSelectremaining">Percentage</label>
+            <select class="form-control" id="percentageSelectremaining">
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="submitPercentageremaining">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal fade" id="vehicleModal" tabindex="-1" role="dialog" aria-labelledby="vehicleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -710,31 +776,57 @@
                     </div>
                     @endif
                     @if ($purchasingOrder->pl_file_path)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
-                        </div>
-                        <div class="col-lg-6 col-md-9 col-sm-12">
-                        <button type="button" class="btn btn-primary btn-sm view-doc-btn" data-toggle="modal" data-target="#viewdocModal">
-                            <i class="fas fa-file-pdf mr-2"></i> View PFI
-                        </button>
-                        </div>
-                    </div>
-                    <div class="modal fade" id="viewdocModal" tabindex="-1" role="dialog" aria-labelledby="viewdocModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="viewdocModalLabel">PL Viewer</h5>
-                                    <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
-                                </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    @endif
+<div class="row">
+    <div class="col-lg-4 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <button type="button" class="btn btn-primary btn-sm view-doc-btn" data-toggle="modal" data-target="#viewdocModal">
+            <i class="fas fa-file-pdf mr-2"></i> View PFI
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="viewdocModal" tabindex="-1" role="dialog" aria-labelledby="viewdocModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewdocModalLabel">PL Viewer</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@foreach ($oldPlFiles as $index => $oldPlFile)
+<div class="row mt-2">
+    <div class="col-lg-4 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Old PFI Document {{ $index + 1 }}</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <button type="button" class="btn btn-secondary btn-sm view-old-doc-btn" data-toggle="modal" data-target="#viewOldDocModal{{ $index }}" data-index="{{ $index }}">
+            <i class="fas fa-file-pdf mr-2"></i> View Old PFI {{ $index + 1 }}
+        </button>
+    </div>
+</div>
+<div class="modal fade" id="viewOldDocModal{{ $index }}" tabindex="-1" role="dialog" aria-labelledby="viewOldDocModalLabel{{ $index }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewOldDocModalLabel{{ $index }}">Old PL Viewer {{ $index + 1 }}</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe src="{{ asset($oldPlFile->file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+
                     @if ($purchasingOrderSwiftCopies->count() > 0)
                     <br>
         <div class="row mb-2">
@@ -744,7 +836,7 @@
             <div class="col-lg-6 col-md-9 col-sm-12">
             @foreach ($purchasingOrderSwiftCopies as $swiftCopy)
                 <button type="button" class="btn btn-primary btn-sm view-swift-btn" data-file-path="{{ asset($swiftCopy->file_path) }}">
-                    <i class="fas fa-file-pdf mr-2"></i> B - {{ $swiftCopy->batch_no }}
+                    <i class="fas fa-file-pdf mr-2"></i> Swift Copy - {{ $swiftCopy->batch_no }}
                 </button>
                 @endforeach
             </div>
@@ -948,11 +1040,22 @@
                             @if ($purchasingOrder->status === 'Approved')
                                 @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <label for="choices-single-default" class="form-label"><strong>Forward All Payment Request</strong></label>
+                                        <label for="choices-single-default" class="form-label"><strong>Forward Payment Request</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                     <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approval</button>
                                     <button id="allpaymentintreqfinreq-btn" class="btn btn-danger" onclick="allpaymentintreqfin('Rejected', {{ $purchasingOrder->id }})">Reject</button>
+                                    </div>
+                                @endif
+                            @endif
+                            @if ($purchasingOrder->status === 'Approved')
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('remaining_payment_status', 'Request for Payment'))
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                        <label for="choices-single-default" class="form-label"><strong>Forward Reamining Payment Request</strong></label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinremaing('Approved', {{ $purchasingOrder->id }})">Approval</button>
+                                    <button id="allpaymentintreqfinreq-btn" class="btn btn-danger" onclick="allpaymentintreqfinremaing('Rejected', {{ $purchasingOrder->id }})">Reject</button>
                                     </div>
                                 @endif
                             @endif
@@ -971,13 +1074,25 @@
                                     </div>
                                 @endif
                             @endif
+                            @if ($purchasingOrder->status === 'Approved')
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('remaining_payment_status', 'Payment Requested'))
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                        <label for="choices-single-default" class="form-label"><strong>Remaining Payment Initiation Request</strong></label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpay('Approved', {{ $purchasingOrder->id }})">Approval All</button>
+                                    </div>
+                                @endif
+                            @endif
                             @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
                         @endphp
                         @if ($hasPermission)
-                            @if ($purchasingOrder->status === 'Approved')
-                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated'))
+    @if ($purchasingOrder->status === 'Approved')
+        @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) 
+            && ($vehicles->contains('payment_status', 'Payment Initiated') 
+                || $vehicles->contains('remaining_payment_status', 'Payment Initiated')))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                         <label for="choices-single-default" class="form-label"><strong>Payment Release Request</strong></label>
                                     </div>
@@ -1052,8 +1167,10 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
                         @if ($hasPermission)
-                        @if ($purchasingOrder->status === 'Approved')
-                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Approved'))
+    @if ($purchasingOrder->status === 'Approved')
+        @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && 
+            ($vehicles->contains('payment_status', 'Payment Release Approved') || 
+            $vehicles->contains('remaining_payment_status', 'Payment Release Approved')))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                         <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
                                     </div>
@@ -1319,7 +1436,24 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
                             @endphp
                             @if ($hasPermission)
-                            <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
+                            <td>
+    @if($vehicles->purchased_paid_percentage != 100 && $vehicles->purchased_paid_percentage != "")
+        {{ 'Partial Payment' }}
+    @elseif($vehicles->purchased_paid_percentage == 100)
+        @if(!$vehicles->remaining_payment_status)
+            {{ ucfirst(strtolower($vehicles->payment_status)) }}
+        @else
+            {{ 'Partial Payment' }}
+        @endif
+    @else
+        {{ ucfirst(strtolower($vehicles->payment_status)) }}
+    @endif
+    
+    @if($vehicles->purchased_paid_percentage)
+        ({{ $vehicles->purchased_paid_percentage }}%)
+    @endif
+</td>
+
                                 @endif
                                 <td style ="width:160px;">
                                 <div class="row">
@@ -1335,9 +1469,13 @@
                             Approved Cancel
                         </a>
                         @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment' && is_null($vehicles->grn_id))
-                        <a id = 'cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
-                            Reject / Cancel
-                        </a>
+                        <form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
+    @csrf
+</form>
+
+<a id='cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" onclick="event.preventDefault(); document.getElementById('cancel-form-{{ $vehicles->id }}').submit();">
+    Reject / Cancel
+</a>
                         @elseif ($vehicles->status == 'Rejected')
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
                             Un-Reject
@@ -1399,6 +1537,18 @@
 										@endif
 										@endif
 										@endif
+                                        @php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+										@endphp
+										@if ($hasPermission)
+										@if ($purchasingOrder->status === 'Approved')
+										@if ($vehicles->payment_status != '' && $vehicles->purchased_paid_percentage != 100 && $vehicles->remaining_payment_status != 'Request for Payment')
+										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentremanings', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Initiate Remainings
+										</a>
+										@endif
+										@endif
+										@endif
 							{{-- End For Initiate Payment procurement  --}}
 							{{-- For Initiate Payment Finance  --}}
                             @if ($vehicles->payment_status === 'Payment Initiated Request')
@@ -1412,23 +1562,7 @@
                         </a> -->
                         @endif
                         @endif
-										@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
-											@endphp
-											@if ($hasPermission)
-											@if ($purchasingOrder->status === 'Approved')
-											@if ($vehicles->status === 'Request for Payment')
-											<div class="btn-group" role="group" aria-label="Payment Actions">
-                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                Approved
-                                            </a>
-                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentintconfirmrej', $vehicles->id) }}" onclick="return confirmPaymentrej();" style="white-space: nowrap;">
-                                                Reject
-                                            </a>
-                                        </div>
-											@endif
-											@endif
-											@endif
+
                                             @php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
 											@endphp
@@ -1532,9 +1666,13 @@
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
                                 @if($vehicles->status !== "Request for Cancel" && is_null($vehicles->grn_id))
-								<a id = 'cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
-									Cancel
-								</a>
+								<form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
+    @csrf
+</form>
+
+<a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" onclick="event.preventDefault(); document.getElementById('cancel-form-{{ $vehicles->id }}').submit();">
+    Cancel
+</a>
                                 @endif
 								@elseif ($vehicles->status === 'Pending Approval' && is_null($vehicles->grn_id))
 								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
@@ -1547,7 +1685,11 @@
                         </div>
 							</div>
                         </td>
-                        <td>{{ ucfirst(strtolower($vehicles->procurement_vehicle_remarks)) }}</td>
+                        <td>
+                        @if ($vehicles->payment_status != '' && $vehicles->purchased_paid_percentage != 100 && $vehicles->remaining_payment_status === 'Request for Payment')
+						Remainings Payment Requested
+						@endif
+                            {{ ucfirst(strtolower($vehicles->procurement_vehicle_remarks)) }}</td>
                         </tr>
                             @endforeach
                             </tbody>
@@ -2614,7 +2756,119 @@ function postUpdateStatus(status, orderId, remarks = '') {
                         window.location.reload();
                     });
             }
+    document.addEventListener('DOMContentLoaded', (event) => {
+    // Populate the percentage dropdown
+    let percentageSelect = document.getElementById('percentageSelect');
+    for (let i = 5; i <= 100; i += 5) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.text = i + '%';
+        if (i === 100) {
+            option.selected = true; // Set default to 100%
+        }
+        percentageSelect.appendChild(option);
+    }
+
+    // Add event listener to the submit button
+    document.getElementById('submitPercentage').addEventListener('click', function() {
+        let percentage = document.getElementById('percentageSelect').value;
+        let status = document.getElementById('percentageModal').dataset.status;
+        let orderId = document.getElementById('percentageModal').dataset.orderId;
+
+        let url = '{{ route('purchasing.allpaymentreqssfin') }}';
+        let data = { status: status, orderId: orderId, percentage: percentage };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Status update successful');
+            window.location.reload();
+        })
+        .catch(error => {
+            window.location.reload();
+        });
+    });
+});
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Populate the percentage dropdown
+    let percentageSelectremaining = document.getElementById('percentageSelectremaining');
+    for (let i = 5; i <= 100; i += 5) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.text = i + '%';
+        if (i === 100) {
+            option.selected = true; // Set default to 100%
+        }
+        percentageSelectremaining.appendChild(option);
+    }
+
+    // Add event listener to the submit button
+    document.getElementById('submitPercentageremaining').addEventListener('click', function() {
+        let percentage = document.getElementById('percentageSelectremaining').value;
+        let status = document.getElementById('percentageModalremaining').dataset.status;
+        let orderId = document.getElementById('percentageModalremaining').dataset.orderId;
+
+        let url = '{{ route('purchasing.allpaymentreqssfinremainig') }}';
+        let data = { status: status, orderId: orderId, percentage: percentage };
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Status update successful');
+            window.location.reload();
+        })
+        .catch(error => {
+            window.location.reload();
+        });
+    });
+});
+function allpaymentintreqfinremaing(status, orderId) {
+    if(status == "Rejected")
+    {
+                let url = '{{ route('purchasing.allpaymentreqssfinremainig') }}';
+                let data = { status: status, orderId: orderId };
+                console.log(data);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Status update successful');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        window.location.reload();
+                    });
+                }
+                else
+                {
+                    let modal = document.getElementById('percentageModalremaining');
+                    modal.dataset.status = status;
+                    modal.dataset.orderId = orderId;
+                    $('#percentageModalremaining').modal('show'); // Use jQuery to show the modal
+                }
+            }
             function allpaymentintreqfin(status, orderId) {
+    if(status == "Rejected")
+    {
                 let url = '{{ route('purchasing.allpaymentreqssfin') }}';
                 let data = { status: status, orderId: orderId };
                 console.log(data);
@@ -2634,6 +2888,14 @@ function postUpdateStatus(status, orderId, remarks = '') {
                     .catch(error => {
                         window.location.reload();
                     });
+                }
+                else
+                {
+                    let modal = document.getElementById('percentageModal');
+                    modal.dataset.status = status;
+                    modal.dataset.orderId = orderId;
+                    $('#percentageModal').modal('show'); // Use jQuery to show the modal
+                }
             }
             // function allpaymentintreqfinpay(status, orderId) {
             //     let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
@@ -2656,27 +2918,75 @@ function postUpdateStatus(status, orderId, remarks = '') {
             //             window.location.reload();
             //         });
             // }
-            function rerequestpayment(status, orderId) {
-                let url = '{{ route('purchasing.rerequestpayment') }}';
-                let data = { status: status, orderId: orderId };
-                console.log(data);
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
-            }
+
+            // function rerequestpayment(status, orderId) {
+            //     let url = '{{ route('purchasing.rerequestpayment') }}';
+            //     let data = { status: status, orderId: orderId };
+            //     fetch(url, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            //         },
+            //         body: JSON.stringify(data),
+            //     })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             console.log('Status update successful');
+            //             window.location.reload();
+            //         })
+            //         .catch(error => {
+            //             window.location.reload();
+            //         });
+            // }
+
+            // Function to open the modal and set dataset attributes
+function rerequestpayment(status, orderId) {
+    let modal = document.getElementById('repercentageModal');
+    modal.dataset.status = status;
+    modal.dataset.orderId = orderId;
+    $('#repercentageModal').modal('show'); // Use jQuery to show the modal
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Populate the percentage dropdown
+    let repercentageSelect = document.getElementById('repercentageSelect');
+    for (let i = 5; i <= 100; i += 5) {
+        let option = document.createElement('option');
+        option.value = i;
+        option.text = i + '%';
+        if (i === 100) {
+            option.selected = true; // Set default to 100%
+        }
+        repercentageSelect.appendChild(option);
+    }
+
+    // Add event listener to the submit button
+    document.getElementById('resubmitPercentage').addEventListener('click', function() {
+        let percentage = document.getElementById('repercentageSelect').value;
+        let status = document.getElementById('repercentageModal').dataset.status;
+        let orderId = document.getElementById('repercentageModal').dataset.orderId;
+
+        let url = '{{ route('purchasing.rerequestpayment') }}';
+        let data = { status: status, orderId: orderId, percentage: percentage };
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Status update successful');
+            window.location.reload();
+        })
+        .catch(error => {
+            window.location.reload();
+        });
+    });
+});
             function allpaymentintreqfinpaycomp(orderId) {
     document.getElementById('status').value = 'Approved';
     document.getElementById('orderId').value = orderId;
@@ -2817,6 +3127,10 @@ $(document).ready(function() {
   $('.view-doc-btn').on('click', function() {
     $('#viewdocModal').modal('show');
   });
+  $(document).on('click', '.view-old-doc-btn', function() {
+    var index = $(this).data('index');
+    $('#viewOldDocModal' + index).modal('show');
+});
 });
 </script>
 <script>

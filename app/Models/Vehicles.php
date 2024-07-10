@@ -45,6 +45,7 @@ class Vehicles extends Model
         'conversion',
         'inspection_date',
         'procurement_vehicle_remarks',
+        'purchased_paid_percentage',
 
     ];
     public function variant()

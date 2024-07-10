@@ -48,7 +48,7 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss);
+            $data = Vehicles::where('status', $statuss);
             $data = $data->where(function ($query) {
                 $query->whereNull('gdn_id')
                       ->orWhere(function ($subQuery) {
@@ -864,7 +864,7 @@ class VehiclesController extends Controller
 
         }else{
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss);
+            $data = Vehicles::where('status', $statuss);
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -1101,7 +1101,7 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
             $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss)
+        $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -1150,7 +1150,7 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('grn_id')
             ->whereNull('inspection_date');
@@ -1194,7 +1194,7 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->whereNull('grn_id')
             ->whereNull('gdn_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
@@ -2113,7 +2113,7 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('so_id')
             ->whereNull('pdi_date');
@@ -2174,7 +2174,7 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('so_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
@@ -2218,7 +2218,7 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('inspection_date')
             ->whereNull('so_id');
@@ -2263,7 +2263,7 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('grn_id')
 		    ->whereNull('netsuit_grn_number');
@@ -2307,7 +2307,7 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $fieldValues = ['so_number', 'so_date', 'sales_person_id', 'reservation_start_date', 'reservation_end_date'];
             $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss)
+        $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -2357,7 +2357,7 @@ class VehiclesController extends Controller
         $today = today();
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('reservation_end_date')
             ->where('reservation_end_date', '<=', $today)
