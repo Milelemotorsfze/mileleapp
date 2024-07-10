@@ -897,7 +897,6 @@ $(document).ready(function() {
         .appendTo(selectWrapper)
         .select2({
           width: '100%',
-          dropdownCssClass: 'select2-blue'
         });
       select.on('change', function() {
         var selectedValues = $(this).val();
