@@ -87,13 +87,13 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
-                                <input type="file" class="form-control" name="passport_file" id="file1-upload"  placeholder="Upload Passport">
+                                <input type="file" class="form-control" name="passport_file" accept='image/*' id="file1-upload"  placeholder="Upload Passport">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Trade License</label>
-                                <input type="file" class="form-control" id="file2-upload" name="trade_license_file" placeholder="Upload Trade License">
+                                <input type="file" class="form-control" id="file2-upload" accept='image/*' name="trade_license_file" placeholder="Upload Trade License">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -110,7 +110,7 @@
                             <div id="file1-preview">
                                 @if($customer->passport)
                                     <h6 class="fw-bold text-center">Passport</h6>
-                                    <iframe src="{{ url('Customers/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
+                                    <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
 
                                 @endif
 
@@ -120,7 +120,7 @@
                             <div id="file2-preview">
                                 @if($customer->tradelicense)
                                     <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('Customers/trade_licenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
+                                    <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
                                 @endif
                             </div>
                         </div>
@@ -211,7 +211,21 @@
                 country_id: {
                     required: true,
                 },
-            }
+                passport_file:{
+                      extension: "png|jpeg|jpg"
+                },
+                trade_license_file:{
+                     extension: "png|jpeg|jpg"
+                }
+            },
+            messages: {
+                trade_license_file: {
+                    extension: "Please upload image file format (png,jpeg,jpg)"
+                },
+                passport_file:{
+                    extension: "Please upload Image file format (png,jpeg,jpg)"
+                }
+            },
         });
     </script>
 @endpush

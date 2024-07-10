@@ -165,36 +165,30 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'Customers/passports';
+            // $destinationPath = 'Customers/passports';
+            $destinationPath = 'storage/app/public/passports';
             if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
                 \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
             }
+            $file->storeAs('passports', $fileName);
             $file->move($destinationPath, $fileName);
 
             $client->passport = $fileName;
         }
         if ($request->has('trade_license_file'))
         {
-            // dd($request->all());
             $file = $request->file('trade_license_file');
 
             $extension = $file->getClientOriginalExtension();
             $fileName2 = 'trade_license'.time().'.'.$extension;
-            $destinationPath = 'Customers/trade_licenses';
+            // $destinationPath = 'Customers/trade_licenses';
 
-            // $destinationPath2 = '/storage/app/public/tradelicenses');
-            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
-                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            $destinationPath2 = 'storage/app/public/tradelicenses';
+            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath2)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath2, $mode = 0777, true, true);
             }
-            $file->move($destinationPath, $fileName2);
-            
-            // // $filetrade = $request->file('tradelicenses');
-            // $file->store('uploads', 'public');
-            //
-
-            // $file->move($destinationPath2, $fileName2);
-            // $file->storeAs('app/public/tradelicenses', $fileName2);
-
+            $file->storeAs('tradelicenses', $fileName2);
+            $file->move($destinationPath2, $fileName2);
             $client->tradelicense = $fileName2;
 
         }
