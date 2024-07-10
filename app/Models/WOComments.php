@@ -25,4 +25,9 @@ class WOComments extends Model
     {
         return $this->hasMany(WOComments::class, 'parent_id');
     }
+
+    public function files()
+    {
+        return $this->hasMany(CommentFile::class, 'comment_id');
+    }
 }

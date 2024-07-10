@@ -1936,13 +1936,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						commentElements.forEach(comment => {
 							const commentId = comment.getAttribute('data-comment-id');
 							const parentId = comment.getAttribute('data-parent-id');
-							const textElement = comment.querySelector('.col-xxl-11');
+							const dateTime = comment.getAttribute('data-date-time');
+							const textElement = comment.querySelector('.comment-text');
+							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img`);
+							const files = Array.from(fileElements).map(file => ({
+								src: file.src,
+								name: file.alt
+							}));
 
-							if (textElement && textElement.childNodes[0]) {
-								const text = textElement.childNodes[0].textContent.trim();
-								comments.push({ commentId, parentId, text });
+							if (textElement) {
+								const text = textElement.textContent.trim();
+								comments.push({ commentId, parentId, text, dateTime, files });
 							} else {
-								console.warn('Text element or its first child is missing for a comment:', comment);
+								console.warn('Text element is missing for a comment:', comment);
 							}
 						});
 					} else {

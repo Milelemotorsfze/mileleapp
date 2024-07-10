@@ -36,23 +36,8 @@
     .hover-options button i {
         pointer-events: none;
     }
-    .mention-dropdown {
-        position: absolute;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        max-height: 150px;
-        overflow-y: auto;
-        z-index: 1000;
-    }
-
-    .mention-dropdown-item {
-        padding: 8px 12px;
-        cursor: pointer;
-    }
-
-    .mention-dropdown-item:hover {
-        background-color: #f1f1f1;
+    .reply-button {
+        margin-left:10px;
     }
 </style>
 
@@ -60,7 +45,7 @@
     <!-- Comments will be dynamically inserted here -->
 </div>
 
-<textarea class="form-control" id="new-comment" rows="2" placeholder="Add a comment..." oninput="handleInput(event)"></textarea>
+<textarea class="form-control" id="new-comment" rows="2" placeholder="Add a comment..."></textarea>
 <div id="mention-suggestions" class="mention-dropdown" style="display:none;"></div>
 <div class="row mt-2">
     <div class="col-xxl-11 col-lg-11 col-md-11">
@@ -77,23 +62,10 @@
 
 
 <script type="text/javascript">
-      let users = ["Alice", "Bob", "Charlie", "David", "Eve"]; // Example users
-      let mentionStartIndex = -1;
-    function selectMention(user, cursorPosition, textarea) {
-        const textBeforeCursor = textarea.value.slice(0, cursorPosition);
-        const textAfterCursor = textarea.value.slice(cursorPosition);
-        const updatedTextBeforeCursor = textBeforeCursor.slice(0, mentionStartIndex) + `@${user} `;
-        textarea.value = updatedTextBeforeCursor + textAfterCursor;
-
-        textarea.focus();
-        textarea.setSelectionRange(updatedTextBeforeCursor.length, updatedTextBeforeCursor.length);
-        hideMentionSuggestions();
-    }
-document.getElementById('comment-files').addEventListener('change', function() {
+    document.getElementById('comment-files').addEventListener('change', function() {
         previewFiles(this.files, 'file-previews');
     });
-
-    function previewFiles(files, previewContainerId) {
+    function previewFiles(files, previewContainerId, commentId) {
         const previewContainer = document.getElementById(previewContainerId);
         previewContainer.innerHTML = ''; // Clear previous previews
 
@@ -102,6 +74,7 @@ document.getElementById('comment-files').addEventListener('change', function() {
             reader.onload = function(e) {
                 const preview = document.createElement('div');
                 preview.classList.add('file-preview', 'm-1');
+                preview.dataset.commentId = commentId; // Add commentId as a data attribute
 
                 if (file.type.startsWith('image/')) {
                     preview.innerHTML = `
@@ -120,11 +93,10 @@ document.getElementById('comment-files').addEventListener('change', function() {
             reader.readAsDataURL(file);
         }
     }
-function viewImage(src) {
+    function viewImage(src) {
         const newWindow = window.open();
         newWindow.document.write(`<img src="${src}" style="max-width: 100%; height: auto;">`);
     }
-
     function downloadImage(src, filename) {
         const link = document.createElement('a');
         link.href = src;
@@ -133,23 +105,8 @@ function viewImage(src) {
         link.click();
         document.body.removeChild(link);
     }
-function showReplyForm(commentId) {
-        $(`#reply-form-${commentId}`).toggle();
-
-        // Add event listener for reply file input
-        $(`#reply-files-${commentId}`).off('change').on('change', function() {
-            previewFiles(this.files, `reply-previews-${commentId}`);
-        });
-    }
-function formatDateTime(date) {
-        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        return date.toLocaleString('en-GB', options).replace(/,/g, '');
-    }
-function hideMentionSuggestions() {
-        const mentionDropdown = document.getElementById('mention-suggestions');
-        mentionDropdown.style.display = 'none';
-    }
-function addComment(parentId = null) {
+  
+    function addComment(parentId = null) {
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
         const commentFiles = parentId ? $(`#reply-files-${parentId}`).prop('files') : $('#comment-files').prop('files');
 
@@ -164,7 +121,7 @@ function addComment(parentId = null) {
                 reader.onload = function(e) {
                     if (file.type.startsWith('image/')) {
                         resolve(`
-                            <div class="file-preview m-1">
+                            <div class="file-preview m-1" data-comment-id="${commentIdCounter}">
                                 <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                 <div class="hover-options">
                                     <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
@@ -182,13 +139,13 @@ function addComment(parentId = null) {
 
         Promise.all(filePreviewsHtml).then(filePreviews => {
             const commentHtml = `
-                <div class="comment mt-2" data-comment-id="${commentIdCounter}" data-parent-id="${parentId || ''}">
+                <div class="comment mt-2" data-comment-id="${commentIdCounter}" data-parent-id="${parentId || ''}" data-date-time="${formattedDateTime}">
                     <div class="row">
                         <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
                             <img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
                         </div>
                         <div class="col-xxl-11 col-lg-11 col-md-11">
-                            ${commentText}<br>
+                            <div class="comment-text">${commentText}</div><br>
                             <div class="d-flex flex-wrap">${filePreviews.join('')}</div><br>
                             <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentIdCounter})" title="Reply">
                                 <i class="fa fa-reply" aria-hidden="true"></i>
@@ -197,7 +154,7 @@ function addComment(parentId = null) {
                             <span style="color:gray;"> - ${formattedDateTime}</span>
                             <br>
                             <div class="reply-form" id="reply-form-${commentIdCounter}" style="display: none;">
-                                <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..." oninput="handleInput(event)></textarea>
+                                <textarea class="form-control reply" id="reply-input-${commentIdCounter}" rows="2" placeholder="Write a reply..."></textarea>
                                 <div class="row">
                                     <div class="col-xxl-11 col-lg-11 col-md-11">
                                         <div id="reply-previews-${commentIdCounter}" class="reply ml-2 d-flex flex-wrap"></div>
@@ -235,34 +192,16 @@ function addComment(parentId = null) {
             commentIdCounter++;
         });
     }
+    function showReplyForm(commentId) {
+        $(`#reply-form-${commentId}`).toggle();
 
-    function handleInput(event) { 
-        const textarea = event.target; 
-        const cursorPosition = textarea.selectionStart; 
-        const textBeforeCursor = textarea.value.slice(0, cursorPosition); 
-
-        const mentionMatch = textBeforeCursor.match(/@(\w*)$/); console.log(mentionMatch);
-        if (mentionMatch) {
-            mentionStartIndex = mentionMatch.index;
-            const mentionQuery = mentionMatch[1].toLowerCase();
-            showMentionSuggestions(mentionQuery, cursorPosition, textarea);
-        } else {
-            mentionStartIndex = -1;
-            hideMentionSuggestions();
-        }
+        // Add event listener for reply file input
+        $(`#reply-files-${commentId}`).off('change').on('change', function() {
+            previewFiles(this.files, `reply-previews-${commentId}`);
+        });
     }
-    function showMentionSuggestions(query, cursorPosition, textarea) {
-        const suggestions = users.filter(user => user.toLowerCase().startsWith(query)).slice(0, 5);
-        const mentionDropdown = document.getElementById('mention-suggestions');
-        mentionDropdown.innerHTML = suggestions.map(user => `<div class="mention-dropdown-item" onclick="selectMention('${user}', ${cursorPosition}, document.getElementById('new-comment'))">${user}</div>`).join('');
-        
-        if (suggestions.length > 0) {
-            const rect = textarea.getBoundingClientRect();
-            mentionDropdown.style.display = 'block';
-            mentionDropdown.style.left = `${rect.left}px`;
-            mentionDropdown.style.top = `${rect.bottom + window.scrollY}px`;
-        } else {
-            hideMentionSuggestions();
-        }
+    function formatDateTime(date) {
+        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        return date.toLocaleString('en-GB', options).replace(/,/g, '');
     }
 </script>

@@ -8,6 +8,7 @@ use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
 use App\Models\WOVehicleAddonRecordHistory;
 use App\Models\WOComments;
+use App\Models\CommentFile;
 use App\Models\WORecordHistory;
 use App\Models\Customer;
 use App\Models\Clients;
@@ -424,11 +425,12 @@ class WorkOrderController extends Controller
                 }
             }
             // Initialize an array to keep track of old to new comment IDs
-            $commentIdMap = [];
-
             // Handle comments
             $comments = json_decode($request->input('comments'), true);
-            if(isset($comments) && $comments != null) {
+            $commentIdMap = [];
+
+            if (isset($comments) && $comments != null) { 
+                // First pass: Create all comments and map their IDs
                 foreach ($comments as $comment) {
                     $newComment = WOComments::create([
                         'work_order_id' => $workOrder->id,
@@ -436,21 +438,32 @@ class WorkOrderController extends Controller
                         'parent_id' => null, // Temporary null, will update later
                         'user_id' => auth()->id(),
                     ]);
+
                     // Map the old comment ID to the new comment ID
                     $commentIdMap[$comment['commentId']] = $newComment->id;
                 }
-            }
-            
-            // Update parent IDs
-            if(isset($comments) && $comments != null) {
+
+                // Second pass: Update parent IDs and save files
                 foreach ($comments as $comment) {
-                    if (!empty($comment['parentId'])) {
-                        $newCommentId = $commentIdMap[$comment['commentId']];
+                    $newCommentId = $commentIdMap[$comment['commentId']];
+
+                    if (!empty($comment['parentId'])) { 
                         $newParentId = $commentIdMap[$comment['parentId']];
                         WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
                     }
+
+                    // Save files associated with the comment
+                    if (isset($comment['files']) && is_array($comment['files'])) { 
+                        foreach ($comment['files'] as $file) {
+                            CommentFile::create([
+                                'comment_id' => $newCommentId,
+                                'file_name' => $file['name'],
+                                'file_data' => $file['src'],
+                            ]);
+                        }
+                    }
                 }  
-            }  
+            }
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
             DB::commit(); 
