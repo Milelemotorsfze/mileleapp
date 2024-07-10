@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-accounts');
+  @endphp
+  @if ($hasPermission)
   <div class="card-header">
   @if(session('success'))
     <div class="alert alert-success">
@@ -26,7 +30,12 @@
                     <th>Currency</th>
                     <th>Transaction By</th>
                     <th>Remarks</th>
+                    @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+  @endphp
+  @if ($hasPermission)
                     <th>Action</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -48,12 +57,17 @@
                     <td>{{ $transition->account_currency }}</td>
                     <td>{{ $transition->user->name }}</td>
                     <td>{{ $transition->remarks }}</td>
+                    @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+  @endphp
+  @if ($hasPermission)
                     <td>
                     @if($transition->transaction_type == "Post-Debit" && $transition->status == "pending")
                         <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
                     @endif
                     </td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -127,6 +141,11 @@ $(document).ready(function() {
     });
 });
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection
 @section('scripts')
 @endsection
