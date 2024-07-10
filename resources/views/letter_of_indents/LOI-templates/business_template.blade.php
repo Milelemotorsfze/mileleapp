@@ -56,11 +56,11 @@
             <div class="border-outline">
                 <h4 class="center" style="text-decoration: underline;color: black">Letter of Intent for Automotive Purchase</h4>
                 <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
-                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->customer->company_name ?? '' }} </p>
+                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->company_name ?? '' }} </p>
                 <p>  <span style="font-weight: bold">Address: </span>  Dubai, UAE</p>
                 <p>Dear Sir/Madam,</p>
 
-                <p>I am writing on behalf of {{ $letterOfIndent->customer->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
+                <p>I am writing on behalf of {{ $letterOfIndent->client->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
                     Please find our company's automotive requirements listed with specifications below.</p>
                 <table class="table table-responsive">
                     <tr>
@@ -97,7 +97,7 @@
                     steps necessary to conclude this transaction professionally and in accordance with the law.
                 </p>
                 <p style="margin-bottom: 5px;">Sincerely,</p>
-                <p> {{ $letterOfIndent->customer->name ?? '' }} </p>
+                <p> {{ $letterOfIndent->client->name ?? '' }} </p>
                 @if($letterOfIndent->signature)
                     <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
                 @endif

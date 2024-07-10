@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\Customer;
+use App\Models\Clients;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
@@ -194,7 +195,7 @@ class LoiCountryCriteriasController extends Controller
     public function CheckCountryCriteria(Request $request)
     {
         info($request->all());
-        $customer = Customer::find($request->customer_id);
+        $customer = Clients::find($request->customer_id);
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
         $data = [];
 
@@ -202,7 +203,7 @@ class LoiCountryCriteriasController extends Controller
         $year = Carbon::parse($request->loi_date)->format('Y');
         $totalUnitCountUsed = LetterOfIndentItem::with('LOI')
                                     ->whereHas('LOI', function($query) use($year, $request){
-                                        $query->where('customer_id', $request->customer_id)
+                                        $query->where('client_id', $request->customer_id)
                                         ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
                                         ->whereYear('date', $year);
                                     })
@@ -216,7 +217,7 @@ class LoiCountryCriteriasController extends Controller
         $data['error'] = 0;
         if(!empty($LoiCountryCriteria->is_only_company_allowed && $LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES)) {
           
-            if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($request->customer_type !== \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
             
                 $data['validation_error'] = 'Only Company Can allow to Create LOI for this Country.';
                 $data['validation_error'] = 'Company can Only Create LOI.';
@@ -228,19 +229,19 @@ class LoiCountryCriteriasController extends Controller
             if($totalUnitCountUsed > 0) {
                $msg = 'Already ' .$totalUnitCountUsed.' unit is used by this customer!';    
             }
-            if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
+            if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL) {
                 if($quantity > $LoiCountryCriteria->max_qty_per_passport) {
                     $data['validation_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
                     $data['error'] = 1;
                 }
             }
-            if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
                 if($LoiCountryCriteria->min_qty_for_company > $quantity) {
                     $data['validation_error'] = 'Total Quantity should be greater than allowed quantity( '.$LoiCountryCriteria->min_qty_for_company.' ). '.$msg;
                     $data['error'] = 1;
                 }
             }
-            if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
                 if($LoiCountryCriteria->max_qty_for_company < $quantity) {
                     $data['validation_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_for_company.' ). '.$msg;
                     $data['error'] = 1;

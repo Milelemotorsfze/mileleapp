@@ -26,7 +26,7 @@ class CustomerController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('Open Customer List Page');
-        $customers = Customer::all();
+        $customers = Clients::where('is_demand_planning_customer', true)->orderBy('updated_at','DESC')->get();
         return view('customer.index', compact('customers'));
     }
 
@@ -49,18 +49,27 @@ class CustomerController extends Controller
         (new UserActivityController)->createActivity('New Customer Created');
 
         $this->validate($request, [
-            'name' => 'required',
+            'name' => 'required|unique:clients,name',
             'country_id' => 'required',
             'type' => 'required',
         ]);
 
-        $customer = new Customer();
-        $customer->name = $request->name;
-//        $customer->company_name = $request->company_name;
-        $customer->country_id = $request->country_id;
-        $customer->type = $request->type;
-        $customer->address = $request->address;
-        $customer->created_by = Auth::id();
+        $client = new Clients();
+        $client->name = $request->name;
+        $client->country_id = $request->country_id;
+        $client->customertype = $request->type;
+        $client->address = $request->address;
+        $client->created_by = Auth::id();
+        $client->is_demand_planning_customer = true;
+
+
+//         $customer = new Customer();
+//         $customer->name = $request->name;
+// //        $customer->company_name = $request->company_name;
+//         $customer->country_id = $request->country_id;
+//         $customer->type = $request->type;
+//         $customer->address = $request->address;
+//         $customer->created_by = Auth::id();
 
         if ($request->has('passport_file'))
         {
@@ -68,24 +77,26 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'customers/passports';
-            $file->move($destinationPath, $fileName);
+            $destinationPath = 'app/public/passports';
+            $file->storeAs($destinationPath, $fileName);
 
-            $customer->passport_file = $fileName;
+            // $customer->passport_file = $fileName;
+            $client->tradelicense = $fileName;
         }
         if ($request->has('trade_license_file'))
         {
             $file = $request->file('trade_license_file');
 
             $extension = $file->getClientOriginalExtension();
-            $fileName2 = 'trade_license'.time().'.'.$extension;
-            $destinationPath = 'customers/trade_licenses';
-            $file->move($destinationPath, $fileName2);
+            $fileName2 = 'trade_license'.time().'.'.$extension;       
+            $file->storeAs('app/public/tradelicenses', $fileName2);
 
-            $customer->trade_license_file = $fileName2;
+            // $customer->trade_license_file = $fileName2;
+            $client->passport = $fileName2;
         }
-
-        $customer->save();
+       
+        $client->save();
+        // $customer->save();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
     }
@@ -105,7 +116,7 @@ class CustomerController extends Controller
     {
         (new UserActivityController)->createActivity('Open Customer Edit Page');
 
-         $customer = Customer::find($id);
+         $customer = Clients::find($id);
          $countries = Country::all();
 
          return view('customer.edit', compact('customer','countries'));
@@ -119,17 +130,24 @@ class CustomerController extends Controller
         (new UserActivityController)->createActivity('Customer Detail Updated');
 
         $this->validate($request, [
-            'name' => 'required',
+            'name' => 'required|unique:clients,name,'.$id,
             'country_id' => 'required',
             'type' => 'required',
         ]);
 
-        $customer = Customer::find($id);
-        $customer->name = $request->name;
-//        $customer->company_name = $request->company_name;
-        $customer->country_id = $request->country_id;
-        $customer->type = $request->type;
-        $customer->address = $request->address;
+        $client = Clients::find($id);
+        $client->name = $request->name;
+        $client->country_id = $request->country_id;
+        $client->customertype = $request->type;
+        $client->address = $request->address;
+        $client->created_by = Auth::id();
+        $client->is_demand_planning_customer = true;
+
+//         $customer->name = $request->name;
+// //        $customer->company_name = $request->company_name;
+//         $customer->country_id = $request->country_id;
+//         $customer->type = $request->type;
+//         $customer->address = $request->address;
 
         if ($request->has('passport_file'))
         {
@@ -137,10 +155,10 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'customers/passports';
-            $file->move($destinationPath, $fileName);
+            $destinationPath = 'app/public/passports';
+            $file->storeAs($destinationPath, $fileName);
 
-            $customer->passport_file = $fileName;
+            $client->passport = $fileName;
         }
         if ($request->has('trade_license_file'))
         {
@@ -148,13 +166,13 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName2 = 'trade_license'.time().'.'.$extension;
-            $destinationPath = 'customers/trade_licenses';
-            $file->move($destinationPath, $fileName2);
+            
+            // $filetrade = $request->file('tradelicenses');
+            $file->storeAs('app/public/tradelicenses', $fileName2);
 
-            $customer->trade_license_file = $fileName2;
+            $client->tradelicense = $fileName2;
         }
-
-        $customer->save();
+        $client->save();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Updated Successfully.');
     }
@@ -166,7 +184,7 @@ class CustomerController extends Controller
     {
         (new UserActivityController)->createActivity('Customer Detail Deleted');
 
-        $customer = Customer::find($id);
+        $customer = Client::find($id);
         $customer->delete();
         
         return response(true);
