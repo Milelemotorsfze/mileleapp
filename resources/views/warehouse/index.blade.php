@@ -1,5 +1,10 @@
 @extends('layouts.table')
 <style>
+     /* Custom style for Select2 dropdown with orange highlight */
+     .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #1e90ff;
+        color: white;
+    }
   .table-responsive {
   overflow: auto;
   max-height: 650px; /* Adjust the max-height to your desired value */
@@ -896,7 +901,7 @@ $(document).ready(function() {
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
-          width: '100%',
+          width: '100%'
         });
       select.on('change', function() {
         var selectedValues = $(this).val();
@@ -915,9 +920,14 @@ $(document).ready(function() {
   $('.dataTables_filter input').on('keyup', function() {
     dataTable.search(this.value).draw();
   });
+
+  // Apply custom CSS class after Select2 dropdown is opened
+  $(document).on('select2:open', function(e) {
+    $('.select2-dropdown').addClass('select2-orange-highlight');
+  });
 });
-    </script>
-        <script>
+</script>
+<script>
         // Set timer for error message
         setTimeout(function() {
             $('#error-message').fadeOut('slow');
@@ -927,8 +937,8 @@ $(document).ready(function() {
         setTimeout(function() {
             $('#success-message').fadeOut('slow');
         }, 2000);
-    </script>
-    <script>
+</script>
+<script>
   function confirmCancel() {
     var confirmDialog = confirm("Are you sure you want to cancel this purchase order?");
     if (confirmDialog) {
