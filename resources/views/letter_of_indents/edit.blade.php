@@ -70,7 +70,7 @@
                                 <select class="form-control widthinput" autofocus multiple name="country" id="country" >
                                     <option disabled>Select Country</option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->customer->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
+                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->client->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -80,21 +80,21 @@
                                 <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
                                 <select class="form-control widthinput" name="customer_type"  id="customer-type">
                                     <option value="" disabled>Select Customer Type</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->client->customertype ? 'selected' : ''}}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}
                                     </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY == $letterOfIndent->client->customertype ? 'selected' : ''}}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}
                                     </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->client->customertype ? 'selected' : ''}} >
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
                                     </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO == $letterOfIndent->client->customertype ? 'selected' : ''}} >
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}
                                     </option>
                                 </select>
                             </div>
@@ -102,10 +102,10 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer</label>
-                                <select class="form-control widthinput" multiple name="customer_id" id="customer" >
+                                <select class="form-control widthinput" multiple name="client_id" id="customer" >
                                     @foreach($possibleCustomers as $customer)
-                                        <option value="{{ $letterOfIndent->customer_id }}"
-                                            {{ $letterOfIndent->customer_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
+                                        <option value="{{ $letterOfIndent->client_id }}"
+                                            {{ $letterOfIndent->client_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -176,9 +176,9 @@
                                     <option value="milele_cars"  {{ in_array('milele_cars',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->dealers == 'Trans Cars' ? 'disabled' : '' }}>Milele Cars</option>
                                     <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : '' }}
-                                        {{ $letterOfIndent->customer->type == 'Company' ? 'disabled' : '' }}>Individual</option>
+                                        {{ $letterOfIndent->client->customertype == 'Company' ? 'disabled' : '' }}>Individual</option>
                                     <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
-                                        {{ $letterOfIndent->customer->type == 'Individual' ? 'disabled' : '' }}>Business</option>
+                                        {{ $letterOfIndent->client->customertype == 'Individual' ? 'disabled' : '' }}>Business</option>
                                 </select>
                             </div>
                         </div>
@@ -487,11 +487,11 @@
                         previousSelected = customerType;
                     
                         $('#template-type').val('').trigger('change');
-                        if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
+                        if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}') {
                             $('#template-type option[value=business]').prop('disabled', true);
                             $('#template-type option[value=individual]').prop('disabled', false);
 
-                        } else if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
+                        } else if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}') {
                             $('#template-type option[value=individual]').prop('disabled', true);
                             $('#template-type option[value=business]').prop('disabled', false);
                         } else {
@@ -650,7 +650,7 @@
                     success: function (data) {
                         $('#customer').empty();
                         jQuery.each(data, function (key, value) {
-                            var selectedId = '{{ $letterOfIndent->customer_id }}';
+                            var selectedId = '{{ $letterOfIndent->client_id }}';
                             $('#customer').append('<option value="' + value.id + ' " >' + value.name + '</option>');
                             checkCountryCriterias();
                         });
@@ -680,7 +680,7 @@
         $("#form-update").validate({
             ignore: [],
             rules: {
-                customer_id: {
+                client_id: {
                     required: true,
                 },
                 category: {

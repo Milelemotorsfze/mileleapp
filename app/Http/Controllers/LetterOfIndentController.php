@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ColorCode;
 use App\Models\Country;
 use App\Models\Customer;
+use App\Models\Clients;
 use App\Models\Demand;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
@@ -80,7 +81,7 @@ class LetterOfIndentController extends Controller
         
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
-        $customers = Customer::all();
+        $customers = Clients::whereNotNull('country_id')->get();
         $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
         $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
 
@@ -93,14 +94,14 @@ class LetterOfIndentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_id' => 'required',
+            'client_id' => 'required',
             'category' => 'required',
             'date' => 'required',
             'dealers' => 'required'
           
         ]);
 
-        $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
+        $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
             ->where('status', LetterOfIndent::LOI_STATUS_NEW)
@@ -111,7 +112,7 @@ class LetterOfIndentController extends Controller
             DB::beginTransaction();
 
             $LOI = new LetterOfIndent();
-            $LOI->customer_id = $request->customer_id;
+            $LOI->client_id = $request->client_id;
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
@@ -119,9 +120,12 @@ class LetterOfIndentController extends Controller
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->sales_person_id = $request->sales_person_id;
-            $customer = Customer::find($request->customer_id);
+            $customer = Clients::find($request->client_id);
             $country = Country::find($request->country);
             $countryName = strtoupper(substr($country->name, 0, 3));
+
+            $customer->is_demand_planning_customer = true;
+            $customer->save();
 
             $names = explode(" ", $customer->name);
             $customerNameCode = "";
@@ -131,7 +135,7 @@ class LetterOfIndentController extends Controller
             $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
             $yearCode = Carbon::now()->format('y');
 
-            $customerTotalLoiCount = LetterOfIndent::where('customer_id', $request->customer_id)->count();
+            $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)->count();
             $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
             $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
@@ -236,8 +240,8 @@ class LetterOfIndentController extends Controller
     }
     public function getCustomers(Request $request)
     {
-        $customers = Customer::where('country_id', $request->country)
-            ->where('type', $request->customer_type)
+        $customers = Clients::where('country_id', $request->country)
+            ->where('customertype', $request->customer_type)
             ->get();
 
         return $customers;
@@ -391,8 +395,8 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($id);
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
-        $customers = Customer::all();
-        $possibleCustomers = Customer::where('country_id', $letterOfIndent->customer->country_id)->get();
+        $customers = Clients::whereNotNull('country_id')->get();
+        $possibleCustomers = Clients::where('country_id', $letterOfIndent->client->country_id)->get();
         $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
@@ -429,13 +433,13 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('Updated LOI Details.');
       
         $request->validate([
-            'customer_id' => 'required',
+            'client_id' => 'required',
             'category' => 'required',
             'date' => 'required',
             'dealers' => 'required'
         ]);
 
-        $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
+        $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
             ->whereNot('id',$id)
@@ -447,7 +451,7 @@ class LetterOfIndentController extends Controller
 
             $LOI = LetterOfIndent::find($id);
 
-            $customer = Customer::find($request->customer_id);
+            $customer = Clients::find($request->client_id);
             $country = Country::find($request->country);
             $countryName = strtoupper(substr($country->name, 0, 3));
 
@@ -459,13 +463,13 @@ class LetterOfIndentController extends Controller
             $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
             $yearCode = Carbon::now()->format('y');
 
-            $customerTotalLoiCount = LetterOfIndent::where('customer_id', $request->customer_id)->count();
+            $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)->count();
             $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
             $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
             $LOI->uuid = $uuid;
 
-            $LOI->customer_id = $request->customer_id;
+            $LOI->client_id = $request->client_id;
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;

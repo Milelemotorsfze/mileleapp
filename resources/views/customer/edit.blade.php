@@ -66,14 +66,14 @@
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control" name="type" id="customer-type">
                                     <option value="" disabled>Type</option>
-                                    <option value="{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}" {{ $customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL ? 'selected' : '' }}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
-                                    <option value="{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}" {{ $customer->type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY ? 'selected' : '' }}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
-                                    <option value="{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}"  {{ $customer->type == \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT ? 'selected' : '' }}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value="{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}"  {{ $customer->type == \App\Models\Customer::CUSTOMER_TYPE_NGO ? 'selected' : '' }}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}" {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL ? 'selected' : '' }}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}" {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY ? 'selected' : '' }}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}"  {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT ? 'selected' : '' }}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}"  {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_NGO ? 'selected' : '' }}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
                                 </select>
                             </div>
                         </div>
@@ -108,9 +108,9 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                             <div id="file1-preview">
-                                @if($customer->passport_file)
+                                @if($customer->passport)
                                     <h6 class="fw-bold text-center">Passport</h6>
-                                    <iframe src="{{ url('customers/passports/' . $customer->passport_file) }}" alt="Trade License "></iframe>
+                                    <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
 
                                 @endif
 
@@ -118,9 +118,9 @@
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                             <div id="file2-preview">
-                                @if($customer->trade_license_file)
+                                @if($customer->tradelicense)
                                     <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('customers/trade_licenses/' . $customer->trade_license_file) }}" alt="Trade License"></iframe>
+                                    <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
                                 @endif
                             </div>
                         </div>
@@ -208,7 +208,7 @@
                 type: {
                     required: true,
                 },
-                country: {
+                country_id: {
                     required: true,
                 },
             }

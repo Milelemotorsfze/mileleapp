@@ -33,9 +33,13 @@ class LetterOfIndent extends Model
         'is_loi_expired'
     ];
 
-    public function customer()
+    // public function customer()
+    // {
+    //     return $this->belongsTo(Customer::class);
+    // }
+    public function client()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Clients::class,'client_id','id');
     }
     public function supplier()
     {
@@ -87,18 +91,22 @@ class LetterOfIndent extends Model
     }
     public function getIsLoiExpiredAttribute() {
         $LOI = LetterOfIndent::find($this->id);
-       
-        $LOItype = $LOI->customer->type;
-        $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-        if($LOIExpiryCondition) {
-            $loiYear = Carbon::parse($LOI->date)->format('Y');
-          
-            $expiryYear = Carbon::now()->addYears(2);
         
-            if($loiYear > $expiryYear) {
+        $LOItype = $LOI->client->customertype;
+      
+        $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
+        if($LOIExpiryCondition) {        
+            $currentDate = Carbon::now();
+           
+            $year = $LOIExpiryCondition->expiry_duration_year;
+          
+            $expiryDate = Carbon::parse($LOI->date)->addYears($year);
+           
+            $test = $currentDate->gt($expiryDate);
+            
+            if($currentDate->gt($expiryDate) == true) {
                 $LOI->is_expired = true;
-                $LOI->save();
-                return true;
+                $LOI->save();  
             }
         }
         return $LOI->is_expired;

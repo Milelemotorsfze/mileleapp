@@ -65,10 +65,10 @@
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control" name="type" id="customer-type">
                                     <option value="" disabled>Type</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
                                 </select>
                             </div>
                         </div>
@@ -191,7 +191,7 @@
                 type: {
                     required: true,
                 },
-                country: {
+                country_id: {
                     required: true,
                 },
             }

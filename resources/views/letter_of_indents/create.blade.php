@@ -80,10 +80,10 @@
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control widthinput" multiple name="customer_type" id="customer-type">
 {{--                                    <option value="" disabled>Type</option>--}}
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
                                 </select>
                                 <span id="customer-type-error" class="error"></span>
                             </div>
@@ -91,10 +91,10 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Customer</label>
-                                <select class="form-control widthinput @error('customer_id') is-invalid @enderror"
-                                        name="customer_id" id="customer" multiple>
+                                <select class="form-control widthinput @error('client_id') is-invalid @enderror"
+                                        name="client_id" id="customer" multiple>
                                 </select>
-                                @error('customer_id')
+                                @error('client_id')
                                 <span role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -380,7 +380,7 @@
                 country: {
                     required: true,
                 },
-                customer_id: {
+                client_id: {
                     required: true,
                 },
                 category: {
@@ -502,9 +502,9 @@
            
             let customerType = $('#customer-type').val();
             $('#template-type').val('').trigger('change');
-            if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
+            if(customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}') {
                 $('#template-type option[value=business]').prop('disabled',true);
-            }else if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
+            }else if(customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}') {
                 $('#template-type option[value=individual]').prop('disabled',true);
             }else{
                 $('#template-type option[value=individual]').prop('disabled',false);

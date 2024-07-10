@@ -64,7 +64,7 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->type }}</td>
+                                <td>{{ $customer->customertype }}</td>
                                 <td>{{ $customer->country->name ?? '' }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
@@ -105,22 +105,22 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                @if($customer->passport_file)
+                                                @if($customer->passport)
                                                     <div class="row p-2">
                                                         <h4>Passport</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('customers/passports/'.$customer->passport_file) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/passports/'.$customer->passport) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
-                                                @if($customer->trade_license_file)
+                                                @if($customer->tradelicense)
                                                     <div class="row p-2">
                                                         <h4>Trade License</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('customers/trade_licenses/'.$customer->trade_license_file) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/tradelicenses/'.$customer->tradelicense) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>

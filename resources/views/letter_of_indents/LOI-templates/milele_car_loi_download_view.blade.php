@@ -106,8 +106,8 @@
                 <td>
                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
                     <span  style="list-style: none;" >
-                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->name ?? '' }}</span>
-                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->country->name ?? '' }} </span>
+                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->client->name ?? '' }}</span>
+                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->client->country->name ?? '' }} </span>
                     </span>
                 </td>
             </tr>
@@ -164,7 +164,7 @@
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                 <td colspan="2" style="border: none;font-size: 14px">Name :
                     <span style="margin-left: 3px" >
-                        {{ $letterOfIndent->customer->name ?? '' }}
+                        {{ $letterOfIndent->client->name ?? '' }}
                     </span>
                 </td>
 

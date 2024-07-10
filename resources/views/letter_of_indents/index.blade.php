@@ -106,7 +106,7 @@
                                         <td> {{ ++$i }}</td>
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
-                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
                                         <td>
@@ -115,7 +115,7 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                          </td>
-                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             @can('LOI-approve')
@@ -312,7 +312,7 @@
                                         <td>{{ ++$i }}</td>
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
-                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
                                         <td>
@@ -321,7 +321,7 @@
                                                 @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
@@ -393,7 +393,7 @@
                                                                             <dt class="form-label font-size-13 text-muted">Customer :</dt>
                                                                         </div>
                                                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                            <dl> {{  $letterOfIndent->customer->name }}</dl>
+                                                                            <dl> {{  $letterOfIndent->client->name }}</dl>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row">
@@ -430,7 +430,7 @@
                                                                             <dt class="form-label font-size-13 text-muted">Country :</dt>
                                                                         </div>
                                                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                            <dl>{{ $letterOfIndent->customer->country->name ?? '' }} </dl>
+                                                                            <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row">
@@ -479,7 +479,7 @@
                                                                     <dt class="form-label font-size-13 text-muted">Customer :</dt>
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                    <dl> {{  $letterOfIndent->customer->name }}</dl>
+                                                                    <dl> {{  $letterOfIndent->client->name }}</dl>
                                                                 </div>
                                                             </div>
                                                             <div class="row">
@@ -516,7 +516,7 @@
                                                                     <dt class="form-label font-size-13 text-muted">Country :</dt>
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                    <dl>{{ $letterOfIndent->customer->country->name ?? '' }} </dl>
+                                                                    <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
                                                                 </div>
                                                             </div>
                                                             <div class="row">
@@ -664,6 +664,7 @@
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
                                     <th>Customer</th>
+                                    <th>Customer Type</th>
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
@@ -686,7 +687,8 @@
                                      
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
-                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->customertype ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
                                         <td>
@@ -695,7 +697,7 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                        
@@ -908,7 +910,7 @@
                                         <td> {{ ++$i }}</td>
                                         <td> {{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
-                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
                                         <td>
@@ -917,7 +919,7 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
