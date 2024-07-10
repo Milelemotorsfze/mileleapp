@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Models\SupplierAccount;
+use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\SupplierAccountTransaction;
+use App\Models\VendorPaymentAdjustments;
+
+
 use App\Models\Vehicles;
 
 use App\Models\VehiclesSupplierAccountTransaction;
@@ -95,7 +99,7 @@ public function handleAction(Request $request)
         $transition->status = 'Approved';
         $transition->remarks = "Approved For Released Payment";
         $vehiclesin = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->get();
-    
+        $suppliertrans = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->first();
         foreach ($vehiclesin as $vehicleTransaction) {
             $vehicle = Vehicles::find($vehicleTransaction->vehicles_id);
             if ($vehicle) {
@@ -107,8 +111,18 @@ public function handleAction(Request $request)
                 $vehicle->save();
             }
         }
+        $paidaccount = PurchasedOrderPaidAmounts::find($suppliertrans->popa_id); // Changed to find to get the model instance
+        if ($paidaccount) {
+            $paidaccount->status = "Approved";
+            $paidaccount->save();
+        }
+        $VendorPaymentAdjustments = VendorPaymentAdjustments::find($suppliertrans->vpa_id); // Changed to find to get the model instance
+        if ($VendorPaymentAdjustments) {
+            $VendorPaymentAdjustments->status = "Approved";
+            $VendorPaymentAdjustments->save();
+        }
     }
-     else if ($request->action == 'reject') {
+    else if ($request->action == 'reject') {
         $transition->status = 'Rejected';
         $transition->remarks = $request->remarks;
         $vehiclesin = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->get();
