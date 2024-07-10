@@ -1219,12 +1219,24 @@ public function getBrandsAndModelLines(Request $request)
         ->get();
         $purchasedorderevents = PurchasingOrderEventsLog::where('purchasing_order_id', $id)->get();
         $oldPlFiles = Purchasedorderoldplfiles::where('purchasing_order_id', $id)->get();
+        $transitions = SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('transaction_amount', '!=', 0)
+        ->with('purchaseOrder')
+        ->orderBy('created_at', 'asc')
+        ->get();
+        $groupedTransitions = $transitions->groupBy('purchaseOrder.po_number');
+        foreach ($groupedTransitions as $po_number => $transactions) {
+        foreach ($transactions as $index => $transaction) {
+        $transaction->row_number = $index + 1;
+        }
+        }
+        $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts'));
     }
     public function edit($id)
     {
@@ -2733,6 +2745,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount + $remainingAmount;
                 $VendorPaymentAdjustments->remaining_amount = $remainingAmount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount + $remainingAmount;
@@ -2740,6 +2753,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Adjustment the payment";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
@@ -2762,6 +2776,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
                 $VendorPaymentAdjustments->remaining_amount = $intialamount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount;
@@ -2769,6 +2784,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Pay the Balance of with this PO";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
@@ -2790,12 +2806,14 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
                 $VendorPaymentAdjustments->remaining_amount = $intialamount - $adjustmentAmount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount;
                 $paidaccount->created_by = auth()->user()->id;
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $totalcost = $intialamount;
                 $description = "Partial Payment to the Vendor";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
@@ -2817,6 +2835,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->created_by = auth()->user()->id;
                 $VendorPaymentAdjustments->totalamount = $intialamount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $adjustmentAmount = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
@@ -2825,6 +2844,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Payment to the vendor without any adjustment";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
@@ -2893,7 +2913,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 foreach ($vehicles as $vehicle) {
                     $updatevehicle = New VehiclesSupplierAccountTransaction();
                     $updatevehicle->vehicles_id =  $vehicle->id;
-                    $updatevehicle->sat_id = $supplieraccountid ;
+                    $updatevehicle->sat_id = $supplieraccountid;
+                    $updatevehicle->vpa_id = $VendorPaymentAdjustmentsid;
+                    $updatevehicle->popa_id = $paidaccountid;
                     $updatevehicle->save();
                 }
             }
@@ -2932,12 +2954,12 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
         if ($supplieracc) {
             $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
-                ->where('status', 'Suggested Payment')
+                ->where('status', 'Approved')
                 ->sum('amount');
             $supplieracc->current_balance += $paymentad;
             $supplieracc->save();
             PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
-                ->where('status', 'Suggested Payment')
+                ->where('status', 'Approved')
                 ->update(['status' => 'Paid']);
             VendorPaymentAdjustments::where('purchasing_order_id', $id)
                 ->where('status', 'Approved')
