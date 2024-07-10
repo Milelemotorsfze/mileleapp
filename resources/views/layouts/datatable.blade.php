@@ -4,8 +4,6 @@
 @include('partials/head-css')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-
-
 </head>
 <body data-layout="horizontal">
     <div id="layout-wrapper">
