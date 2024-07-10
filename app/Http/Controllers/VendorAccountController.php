@@ -72,7 +72,7 @@ class VendorAccountController extends Controller
     $transitions = SupplierAccountTransaction::where('supplier_account_id', $id)
                     ->where('transaction_amount', '!=', 0)
                     ->with('purchaseOrder')
-                    ->orderBy('created_at', 'desc')
+                    ->orderBy('created_at', 'asc')
                     ->get();
     $groupedTransitions = $transitions->groupBy('purchaseOrder.po_number');
     foreach ($groupedTransitions as $po_number => $transactions) {
