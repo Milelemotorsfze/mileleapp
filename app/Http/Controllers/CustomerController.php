@@ -17,6 +17,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Auth;
+use Storage;
 
 class CustomerController extends Controller
 {
@@ -77,8 +78,11 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'app/public/passports';
-            $file->storeAs($destinationPath, $fileName);
+            $destinationPath = 'Customers/passports';
+            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            }
+            $file->move($destinationPath, $fileName);
 
             // $customer->passport_file = $fileName;
             $client->tradelicense = $fileName;
@@ -89,7 +93,11 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName2 = 'trade_license'.time().'.'.$extension;       
-            $file->storeAs('app/public/tradelicenses', $fileName2);
+            $destinationPath = 'Customers/trade_licenses';
+            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            }
+            $file->move($destinationPath, $fileName);
 
             // $customer->trade_license_file = $fileName2;
             $client->passport = $fileName2;
@@ -135,6 +143,8 @@ class CustomerController extends Controller
             'type' => 'required',
         ]);
 
+        DB::beginTransaction();
+
         $client = Clients::find($id);
         $client->name = $request->name;
         $client->country_id = $request->country_id;
@@ -155,27 +165,41 @@ class CustomerController extends Controller
 
             $extension = $file->getClientOriginalExtension();
             $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'app/public/passports';
-            $file->storeAs($destinationPath, $fileName);
+            $destinationPath = 'Customers/passports';
+            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            }
+            $file->move($destinationPath, $fileName);
 
             $client->passport = $fileName;
         }
         if ($request->has('trade_license_file'))
         {
-            $fileTradeLicense = $request->file('trade_license_file');
+            // dd($request->all());
+            $file = $request->file('trade_license_file');
 
-            $extension = $fileTradeLicense->getClientOriginalExtension();
+            $extension = $file->getClientOriginalExtension();
             $fileName2 = 'trade_license'.time().'.'.$extension;
+            $destinationPath = 'Customers/trade_licenses';
+
+            // $destinationPath2 = '/storage/app/public/tradelicenses');
+            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            }
+            $file->move($destinationPath, $fileName2);
             
             // // $filetrade = $request->file('tradelicenses');
-            // $file->store('app/public/tradelicenses', $fileName2);
+            // $file->store('uploads', 'public');
+            //
 
-            // $client->tradelicense = $fileName2;
-                $fileTradeLicense->store('tradelicenses');
-                $client->tradelicense = $fileName2;
-           
+            // $file->move($destinationPath2, $fileName2);
+            // $file->storeAs('app/public/tradelicenses', $fileName2);
+
+            $client->tradelicense = $fileName2;
+
         }
         $client->save();
+        DB::commit();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Updated Successfully.');
     }
