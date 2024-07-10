@@ -162,15 +162,18 @@ class CustomerController extends Controller
         }
         if ($request->has('trade_license_file'))
         {
-            $file = $request->file('trade_license_file');
+            $fileTradeLicense = $request->file('trade_license_file');
 
-            $extension = $file->getClientOriginalExtension();
+            $extension = $fileTradeLicense->getClientOriginalExtension();
             $fileName2 = 'trade_license'.time().'.'.$extension;
             
-            // $filetrade = $request->file('tradelicenses');
-            $file->storeAs('app/public/tradelicenses', $fileName2);
+            // // $filetrade = $request->file('tradelicenses');
+            // $file->store('app/public/tradelicenses', $fileName2);
 
-            $client->tradelicense = $fileName2;
+            // $client->tradelicense = $fileName2;
+                $fileTradeLicense->store('tradelicenses');
+                $client->tradelicense = $fileName2;
+           
         }
         $client->save();
 
