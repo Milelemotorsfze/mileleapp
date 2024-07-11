@@ -2241,6 +2241,7 @@ public function paymentreleasesconfirm($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+
             if($vehicle->model_id) {
                 // get the loi item and update the utilization quantity
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
@@ -2267,7 +2268,6 @@ public function paymentreleasesconfirm($id)
                 }
             }
             DB::commit();
-
         return redirect()->back()->with('success', 'Payment Payment Release Approved confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -2477,6 +2477,13 @@ public function purchasingallupdateStatusrel(Request $request)
         VendorPaymentAdjustments::where('purchasing_order_id', $id)
                 ->where('status', 'pending')
                 ->update(['status' => 'Approved']);
+        SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('status', 'pending')
+        ->where('transaction_type', 'Post-Debit')
+        ->update([
+            'status' => 'Approved',
+            'remarks' => 'Approved For Released Payment'
+        ]);
         }
     elseif ($status == 'Rejected') {
         PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Suggested Payment')->delete();
