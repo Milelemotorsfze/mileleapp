@@ -8,6 +8,7 @@ use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
 use App\Models\WOVehicleAddonRecordHistory;
 use App\Models\WOComments;
+use App\Models\CommentFile;
 use App\Models\WORecordHistory;
 use App\Models\Customer;
 use App\Models\Clients;
@@ -424,33 +425,45 @@ class WorkOrderController extends Controller
                 }
             }
             // Initialize an array to keep track of old to new comment IDs
-            $commentIdMap = [];
-
             // Handle comments
             $comments = json_decode($request->input('comments'), true);
-            if(isset($comments) && $comments != null) {
+            $commentIdMap = [];
+
+            if (isset($comments) && $comments != null) { 
+                // First pass: Create all comments and map their IDs
                 foreach ($comments as $comment) {
                     $newComment = WOComments::create([
                         'work_order_id' => $workOrder->id,
-                        'text' => $comment['text'],
+                        'text' => $comment['text'] ?? null, // Allow null text
                         'parent_id' => null, // Temporary null, will update later
                         'user_id' => auth()->id(),
                     ]);
+
                     // Map the old comment ID to the new comment ID
                     $commentIdMap[$comment['commentId']] = $newComment->id;
                 }
-            }
-            
-            // Update parent IDs
-            if(isset($comments) && $comments != null) {
+
+                // Second pass: Update parent IDs and save files
                 foreach ($comments as $comment) {
-                    if (!empty($comment['parentId'])) {
-                        $newCommentId = $commentIdMap[$comment['commentId']];
+                    $newCommentId = $commentIdMap[$comment['commentId']];
+
+                    if (!empty($comment['parentId'])) { 
                         $newParentId = $commentIdMap[$comment['parentId']];
                         WOComments::where('id', $newCommentId)->update(['parent_id' => $newParentId]);
                     }
+
+                    // Save files associated with the comment
+                    if (isset($comment['files']) && is_array($comment['files'])) { 
+                        foreach ($comment['files'] as $file) {
+                            CommentFile::create([
+                                'comment_id' => $newCommentId,
+                                'file_name' => $file['name'],
+                                'file_data' => $file['src'],
+                            ]);
+                        }
+                    }
                 }  
-            }  
+            }
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
             DB::commit(); 
@@ -1334,20 +1347,45 @@ class WorkOrderController extends Controller
     }
     public function storeComments(Request $request)
     {
+        // Validate the request data, making 'text' nullable
         $request->validate([
-            'text' => 'required|string|max:255',
+            'text' => 'nullable|string|max:255', // 'text' is now nullable
             'parent_id' => 'nullable|integer|exists:w_o_comments,id',
             'work_order_id' => 'required|integer|exists:work_orders,id'
         ]);
-
+    
+        // Check if text is null and there are no files
+        if (is_null($request->input('text')) && !$request->hasFile('files')) {
+            return response()->json(['error' => 'Text or files are required.'], 422);
+        }
+    
+        // Store empty space if text is null
+        $text = $request->input('text') ?? '';
+        // Create the comment with nullable text
         $comment = WOComments::create([
             'work_order_id' => $request->input('work_order_id'),
-            'text' => $request->input('text'),
+            'text' => $text, // Store text or empty space
             'parent_id' => $request->input('parent_id'),
             'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
         ]);
-
-        return response()->json($comment, 201);
+        $files = [];
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $fileData = base64_encode(file_get_contents($file->getRealPath()));
+                $files[] = [
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . $fileData
+                ];
+            }
+        }
+    
+        // Assuming you have a relation set up for files on the comment model
+        if (!empty($files)) {
+            $comment->files()->createMany($files);
+        }
+    
+        // Respond with the comment and files data
+        return response()->json($comment->load('files'), 201);
     }
     // public function getComments($workOrderId)
     // {
@@ -1355,9 +1393,10 @@ class WorkOrderController extends Controller
     //     $comments = WOComments::where('work_order_id', $workOrderId)->get();
     //     return response()->json(['comments' => $comments]);
     // }
+    
     public function getComments($workOrderId)
     {
-        $comments = WOComments::where('work_order_id', $workOrderId)->get();
+        $comments = WOComments::where('work_order_id', $workOrderId)->with('files','user')->get();
         return response()->json(['comments' => $comments]);
     }
     public function uniqueSO(Request $request) { 
