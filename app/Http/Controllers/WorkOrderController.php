@@ -434,7 +434,7 @@ class WorkOrderController extends Controller
                 foreach ($comments as $comment) {
                     $newComment = WOComments::create([
                         'work_order_id' => $workOrder->id,
-                        'text' => $comment['text'],
+                        'text' => $comment['text'] ?? null, // Allow null text
                         'parent_id' => null, // Temporary null, will update later
                         'user_id' => auth()->id(),
                     ]);
@@ -1347,21 +1347,30 @@ class WorkOrderController extends Controller
     }
     public function storeComments(Request $request)
     {
+        // Validate the request data, making 'text' nullable
         $request->validate([
-            'text' => 'required|string|max:255',
+            'text' => 'nullable|string|max:255', // 'text' is now nullable
             'parent_id' => 'nullable|integer|exists:w_o_comments,id',
             'work_order_id' => 'required|integer|exists:work_orders,id'
         ]);
-
+    
+        // Check if text is null and there are no files
+        if (is_null($request->input('text')) && !$request->hasFile('files')) {
+            return response()->json(['error' => 'Text or files are required.'], 422);
+        }
+    
+        // Store empty space if text is null
+        $text = $request->input('text') ?? '';
+        // Create the comment with nullable text
         $comment = WOComments::create([
             'work_order_id' => $request->input('work_order_id'),
-            'text' => $request->input('text'),
+            'text' => $text, // Store text or empty space
             'parent_id' => $request->input('parent_id'),
             'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
         ]);
         $files = [];
-        if($request->hasFile('files')) {
-            foreach($request->file('files') as $file) {
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
                 $fileData = base64_encode(file_get_contents($file->getRealPath()));
                 $files[] = [
                     'file_name' => $file->getClientOriginalName(),
@@ -1371,7 +1380,9 @@ class WorkOrderController extends Controller
         }
     
         // Assuming you have a relation set up for files on the comment model
-        $comment->files()->createMany($files);
+        if (!empty($files)) {
+            $comment->files()->createMany($files);
+        }
     
         // Respond with the comment and files data
         return response()->json($comment->load('files'), 201);

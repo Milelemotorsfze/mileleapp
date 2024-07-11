@@ -136,7 +136,8 @@
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [] } = commentData;
 
-        if (!text || !id) {
+        // Check for invalid comment data
+        if (!id || (text === '' && files.length === 0)) {
             console.error('Invalid comment data:', commentData);
             return;
         }
@@ -224,20 +225,26 @@
     }
 
     function addCommentFromInput(parentId = null) {
+        // Get the comment text and file inputs
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
-        if (commentText.trim() === '') return;
-
         const filesInput = parentId ? $(`#reply-files-${parentId}`)[0].files : $('#comment-files')[0].files;
 
+        // Check if comment text is empty and no files are attached
+        if (commentText.trim() === '' && filesInput.length === 0) {
+            console.error('Cannot add an empty comment without files.');
+            return;
+        }
+
+        // Create a FormData object to hold the comment data
         const formData = new FormData();
-        formData.append('text', commentText);
+        formData.append('text', commentText.trim() === '' ? '' : commentText); // Store text as null if empty
         formData.append('parent_id', parentId ? parentId : '');
         formData.append('work_order_id', workOrder.id);
 
+        // Append files to the FormData object
         Array.from(filesInput).forEach(file => {
             formData.append('files[]', file);
         });
-
         $.ajax({
             url: '/comments', // Laravel route to handle comment storage
             type: 'POST',
