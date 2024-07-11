@@ -685,13 +685,11 @@
                         <div class="col-lg-4 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Price Increase</strong></label>
                         </div>
-                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <div class="col-lg-2 col-md-4 col-sm-6">
                         <div style="background-color: red; color: white; padding: 1px; border-radius: 3px; display: inline-block;">
                         {{ number_format($totalSurcharges, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </div>
                         </div>
-                    </div>
-                    @endif
                     @if($totalDiscounts)
                     <div class="row">
                         <div class="col-lg-4 col-md-3 col-sm-12">
@@ -765,6 +763,107 @@
                         <span> {{ $purchasingOrder->polPort->name ?? '' }} / {{ $purchasingOrder->podPort->name ?? '' }} / {{ $purchasingOrder->fdCountry->name ?? '' }}</span>
                         </div>
                     </div>
+                    @php
+                        $statuses = [
+                'Payment Release Approved', 
+                'Payment Completed', 
+                'Vendor Confirmed', 
+                'Incoming Stock'
+            ];
+                        $purchasingOrderIdforcheck = $purchasingOrder->id;
+                        $vehiclesAlreadyPaid = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrderIdforcheck)
+                            ->where(function($query) use ($statuses) {
+                                $query->whereIn('payment_status', $statuses)
+                                    ->where('purchased_paid_percentage', 100)
+                                    ->whereNull('remaining_payment_status');
+                            })
+                            ->first();
+
+                        $vehiclesAlreadyPaidOrRemainingInStatuses = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrderIdforcheck)
+                            ->where(function($query) use ($statuses) {
+                                $query->whereIn('payment_status', $statuses)
+                                    ->where('purchased_paid_percentage', 100)
+                                    ->orWhereIn('remaining_payment_status', $statuses);
+                            })
+                            ->first();
+                        @endphp
+                        @if (!empty($vehiclesAlreadyPaid) && !empty($vehiclesAlreadyPaidOrRemainingInStatuses))
+                    @php
+    $additionalpaymentpendFormatted = $additionalpaymentpend > 0 ? number_format($additionalpaymentpend, 0, '', ',') : null;
+    $additionalpaymentintFormatted = $additionalpaymentint > 0 ? number_format($additionalpaymentint, 0, '', ',') : null;
+    $additionalpaymentapprovedFormatted = $additionalpaymentpapproved > 0 ? number_format($additionalpaymentpapproved, 0, '', ',') : null;
+    $payments = array_filter([$additionalpaymentpendFormatted, $additionalpaymentintFormatted, $additionalpaymentapprovedFormatted]);
+@endphp
+
+@if(!empty($payments))
+    <div class="row">
+        <div class="col-lg-4 col-md-3 col-sm-12">
+            <label for="choices-single-default" class="form-label">
+                <strong>Additional Payment</strong>
+            </label>
+        </div>
+        <div class="col-lg-4 col-md-9 col-sm-12">
+            <span>
+                @if($additionalpaymentpendFormatted)
+                    Pending Request: {{ $additionalpaymentpendFormatted }} - {{ $purchasingOrder->currency }}
+                @endif
+                @if($additionalpaymentpendFormatted && ($additionalpaymentintFormatted || $additionalpaymentapprovedFormatted))
+                </br>
+                @endif
+                @if($additionalpaymentintFormatted)
+                Pending Initiated: {{ $additionalpaymentintFormatted }} - {{ $purchasingOrder->currency }}
+                @endif
+                @if($additionalpaymentintFormatted && $additionalpaymentapprovedFormatted)
+                        </br>
+                @endif
+                @if($additionalpaymentapprovedFormatted)
+                    Pending Released: {{ $additionalpaymentapprovedFormatted }} - {{ $purchasingOrder->currency }}
+                @endif
+            </span>
+        </div>
+        @if($additionalpaymentpendFormatted)
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('request-additional-payment');
+        @endphp
+        @if ($hasPermission)
+        <div class="col-lg-3 col-md-4 col-sm-6">
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Request For Initiated</button>
+        </div>
+        @endif
+        @endif
+        @if($additionalpaymentintFormatted)
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('initiated-additional-payment');
+        @endphp
+        @if ($hasPermission)
+        <div class="col-lg-3 col-md-4 col-sm-6">
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Initiated Payment</button>
+        </div>
+        @endif
+        @endif
+        @if($additionalpaymentapprovedFormatted)
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('approved-additional-payment');
+        @endphp
+        @if ($hasPermission)
+        <div class="col-lg-3 col-md-4 col-sm-6">
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Released</button>
+        </div>
+        @endif
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('complete-additional-payment');
+        @endphp
+        @if ($hasPermission)
+        <div class="col-lg-3 col-md-4 col-sm-6">
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Complete Payment</button>
+        </div>
+        @endif
+        @endif
+    </div>
+@endif
+                        @endif
+                    </div>
+                    @endif
                     @if ($purchasingOrder->pl_number)
                     <div class="row">
                         <div class="col-lg-4 col-md-3 col-sm-12">
@@ -3828,5 +3927,24 @@ $(document).ready(function() {
         }
     });
 });
+</script>
+<script>
+function requestForAdditionalPayment(orderId) {
+    $.ajax({
+        url: '/request-additional-payment',
+        type: 'POST',
+        data: {
+            id: orderId,
+            status: 'Approved',
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        },
+        success: function(response) {
+            alert('Request successfully sent');
+        },
+        error: function(xhr) {
+            alert('An error occurred');
+        }
+    });
+}
 </script>
 @endsection

@@ -913,6 +913,9 @@ Route::get('/d', function () {
     // Migration Data check Route
     Route::resource('migrations', MigrationDataCheckController::class);
 
+    //Addinational Payments
+    Route::post('/request-additional-payment', [PurchasingOrderController::class, 'requestAdditionalPayment']);
+    
 
 
 
