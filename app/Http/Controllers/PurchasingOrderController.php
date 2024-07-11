@@ -3523,7 +3523,19 @@ public function updatePrices(Request $request)
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderCurrency = $purchasingOrder->currency;
     $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+
+    if(!$supplierAccount) {
+        $createsupplieracc = new SupplierAccount();
+        $createsupplieracc->opening_balance = 0;
+        $createsupplieracc->current_balance = 0;
+        $createsupplieracc->suppliers_id = $purchasingOrder->vendors_id;
+        $createsupplieracc->currency = $orderCurrency; 
+        $createsupplieracc->save();
+        $supplierAccount = $createsupplieracc;
+    }
+
     $accountCurrency = $supplierAccount->currency;
+
     $conversionRates = [
         'USD' => 3.67,
         'EUR' => 3.94,
@@ -3531,28 +3543,32 @@ public function updatePrices(Request $request)
         'JPY' => 0.023,
         'CAD' => 2.69
     ];
+
     $totalDifference = 0;
     $priceChanges = [];
     $totalAmountOfChanges = 0;
     $totalVehiclesChanged = 0;
+
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
         $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
         $oldPrice = $vehicleCost->unit_price;
         $priceDifference = $oldPrice - $newPrice;
+
         if ($priceDifference != 0) {
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
+            
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();
             $vehicleslog->date = $currentDateTime->toDateString();
             $vehicleslog->status = 'Update Vehicles Price';
             $vehicleslog->vehicles_id = $vehicleId;
             $vehicleslog->field = "Price";
-            $vehicleslog->old_value = $vehicleCost->unit_price;
+            $vehicleslog->old_value = $oldPrice;
             $vehicleslog->new_value = $newPrice;
-            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->created_by = $userId;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
             $statuses = [
@@ -3561,89 +3577,77 @@ public function updatePrices(Request $request)
                 'Vendor Confirmed', 
                 'Incoming Stock'
             ];
+
             $vehiclesalreadypaid = Vehicles::where('id', $vehicleId)
-                               ->whereIn('payment_status', $statuses)
-                               ->first();
-            if($vehiclesalreadypaid)
-            {
-                if ($vehicleCost->unit_price > $newPrice) {
-                    $changeType = 'discount';
-                } else {
-                    $changeType = 'Surcharge';
-                }
-                $priceChange = abs($vehicleCost->unit_price - $newPrice);
-                $priceupdates = New PurchasedOrderPriceChanges ();
-                $priceupdates->purchasing_order_id = $purchasingOrderId;
-                $priceupdates->vehicles_id = $vehicleId;
-                $priceupdates->original_price = $vehicleCost->unit_price;
-                $priceupdates->new_price = $newPrice;
-                $priceupdates->price_change = $priceChange;
-                $priceupdates->change_type = $changeType;
-                $priceupdates->save();
+                ->where(function($query) use ($statuses) {
+                    $query->whereIn('payment_status', $statuses)
+                        ->where('purchased_paid_percentage', 100)
+                        ->whereNull('remaining_payment_status');
+                })
+                ->first();
+            $vehicleAlreadyPaidOrRemainingInStatuses = Vehicles::where('id', $vehicleId)
+                ->where(function($query) use ($statuses) {
+                    $query->whereIn('payment_status', $statuses)
+                        ->where('purchased_paid_percentage', 100)
+                        ->orWhereIn('remaining_payment_status', $statuses);
+                })
+                ->first();
+                info($vehicleAlreadyPaidOrRemainingInStatuses);
+                info($vehiclesalreadypaid);
+            $priceChange = abs($priceDifference);
+            $changeType = $priceDifference > 0 ? 'discount' : 'surcharge';
+
+            $priceupdates = new PurchasedOrderPriceChanges();
+            $priceupdates->purchasing_order_id = $purchasingOrderId;
+            $priceupdates->vehicles_id = $vehicleId;
+            $priceupdates->original_price = $oldPrice;
+            $priceupdates->new_price = $newPrice;
+            $priceupdates->price_change = $priceChange;
+            $priceupdates->change_type = $changeType;
+            $priceupdates->save();
+
+            $vehicle = Vehicles::find($vehicleId);
+            $priceChanges[] = [
+                'vehicle_reference' => $vehicle->id,
+                'Vin' => $vehicle->vin,
+                'variant_name' => $vehicle->variant->name,
+                'old_price' => $oldPrice,
+                'new_price' => $newPrice,
+                'changed_by' => auth()->user()->name,
+            ];
+
+            $totalAmountOfChanges += $priceDifference;
+            $totalVehiclesChanged++;
+
+            if ($orderCurrency !== $accountCurrency) {
+                $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
+            } else {
+                $priceDifferenceInAccountCurrency = $priceDifference;
             }
+
+            $totalDifference += $priceDifferenceInAccountCurrency;
+
             $vehicleCost->update(['unit_price' => $newPrice]);
-            $updatepriceinpaid = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Request For Payment')->orderBy('created_at', 'desc')->first();
-            $updatePerformed = false;
-            if ($updatepriceinpaid) {
-                if ($priceDifference > 0) {
-                    $updatepriceinpaid->amount -= $priceDifference; 
-                } else {
-                    $updatepriceinpaid->amount += abs($priceDifference);
-                }
-                $updatepriceinpaid->save();
-                $updatePerformed = true;
+
+            if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
+                $supplierAccount->current_balance += $totalDifference;
+                $supplierAccount->save();
+
+                SupplierAccountTransaction::create([
+                    'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
+                    'purchasing_order_id' => $purchasingOrderId,
+                    'supplier_account_id' => $supplierAccount->id,
+                    'created_by' => $userId,
+                    'account_currency' => $accountCurrency,
+                    'transaction_amount' => abs($totalDifference),
+                ]);
+                $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
+                Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
             }
-            $vehicles = Vehicles::where('id', $vehicleId)->first();
-            if ($vehicles && ($vehicles->payment_status == '' || $vehicles->payment_status == 'Payment Initiated Request')) {
-                continue;
-            }
-            if (!$updatePerformed) {
-            $updatepriceinpaidint = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Initiated Payment')->orderBy('created_at', 'desc')->first();
-            if ($updatepriceinpaidint) {
-                if ($priceDifference > 0) {
-                    $updatepriceinpaidint->amount -= $priceDifference;
-                } else {
-                    $updatepriceinpaidint->amount += abs($priceDifference);
-                }
-                $updatepriceinpaidint->save();
-            }
-         }
-         $vehicle = Vehicles::find($vehicleId);
-         $priceChanges[] = [
-             'vehicle_reference' => $vehicle->id,
-             'Vin' => $vehicle->vin,
-             'variant_name' => $vehicle->variant->name,
-             'old_price' => abs($oldPrice),
-             'new_price' => $newPrice,
-             'changed_by' => auth()->user()->name,
-         ];
-         $totalAmountOfChanges += $priceDifference;
-         $totalVehiclesChanged++;
         }
-        if ($orderCurrency !== $accountCurrency) {
-            $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
-        } else {
-            $priceDifferenceInAccountCurrency = $priceDifference;
-        }
-        $totalDifference += $priceDifferenceInAccountCurrency;
     }
-    if ($totalDifference != 0) {
-        $supplierAccount->current_balance += $totalDifference;
-        $supplierAccount->save();
-        SupplierAccountTransaction::create([
-            'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
-            'purchasing_order_id' => $purchasingOrderId,
-            'supplier_account_id' => $supplierAccount->id,
-            'created_by' => $userId,
-            'account_currency' => $accountCurrency,
-            'transaction_amount' => abs($totalDifference),
-        ]);
-    }
+
     $purchasingOrder->update(['totalcost' => $totalPrice]);
-    $ponumber = $purchasingOrder->po_number;
-    $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
-    Mail::to($recipients)->send(new PriceChangeNotification($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
-    return response()->json(['message' => 'Prices updated successfully']);
 }
 private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
 {
