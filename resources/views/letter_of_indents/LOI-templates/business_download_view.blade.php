@@ -7,6 +7,7 @@
         /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
+            font-size:13px;
         }
         .center {
             display: block;
@@ -15,14 +16,15 @@
             width: 50%;
         }
         table ,td,th{
-            font-family: arial, sans-serif;
+            /* font-family: arial, sans-serif; */
             border-collapse: collapse;
-            width: 100%;
             padding:10px;
+            font-size:12px;
+           
             border: 1px solid #1c1b1b;
             /*background-color: #0a58ca;*/
-
         }
+    
         .last{
             text-align: right;
             /*margin-left: 20px;*/
@@ -37,17 +39,17 @@
     <div class="content">
         <h3 class="center" style="text-decoration: underline;color: black;font-size: 16px;">Letter of Intent for Automotive Purchase</h3>
         <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
-        <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->company_name ?? '' }} </p>
-        <p>  <span style="font-weight: bold">Address: </span>  Dubai, UAE</p>
+        <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->name ?? '' }} </p>
+        <p>  <span style="font-weight: bold">Address: </span> {{  ucfirst($letterOfIndent->client->country->name) ?? ''}} </p>
         <p>Dear Sir/Madam,</p>
 
         <p>I am writing on behalf of {{ $letterOfIndent->client->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
             Please find our company's automotive requirements listed with specifications below.</p>
-        <table>
+        <table style="width:100%">
             <tr>
-                <th>Brand</th>
-                <th>Model Type</th>
-                <th>Quantity</th>
+                <th style="text-align:center;">Brand</th>
+                <th style="width:70%">Model Type</th>
+                <th style="text-align:center;">Quantity</th>
             </tr>
             @foreach($letterOfIndentItems as $letterOfIndentItem)
                 <tr>

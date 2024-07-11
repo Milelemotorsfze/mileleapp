@@ -20,6 +20,7 @@
         #so-details td {
             border: none;
             padding: 5px;
+            font-size: 12px;
         }
         #so-items td, th{
             border: 1px solid #1c1b1b;
@@ -87,45 +88,45 @@
                             <b><p style="padding-left: 5px;font-weight: bold;padding-top: 10px">Milele Motors FZCO</p></b>
                             <table id="so-details">
                                 <tr>
-                                    <td class="left">VAT TRN - 100057588400003</td>
-                                    <td></td>
-                                    <td class="last" style="padding-right: 20px">SO NO: <span style="background-color: black;color: black">1234567790898233</span></td>
+                                    <td class="left" style="padding-top:0px;">VAT TRN - 100057588400003</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last" style="padding-right: 20px;padding-top:0px;">SO NO: <span style="background-color: black;color: black">1234567790898233</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="left">Ras al khor 3, Yard 11 - DAZ</td>
-                                    <td></td>
-                                    <td class="last" >Date :
-                                        <span> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </span>
+                                    <td class="left" style="padding-top:0px;">Ras al khor 3, Yard 11 - DAZ</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last" style="padding-top:0px;" >Date :
+                                        <span> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('M d Y')}} </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td >Dubai, U.A.E</td>
-                                    <td></td>
-                                    <td class="last ">Customer ID: <span style="background-color: black;color: black">123455555</span></td>
+                                    <td style="padding-top:0px;">Dubai, U.A.E</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last " style="padding-top:0px;">Customer ID: <span style="background-color: black;color: black">123455555</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="left">+971 43235991</td>
-                                    <td></td>
-                                    <td class="last">Sales Order Type: Sales Of Motor Vehicle</td>
+                                    <td class="left"  style="padding-top:0px;">+971 43235991</td>
+                                    <td  style="padding-top:0px;"></td>
+                                    <td class="last"  style="padding-top:0px;">Sales Order Type: Sales Of Motor Vehicle</td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <span style="margin-right: 50px;padding-right: 50px"> To </span>
-                                        <span  style="list-style: none;" >
-                                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->client->name ?? '' }}</span>
-                                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->client->country->name ?? '' }} </span>
+                                        <span style="margin-right: 50px;padding-right: 20px"> To </span>
+                                        <!-- <span  style="list-style: none;" > -->
+                                        <span >{{ strtoupper($letterOfIndent->client->name ?? '') }}</span>
+                                       <span style="display: list-item;list-style: none;padding-left: 30px;margin-left: 55px">{{ strtoupper($letterOfIndent->client->country->name ?? '') }} </span>
                                     </span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <span style="margin-right: 55px;padding-right: 30px"> </span>
-                                        <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
+                                        <span style="background-color: black;font-size: 35px;color: black">zxdfdsiedirityrtyr</span>
                                     </td>
                                 </tr>
                             </table>
                             <br>
-                            <br>
+                      
                             <table id="so-items" >
                                 <tr style="background-color: black;color: #FFFFFF" >
                                     <th>QUANTITY</th>
@@ -153,15 +154,15 @@
                                 </tr>
                               
                                 <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
-                                    <td colspan="2" style="border: none;">Name:
+                                    <td colspan="2" style="border: none;padding-top:0px">Name:
                                         <span style="margin-left: 10px"> {{ $letterOfIndent->client->name ?? '' }} </span>
                                     </td>
 
-                                    <td style="border: none;text-align: end">SUBTOTAL</td>
-                                    <td  style="border: none;background-color: black;color: black" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">SUBTOTAL</td>
+                                    <td  style="border: none;background-color: black;color: black;padding-top:0px" ></td>
                                 </tr >
                                 <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF;" id="date-div">
-                                    <td colspan="2" style="border: none">Date:
+                                    <td colspan="2" style="border: none;padding-top:0px">Date:
                                         <span>
                                          {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
                                     </span>
@@ -170,18 +171,18 @@
                                     {{--                                <td style="border: none">--}}
                                     {{--                                  --}}
                                     {{--                                </td>--}}
-                                    <td style="border: none;text-align: end">SALES VAT</td>
-                                    <td  style="border: none;background-color: black;color: black" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">SALES VAT</td>
+                                    <td  style="border: none;background-color: black;color: black;padding-top:0px" ></td>
                                 </tr>
                                 <tr style=";background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
-                                    <td colspan="2" style="border: none">
+                                    <td colspan="2" style="border: none;padding-top:0px">
                                         @if($letterOfIndent->signature)
                                             <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 100px;width: 150px">
                                         @endif
                                     </td>
 
-                                    <td style="border: none;text-align: end">TOTAL</td>
-                                    <td style="background-color: #000000;border: none" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">TOTAL</td>
+                                    <td style="background-color: #000000;border: none;padding-top:0px" ></td>
                                 </tr>
                             </table>
                         </div>

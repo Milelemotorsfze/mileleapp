@@ -16,9 +16,8 @@
         table ,td,th{
             font-family: arial, sans-serif;
             border-collapse: collapse;
-            width: 100%;
-            padding:10px;
-            border: 1px solid #1c1b1b;
+            /* padding:10px; */
+            border: none;
             /*background-color: #0a58ca;*/
 
         }
@@ -62,11 +61,35 @@
                 <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
                 <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>
                 <p style="margin-bottom: 0px;"> <span class="fw-bold">Full Name: </span> {{ ucfirst($letterOfIndent->client->name ?? '') }} </p>
-                <p> <span class="fw-bold">Address: </span>  Dubai, UAE</p>
+                <p> <span class="fw-bold">Address: </span>  {{  ucfirst($letterOfIndent->client->country->name) ?? ''}} </p>
                 <p>Dear Milele Motors,</p>
                 <p>I, ({{ ucfirst($letterOfIndent->client->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
                 <h5 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline;color: black">Requirements:</h5>
-                <div style="list-style-type: none;">
+                <table  style="width:100%;">
+                    @foreach($letterOfIndentItems as $key => $letterOfIndentItem)             
+                        <tr>
+                            <td> {{$key + 1}}.&nbsp; <span class="fw-bold">Model Description:</span></td>
+                            <td  style="width:80%">
+                                @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
+                                    {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                                @else
+                                    {{ str_replace('- SPECIFICATION ATTACHED IN APPENDIX','',$letterOfIndentItem->masterModel->milele_loi_description ?? '' )  }}
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold" style="padding-left: 20px;">  Type: </td>
+                            <td>Brand New</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold" style="padding-left: 20px;"> Quantity:  </td>
+                            <td> {{ $letterOfIndentItem->quantity ?? '' }}</td>
+                        </tr>
+                  
+                    @endforeach
+                </table>
+
+                <!-- <div style="list-style-type: none;">
                     @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                         <li>{{$key + 1}}.&nbsp;
                             <span class="fw-bold">Model Description:</span>
@@ -81,8 +104,8 @@
                             {{ $letterOfIndentItem->quantity ?? '' }}
                         </li>
                     @endforeach
-                </div>
-                <p>
+                </div> -->
+                <p style="margin-top:20px;">
                     I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
                     purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
                     I would like to declare that the purchased automobile(s) will be registered within the designated country,

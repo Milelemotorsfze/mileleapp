@@ -56,8 +56,8 @@
             <div class="border-outline">
                 <h4 class="center" style="text-decoration: underline;color: black">Letter of Intent for Automotive Purchase</h4>
                 <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
-                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->company_name ?? '' }} </p>
-                <p>  <span style="font-weight: bold">Address: </span>  Dubai, UAE</p>
+                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->name ?? '' }} </p>
+                <p>  <span style="font-weight: bold">Address: </span>  {{  ucfirst($letterOfIndent->client->country->name) ?? ''}}</p>
                 <p>Dear Sir/Madam,</p>
 
                 <p>I am writing on behalf of {{ $letterOfIndent->client->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
@@ -65,7 +65,7 @@
                 <table class="table table-responsive">
                     <tr>
                         <th >Brand</th>
-                        <th>Model Type</th>
+                        <th >Model Type</th>
                         <th>Quantity</th>
                     </tr>
                     @foreach($letterOfIndentItems as $letterOfIndentItem)
@@ -79,7 +79,7 @@
                                 @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
                                     {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
                                 @else
-                                    {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
+                                    {{ str_replace('- SPECIFICATION ATTACHED IN APPENDIX','',$letterOfIndentItem->masterModel->milele_loi_description ?? '' ) }}
                                 @endif
                             </td>
                             <td>{{ $letterOfIndentItem->quantity }}</td>
