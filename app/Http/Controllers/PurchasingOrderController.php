@@ -1231,12 +1231,15 @@ public function getBrandsAndModelLines(Request $request)
         }
         }
         $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
+        $additionalpaymentpend = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'pending')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved'));
     }
     public function edit($id)
     {
@@ -3599,8 +3602,6 @@ public function updatePrices(Request $request)
                         ->orWhereIn('remaining_payment_status', $statuses);
                 })
                 ->first();
-                info($vehicleAlreadyPaidOrRemainingInStatuses);
-                info($vehiclesalreadypaid);
             $priceChange = abs($priceDifference);
             $changeType = $priceDifference > 0 ? 'discount' : 'surcharge';
 
@@ -3863,4 +3864,10 @@ if ($vehicle) {
                 }
          return redirect()->back()->with('success', 'Payment Status Updated');
 }
+public function requestAdditionalPayment(Request $request)
+    {
+        $id = $request->input('id');
+        $totalSurcharges = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Pending')->update(['status' => 'Initiated Request']);
+        return response()->json(['message' => 'Submitted Additional Payment Request successfully']);
+    }
 }
