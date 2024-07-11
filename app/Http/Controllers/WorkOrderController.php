@@ -1285,6 +1285,12 @@ class WorkOrderController extends Controller
                     $woVehicle->save();
                 }
             }
+            $newComment = WOComments::create([
+                'work_order_id' => $workOrder->id,
+                'text' => "The work order data was changed as follows by ".auth()->user()->name, // Allow null text
+                'parent_id' => null, // Temporary null, will update later
+                'user_id' => null,
+            ]);
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
             
             DB::commit();
@@ -1385,7 +1391,7 @@ class WorkOrderController extends Controller
         }
     
         // Respond with the comment and files data
-        return response()->json($comment->load('files'), 201);
+        return response()->json($comment->load('files','user'), 201);
     }
     // public function getComments($workOrderId)
     // {

@@ -170,7 +170,14 @@
             } else {
                 return `<a href="${file.file_data}" class="m-1" target="_blank">${file.file_name}</a>`;
             }
-        });
+        }).join('');
+
+        const replyButtonHtml = commentData.user ? `
+            <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})" title="Reply">
+                <i class="fa fa-reply" aria-hidden="true"></i>
+            </button>` : '';
+
+        const additionalDivHtml = !commentData.user ? `<div id="additional-div-${id}">Some data will display here</div>` : '';
 
         const commentHtml = `
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
@@ -180,13 +187,13 @@
                     </div>
                     <div class="col-xxl-11 col-lg-11 col-md-11">
                         <div class="comment-text">${text}</div>
-                        <div class="d-flex flex-wrap">${filePreviewsHtml.join('')}</div>
-                        <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})" title="Reply">
-                            <i class="fa fa-reply" aria-hidden="true"></i>
-                        </button>
-                        <span style="color:gray;">Rejitha R Prasad</span>
+                        ${additionalDivHtml}
+                        <div class="d-flex flex-wrap">${filePreviewsHtml}</div>
+                        ${replyButtonHtml}
+                        <span style="color:gray;">
+                            ${commentData.user ? commentData.user.name : 'System Generated'}
+                        </span>
                         <span style="color:gray;"> - ${formattedDateTime}</span>
-                        
                         <div class="reply-form" id="reply-form-${id}" style="display: none;">
                             <textarea class="form-control reply" id="reply-input-${id}" rows="2" placeholder="Write a reply..."></textarea>
                             <div class="row">
