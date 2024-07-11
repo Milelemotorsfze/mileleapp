@@ -3641,8 +3641,7 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-
-                $recipients = ['waqar.younas@milele.com'];
+                $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
                 Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
             }
         }
