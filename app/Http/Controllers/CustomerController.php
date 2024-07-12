@@ -17,6 +17,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 use Storage;
 
 class CustomerController extends Controller
@@ -205,7 +206,7 @@ class CustomerController extends Controller
     {
         (new UserActivityController)->createActivity('Customer Detail Deleted');
 
-        $customer = Client::find($id);
+        $customer = Clients::find($id);
         $customer->delete();
         
         return response(true);

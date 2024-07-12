@@ -555,6 +555,7 @@ class LetterOfIndentController extends Controller
                 }
             }
             if ($request->template_type) {
+                $LOI->LOITemplates()->delete();
                 foreach ($request->template_type as $template) {
                     $LOITemplate = new  LoiTemplate();
                     $LOITemplate->template_type = $template;

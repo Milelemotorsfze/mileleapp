@@ -55,9 +55,9 @@
                                     <td>{{ $loiExpiryCondition->expiry_duration_year }}</td>
                                     <td>{{ \Illuminate\Support\Carbon::parse($loiExpiryCondition->created_at)->format('d M Y') ?? '' }}</td>
                                     <td>
-                                        @can('edit-loi-mapping-criterias')
+                                        @can('edit-loi-expiry-criterias')
                                             @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-loi-mapping-criterias');
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-loi-expiry-criterias');
                                             @endphp
                                             @if ($hasPermission)
                                             

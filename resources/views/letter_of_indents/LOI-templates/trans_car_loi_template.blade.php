@@ -94,7 +94,7 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
+                            <td>{{ strtoupper($letterOfIndent->client->country->name ?? '') }}</td>
                             <td></td>
                             <td></td>
                         </tr>
