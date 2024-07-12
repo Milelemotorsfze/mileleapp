@@ -18,7 +18,7 @@
 </div>
 <div class="row mt-1">
     <div class="table-responsive">
-        <table class="table table-striped table-editable table-edits table table-condensed my-datatable" >
+        <table id="myVehAddonTable" class="table table-striped table-editable table-edits table table-condensed my-datatable" >
             <thead style="background-color: #e6f1ff">
                 <tr>
                     <th>Action</th>
@@ -58,7 +58,7 @@
             @if(isset($workOrder) && isset($workOrder->vehiclesWithTrashed) && count($workOrder->vehiclesWithTrashed) > 0)
             <div hidden>{{$i=0;}}</div>
                 @foreach($workOrder->vehiclesWithTrashed as $vehicle)
-                    <tr class="vehicle-row" data-vin="{{ $vehicle->vin ?? '' }}" style="border-top: 2px solid rgb(166, 166, 166);">
+                    <tr class="vehicle-row" data-vin="{{ $vehicle->vin ?? '' }}" data-id="{{ $vehicle->id ?? '' }}" style="border-top: 2px solid rgb(166, 166, 166);">
                         <td>
                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Vehicle Data History" class="btn btn-sm btn-warning" 
                                     href="{{route('wo-vehicles.data-history',$vehicle->id ?? '')}}">

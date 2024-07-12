@@ -1517,7 +1517,8 @@ class WorkOrderController extends Controller
     
     public function getComments($workOrderId)
     {
-        $comments = WOComments::where('work_order_id', $workOrderId)->with('files','user','wo_histories')->get();
+        $comments = WOComments::where('work_order_id', $workOrderId)
+            ->with('files','user','wo_histories','new_vehicles','removed_vehicles')->get();
         return response()->json(['comments' => $comments]);
     }
     public function uniqueSO(Request $request) { 

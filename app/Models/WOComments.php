@@ -33,4 +33,10 @@ class WOComments extends Model
     public function wo_histories() {
         return $this->hasMany(WORecordHistory::class, 'comment_id');
     }
+    public function new_vehicles() {
+        return $this->hasMany(WOVehicles::class, 'comment_id')->withTrashed();
+    }
+    public function removed_vehicles() {
+        return $this->hasMany(WOVehicles::class, 'deleted_comment_id')->withTrashed();
+    }
 }
