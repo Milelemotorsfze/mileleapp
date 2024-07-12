@@ -16,7 +16,6 @@
             font-family: arial, sans-serif;
             border-collapse: collapse;
             /*width: 100%;*/
-            padding:10px;
             border: 1px solid #1c1b1b;
             /*background-color: #0a58ca;*/
 
@@ -56,33 +55,33 @@
             <div class="border-outline">
                 <h4 class="center" style="text-decoration: underline;color: black">Letter of Intent for Automotive Purchase</h4>
                 <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
-                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->client->name ?? '' }} </p>
-                <p>  <span style="font-weight: bold">Address: </span>  {{  ucfirst($letterOfIndent->client->country->name) ?? ''}}</p>
+                <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
+                <p>  <span style="font-weight: bold;margin-right:50px;">Address: </span>  {{  strtoupper($letterOfIndent->client->country->name) ?? ''}}</p>
                 <p>Dear Sir/Madam,</p>
 
-                <p>I am writing on behalf of {{ $letterOfIndent->client->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
+                <p>I am writing on behalf of {{ strtoupper($letterOfIndent->client->name ?? '') }}  to formally convey our intent to procure automobile(s) from Milele Motors.
                     Please find our company's automotive requirements listed with specifications below.</p>
                 <table class="table table-responsive">
-                    <tr>
-                        <th >Brand</th>
-                        <th >Model Type</th>
-                        <th>Quantity</th>
+                    <tr >
+                        <th style="text-align:center;padding:0px" >Brand</th>
+                        <th style="padding:0px;text-align:center;">Model Type</th>
+                        <th style="text-align:center;padding:0px">Quantity</th>
                     </tr>
                     @foreach($letterOfIndentItems as $letterOfIndentItem)
                         <tr>
-                            <td>
+                            <td style="text-align:center;padding:0px;font-style:italic;">
                                 @if($letterOfIndentItem->masterModel->variant()->exists())
                                     {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}}
                                 @endif
                             </td>
-                            <td>
+                            <td style="padding-top:0px;padding-bottom:0px;font-style:italic;">
                                 @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
                                     {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
                                 @else
                                     {{ str_replace('- SPECIFICATION ATTACHED IN APPENDIX','',$letterOfIndentItem->masterModel->milele_loi_description ?? '' ) }}
                                 @endif
-                            </td>
-                            <td>{{ $letterOfIndentItem->quantity }}</td>
+                            </td >
+                            <td style="text-align:center;padding:0px;font-style:italic;">{{ $letterOfIndentItem->quantity }}</td>
                         </tr>
                     @endforeach
                 </table>
@@ -91,13 +90,13 @@
                     As a business, we are committed to complying with all relevant laws and regulations governing vehicle registration,
                     taxation, and operational use. The purchased automobiles will be used exclusively for our corporate operations and will not be resold.
                 </p>
-                <br>
+            
                 <p>
                     We look forward to your acknowledgment of this Letter of Intent and the subsequent
                     steps necessary to conclude this transaction professionally and in accordance with the law.
                 </p>
                 <p style="margin-bottom: 5px;">Sincerely,</p>
-                <p> {{ $letterOfIndent->client->name ?? '' }} </p>
+                <p> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
                 @if($letterOfIndent->signature)
                     <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
                 @endif

@@ -44,12 +44,12 @@
 
         <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
         <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>
-        <p style="margin-bottom: 0px;"> <span class="fw-bold" >Full Name: </span> {{ ucfirst($letterOfIndent->client->name ?? '') }} </p>
-        <p style="margin-top: 0px;"> <span class="fw-bold">Address: </span> {{  ucfirst($letterOfIndent->client->country->name) ?? ''}} </p>
+        <p style="margin-bottom: 0px;"> <span class="fw-bold" >Full Name: </span> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
+        <p style="margin-top: 0px;"> <span class="fw-bold">Address: </span> {{  strtoupper($letterOfIndent->client->country->name) ?? ''}} </p>
 
         <p>Dear Milele Motors,</p>
 
-        <p>I, ({{ ucfirst($letterOfIndent->client->name) ?? ''}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
+        <p>I, ({{ strtoupper($letterOfIndent->client->name) ?? ''}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
         <h3 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline">Requirements:</h3>
 
         <table  style="width:100%;">
@@ -99,7 +99,7 @@
             and this acquisition is not intended for resale purposes.
         </p>
         <p style="margin-bottom: 5px;">Sincerely,</p>
-        <p> {{ ucfirst($letterOfIndent->client->name ?? '') }} </p>
+        <p> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
         @if($letterOfIndent->signature)
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
