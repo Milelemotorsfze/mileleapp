@@ -141,7 +141,7 @@
                       
                             <table id="so-items" style="margin-top:5px;" >
                                 <tr style="background-color: black;color: #FFFFFF;text-align:center" >
-                                    <th style="text-align:center">QUANTITY</th>
+                                    <th style="text-align:center;padding-left:8px;padding-right:8px;">QUANTITY</th>
                                     <th>DESCRIPTION</th>
                                     <th width="100px" style="border-bottom:none">UNIT PRICE</th>
                                     <th width="100px" style="border-bottom:none">LINE TOTAL </th>
