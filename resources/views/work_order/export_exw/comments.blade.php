@@ -172,12 +172,22 @@
             }
         }).join('');
 
-        const replyButtonHtml = commentData.user ? `
-            <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})" title="Reply">
-                <i class="fa fa-reply" aria-hidden="true"></i>
-            </button>` : '';
+        // Process wo_histories for additional divs
+        let historiesHtml = '';
+        commentData.wo_histories.forEach(item => {
+            let sentence = '';
 
-        const additionalDivHtml = !commentData.user ? `<div id="additional-div-${id}">Some data will display here</div>` : '';
+            if (item.type === "Change") {
+                sentence = `The ${item.field} was changed from ${item.old_value} to ${item.new_value}.`;
+            } else if (item.type === "Set") {
+                sentence = `The ${item.field} was set as ${item.new_value}.`;
+            } else if (item.type === "Unset") {
+                sentence = `The ${item.field} was Unset.`;
+            }
+
+            const additionalDivHtml = !commentData.user ? `<div id="additional-div-${item.id}">${sentence}</div>` : `<div>${sentence}</div>`;
+            historiesHtml += additionalDivHtml;
+        });
 
         const commentHtml = `
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
@@ -187,9 +197,11 @@
                     </div>
                     <div class="col-xxl-11 col-lg-11 col-md-11">
                         <div class="comment-text">${text}</div>
-                        ${additionalDivHtml}
+                        ${historiesHtml}
                         <div class="d-flex flex-wrap">${filePreviewsHtml}</div>
-                        ${replyButtonHtml}
+                        <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})" title="Reply">
+                            <i class="fa fa-reply" aria-hidden="true"></i>
+                        </button>
                         <span style="color:gray;">
                             ${commentData.user ? commentData.user.name : 'System Generated'}
                         </span>

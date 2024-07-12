@@ -651,6 +651,14 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
         try { 
             $authId = Auth::id();
+            
+            $newComment = WOComments::create([
+                'work_order_id' => $workOrder->id,
+                'text' => "The work order data was changed as follows by ".auth()->user()->name, // Allow null text
+                'parent_id' => null, // Temporary null, will update later
+                'user_id' => null,
+            ]);
+            $CommentId = $newComment->id;
             // Initialize newData array
             $newData = [];
             $newData = $request->all();
@@ -694,7 +702,7 @@ class WorkOrderController extends Controller
             }
 
             // Helper function to handle file upload and history recording
-            function handleFileUpload($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag = null) {
+            function handleFileUpload($request, $fileKey, $path, &$newData, $workOrder, $oldData, $deleteFlag = null, $CommentId) {
                 $fileName = null;
                 if ($request->hasFile($fileKey)) {
                     $fileName = auth()->id() . '_' . time() . '.' . $request->file($fileKey)->extension();
@@ -733,6 +741,7 @@ class WorkOrderController extends Controller
                         'type' => $type,
                         'user_id' => Auth::id(),
                         'changed_at' => Carbon::now(),
+                        'comment_id' => $CommentId,
                     ]);
                 }
             }
@@ -754,14 +763,14 @@ class WorkOrderController extends Controller
             ];
 
             foreach ($filesToHandle as $fileKey => $path) {
-                handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete');
+                handleFileUpload($request, $fileKey, $path, $newData, $workOrder, $oldData, 'is_' . $fileKey . '_delete',$CommentId);
             }
     
             // List of fields to exclude
             $excludeFields = [
                 '_method', '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 'wo_id', 'updated_by',
                 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 'enduser_trade_license',
-                'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'new_customer_name', 'existing_customer_name',
+                'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'new_customer_name', 'existing_customer_name','customer_name',
                 'is_brn_file_delete','is_signed_pfi_delete','is_signed_contract_delete','is_payment_receipts_delete','is_noc_delete',
                 'is_enduser_trade_license_delete','is_enduser_passport_delete','is_enduser_contract_delete','is_vehicle_handover_person_id_delete',
             ];
@@ -807,7 +816,8 @@ class WorkOrderController extends Controller
                         'old_value' => $oldValue,
                         'new_value' => $newValue,
                         'type' => $changeType,
-                        'changed_at' => Carbon::now()
+                        'changed_at' => Carbon::now(),
+                        'comment_id' => $CommentId,
                     ];
                 }
             }
@@ -827,13 +837,14 @@ class WorkOrderController extends Controller
                     'old_value' => $oldData['customer_name'],
                     'new_value' => $request->new_customer_name,
                     'type' => $changeType,
-                    'changed_at' => Carbon::now()
+                    'changed_at' => Carbon::now(),
+                    'comment_id' =>$CommentId,
                 ];
-            } elseif ($request->customer_type == 'existing' && $oldData['customer_name'] != $request->existing_customer_name) {
+            } else if ($request->customer_type == 'existing' && $oldData['customer_name'] != $request->existing_customer_name) {
                 $changeType = 'Change';
                 if (is_null($oldData['customer_name']) && !is_null($request->existing_customer_name)) {
                     $changeType = 'Set';
-                } elseif (!is_null($oldData['customer_name']) && is_null($request->existing_customer_name)) {
+                } else if (!is_null($oldData['customer_name']) && is_null($request->existing_customer_name)) {
                     $changeType = 'Unset';
                 }
                 $changes[] = [
@@ -843,7 +854,8 @@ class WorkOrderController extends Controller
                     'old_value' => $oldData['customer_name'],
                     'new_value' => $request->existing_customer_name,
                     'type' => $changeType,
-                    'changed_at' => Carbon::now()
+                    'changed_at' => Carbon::now(),
+                    'comment_id' => $CommentId,
                 ];
             }
             // Handle currency changes based on SO Amount, Amount Received and Balance Amount
@@ -862,7 +874,8 @@ class WorkOrderController extends Controller
                     'old_value' => $oldData['currency'],
                     'new_value' => $request->currency,
                     'type' => $changeType,
-                    'changed_at' => Carbon::now()
+                    'changed_at' => Carbon::now(),
+                    'comment_id' =>$CommentId,
                 ];
             }
             // If there are changes, insert them into the WORecordHistory
@@ -930,6 +943,7 @@ class WorkOrderController extends Controller
                                 'type' => $changeType,
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
+                                'comment_id' => $CommentId,
                             ]);
                         }
                     }
@@ -1006,6 +1020,7 @@ class WorkOrderController extends Controller
                                     'type' => $changeType,
                                     'user_id' => Auth::id(),
                                     'changed_at' => Carbon::now(),
+                                    'comment_id' =>$CommentId,
                                 ]);
                             }
                         }
@@ -1032,6 +1047,7 @@ class WorkOrderController extends Controller
                                 'type' => 'Set',
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
+                                'comment_id' =>$CommentId,
                             ]);
                         }
                     }
@@ -1071,6 +1087,7 @@ class WorkOrderController extends Controller
                             'type' => 'Set',
                             'user_id' => Auth::id(),
                             'changed_at' => Carbon::now(),
+                            'comment_id' =>$CommentId,
                         ]);
                     }
 
@@ -1112,6 +1129,7 @@ class WorkOrderController extends Controller
                                             'type' => 'Set',
                                             'user_id' => Auth::id(),
                                             'changed_at' => Carbon::now(),
+                                            'comment_id' =>$CommentId,
                                         ]);
                                     }
                                     // Mark this addon as processed
@@ -1172,6 +1190,7 @@ class WorkOrderController extends Controller
                                     'type' => 'Unset',
                                     'user_id' => Auth::id(),
                                     'changed_at' => Carbon::now(),
+                                    'comment_id' =>$CommentId,
                                 ]);
                             }
                         }
@@ -1204,6 +1223,7 @@ class WorkOrderController extends Controller
                                         'type' => $changeType,
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
+                                        'comment_id' =>$CommentId,
                                     ]);
                                 }
                             }
@@ -1240,6 +1260,7 @@ class WorkOrderController extends Controller
                                     'type' => 'Change',
                                     'user_id' => Auth::id(),
                                     'changed_at' => Carbon::now(),
+                                    'comment_id' =>$CommentId,
                                 ]);
                             }
                         } else {
@@ -1259,6 +1280,7 @@ class WorkOrderController extends Controller
                                     'type' => 'Change',
                                     'user_id' => Auth::id(),
                                     'changed_at' => Carbon::now(),
+                                    'comment_id' =>$CommentId,
                                 ]);
                             }
                         }
@@ -1279,18 +1301,13 @@ class WorkOrderController extends Controller
                             'type' => 'Change',
                             'user_id' => Auth::id(),
                             'changed_at' => Carbon::now(),
+                            'comment_id' =>$CommentId,
                         ]);
                     }
                     $woVehicle->deposit_received = 'no';
                     $woVehicle->save();
                 }
             }
-            $newComment = WOComments::create([
-                'work_order_id' => $workOrder->id,
-                'text' => "The work order data was changed as follows by ".auth()->user()->name, // Allow null text
-                'parent_id' => null, // Temporary null, will update later
-                'user_id' => null,
-            ]);
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
             
             DB::commit();
@@ -1402,7 +1419,7 @@ class WorkOrderController extends Controller
     
     public function getComments($workOrderId)
     {
-        $comments = WOComments::where('work_order_id', $workOrderId)->with('files','user')->get();
+        $comments = WOComments::where('work_order_id', $workOrderId)->with('files','user','wo_histories')->get();
         return response()->json(['comments' => $comments]);
     }
     public function uniqueSO(Request $request) { 

@@ -30,4 +30,7 @@ class WOComments extends Model
     {
         return $this->hasMany(CommentFile::class, 'comment_id');
     }
+    public function wo_histories() {
+        return $this->hasMany(WORecordHistory::class, 'comment_id');
+    }
 }

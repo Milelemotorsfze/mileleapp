@@ -9,7 +9,7 @@ class WOVehicleAddonRecordHistory extends Model
 {
     use HasFactory;
     protected $table = "w_o_vehicle_addon_record_histories";
-    protected $fillable = ['type','w_o_vehicle_addon_id','user_id','field_name', 'old_value', 'new_value','changed_at'];
+    protected $fillable = ['type','w_o_vehicle_addon_id','user_id','field_name', 'old_value', 'new_value','changed_at','comment_id'];
     public $timestamps = false;
 
     protected $casts = [
