@@ -84,6 +84,7 @@ class WorkOrder extends Model
         'updated_by',
         'deleted_by',
     ];
+    
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');

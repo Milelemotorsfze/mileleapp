@@ -9,7 +9,7 @@ class WORecordHistory extends Model
 {
     use HasFactory;
     protected $table = "w_o_record_histories";
-    protected $fillable = ['type','work_order_id','user_id','field_name', 'old_value', 'new_value','changed_at'];
+    protected $fillable = ['type','work_order_id','user_id','field_name', 'old_value', 'new_value','changed_at','comment_id'];
     public $timestamps = false;
 
     protected $casts = [
