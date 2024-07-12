@@ -109,7 +109,7 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI)
         {
-            DB::beginTransaction();
+            DB::beginTransaction();        
 
             $LOI = new LetterOfIndent();
             $LOI->client_id = $request->client_id;
@@ -120,6 +120,7 @@ class LetterOfIndentController extends Controller
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->sales_person_id = $request->sales_person_id;
+           
             $customer = Clients::find($request->client_id);
             $country = Country::find($request->country);
             $countryName = strtoupper(substr($country->name, 0, 3));
@@ -134,12 +135,17 @@ class LetterOfIndentController extends Controller
             }
             $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
             $yearCode = Carbon::now()->format('y');
+            $year = Carbon::now()->format('Y');
 
-            $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)->count();
+            $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)
+                                ->whereYear('date', $year)->count();
+
             $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
-
             $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
+            $customerYearCode = $yearCode."-".$nextLoiCount;
+
             $LOI->uuid = $uuid;
+            $LOI->year_code = $customerYearCode;
 
             if ($request->has('loi_signature'))
             {
@@ -251,6 +257,8 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('Generated LOI Document.');
         
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
+        // $yearCode = Carbon::now()->format('y')
+        $fileName = $letterOfIndent->client->name .'-'.$letterOfIndent->year_code.'.pdf';
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
         $imageFiles = [];
         foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument) {
@@ -274,7 +282,7 @@ class LetterOfIndentController extends Controller
                 // $pdfFile->save($directory . '/' . $filename);
                 try{
                 //      $pdf = $this->pdfMerge($letterOfIndent->id);
-                    return $pdfFile->download('LOI_'.date('Y_m_d').'.pdf');
+                    return $pdfFile->download($fileName);
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -294,7 +302,10 @@ class LetterOfIndentController extends Controller
                 try{
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
-                    return $pdfFile->download('LOI_'.date('Y_m_d').'.pdf');
+                    // $pdfFile->store('LOI-Documents', $fileName);
+                    // $letterOfIndent->loi_document_file = $fileName;
+                    // $letterOfIndent->save();
+                    return $pdfFile->download($fileName);
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -314,7 +325,7 @@ class LetterOfIndentController extends Controller
                 try{
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
-                    return $pdfFile->download('LOI_'.date('Y_m_d').'.pdf');
+                    return $pdfFile->download($fileName);
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -336,7 +347,7 @@ class LetterOfIndentController extends Controller
                 try{
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
-                    return $pdfFile->download('LOI_'.date('Y_m_d').'.pdf');
+                    return $pdfFile->download($fileName);
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -347,6 +358,8 @@ class LetterOfIndentController extends Controller
         return redirect()->back()->withErrors("error", "Something went wrong!Please try again");
 
     }
+
+  
     // public function pdfMerge($letterOfIndentId)
     // {
     //     $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
