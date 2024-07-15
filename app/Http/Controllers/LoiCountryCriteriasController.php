@@ -179,8 +179,9 @@ class LoiCountryCriteriasController extends Controller
 
         $loiCountryCriteria = LoiCountryCriteria::find($id);
         $loiModeLlines = LoiAllowedOrRestrictedModelLines::where('country_id', $loiCountryCriteria->country_id)->delete();
-        $loiCountryCriteria->deleted_by = Auth::id();
         $loiCountryCriteria->delete();
+        $loiCountryCriteria->deleted_by = Auth::id();
+        $loiCountryCriteria->save();
 
         return response(true);
     }

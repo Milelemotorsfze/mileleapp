@@ -29,8 +29,17 @@ class MasterModelController extends Controller
                     return Carbon::parse($query->created_at)->format('d M Y');
                 })
                 ->editColumn('created_by', function($query) {
-                    return $query->CreatedBy->name ?? '';
+                    return $query->createdBy->name ?? '';
                 })
+                ->editColumn('updated_by', function($query) {
+                    return $query->updatedBy->name ?? '';
+                })
+                ->editColumn('updated_at', function($query) {
+                   return Carbon::parse($query->updated_at)->format('d m Y');
+                })
+                // ->editColumn('created_at', function($query) {
+                //     return Carbon::parse($query->created_at)->format('d m Y');
+                //  })
                 ->editColumn('variant_id', function($query) {
                     return $query->variant->name ?? '';
                 })
@@ -58,6 +67,10 @@ class MasterModelController extends Controller
             ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'Milele LOI Description'],
             ['data' => 'amount_uae', 'name' => 'amount_uae','title' => 'Amount in UAE '],
             ['data' => 'amount_belgium', 'name' => 'amount_belgium','title' => 'Amount in Belgium '],
+            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
+            ['data' => 'created_by', 'name' => 'created_by','title' => 'Created By'],
+            ['data' => 'updated_at', 'name' => 'updated_at','title' => 'Updated At'],
+            ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
 
         ]);
@@ -193,6 +206,7 @@ class MasterModelController extends Controller
         $masterModel = MasterModel::find($id);
         $masterModel->deleted_by = Auth::id();
         $masterModel->delete();
+        $masterModel->save();
 
         return response(true);
     }
