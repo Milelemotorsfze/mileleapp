@@ -191,6 +191,7 @@ class MasterModelController extends Controller
         (new UserActivityController)->createActivity('Deleted Master Model.');
 
         $masterModel = MasterModel::find($id);
+        $masterModel->deleted_by = Auth::id();
         $masterModel->delete();
 
         return response(true);
