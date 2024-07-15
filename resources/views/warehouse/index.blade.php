@@ -325,7 +325,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Initiated')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
+            });
             })
             ->count();
         @endphp
@@ -337,7 +340,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Initiated')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
+            });
             })
             ->count();
             @endphp
@@ -378,7 +384,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Initiated Request')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
+            });
             })
             ->count();
         @endphp
@@ -390,7 +399,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Initiated Request')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
+            });
             })
             ->count();
             @endphp
@@ -421,7 +433,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Approved');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Release Approved')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
+            });
             })
             ->count();
         @endphp
@@ -433,7 +448,10 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Approved');
+                    ->where(function($subquery) {
+                $subquery->where('vehicles.payment_status', 'Payment Release Approved')
+                         ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
+            });
             })
             ->count();
         @endphp
