@@ -68,7 +68,7 @@
                                 <td>{{ $customer->country->name ?? '' }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M y') }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M Y') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm document-btn" title="To view Customer Documents" data-bs-toggle="modal" data-bs-target="#view--docs-{{$customer->id}}">
                                         <i class="fa fa-file-pdf"></i>

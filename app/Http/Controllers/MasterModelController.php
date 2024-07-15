@@ -35,7 +35,7 @@ class MasterModelController extends Controller
                     return $query->updatedBy->name ?? '';
                 })
                 ->editColumn('updated_at', function($query) {
-                   return Carbon::parse($query->updated_at)->format('d m Y');
+                   return Carbon::parse($query->updated_at)->format('d M Y');
                 })
                 // ->editColumn('created_at', function($query) {
                 //     return Carbon::parse($query->created_at)->format('d m Y');
