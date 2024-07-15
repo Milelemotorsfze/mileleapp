@@ -20,17 +20,21 @@ class LOIExpiryConditionSeeder extends Seeder
             [
                 'id' => 1,
                 'category_name' => 'Individual',
-                'expiry_duration_year' => 1
+                'expiry_duration_year' => 1,
+                'created_by' => 16
+                
             ],
             [
                 'id' => 2,
                 'category_name' => 'Company',
-                'expiry_duration_year' => 1
+                'expiry_duration_year' => 1,
+                'created_by' => 16
             ],
             [
                 'id' => 3,
                 'category_name' => 'Government',
-                'expiry_duration_year' => 2
+                'expiry_duration_year' => 2,
+                'created_by' => 16
             ],
             
         ]);
