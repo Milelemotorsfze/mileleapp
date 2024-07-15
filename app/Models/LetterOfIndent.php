@@ -25,6 +25,7 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_NEW = "New";
     public const LOI_STATUS_PFI_CREATED = "PFI Created";
     public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
+    public const LOI_STATUS_EXPIRED = "Expired";
 
     protected $appends = [
         'total_loi_quantity',
@@ -95,7 +96,7 @@ class LetterOfIndent extends Model
         $LOItype = $LOI->client->customertype;
       
         $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-        if($LOIExpiryCondition) {        
+        if($LOIExpiryCondition && $LOI->is_expired == false) {        
             $currentDate = Carbon::now();
            
             $year = $LOIExpiryCondition->expiry_duration_year;
@@ -103,9 +104,9 @@ class LetterOfIndent extends Model
             $expiryDate = Carbon::parse($LOI->date)->addYears($year);
            
             $test = $currentDate->gt($expiryDate);
-            
+            // do not make status expired, becasue to know at which status stage it got expired
             if($currentDate->gt($expiryDate) == true) {
-                $LOI->is_expired = true;
+                $LOI->is_expired = true;              
                 $LOI->save();  
             }
         }
