@@ -79,11 +79,10 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control widthinput" multiple name="customer_type" id="customer-type">
-{{--                                    <option value="" disabled>Type</option>--}}
+
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
                                 </select>
                                 <span id="customer-type-error" class="error"></span>
                             </div>
@@ -504,7 +503,7 @@
             $('#template-type').val('').trigger('change');
             if(customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}') {
                 $('#template-type option[value=business]').prop('disabled',true);
-            }else if(customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}') {
+            }else if(customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}' || customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}') {
                 $('#template-type option[value=individual]').prop('disabled',true);
             }else{
                 $('#template-type option[value=individual]').prop('disabled',false);

@@ -72,8 +72,7 @@
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
                                     <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}"  {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT ? 'selected' : '' }}>
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}"  {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_NGO ? 'selected' : '' }}>
-                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
+                                    
                                 </select>
                             </div>
                         </div>
