@@ -92,10 +92,6 @@
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->client->customertype ? 'selected' : ''}} >
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
                                     </option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}
-                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO == $letterOfIndent->client->customertype ? 'selected' : ''}} >
-                                        {{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}
-                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -176,7 +172,7 @@
                                     <option value="milele_cars"  {{ in_array('milele_cars',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->dealers == 'Trans Cars' ? 'disabled' : '' }}>Milele Cars</option>
                                     <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : '' }}
-                                        {{ $letterOfIndent->client->customertype == 'Company' ? 'disabled' : '' }}>Individual</option>
+                                        {{ $letterOfIndent->client->customertype == 'Company' || $letterOfIndent->client->customertype == 'Government' ? 'disabled' : '' }}>Individual</option>
                                     <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->client->customertype == 'Individual' ? 'disabled' : '' }}>Business</option>
                                 </select>
@@ -494,7 +490,7 @@
                             $('#template-type option[value=business]').prop('disabled', true);
                             $('#template-type option[value=individual]').prop('disabled', false);
 
-                        } else if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}') {
+                        } else if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}' || customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}') {
                             $('#template-type option[value=individual]').prop('disabled', true);
                             $('#template-type option[value=business]').prop('disabled', false);
                         } else {

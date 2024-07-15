@@ -14,7 +14,6 @@ class Clients extends Model
     public const CUSTOMER_TYPE_INDIVIDUAL = "Individual";
     public const CUSTOMER_TYPE_COMPANY = "Company";
     public const CUSTOMER_TYPE_GOVERMENT = "Government";
-    public const CUSTOMER_TYPE_NGO = "NGO";
 
     protected $appends = [
         'is_deletable'

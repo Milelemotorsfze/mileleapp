@@ -68,7 +68,6 @@
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
                                     <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Clients::CUSTOMER_TYPE_NGO }}</option>
                                 </select>
                             </div>
                         </div>
