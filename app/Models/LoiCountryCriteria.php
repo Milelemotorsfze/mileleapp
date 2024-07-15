@@ -22,6 +22,10 @@ class LoiCountryCriteria extends Model
     {
         return $this->belongsTo(Country::class,'country_id','id');
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
     public function updatedBy()
     {
         return $this->belongsTo(User::class,'updated_by','id');

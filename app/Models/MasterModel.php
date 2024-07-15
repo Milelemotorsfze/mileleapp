@@ -24,6 +24,10 @@ class MasterModel extends Model
     {
         return $this->belongsTo(User::class,'created_by','id');
     }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
     public function modelLine()
     {
         return $this->belongsTo(MasterModelLines::class,'master_model_line_id','id');

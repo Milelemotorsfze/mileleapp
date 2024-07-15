@@ -38,6 +38,14 @@ class LetterOfIndent extends Model
     // {
     //     return $this->belongsTo(Customer::class);
     // }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
     public function client()
     {
         return $this->belongsTo(Clients::class,'client_id','id');

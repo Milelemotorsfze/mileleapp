@@ -487,6 +487,7 @@ class LetterOfIndentController extends Controller
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
             $LOI->sales_person_id = $request->sales_person_id;
+            $LOI->updated_by = Auth::id();
             if($request->is_signature_removed == 1) {
                 $LOI->signature = NULL;
             }
@@ -593,6 +594,7 @@ class LetterOfIndentController extends Controller
 
       $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
       $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->updated_by = Auth::id();
       $LOI->save();
 
       return response(true);
@@ -614,6 +616,7 @@ class LetterOfIndentController extends Controller
 
         }
         $LOI->loi_approval_date = $request->loi_approval_date;
+        $LOI->updated_by = Auth::id();
         $LOI->save();
         return response(true);
     }
@@ -626,12 +629,14 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('LOI Deleted successfully.');
     
         DB::beginTransaction();
-
+        $LOI = LetterOfIndent::find($id);
         LoiTemplate::where('letter_of_indent_id', $id)->delete();
         LoiSoNumber::where('letter_of_indent_id', $id)->delete();
         LetterOfIndentDocument::where('letter_of_indent_id', $id)->delete();
         LetterOfIndentItem::where('letter_of_indent_id', $id)->delete();
         LetterOfIndent::find($id)->delete();
+        $LOI->deleted_by  = Auth::id();
+        $LOI->save();
     
         DB::commit();
 
@@ -643,6 +648,7 @@ class LetterOfIndentController extends Controller
 
         $LOI = LetterOfIndent::find($id);
         $LOI->utilized_quantity = $request->utilized_quantity;
+        $LOI->updated_by = Auth::id(); 
         $LOI->save();
         return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
     }

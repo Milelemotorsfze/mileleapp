@@ -43,6 +43,9 @@
                             <th>Catgeory Name</th>
                             <th>Expiry Duration (Years)</th>
                             <th>Created At</th>
+                            <th>Created By</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -54,6 +57,9 @@
                                     <td>{{ $loiExpiryCondition->category_name }}</td>
                                     <td>{{ $loiExpiryCondition->expiry_duration_year }}</td>
                                     <td>{{ \Illuminate\Support\Carbon::parse($loiExpiryCondition->created_at)->format('d M Y') ?? '' }}</td>
+                                    <td>{{ $loiExpiryCondition->createdBy->name ?? '' }}</td> 
+                                     <td>{{ \Illuminate\Support\Carbon::parse($loiExpiryCondition->updated_at)->format('d M Y') ?? '' }}</td>
+                                     <td>{{ $loiExpiryCondition->updatedBy->name ?? '' }}</td>
                                     <td>
                                         @can('edit-loi-expiry-criterias')
                                             @php

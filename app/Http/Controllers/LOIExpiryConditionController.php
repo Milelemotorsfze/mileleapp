@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\LOIExpiryCondition;
 
 class LOIExpiryConditionController extends Controller
@@ -55,6 +56,7 @@ class LOIExpiryConditionController extends Controller
     {
         $loiExpiryCondition = LOIExpiryCondition::find($id);
         $loiExpiryCondition->expiry_duration_year = $request->expiry_duration_year;
+        $loiExpiryCondition->updated_by = Auth::id();
         $loiExpiryCondition->save();
         
         return redirect()->back()->with('success', "LOI expiry Condition updated Successfully.");
