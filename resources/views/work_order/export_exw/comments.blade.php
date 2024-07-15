@@ -134,7 +134,7 @@
     });
 
     function addComment(commentData = {}) {
-        const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [] } = commentData;
+        const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
         // Check for invalid comment data
         if (!id || (text === '' && files.length === 0)) {
             console.error('Invalid comment data:', commentData);
@@ -287,28 +287,49 @@
                     <tbody>
             `;
             orderedNewVehicles.forEach(item => {
-                const viewMoreClass = item.deleted_at ? 'view-more-btn-removed' : 'view-more-btn';
+                // Helper function to find new_value for a specific field_name
+                const getFieldValue = (field_name, default_value) => {
+                    const detail = item.comment_vehicle && item.comment_vehicle.find(detail => detail.field_name === field_name);
+                    return detail ? detail.new_value : (item[field_name] || default_value);
+                };
+
+                const brandValue = getFieldValue('brand', '');
+                const variantValue = getFieldValue('variant', '');
+                const engineValue = getFieldValue('engine', '');
+                const modelDescriptionValue = getFieldValue('model_description', '');
+                const modelYearValue = getFieldValue('model_year', '');
+                const steeringValue = getFieldValue('steering', '');
+                const exteriorColourValue = getFieldValue('exterior_colour', '');
+                const interiorColourValue = getFieldValue('interior_colour', '');
+                const warehouseValue = getFieldValue('warehouse', '');
+                const territoryValue = getFieldValue('territory', '');
+                const preferredDestinationValue = getFieldValue('preferred_destination', '');
+                const importDocumentTypeNameValue = getFieldValue('import_document_type_name', '');
+                const ownershipNameValue = getFieldValue('ownership_name', '');
+
+                // const viewMoreClass = item.deleted_at ? 'view-more-btn-removed' : 'view-more-btn';
                 const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
 
                 newVehiclesHtml += `
                     <tr style="border:1px solid #e9e9ef;">
                         <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="${viewMoreClass}" data-vin="${item.vin}" data-id="${item.id}" title="View More">View More</a>
+                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View More">ViewMore</a>
+                            ${item.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vin}" data-id="${item.id}" title="View Current Record">CurrentRecord</a>` : ''}
                         </td>
                         <td>${item.vin || ''}</td>
-                        <td>${item.brand || ''}</td>
-                        <td>${item.variant || ''}</td>
-                        <td>${item.engine || ''}</td>
-                        <td>${item.model_description || ''}</td>
-                        <td>${item.model_year || ''}</td>
-                        <td>${item.steering || ''}</td>
-                        <td>${item.exterior_colour || ''}</td>  
-                        <td>${item.interior_colour || ''}</td>
-                        <td>${item.warehouse || ''}</td>
-                        <td>${item.territory || ''}</td>
-                        <td>${item.preferred_destination || ''}</td>
-                        <td>${item.import_document_type_name || ''}</td>
-                        <td>${item.ownership_name || ''}</td>
+                        <td>${brandValue}</td>
+                        <td>${variantValue}</td>
+                        <td>${engineValue}</td>
+                        <td>${modelDescriptionValue}</td>
+                        <td>${modelYearValue}</td>
+                        <td>${steeringValue}</td>
+                        <td>${exteriorColourValue}</td>
+                        <td>${interiorColourValue}</td>
+                        <td>${warehouseValue}</td>
+                        <td>${territoryValue}</td>
+                        <td>${preferredDestinationValue}</td>
+                        <td>${importDocumentTypeNameValue}</td>
+                        <td>${ownershipNameValue}</td>
                     </tr>
                 `;
             });
@@ -380,6 +401,65 @@
             `;        
         }
 
+        // Process updated_vehicles for additional div
+        let updatedVehiclesHtml = '';
+        if (updated_vehicles.length >= 1) {
+            const orderedUpdatedVehicles = updated_vehicles.sort((a, b) => a.vin.localeCompare(b.vin));
+
+            updatedVehiclesHtml = `
+                <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
+                    <thead>
+                        <tr>
+                            <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;border-bottom:1px solid #e9e9ef;">
+                                ${updated_vehicles.length} vehicles data updated
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            orderedUpdatedVehicles.forEach(item => {
+                const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
+                // Add a row for the vehicle's VIN
+                updatedVehiclesHtml += `
+                    <tr>
+                        <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; border-top:2px solid #e1e1ea;">
+                           <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View More">ViewMore</a>
+                            ${item.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vin}" data-id="${item.id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vin} details updated as follows
+                        </th>
+                    </tr>
+                    <tr style="border-width: 1;">
+                        <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Field</th>
+                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Type</th>
+                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Old Value</th>
+                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">New Value</th>
+                    </tr>
+                `;
+
+                // Sort the details by field name in ascending order
+                const sortedDetails = item.comment_updated_vehicle.sort((a, b) => a.field_name.localeCompare(b.field_name));
+
+                // Loop through each sorted comment_updated_vehicle and create table rows
+                sortedDetails.forEach(detail => {
+                    if (detail.comment_id === commentData.id) {
+                        updatedVehiclesHtml += `
+                            <tr style="border:1px solid #e9e9ef;">
+                                <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field_name || ''}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.old_value || ''}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.new_value || ''}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            });
+
+            updatedVehiclesHtml += `
+                    </tbody>
+                </table>
+            `;
+        }
+
         const commentHtml = `
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
                 <div class="row">
@@ -396,6 +476,7 @@
                             ${historiesHtml}
                             ${newVehiclesHtml}
                             ${removedVehiclesHtml}
+                            ${updatedVehiclesHtml}
                             <div class="d-flex flex-wrap">${filePreviewsHtml}</div>
                         </div>
                         <button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${id})" title="Reply">
