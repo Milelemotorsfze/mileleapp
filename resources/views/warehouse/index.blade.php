@@ -807,6 +807,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                     <th style="vertical-align: middle; text-align: center;">PO Date</th>
                     <th style="vertical-align: middle; text-align: center;">Vendor Name</th>
                     <th style="vertical-align: middle; text-align: center;">Total Vehicles</th>
+                    <th style="vertical-align: middle; text-align: center;">Total Cost</th>
                     <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Vehicle Status</th>
                 </tr>
                 </thead>
@@ -828,6 +829,13 @@ $pendingvendorfol = DB::table('purchasing_order')
                         $vehicleCount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->wherenull('deleted_at')->count();
                         @endphp
                         {{ $vehicleCount }}
+                    </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        @if(isset($purchasingOrder->totalcost) && $purchasingOrder->totalcost != 0)
+                            {{ $purchasingOrder->currency }} {{ number_format($purchasingOrder->totalcost) }}
+                        @else
+                            N/A
+                        @endif
                     </td>
                     <td>
                     <table id="dtBasicExample20" class="table table-striped table-editable table-edits table table-bordered table-sm">
