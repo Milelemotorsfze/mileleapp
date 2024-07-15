@@ -43,8 +43,7 @@ class Clients extends Model
 
                         return true;
                     }
-                }
-               
+                }             
             }
         }
            
