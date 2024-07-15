@@ -915,6 +915,9 @@ Route::get('/d', function () {
 
     //Addinational Payments
     Route::post('/request-additional-payment', [PurchasingOrderController::class, 'requestAdditionalPayment']);
+    Route::post('/request-initiated-payment', [PurchasingOrderController::class, 'requestinitiatedPayment']);
+    Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
+    Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     
 
 

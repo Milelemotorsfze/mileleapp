@@ -50,8 +50,6 @@ use App\Models\PurchasedOrderReplies;
 use App\Models\Purchasedorderoldplfiles;
 use App\Models\VehiclesSupplierAccountTransaction;
 
-
-
 class PurchasingOrderController extends Controller
 {
     /**
@@ -1232,14 +1230,15 @@ public function getBrandsAndModelLines(Request $request)
         }
         $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
         $additionalpaymentpend = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'pending')->where('change_type', 'surcharge')->sum('price_change');
-        $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
     }
     public function edit($id)
     {
@@ -2322,6 +2321,29 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
+            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id);
+            $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
+            if (!$supplieraccountchange) {
+            $supplieraccountchange = new SupplierAccount();
+            $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
+            $supplieraccountchange->current_balance -= $totalcost;
+            $supplieraccountchange->currency = "AED";
+            $supplieraccountchange->opening_balance = 0;
+            $supplieraccountchange->save();
+            }
+            $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Approved')
+                ->sum('amount');
+            $supplieracc->current_balance += $paymentad;
+            $supplieraccountchange->save();
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $vehicle->purchasing_order_id;
+            $supplieraccount->supplier_account_id = $supplieraccountchange->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $purchasedorder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
         }
     if ($vehicle) {
         DB::beginTransaction();
@@ -2480,9 +2502,12 @@ public function purchasingallupdateStatusrel(Request $request)
         VendorPaymentAdjustments::where('purchasing_order_id', $id)
                 ->where('status', 'pending')
                 ->update(['status' => 'Approved']);
+        PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Suggested Payment')
+                ->update(['status' => 'Approved']);
         SupplierAccountTransaction::where('purchasing_order_id', $id)
         ->where('status', 'pending')
-        ->where('transaction_type', 'Post-Debit')
+        ->where('transaction_type', 'Pre-Debit')
         ->update([
             'status' => 'Approved',
             'remarks' => 'Approved For Released Payment'
@@ -2838,7 +2863,7 @@ public function allpaymentreqssfinpay(Request $request)
             else
             {
                 $VendorPaymentAdjustments = New VendorPaymentAdjustments();
-                $VendorPaymentAdjustments->amount = $adjustmentAmount;
+                $VendorPaymentAdjustments->amount = $intialamount;
                 $VendorPaymentAdjustments->type = "No Adjustment";
                 $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
                 $VendorPaymentAdjustments->purchasing_order_id = $id;
@@ -2912,7 +2937,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 $supplieraccountchange->save();
                 }
                 $supplieraccount = new SupplierAccountTransaction();
-                $supplieraccount->transaction_type = "Post-Debit";
+                $supplieraccount->transaction_type = "Pre-Debit";
                 $supplieraccount->purchasing_order_id = $purchasedorder->id;
                 $supplieraccount->supplier_account_id = $supplieraccountchange->id;
                 $supplieraccount->created_by = auth()->user()->id;
@@ -3870,4 +3895,112 @@ public function requestAdditionalPayment(Request $request)
         $totalSurcharges = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Pending')->update(['status' => 'Initiated Request']);
         return response()->json(['message' => 'Submitted Additional Payment Request successfully']);
     }
+    public function requestinitiatedPayment(Request $request)
+    {
+        $id = $request->input('id');
+        $totalcost = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Initiated Request')->sum('price_change');
+        PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Initiated Request')->update(['status' => 'Initiated']);
+        $purchasingOrder = PurchasingOrder::find($id);
+        $orderCurrency = $purchasingOrder->currency;
+        $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+        $supplieraccounttransition = new SupplierAccountTransaction();
+                $supplieraccounttransition->transaction_type = "Pre-Debit";
+                $supplieraccounttransition->purchasing_order_id = $id;
+                $supplieraccounttransition->supplier_account_id = $supplierAccount->id;
+                $supplieraccounttransition->created_by = auth()->user()->id;
+                $supplieraccounttransition->account_currency = $orderCurrency;
+                $supplieraccounttransition->transaction_amount = $totalcost;
+                $supplieraccounttransition->payment_category = "Additional Payment";
+                $supplieraccounttransition->remarks = "Additional Payment";
+                $supplieraccounttransition->save();
+        return response()->json(['message' => 'Submitted Additional Payment Request successfully']);
+    }
+    public function requestReleasedPayment(Request $request)
+    {
+    $id = $request->input('id');
+    PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+        ->where('change_type', 'Surcharge')
+        ->where('status', 'Initiated')
+        ->update(['status' => 'Approved']);
+    $transition = SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('transaction_type', 'Pre-Debit')
+        ->where('payment_category', 'Additional Payment')
+        ->first();
+    if ($transition) {
+        $transition->status = 'Approved';
+        $transition->remarks = 'Approved For Released Payment';
+        $transition->save();
+    }
+    return response()->json(['message' => 'Additional Payment Approved successfully']);
+    }
+    public function completedadditionalpayment(Request $request)
+    {
+        $id = $request->input('orderIdadditional');
+        $status = $request->input('statusadditional');
+        $vehicleCount = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+        ->where('change_type', 'Surcharge')
+        ->where('status', 'Approved')
+        ->count();
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+            $PurchasingOrder = PurchasingOrder::where('id', $id)->first();
+            info($PurchasingOrder);
+            $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
+        if ($supplieracc) {
+            $paymentad = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+                        ->where('change_type', 'Surcharge')
+                        ->where('status', 'Approved')
+                        ->sum('price_change');
+            $supplieracc->current_balance += $paymentad;
+            $supplieracc->save();
+            PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+            ->where('change_type', 'Surcharge')
+            ->where('status', 'Approved')
+            ->update(['status' => 'Paid']);
+            if($paymentad != 0)
+            {
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $id;
+            $supplieraccount->supplier_account_id = $supplieracc->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $PurchasingOrder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
+            $paymentspaid = New PurchasedOrderPaidAmounts();
+            $paymentspaid->amount = $paymentad;
+            $paymentspaid->created_by = auth()->user()->id;
+            $paymentspaid->purchasing_order_id = $id;
+            $paymentspaid->status = "Paid";
+            $paymentspaid->percentage = "100";
+            $paymentspaid->save();
+            $vendoradjustmentpaid = New VendorPaymentAdjustments();
+            $vendoradjustmentpaid->amount = $paymentad;
+            $vendoradjustmentpaid->type = 'Additional Payment';
+            $vendoradjustmentpaid->supplier_account_id = $supplieracc->id;
+            $vendoradjustmentpaid->purchasing_order_id = $id;
+            $vendoradjustmentpaid->created_by = auth()->user()->id;
+            $vendoradjustmentpaid->totalamount = $paymentad;
+            $vendoradjustmentpaid->status = 'Paid';
+            $vendoradjustmentpaid->remaining_amount = 0;
+            $vendoradjustmentpaid->save();
+            }
+        }
+    }
+                return redirect()->back()->with('success', 'Payment Status Updated');
+           }
 }

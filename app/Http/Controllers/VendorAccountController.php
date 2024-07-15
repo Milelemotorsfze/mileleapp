@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\SupplierAccount;
 use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\SupplierAccountTransaction;
+use App\Models\PurchasedOrderPriceChanges;
 use App\Models\VendorPaymentAdjustments;
 
 
@@ -90,14 +91,14 @@ class VendorAccountController extends Controller
 public function handleAction(Request $request)
 {
     $transition = SupplierAccountTransaction::find($request->id);
-
     if (!$transition) {
         return response()->json(['success' => false, 'message' => 'Transaction not found.']);
     }
-
     if ($request->action == 'approve') {
         $transition->status = 'Approved';
         $transition->remarks = "Approved For Released Payment";
+        if($transition->payment_category != "Additional Payment")
+        {
         $vehiclesin = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->get();
         $suppliertrans = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->first();
         foreach ($vehiclesin as $vehicleTransaction) {
@@ -111,20 +112,27 @@ public function handleAction(Request $request)
                 $vehicle->save();
             }
         }
-        $paidaccount = PurchasedOrderPaidAmounts::find($suppliertrans->popa_id); // Changed to find to get the model instance
+        $paidaccount = PurchasedOrderPaidAmounts::find($suppliertrans->popa_id);
         if ($paidaccount) {
             $paidaccount->status = "Approved";
             $paidaccount->save();
         }
-        $VendorPaymentAdjustments = VendorPaymentAdjustments::find($suppliertrans->vpa_id); // Changed to find to get the model instance
+        $VendorPaymentAdjustments = VendorPaymentAdjustments::find($suppliertrans->vpa_id);
         if ($VendorPaymentAdjustments) {
             $VendorPaymentAdjustments->status = "Approved";
             $VendorPaymentAdjustments->save();
         }
     }
+    else
+    {
+     PurchasedOrderPriceChanges::where('purchasing_order_id', $transition->purchasing_order_id)->where('change_type', 'Surcharge')->where('status', 'Initiated')->update(['status' => 'Approved']);
+    }
+    }
     else if ($request->action == 'reject') {
         $transition->status = 'Rejected';
         $transition->remarks = $request->remarks;
+        if($transition->payment_category != "Additional Payment")
+        {
         $vehiclesin = VehiclesSupplierAccountTransaction::where('sat_id', $request->id)->get();
         foreach ($vehiclesin as $vehicleTransaction) {
             $vehicle = Vehicles::find($vehicleTransaction->vehicles_id);
@@ -140,6 +148,11 @@ public function handleAction(Request $request)
                 $vehicle->save();
             }
         }
+    }
+    else
+    {
+        PurchasedOrderPriceChanges::where('purchasing_order_id', $transition->purchasing_order_id)->where('change_type', 'Surcharge')->where('status', 'Initiated')->update(['status' => 'Rejected']);
+    }
     }
     $transition->save();
     return response()->json(['success' => true]);
