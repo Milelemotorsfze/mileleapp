@@ -350,6 +350,28 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="fileUploadModaladditional" tabindex="-1" role="dialog" aria-labelledby="fileUploadModaladditionalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileUploadModaladditionalLabel">Swift Copy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="fileUploadFormadditional" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="file">Uploading PDF of Swift Copy</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                    </div>
+                    <br>
+                    <input type="hidden" id="statusadditional" name="statusadditional" value="">
+                    <input type="hidden" id="orderIdadditional" name="orderIdadditional" value="">
+                    <button type="submit" class="btn btn-primary">Upload & Complete Payment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="card-header">
         <!-- @if ($previousId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
@@ -690,6 +712,8 @@
                         {{ number_format($totalSurcharges, 0, '.', ',') }} - {{ $purchasingOrder->currency }}
                         </div>
                         </div>
+                        </div>
+                        @endif
                     @if($totalDiscounts)
                     <div class="row">
                         <div class="col-lg-4 col-md-3 col-sm-12">
@@ -790,11 +814,11 @@
                         @if (!empty($vehiclesAlreadyPaid) && !empty($vehiclesAlreadyPaidOrRemainingInStatuses))
                     @php
     $additionalpaymentpendFormatted = $additionalpaymentpend > 0 ? number_format($additionalpaymentpend, 0, '', ',') : null;
-    $additionalpaymentintFormatted = $additionalpaymentint > 0 ? number_format($additionalpaymentint, 0, '', ',') : null;
-    $additionalpaymentapprovedFormatted = $additionalpaymentpapproved > 0 ? number_format($additionalpaymentpapproved, 0, '', ',') : null;
-    $payments = array_filter([$additionalpaymentpendFormatted, $additionalpaymentintFormatted, $additionalpaymentapprovedFormatted]);
+    $additionalpaymentintFormatted = $additionalpaymentintreq > 0 ? number_format($additionalpaymentintreq, 0, '', ',') : null;
+    $additionalpaymentapprovedFormatted = $additionalpaymentint > 0 ? number_format($additionalpaymentint, 0, '', ',') : null;
+    $additionalpaymentalreadyappFormatted = $additionalpaymentpapproved > 0 ? number_format($additionalpaymentpapproved, 0, '', ',') : null;
+    $payments = array_filter([$additionalpaymentpendFormatted, $additionalpaymentintFormatted, $additionalpaymentapprovedFormatted, $additionalpaymentalreadyappFormatted]);
 @endphp
-
 @if(!empty($payments))
     <div class="row">
         <div class="col-lg-4 col-md-3 col-sm-12">
@@ -819,6 +843,9 @@
                 @if($additionalpaymentapprovedFormatted)
                     Pending Released: {{ $additionalpaymentapprovedFormatted }} - {{ $purchasingOrder->currency }}
                 @endif
+                @if($additionalpaymentalreadyappFormatted)
+                Pending Complete: {{ $additionalpaymentalreadyappFormatted }} - {{ $purchasingOrder->currency }}
+                @endif
             </span>
         </div>
         @if($additionalpaymentpendFormatted)
@@ -837,7 +864,7 @@
         @endphp
         @if ($hasPermission)
         <div class="col-lg-3 col-md-4 col-sm-6">
-        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Initiated Payment</button>
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForinitiatedPayment({{ $purchasingOrder->id }})">Initiated Payment</button>
         </div>
         @endif
         @endif
@@ -847,23 +874,23 @@
         @endphp
         @if ($hasPermission)
         <div class="col-lg-3 col-md-4 col-sm-6">
-        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Released</button>
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForreleasedPayment({{ $purchasingOrder->id }})">Released</button>
         </div>
+        @endif
         @endif
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('complete-additional-payment');
         @endphp
         @if ($hasPermission)
+        @if($additionalpaymentalreadyappFormatted)
         <div class="col-lg-3 col-md-4 col-sm-6">
-        <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Complete Payment</button>
+        <button id="approval-btn" class="btn btn-success btn-sm" onclick="completedadditionalpayment({{ $purchasingOrder->id }})">Complete Payment</button>
         </div>
         @endif
         @endif
     </div>
 @endif
                         @endif
-                    </div>
-                    @endif
                     @if ($purchasingOrder->pl_number)
                     <div class="row">
                         <div class="col-lg-4 col-md-3 col-sm-12">
@@ -2003,7 +2030,7 @@
   @endphp
   @if ($hasPermission)
                     <td>
-                    @if($transition->transaction_type == "Post-Debit" && $transition->status == "pending")
+                    @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
                         <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
                     @endif
@@ -3939,12 +3966,82 @@ function requestForAdditionalPayment(orderId) {
             _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
         },
         success: function(response) {
-            alert('Request successfully sent');
+            alertify.success('Request successfully sent');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
         },
         error: function(xhr) {
             alert('An error occurred');
         }
     });
 }
+function requestForinitiatedPayment(orderId) {
+    $.ajax({
+        url: '/request-initiated-payment',
+        type: 'POST',
+        data: {
+            id: orderId,
+            status: 'Approved',
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        },
+        success: function(response) {
+            alertify.success('Iniatiated Request successfully sent');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
+        },
+        error: function(xhr) {
+            alert('An error occurred');
+        }
+    });
+}
+function requestForreleasedPayment(orderId) {
+    $.ajax({
+        url: '/request-released-payment',
+        type: 'POST',
+        data: {
+            id: orderId,
+            status: 'Approved',
+            _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+        },
+        success: function(response) {
+            alertify.success('Released Payment successfully sent');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
+        },
+        error: function(xhr) {
+            alert('An error occurred');
+        }
+    });
+}
+function completedadditionalpayment(orderId) {
+    document.getElementById('statusadditional').value = 'Approved';
+    document.getElementById('orderIdadditional').value = orderId;
+    console.log(orderId);
+    $('#fileUploadModaladditional').modal('show');
+}
+document.getElementById('fileUploadFormadditional').addEventListener('submit', function(event) {
+    event.preventDefault();
+    let formData = new FormData(this);
+    let url = '{{ route('purchasing.completedadditionalpayment') }}';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('File upload successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        console.log('File upload failed', error);
+        window.location.reload();
+    });
+});
 </script>
 @endsection

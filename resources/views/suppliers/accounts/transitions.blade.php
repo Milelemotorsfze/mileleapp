@@ -62,7 +62,7 @@
   @endphp
   @if ($hasPermission)
                     <td>
-                    @if($transition->transaction_type == "Post-Debit" && $transition->status == "pending")
+                    @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
                         <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
                     @endif
