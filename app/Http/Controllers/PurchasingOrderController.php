@@ -1226,6 +1226,9 @@ public function getBrandsAndModelLines(Request $request)
         foreach ($groupedTransitions as $po_number => $transactions) {
         foreach ($transactions as $index => $transaction) {
         $transaction->row_number = $index + 1;
+        $transaction->vehicle_count = \DB::table('vehicles_supplier_account_transaction')
+                                        ->where('sat_id', $transaction->id)
+                                        ->count();
         }
         }
         $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();

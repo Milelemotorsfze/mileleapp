@@ -2006,6 +2006,7 @@
                                 <th>Transaction Amount</th>
                                 <th>Currency</th>
                                 <th>Transaction By</th>
+                                <th>Vehicle Count</th>
                                 <th>Remarks</th>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
@@ -2024,6 +2025,7 @@
                     <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
                     <td>{{ $transition->account_currency }}</td>
                     <td>{{ $transition->user->name }}</td>
+                    <td>{{ $transition->vehicle_count }}</td>
                     <td>{{ $transition->remarks }}</td>
                     @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
