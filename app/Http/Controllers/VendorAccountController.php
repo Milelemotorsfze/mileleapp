@@ -79,12 +79,18 @@ class VendorAccountController extends Controller
                     ->with('purchaseOrder')
                     ->orderBy('created_at', 'asc')
                     ->get();
+                    
     $groupedTransitions = $transitions->groupBy('purchaseOrder.po_number');
     foreach ($groupedTransitions as $po_number => $transactions) {
         foreach ($transactions as $index => $transaction) {
             $transaction->row_number = $index + 1;
+            // Count the number of vehicles for this transaction
+            $transaction->vehicle_count = \DB::table('vehicles_supplier_account_transaction')
+                                            ->where('sat_id', $transaction->id)
+                                            ->count();
         }
     }
+    
     $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
     return view('suppliers.accounts.transitions', compact('transitions', 'accounts'));
 }
