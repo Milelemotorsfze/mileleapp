@@ -93,6 +93,7 @@
                                     <th>So Number</th>
                                     <th>Country</th>
                                     <th> Status</th>
+                                    <th>Is Expired</th>
                                     <th>Supplier Approval</th>
                                     <th>LOI</th>
                                     <th>Actions</th>
@@ -103,8 +104,8 @@
                                 </div>
                                 @foreach ($newLOIs as $key => $letterOfIndent)
                                     <tr>
-                                        <td> {{ ++$i }}</td>
-                                        <td> {{ $letterOfIndent->uuid }}</td>
+                                        <td>{{ ++$i }}</td>
+                                        <td>{{ $letterOfIndent->uuid }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->client->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
@@ -116,15 +117,24 @@
                                             @endforeach
                                          </td>
                                         <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
-                                        <td>{{ $letterOfIndent->status }}</td>
+                                        <td>
+                                             {{ $letterOfIndent->status }}
+                                         
+                                         </td>
+                                         <td>  
+                                            @if($letterOfIndent->is_loi_expired == true)
+                                            Expired  @else  Not Expired @endif
+                                        </td>
                                         <td>
                                             @can('LOI-approve')
                                                 @php
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                                 @endphp
                                                 @if ($hasPermission)
+                                                    @if($letterOfIndent->is_expired == false)
                                                         <button type="button" data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indent.request-supplier-approval') }}"
                                                                 class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>
+                                                    @endif
                                                 @endif
                                             @endcan
                                         </td>
@@ -298,6 +308,7 @@
                                     <th>Country</th>
                                     <th>LOI Quantity</th>
                                     <th>Status</th>
+                                    <th>Is Expired</th>
                                     <th>LOI</th>
                                     <th>Remarks</th>
                                     <th>Approve/Reject</th>
@@ -323,8 +334,16 @@
                                         </td>
                                         <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->total_loi_quantity }}</td>
-                                        <td>{{ $letterOfIndent->status }}</td>
+                                        <td> 
+                                             {{ $letterOfIndent->status }}
+                                         
+                                        </td>
+                                        <td>  
+                                            @if($letterOfIndent->is_loi_expired == true)
+                                            Expired  @else  Not Expired @endif
+                                        </td>
                                         <td>
+                                           
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
                                                 <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
                                                     {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
@@ -338,11 +357,14 @@
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+                                                    @if($letterOfIndent->is_expired == false)
+                                                        <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
+                                                                data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
 
-                                                    <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
+                                                        <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
+                                                                data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
+                                                    
+                                                    @endif
                                                 @endif
                                             @endcan
                                         </td>
@@ -715,17 +737,19 @@
                                         </td>
                                         <td>{{ $letterOfIndent->review }}</td>                                   
                                         <td>
-                                            <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm mt-1" data-bs-toggle="modal" 
-                                            data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
-                                                <i class="fa fa-save"></i>
-                                            </button>
+                                             @if($letterOfIndent->is_expired == false)
+                                                <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm mt-1" data-bs-toggle="modal" 
+                                                data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
+                                                    <i class="fa fa-save"></i>
+                                                </button>
+                                            @endif
                                             <!-- allow only not expired LOI to ctreate PFI -->
                                             @can('PFI-create')
                                                 @php
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                   @if($letterOfIndent->is_loi_expired == false)
+                                                   @if($letterOfIndent->is_expired == false)
                                                         <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                                                             <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
                                                         </a>
