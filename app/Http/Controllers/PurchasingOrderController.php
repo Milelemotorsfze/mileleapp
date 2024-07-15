@@ -520,7 +520,10 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated')
+            ->where(function($query) {
+                $query->where('vehicles.payment_status', 'Payment Initiated')
+                      ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
+            })
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -534,7 +537,10 @@ else
         // })
         ->where('purchasing_order.status', $status)
         ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-        ->where('vehicles.payment_status', 'Payment Initiated')
+        ->where(function($query) {
+            $query->where('vehicles.payment_status', 'Payment Initiated')
+                  ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
+        })
         ->select('purchasing_order.*')
         ->groupBy('purchasing_order.id')
         ->get();
@@ -622,7 +628,10 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->where(function($query) {
+                $query->where('vehicles.payment_status', 'Payment Initiated Request')
+                      ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
+            })
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -636,7 +645,10 @@ else
             // })
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->where(function($query) {
+                $query->where('vehicles.payment_status', 'Payment Initiated Request')
+                      ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
+            })
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -673,7 +685,10 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Approved')
+            ->where(function($query) {
+                $query->where('vehicles.payment_status', 'Payment Release Approved')
+                      ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
+            })
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -684,7 +699,10 @@ else
             // ->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Approved')
+            ->where(function($query) {
+                $query->where('vehicles.payment_status', 'Payment Release Approved')
+                      ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
+            })
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
