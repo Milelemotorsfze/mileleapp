@@ -37,7 +37,6 @@ class WOVehicles extends Model
         'updated_by',
         'deleted_by',
         'deposit_received',
-        'comment_id',
         'deleted_comment_id',
     ];
     protected $appends = [

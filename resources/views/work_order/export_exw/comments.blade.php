@@ -256,11 +256,10 @@
                 </table>
             `;
         }
-
-       // Process new_vehicles for additional divs
         let newVehiclesHtml = '';
+
         if (new_vehicles.length >= 1) {
-            const orderedNewVehicles = new_vehicles.sort((a, b) => a.vin.localeCompare(b.vin));
+            const orderedNewVehicles = new_vehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             newVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
@@ -289,8 +288,8 @@
             orderedNewVehicles.forEach(item => {
                 // Helper function to find new_value for a specific field_name
                 const getFieldValue = (field_name, default_value) => {
-                    const detail = item.comment_vehicle && item.comment_vehicle.find(detail => detail.field_name === field_name);
-                    return detail ? detail.new_value : (item[field_name] || default_value);
+                    const detail = item.record_histories.find(detail => detail.field_name === field_name);
+                    return detail ? detail.new_value : (item.vehicle[field_name] || default_value);
                 };
 
                 const brandValue = getFieldValue('brand', '');
@@ -307,16 +306,15 @@
                 const importDocumentTypeNameValue = getFieldValue('import_document_type_name', '');
                 const ownershipNameValue = getFieldValue('ownership_name', '');
 
-                // const viewMoreClass = item.deleted_at ? 'view-more-btn-removed' : 'view-more-btn';
                 const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
 
                 newVehiclesHtml += `
                     <tr style="border:1px solid #e9e9ef;">
                         <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View More">ViewMore</a>
-                            ${item.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vin}" data-id="${item.id}" title="View Current Record">CurrentRecord</a>` : ''}
+                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View More">ViewMore</a>
+                            ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
                         </td>
-                        <td>${item.vin || ''}</td>
+                        <td>${item.vehicle.vin || ''}</td>
                         <td>${brandValue}</td>
                         <td>${variantValue}</td>
                         <td>${engineValue}</td>
@@ -401,10 +399,10 @@
             `;        
         }
 
-        // Process updated_vehicles for additional div
+        // Process updated_vehicles for additional divs
         let updatedVehiclesHtml = '';
         if (updated_vehicles.length >= 1) {
-            const orderedUpdatedVehicles = updated_vehicles.sort((a, b) => a.vin.localeCompare(b.vin));
+            const orderedUpdatedVehicles = updated_vehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             updatedVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
@@ -424,8 +422,8 @@
                 updatedVehiclesHtml += `
                     <tr>
                         <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; border-top:2px solid #e1e1ea;">
-                           <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View More">ViewMore</a>
-                            ${item.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vin}" data-id="${item.id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vin} details updated as follows
+                        <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View More">ViewMore</a>
+                            ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vehicle.vin} details updated as follows
                         </th>
                     </tr>
                     <tr style="border-width: 1;">
@@ -436,21 +434,19 @@
                     </tr>
                 `;
 
-                // Sort the details by field name in ascending order
-                const sortedDetails = item.comment_updated_vehicle.sort((a, b) => a.field_name.localeCompare(b.field_name));
+                // Sort the record_histories by field name in ascending order
+                const sortedDetails = item.record_histories.sort((a, b) => a.field_name.localeCompare(b.field_name));
 
-                // Loop through each sorted comment_updated_vehicle and create table rows
+                // Loop through each sorted record_history and create table rows
                 sortedDetails.forEach(detail => {
-                    if (detail.comment_id === commentData.id) {
-                        updatedVehiclesHtml += `
-                            <tr style="border:1px solid #e9e9ef;">
-                                <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field_name || ''}</td>
-                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
-                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.old_value || ''}</td>
-                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.new_value || ''}</td>
-                            </tr>
-                        `;
-                    }
+                    updatedVehiclesHtml += `
+                        <tr style="border:1px solid #e9e9ef;">
+                            <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field_name || ''}</td>
+                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
+                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.old_value || ''}</td>
+                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.new_value || ''}</td>
+                        </tr>
+                    `;
                 });
             });
 

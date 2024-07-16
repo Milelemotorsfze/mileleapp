@@ -8,6 +8,7 @@ use App\Models\WOVehicleRecordHistory;
 use App\Models\WOVehicleAddons;
 use App\Models\WOVehicleAddonRecordHistory;
 use App\Models\WOComments;
+use App\Models\CommentVehicleMapping;
 use App\Models\CommentFile;
 use App\Models\WORecordHistory;
 use App\Models\Customer;
@@ -775,6 +776,7 @@ class WorkOrderController extends Controller
                 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'new_customer_name', 'existing_customer_name','customer_name','customer_reference_id',
                 'is_brn_file_delete','is_signed_pfi_delete','is_signed_contract_delete','is_payment_receipts_delete','is_noc_delete',
                 'is_enduser_trade_license_delete','is_enduser_passport_delete','is_enduser_contract_delete','is_vehicle_handover_person_id_delete',
+                'vin_multiple',
             ];
 
             // Filter $newData to exclude array values and fields in the exclude list
@@ -919,11 +921,19 @@ class WorkOrderController extends Controller
                 ];
                
                 // Update if exists, otherwise create
-                if (isset($existingVehicles[$id])) {
-                    
+                if (isset($existingVehicles[$id])) {                    
                     // Mark this VIN as processed
                     $processedIds[] = $id; 
                     $vehicle = $existingVehicles[$id];
+
+                    $createVehComMap = [];
+                    $createVehComMap['type'] = 'update';
+                    $createVehComMap['comment_id'] = $CommentId;
+                    $createVehComMap['vehicle_id'] = $vehicle->id;
+                    $createVehComMap['wo_id'] = $workOrder->id;
+                    $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
+                    $canDeleteComment = false;
+
                     $vehicleData['updated_by'] = Auth::id();
                     // Filter out non-null, non-array values, and exclude specified fields
                     $filterredVehicleData = array_filter($vehicleData, function ($value, $key) use ($excludeVehicleFields) {
@@ -951,9 +961,8 @@ class WorkOrderController extends Controller
                                 'type' => $changeType,
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
-                                'comment_id' => $CommentId,
+                                'comment_vehicle_id' => $CreatedVehComMap->id,
                             ]);
-                            $canDeleteComment = false;
                         }
                     }
                     $vehicle->updated_by = $authId;
@@ -1087,6 +1096,16 @@ class WorkOrderController extends Controller
                     $vehicleData['comment_id'] = $CommentId;
                     $canDeleteComment = false;
                     $woVehicles = WOVehicles::create($vehicleData);
+
+                    $createVehComMap = [];
+                    $createVehComMap['type'] = 'store';
+                    $createVehComMap['comment_id'] = $CommentId;
+                    $createVehComMap['vehicle_id'] = $woVehicles->id;
+                    $createVehComMap['wo_id'] = $workOrder->id;
+                    $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
+                    $canDeleteComment = false;
+
+
                     // Push the newly created vehicle's ID into the array
                     $NewVehicleIdArr[] = $woVehicles->id;
                     // Filter out non-null, non-array values, and exclude specified fields
@@ -1104,9 +1123,8 @@ class WorkOrderController extends Controller
                             'type' => 'Set',
                             'user_id' => Auth::id(),
                             'changed_at' => Carbon::now(),
-                            'comment_id' =>$CommentId,
+                            'comment_vehicle_id' =>$CreatedVehComMap->id,
                         ]);
-                        $canDeleteComment = false;
                     }
 
 
@@ -1213,7 +1231,7 @@ class WorkOrderController extends Controller
                                         'type' => 'Unset',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' => null,
+                                        // 'comment_id' => null,
                                     ]);
                                 } else {
                                     WOVehicleRecordHistory::create([
@@ -1224,9 +1242,9 @@ class WorkOrderController extends Controller
                                         'type' => 'Unset',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' => $CommentId,
+                                        // 'comment_id' => $CommentId,
                                     ]);
-                                    $canDeleteComment = false;
+                                    // $canDeleteComment = false;
                                 }
                             }
                         }
@@ -1259,7 +1277,7 @@ class WorkOrderController extends Controller
                                             'type' => $changeType,
                                             'user_id' => Auth::id(),
                                             'changed_at' => Carbon::now(),
-                                            'comment_id' =>null,
+                                            // 'comment_id' =>null,
                                         ]);
                                     }
                                     else {
@@ -1271,9 +1289,9 @@ class WorkOrderController extends Controller
                                             'type' => $changeType,
                                             'user_id' => Auth::id(),
                                             'changed_at' => Carbon::now(),
-                                            'comment_id' =>$CommentId,
+                                            // 'comment_id' =>$CommentId,
                                         ]);
-                                        $canDeleteComment = false;
+                                        // $canDeleteComment = false;
                                     }
                                 }
                             }
@@ -1310,11 +1328,11 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' =>$woVehicles->comment_id,
+                                        // 'comment_id' =>$woVehicles->comment_id,
                                     ]);
-                                    if($woVehicles->comment_id == $CommentId) {
-                                        $canDeleteComment = false;
-                                    }
+                                    // if($woVehicles->comment_id == $CommentId) {
+                                    //     $canDeleteComment = false;
+                                    // }
                                 }
                                 else {
                                     // Create history record
@@ -1326,9 +1344,9 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' =>$CommentId,
+                                        // 'comment_id' =>$CommentId,
                                     ]);
-                                    $canDeleteComment = false;
+                                    // $canDeleteComment = false;
                                 }
                             }
                         } else {
@@ -1348,11 +1366,11 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' =>$vinUpdate->comment_id,
+                                        // 'comment_id' =>$vinUpdate->comment_id,
                                     ]);
-                                    if($vinUpdate->comment_id == $CommentId) {
-                                        $canDeleteComment = false;
-                                    }
+                                    // if($vinUpdate->comment_id == $CommentId) {
+                                    //     $canDeleteComment = false;
+                                    // }
                                 }
                                 else {
                                     // Create history record
@@ -1364,9 +1382,9 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_id' =>$CommentId,
+                                        // 'comment_id' =>$CommentId,
                                     ]);
-                                    $canDeleteComment = false;
+                                    // $canDeleteComment = false;
                                 }
                             }
                         }
@@ -1388,11 +1406,11 @@ class WorkOrderController extends Controller
                                 'type' => 'Change',
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
-                                'comment_id' =>$woVehicles->comment_id,
+                                // 'comment_id' =>$woVehicles->comment_id,
                             ]);
-                            if($woVehicles->comment_id == $CommentId) {
-                                $canDeleteComment = false;
-                            }
+                            // if($woVehicles->comment_id == $CommentId) {
+                            //     $canDeleteComment = false;
+                            // }
                         }
                         else {
                             // Create history record
@@ -1404,9 +1422,9 @@ class WorkOrderController extends Controller
                                 'type' => 'Change',
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
-                                'comment_id' =>$CommentId,
+                                // 'comment_id' =>$CommentId,
                             ]);
-                            $canDeleteComment = false;
+                            // $canDeleteComment = false;
                         }
                     }
                     $woVehicle->deposit_received = 'no';
@@ -1532,10 +1550,8 @@ class WorkOrderController extends Controller
     public function getComments($workOrderId)
     {
         $comments = WOComments::where('work_order_id', $workOrderId)
-            ->with('files', 'user', 'wo_histories', 'new_vehicles.commentVehicle', 'removed_vehicles')
-            ->with(['updated_vehicles' => function ($query) {
-                $query->with('commentUpdatedVehicle'); // Fetch all related comment vehicles
-            }])
+            ->with('files', 'user', 'wo_histories', 'removed_vehicles','new_vehicles.vehicle','updated_vehicles.vehicle',
+            'new_vehicles.recordHistories','updated_vehicles.recordHistories')
             ->get();
         return response()->json(['comments' => $comments]);
     }
