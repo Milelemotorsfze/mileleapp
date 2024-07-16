@@ -367,8 +367,7 @@
 
             const file = files[0];
             let size = file.size;
-            alert(size);
-
+           
             const objectUrl = URL.createObjectURL(file);
             const iframe = document.createElement("iframe");
             iframe.src = objectUrl;
