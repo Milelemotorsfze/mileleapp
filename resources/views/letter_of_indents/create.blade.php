@@ -329,7 +329,7 @@
     @endcan
 @endsection
 @push('scripts')
-
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/additional-methods.js"></script>
     <script type="text/javascript">
         let formValid = true;
         let previousSelected = $('#customer-type').val();
@@ -363,8 +363,11 @@
             while (signaturePreviewFile.firstChild) {
                 signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
             }
+          
 
             const file = files[0];
+            let size = file.size;
+            alert(size);
 
             const objectUrl = URL.createObjectURL(file);
             const iframe = document.createElement("iframe");
@@ -408,7 +411,8 @@
                 },
                 "files[]": {
                     required:true,
-                    extension: "png|jpeg|jpg"
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880 
                 },
                 "template_type[]":{
                     required:true
@@ -417,8 +421,10 @@
                     required:function(element) {
                         return $("#dealer").val() == 'Milele Motors'
                     },
-                    extension: "png|jpeg|jpg|svg"
-                }
+                    extension: "png|jpeg|jpg|svg",
+                    maxsize:5242880 
+                },
+               
             },
                 
             messages: {
