@@ -104,17 +104,13 @@
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
     </div>
-</div>
-    <!-- @if(!empty($imageFiles)) -->
-        <!-- <div class="page_break"></div> -->
-       
         <div class="row">
-            @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
-            <img src="{{ public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  class="mt-2">
+            @foreach($letterOfIndent->LOIDocuments as $LOIDocument)
+                 <img src="{{ public_path('LOI-Documents/'.$LOIDocument->loi_document_file) }}"  class="mt-2">
             @endforeach
         </div>
-  
-    <!-- @endif -->
+</div>
+    
 </body>
 </html>
 
