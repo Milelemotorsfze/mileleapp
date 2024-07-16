@@ -83,7 +83,7 @@ class LetterOfIndentController extends Controller
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Clients::whereNotNull('country_id')->get();
         $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
-        $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
+        $salesPersons = User::where('status','active')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models','salesPersons'));
     }
@@ -142,7 +142,7 @@ class LetterOfIndentController extends Controller
 
             $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
             $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
-            $customerYearCode = $yearCode."-".$nextLoiCount;
+            $customerYearCode = $yearCode.''.$nextLoiCount;
 
             $LOI->uuid = $uuid;
             $LOI->year_code = $customerYearCode;
@@ -410,7 +410,7 @@ class LetterOfIndentController extends Controller
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Clients::whereNotNull('country_id')->get();
         $possibleCustomers = Clients::where('country_id', $letterOfIndent->client->country_id)->get();
-        $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
+        $salesPersons = User::where('status','active')->get();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
             $models = MasterModel::where('is_transcar', true);

@@ -64,10 +64,10 @@
                                 @endif
                             </td>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                             <td class="fw-bold" style="padding-left: 20px;">  Type: </td>
                             <td>Brand New</td>
-                        </tr>
+                        </tr> -->
                         <tr>
                             <td class="fw-bold" style="padding-left: 20px;"> Quantity:  </td>
                             <td> {{ $letterOfIndentItem->quantity ?? '' }}</td>
