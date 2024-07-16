@@ -1,6 +1,19 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+   .select2-container {
+      z-index: 2050; /* Adjust this value as needed */
+      width: 100% !important;
+    }
+    .select2-selection {
+      width: 100% !important;
+    }
+    .modal-dialog {
+      max-width: 90%;
+    }
+    .dataTables_wrapper {
+      width: 100%;
+    }
 .comments-header {
     position: sticky;
     top: 0;
@@ -138,6 +151,84 @@
     }
 </style>
 @section('content')
+<!-- Modal -->
+<div class="modal fade" id="purchaseOrderModal" tabindex="-1" role="dialog" aria-labelledby="purchaseOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="purchaseOrderModalLabel">Initiate Payments</h5>
+                <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="radioPurchasedOrder" name="paymentOption" value="purchasedOrder" class="form-check-input">
+                        <label for="radioPurchasedOrder" class="form-check-label">Initiate payment for Purchased Order</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="radio" id="radioVehicle" name="paymentOption" value="vehicle" class="form-check-input">
+                        <label for="radioVehicle" class="form-check-label">Vehicle</label>
+                    </div>
+                </div>
+                <div id="purchasedOrderOptions" style="display: none;">
+                    <div class="form-group">
+                        <label for="purchasedOrderDropdown">Select Payment Option:</label>
+                        <select id="purchasedOrderDropdown" class="form-control">
+                            <option value="">Select an option</option>
+                            <option value="equalDivided">Equal Divided to All Vehicles</option>
+                            <option value="purchasedOrderPayment">Purchased Order Payment</option>
+                        </select>
+                    </div>
+                    <div id="amountInput" class="form-group" style="display: none;">
+                        <label for="amount">Enter Amount:</label>
+                        <input type="number" id="amount" name="amount" class="form-control">
+                        <p id="amountDivisionResult" style="display: none;" class="mt-2"></p>
+                    </div>
+                </div>
+                <br>
+                <div id="vehicleOptions" style="display: none;">
+                    <div class="form-group">
+                        <label for="vehicleDropdown">Select Vehicle Option:</label>
+                        <select id="vehicleDropdown" class="form-control">
+                            <option value="">Select an option</option>
+                            <option value="allVehicles">All Vehicles</option>
+                            <option value="oneByOne">One by One</option>
+                        </select>
+                    </div>
+                    <div id="vehicleSelection" class="form-group" style="display: none;">
+                        <label for="vehicleSelectDropdown">Select Vehicle:</label>
+                        <select id="vehicleSelectDropdown" class="form-control" multiple="multiple">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive" id="vehicleTableContainer" style="display: none;">
+                    <table id="vehicleTable" class="table table-striped table-bordered mt-3">
+                        <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Ref No</th>
+                                <th>Brand</th>
+                                <th>Model Line</th>
+                                <th>Variant</th>
+                                <th>VIN</th>
+                                <th>Total Price</th>
+                                <th>Initiate Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTableBody">
+                            <!-- Rows will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="saveDetails">Save</button>
+                <button type="button" class="btn btn-primary" id="submitPercentage">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="percentageModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="percentageModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -1062,12 +1153,6 @@
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Initiation Requested</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
                             <td style="font-size: 12px;">Procurement</td>
@@ -1239,7 +1324,7 @@
                                         <label for="choices-single-default" class="form-label"><strong>Initiate Payment Request</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreq('Approved', {{ $purchasingOrder->id }})">Request for All</button>
+                                    <button id="approval-btn" class="btn btn-success" onclick="openPurchaseOrderModal({{ $purchasingOrder->id }})">Request for All</button>
                                     </div>
                                 @endif
                             @endif
@@ -1596,12 +1681,11 @@
                         </a>
                         @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment' && is_null($vehicles->grn_id))
                         <form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
-    @csrf
-</form>
-
-<a id='cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" onclick="event.preventDefault(); document.getElementById('cancel-form-{{ $vehicles->id }}').submit();">
-    Reject / Cancel
-</a>
+                            @csrf
+                        </form>
+                        <a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
+                            Reject / Cancel
+                        </a>
                         @elseif ($vehicles->status == 'Rejected')
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
                             Un-Reject
@@ -1650,19 +1734,6 @@
 											@endif
 											{{-- End For Vendor Confirm  --}}
 						{{-- End For Management  --}}
-						{{-- For Initiate Payment Procurement  --}}
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-										@endphp
-										@if ($hasPermission)
-										@if ($purchasingOrder->status === 'Approved')
-										@if ($vehicles->status === 'Approved' && $vehicles->payment_status === '')
-										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Initiate Payment
-										</a>
-										@endif
-										@endif
-										@endif
                                         @php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 										@endphp
@@ -1793,12 +1864,12 @@
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
                                 @if($vehicles->status !== "Request for Cancel" && is_null($vehicles->grn_id))
 								<form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
-    @csrf
-</form>
+                                    @csrf
+                                </form>
 
-<a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" onclick="event.preventDefault(); document.getElementById('cancel-form-{{ $vehicles->id }}').submit();">
-    Cancel
-</a>
+                                <a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
+                                    Cancel
+                                </a>
                                 @endif
 								@elseif ($vehicles->status === 'Pending Approval' && is_null($vehicles->grn_id))
 								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
@@ -2860,14 +2931,16 @@ function postUpdateStatus(status, orderId, remarks = '') {
 
         </script>
   <script>
- $(document).ready(function() {
+$(document).ready(function() {
     var cancelUrl;
+    
     $('#cancelButtonveh').click(function(event) {
-                event.preventDefault(); // Prevent the default action (navigation)
-        cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
+        event.preventDefault(); // Prevent the default action (navigation)
+        cancelUrl = $(this).data('url'); // Store the URL to redirect to after confirmation
         $('#confirmationvehModal').modal('show'); // Show the modal
-            });
-			$('#confirmvehCancel').click(function() {
+    });
+
+    $('#confirmvehCancel').click(function() {
         var remarks = $('#remarksveh').val(); // Get the remarks from the textarea
         if (!remarks) {
             alert('Please provide remarks.');
@@ -2885,7 +2958,7 @@ function postUpdateStatus(status, orderId, remarks = '') {
             success: function(response) {
                 $('#confirmationvehModal').modal('hide'); // Hide the modal
                 alert('Remarks submitted successfully');
-                window.location.href = window.location.href; // Redirect to the cancel URL
+                window.location.href = window.location.href; // Redirect to the current URL
             },
             error: function(xhr) {
                 console.error('Error:', xhr);
@@ -2893,7 +2966,7 @@ function postUpdateStatus(status, orderId, remarks = '') {
             }
         });
     });
-           });
+});
         </script>
         <script>
             function confirmPayment() {
@@ -3369,7 +3442,6 @@ $(document).ready(function() {
 <script>
 $(document).ready(function() {
     var cancelUrl;
-
     $('#cancelButton').click(function(event) {
         event.preventDefault(); // Prevent the default action (navigation)
         cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
@@ -4045,5 +4117,227 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         window.location.reload();
     });
 });
+</script>
+<script>
+    let vehicleTable;
+
+    function openPurchaseOrderModal(purchaseOrderId) {
+        $('#purchaseOrderModal').data('purchaseOrderId', purchaseOrderId);
+        $('#purchaseOrderModal').modal('show');
+    }
+
+    $(document).ready(function() {
+        $('#vehicleSelectDropdown').select2({
+            width: '100%'
+        });
+
+        $('input[name="paymentOption"]').change(function() {
+            if (this.value === 'purchasedOrder') {
+                $('#purchasedOrderOptions').show();
+                $('#vehicleOptions').hide();
+                $('#vehicleTableContainer').hide();
+            } else if (this.value === 'vehicle') {
+                $('#purchasedOrderOptions').hide();
+                $('#vehicleOptions').show();
+            }
+        });
+
+        $('#purchasedOrderDropdown').change(function() {
+            if (this.value === 'equalDivided' || this.value === 'purchasedOrderPayment') {
+                $('#amountInput').show();
+            } else {
+                $('#amountInput').hide();
+                $('#amountDivisionResult').hide();
+            }
+        });
+
+        $('#amount').on('input', function() {
+            const amount = parseFloat(this.value);
+            const purchaseOrderId = $('#purchaseOrderModal').data('purchaseOrderId');
+            if ($('#purchasedOrderDropdown').val() === 'equalDivided') {
+                $.ajax({
+                    url: `/getVehicles/${purchaseOrderId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        const vehicleCount = response.length;
+                        const dividedAmount = amount / vehicleCount;
+                        $('#amountDivisionResult').text(`Amount per vehicle: ${dividedAmount}`).show();
+                    }
+                });
+            } else {
+                $('#amountDivisionResult').hide();
+            }
+        });
+
+        $('#vehicleDropdown').change(function() {
+            if (this.value === 'allVehicles') {
+                $('#vehicleSelection').hide();
+                const purchaseOrderId = $('#purchaseOrderModal').data('purchaseOrderId');
+                $.ajax({
+                    url: `/getVehicles/${purchaseOrderId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
+                            vehicleTable = $('#vehicleTable').DataTable();
+                        } else {
+                            vehicleTable.clear().draw();
+                        }
+                        response.forEach(vehicle => {
+                            const formattedPrice = formatPrice(vehicle.vehicle_purchasing_cost ? vehicle.vehicle_purchasing_cost.unit_price : 'N/A');
+                            vehicleTable.row.add([
+                                vehicle.id,
+                                vehicle.variant.brand.brand_name,
+                                vehicle.variant.master_model_lines.model_line,
+                                vehicle.variant.name,
+                                vehicle.vin,
+                                formattedPrice,
+                                `<input type="number" class="form-control" name="newPrice${vehicle.id}" id="newPrice${vehicle.id}" value="${vehicle.vehicle_purchasing_cost ? vehicle.vehicle_purchasing_cost.unit_price : ''}">`,
+                                `<button class="btn btn-danger btn-sm" onclick="removeVehicleRow(this, ${vehicle.id})">X</button>`
+                            ]).draw(false);
+                        });
+                        $('#vehicleTableContainer').show();
+                    }
+                });
+            } else if (this.value === 'oneByOne') {
+                $('#vehicleSelection').show();
+                const purchaseOrderId = $('#purchaseOrderModal').data('purchaseOrderId');
+                $.ajax({
+                    url: `/getVehicles/${purchaseOrderId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        const vehicleSelectDropdown = $('#vehicleSelectDropdown');
+                        vehicleSelectDropdown.empty();
+                        response.forEach(vehicle => {
+                            vehicleSelectDropdown.append(`<option value="${vehicle.id}">${vehicle.id}</option>`);
+                        });
+                        $('#vehicleTableContainer').show();
+                        if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
+                            vehicleTable = $('#vehicleTable').DataTable();
+                        }
+                    }
+                });
+            } else {
+                $('#vehicleSelection').hide();
+                $('#vehicleTableContainer').hide();
+            }
+        });
+
+        $('#vehicleSelectDropdown').change(function() {
+            const selectedVehicles = $(this).val();
+            selectedVehicles.forEach(vehicleId => {
+                $.ajax({
+                    url: `/getVehicleDetails/${vehicleId}`,
+                    method: 'GET',
+                    success: function(response) {
+                        const formattedPrice = formatPrice(response.vehicle_purchasing_cost ? response.vehicle_purchasing_cost.unit_price : 'N/A');
+                        vehicleTable.row.add([
+                            response.id,
+                            response.variant.brand.brand_name,
+                            response.variant.master_model_lines.model_line,
+                            response.variant.name,
+                            response.vin,
+                            formattedPrice,
+                            `<input type="number" class="form-control" name="newPrice${response.id}" id="newPrice${response.id}" value="${response.vehicle_purchasing_cost ? response.vehicle_purchasing_cost.unit_price : ''}">`,
+                            `<button class="btn btn-danger btn-sm" onclick="removeVehicleRow(this, ${response.id})">X</button>`
+                        ]).draw(false);
+                        $(`#vehicleSelectDropdown option[value="${response.id}"]`).prop('disabled', true);
+                        $('#vehicleTableContainer').show();
+                        $('#vehicleSelectDropdown').select2();
+                    }
+                });
+            });
+        });
+
+        $('#vehicleSelectDropdown').on('select2:unselect', function(e) {
+            const vehicleId = e.params.data.id;
+            removeVehicleRowById(vehicleId);
+        });
+
+        $('#saveDetails').click(function() {
+            const data = gatherFormData();
+            $.ajax({
+                url: '/savePaymentDetails',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    alert('Details saved successfully!');
+                    $('#purchaseOrderModal').modal('hide');
+                },
+                error: function() {
+                    alert('Failed to save details.');
+                }
+            });
+        });
+
+        $('#submitPercentage').click(function() {
+            const data = gatherFormData();
+            $.ajax({
+                url: '/submitPaymentDetails',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    alert('Details submitted successfully!');
+                    $('#purchaseOrderModal').modal('hide');
+                    location.reload();
+                },
+                error: function() {
+                    alert('Failed to submit details.');
+                }
+            });
+        });
+    });
+
+    function removeVehicleRow(button, vehicleId) {
+        const row = $(button).closest('tr');
+        const table = $('#vehicleTable').DataTable();
+        table.row(row).remove().draw();
+        $(`#vehicleSelectDropdown option[value="${vehicleId}"]`).prop('disabled', false);
+        $('#vehicleSelectDropdown').select2();
+    }
+
+    function removeVehicleRowById(vehicleId) {
+        const table = $('#vehicleTable').DataTable();
+        table.rows().every(function() {
+            if (this.data()[0] == vehicleId) {
+                this.remove().draw();
+            }
+        });
+        $(`#vehicleSelectDropdown option[value="${vehicleId}"]`).prop('disabled', false);
+        $('#vehicleSelectDropdown').select2();
+    }
+
+    function gatherFormData() {
+        const paymentOption = $('input[name="paymentOption"]:checked').val();
+        const purchaseOrderId = $('#purchaseOrderModal').data('purchaseOrderId');
+        const data = {
+            paymentOption: paymentOption,
+            purchaseOrderId: purchaseOrderId
+        };
+
+        if (paymentOption === 'purchasedOrder') {
+            data.purchasedOrderOption = $('#purchasedOrderDropdown').val();
+            data.amount = $('#amount').val();
+        } else if (paymentOption === 'vehicle') {
+            data.vehicles = [];
+            $('#vehicleTable tbody tr').each(function() {
+                const row = $(this);
+                const vehicleId = row.find('td').eq(0).text();
+                const initiatedPrice = row.find('input').val();
+                data.vehicles.push({
+                    vehicleId: vehicleId,
+                    initiatedPrice: initiatedPrice
+                });
+            });
+        }
+
+        return data;
+    }
+
+    function formatPrice(price) {
+        if (price === 'N/A') return price;
+        return parseInt(price).toLocaleString('en-US');
+    }
 </script>
 @endsection

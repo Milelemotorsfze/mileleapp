@@ -919,6 +919,11 @@ Route::get('/d', function () {
     Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     
+    Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
+    Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
+    Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
+    Route::post('/savePaymentDetails', [PurchasingOrderController::class, 'savePaymentDetails']);
+    Route::post('/submitPaymentDetails', [PurchasingOrderController::class, 'submitPaymentDetails']);
 
 
 
