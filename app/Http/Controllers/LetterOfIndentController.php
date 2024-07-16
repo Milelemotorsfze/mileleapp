@@ -298,7 +298,9 @@ class LetterOfIndentController extends Controller
                 try{
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
-
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
                 // $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 // $directory = public_path('LOI');
                 // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
@@ -310,9 +312,7 @@ class LetterOfIndentController extends Controller
                     // $letterOfIndent->loi_document_file = $fileName;
                     // $letterOfIndent->save();
                     return $pdfFile->download($fileName);
-                }catch (\Exception $e){
-                    return $e->getMessage();
-                }
+               
 
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
@@ -531,6 +531,7 @@ class LetterOfIndentController extends Controller
             $LOI->LOITemplates()->delete();
             if($request->deletedIds) {
                 LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
+                // delet ethe corresponding file also
             }
 
             $quantities = $request->quantity;
