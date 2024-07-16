@@ -109,7 +109,8 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI)
         {
-            DB::beginTransaction();        
+            DB::beginTransaction();      
+            try{
 
             $LOI = new LetterOfIndent();
             $LOI->client_id = $request->client_id;
@@ -231,7 +232,9 @@ class LetterOfIndentController extends Controller
                     $LOITemplate->save();
                 }
             }
-            
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
 
             DB::commit();
 
@@ -272,7 +275,7 @@ class LetterOfIndentController extends Controller
             $width = $request->width;
 
             if($request->download == 1) {
-                
+                try{ 
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
@@ -280,7 +283,7 @@ class LetterOfIndentController extends Controller
                 // $directory = public_path('LOI');
                 // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 // $pdfFile->save($directory . '/' . $filename);
-                try{
+              
                 //      $pdf = $this->pdfMerge($letterOfIndent->id);
                     return $pdfFile->download($fileName);
                 }catch (\Exception $e){
@@ -291,7 +294,7 @@ class LetterOfIndentController extends Controller
         }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
                 $width = $request->width;
-
+                try{
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
@@ -299,7 +302,7 @@ class LetterOfIndentController extends Controller
                 // $directory = public_path('LOI');
                 // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 // $pdfFile->save($directory . '/' . $filename);
-                try{
+              
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
                     // $pdfFile->store('LOI-Documents', $fileName);
@@ -315,14 +318,14 @@ class LetterOfIndentController extends Controller
         } else if($request->type == 'business'){
             if($request->download == 1) {
                 $width = $request->width;
-
+                try{
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.business_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
                 // $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 // $directory = public_path('LOI');
                 // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 // $pdfFile->save($directory . '/' . $filename);
-                try{
+               
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
                     return $pdfFile->download($fileName);
@@ -336,7 +339,7 @@ class LetterOfIndentController extends Controller
         else {
             if($request->download == 1) {
                 $width = $request->width;
-
+                try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
@@ -344,7 +347,7 @@ class LetterOfIndentController extends Controller
                 // $directory = public_path('LOI');
                 // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 // $pdfFile->save($directory . '/' . $filename);
-                try{
+               
                     // $pdf = $this->pdfMerge($letterOfIndent->id);
                     // return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
                     return $pdfFile->download($fileName);
@@ -461,6 +464,7 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI) {
             DB::beginTransaction();
+            try{
 
             $LOI = LetterOfIndent::find($id);
 
@@ -578,6 +582,9 @@ class LetterOfIndentController extends Controller
                 }
             }
 
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
             DB::commit();
 
             return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
