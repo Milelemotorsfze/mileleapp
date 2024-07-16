@@ -271,6 +271,7 @@ class LetterOfIndentController extends Controller
                 $imageFiles[] = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
             }
         }
+        info($imageFiles);
         if ($request->type == 'trans_cars') {
             $width = $request->width;
 
