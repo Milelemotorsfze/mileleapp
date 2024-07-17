@@ -2912,16 +2912,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
 				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
-
-			// Ensure certification_per_vin is an array
-			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
-
 			options.forEach(function(optionData) {
 				var option = document.createElement('option');
 				option.value = optionData.value;
 				option.textContent = optionData.text;
-				
-				if (certification_per_vin.includes(optionData.value)) {
+
+				if (certification_per_vin==optionData.value) {
 					option.selected = true;
 				}
 				
@@ -2933,8 +2929,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$(selectElement).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
-				placeholder: "Choose "
+				placeholder: "Choose ",
+				initSelection: function(element, callback) {
+					var selectedValues = certification_per_vin.map(function(value) {
+						return options.find(option => option.value === value);
+					});
+					callback(selectedValues);
+				}
 			});
+
+			// Set the selected values for select2
+			$(selectElement).val(certification_per_vin).trigger('change');
 
 			return cell;
 		}

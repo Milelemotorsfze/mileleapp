@@ -22,7 +22,7 @@ class WOVehicleAddons extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'comment_id',
+        'delete_cvm_id',
     ];
     public function workOrderVehicle()
     {

@@ -14,7 +14,7 @@ class CommentVehicleMapping extends Model
     ];
     public function vehicle()
     {
-        return $this->hasOne(WOVehicles::class,'id','vehicle_id');
+        return $this->hasOne(WOVehicles::class,'id','vehicle_id')->withTrashed();
     }
     public function recordHistories()
     {

@@ -264,23 +264,27 @@
             newVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
-                        <tr><th colSpan="15" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${new_vehicles.length} vehicles added as new</th></tr>
+                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${new_vehicles.length} vehicles added as new</th></tr>
                         <tr style="border-width: 1;">
-                            <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">View More</th>
+                            <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">VIN</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Brand</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Variant</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Engine</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Description</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Year</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Year to mention on Documents</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Steering</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Exterior Colour</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Interior Colour</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Warehouse</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Territory</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Preferred Destination</th>
-                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Import Type</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Import Document Type</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Ownership Name</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Certification Per VIN</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Deposit Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -292,34 +296,43 @@
                     return detail ? detail.new_value : (item.vehicle[field_name] || default_value);
                 };
 
+                // Initialize each constant with an empty string
+                const boeValue = getFieldValue('boe_number', '');
                 const brandValue = getFieldValue('brand', '');
                 const variantValue = getFieldValue('variant', '');
                 const engineValue = getFieldValue('engine', '');
                 const modelDescriptionValue = getFieldValue('model_description', '');
                 const modelYearValue = getFieldValue('model_year', '');
+                const modelYearToMentionOnDocumentsValue = getFieldValue('model_year_to_mention_on_documents', '');
                 const steeringValue = getFieldValue('steering', '');
                 const exteriorColourValue = getFieldValue('exterior_colour', '');
                 const interiorColourValue = getFieldValue('interior_colour', '');
                 const warehouseValue = getFieldValue('warehouse', '');
                 const territoryValue = getFieldValue('territory', '');
                 const preferredDestinationValue = getFieldValue('preferred_destination', '');
-                const importDocumentTypeNameValue = getFieldValue('import_document_type_name', '');
+                const importDocumentTypeNameValue = getFieldValue('import_document_type', '');
                 const ownershipNameValue = getFieldValue('ownership_name', '');
+                const certificationPerVinValue = getFieldValue('certification_per_vin_name', '');
+                const depositReceivedValue = getFieldValue('deposit_received', '');
+                const modificationOrJobsToPerformPerVinValue = getFieldValue('modification_or_jobs_to_perform_per_vin', '');
+                const specialRequestOrRemarksValue = getFieldValue('special_request_or_remarks', '');
 
-                const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
+                const viewMoreUrl = 'javascript:void(0);'; // Prevent default link behavior
 
                 newVehiclesHtml += `
-                    <tr style="border:1px solid #e9e9ef;">
+                    <tr style="border-top:2px solid #d3d3df;">
                         <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View More">ViewMore</a>
+                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
                             ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
                         </td>
+                        <td>${boeValue}</td>
                         <td>${item.vehicle.vin || ''}</td>
                         <td>${brandValue}</td>
                         <td>${variantValue}</td>
                         <td>${engineValue}</td>
                         <td>${modelDescriptionValue}</td>
                         <td>${modelYearValue}</td>
+                        <td>${modelYearToMentionOnDocumentsValue}</td>
                         <td>${steeringValue}</td>
                         <td>${exteriorColourValue}</td>
                         <td>${interiorColourValue}</td>
@@ -328,6 +341,18 @@
                         <td>${preferredDestinationValue}</td>
                         <td>${importDocumentTypeNameValue}</td>
                         <td>${ownershipNameValue}</td>
+                        <td>${certificationPerVinValue}</td>
+                        <td>${depositReceivedValue}</td>
+                    </tr>
+                    <tr style="border:1px solid #e9e9ef;">
+                        <th colspan="1"></th>
+                        <th colspan="3" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Modification/Jobs</th>
+                        <td colspan="15">${modificationOrJobsToPerformPerVinValue}</td>
+                    </tr>
+                    <tr style="border:1px solid #e9e9ef;">
+                        <th colspan="1"></th>
+                        <th colspan="3" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Special Request/Remarks</th>
+                        <td colspan="15">${specialRequestOrRemarksValue}</td>
                     </tr>
                 `;
             });
@@ -346,23 +371,27 @@
             removedVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
-                        <tr><th colSpan="15" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${removed_vehicles.length} vehicles removed</th></tr>
-                        <tr style="border-width: 1;">
-                            <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">View More</th>
+                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${removed_vehicles.length} vehicles removed</th></tr>
+                        <tr style="border-top:2px solid #d3d3df;">
+                            <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">VIN</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Brand</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Variant</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Engine</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Description</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Year</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Model Year to mention on Documents</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Steering</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Exterior Colour</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Interior Colour</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Warehouse</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Territory</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Preferred Destination</th>
-                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Import Type</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Import Document Type</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Ownership Name</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Certification Per VIN</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Deposit Received</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -373,22 +402,36 @@
                 removedVehiclesHtml += `
                     <tr style="border:1px solid #e9e9ef;">
                         <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View More">View More</a>
+                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View History">ViewHistory</a>
                         </td>
+                        <td>${item.boe_number || ''}</td>
                         <td>${item.vin || ''}</td>
                         <td>${item.brand || ''}</td>
                         <td>${item.variant || ''}</td>
                         <td>${item.engine || ''}</td>
                         <td>${item.model_description || ''}</td>
                         <td>${item.model_year || ''}</td>
+                        <td>${item.model_year_to_mention_on_documents || ''}</td>
                         <td>${item.steering || ''}</td>
                         <td>${item.exterior_colour || ''}</td>
                         <td>${item.interior_colour || ''}</td>
                         <td>${item.warehouse || ''}</td>
                         <td>${item.territory || ''}</td>
                         <td>${item.preferred_destination || ''}</td>
-                        <td>${item.import_document_type_name || ''}</td>
+                        <td>${item.import_document_type || ''}</td>
                         <td>${item.ownership_name || ''}</td>
+                        <td>${item.certification_per_vin_name || ''}</td>
+                        <td>${item.deposit_received || ''}</td>
+                    </tr>
+                    <tr style="border:1px solid #e9e9ef;">
+                        <th colspan="1"></th>
+                        <th colspan="3" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Modification/Jobs</th>
+                        <td colspan="15">${item.modification_or_jobs_to_perform_per_vin || ''}</td>
+                    </tr>
+                    <tr style="border:1px solid #e9e9ef;">
+                        <th colspan="1"></th>
+                        <th colspan="3" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Special Request/Remarks</th>
+                        <td colspan="15">${item.special_request_or_remarks || ''}</td>
                     </tr>
                 `;
             });
@@ -422,7 +465,7 @@
                 updatedVehiclesHtml += `
                     <tr>
                         <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; border-top:2px solid #e1e1ea;">
-                        <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View More">ViewMore</a>
+                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
                             ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vehicle.vin} details updated as follows
                         </th>
                     </tr>
@@ -437,14 +480,43 @@
                 // Sort the record_histories by field name in ascending order
                 const sortedDetails = item.record_histories.sort((a, b) => a.field.localeCompare(b.field));
 
+                // Helper function to get the certification description
+                const getCertificationDescription = (value) => {
+                    switch(value) {
+                        case 'rta_without_number_plate':
+                            return 'RTA Without Number Plate';
+                        case 'rta_with_number_plate':
+                            return 'RTA With Number Plate';
+                        case 'certificate_of_origin':
+                            return 'Certificate Of Origin';
+                        case 'certificate_of_conformity':
+                            return 'Certificate Of Conformity';
+                        case 'qisj_inspection':
+                            return 'QISJ Inspection';
+                        case 'eaa_inspection':
+                            return 'EAA Inspection';
+                        default:
+                            return value || ''; // Return empty string if value is null or undefined
+                    }
+                };
+
                 // Loop through each sorted record_history and create table rows
                 sortedDetails.forEach(detail => {
+                    let oldValue = detail.old_value !== null && detail.old_value !== undefined ? detail.old_value : '';
+                    let newValue = detail.new_value !== null && detail.new_value !== undefined ? detail.new_value : '';
+
+                    // If the field is "Certification Per VIN", replace the values
+                    if (detail.field === 'Certification Per VIN') {
+                        oldValue = getCertificationDescription(detail.old_value);
+                        newValue = getCertificationDescription(detail.new_value);
+                    }
+
                     updatedVehiclesHtml += `
                         <tr style="border:1px solid #e9e9ef;">
                             <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field || ''}</td>
                             <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
-                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.old_value || ''}</td>
-                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.new_value || ''}</td>
+                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${oldValue}</td>
+                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${newValue}</td>
                         </tr>
                     `;
                 });
