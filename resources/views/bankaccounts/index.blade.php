@@ -81,7 +81,7 @@
         @foreach ($bankaccounts as $bankaccount)
         <tr>
             <td>{{ $bankaccount->entity }}</td>
-            <td>{{ $bankaccount->bank_name }}</td>
+            <td>{{ $bankaccount->bank->bank_name }}</td>
             <td>{{ $bankaccount->account_number }}</td>
             <td>{{ number_format($bankaccount->current_balance, 0, '', ',') }}</td>
             <td>{{ $bankaccount->currency }}</td>
