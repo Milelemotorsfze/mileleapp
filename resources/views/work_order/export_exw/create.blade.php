@@ -355,7 +355,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
-							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
+							<label for="airline" class="col-form-label text-md-end">{{ __('Choose Airline') }}</label>
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 									<option value="{{$airline->name}}" 
@@ -503,7 +503,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
-						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
+						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Against Vehicle :</label>
 						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
 						</select>
 					</div>
@@ -1703,6 +1703,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
                 port_of_loading: {
                     required: true,
+					noSpaces: true,
                 },
                 port_of_discharge: {
                     required: true,

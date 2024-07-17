@@ -435,13 +435,13 @@
                 `;
 
                 // Sort the record_histories by field name in ascending order
-                const sortedDetails = item.record_histories.sort((a, b) => a.field_name.localeCompare(b.field_name));
+                const sortedDetails = item.record_histories.sort((a, b) => a.field.localeCompare(b.field));
 
                 // Loop through each sorted record_history and create table rows
                 sortedDetails.forEach(detail => {
                     updatedVehiclesHtml += `
                         <tr style="border:1px solid #e9e9ef;">
-                            <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field_name || ''}</td>
+                            <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field || ''}</td>
                             <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
                             <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.old_value || ''}</td>
                             <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.new_value || ''}</td>
