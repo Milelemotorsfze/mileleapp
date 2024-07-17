@@ -16,4 +16,8 @@ class BankMaster extends Model
         'address',
         'contact_number',
     ];
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccounts::class, 'bank_master_id');
+    }
 }

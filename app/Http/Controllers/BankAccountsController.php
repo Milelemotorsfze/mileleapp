@@ -18,7 +18,7 @@ class BankAccountsController extends Controller
     public function index()
 {
     (new UserActivityController)->createActivity('View Bank Accounts');
-    $bankaccounts = BankAccounts::get();
+    $bankaccounts = BankAccounts::with('bank')->get();
     $exchangeRates = [
         'USD' => 3.67,
         'EUR' => 4.20,

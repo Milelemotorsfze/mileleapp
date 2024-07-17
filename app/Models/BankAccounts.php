@@ -13,4 +13,8 @@ class BankAccounts extends Model
     {
         return $this->hasMany(BankAccountLog::class);
     }
+    public function bank()
+    {
+        return $this->belongsTo(BankMaster::class, 'bank_master_id');
+    }
 }
