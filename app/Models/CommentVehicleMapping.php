@@ -20,4 +20,10 @@ class CommentVehicleMapping extends Model
     {
         return $this->hasMany(WOVehicleRecordHistory::class, 'comment_vehicle_id', 'id');
     }
+    public function storeMappingAddons() {
+        return $this->hasmany(CommentVehicleAddonMapping::class, 'comment_vehicle_mapping_id', 'id')->where('type', 'store');
+    }
+    public function updateMappingAddons() {
+        return $this->hasmany(CommentVehicleAddonMapping::class, 'comment_vehicle_mapping_id', 'id')->where('type', 'update');
+    }
 }

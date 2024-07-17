@@ -1001,8 +1001,9 @@ class WorkOrderController extends Controller
                             $createCommVehAddon['type'] = 'update';
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $addon->id;
-                            $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createdCommVehAddon);
+                            $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
                             $canDeleteCreatedVehComMap = false;
+                            $canDeleteCreateVehComAddMap = true;
                             $addonData['updated_by'] = Auth::id();
                             // Filter out non-null, non-array values, and exclude specified fields
                             $filterredVehicleAddonData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
@@ -1049,9 +1050,15 @@ class WorkOrderController extends Controller
                                         'changed_at' => Carbon::now(),
                                         'cvm_id' => $createdCommVehAddonMapp->id,
                                     ]);
+                                    $canDeleteCreateVehComAddMap = false;
                                 }
                             }
-                            
+                            if($canDeleteCreateVehComAddMap == true) {
+                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
+                                if($deleteCreateVehComAddMap) {
+                                    $deleteCreateVehComAddMap->delete();
+                                }
+                            }
                             // Save the vehicle with updated data
                             $addon->save();
                         } else {
@@ -1060,11 +1067,12 @@ class WorkOrderController extends Controller
                             $addonData['comment_id'] = $CommentId;
                             $woVehicleAddon = WOVehicleAddons::create($addonData);
                             
-                            $createCommVehAddon['type'] = 'update';
+                            $createCommVehAddon['type'] = 'store';
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $woVehicleAddon->id;
-                            $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createdCommVehAddon);
+                            $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
                             $canDeleteCreatedVehComMap = false;
+                            $canDeleteCreateVehComAddMap = true;
                             $canDeleteComment = false;
                             $processedAddonIds[] = $woVehicleAddon->id; // Append ID to array
                             // Filter out non-null, non-array values, and exclude specified fields
@@ -1084,6 +1092,13 @@ class WorkOrderController extends Controller
                                     'changed_at' => Carbon::now(),
                                     'cvm_id' => $createdCommVehAddonMapp->id,
                                 ]);
+                                $canDeleteCreateVehComAddMap = false;
+                            }
+                            if($canDeleteCreateVehComAddMap == true) {
+                                $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
+                                if($deleteCreateVehComAddMap) {
+                                    $deleteCreateVehComAddMap->delete();
+                                }
                             }
                         }
                     }
@@ -1167,11 +1182,12 @@ class WorkOrderController extends Controller
                                     $createWOVehiclesAddons['created_by'] = $authId;
                                     $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
 
-                                    $createCommVehAddon['type'] = 'update';
+                                    $createCommVehAddon['type'] = 'store';
                                     $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                                     $createCommVehAddon['addon_id'] = $WOVehicleAddons->id;
-                                    $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createdCommVehAddon);
+                                    $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
                                     $canDeleteCreatedVehComMap = false;
+                                    $canDeleteCreateVehComAddMap = true;
                                     // Filter out non-null, non-array values, and exclude specified fields
                                     $excludeVehicleAddonFields = [
                                         'id','w_o_vehicle_id',
@@ -1193,8 +1209,15 @@ class WorkOrderController extends Controller
                                             'changed_at' => Carbon::now(),
                                             'cvm_id' =>$createdCommVehAddonMapp->id,
                                         ]);
+                                        $canDeleteCreateVehComAddMap = false;
                                     }
                                     // Mark this addon as processed
+                                    if($canDeleteCreateVehComAddMap == true) {
+                                        $deleteCreateVehComAddMap = CommentVehicleAddonMapping::where('id',$createdCommVehAddonMapp->id)->first();
+                                        if($deleteCreateVehComAddMap) {
+                                            $deleteCreateVehComAddMap->delete();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1576,8 +1599,10 @@ class WorkOrderController extends Controller
     public function getComments($workOrderId)
     {
         $comments = WOComments::where('work_order_id', $workOrderId)
-            ->with('files', 'user', 'wo_histories', 'removed_vehicles','new_vehicles.vehicle','updated_vehicles.vehicle',
-            'new_vehicles.recordHistories','updated_vehicles.recordHistories')
+            ->with('files', 'user', 'wo_histories', 'removed_vehicles','new_vehicles.vehicle.addonsWithTrashed',
+            'updated_vehicles.vehicle.addonsWithTrashed','new_vehicles.recordHistories','updated_vehicles.recordHistories',
+            'new_vehicles.storeMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.recordHistories',
+            'new_vehicles.storeMappingAddons.addon','updated_vehicles.updateMappingAddons.addon')
             ->get();
         return response()->json(['comments' => $comments]);
     }
