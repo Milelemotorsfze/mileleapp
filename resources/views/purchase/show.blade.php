@@ -2080,9 +2080,10 @@
                                 <th>Vehicle Count</th>
                                 <th>Remarks</th>
                                 @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+                                $hasTransitionPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+                                $hasPaymentPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
                                 @endphp
-                                @if ($hasPermission)
+                                @if ($hasTransitionPermission || $hasPaymentPermission)
                                 <th>Action</th>
                                 @endif
                             </tr>
@@ -2099,12 +2100,23 @@
                     <td>{{ $transition->vehicle_count }}</td>
                     <td>{{ $transition->remarks }}</td>
                     @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
-  @endphp
-  @if ($hasPermission)
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+                    @endphp
+                    @if ($hasPermission)
                     <td>
                     @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
                         <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
+                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                    @endif
+                    </td>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                    @endphp
+                    @if ($hasPermission)
+                    <td>
+                    @if($transition->transaction_type == "Initiate Payment Request")
+                        <button class="btn btn-success btn-sm" onclick="handleActioninitiate('approve', {{ $transition->id }})">Approve</button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
                     @endif
                     </td>
@@ -3987,6 +3999,26 @@ $(document).ready(function() {
 });
 </script>
 <script>
+    function handleActioninitiate(action, transitionId, remarks = '') {
+    $.ajax({
+        url: '{{ route("transition.actioninitiate") }}', // Update this route to your controller method
+        type: 'POST',
+        data: {
+            id: transitionId,
+            action: action,
+            remarks: remarks
+        },
+        success: function(response) {
+            alertify.success('Transitions Updated Successfully');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });
+}
 function handleAction(action, transitionId, remarks = '') {
     $.ajax({
         url: '{{ route("transition.action") }}', // Update this route to your controller method
