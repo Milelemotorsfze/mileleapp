@@ -151,7 +151,6 @@
     }
 </style>
 @section('content')
-<!-- Modal -->
 <div class="modal fade" id="purchaseOrderModal" tabindex="-1" role="dialog" aria-labelledby="purchaseOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -160,14 +159,29 @@
                 <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <div class="form-check form-check-inline">
-                        <input type="radio" id="radioPurchasedOrder" name="paymentOption" value="purchasedOrder" class="form-check-input">
-                        <label for="radioPurchasedOrder" class="form-check-label">Initiate payment for Purchased Order</label>
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <div class="form-check form-check-inline">
+                            <input type="radio" id="radioPurchasedOrder" name="paymentOption" value="purchasedOrder" class="form-check-input">
+                            <label for="radioPurchasedOrder" class="form-check-label">Initiate payment for Purchased Order</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input type="radio" id="radioVehicle" name="paymentOption" value="vehicle" class="form-check-input">
-                        <label for="radioVehicle" class="form-check-label">Vehicle</label>
+                    <div class="col-md-2">
+                        <div class="form-check form-check-inline">
+                            <input type="radio" id="radioVehicle" name="paymentOption" value="vehicle" class="form-check-input">
+                            <label for="radioVehicle" class="form-check-label">Vehicle</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="paymentAdjustmentContainer">
+                        <div class="form-check form-check-inline">
+                            <input type="checkbox" id="paymentAdjustmentCheckbox" class="form-check-input">
+                            <label for="paymentAdjustmentCheckbox" class="form-check-label">Enter Adjustment Amount</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4" id="paymentAdjustmentInput" style="display: none;">
+                        <label for="adjustmentAmount" class="form-check-label">Enter Adjustment Amount:</label>
+                        <input type="number" id="adjustmentAmount" name="adjustmentAmount" class="form-control">
+                        <p id="adjustmentAmountError" class="text-danger" style="display: none;">Amount cannot exceed the current balance.</p>
                     </div>
                 </div>
                 <div id="purchasedOrderOptions" style="display: none;">
@@ -192,8 +206,7 @@
                         <select id="vehicleDropdown" class="form-control">
                             <option value="">Select an option</option>
                             <option value="allVehicles">All Vehicles</option>
-                            <option value="oneByOne">One by One</option>
-                        </select>
+                            <option value="oneByOne">One by One</select>
                     </div>
                     <div id="vehicleSelection" class="form-group" style="display: none;">
                         <label for="vehicleSelectDropdown">Select Vehicle:</label>
@@ -2089,7 +2102,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($transitions as $transition)
+                @foreach ($transitions as $transition)
                 <tr data-transition-id="{{ $transition->id }}">
                 <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
                 <td>{{ $transition->created_at->format('d M Y') }}</td>
@@ -2118,6 +2131,16 @@
                     @if($transition->transaction_type == "Initiate Payment Request")
                         <button class="btn btn-success btn-sm" onclick="handleActioninitiate('approve', {{ $transition->id }})">Approve</button>
                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                    @endif
+                    </td>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
+                    <td>
+                    @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Draft")
+                        <button class="btn btn-primary btn-sm" onclick="submitpayment('approve', {{ $transition->id }})">Submit</button>
                     @endif
                     </td>
                     @endif
@@ -4010,14 +4033,35 @@ $(document).ready(function() {
         },
         success: function(response) {
             alertify.success('Transitions Updated Successfully');
-            setTimeout(function() {
-            window.location.reload();
-        }, 500);
+            updateTableRow(transitionId);
         },
         error: function(xhr) {
             console.error(xhr.responseText);
         }
     });
+}
+function submitpayment(action, transitionId) {
+    $.ajax({
+        url: '{{ route("transition.submitforpayment") }}', // Update this route to your controller method
+        type: 'POST',
+        data: {
+            id: transitionId,
+            action: action
+        },
+        success: function(response) {
+            alertify.success('Transitions Updated Successfully');
+            updateTableRow(transitionId);
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+function updateTableRow(transitionId) {
+    let row = $(`#row-${transitionId}`);
+    row.find('button').hide(); // Hide all buttons in the row
+    // You can also update the row content if needed, for example:
+    // row.find('.status-cell').text('Approved');
 }
 function handleAction(action, transitionId, remarks = '') {
     $.ajax({
@@ -4152,12 +4196,27 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
 </script>
 <script>
     let vehicleTable;
-
+    let currentBalance = 0;
     function openPurchaseOrderModal(purchaseOrderId) {
         $('#purchaseOrderModal').data('purchaseOrderId', purchaseOrderId);
         $('#purchaseOrderModal').modal('show');
+        $.ajax({
+            url: `/get-vendor-and-balance/${purchaseOrderId}`,
+            method: 'GET',
+            success: function(response) {
+                const { supplier_account_id, current_balance } = response;
+                if (supplier_account_id) {
+                    console.log(current_balance);
+                    currentBalance = current_balance;
+                    if (current_balance > 0) {
+                        $('#paymentAdjustmentContainer').show();
+                    } else {
+                        $('#paymentAdjustmentContainer').hide();
+                    }
+                }
+            }
+        });
     }
-
     $(document).ready(function() {
         $('#vehicleSelectDropdown').select2({
             width: '100%'
@@ -4284,7 +4343,22 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
             const vehicleId = e.params.data.id;
             removeVehicleRowById(vehicleId);
         });
+        $('#paymentAdjustmentCheckbox').change(function() {
+            if ($(this).is(':checked')) {
+                $('#paymentAdjustmentInput').show();
+            } else {
+                $('#paymentAdjustmentInput').hide();
+            }
+        });
 
+        $('#adjustmentAmount').on('input', function() {
+            const amount = parseFloat(this.value);
+            if (amount > currentBalance) {
+                $('#adjustmentAmountError').show();
+            } else {
+                $('#adjustmentAmountError').hide();
+            }
+        });
         $('#saveDetails').click(function() {
             const data = gatherFormData();
             $.ajax({
@@ -4345,7 +4419,8 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         const purchaseOrderId = $('#purchaseOrderModal').data('purchaseOrderId');
         const data = {
             paymentOption: paymentOption,
-            purchaseOrderId: purchaseOrderId
+            purchaseOrderId: purchaseOrderId,
+            adjustmentAmount: $('#adjustmentAmount').val()
         };
 
         if (paymentOption === 'purchasedOrder') {
@@ -4363,7 +4438,9 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                 });
             });
         }
-
+        if ($('#paymentAdjustmentCheckbox').is(':checked')) {
+            data.adjustmentAmount = $('#adjustmentAmount').val();
+        }
         return data;
     }
 

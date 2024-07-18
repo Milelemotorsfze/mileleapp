@@ -925,6 +925,8 @@ Route::get('/d', function () {
     Route::post('/savePaymentDetails', [PurchasingOrderController::class, 'savePaymentDetails']);
     Route::post('/submitPaymentDetails', [PurchasingOrderController::class, 'submitPaymentDetails']);
     Route::post('/transition/actioninitiate', [PurchasingOrderController::class, 'handleActioninitiate'])->name('transition.actioninitiate');
+    Route::get('/get-vendor-and-balance/{purchaseOrderId}', [PurchasingOrderController::class, 'getVendorAndBalance']);
+    Route::post('/transition/submitforpayment', [PurchasingOrderController::class, 'submitforpayment'])->name('transition.submitforpayment');
 
 
 
