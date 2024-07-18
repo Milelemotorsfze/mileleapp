@@ -79,7 +79,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-customer');
                                         @endphp
                                         @if ($hasPermission)
-                                        <a title="Edit Customer Details" class="btn btn-sm btn-info" href="{{ route('dm-customers.edit', $customer->id) }}">
+                                        <a title="Edit Customer Details" class="btn btn-sm btn-info mt-1" href="{{ route('dm-customers.edit', $customer->id) }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i>
                                         </a>
                                         @endif
