@@ -526,59 +526,121 @@
                             ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vehicle.vin} details updated as follows
                         </th>
                     </tr>
-                    <tr style="border-width: 1;">
-                        <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Field</th>
-                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Type</th>
-                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Old Value</th>
-                        <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">New Value</th>
-                    </tr>
                 `;
 
-                // Sort the record_histories by field name in ascending order
-                const sortedDetails = item.record_histories.sort((a, b) => a.field.localeCompare(b.field));
+                if (item.record_histories.length > 0) { // Check if there are record histories
+                    updatedVehiclesHtml += `
+                        <tr style="border-width: 1;">
+                            <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Field</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Type</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Old Value</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">New Value</th>
+                        </tr>
+                    `;
 
-                // Helper function to get the certification description
-                const getCertificationDescription = (value) => {
-                    switch(value) {
-                        case 'rta_without_number_plate':
-                            return 'RTA Without Number Plate';
-                        case 'rta_with_number_plate':
-                            return 'RTA With Number Plate';
-                        case 'certificate_of_origin':
-                            return 'Certificate Of Origin';
-                        case 'certificate_of_conformity':
-                            return 'Certificate Of Conformity';
-                        case 'qisj_inspection':
-                            return 'QISJ Inspection';
-                        case 'eaa_inspection':
-                            return 'EAA Inspection';
-                        default:
-                            return value || ''; // Return empty string if value is null or undefined
-                    }
-                };
+                    // Sort the record_histories by field name in ascending order
+                    const sortedDetails = item.record_histories.sort((a, b) => a.field.localeCompare(b.field));
 
-                // Loop through each sorted record_history and create table rows
-                sortedDetails.forEach(detail => {
-                    let oldValue = detail.old_value !== null && detail.old_value !== undefined ? detail.old_value : '';
-                    let newValue = detail.new_value !== null && detail.new_value !== undefined ? detail.new_value : '';
+                    // Helper function to get the certification description
+                    const getCertificationDescription = (value) => {
+                        switch(value) {
+                            case 'rta_without_number_plate':
+                                return 'RTA Without Number Plate';
+                            case 'rta_with_number_plate':
+                                return 'RTA With Number Plate';
+                            case 'certificate_of_origin':
+                                return 'Certificate Of Origin';
+                            case 'certificate_of_conformity':
+                                return 'Certificate Of Conformity';
+                            case 'qisj_inspection':
+                                return 'QISJ Inspection';
+                            case 'eaa_inspection':
+                                return 'EAA Inspection';
+                            default:
+                                return value || ''; // Return empty string if value is null or undefined
+                        }
+                    };
 
-                    // If the field is "Certification Per VIN", replace the values
-                    if (detail.field === 'Certification Per VIN') {
-                        oldValue = getCertificationDescription(detail.old_value);
-                        newValue = getCertificationDescription(detail.new_value);
-                    }
+                    // Loop through each sorted record_history and create table rows
+                    sortedDetails.forEach(detail => {
+                        let oldValue = detail.old_value !== null && detail.old_value !== undefined ? detail.old_value : '';
+                        let newValue = detail.new_value !== null && detail.new_value !== undefined ? detail.new_value : '';
+
+                        // If the field is "Certification Per VIN", replace the values
+                        if (detail.field === 'Certification Per VIN') {
+                            oldValue = getCertificationDescription(detail.old_value);
+                            newValue = getCertificationDescription(detail.new_value);
+                        }
+
+                        updatedVehiclesHtml += `
+                            <tr style="border:1px solid #e9e9ef;">
+                                <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field || ''}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${oldValue}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${newValue}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                // Add Service Breakdown section if there are store_mapping_addons
+                if (item.store_mapping_addons && item.store_mapping_addons.length > 0) {
+                    // Sort the addons by addon_code in ascending order
+                    const sortedAddons = item.store_mapping_addons.sort((a, b) => {
+                        if (a.addon.addon_code < b.addon.addon_code) return -1;
+                        if (a.addon.addon_code > b.addon.addon_code) return 1;
+                        return 0;
+                    });
 
                     updatedVehiclesHtml += `
                         <tr style="border:1px solid #e9e9ef;">
-                            <td style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${detail.field || ''}</td>
-                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${detail.type || ''}</td>
-                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${oldValue}</td>
-                            <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${newValue}</td>
+                            <th colspan="3" style="padding-left:5px; padding-top:5px;padding-bottom:5px; font-size:12px!important;">${item.store_mapping_addons.length} Service Breakdown added as new</th>
+                        </tr>
+                        <tr style="border:1px solid #e9e9ef;">
+                            <th style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Quantity</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Description</th>
                         </tr>
                     `;
-                });
-            });
+                    
+                    sortedAddons.forEach(addonMapping => {
+                        const addon = addonMapping.addon;
+                        const recordHistories = addonMapping.record_histories || [];
 
+                        // Initialize addon field values
+                        let addonCode = 'NA';
+                        let addonName = 'NA';
+                        let addonQuantity = 'NA';
+                        let addonDescription = 'NA';
+
+                        // Loop through record histories to get field values
+                        recordHistories.forEach(history => {
+                            switch(history.field_name) {
+                                case 'addon_code':
+                                    addonCode = history.new_value || 'NA';
+                                    break;
+                                case 'addon_name':
+                                    addonName = history.new_value || 'NA';
+                                    break;
+                                case 'addon_quantity':
+                                    addonQuantity = history.new_value || 'NA';
+                                    break;
+                                case 'addon_description':
+                                    addonDescription = history.new_value || 'NA';
+                                    break;
+                            }
+                        });
+
+                        updatedVehiclesHtml += `
+                            <tr style="border:1px solid #e9e9ef;">
+                                <td style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonCode}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonQuantity}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonDescription}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+            
             updatedVehiclesHtml += `
                     </tbody>
                 </table>

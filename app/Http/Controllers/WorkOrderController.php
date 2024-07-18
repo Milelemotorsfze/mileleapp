@@ -1002,7 +1002,6 @@ class WorkOrderController extends Controller
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $addon->id;
                             $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
-                            $canDeleteCreatedVehComMap = false;
                             $canDeleteCreateVehComAddMap = true;
                             $addonData['updated_by'] = Auth::id();
                             // Filter out non-null, non-array values, and exclude specified fields
@@ -1059,6 +1058,10 @@ class WorkOrderController extends Controller
                                     $deleteCreateVehComAddMap->delete();
                                 }
                             }
+                            else {
+                                $canDeleteCreatedVehComMap = false;
+
+                            }
                             // Save the vehicle with updated data
                             $addon->save();
                         } else {
@@ -1110,6 +1113,10 @@ class WorkOrderController extends Controller
                     // Retrieve addons that were not in the incoming request and update deleted_by field
                     $addonsToDelete = WOVehicleAddons::whereNotIn('id', $processedAddonIds)->where('w_o_vehicle_id', $vehicle->id)->get();
                     foreach ($addonsToDelete as $addon) {
+                        $createCommVehAddon['type'] = 'delete';
+                        $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
+                        $createCommVehAddon['addon_id'] = $addon->id;
+                        $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
                         $addon->deleted_by = Auth::id();
                         $addon->delete_cvm_id = $CreatedVehComMap->id;
                         $addon->save();
@@ -1602,7 +1609,10 @@ class WorkOrderController extends Controller
             ->with('files', 'user', 'wo_histories', 'removed_vehicles','new_vehicles.vehicle.addonsWithTrashed',
             'updated_vehicles.vehicle.addonsWithTrashed','new_vehicles.recordHistories','updated_vehicles.recordHistories',
             'new_vehicles.storeMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.recordHistories',
-            'new_vehicles.storeMappingAddons.addon','updated_vehicles.updateMappingAddons.addon')
+            'new_vehicles.storeMappingAddons.addon','updated_vehicles.updateMappingAddons.addon',
+            'updated_vehicles.storeMappingAddons.recordHistories','updated_vehicles.storeMappingAddons.addon',
+            )
+            // 'updated_vehicles.deleteMappingAddons'
             ->get();
         return response()->json(['comments' => $comments]);
     }

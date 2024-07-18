@@ -26,4 +26,7 @@ class CommentVehicleMapping extends Model
     public function updateMappingAddons() {
         return $this->hasmany(CommentVehicleAddonMapping::class, 'comment_vehicle_mapping_id', 'id')->where('type', 'update');
     }
+    public function deleteMappingAddons() {
+        return $this->hasmany(CommentVehicleAddonMapping::class, 'comment_vehicle_mapping_id', 'id')->where('type', 'delete');
+    }
 }
