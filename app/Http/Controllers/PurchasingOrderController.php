@@ -4320,7 +4320,7 @@ public function submitPaymentDetails(Request $request)
     }
     public function submitforpayment(Request $request)
     {
-        $transitionId = $request->input('id');
+    $transitionId = $request->input('id');
     $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
     if ($supplierAccountTransaction) {
         $supplierAccountTransaction->transaction_type = 'Initiate Payment Request';
@@ -4345,5 +4345,139 @@ public function submitPaymentDetails(Request $request)
     }
 
     return response()->json(['message' => 'Payment details saved successfully'], 200);
+    }
+    public function submitPayment(Request $request)
+    {
+        try {
+            $transitionId = $request->input('transitionId');
+            $bankAccount = $request->input('bankAccount');
+            $file = $request->file('file');
+            $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+            if ($supplierAccountTransaction) {
+                if ($file) {
+                    $filePath = $file->store('transition_file', 'public');
+                    $supplierAccountTransaction->transition_file = $filePath;
+                }
+                $supplierAccountTransaction->transaction_type = 'Post-Debit';
+                $supplierAccountTransaction->status = 'pending';
+                $supplierAccountTransaction->bank_accounts_id =  $bankAccount;
+                $supplierAccountTransaction->save();
+                $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+                {
+                    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+                    if ($purchasingOrder) {
+                        $currency = $purchasingOrder->currency;
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                        // Conversion rates
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.023,
+                            "AED" => 1,
+                            "CAD" => 2.68
+                        ];
+                        $conversionRate = $conversionRates[$currency] ?? 1;
+                        $totalcostconverted = $transactionAmount * $conversionRate;
+                        $supplierAccount->current_balance -= $totalcostconverted;
+                        $supplierAccount->save();
+                }
+            }
+            }
+            $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+            if ($purchasedOrderPaidAmounts) {
+                $purchasedOrderPaidAmounts->status = 'Suggested Payment';
+                $purchasedOrderPaidAmounts->save();
+            }
+            $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+            if ($vendorPayment) {
+                $vendorPayment->status = 'Initiate';
+                $vendorPayment->save();
+            }
+            $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+            foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+                $vehicleTransaction->status = 'Initiate';
+                $vehicleTransaction->save();
+            }
+            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+        } catch (\Exception $e) {
+            Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function approveTransition(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Debit';
+        $supplierAccountTransaction->status = 'Approved';
+        $supplierAccountTransaction->save();
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Approved';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Approved';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Approved';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['success' => true, 'transition_id' => $transitionId]);
+    }
+    public function rejectTransition(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $remarks = $request->input('remarks');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Rejected';
+        $supplierAccountTransaction->status = 'Rejected';
+        $supplierAccountTransaction->remarks = $remarks;
+        $supplierAccountTransaction->save();
+        $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+        {
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                // Conversion rates
+                $conversionRates = [
+                    "USD" => 3.67,
+                    "EUR" => 3.94,
+                    "GBP" => 4.67,
+                    "JPY" => 0.023,
+                    "AED" => 1,
+                    "CAD" => 2.68
+                ];
+                $conversionRate = $conversionRates[$currency] ?? 1;
+                $totalcostconverted = $transactionAmount * $conversionRate;
+                $supplierAccount->current_balance += $totalcostconverted;
+                $supplierAccount->save();
+        }
+    }
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Rejected';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Rejected';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Rejected';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Transition rejected successfully.']);
     }
 }

@@ -182,4 +182,10 @@ class BankAccountsController extends Controller
         }
         return response()->json(['success' => 'Balance updated successfully']);
     }
+    public function getBankAccounts(Request $request)
+    {
+        $bankId = $request->query('bank_id');
+        $accounts = BankAccounts::where('bank_master_id', $bankId)->get();
+        return response()->json($accounts);
+    }
 }

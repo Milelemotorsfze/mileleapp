@@ -151,6 +151,43 @@
     }
 </style>
 @section('content')
+<!-- Modal Structure -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalLabel">Initiate Payment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="paymentForm" enctype="multipart/form-data">
+          @csrf <!-- Laravel CSRF token -->
+          <input type="hidden" id="transitionId" name="transitionId">
+          <div class="mb-3">
+            <label for="bank" class="form-label">Select Bank</label>
+            <select class="form-select" id="bank" name="bank" onchange="fetchBankAccounts()">
+              <!-- Options to be populated dynamically -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="bankAccount" class="form-label">Select Bank Account</label>
+            <select class="form-select" id="bankAccount" name="bankAccount">
+              <!-- Options to be populated dynamically -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="file" class="form-label">Upload File</label>
+            <input type="file" class="form-control" id="file" name="file">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitPaymentForm()">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal fade" id="purchaseOrderModal" tabindex="-1" role="dialog" aria-labelledby="purchaseOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -2092,6 +2129,7 @@
                                 <th>Transaction By</th>
                                 <th>Vehicle Count</th>
                                 <th>Remarks</th>
+                                <th>View Details</th>
                                 @php
                                 $hasTransitionPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
                                 $hasPaymentPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
@@ -2144,6 +2182,27 @@
                     @endif
                     </td>
                     @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                    @endphp
+                    @if ($hasPermission)
+                    <td>
+                    @if($transition->transaction_type == "Request For Payment")
+                    <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
+                    @endif
+                    </td>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                    @endphp
+                    @if ($hasPermission)
+                    <td>
+                    @if($transition->transaction_type == "Post-Debit")
+                    <button id="approveButton" class="btn btn-success btn-sm" data-transition-id="{{ $transition->id }}">Released</button>
+                    <button class="btn btn-danger btn-sm" data-reject-id="{{ $transition->id }}" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                    @endif
+                    </td>
+                    @endif
                 </tr>
                 @endforeach
                             </tbody>
@@ -2166,8 +2225,8 @@
             <label for="remarks">Remarks</label>
             <textarea class="form-control" id="remarks" rows="3" required></textarea>
           </div>
-</br>
-          <button type="submit" class="btn btn-danger">Submit</button>
+            </br>
+          <button type="submit" id="submitReject" class="btn btn-danger">Submit</button>
         </form>
       </div>
     </div>
@@ -4088,15 +4147,6 @@ function showRejectModal(transitionId) {
     $('#rejectTransitionId').val(transitionId);
     $('#rejectModal').modal('show');
 }
-
-$('#rejectForm').on('submit', function(event) {
-    event.preventDefault();
-    var transitionId = $('#rejectTransitionId').val();
-    var remarks = $('#remarks').val();
-    handleAction('reject', transitionId, remarks);
-    $('#rejectModal').modal('hide');
-});
-
 $(document).ready(function() {
     $.ajaxSetup({
         headers: {
@@ -4448,5 +4498,146 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         if (price === 'N/A') return price;
         return parseInt(price).toLocaleString('en-US');
     }
+    function modalforinitiated(transitionId) {
+  // Open the modal
+  $('#paymentModal').modal('show');
+  
+  // Set the transitionId in the hidden input field
+  document.getElementById('transitionId').value = transitionId;
+  
+  // Fetch and populate the banks dropdown
+  fetch('/api/banks')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const bankSelect = document.getElementById('bank');
+      bankSelect.innerHTML = '<option value="">Select Bank</option>';
+      data.forEach(bank => {
+        const option = document.createElement('option');
+        option.value = bank.id;
+        option.textContent = bank.bank_name;
+        bankSelect.appendChild(option);
+      });
+    })
+    .catch(error => console.error('There was a problem with the fetch operation:', error));
+}
+
+function fetchBankAccounts() {
+  const bankId = document.getElementById('bank').value;
+  
+  if (bankId) {
+    fetch(`/api/bank-accounts?bank_id=${bankId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const bankAccountSelect = document.getElementById('bankAccount');
+        bankAccountSelect.innerHTML = '<option value="">Select Bank Account</option>';
+        data.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = account.account_number;
+          bankAccountSelect.appendChild(option);
+        });
+      })
+      .catch(error => console.error('There was a problem with the fetch operation:', error));
+  }
+}
+
+function submitPaymentForm() {
+  const formData = new FormData(document.getElementById('paymentForm'));
+
+  fetch('/submit-payment', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      alert('Payment submitted successfully');
+      $('#paymentModal').modal('hide');
+      const transitionId = formData.get('transitionId');
+      const button = document.querySelector(`button[data-transition-id="${transitionId}"]`);
+      if (button) {
+        button.style.display = 'none';
+      }
+    } else {
+      alert('Error submitting payment: ' + data.message);
+    }
+  })
+  .catch(error => console.error('There was a problem with the fetch operation:', error));
+}
+</script>
+<script>
+    $(document).ready(function() {
+        $('#approveButton').click(function() {
+            var transitionId = $(this).data('transition-id');
+            $.ajax({
+                url: '{{ route("approve.transition") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    transition_id: transitionId
+                },
+                success: function(response) {
+                    if(response.success) {
+                        alert('Transition approved successfully!');
+                        $(`button[data-transition-id="${transitionId}"]`).hide();
+                        $(`button[data-reject-id="${transitionId}"]`).hide();
+                    } else {
+                        alert('Failed to approve transition.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        });
+    });
+    function showRejectModal(transitionId) {
+  $('#rejectModal').modal('show');
+  $('#submitReject').data('transition-id', transitionId);
+}
+$(document).ready(function() {
+  $('#submitReject').click(function() {
+    var transitionId = $(this).data('transition-id');
+    var remarks = $('#rejectRemarks').val();
+
+    $.ajax({
+      url: '/reject-transition', // The URL to send the request to
+      method: 'POST',
+      data: {
+        _token: '{{ csrf_token() }}',
+        transition_id: transitionId,
+        remarks: remarks
+      },
+      success: function(response) {
+        $('#rejectModal').modal('hide');
+        // Handle the response from the controller
+        alert('Transition rejected successfully.');
+      },
+      error: function(xhr, status, error) {
+        // Handle any errors
+        alert('An error occurred: ' + xhr.responseText);
+      }
+    });
+  });
+});
 </script>
 @endsection
