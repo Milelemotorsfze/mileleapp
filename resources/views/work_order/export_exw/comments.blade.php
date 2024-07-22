@@ -266,7 +266,7 @@
             newVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
-                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${new_vehicles.length} vehicles added as new</th></tr>
+                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${new_vehicles.length} vehicles added as new</th></tr>
                         <tr style="border-width: 1;">
                             <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
@@ -323,9 +323,9 @@
 
                 newVehiclesHtml += `
                     <tr style="border-top:2px solid #d3d3df;">
-                        <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
-                            ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
+                        <td style="padding-left:5px; font-size:12px!important;">
+                            <a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
+                            ${item.vehicle.deleted_at == null ? `<a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
                         </td>
                         <td>${boeValue}</td>
                         <td>${item.vehicle.vin || ''}</td>
@@ -429,7 +429,7 @@
             removedVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
-                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;">${removed_vehicles.length} vehicles removed</th></tr>
+                        <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${removed_vehicles.length} vehicles removed</th></tr>
                         <tr style="border-top:2px solid #d3d3df;">
                             <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
@@ -459,8 +459,8 @@
 
                 removedVehiclesHtml += `
                     <tr style="border:1px solid #e9e9ef;">
-                        <td style="padding-left:5px;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View History">ViewHistory</a>
+                        <td style="padding-left:5px; font-size:12px!important;">
+                            <a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vin}" data-id="${item.id}" title="View History">ViewHistory</a>
                         </td>
                         <td>${item.boe_number || ''}</td>
                         <td>${item.vin || ''}</td>
@@ -510,7 +510,7 @@
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr>
-                            <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;border-bottom:1px solid #e9e9ef;">
+                            <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;border-bottom:1px solid #e9e9ef; background-color:#e6f1ff!important;">
                                 ${updated_vehicles.length} vehicles data updated
                             </th>
                         </tr>
@@ -524,8 +524,8 @@
                 updatedVehiclesHtml += `
                     <tr>
                         <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; border-top:2px solid #e1e1ea;">
-                            <a href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
-                            ${item.vehicle.deleted_at == null ? `<a href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vehicle.vin} details updated as follows
+                            <a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
+                            ${item.vehicle.deleted_at == null ? `<a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''} ${item.vehicle.vin} details updated as follows
                         </th>
                     </tr>
                 `;
@@ -674,6 +674,40 @@
                         `;
                     });
                 }
+                // Service Breakdown updated Section
+                if(item.update_mapping_addons && item.update_mapping_addons.length > 0) {
+                    const orderedAddons = item.update_mapping_addons.sort((a, b) => a.addon.addon_code.localeCompare(b.addon.addon_code));
+
+                    orderedAddons.forEach(addon => {
+                        updatedVehiclesHtml += `
+                            <tr style="border:1px solid #e9e9ef;">
+                                <td colspan="4" style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">${addon.record_histories.length} change for ${addon.addon.addon_code} as follows</td>
+                            </tr>
+                            <tr style="border-width: 1;">
+                                <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Field</th>
+                                <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Type</th>
+                                <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Old Value</th>
+                                <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">New Value</th>
+                            </tr>
+                        `;
+                        if (addon.record_histories && addon.record_histories.length > 0) {
+                            addon.record_histories.forEach(history => {
+                                let oldValueHtml = history.old_value ? `<td style="font-size:12px!important;">${history.old_value}</td>` : '<td></td>';
+                                let newValueHtml = history.new_value ? `<td style="font-size:12px!important;">${history.new_value}</td>` : '<td></td>';
+
+                                updatedVehiclesHtml += `
+                                    <tr style="border:1px solid #e9e9ef;">
+                                        <td style="padding-left:5px;">${history.field}</td>
+                                        <td style="font-size:12px!important;">${history.type}</td>
+                                        ${oldValueHtml}
+                                        ${newValueHtml}
+                                    </tr>
+                                `;
+                            });
+                        }
+                    });
+                }
+               
             });
             
             updatedVehiclesHtml += `

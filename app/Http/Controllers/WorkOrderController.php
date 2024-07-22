@@ -1610,7 +1610,8 @@ class WorkOrderController extends Controller
             'updated_vehicles.vehicle.addonsWithTrashed','new_vehicles.recordHistories','updated_vehicles.recordHistories',
             'new_vehicles.storeMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.recordHistories',
             'new_vehicles.storeMappingAddons.addon','updated_vehicles.updateMappingAddons.addon',
-            'updated_vehicles.storeMappingAddons.recordHistories','updated_vehicles.storeMappingAddons.addon','updated_vehicles.deleteMappingAddons.addon'
+            'updated_vehicles.storeMappingAddons.recordHistories','updated_vehicles.storeMappingAddons.addon','updated_vehicles.deleteMappingAddons.addon',
+            'updated_vehicles.updateMappingAddons.recordHistories','updated_vehicles.updateMappingAddons.addon'
             )
             // 'updated_vehicles.deleteMappingAddons'
             ->get();
