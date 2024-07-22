@@ -260,7 +260,8 @@
         let newVehiclesHtml = '';
 
         if (new_vehicles.length >= 1) {
-            const orderedNewVehicles = new_vehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
+            const validNewVehicles = new_vehicles.filter(item => item && item.vehicle && item.vehicle.vin);
+            const orderedNewVehicles = validNewVehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             newVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
@@ -502,7 +503,8 @@
         // Process updated_vehicles for additional divs
         let updatedVehiclesHtml = '';
         if (updated_vehicles.length >= 1) {
-            const orderedUpdatedVehicles = updated_vehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
+            const validUpdatedVehicles = updated_vehicles.filter(item => item && item.vehicle && item.vehicle.vin);
+            const orderedUpdatedVehicles = validUpdatedVehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             updatedVehiclesHtml = `
                 <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">

@@ -179,7 +179,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
                             </li>   
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicles & Addons Data History</a>
                             </li>                          
                         </ul>
                     </div>
@@ -956,7 +956,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         </div>
                         <div class="tab-pane fade" id="wo_vehicle_data_history">
                             <div class="card-header text-center">
-                                <center style="font-size:12px;">WO Vehicle Data History</center>
+                                <center style="font-size:12px;">WO Vehicles & Addons Data History</center>
                             </div>
                             <div class="card-body">
                                 @include('work_order.export_exw.vehicle_data_history')
