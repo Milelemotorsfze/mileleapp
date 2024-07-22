@@ -2568,7 +2568,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
-			addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
+			addonQuantityCell.innerHTML = '<input class="child_addon_id_'+data.vehicle_id+'" type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
 				+ '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
 				+ '<div class="input-group">'
 				+ '<div class="input-group-append">'
@@ -2643,16 +2643,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			allVehicleRows.each(function(index) {
 				var row = $(this);			
 				// Update hidden input field for addon_code
-				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
+				row.find('.child_addon_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]').attr('id', 'addons_' + className + '_' + index);
 
 				// Update quantity input field within the specific div structure
-				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id', 'addon_quantity_' + className + '_' + index);
 
 				// Update description input field within the <td> element
 				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + className + '_' + index);
 				
 				// Update hidden input field for addon ID
-				row.find('input[type="hidden"][name^="vehicle[' + className + '][addons]"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
+				row.find('.child_addon_id_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
 
 				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {

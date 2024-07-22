@@ -609,28 +609,61 @@
                         const recordHistories = addonMapping.record_histories || [];
 
                         // Initialize addon field values
-                        let addonCode = 'NA';
-                        let addonName = 'NA';
-                        let addonQuantity = 'NA';
-                        let addonDescription = 'NA';
+                        let addonCode = '';
+                        let addonQuantity = '';
+                        let addonDescription = '';
 
                         // Loop through record histories to get field values
                         recordHistories.forEach(history => {
                             switch(history.field_name) {
                                 case 'addon_code':
-                                    addonCode = history.new_value || 'NA';
-                                    break;
-                                case 'addon_name':
-                                    addonName = history.new_value || 'NA';
+                                    addonCode = history.new_value || '';
                                     break;
                                 case 'addon_quantity':
-                                    addonQuantity = history.new_value || 'NA';
+                                    addonQuantity = history.new_value || '';
                                     break;
                                 case 'addon_description':
-                                    addonDescription = history.new_value || 'NA';
+                                    addonDescription = history.new_value || '';
                                     break;
                             }
                         });
+
+                        updatedVehiclesHtml += `
+                            <tr style="border:1px solid #e9e9ef;">
+                                <td style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonCode}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonQuantity}</td>
+                                <td style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">${addonDescription}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                // Service breakdown removed section
+                if(item.delete_mapping_addons && item.delete_mapping_addons.length > 0) {
+                    // Sort the addons by addon_code in ascending order
+                    const sortedAddons = item.delete_mapping_addons.sort((a, b) => {
+                        if (a.addon.addon_code < b.addon.addon_code) return -1;
+                        if (a.addon.addon_code > b.addon.addon_code) return 1;
+                        return 0;
+                    });
+
+                    updatedVehiclesHtml += `
+                        <tr style="border:1px solid #e9e9ef;">
+                            <th colspan="3" style="padding-left:5px; padding-top:5px;padding-bottom:5px; font-size:12px!important;">${item.delete_mapping_addons.length} Service Breakdown removed</th>
+                        </tr>
+                        <tr style="border:1px solid #e9e9ef;">
+                            <th style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Quantity</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Description</th>
+                        </tr>
+                    `;
+                    
+                    sortedAddons.forEach(addonMapping => {
+                        const addon = addonMapping.addon;
+
+                        // Initialize addon field values
+                        let addonCode = addon.addon_code || '';
+                        let addonQuantity = addon.addon_quantity || '';
+                        let addonDescription = addon.addon_description || '';
 
                         updatedVehiclesHtml += `
                             <tr style="border:1px solid #e9e9ef;">
