@@ -266,22 +266,7 @@
         
         });
 
-            $('#approval-date').change(function () {
-                console.log("date");
-                var date = $(this).val();
-                $('#rejection-date').val(date);
-                console.log(date);
-                $msg = "";
-                removeLOIApprovalDateError($msg)
-            });
-            $('#rejection-date').change(function () {
-                console.log("date");
-                var date = $(this).val();
-                $('#rejection-date').val(date);
-                console.log(date);
-                $msg = "";
-                removeLOIRejectionDateError($msg)
-            });
+          
            
            
         });
