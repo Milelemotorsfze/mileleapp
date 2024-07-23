@@ -246,29 +246,6 @@
  
     <script type="text/javascript">
         $(document).ready(function () { 
-            $('#status-change-button-approve').click(function () {
-                console.log("button clicked");
-                // var id = $('#id').val();
-                // var status = $('#status-approve').val();
-                // var date = document.getElementById("approval-date").value
-                // if (date.length > 0) {
-                    statusChange();
-                // } else {
-                //     $msg = "This field is required";
-                //     showLOIApprovalDateError($msg)
-                // }
-            })
-            $('#status-reject-button').click(function (e) {
-                var id = $('#id').val();
-                var status = $('#status-reject').val();
-                var date = document.getElementById("rejection-date").value
-                if (date.length > 0) {
-                    statusChange(id, status, date)
-                } else {
-                    $msg = "This field is required";
-                    showLOIRejectionDateError($msg)
-                }
-            });
            
 
             $('.btn-request-supplier-approval').on('click',function(){
