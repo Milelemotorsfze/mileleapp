@@ -77,10 +77,6 @@
                                 @endif
                             </td>
                         </tr>
-                        <!-- <tr>
-                            <td class="fw-bold" style="padding-left: 20px;">  Type: </td>
-                            <td>Brand New</td>
-                        </tr> -->
                         <tr>
                             <td class="fw-bold" style="padding-left: 20px;"> Quantity:  </td>
                             <td> {{ $letterOfIndentItem->quantity ?? '' }}</td>
@@ -89,22 +85,6 @@
                     @endforeach
                 </table>
 
-                <!-- <div style="list-style-type: none;">
-                    @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
-                        <li>{{$key + 1}}.&nbsp;
-                            <span class="fw-bold">Model Description:</span>
-                            @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
-                                {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
-                            @else
-                                {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
-                            @endif
-                        </li>
-                        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
-                        <li style="margin-bottom: 10px;">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;<span class="fw-bold">Quantity: </span>
-                            {{ $letterOfIndentItem->quantity ?? '' }}
-                        </li>
-                    @endforeach
-                </div> -->
                 <p style="margin-top:20px;">
                     I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
                     purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,

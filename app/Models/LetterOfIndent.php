@@ -29,15 +29,9 @@ class LetterOfIndent extends Model
 
     protected $appends = [
         'total_loi_quantity',
-        // 'total_approved_quantity',
-        'is_pfi_pending_for_loi',
-        'is_loi_expired'
     ];
 
-    // public function customer()
-    // {
-    //     return $this->belongsTo(Customer::class);
-    // }
+    
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by','id');
@@ -45,6 +39,10 @@ class LetterOfIndent extends Model
     public function updatedBy()
     {
         return $this->belongsTo(User::class,'updated_by','id');
+    }
+    public function salesPerson()
+    {
+        return $this->belongsTo(User::class,'sales_person_id','id');
     }
     public function client()
     {
@@ -79,45 +77,6 @@ class LetterOfIndent extends Model
     
         return $letterOfIndentItemQty;
     }
-    // public function getTotalApprovedQuantityAttribute() {
-    //     $letterOfIndentItemApprovedQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
-    //         ->sum('approved_quantity');
-    //     if(!$letterOfIndentItemApprovedQty) {
-    //         return 0;
-    //     }
-    //     return $letterOfIndentItemApprovedQty;
-    // }
-    public function getIsPfiPendingForLoiAttribute() {
-        $approvedloiItem = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $this->id);
-
-        if($approvedloiItem->count() > 0) {
-            $isPfiPending = $approvedloiItem->whereNull('pfi_id')->get();
-            if($isPfiPending->count() > 0) {
-                return true;
-            }
-        }
-         return false;
-    }
-    public function getIsLoiExpiredAttribute() {
-        $LOI = LetterOfIndent::find($this->id);
-        
-        $LOItype = $LOI->client->customertype;
-      
-        $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-        if($LOIExpiryCondition && $LOI->is_expired == false) {        
-            $currentDate = Carbon::now();
-           
-            $year = $LOIExpiryCondition->expiry_duration_year;
-          
-            $expiryDate = Carbon::parse($LOI->date)->addYears($year);
-           
-            $test = $currentDate->gt($expiryDate);
-            // do not make status expired, becasue to know at which status stage it got expired
-            if($currentDate->gt($expiryDate) == true) {
-                $LOI->is_expired = true;              
-                $LOI->save();  
-            }
-        }
-        return $LOI->is_expired;
-    }
-}
+   
+   
+   }
