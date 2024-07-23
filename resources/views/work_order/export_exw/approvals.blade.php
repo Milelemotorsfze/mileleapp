@@ -9,9 +9,9 @@
         </a>
     @endif
 @elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
-    <a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+    <!-- <a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
     <i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
-    </a>
+    </a> -->
 @endif
 @if(isset($workOrder) && $workOrder->finance_approved_at != '')
     <a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
