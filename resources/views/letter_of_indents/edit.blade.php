@@ -711,14 +711,16 @@
                 },
                 "files[]": {
                     fileCheck:true,
-                    extension: "png|jpeg|jpg"
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880  
                 },
                 loi_signature: {
                     required:function(element) {
                         let currentDealer = '{{ $letterOfIndent->dealers }}';
                         return $("#dealer").val() == 'Milele Motors' && currentDealer == 'Trans Cars'
                     },
-                    extension: "png|jpeg|jpg|svg"
+                    extension: "png|jpeg|jpg|svg",
+                      maxsize:5242880  
                 }
             },
                 messages: {

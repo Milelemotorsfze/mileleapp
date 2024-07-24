@@ -106,11 +106,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" required>
                     </div>
                     <div class="col-lg-4 col-md-6">
-                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
                     {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
                     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
-                    <div id="emailError" class="error-text"></div>
                     </div>
                     <div class="col-lg-4 col-md-6" id="companyNameField" style="display: none;">
                         <label for="basicpill-firstname-input" class="form-label">Company Name : </label>

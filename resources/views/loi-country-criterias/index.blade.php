@@ -76,9 +76,9 @@
                                 <td>{{ $loiCountryCriteria->min_qty_for_company }}</td>
                                 <td>{{ $loiCountryCriteria->comment}}</td>
                                 <td>{{ $loiCountryCriteria->status }} </td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->created_at)->format('Y-m-d')  }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->created_at)->format('d M Y')  }}</td>
                                 <td>{{ $loiCountryCriteria->createdBy->name ?? '' }} </td>     
-                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->updated_at)->format('Y-m-d')  }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->updated_at)->format('d M Y')  }}</td>
                                 <td>  {{ $loiCountryCriteria->updatedBy->name ?? '' }}</td>
                                 <td>
                                 @can('loi-restricted-country-edit')
