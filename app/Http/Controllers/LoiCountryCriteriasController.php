@@ -63,7 +63,6 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
-        $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->status = LoiCountryCriteria::STATUS_ACTIVE;
         if($request->allowed_master_model_line_ids) {
            
@@ -134,13 +133,13 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
-//        $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
-        $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->save();
+        LoiAllowedOrRestrictedModelLines::where('country_id', $request->country_id)->delete();
+
         if($request->allowed_master_model_line_ids) {
            
             foreach($request->allowed_master_model_line_ids as $allowedModelLine) {

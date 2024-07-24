@@ -145,11 +145,11 @@
         </div>
     </div>
 </div>
-    @if(!empty($imageFiles))
+    @if($letterOfIndent->LOIDocuments->count() > 0)
         <div class="page_break"></div>
         <div class="row">
-            @foreach($imageFiles as $imageFile)
-            <img src="{{ public_path($imageFile) }}" class="mt-2">
+            @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
+            <img src="{{ public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  class="mt-2">
             @endforeach
         </div>
     @endif

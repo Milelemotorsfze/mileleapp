@@ -53,45 +53,28 @@
         <h3 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline">Requirements:</h3>
 
         <table  style="width:100%;">
-                    @foreach($letterOfIndentItems as $key => $letterOfIndentItem)             
-                        <tr>
-                            <td> {{$key + 1}}.&nbsp; <span class="fw-bold">Model Description:</span></td>
-                            <td  style="width:80%">
-                                @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
-                                    {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
-                                @else
-                                    {{ str_replace('- SPECIFICATION ATTACHED IN APPENDIX','',$letterOfIndentItem->masterModel->milele_loi_description ?? '' )  }}
-                                @endif
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold" style="padding-left: 20px;">  Type: </td>
-                            <td>Brand New</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold" style="padding-left: 20px;"> Quantity:  </td>
-                            <td> {{ $letterOfIndentItem->quantity ?? '' }}</td>
-                        </tr>
-                  
-                    @endforeach
-                </table>
-
-        <!-- <div style="list-style-type: none;margin-right: 15px;font-size: 14px;">
-            @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
-                <li>{{$key + 1}}.&nbsp;
-                    <span class="fw-bold">Model Description:</span>
-                    @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
-                        {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
-                    @else
-                        {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
-                    @endif
-                </li>
-                <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
-                <li style="margin-bottom: 10px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Quantity: </span>
-                    {{ $letterOfIndentItem->quantity ?? '' }}
-                </li>
+            @foreach($letterOfIndentItems as $key => $letterOfIndentItem)             
+                <tr>
+                    <td> {{$key + 1}}.&nbsp; <span class="fw-bold">Model Description:</span></td>
+                    <td  style="width:80%">
+                        @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
+                            {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                        @else
+                            {{ str_replace('- SPECIFICATION ATTACHED IN APPENDIX','',$letterOfIndentItem->masterModel->milele_loi_description ?? '' )  }}
+                        @endif
+                    </td>
+                </tr>
+                <!-- <tr>
+                    <td class="fw-bold" style="padding-left: 20px;">  Type: </td>
+                    <td>Brand New</td>
+                </tr> -->
+                <tr>
+                    <td class="fw-bold" style="padding-left: 20px;"> Quantity:  </td>
+                    <td> {{ $letterOfIndentItem->quantity ?? '' }}</td>
+                </tr>
+            
             @endforeach
-        </div> -->
+        </table>
         <p style="margin-top:20px;">
             I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
             purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
@@ -104,15 +87,13 @@
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
     </div>
-</div>
-    <!-- @if(!empty($imageFiles)) -->
-        <!-- <div class="page_break"></div> -->
         <div class="row">
-            @foreach($imageFiles as $imageFile)
-            <img src="{{ public_path($imageFile) }}"  class="mt-2">
+            @foreach($letterOfIndent->LOIDocuments as $LOIDocument)
+                 <img src="{{ public_path('LOI-Documents/'.$LOIDocument->loi_document_file) }}"  class="mt-2">
             @endforeach
         </div>
-    <!-- @endif -->
+</div>
+    
 </body>
 </html>
 

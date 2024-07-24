@@ -355,6 +355,7 @@ class DailyleadsController extends Controller
             'custom_brand_model' => $request->input('custom_brand_model'),
             'language' => $client->lauguage,
             'created_at' => $formattedDate,
+            'assign_time' => $formattedDate,
             'created_by' => Auth::id(),
             'status' => "New",
             'priority' => "High",

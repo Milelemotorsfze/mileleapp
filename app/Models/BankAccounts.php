@@ -15,6 +15,6 @@ class BankAccounts extends Model
     }
     public function bank()
     {
-        return $this->belongsTo(BankMaster::class);
+        return $this->belongsTo(BankMaster::class, 'bank_master_id');
     }
 }

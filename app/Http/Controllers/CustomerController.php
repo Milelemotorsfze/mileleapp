@@ -65,14 +65,6 @@ class CustomerController extends Controller
         $client->is_demand_planning_customer = true;
 
 
-//         $customer = new Customer();
-//         $customer->name = $request->name;
-// //        $customer->company_name = $request->company_name;
-//         $customer->country_id = $request->country_id;
-//         $customer->type = $request->type;
-//         $customer->address = $request->address;
-//         $customer->created_by = Auth::id();
-
         if ($request->has('passport_file'))
         {
             $file = $request->file('passport_file');
@@ -154,11 +146,6 @@ class CustomerController extends Controller
         $client->created_by = Auth::id();
         $client->is_demand_planning_customer = true;
 
-//         $customer->name = $request->name;
-// //        $customer->company_name = $request->company_name;
-//         $customer->country_id = $request->country_id;
-//         $customer->type = $request->type;
-//         $customer->address = $request->address;
 
         if ($request->has('passport_file'))
         {
