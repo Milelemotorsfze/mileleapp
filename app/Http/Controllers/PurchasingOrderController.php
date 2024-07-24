@@ -7,6 +7,7 @@ use App\Models\LetterOfIndentItem;
 use App\Models\LetterOfIndent;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
+use Illuminate\Support\Facades\Log;
 use App\Models\PFI;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
@@ -239,29 +240,36 @@ class PurchasingOrderController extends Controller
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', 'Approved')
-    ->whereExists(function ($query) {
-        $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Approved');
-    })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.status', 'Approved');
+            })
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('supplier_account_transaction')
+                    ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
+            })
             ->groupBy('purchasing_order.id')
-            ->get();
+            ->get();                
         }
         else{
-        $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.status', 'Approved')
-        // ->where(function ($query) use ($userId) {
-        //     $query->where('purchasing_order.created_by', $userId)
-        //         ->orWhere('purchasing_order.created_by', 16);
-        // })
-    ->whereExists(function ($query) {
-        $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Approved');
-    })
+        $data = PurchasingOrder::with('purchasing_order_items')
+        ->where('purchasing_order.status', 'Approved')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('vehicles')
+                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->where('vehicles.status', 'Approved');
+        })
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
+        })
         ->groupBy('purchasing_order.id')
-        ->get();
+        ->get();        
         }
         return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
@@ -292,50 +300,52 @@ class PurchasingOrderController extends Controller
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
-        $data = PurchasingOrder::with('purchasing_order_items')
-        ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                ->where('purchasing_order.status', '<>', 'Cancelled')
-                ->where(function ($query) {
-                    $query->where('status', 'Request for Payment')
-                        ->orWhere(function ($query) {
-                            $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                                ->where(function ($query) {
-                                    $query->whereNotNull('payment_status')
-                                        ->where('payment_status', '<>', '');
-                                });
-                        });
-                });
-        })
-        ->groupBy('purchasing_order.id')
-        ->get();
-    }
-        else{
             $data = PurchasingOrder::with('purchasing_order_items')
-            // ->where(function ($query) use ($userId) {
-            //     $query->where('purchasing_order.created_by', $userId)
-            //         ->orWhere('purchasing_order.created_by', 16);
-            // })
+            ->where(function ($query) {
+                $query->where('purchasing_order.status', 'Approved')
+                      ->orWhereNot('purchasing_order.status', 'Cancelled');
+            })
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('purchasing_order.status', '<>', 'Cancelled')
-                    ->where(function ($query) {
-                        $query->where('status', 'Request for Payment')
-                            ->orWhere(function ($query) {
-                                $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                                    ->where(function ($query) {
-                                        $query->whereNotNull('payment_status')
-                                            ->where('payment_status', '<>', '');
-                                    });
+                    ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                    ->where('vehicles.status', 'Approved')
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                            ->from('vehicle_purchasing_cost')
+                            ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                            ->where(function ($query) {
+                                $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                                      ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
                             });
                     });
             })
             ->groupBy('purchasing_order.id')
-            ->get();
+            ->get();        
+    }
+        else{
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where(function ($query) {
+                $query->where('purchasing_order.status', 'Approved')
+                      ->orWhereNot('purchasing_order.status', 'Cancelled');
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                    ->where('vehicles.status', 'Approved')
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                            ->from('vehicle_purchasing_cost')
+                            ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                            ->where(function ($query) {
+                                $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                                      ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                            });
+                    });
+            })
+            ->groupBy('purchasing_order.id')
+            ->get(); 
         }
         return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
@@ -366,13 +376,19 @@ class PurchasingOrderController extends Controller
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
-    $data = PurchasingOrder::with('purchasing_order_items')
+        $data = PurchasingOrder::with('purchasing_order_items')
     ->where('status', 'Approved')
-    ->whereNotExists(function ($query) {
+    ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+            });
     })
     ->groupBy('purchasing_order.id')
     ->get();
@@ -380,16 +396,18 @@ class PurchasingOrderController extends Controller
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
-    // ->where(function ($query) use ($userId) {
-    //     $query->where('purchasing_order.created_by', $userId)
-    //         ->orWhere('purchasing_order.created_by', 16);
-    // })
     ->where('status', 'Approved')
-    ->whereNotExists(function ($query) {
+    ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+            });
     })
     ->groupBy('purchasing_order.id')
     ->get();
@@ -425,8 +443,8 @@ else
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Request for Payment')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -435,8 +453,8 @@ else
         {
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Request for Payment')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -472,8 +490,8 @@ else
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -482,8 +500,8 @@ else
         {
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -519,11 +537,8 @@ else
     if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function($query) {
-                $query->where('vehicles.payment_status', 'Payment Initiated')
-                      ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
-            })
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+           ->where('supplier_account_transaction.transaction_type', 'Pre-Debit')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -536,11 +551,8 @@ else
         //         ->orWhere('purchasing_order.created_by', 16);
         // })
         ->where('purchasing_order.status', $status)
-        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-        ->where(function($query) {
-            $query->where('vehicles.payment_status', 'Payment Initiated')
-                  ->orWhere('vehicles.remaining_payment_status', 'Payment Initiated');
-        })
+        ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+       ->where('supplier_account_transaction.transaction_type', 'Pre-Debit')
         ->select('purchasing_order.*')
         ->groupBy('purchasing_order.id')
         ->get();
@@ -627,11 +639,8 @@ else
         if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function($query) {
-                $query->where('vehicles.payment_status', 'Payment Initiated Request')
-                      ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
-            })
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -644,11 +653,8 @@ else
             //         ->orWhere('purchasing_order.created_by', 16);
             // })
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function($query) {
-                $query->where('vehicles.payment_status', 'Payment Initiated Request')
-                      ->orWhere('vehicles.remaining_payment_status', 'Payment Requested');
-            })
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -684,11 +690,8 @@ else
         if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function($query) {
-                $query->where('vehicles.payment_status', 'Payment Release Approved')
-                      ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
-            })
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -698,11 +701,8 @@ else
             $data = PurchasingOrder::with('purchasing_order_items')
             // ->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function($query) {
-                $query->where('vehicles.payment_status', 'Payment Release Approved')
-                      ->orWhere('vehicles.remaining_payment_status', 'Payment Release Approved');
-            })
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -740,10 +740,11 @@ else
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Payment Completed');
+                    $query->Where('transaction_type', 'Debit')
+                    ->whereNull('vendor_payment_status');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -756,10 +757,11 @@ else
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Payment Completed');
+                    $query->Where('transaction_type', 'Debit')
+                    ->whereNull('vendor_payment_status');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -852,14 +854,21 @@ public function paymentinitiation($status)
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
-$data = PurchasingOrder::with('purchasing_order_items')
+    $data = PurchasingOrder::with('purchasing_order_items')
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->groupBy('purchasing_order.id')
@@ -868,14 +877,20 @@ $data = PurchasingOrder::with('purchasing_order_items')
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
-    // ->where('created_by', $userId)->orWhere('created_by', 16)
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->groupBy('purchasing_order.id')
@@ -1158,6 +1173,9 @@ public function getBrandsAndModelLines(Request $request)
         $vendorPaymentAdjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)
     ->where(function ($query) {
         $query->where('status', '!=', 'Paid')
+              ->where('status', '!=', 'pending')
+              ->where('status', '!=', 'Rejected')
+              ->where('status', '!=', 'Request For Payment')
               ->Where('status', '!=', 'Approved');
     })
     ->select('type', DB::raw('SUM(totalamount) as total_amount'), 'amount', DB::raw('SUM(amount) as total_adjusted_amount'))
@@ -1815,7 +1833,7 @@ public function purchasingupdateStatus(Request $request)
     {
         $vehicle = Vehicles::findOrFail($id);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
-        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process'|| $vehicle->status == 'Payment Requested'|| $vehicle->status == 'Payment Completed' || $vehicle->status == 'Incoming Stock') {
+        if ($vehicle->status == 'Approved') {
             if($hasPermission)
             {
                 $purchasinglog = new Purchasinglog();
@@ -2344,17 +2362,17 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $swiftcopy->save();
             $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id);
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
-            if (!$supplieraccountchange) {
-            $supplieraccountchange = new SupplierAccount();
-            $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
-            $supplieraccountchange->current_balance -= $totalcost;
-            $supplieraccountchange->currency = "AED";
-            $supplieraccountchange->opening_balance = 0;
-            $supplieraccountchange->save();
-            }
             $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
                 ->where('status', 'Approved')
                 ->sum('amount');
+            if (!$supplieraccountchange) {
+            $supplieraccountchange = new SupplierAccount();
+            $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
+            $supplieraccountchange->current_balance += $paymentad;
+            $supplieraccountchange->currency = $purchasedorder;
+            $supplieraccountchange->opening_balance = 0;
+            $supplieraccountchange->save();
+            }
             $supplieracc->current_balance += $paymentad;
             $supplieraccountchange->save();
             $supplieraccount = new SupplierAccountTransaction();
@@ -4026,6 +4044,7 @@ public function requestAdditionalPayment(Request $request)
            }
            public function getVehicles($purchaseOrderId) {
             $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+            ->where('status', 'Approved')
                 ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
                 ->get();
         
@@ -4145,6 +4164,7 @@ public function requestAdditionalPayment(Request $request)
                 $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
                 $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
                 $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
                 $vehiclesSupplierAccountTransaction->status = 'Draft';
                 if (!$vehiclesSupplierAccountTransaction->save()) {
                     return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
@@ -4263,6 +4283,7 @@ public function submitPaymentDetails(Request $request)
                 $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
                 $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
                 $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
                 $vehiclesSupplierAccountTransaction->status = 'pending';
                 if (!$vehiclesSupplierAccountTransaction->save()) {
                     return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
@@ -4355,10 +4376,11 @@ public function submitPaymentDetails(Request $request)
             $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
             if ($supplierAccountTransaction) {
                 if ($file) {
-                    $filePath = $file->store('transition_file', 'public');
-                    $supplierAccountTransaction->transition_file = $filePath;
+                    $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->move(public_path('storage/transition_file'), $fileNameToStore);
+                    $supplierAccountTransaction->transition_file = 'storage/transition_file/' . $fileNameToStore;
                 }
-                $supplierAccountTransaction->transaction_type = 'Post-Debit';
+                $supplierAccountTransaction->transaction_type = 'Pre-Debit';
                 $supplierAccountTransaction->status = 'pending';
                 $supplierAccountTransaction->bank_accounts_id =  $bankAccount;
                 $supplierAccountTransaction->save();
@@ -4410,7 +4432,7 @@ public function submitPaymentDetails(Request $request)
     $transitionId = $request->input('transition_id');
     $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
     if ($supplierAccountTransaction) {
-        $supplierAccountTransaction->transaction_type = 'Debit';
+        $supplierAccountTransaction->transaction_type = 'Released';
         $supplierAccountTransaction->status = 'Approved';
         $supplierAccountTransaction->save();
     }
@@ -4428,6 +4450,9 @@ public function submitPaymentDetails(Request $request)
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'Approved';
         $vehicleTransaction->save();
+        $vehiclespaid = VehiclePurchasingCost::where('vehicles_id', $vehicleTransaction->vehicles_id)->first();
+        $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
+        $vehiclespaid->save();
     }
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
@@ -4479,5 +4504,176 @@ public function submitPaymentDetails(Request $request)
         $vehicleTransaction->save();
     }
     return response()->json(['message' => 'Transition rejected successfully.']);
+    }
+    public function rejectTransitionlinitiate(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $remarks = $request->input('remarks');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Rejected';
+        $supplierAccountTransaction->status = 'Rejected';
+        $supplierAccountTransaction->remarks = $remarks;
+        $supplierAccountTransaction->save();
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Rejected';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Rejected';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Rejected';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Transition rejected successfully.']);
+    }
+    public function uploadSwiftFile(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'swiftFile' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx',
+        'transition_id' => 'required|integer'
+    ]);
+
+    try {
+        $transitionId = $request->input('transition_id');
+        $file = $request->file('swiftFile');
+
+        // Check if the file and transaction exist
+        if ($file && $supplierAccountTransaction = SupplierAccountTransaction::find($transitionId)) {
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
+            $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $supplierAccountTransaction->purchasing_order_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $supplierAccountTransaction->purchasing_order_id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->sat_id = $transitionId;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+            $supplierAccountTransaction->transaction_type = 'Debit';
+            $supplierAccountTransaction->status = 'Paid';
+            $supplierAccountTransaction->save();
+            $supplierAccount = SupplierAccount::find($supplierAccountTransaction->supplier_account_id);
+            if ($supplierAccount) {
+                $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);
+                if ($purchasingOrder) {
+                    $currency = $purchasingOrder->currency;
+                    $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                    $conversionRates = [
+                        "USD" => 3.67,
+                        "EUR" => 3.94,
+                        "GBP" => 4.67,
+                        "JPY" => 0.023,
+                        "AED" => 1,
+                        "CAD" => 2.68
+                    ];
+                    $conversionRate = $conversionRates[$currency] ?? 1;
+                    $totalCostConverted = $transactionAmount * $conversionRate;
+                    $supplierAccount->current_balance += $totalCostConverted;
+                    $supplierAccount->save();
+                }
+            }
+            $this->updateRelatedStatuses($transitionId);
+
+            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Invalid transition ID or file'], 422);
+        }
+    } catch (\Exception $e) {
+        Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+        return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
+    }
+}
+
+private function updateRelatedStatuses($transitionId)
+{
+    // Update PurchasedOrderPaidAmounts
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Paid';
+        $purchasedOrderPaidAmounts->save();
+    }
+
+    // Update VendorPaymentAdjustments
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Paid';
+        $vendorPayment->save();
+    }
+
+    // Update VehiclesSupplierAccountTransactions
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Paid';
+        $vehicleTransaction->save();
+    }
+}
+public function getSwiftDetails($id)
+{
+    try {
+        $supplierAccountTransaction = SupplierAccountTransaction::find($id);
+
+        if (!$supplierAccountTransaction) {
+            return response()->json(['success' => false, 'message' => 'Transaction not found'], 404);
+        }
+        $swiftCopy = DB::table('purchasing_order_swift_copies')
+            ->where('sat_id', $id)
+            ->first();
+        $bankAccount = DB::table('bank_accounts')
+            ->where('id', $supplierAccountTransaction->bank_accounts_id)
+            ->first();
+
+        $bankMaster = null;
+        if ($bankAccount) {
+            $bankMaster = DB::table('bank_master')
+                ->where('id', $bankAccount->bank_master_id)
+                ->first();
+        }
+
+        $swiftDetails = [
+            'transition_id' => $supplierAccountTransaction->id,
+            'transition_file' => $supplierAccountTransaction->transition_file ? asset($supplierAccountTransaction->transition_file) : null,
+            'swift_copy_file' => $swiftCopy ? asset($swiftCopy->file_path) : null,
+            'bank_accounts_id' => $supplierAccountTransaction->bank_accounts_id ?? 'N/A',
+            'account_number' => $bankAccount->account_number ?? 'N/A',
+            'currency' => $bankAccount->currency ?? 'N/A',
+            'current_balance' => $bankAccount->current_balance ?? 'N/A',
+            'bank_name' => $bankMaster->bank_name ?? 'N/A',
+        ];
+
+        info($swiftDetails);
+        return response()->json(['success' => true, 'data' => $swiftDetails]);
+    } catch (\Exception $e) {
+        Log::error('Failed to fetch swift details', ['error' => $e->getMessage()]);
+        return response()->json(['success' => false, 'message' => 'Error fetching details', 'error' => $e->getMessage()], 500);
+    }
+}
+public function paymentconfirm(Request $request)
+    {
+    $transitionId = $request->input('id');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->vendor_payment_status = 'Confirmed';
+        $supplierAccountTransaction->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Confirmed';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
 }

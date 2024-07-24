@@ -19,14 +19,14 @@ class VariantPriceController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('View Variant Price Info Page');
-        $statuss = "Incoming Stock";
+        $statuss = "Approved";
         $activeStocks = Vehicles::whereNull('gdn_id')
-                                ->where('payment_status', $statuss)
+                                ->where('status', $statuss)
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')->get();
 
         $InactiveStocks =  Vehicles::whereNotNull('gdn_id')
-                                ->where('payment_status', $statuss)
+                                ->where('status', $statuss)
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')
                                 ->get();
@@ -34,7 +34,7 @@ class VariantPriceController extends Controller
         $InactiveStocks = $InactiveStocks->sortBy('price_status');
         foreach ($activeStocks as $activeStock) {
 
-            $activeStock->similar_vehicles_with_active_stock =  Vehicles::whereNull('gdn_id')->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
+            $activeStock->similar_vehicles_with_active_stock =  Vehicles::whereNull('gdn_id')->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
                                                                     ->where('varaints_id', $activeStock->varaints_id)
                                                                     ->groupBy('int_colour','ex_colour')
                                                                     ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -69,7 +69,7 @@ class VariantPriceController extends Controller
         foreach ($InactiveStocks as $InactiveStock) {
 
                 $InactiveStock->similar_vehicles_with_inactive_stock = Vehicles::whereNotNull('gdn_id')
-                    ->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
+                    ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
                     ->where('varaints_id', $InactiveStock->varaints_id)
                     ->groupBy('int_colour', 'ex_colour')
                     ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -141,7 +141,7 @@ class VariantPriceController extends Controller
             ->pluck('id');
         if($type == 1) {
          $similarVehicles =  Vehicles::whereNull('gdn_id')
-                ->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
+                ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
                 ->where('varaints_id', $vehicle->varaints_id)
                 ->groupBy('int_colour','ex_colour')
                 ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -177,7 +177,7 @@ class VariantPriceController extends Controller
                 ->orderBy('id','DESC')->get();
         }else{
             $similarVehicles = Vehicles::whereNotNull('gdn_id')
-                ->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
+                ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
                 ->where('varaints_id', $vehicle->varaints_id)
                 ->groupBy('int_colour', 'ex_colour')
                 ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')

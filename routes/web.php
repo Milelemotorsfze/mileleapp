@@ -930,6 +930,15 @@ Route::get('/d', function () {
     Route::post('/submit-payment', [PurchasingOrderController::class, 'submitPayment']);
     Route::post('/approve-transition', [PurchasingOrderController::class, 'approveTransition'])->name('approve.transition');
     Route::post('/reject-transition', [PurchasingOrderController::class, 'rejectTransition']);
+    Route::post('/reject-transition-linitiate', [PurchasingOrderController::class, 'rejectTransitionlinitiate']);
+    Route::post('/upload-swift-file', [PurchasingOrderController::class, 'uploadSwiftFile'])->name('uploadSwiftFile');
+    Route::get('/get-swift-details/{id}', [PurchasingOrderController::class, 'getSwiftDetails'])->name('getSwiftDetails');
+    Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
+    Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
+    
+
+
+
 
 
 

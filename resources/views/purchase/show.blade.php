@@ -513,6 +513,50 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="swiftUploadModal" tabindex="-1" aria-labelledby="swiftUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="swiftUploadModalLabel">Upload Swift File</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="swiftUploadForm" enctype="multipart/form-data">
+          @csrf
+          <input type="hidden" name="transition_id" id="transition_id" value="">
+          <div class="form-group">
+            <label for="swiftFile">Choose file</label>
+            <input type="file" class="form-control-file" id="swiftFile" name="swiftFile" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="uploadSwiftButton">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="swiftDetailsModal" tabindex="-1" aria-labelledby="swiftDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="swiftDetailsModalLabel">Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="swiftDetailsContent">
+          <!-- Swift file details will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="card-header">
         <!-- @if ($previousId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
@@ -994,9 +1038,9 @@
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('request-additional-payment');
         @endphp
         @if ($hasPermission)
-        <div class="col-lg-3 col-md-4 col-sm-6">
+        <!-- <div class="col-lg-3 col-md-4 col-sm-6">
         <button id="approval-btn" class="btn btn-success btn-sm" onclick="requestForAdditionalPayment({{ $purchasingOrder->id }})">Request For Initiated</button>
-        </div>
+        </div> -->
         @endif
         @endif
         @if($additionalpaymentintFormatted)
@@ -1141,6 +1185,7 @@
                     @endif
                 </div>
                 @php
+                           $vehicleIds = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->pluck('id');
                             $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
                             $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
                             $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
@@ -1149,18 +1194,19 @@
                             $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
                             $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
                             $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
-                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
-                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
+                            $vehiclescountrequestpay = DB::table('vehicles_supplier_account_transaction')->whereIn('vehicles_id', $vehicleIds)->where('status', 'pending')->groupBy('vehicles_id')->selectRaw('count(*) as total')->count();
+                            $vehiclescountintitail = DB::table('vehicles_supplier_account_transaction')->whereIn('vehicles_id', $vehicleIds)->where('status', 'Request For Payment')->groupBy('vehicles_id')->selectRaw('count(*) as total')->count();
                             $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
                             $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelreq = DB::table('vehicles_supplier_account_transaction')->whereIn('vehicles_id', $vehicleIds)->where('status', 'Initiate')->groupBy('vehicles_id')->selectRaw('count(*) as total')->count();
+                            $vehiclescountintitailrelapp = DB::table('vehicles_supplier_account_transaction')->whereIn('vehicles_id', $vehicleIds)->where('status', 'Approved')->groupBy('vehicles_id')->selectRaw('count(*) as total')->count();
                             $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
-                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailpaycomp = DB::table('vehicles_supplier_account_transaction')->whereIn('vehicles_id', $vehicleIds)->where('status', 'Paid')->groupBy('vehicles_id')->selectRaw('count(*) as total')->count();
                             $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
                             $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
                             $vendorandincomingconfirm = $vendorpaymentconfirm + $vendorpaymentincoming ;
-                            $serialNumber = 1;   
+                            $serialNumber = 1;
+                            $serialNumberpayments = 1;   
                             @endphp
                             <div class="col-lg-3 col-md-3 col-sm-12">
                             <div class="container">
@@ -1181,8 +1227,32 @@
 </div>
                         </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
-                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
-                        <thead class="bg-soft-secondary">
+                <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
+                        <th style="font-size: 12px;">S.No</th>
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Not Approved Vehicles</td>
+                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
+                        </tr>
+                        <tr> 
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;"> Approved Vehicles</td>
+                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                        </tr>
+                        <tr>
+                        <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Cancel Vehicles</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="dtBasicExample93" class="table table-striped table-editable table-edits table table-bordered table-sm">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
                         <th style="font-size: 12px;">S.No</th>
                         <th style="font-size: 12px;">Status</th>
                         <th style="font-size: 12px;">Qty</th>
@@ -1190,69 +1260,40 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Not Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr> 
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;"> Vehicles Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
                             <td style="font-size: 12px;">Payment Initiation Requested</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
+                            <td style="font-size: 12px;">Procurement Manager</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Request</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
+                            <td style="font-size: 12px;">Payment Initiated Request</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
                             <td style="font-size: 12px;">Finance</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
                             <td style="font-size: 12px;">Payment Initiated</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
-                            <td style="font-size: 12px;">CEO</td>
+                            <td style="font-size: 12px;">CEO Office</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
                             <td style="font-size: 12px;">Payment Released</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
                             <td style="font-size: 12px;">Finance</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
                             <td style="font-size: 12px;">Payment Release Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
                             <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">{{ $serialNumberpayments++ }}</td>
                             <td style="font-size: 12px;">Payment Acknowledged</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
                             <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Incoming Stock</td>
-                            <td colspan="2" style="font-size: 12px;">{{ $vendorandincomingconfirm }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
-                        <thead class="bg-soft-secondary" style="background-color: darkred;">
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td style="font-size: 12px;">Vehicles Cancel</td>
-                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -1428,10 +1469,10 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
                         @if ($hasPermission)
-    @if ($purchasingOrder->status === 'Approved')
-        @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && 
-            ($vehicles->contains('payment_status', 'Payment Release Approved') || 
-            $vehicles->contains('remaining_payment_status', 'Payment Release Approved')))
+                        @if ($purchasingOrder->status === 'Approved')
+                            @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && 
+                                ($vehicles->contains('payment_status', 'Payment Release Approved') || 
+                                $vehicles->contains('remaining_payment_status', 'Payment Release Approved')))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                         <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
                                     </div>
@@ -1448,6 +1489,7 @@
                 <div class="card-header">
                     <h4 class="card-title">Active Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
+                    @if($purchasingOrder->status != "Cancelled")
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                     @endphp
@@ -1466,6 +1508,7 @@
                     @endphp
                     @if ($hasPermission)
                     <a href="#" class="btn btn-sm btn-primary float-left updatevariant-btn me-2" data-id="{{ $purchasingOrder->id }}">Variant Update</a>
+                    @endif
                     @endif
                 </div>
                 <div class="card-body">
@@ -1495,13 +1538,18 @@
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
-                                @php
+                                <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
                                 @endphp
                                 @if ($hasPermission)
                                     <th>Payment Status</th>
+                                @endif -->
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['po-approval', 'edit-po-colour-details']);
+                                @endphp
+                                @if ($hasPermission)
+                                    <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
                                 @endif
-                                <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
                                 <th style="vertical-align: middle; text-align: center;">Remarks</th>
                             </tr>
                             </thead>
@@ -1693,7 +1741,7 @@
                             {{ ucfirst(strtolower( $vehicles->status)) }}
                             @endif
                             </td>
-                            @php
+                            <!-- @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
                             @endphp
                             @if ($hasPermission)
@@ -1715,12 +1763,24 @@
     @endif
 </td>
 
-                                @endif
+                                @endif -->
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['po-approval', 'edit-po-colour-details']);
+                                @endphp
+                                @if ($hasPermission)
                                 <td style ="width:160px;">
                                 <div class="row">
                                 <div class="col-lg-12" style="display: inline-flex;">
                                 <div class="col-lg-8">
-                        {{-- For Management  --}}
+								@if ($vehicles->status === 'Not Approved')
+                                <a class='holdButtonveh btn btn-sm btn-secondary' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap; margin-bottom: 10px;" data-url="{{ route('vehicles.hold', $vehicles->id) }}" data-status="hold">
+                            Hold
+                            </a>
+                            @elseif($vehicles->status === 'Hold')
+                            <a class='holdButtonveh btn btn-sm btn-secondary' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap; margin-bottom: 10px;" data-url="{{ route('vehicles.hold', $vehicles->id) }}" data-status="unhold">
+                                                Un-Hold
+                                            </a>
+                            @endif
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                         @endphp
@@ -1733,7 +1793,7 @@
                         <form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
                             @csrf
                         </form>
-                        <a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
+                        <a class='cancelButtonveh btn btn-sm btn-danger' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
                             Reject / Cancel
                         </a>
                         @elseif ($vehicles->status == 'Rejected')
@@ -1742,21 +1802,20 @@
                         </a>
                         @endif
                         @endif
-                        @php
+                        <!-- @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
                         @endphp
                         @if ($hasPermission)
                         @if ($vehicles->payment_status === 'Payment Initiated')
-                        <!-- <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px;">
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
                         <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
-                        </div> -->
+                        </div>
                         @endif
-                        @endif
-                        {{-- For Incoming Confirm  --}}
-											@php
+                        @endif -->
+											<!-- @php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 											@endphp
 											@if ($hasPermission)
@@ -1767,10 +1826,8 @@
 											</a>
                                             @endif
 											@endif
-											@endif
-											{{-- End For Vendor Confirm  --}}
-                        {{-- For Vendor Confirm  --}}
-											@php
+											@endif -->
+											<!-- @php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 											@endphp
 											@if ($hasPermission)
@@ -1781,10 +1838,8 @@
 											</a>
                                            @endif
 											@endif
-											@endif
-											{{-- End For Vendor Confirm  --}}
-						{{-- End For Management  --}}
-                                        @php
+											@endif -->
+                                        <!-- @php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 										@endphp
 										@if ($hasPermission)
@@ -1795,22 +1850,19 @@
 										</a>
 										@endif
 										@endif
-										@endif
-							{{-- End For Initiate Payment procurement  --}}
-							{{-- For Initiate Payment Finance  --}}
-                            @if ($vehicles->payment_status === 'Payment Initiated Request')
+										@endif -->
+                            <!-- @if ($vehicles->payment_status === 'Payment Initiated Request')
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
                         @if ($hasPermission)
                         <div style="display: flex; gap: 10px;">
-                        <!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                       <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
                         Approved
-                        </a> -->
+                        </a>
                         @endif
-                        @endif
-
-                                            @php
+                        @endif -->
+                                            <!-- @php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
 											@endphp
 											@if ($hasPermission)
@@ -1821,10 +1873,8 @@
 											</a>
 											@endif
 											@endif
-											@endif
-								{{-- End For Initiate Payment Finance  --}}
-								{{-- For Release Request  --}}
-								@php
+											@endif -->
+								<!-- @php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
 								@endphp
 								@if ($hasPermission)
@@ -1835,10 +1885,8 @@
 								</a>
 								@endif
 								@endif
-								@endif
-								{{-- End For Release Request  --}}
-								{{-- For Amount Debited  --}}
-									@php
+								@endif -->
+									<!-- @php
 									$hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
 									@endphp
 									@if ($hasPermission)
@@ -1869,7 +1917,7 @@
       </form>
     </div>
   </div>
-</div>
+</div> -->
                                         <!-- File Upload Modal -->
                                         <!-- <div class="modal fade" id="fileUploadModalsingle" tabindex="-1" role="dialog" aria-labelledby="fileUploadModalsingleLabel" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
@@ -1894,19 +1942,17 @@
                                             </div>
                                         </div>
                                         </div> -->
-                                    <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="#" onclick="allpaymentintreqfinpaycompsingle({{ $vehicles->id }});" style="margin-right: 10px; white-space: nowrap;">
+                                    <!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="#" onclick="allpaymentintreqfinpaycompsingle({{ $vehicles->id }});" style="margin-right: 10px; white-space: nowrap;">
     Payment Completed
-</a>
+</a> -->
 									<!-- <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 									Payment Completed
 									</a> -->
+									<!-- @endif
 									@endif
 									@endif
-									@endif
-									{{-- End For Amount Debited  --}}
-									</div>
+									</div> -->
                             <div class="col-lg-4">
-								{{-- Cancel & Delete for procurement  --}}
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole('cancel-vehicle-purchased-order');
 								@endphp
@@ -1916,8 +1962,7 @@
 								<form id="cancel-form-{{ $vehicles->id }}" action="{{ route('vehicles.cancel', $vehicles->id) }}" method="POST" style="display:none;">
                                     @csrf
                                 </form>
-
-                                <a id='cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
+                                <a class='cancelButtonveh btn btn-sm btn-danger' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="javascript:void(0);" style="white-space: nowrap;" data-url="{{ route('vehicles.cancel', $vehicles->id) }}">
                                     Cancel
                                 </a>
                                 @endif
@@ -1927,15 +1972,15 @@
 								</a>
 								@endif
 								@endif
-							{{-- End Cancel & Delete For Procurement  --}}
                         </div>
                         </div>
 							</div>
                         </td>
+                        @endif
                         <td>
-                        @if ($vehicles->payment_status != '' && $vehicles->purchased_paid_percentage != 100 && $vehicles->remaining_payment_status === 'Request for Payment')
+                        <!-- @if ($vehicles->payment_status != '' && $vehicles->purchased_paid_percentage != 100 && $vehicles->remaining_payment_status === 'Request for Payment')
 						Remainings Payment Requested
-						@endif
+						@endif -->
                             {{ ucfirst(strtolower($vehicles->procurement_vehicle_remarks)) }}</td>
                         </tr>
                             @endforeach
@@ -1944,6 +1989,7 @@
                     </div>
                 </div>
             </div>
+            @if($purchasingOrder->status != "Cancelled")
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('add-more-vehicles-po');
             @endphp
@@ -2034,6 +2080,7 @@
 {{--                    @endif--}}
                 @endif
             @endcan
+            @endif
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Cancel Vehicle's Details</h4>
@@ -2109,7 +2156,7 @@
                 </div>
             </div>
             @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-accounts');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('purchased-order-transition-view');
   @endphp
   @if ($hasPermission)
             <div class="card">
@@ -2133,101 +2180,135 @@
                                 @php
                                 $hasTransitionPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
                                 $hasPaymentPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                                $hasdetailsPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                                $haspaymentinitiatedPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                                $haspaymentreleasePermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
                                 @endphp
-                                @if ($hasTransitionPermission || $hasPaymentPermission)
+                                @if ($hasTransitionPermission || $hasPaymentPermission || $hasdetailsPermission || $haspaymentinitiatedPermission || $haspaymentreleasePermission)
                                 <th>Action</th>
                                 @endif
                             </tr>
                             </thead>
                             <tbody>
-                @foreach ($transitions as $transition)
-                <tr data-transition-id="{{ $transition->id }}">
-                <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
-                <td>{{ $transition->created_at->format('d M Y') }}</td>
-                    <td>{{ $transition->transaction_type }}</td>
-                    <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
-                    <td>{{ $transition->account_currency }}</td>
-                    <td>{{ $transition->user->name }}</td>
-                    <td>{{ $transition->vehicle_count }}</td>
-                    <td>{{ $transition->remarks }}</td>
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
-                    @endphp
-                    @if ($hasPermission)
-                    <td>
-                    @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
-                        <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
-                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
-                    @endif
-                    </td>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
-                    @endphp
-                    @if ($hasPermission)
-                    <td>
-                    @if($transition->transaction_type == "Initiate Payment Request")
-                        <button class="btn btn-success btn-sm" onclick="handleActioninitiate('approve', {{ $transition->id }})">Approve</button>
-                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
-                    @endif
-                    </td>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                    @endphp
-                    @if ($hasPermission)
-                    <td>
-                    @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Draft")
-                        <button class="btn btn-primary btn-sm" onclick="submitpayment('approve', {{ $transition->id }})">Submit</button>
-                    @endif
-                    </td>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
-                    @endphp
-                    @if ($hasPermission)
-                    <td>
-                    @if($transition->transaction_type == "Request For Payment")
-                    <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
-                    @endif
-                    </td>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
-                    @endphp
-                    @if ($hasPermission)
-                    <td>
-                    @if($transition->transaction_type == "Post-Debit")
-                    <button id="approveButton" class="btn btn-success btn-sm" data-transition-id="{{ $transition->id }}">Released</button>
-                    <button class="btn btn-danger btn-sm" data-reject-id="{{ $transition->id }}" onclick="showRejectModal({{ $transition->id }})">Reject</button>
-                    @endif
-                    </td>
-                    @endif
-                </tr>
-                @endforeach
+                            @foreach ($transitions as $transition)
+                            <tr data-transition-id="{{ $transition->id }}">
+                                <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
+                                <td>{{ $transition->created_at->format('d M Y') }}</td>
+                                <td>{{ $transition->transaction_type }}</td>
+                                <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
+                                <td>{{ $transition->account_currency }}</td>
+                                <td>{{ $transition->user->name }}</td>
+                                <td>{{ $transition->vehicle_count }}</td>
+                                <td>{{ $transition->remarks }}</td>
+                                <td>
+                                @php
+                                $haspostdebit = $transition->transaction_type == "Pre-Debit";
+                                $hasreleased = $transition->transaction_type == "Released";
+                                $hasdebit = $transition->transaction_type == "Debit";
+                                $hasrejectioned = $transition->transaction_type == "Rejected";
+                                @endphp
+                                @if ($haspostdebit || $hasreleased || $hasdebit || $hasrejectioned)
+                                <button class="btn btn-info btn-sm" onclick="openSwiftDetailsModal({{ $transition->id }})">
+                                    <i class="fa fa-eye"></i> View
+                                </button>
+                                @endif
+                            </td>
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+                            @endphp
+                            @if ($hasPermission)
+                                <td>
+                                    @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
+                                        <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
+                                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                                    @endif
+                                </td>
+                            @endif
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                            @endphp
+                            @if ($hasPermission)
+                                <td>
+                                    @if($transition->transaction_type == "Initiate Payment Request")
+                                        <button class="btn btn-success btn-sm" onclick="handleActioninitiate('approve', {{ $transition->id }})">Approve</button>
+                                        <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
+                                    @endif
+                                </td>
+                            @endif
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                            @endphp
+                            @if ($hasPermission)
+                                <td>
+                                    @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Draft")
+                                        <button class="btn btn-primary btn-sm" onclick="submitpayment('approve', {{ $transition->id }})">Submit</button>
+                                    @endif
+                                    @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Debit" && $transition->vendor_payment_status == Null)
+                                        <button class="btn btn-primary btn-sm" onclick="paymentconfirm('approve', {{ $transition->id }})">Vendor Payment Confirm</button>
+                                    @endif
+                                </td>
+                            @endif
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                            @endphp
+                            @if ($hasPermission)
+                                <td>
+                                    @if($transition->transaction_type == "Pre-Debit")
+                                        <button id="approveButton" class="btn btn-success btn-sm" data-transition-id="{{ $transition->id }}">Released</button>
+                                        <button class="btn btn-danger btn-sm" data-reject-id="{{ $transition->id }}" onclick="showRejectModalreleased({{ $transition->id }})">Reject</button>
+                                        <!-- <button class="btn btn-danger btn-sm" onclick="showRejectModalreleased({{ $transition->id }})">Reject</button> -->
+                                    @endif
+                                </td>
+                            @endif
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                            @endphp
+                            @if ($hasPermission)
+                                <td>
+                                    @if($transition->transaction_type == "Released")
+                                        <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
+                                    @elseif($transition->transaction_type == "Request For Payment")
+                                        <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
+                                                    @endif
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <!-- Modal for rejection remarks -->
-<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+<div id="rejectModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="rejectModalLabel">Reject Transaction</h5>
-        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="rejectModalLabel">Reject Transition</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="rejectForm">
-          <input type="hidden" id="rejectTransitionId">
-          <div class="form-group">
-            <label for="remarks">Remarks</label>
-            <textarea class="form-control" id="remarks" rows="3" required></textarea>
-          </div>
-            </br>
-          <button type="submit" id="submitReject" class="btn btn-danger">Submit</button>
-        </form>
+        <textarea id="rejectRemarks" class="form-control" placeholder="Enter remarks"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="submitReject" type="button" class="btn btn-danger">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="rejectModallinitiate" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModallinitiateLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModallinitiateLabel">Reject Transition</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="rejectRemarkslinitiate" class="form-control" placeholder="Enter remarks"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="submitRejectlinitiate" type="button" class="btn btn-danger">Reject</button>
       </div>
     </div>
   </div>
@@ -2688,6 +2769,7 @@
             const editableFields = document.querySelectorAll('.editable-field');
             const editBtn = document.querySelector('.edit-btn');
             const updateBtn = document.querySelector('.update-btn');
+            if (editBtn && updateBtn) {
             editBtn.addEventListener('click', () => {
                 editBtn.style.display = 'none';
                 updateBtn.style.display = 'block';
@@ -2778,6 +2860,7 @@
         }
     });
 });
+}
         </script>
         @endif
         <script>
@@ -3027,41 +3110,42 @@ function postUpdateStatus(status, orderId, remarks = '') {
   <script>
 $(document).ready(function() {
     var cancelUrl;
-    
-    $('#cancelButtonveh').click(function(event) {
+
+    $('.cancelButtonveh').click(function(event) {
         event.preventDefault(); // Prevent the default action (navigation)
         cancelUrl = $(this).data('url'); // Store the URL to redirect to after confirmation
         $('#confirmationvehModal').modal('show'); // Show the modal
-    });
 
-    $('#confirmvehCancel').click(function() {
-        var remarks = $('#remarksveh').val(); // Get the remarks from the textarea
-        if (!remarks) {
-            alert('Please provide remarks.');
-            return; // Do not proceed if remarks are empty
-        }
-
-        // Make an AJAX POST request with the remarks and purchasing order ID
-        $.ajax({
-            url: cancelUrl, // Use the stored URL
-            type: 'POST',
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
-                remarks: remarks
-            },
-            success: function(response) {
-                $('#confirmationvehModal').modal('hide'); // Hide the modal
-                alert('Remarks submitted successfully');
-                window.location.href = window.location.href; // Redirect to the current URL
-            },
-            error: function(xhr) {
-                console.error('Error:', xhr);
-                alert('An error occurred. Please try again.');
+        // Attach the confirmation event handler inside the click handler
+        $('#confirmvehCancel').off('click').on('click', function() {
+            var remarks = $('#remarksveh').val(); // Get the remarks from the textarea
+            if (!remarks) {
+                alert('Please provide remarks.');
+                return; // Do not proceed if remarks are empty
             }
+
+            // Make an AJAX POST request with the remarks and purchasing order ID
+            $.ajax({
+                url: cancelUrl, // Use the stored URL
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                    remarks: remarks
+                },
+                success: function(response) {
+                    $('#confirmationvehModal').modal('hide'); // Hide the modal
+                    alert('Remarks submitted successfully');
+                    window.location.href = window.location.href; // Redirect to the current URL
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    alert('An error occurred. Please try again.');
+                }
+            });
         });
     });
 });
-        </script>
+</script>
         <script>
             function confirmPayment() {
                 var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
@@ -4092,6 +4176,11 @@ $(document).ready(function() {
         },
         success: function(response) {
             alertify.success('Transitions Updated Successfully');
+            setTimeout(function() {
+            window.location.reload();
+        }, 500);
+            var row = $('button[data-reject-id="' + transitionId + '"]').closest('tr');
+      row.find('.btn').hide();
             updateTableRow(transitionId);
         },
         error: function(xhr) {
@@ -4109,13 +4198,33 @@ function submitpayment(action, transitionId) {
         },
         success: function(response) {
             alertify.success('Transitions Updated Successfully');
-            updateTableRow(transitionId);
+            var buttonRow = $('button[data-transition-id="' + transitionId + '"]').closest('td');
+            buttonRow.find('.btn').hide();
         },
         error: function(xhr) {
             console.error(xhr.responseText);
         }
     });
 }
+function paymentconfirm(action, transitionId) {
+    $.ajax({
+        url: '{{ route("transition.paymentconfirm") }}', // Update this route to your controller method
+        type: 'POST',
+        data: {
+            id: transitionId,
+            action: action
+        },
+        success: function(response) {
+            alertify.success('Transitions Confirmation Successfully');
+            var buttonRow = $('button[data-transition-id="' + transitionId + '"]').closest('td');
+            buttonRow.find('.btn').hide();
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
 function updateTableRow(transitionId) {
     let row = $(`#row-${transitionId}`);
     row.find('button').hide(); // Hide all buttons in the row
@@ -4146,6 +4255,10 @@ function handleAction(action, transitionId, remarks = '') {
 function showRejectModal(transitionId) {
     $('#rejectTransitionId').val(transitionId);
     $('#rejectModal').modal('show');
+}
+function showRejectModalinitiate(transitionId) {
+    $('#submitRejectlinitiate').data('transition-id', transitionId);
+    $('#rejectModallinitiate').modal('show');
 }
 $(document).ready(function() {
     $.ajaxSetup({
@@ -4325,6 +4438,7 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                         }
                         response.forEach(vehicle => {
                             const formattedPrice = formatPrice(vehicle.vehicle_purchasing_cost ? vehicle.vehicle_purchasing_cost.unit_price : 'N/A');
+                            const paidamount = formatPrice(vehicle.vehicle_purchasing_cost ? vehicle.vehicle_purchasing_cost.amount : 'N/A');
                             vehicleTable.row.add([
                                 vehicle.id,
                                 vehicle.variant.brand.brand_name,
@@ -4419,6 +4533,7 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                 success: function(response) {
                     alert('Details saved successfully!');
                     $('#purchaseOrderModal').modal('hide');
+                    location.reload();
                 },
                 error: function() {
                     alert('Failed to save details.');
@@ -4499,13 +4614,8 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         return parseInt(price).toLocaleString('en-US');
     }
     function modalforinitiated(transitionId) {
-  // Open the modal
   $('#paymentModal').modal('show');
-  
-  // Set the transitionId in the hidden input field
   document.getElementById('transitionId').value = transitionId;
-  
-  // Fetch and populate the banks dropdown
   fetch('/api/banks')
     .then(response => {
       if (!response.ok) {
@@ -4569,7 +4679,7 @@ function submitPaymentForm() {
   })
   .then(data => {
     if (data.success) {
-      alert('Payment submitted successfully');
+        alertify.success('Payment submitted successfully');
       $('#paymentModal').modal('hide');
       const transitionId = formData.get('transitionId');
       const button = document.querySelector(`button[data-transition-id="${transitionId}"]`);
@@ -4596,7 +4706,7 @@ function submitPaymentForm() {
                 },
                 success: function(response) {
                     if(response.success) {
-                        alert('Transition approved successfully!');
+                        alertify.success('Transitions approved Successfully');
                         $(`button[data-transition-id="${transitionId}"]`).hide();
                         $(`button[data-reject-id="${transitionId}"]`).hide();
                     } else {
@@ -4610,7 +4720,7 @@ function submitPaymentForm() {
             });
         });
     });
-    function showRejectModal(transitionId) {
+    function showRejectModalreleased(transitionId) {
   $('#rejectModal').modal('show');
   $('#submitReject').data('transition-id', transitionId);
 }
@@ -4630,7 +4740,10 @@ $(document).ready(function() {
       success: function(response) {
         $('#rejectModal').modal('hide');
         // Handle the response from the controller
-        alert('Transition rejected successfully.');
+        alertify.success('Transitions rejected Successfully');
+        // Hide the buttons
+        var buttonRow = $('button[data-transition-id="' + transitionId + '"]').closest('td');
+        buttonRow.find('.btn').hide();
       },
       error: function(xhr, status, error) {
         // Handle any errors
@@ -4638,6 +4751,146 @@ $(document).ready(function() {
       }
     });
   });
+});
+$(document).ready(function() {
+  $('#submitRejectlinitiate').click(function() {
+    var transitionId = $(this).data('transition-id');
+    var remarks = $('#rejectRemarkslinitiate').val();
+    $.ajax({
+      url: '/reject-transition-linitiate',
+      method: 'POST',
+      data: {
+        _token: '{{ csrf_token() }}',
+        transition_id: transitionId,
+        remarks: remarks
+      },
+      success: function(response) {
+        $('#rejectModallinitiate').modal('hide');
+        alertify.success('Transitions rejected Successfully');
+        var row = $('button[data-reject-id="' + transitionId + '"]').closest('tr');
+        row.find('.btn').hide();
+      },
+      error: function(xhr, status, error) {
+        alert('An error occurred: ' + xhr.responseText);
+      }
+    });
+  });
+});
+function openSwiftUploadModal(transitionId) {
+    $('#transition_id').val(transitionId);
+    $('#swiftUploadModal').modal('show');
+}
+
+$('#uploadSwiftButton').on('click', function() {
+    var formData = new FormData($('#swiftUploadForm')[0]);
+    var transitionId = $('#transition_id').val();
+
+    $.ajax({
+        url: '/upload-swift-file',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            $('#swiftUploadModal').modal('hide');
+            $('button[data-transition-id="' + transitionId + '"]').hide();
+            alert('File uploaded successfully!');
+        },
+        error: function(response) {
+            alert('Failed to upload file. ' + response.responseJSON.message);
+        }
+    });
+});
+function openSwiftDetailsModal(transitionId) {
+    $.ajax({
+        url: '/get-swift-details/' + transitionId,
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                const data = response.data;
+                let contentHtml = `
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tbody>
+                <tr>
+                                    <th>Account Number</th>
+                                    <td>${data.account_number}</td>
+                                </tr>
+                                <tr>
+                                    <th>Currency</th>
+                                    <td>${data.currency}</td>
+                                </tr>
+                                <tr>
+                                    <th>Current Balance</th>
+                                    <td>${data.current_balance}</td>
+                                </tr>
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <td>${data.bank_name}</td>
+                                </tr>`;
+
+                if (data.transition_file) {
+                    contentHtml += `
+                        <tr>
+                            <th>Transaction File</th>
+                            <td><iframe src="${data.transition_file}" width="100%" height="400px"></iframe></td>
+                        </tr>
+                    `;
+                }
+
+                if (data.swift_copy_file) {
+                    contentHtml += `
+                        <tr>
+                            <th>Swift Copy File</th>
+                            <td><iframe src="${data.swift_copy_file}" width="100%" height="400px"></iframe></td>
+                        </tr>
+                    `;
+                }
+                contentHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                $('#swiftDetailsContent').html(contentHtml);
+                $('#swiftDetailsModal').modal('show');
+            } else {
+                alert('Failed to fetch details: ' + response.message);
+            }
+        },
+        error: function(response) {
+            alert('Failed to fetch details: ' + response.responseJSON.message);
+        }
+    });
+}
+</script>
+<script>
+$(document).ready(function() {
+    $('.holdButtonveh').on('click', function(e) {
+        e.preventDefault();
+        
+        var url = $(this).data('url');
+        var status = $(this).data('status');
+        var $row = $(this).closest('tr'); // Get the closest row
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                status: status
+            },
+            success: function(response) {
+                // Handle success
+                alert('Status updated successfully!');
+                location.reload();
+            },
+            error: function(xhr) {
+                // Handle error
+                alert('Failed to update status!');
+            }
+        });
+    });
 });
 </script>
 @endsection
