@@ -640,7 +640,7 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -654,7 +654,7 @@ else
             // })
             ->where('purchasing_order.status', $status)
             ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
