@@ -413,7 +413,7 @@ th.nowrap-td {
         $query->select(DB::raw(1))
             ->from('supplier_account_transaction')
             ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request');
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment');
     })
     ->count();
         @endphp
@@ -425,7 +425,7 @@ th.nowrap-td {
         $query->select(DB::raw(1))
             ->from('supplier_account_transaction')
             ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request');
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment');
     })
     ->count();
             @endphp
