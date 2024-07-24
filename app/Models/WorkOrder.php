@@ -121,4 +121,28 @@ class WorkOrder extends Model
     {
         return $this->hasMany(WORecordHistory::class,'work_order_id','id');
     }
+    public function financePendingApproval() {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->where('status', 'pending');
+    }
+    public function cooPendingApproval() {
+        return $this->hasOne(WOApprovals::class)
+        ->where('type', 'coo')
+        ->where('status', 'pending');
+    }
+    public function latestFinanceApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latestOfMany('action_at');
+    }
+    public function latestCooPendingApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'coo')
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latestOfMany('action_at');
+    }
 }

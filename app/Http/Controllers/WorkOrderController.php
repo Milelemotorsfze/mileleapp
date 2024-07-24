@@ -12,6 +12,10 @@ use App\Models\CommentVehicleMapping;
 use App\Models\CommentVehicleAddonMapping;
 use App\Models\CommentFile;
 use App\Models\WORecordHistory;
+use App\Models\WOApprovals;
+use App\Models\WOApprovalDataHistory;
+use App\Models\WOApprovalAddonDataHistory;
+use App\Models\WOApprovalVehicleDataHistory;
 use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
@@ -261,7 +265,7 @@ class WorkOrderController extends Controller
                 'freight_agent_contact_number' => 'full',
                 'transporting_driver_contact_number' => 'full'
             ];
-
+            $canCreateFinanceApproval = false;
             // Store each non-null, non-array field in the data history
             foreach ($nonNullData as $field => $value) { 
                 WORecordHistory::create([
@@ -285,6 +289,12 @@ class WorkOrderController extends Controller
                         'user_id' => Auth::id(),
                         'changed_at' => Carbon::now(),
                     ]);
+                }
+            
+                // Check for specified fields and create an entry in the WOApprovals model
+                if (in_array($field, ['so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
+                    // , 'currency'
+                    $canCreateFinanceApproval = true;
                 }
             }
 
@@ -311,13 +321,13 @@ class WorkOrderController extends Controller
                         'field_name' => $data['file_name'],
                         'old_value' => NULL,
                         'new_value' => $data['file_path'],
-                        'type' => 'SET',
+                        'type' => 'Set',
                         'user_id' => Auth::id(),
                         'changed_at' => Carbon::now(),
                     ]);
                 }
             }
-
+            $canCreateCOOApproval = false;
             if (isset($request->vehicle)) {
                 if (count($request->vehicle) > 0) {
                     foreach ($request->vehicle as $key => $vehicleData) {
@@ -346,7 +356,7 @@ class WorkOrderController extends Controller
                         $createWOVehicles['created_by'] = $authId;
             
                         $woVehicles = WOVehicles::create($createWOVehicles);
-
+                        $canCreateCOOApproval = true;
                         // Define the fields to exclude
                         $excludeVehicleFields = [
                             'vehicle_id'
@@ -373,7 +383,7 @@ class WorkOrderController extends Controller
                             if (count($vehicleData['addons']) > 0) {
                                 foreach ($vehicleData['addons'] as $key => $addonData) {
                                     if (isset($addonData['addon_code']) && $addonData['addon_code'] != null) {
-                                        $this->processNewAddons($woVehicles,$addonData,$authId);
+                                        $canCreateFinanceApproval = $this->processNewAddons($woVehicles, $addonData, $authId);
                                     }
                                 }
                             }
@@ -422,6 +432,7 @@ class WorkOrderController extends Controller
                                 'user_id' => Auth::id(),
                                 'changed_at' => Carbon::now(),
                             ]);
+                            $canCreateFinanceApproval = true;
                         }
                     }
                 }
@@ -466,6 +477,22 @@ class WorkOrderController extends Controller
                     }
                 }  
             }
+            if($canCreateFinanceApproval == true) {
+                WOApprovals::create([
+                    'work_order_id' => $workOrder->id,
+                    'type' => 'finance', 
+                    'status' => 'pending', 
+                    'action_at' =>NULL,
+                ]);
+            }
+            if($canCreateCOOApproval == true) {
+                WOApprovals::create([
+                    'work_order_id' => $workOrder->id,
+                    'type' => 'coo', 
+                    'status' => 'pending', 
+                    'action_at' =>NULL,
+                ]);
+            }
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
             // Commit the transaction
             DB::commit(); 
@@ -493,6 +520,7 @@ class WorkOrderController extends Controller
         $createWOVehiclesAddons['created_by'] = $authId;
     
         $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
+        $canCreateFinanceApproval = true;
         // Filter out non-null, non-array values, and exclude specified fields
         $excludeVehicleAddonFields = [
             'id','w_o_vehicle_id',
@@ -514,6 +542,7 @@ class WorkOrderController extends Controller
                 'changed_at' => Carbon::now(),
             ]);
         }
+        return $canCreateFinanceApproval;
     }
    
     /**
@@ -537,7 +566,7 @@ class WorkOrderController extends Controller
         // $errorMsg ="This page will coming very soon !";
         // return view('hrm.notaccess',compact('errorMsg'));
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments')->first();
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments','financePendingApproval','cooPendingApproval','latestFinanceApproval','latestCooPendingApproval')->first();
         $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
         $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
@@ -552,7 +581,8 @@ class WorkOrderController extends Controller
     public function edit(WorkOrder $workOrder)
     {
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('vehicles.addons','comments')->first();
+        $workOrder = WorkOrder::where('id',$workOrder->id)
+        ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval','latestFinanceApproval','latestCooPendingApproval')->first();
         // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
@@ -652,6 +682,8 @@ class WorkOrderController extends Controller
     { 
         DB::beginTransaction();
         try { 
+            $canCreateFinanceApproval = false;
+            $canCreateCOOApproval = false;
             $authId = Auth::id();
             
             $newComment = WOComments::create([
@@ -825,6 +857,10 @@ class WorkOrderController extends Controller
                         'comment_id' => $CommentId,
                     ];
                     $canDeleteComment = false;
+                    // Check for specified fields and create an entry in the WOApprovals model
+                    if (in_array($field, ['so_total_amount','so_vehicle_quantity', 'amount_received', 'balance_amount'])) {
+                        $canCreateFinanceApproval = true;
+                    }
                 }
             }
 
@@ -886,6 +922,7 @@ class WorkOrderController extends Controller
                     'comment_id' =>$CommentId,
                 ];
                 $canDeleteComment = false;
+                $canCreateFinanceApproval = true;
             }
             // If there are changes, insert them into the WORecordHistory
             if (!empty($changes)) { 
@@ -966,6 +1003,7 @@ class WorkOrderController extends Controller
                                 'comment_vehicle_id' => $CreatedVehComMap->id,
                             ]);
                             $canDeleteCreatedVehComMap = false;
+                            $canCreateCOOApproval =true;
                         }
                     }
                     $vehicle->updated_by = $authId;
@@ -1049,6 +1087,7 @@ class WorkOrderController extends Controller
                                         'changed_at' => Carbon::now(),
                                         'cvm_id' => $createdCommVehAddonMapp->id,
                                     ]);
+                                    $canCreateFinanceApproval = true;
                                     $canDeleteCreateVehComAddMap = false;
                                 }
                             }
@@ -1069,7 +1108,7 @@ class WorkOrderController extends Controller
                             $addonData['created_by'] = Auth::id();
                             $addonData['comment_id'] = $CommentId;
                             $woVehicleAddon = WOVehicleAddons::create($addonData);
-                            
+                            $canCreateFinanceApproval = true;
                             $createCommVehAddon['type'] = 'store';
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $woVehicleAddon->id;
@@ -1138,7 +1177,7 @@ class WorkOrderController extends Controller
                     $vehicleData['comment_id'] = $CommentId;
                     $canDeleteComment = false;
                     $woVehicles = WOVehicles::create($vehicleData);
-
+                    $canCreateCOOApproval = true;
                     $createVehComMap = [];
                     $createVehComMap['type'] = 'store';
                     $createVehComMap['comment_id'] = $CommentId;
@@ -1188,7 +1227,7 @@ class WorkOrderController extends Controller
                                     $createWOVehiclesAddons['addon_description'] = $addonData['addon_description'] ?? null;                                  
                                     $createWOVehiclesAddons['created_by'] = $authId;
                                     $WOVehicleAddons = WOVehicleAddons::create($createWOVehiclesAddons); 
-
+                                    $canCreateFinanceApproval = true;
                                     $createCommVehAddon['type'] = 'store';
                                     $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                                     $createCommVehAddon['addon_id'] = $WOVehicleAddons->id;
@@ -1393,6 +1432,7 @@ class WorkOrderController extends Controller
                                         'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
+                                    $canCreateFinanceApproval = true;
                                 }
                                 else {
                                     // Create history record
@@ -1407,6 +1447,7 @@ class WorkOrderController extends Controller
                                         'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
+                                    $canCreateFinanceApproval = true;
                                 }
                             }
                         } else {
@@ -1429,6 +1470,7 @@ class WorkOrderController extends Controller
                                        'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
+                                    $canCreateFinanceApproval = true;
                                 }
                                 else {
                                     // Create history record
@@ -1443,6 +1485,7 @@ class WorkOrderController extends Controller
                                         'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
+                                    $canCreateFinanceApproval = true;
                                 }
                             }
                         }
@@ -1467,6 +1510,7 @@ class WorkOrderController extends Controller
                                 'comment_vehicle_id' =>$CreatedVehComMap->id,
                             ]);
                             $canDeleteCreatedVehComMap = false;
+                            $canCreateFinanceApproval = true;
                         }
                         else {
                             // Create history record
@@ -1481,6 +1525,7 @@ class WorkOrderController extends Controller
                                 'comment_vehicle_id' =>$CreatedVehComMap->id,
                             ]);
                             $canDeleteCreatedVehComMap = false;
+                            $canCreateFinanceApproval = true;
                         }
                     }
                     $woVehicle->deposit_received = 'no';
@@ -1492,6 +1537,37 @@ class WorkOrderController extends Controller
                 $deleteComment = WOComments::where('id', $CommentId)->first();
                 if($deleteComment) {
                     $deleteComment->delete();
+                }
+            }
+            
+            if($canCreateFinanceApproval == true) {
+                $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
+                if($financePendingApproval == null) { 
+                    WOApprovals::create([
+                        'work_order_id' => $workOrder->id,
+                        'type' => 'finance', 
+                        'status' => 'pending', 
+                        'action_at' =>NULL,
+                    ]);
+                }
+                else {
+                    $financePendingApproval->updated_at = Carbon::now();
+                    $financePendingApproval->update();
+                }
+            }
+            if($canCreateCOOApproval == true) {
+                $cooPendingApprovals = WOApprovals::where('work_order_id',$workOrder->id)->where('type','coo')->where('status','pending')->first();
+                if($cooPendingApprovals == null) { 
+                    WOApprovals::create([
+                        'work_order_id' => $workOrder->id,
+                        'type' => 'coo', 
+                        'status' => 'pending', 
+                        'action_at' =>NULL,
+                    ]);
+                }
+                else {
+                    $cooPendingApprovals->updated_at = Carbon::now();
+                    $cooPendingApprovals->update();
                 }
             }
             (new UserActivityController)->createActivity('Update ' . $request->type . ' work order');
@@ -1653,159 +1729,81 @@ class WorkOrderController extends Controller
         $datas = WOVehicleAddonRecordHistory::where('w_o_vehicle_addon_id',$id)->get();
         return view('work_order.export_exw.show_vehicle_addon_history',compact('datas','woVehicleAddon'));
     }
-    public function salesApproval(Request $request) {
+    public function financeApproval(Request $request)
+    { 
         $validator = Validator::make($request->all(), [
             'id' => 'required',
+            'status' => 'required',
         ]);
+    
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
+        } else {
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
-                    $wo->sales_support_data_confirmation_at = Carbon::now();
-                    $wo->sales_support_data_confirmation_by = $authId;
-                    $wo->update();
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'sales_support_data_confirmation_at',
-                        'old_value' => NULL,
-                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'sales_support_data_confirmation_by',
-                        'old_value' => NULL,
-                        'new_value' => Auth::user()->name,
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
+                $woApprovals = WOApprovals::where('id', $request->id)->first();
+    
+                if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
+                    $woApprovals->action_at = Carbon::now();
+                    $woApprovals->user_id = $authId;
+                    $woApprovals->comments = $request->comments;
+    
+                    $woApprovals->status = ($request->status == 'approve') ? 'approved' : 'rejected';
+                    $woApprovals->update();
+    
+                    $fields = ['so_total_amount', 'currency', 'so_vehicle_quantity', 'amount_received', 'balance_amount'];
+    
+                    $woHistory = WORecordHistory::where('work_order_id', $woApprovals->work_order_id)
+                        ->whereIn('field_name', $fields)
+                        ->orderBy('changed_at', 'desc')
+                        ->get()
+                        ->unique('field_name');
+    
+                    foreach ($woHistory as $record) {
+                        WOApprovalDataHistory::create([
+                            'w_o_approvals_id' => $woApprovals->id,
+                            'wo_history_id' => $record->id
+                        ]);
+                    }
+    
+                    $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
+                    $woAddonIds = WOVehicleAddons::whereIn('w_o_vehicle_id', $woVehicleIds)->pluck('id');
+    
+                    $woAddonHistory = WOVehicleAddonRecordHistory::whereIn('w_o_vehicle_addon_id', $woAddonIds)
+                        ->orderBy('changed_at', 'desc')
+                        ->get()
+                        ->unique(function ($item) {
+                            return $item['field_name'] . $item['w_o_vehicle_addon_id'];
+                        });
+    
+                    foreach ($woAddonHistory as $record) {
+                        WOApprovalAddonDataHistory::create([
+                            'w_o_approvals_id' => $woApprovals->id,
+                            'wo_addon_history_id' => $record->id
+                        ]);
+                    }
+    
                     DB::commit();
                     return response()->json('success');
-                }
-                else if($wo && $wo->sales_support_data_confirmation_at != '') {
+                } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
                     return response()->json('error');
                 }
-            } 
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 DB::rollback();
                 info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
+                $errorMsg = "Something went wrong! Contact your admin";
+                return view('hrm.notaccess', compact('errorMsg'));
             }
         }
     }
-    public function revertSalesApproval(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
-            DB::beginTransaction();
-            try {
-                $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->sales_support_data_confirmation_at != '' && $wo->sales_support_data_confirmation_by != '') {
-                    $wo->sales_support_data_confirmation_at = NULL;
-                    $wo->sales_support_data_confirmation_by = NULL;
-                    $wo->update();
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'sales_support_data_confirmation_at',
-                        'old_value' => $wo->sales_support_data_confirmation_at,
-                        'new_value' => NULL,
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'sales_support_data_confirmation_by',
-                        'old_value' => $wo->sales_support_data_confirmation_by,
-                        'new_value' => NULL,
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    DB::commit();
-                    return response()->json('success');
-                }
-                else if($wo && $wo->sales_support_data_confirmation_at == '') {
-                    DB::commit();
-                    return response()->json('error');
-                }
-            } 
-            catch (\Exception $e) {
-                DB::rollback();
-                info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
-            }
-        }
-    }
-    public function financeApproval(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return redirect()->back()->withInput()->withErrors($validator);
-        }
-        else {
-            DB::beginTransaction();
-            try {
-                $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->finance_approved_at == '' && $wo->finance_approval_by == '') {
-                    $wo->finance_approved_at = Carbon::now();
-                    $wo->finance_approval_by = $authId;
-                    $wo->update();
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'finance_approved_at',
-                        'old_value' => NULL,
-                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'finance_approval_by',
-                        'old_value' => NULL,
-                        'new_value' => Auth::user()->name,
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    DB::commit();
-                    return response()->json('success');
-                }
-                else if($wo && $wo->finance_approved_at != '') {
-                    DB::commit();
-                    return response()->json('error');
-                }
-            } 
-            catch (\Exception $e) {
-                DB::rollback();
-                info($e);
-                $errorMsg ="Something went wrong! Contact your admin";
-                return view('hrm.notaccess',compact('errorMsg'));
-            }
-        }
-    }
+    
+    
     public function coeOfficeApproval(Request $request) {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
+            'status' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -1814,51 +1812,37 @@ class WorkOrderController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $wo = WorkOrder::where('id',$request->id)->first();
-                if($wo && $wo->coe_office_approved_at == '' && $wo->coe_office_approval_by == '') {
-                    $wo->coe_office_approved_at = Carbon::now();
-                    $wo->coe_office_approval_by = $authId;
-                    if(isset($request->comments) && $request->comments != '') {
-                        $wo->coe_office_direct_approval_comments = $request->comments;
-                    }
-                    $wo->update();
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'coe_office_approved_at',
-                        'old_value' => NULL,
-                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    WORecordHistory::create([
-                        'work_order_id' => $wo->id,
-                        'user_id' => $authId,
-                        'field_name' => 'coe_office_approval_by',
-                        'old_value' => NULL,
-                        'new_value' => Auth::user()->name,
-                        'type' => 'Set',
-                        'changed_at' => Carbon::now()
-                    ]);
-                    if(isset($request->comments) && $request->comments != '') {
-                        WORecordHistory::create([
-                            'work_order_id' => $wo->id,
-                            'user_id' => $authId,
-                            'field_name' => 'coe_office_direct_approval_comments',
-                            'old_value' => NULL,
-                            'new_value' => $request->comments,
-                            'type' => 'Set',
-                            'changed_at' => Carbon::now()
+                $woApprovals = WOApprovals::where('id', $request->id)->first();
+    
+                if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
+                    $woApprovals->action_at = Carbon::now();
+                    $woApprovals->user_id = $authId;
+                    $woApprovals->comments = $request->comments;
+    
+                    $woApprovals->status = ($request->status == 'approve') ? 'approved' : 'rejected';
+                    $woApprovals->update();
+                    $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
+
+                    $woVehicleHistory = WOVehicleRecordHistory::whereIn('w_o_vehicle_id', $woVehicleIds)
+                        ->orderBy('changed_at', 'desc')
+                        ->get()
+                        ->unique(function ($item) {
+                            return $item['field_name'] . $item['w_o_vehicle_id'];
+                        });
+                    foreach ($woVehicleHistory as $record) {
+                        WOApprovalVehicleDataHistory::create([
+                            'w_o_approvals_id' => $woApprovals->id,
+                            'wo_vehicle_history_id' => $record->id
                         ]);
                     }
+    
                     DB::commit();
                     return response()->json('success');
-                }
-                else if($wo && $wo->coe_office_approved_at != '') {
+                } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
                     return response()->json('error');
                 }
-            } 
+            }
             catch (\Exception $e) {
                 DB::rollback();
                 info($e);

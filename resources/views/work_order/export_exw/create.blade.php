@@ -1018,6 +1018,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#balance-amount-div").show();
 				$("#deposit-aganist-vehicle-div").hide();
 				selectedDepositReceivedValue = 'total_deposit';
+				setDepositBalance();
 			}
 			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
 				$("#amount-received-div").show();
@@ -1025,6 +1026,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#deposit-aganist-vehicle-div").show();
 				selectedDepositReceivedValue = 'custom_deposit';
 				setDepositAganistVehicleDropdownOptions();
+				setDepositBalance();
 			}
 
 			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
@@ -1293,6 +1295,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$("#deposit-aganist-vehicle-div").show();
 					setDepositAganistVehicleDropdownOptions();
 				}
+				setDepositBalance();
 			});
 		// DEPOSIT RECEIVED AS ONCHANGE END
 
@@ -2026,8 +2029,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	function setDepositBalance() {
 		var totalAmount = $('#so_total_amount').val();
 		var amountReceived = $('#amount_received').val();
-		var balanceAmount = '';
-		if(totalAmount != '' && amountReceived != '') {
+		var balanceAmount = ''; 
+		if(totalAmount != '' && amountReceived != '' && selectedDepositReceivedValue != '') { 
 			balanceAmount = Number(totalAmount) - Number(amountReceived);
 		}
 		document.getElementById('balance_amount').value = balanceAmount;
