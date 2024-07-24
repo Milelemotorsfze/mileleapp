@@ -18,6 +18,23 @@
     <br>
   </div>
   <div class="card-body">
+  <div id="rejectModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModalLabel">Reject Transition</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="rejectRemarks" class="form-control" placeholder="Enter remarks"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="submitReject" type="button" class="btn btn-danger">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="table-responsive">
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
@@ -60,13 +77,13 @@
                     <td>{{ $transition->vehicle_count }}</td>
                     <td>{{ $transition->remarks }}</td>
                     @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
-  @endphp
-  @if ($hasPermission)
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
+                    @endphp
+                    @if ($hasPermission)
                     <td>
                     @if($transition->transaction_type == "Pre-Debit" && $transition->status == "pending")
-                        <button class="btn btn-success btn-sm" onclick="handleAction('approve', {{ $transition->id }})">Approve</button>
-                        <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
+                    <button id="approveButton" class="btn btn-success btn-sm" data-transition-id="{{ $transition->id }}">Released</button>
+                    <button class="btn btn-danger btn-sm" data-reject-id="{{ $transition->id }}" onclick="showRejectModalreleased({{ $transition->id }})">Reject</button>
                     @endif
                     </td>
                     @endif
@@ -78,7 +95,7 @@
 </div>
 
 <!-- Modal for rejection remarks -->
-<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -98,7 +115,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <script>
 function handleAction(action, transitionId, remarks = '') {
@@ -122,18 +139,18 @@ function handleAction(action, transitionId, remarks = '') {
     });
 }
 
-function showRejectModal(transitionId) {
-    $('#rejectTransitionId').val(transitionId);
-    $('#rejectModal').modal('show');
-}
+// function showRejectModal(transitionId) {
+//     $('#rejectTransitionId').val(transitionId);
+//     $('#rejectModal').modal('show');
+// }
 
-$('#rejectForm').on('submit', function(event) {
-    event.preventDefault();
-    var transitionId = $('#rejectTransitionId').val();
-    var remarks = $('#remarks').val();
-    handleAction('reject', transitionId, remarks);
-    $('#rejectModal').modal('hide');
-});
+// $('#rejectForm').on('submit', function(event) {
+//     event.preventDefault();
+//     var transitionId = $('#rejectTransitionId').val();
+//     var remarks = $('#remarks').val();
+//     handleAction('reject', transitionId, remarks);
+//     $('#rejectModal').modal('hide');
+// });
 
 $(document).ready(function() {
     $.ajaxSetup({
@@ -141,6 +158,64 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+});
+$(document).ready(function() {
+        $('#approveButton').click(function() {
+            var transitionId = $(this).data('transition-id');
+            $.ajax({
+                url: '{{ route("approve.transition") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    transition_id: transitionId
+                },
+                success: function(response) {
+                    if(response.success) {
+                        alertify.success('Transitions approved Successfully');
+                        $(`button[data-transition-id="${transitionId}"]`).hide();
+                        $(`button[data-reject-id="${transitionId}"]`).hide();
+                    } else {
+                        alert('Failed to approve transition.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        });
+    });
+    function showRejectModalreleased(transitionId) {
+  $('#rejectModal').modal('show');
+  $('#submitReject').data('transition-id', transitionId);
+}
+$(document).ready(function() {
+  $('#submitReject').click(function() {
+    var transitionId = $(this).data('transition-id');
+    var remarks = $('#rejectRemarks').val();
+
+    $.ajax({
+      url: '/reject-transition', // The URL to send the request to
+      method: 'POST',
+      data: {
+        _token: '{{ csrf_token() }}',
+        transition_id: transitionId,
+        remarks: remarks
+      },
+      success: function(response) {
+        $('#rejectModal').modal('hide');
+        // Handle the response from the controller
+        alertify.success('Transitions rejected Successfully');
+        // Hide the buttons
+        var buttonRow = $('button[data-transition-id="' + transitionId + '"]').closest('td');
+        buttonRow.find('.btn').hide();
+      },
+      error: function(xhr, status, error) {
+        // Handle any errors
+        alert('An error occurred: ' + xhr.responseText);
+      }
+    });
+  });
 });
 </script>
 @else

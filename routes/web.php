@@ -919,6 +919,28 @@ Route::get('/d', function () {
     Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     
+    Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
+    Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
+    Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
+    Route::post('/savePaymentDetails', [PurchasingOrderController::class, 'savePaymentDetails']);
+    Route::post('/submitPaymentDetails', [PurchasingOrderController::class, 'submitPaymentDetails']);
+    Route::post('/transition/actioninitiate', [PurchasingOrderController::class, 'handleActioninitiate'])->name('transition.actioninitiate');
+    Route::get('/get-vendor-and-balance/{purchaseOrderId}', [PurchasingOrderController::class, 'getVendorAndBalance']);
+    Route::post('/transition/submitforpayment', [PurchasingOrderController::class, 'submitforpayment'])->name('transition.submitforpayment');
+    Route::post('/submit-payment', [PurchasingOrderController::class, 'submitPayment']);
+    Route::post('/approve-transition', [PurchasingOrderController::class, 'approveTransition'])->name('approve.transition');
+    Route::post('/reject-transition', [PurchasingOrderController::class, 'rejectTransition']);
+    Route::post('/reject-transition-linitiate', [PurchasingOrderController::class, 'rejectTransitionlinitiate']);
+    Route::post('/upload-swift-file', [PurchasingOrderController::class, 'uploadSwiftFile'])->name('uploadSwiftFile');
+    Route::get('/get-swift-details/{id}', [PurchasingOrderController::class, 'getSwiftDetails'])->name('getSwiftDetails');
+    Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
+    Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
+    
+
+
+
+
+
 
 
 
