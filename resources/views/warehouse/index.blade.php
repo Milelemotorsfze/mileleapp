@@ -360,7 +360,7 @@ th.nowrap-td {
         $query->select(DB::raw(1))
             ->from('supplier_account_transaction')
             ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Post-Debit');
+            ->where('supplier_account_transaction.transaction_type', 'Pre-Debit');
     })
     ->count();
         @endphp
@@ -372,7 +372,7 @@ th.nowrap-td {
         $query->select(DB::raw(1))
             ->from('supplier_account_transaction')
             ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
-            ->where('supplier_account_transaction.transaction_type', 'Post-Debit');
+            ->where('supplier_account_transaction.transaction_type', 'Pre-Debit');
     })
     ->count();
             @endphp
