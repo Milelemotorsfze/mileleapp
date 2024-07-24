@@ -62,4 +62,43 @@ class WOApprovalsController extends Controller
     {
         //
     }
+    public function fetchFinanceApprovalHistory($id)
+    {
+        $data = WOApprovals::where('work_order_id', $id)->where('type', 'finance')->orderBy('id','DESC')->get();
+        $workOrder = WorkOrder::where('id',$id)->first();
+        $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
+        $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
+        $type = $workOrder->type;
+        return view('work_order.export_exw.finance-approval-history-page', compact('data','type','id','previous','next'));
+    }
+
+    public function showFinanceApprovalHistoryPage($id)
+    {
+        // Retrieve data from the session
+        $data = session('financeApprovalHistory');
+
+        // Pass data to the Blade view
+        return view('work_order.export_exw.finance-approval-history-page', compact('data'));
+    }
+
+    public function fetchCooApprovalHistory($id)
+    {
+        // Fetch data from the database
+        $data = YourModel::where('approval_type', 'coo')->get();
+
+        // Store data in session or pass it to the view
+        session(['cooApprovalHistory' => $data]);
+
+        // Return a response indicating success
+        return response()->json(['success' => true]);
+    }
+
+    public function showCooApprovalHistoryPage($id)
+    {
+        // Retrieve data from the session
+        $data = session('cooApprovalHistory');
+
+        // Pass data to the Blade view
+        return view('coo-approval-history-page', compact('data'));
+    }
 }

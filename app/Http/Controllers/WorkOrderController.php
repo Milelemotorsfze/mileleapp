@@ -566,7 +566,7 @@ class WorkOrderController extends Controller
         // $errorMsg ="This page will coming very soon !";
         // return view('hrm.notaccess',compact('errorMsg'));
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments','financePendingApproval','cooPendingApproval','latestFinanceApproval','latestCooPendingApproval')->first();
+        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments','financePendingApproval','cooPendingApproval')->first();
         $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
         $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
@@ -582,7 +582,7 @@ class WorkOrderController extends Controller
     {
         $type = $workOrder->type;
         $workOrder = WorkOrder::where('id',$workOrder->id)
-        ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval','latestFinanceApproval','latestCooPendingApproval')->first();
+        ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval')->first();
         // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
         // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();

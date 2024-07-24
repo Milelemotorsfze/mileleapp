@@ -84,7 +84,34 @@ class WorkOrder extends Model
         'updated_by',
         'deleted_by',
     ];
-    
+    protected $appends = [
+        'finance_approval_status',
+        'coo_approval_status',
+    ];
+    public function getFinanceApprovalStatusAttribute() {
+        $status = '';
+        $data = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
+        if($data && $data->status == 'pending') {
+            $status = 'Pending';
+        } else if($data && $data->status == 'approved') {
+            $status = 'Approved';
+        }else if($data && $data->status == 'rejected') {
+            $status = 'Rejected';
+        }
+        return $status;
+    }
+    public function getCooApprovalStatusAttribute() {
+        $status = '';
+        $data = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
+        if($data && $data->status == 'pending') {
+            $status = 'Pending';
+        } else if($data && $data->status == 'approved') {
+            $status = 'Approved';
+        }else if($data && $data->status == 'rejected') {
+            $status = 'Rejected';
+        }
+        return $status;
+    }
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
