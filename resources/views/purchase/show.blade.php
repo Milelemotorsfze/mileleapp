@@ -2213,7 +2213,7 @@
                                 </button>
                                 @endif
                             </td>
-                            @php
+                            <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('transition-approved');
                             @endphp
                             @if ($hasPermission)
@@ -2223,7 +2223,7 @@
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModal({{ $transition->id }})">Reject</button>
                                     @endif
                                 </td>
-                            @endif
+                            @endif -->
                             @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
                             @endphp
