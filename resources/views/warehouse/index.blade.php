@@ -566,7 +566,7 @@ th.nowrap-td {
 <tr onclick="window.location='{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}">
-        Rejected Payment Releases
+        Rejected
         </a>
     </td>
     <td style="font-size: 12px;">
