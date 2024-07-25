@@ -2242,7 +2242,7 @@
                                     @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Draft")
                                         <button class="btn btn-primary btn-sm" onclick="submitpayment('approve', {{ $transition->id }})">Submit</button>
                                     @endif
-                                    @if($transition->created_by == auth()->user()->id && $transition->transaction_type == "Debit" && $transition->vendor_payment_status == Null)
+                                    @if($transition->transaction_type == "Debit" && $transition->vendor_payment_status == Null)
                                         <button class="btn btn-primary btn-sm" onclick="paymentconfirm('approve', {{ $transition->id }})">Vendor Payment Confirm</button>
                                     @endif
                                 </td>
