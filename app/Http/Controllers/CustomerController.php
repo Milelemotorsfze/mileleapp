@@ -62,51 +62,53 @@ class CustomerController extends Controller
             if($isCustomerExist) {
                 return redirect()->back()->with('error', 'This customer name is already existing!');
             }
+        DB::beginTransaction();
 
-        $client = new Clients();
-        $client->name = $request->name;
-        $client->country_id = $request->country_id;
-        $client->customertype = $request->type;
-        $client->address = $request->address;
-        $client->created_by = Auth::id();
-        $client->is_demand_planning_customer = true;
+            $client = new Clients();
+            $client->name = $request->name;
+            $client->country_id = $request->country_id;
+            $client->customertype = $request->type;
+            $client->address = $request->address;
+            $client->created_by = Auth::id();
+            $client->is_demand_planning_customer = true;
 
 
-        if ($request->has('passport_file'))
-        {
-            $file = $request->file('passport_file');
+            if ($request->has('passport_file'))
+            {
+                $file = $request->file('passport_file');
 
-            $extension = $file->getClientOriginalExtension();
-            $fileName = 'passport'.time().'.'.$extension;
-            // $destinationPath = 'Customers/passports';
-            $destinationPath = 'storage/app/public/passports';
-            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
-                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = 'passport'.time().'.'.$extension;
+                // $destinationPath = 'Customers/passports';
+                $destinationPath = 'storage/app/public/passports';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+                $file->storeAs('passports', $fileName);
+                $file->move($destinationPath, $fileName);
+
+                $client->passport = $fileName;
             }
-            $file->storeAs('passports', $fileName);
-            $file->move($destinationPath, $fileName);
+            if ($request->has('trade_license_file'))
+            {
+                $file = $request->file('trade_license_file');
 
-            $client->passport = $fileName;
-        }
-        if ($request->has('trade_license_file'))
-        {
-            $file = $request->file('trade_license_file');
+                $extension = $file->getClientOriginalExtension();
+                $fileName2 = 'trade_license'.time().'.'.$extension;
+                // $destinationPath = 'Customers/trade_licenses';
 
-            $extension = $file->getClientOriginalExtension();
-            $fileName2 = 'trade_license'.time().'.'.$extension;
-            // $destinationPath = 'Customers/trade_licenses';
+                $destinationPath2 = 'storage/app/public/tradelicenses';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath2)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath2, $mode = 0777, true, true);
+                }
+                $file->storeAs('tradelicenses', $fileName2);
+                $file->move($destinationPath2, $fileName2);
+                $client->tradelicense = $fileName2;
 
-            $destinationPath2 = 'storage/app/public/tradelicenses';
-            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath2)) {
-                \Illuminate\Support\Facades\File::makeDirectory($destinationPath2, $mode = 0777, true, true);
             }
-            $file->storeAs('tradelicenses', $fileName2);
-            $file->move($destinationPath2, $fileName2);
-            $client->tradelicense = $fileName2;
-
-        }
-       
-        $client->save();
+        
+            $client->save();
+        DB::commit();
         // $customer->save();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
