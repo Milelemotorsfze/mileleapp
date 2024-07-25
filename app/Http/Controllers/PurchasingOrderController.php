@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\PFI;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
+use App\Mail\DPEmailNotification;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -4454,6 +4455,8 @@ public function submitPaymentDetails(Request $request)
         $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
         $vehiclespaid->save();
     }
+    // $recipients = ['team.dp@milele.com'];
+    //             Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)
