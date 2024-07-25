@@ -919,6 +919,8 @@ Route::get('/d', function () {
     Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
     Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
+    Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
+    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
 
 
 

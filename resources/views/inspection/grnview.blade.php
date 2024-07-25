@@ -47,6 +47,7 @@
 @endif
     <h4 class="card-title">
      GRN Info
+     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
     <ul class="nav nav-pills nav-fill">
@@ -58,6 +59,58 @@
       </li>
     </ul>      
   </div>
+  <!-- Modal HTML -->
+<div class="modal fade" id="netsuiteModal" tabindex="-1" role="dialog" aria-labelledby="netsuiteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="netsuiteModalLabel">Enter Netsuite GRN</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+        <form id="netsuiteForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="grnInput">Netsuite GRN</label>
+            <input type="text" class="form-control" id="grnInput" required>
+          </div>
+          </div>
+          <input type="hidden" id="vehicleId">
+          <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalupdateModal" tabindex="-1" role="dialog" aria-labelledby="modalupdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalupdateModalLabel">Enter Netsuite GRN</h5>
+        <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="modalupdateForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="actionSelect">Action</label>
+            <select class="form-control" id="actionSelect" required>
+              <option value="update">Update</option>
+              <option value="add">Add New</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="grnInputupdate">Netsuite GRN</label>
+            <input type="text" class="form-control" id="grnInputupdate" required>
+          </div>
+        </div>
+        <input type="hidden" id="vehicleIdupdate">
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
@@ -114,52 +167,110 @@
     </div>
   </div>
   <script>
-        $(document).ready(function () {
-    $('#dtBasicExample1').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('approvalsinspection.addingnetsuitegrn', ['status' => 'pending']) }}",
-        columns: [
-            { data: 'incidentsnumber', name: 'incident.id' },
-            { data: 'vehicle_status', name: 'incident.vehicle_status' },
-            { data: 'update_remarks', name: 'incident.update_remarks' },
-            { data: 'part_po_number', name: 'incident.part_po_number' },
-            { data: 'aging', name: 'aging', searchable: false },
-            { data: 'po_number', name: 'purchasing_order.po_number' },
-            { data: 'vin', name: 'vehicles.vin' },
-            { data: 'engine', name: 'vehicles.engine' },
-            { data: 'created_at_pending', name: 'inspection.created_at' },
-            { data: 'remark', name: 'inspection.remark' },
-            { data: 'type', name: 'incident.type' },
-            { data: 'narration', name: 'incident.narration' },
-            { data: 'reason', name: 'incident.reason' },
-            { data: 'driven_by', name: 'incident.driven_by' },
-            { data: 'responsivity', name: 'incident.responsivity' },
-            { data: 'model_detail', name: 'varaints.model_detail' },
-            { data: 'variant', name: 'varaints.name' },
-            { data: 'detail', name: 'varaints.detail' },
-            { data: 'my', name: 'varaints.my' },
-            { data: 'steering', name: 'varaints.steering' },
-            { data: 'seat', name: 'varaints.seat' },
-            { data: 'fuel_type', name: 'varaints.fuel_type' },
-            { data: 'gearbox', name: 'varaints.gearbox' },
-            { data: 'upholestry', name: 'varaints.upholestry' },
-            { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-            { data: 'interior_color', name: 'int_color.name' },
-            { data: 'exterior_color', name: 'ex_color.name' },
-        ],
-        columnDefs: [
-            {
-                targets: 0,
-                render: function (data, type, row) {
-                    if (row.status === 'Re Work') {
-                        return '<span class="red-star">*</span> ' + data;
-                    }
-                    return data;
+    $(document).ready(function () {
+        var table1 = $('#dtBasicExample1').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('netsuitegrn.addingnetsuitegrn', ['status' => 'pending']) }}",
+            columns: [
+                { data: 'inspectiondate', name: 'vehicles.inspection_date' },
+                { data: 'vin', name: 'vehicles.vin' },
+                { data: 'brand_name', name: 'brands.brand_name' },
+                { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'variant', name: 'varaints.name'},
+                { data: 'model_detail', name: 'varaints.model_detail' },
+                { data: 'interior_color', name: 'int_color.name' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
+                { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
+                { data: null, render: function (data, type, row) {
+                    return '<button class="btn btn-sm btn-success modaladd" data-id="'+row.id+'"><i class="fa fa-plus" aria-hidden="true"></i> GRN</button>';
+                }}
+            ]
+        });
+
+        var table2 = $('#dtBasicExample2').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('netsuitegrn.addingnetsuitegrn', ['status' => 'approved']) }}",
+            columns: [
+                { data: 'inspectiondate', name: 'vehicles.inspection_date' },
+                { data: 'vin', name: 'vehicles.vin' },
+                { data: 'brand_name', name: 'brands.brand_name' },
+                { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'variant', name: 'varaints.name'},
+                { data: 'model_detail', name: 'varaints.model_detail' },
+                { data: 'interior_color', name: 'int_color.name' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'varaints_old', name: 'vehicle_variant_histories.varaints_old' },
+                { data: 'varaints_new', name: 'vehicle_variant_histories.varaints_new' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: null, render: function (data, type, row) {
+                    return '<button class="btn btn-sm btn-info modalupdate" data-id="'+row.id+'"><i class="fa fa-edit" aria-hidden="true"></i> Update</button>';
+                }}
+            ]
+        });
+
+        $('#dtBasicExample1 tbody').on('click', '.modaladd', function() {
+            var data = table1.row($(this).parents('tr')).data();
+            $('#vehicleId').val(data.id);
+            $('#netsuiteModal').modal('show');
+        });
+
+        $('#dtBasicExample2 tbody').on('click', '.modalupdate', function() {
+            var data = table2.row($(this).parents('tr')).data();
+            $('#vehicleIdupdate').val(data.id);
+            $('#modalupdateModal').modal('show');
+        });
+
+        $('#netsuiteForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var vehicleId = $('#vehicleId').val();
+            var grn = $('#grnInput').val();
+
+            $.ajax({
+                url: "{{ route('netsuitegrn.submit') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    vehicle_id: vehicleId,
+                    grn: grn
+                },
+                success: function(response) {
+                    $('#netsuiteModal').modal('hide');
+                    table1.ajax.reload();
+                },
+                error: function(xhr) {
+                    alert('An error occurred. Please try again.');
                 }
-            }
-        ]
+            });
+        });
+
+        $('#modalupdateForm').on('submit', function(e) {
+            e.preventDefault();
+
+            var vehicleId = $('#vehicleIdupdate').val();
+            var grn = $('#grnInputupdate').val();
+            var action = $('#actionSelect').val();
+            var url = action === 'update' ? "{{ route('netsuitegrn.submit') }}" : "{{ route('netsuitegrn.add') }}";
+            $.ajax({
+                url: url,
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    vehicle_id: vehicleId,
+                    grn: grn
+                },
+                success: function(response) {
+                    $('#modalupdateModal').modal('hide');
+                    table2.ajax.reload();
+                },
+                error: function(xhr) {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
     });
-});
 </script>
 @endsection

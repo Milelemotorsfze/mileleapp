@@ -229,7 +229,6 @@ class MovementController extends Controller
             $grn->date = $date;
             $grn->save();
             $grnNumber = $grn->id;
-            $grn->grn_number = $grnNumber;
             $grn->save();
             Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
             $vehicleId = Vehicles::whereIn('vin', $grnVins)->pluck('id');
@@ -461,7 +460,6 @@ public function grnfilepost(Request $request)
             if ($vehicle) {
                 $grn = grn::find($vehicle->grn_id);
                 if ($grn) {
-                    $grn->grn_number = $grnNumber;
                     $grn->date = $grnDate;
                     $grn->save();
                     $existingVins[] = $vin;
