@@ -451,7 +451,7 @@ else
         }
         else
         {
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.created_by', $userId)
             ->where('purchasing_order.status', $status)
             ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
             ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
@@ -498,7 +498,7 @@ else
         }
         else
         {
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.created_by', $userId)
             ->where('purchasing_order.status', $status)
             ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
             ->where('supplier_account_transaction.transaction_type', 'Rejected')
