@@ -34,7 +34,7 @@
                 @endcan
 
                 @if (count($errors) > 0)
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger mt-2">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
                         <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                         <ul>
@@ -45,13 +45,13 @@
                     </div>
                 @endif
                 @if (Session::has('error'))
-                    <div class="alert alert-danger" >
+                    <div class="alert alert-danger mt-2" >
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('error') }}
                     </div>
                 @endif
                 @if (Session::has('success'))
-                    <div class="alert alert-success" id="success-alert">
+                    <div class="alert alert-success mt-2" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('success') }}
                     </div>
@@ -809,32 +809,7 @@
             }).set({title:"Delete Item"})
         });
 
-        function showLOIApprovalDateError($msg)
-        {
-            console.log("element error function");
-            document.getElementById("loi-approval-date-error").textContent=$msg;
-            document.getElementById("approval-date").classList.add("is-invalid");
-            document.getElementById("loi-approval-date-error").classList.add("paragraph-class");
-        }
-        function removeLOIApprovalDateError($msg)
-        {
-            document.getElementById("loi-approval-date-error").textContent="";
-            document.getElementById("approval-date").classList.remove("is-invalid");
-            document.getElementById("loi-approval-date-error").classList.remove("paragraph-class");
-        }
-        function showLOIRejectionDateError($msg)
-        {
-            console.log("rejection error");
-            document.getElementById("loi-rejection-date-error").textContent=$msg;
-            document.getElementById("rejection-date").classList.add("is-invalid");
-            document.getElementById("loi-rejection-date-error").classList.add("paragraph-class");
-        }
-        function removeLOIRejectionDateError($msg)
-        {
-            document.getElementById("loi-rejection-date-error").textContent="";
-            document.getElementById("rejection-date").classList.remove("is-invalid");
-            document.getElementById("loi-rejection-date-error").classList.remove("paragraph-class");
-        }
+       
     </script>
 @endpush
 

@@ -98,7 +98,7 @@
                                     <th>Updated By</th>
                                     <th>Updated At</th>
                                     <th>Send Supplier Approval</th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -128,7 +128,7 @@
                                     <th>Updated By</th>
                                     <th>Updated At</th>
                                     <th>Approve / Reject </th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -160,8 +160,7 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Utilization QTY Update</th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -260,16 +259,13 @@
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updated_by' },        
             {'data' : 'updated_at', 'name': 'updated_at' },  
-            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },           
+            // {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },           
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
         
         });
 
-          
-           
-           
-        });
+    });
 
         
        
