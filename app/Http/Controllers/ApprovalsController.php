@@ -31,6 +31,8 @@ use App\Models\ModelSpecification;
 use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\Variantlog;
+use App\Models\VehicleVariantHistories;
+
 
 
 class ApprovalsController extends Controller
@@ -603,6 +605,14 @@ class ApprovalsController extends Controller
             if ($vehicle) {
                 $oldVariantName = Varaint::find($vehicle->variants_id)->name;
                 $newVariantName = Varaint::find($existingVariantId)->name;
+                if($vehicle->variants_id != $existingVariantId)
+                {
+                    $newvariantstorehistory = New VehicleVariantHistories ();
+                    $newvariantstorehistory->varaints_old = $vehicle->variants_id;
+                    $newvariantstorehistory->varaints_new = $existingVariantId;
+                    $newvariantstorehistory->vehicles_id = $inspection->vehicle_id;
+                    $newvariantstorehistory->save();
+                }
                 Vehicles::where('id', $inspection->vehicle_id)->update(['variants_id' => $existingVariantId]);
                 $updatedVehicle = Vehicles::find($inspection->vehicle_id);
                 $vehicleslog = new Vehicleslog();
@@ -873,6 +883,14 @@ class ApprovalsController extends Controller
         $vehicle = Vehicles::where('id', $inspection->vehicle_id)->first();
         $oldVariantName = Varaint::where('id', $vehicle->variants_id)->pluck('name')->first();
         $newVariantName = Varaint::where('id', $variantId)->pluck('name')->first();
+        if($vehicle->variants_id != $variantId)
+        {
+            $newvariantstorehistory = New VehicleVariantHistories ();
+            $newvariantstorehistory->varaints_old = $vehicle->variants_id;
+            $newvariantstorehistory->varaints_new = $variantId;
+            $newvariantstorehistory->vehicles_id = $inspection->vehicle_id;
+            $newvariantstorehistory->save();
+        }
                 Vehicles::where('id', $inspection->vehicle_id)
                 ->update(['varaints_id' => $variantId]);
                 $vehicleslog = new Vehicleslog();
@@ -1190,4 +1208,60 @@ class ApprovalsController extends Controller
             'remarks' => $inspection,
         ]);
     }
+    public function addingnetsuitegrn(Request $request)
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open The Netsuite GRN";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    if ($request->ajax()) {
+        $status = $request->input('status');
+        if ($status == "pending") {
+            $data = Vehicles::select([
+                    'incident.id as incidentsnumber',
+                    'users.name as created_by_name',
+                    'incident.type',
+                    'incident.part_po_number',
+                    'incident.update_remarks',
+                    'incident.narration',
+                    'incident.reason',
+                    'incident.driven_by',
+                    'incident.responsivity',
+                    DB::raw("DATE_FORMAT(incident.reinspection_date, '%d-%b-%Y') as reinspection_date"),
+                    'vehicles.ppmmyyy',
+                    'vehicles.vin',
+                    'vehicles.engine',
+                    'varaints.name as variant',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                ])
+                ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
+                ->leftJoin('grn', 'grn.id', '=', 'vehicles.grn_id')
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->whereNull('grn.grn_number')
+                ->groupBy('vehicles.id');
+        } else {
+            $data = collect(); // Define what to return if status is not pending
+        }
+
+        return DataTables::of($data)->toJson();
+    }
+
+    return view('inspection.grnview');
+}
 }

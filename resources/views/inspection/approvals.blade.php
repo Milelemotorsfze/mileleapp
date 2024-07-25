@@ -74,6 +74,10 @@
     @endif
     <h4 class="card-title">
      Inspection Approvals Info
+     <a class="btn btn-sm btn-primary float-end" href="{{ route('netsuitegrn.addingnetsuitegrn') }}" text-align: right>
+    <i class="fa fa-arrow-right" aria-hidden="true"></i> Netsuite GRN
+</a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
