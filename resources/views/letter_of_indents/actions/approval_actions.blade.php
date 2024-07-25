@@ -1,6 +1,4 @@
-    <style>
-
-        </style>
+    
     @if($letterOfIndent->is_expired == false)
         @if($type == 'NEW')
             @can('LOI-approve')
@@ -27,19 +25,7 @@
                 @endif
             @endcan
         @endif
-        @if($type == 'SUPPLIER_RESPONSE')
-            @can('LOI-list')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
-                @endphp
-                @if ($hasPermission)
-                    <button type="button" title="Update Utilization Quantity" class="btn btn-soft-green btn-sm mt-1" data-bs-toggle="modal" 
-                    data-bs-target="#update-utilization-quantity-{{$letterOfIndent->id}}">
-                        <i class="fa fa-save"></i>
-                    </button>                   
-                @endif
-            @endcan
-        @endif
+       
     @endif
     <!-- To Reject LOI -->
 
@@ -217,122 +203,5 @@
         </div>
     </div>
     
-    <!-- To Update Utilization Quantity -->
-    <div class="modal fade " id="update-utilization-quantity-{{$letterOfIndent->id}}" data-bs-backdrop="static" 
-      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Utilized Quantity</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="{{ route('utilization-quantity-update', $letterOfIndent->id) }}" method="POST">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="col-lg-12">
-                            <div class="row p-2">
-                                <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$total_loi_quantity}}" name="utilized_quantity" class="form-control" >
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-info">Update</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
- 
-    <script type="text/javascript">
-        $(document).ready(function () { 
-           
-
-            $('.btn-request-supplier-approval').on('click',function(){
-
-                let id = $(this).attr('data-id');
-                let url =  $(this).attr('data-url');
-                console.log(url);
-                console.log(id);
-                var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
-                    if (e) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                id: id,
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success:function (data) {
-                                alertify.success('Approval Request Send Successfully.');
-                                let table = $('.new-LOI-table').DataTable();
-                                table.ajax.reload();
-                                // location.reload();
-                            
-                            }
-                        });
-                    }
-                }).set({title:"Delete Item"})
-                });
-            });
-
-            function statusChange() {
-                console.log("reched function");
-                let url = '{{ route('letter-of-indents.supplier-approval') }}';
-                if (status == 'REJECTED') {
-                    var message = 'Reject';
-                    var review = $('#review').val();
-                } else {
-                    var message = 'Approve';
-                    var review = '';
-                }
-                var confirm = alertify.confirm('Are you sure you want to ' + message + ' this item ?', function (e) {
-                    if (e) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            dataType: "json",
-                            data: $("#loi-approve-form").serialize(),
-                            success: function (data) {
-                                console.log("updated");
-                                window.location.reload();
-                                alertify.success(status + " Successfully");
-                            }
-                        });
-                    }
-                }).set({title: "Status Change"})
-            }
-
-        
-
-        function showLOIApprovalDateError($msg)
-        {
-            console.log("element error function");
-            document.getElementById("loi-approval-date-error").textContent=$msg;
-            document.getElementById("approval-date").classList.add("is-invalid");
-            document.getElementById("loi-approval-date-error").classList.add("paragraph-class");
-        }
-        function removeLOIApprovalDateError($msg)
-        {
-            document.getElementById("loi-approval-date-error").textContent="";
-            document.getElementById("approval-date").classList.remove("is-invalid");
-            document.getElementById("loi-approval-date-error").classList.remove("paragraph-class");
-        }
-        function showLOIRejectionDateError($msg)
-        {
-            console.log("rejection error");
-            document.getElementById("loi-rejection-date-error").textContent=$msg;
-            document.getElementById("rejection-date").classList.add("is-invalid");
-            document.getElementById("loi-rejection-date-error").classList.add("paragraph-class");
-        }
-        function removeLOIRejectionDateError($msg)
-        {
-            document.getElementById("loi-rejection-date-error").textContent="";
-            document.getElementById("rejection-date").classList.remove("is-invalid");
-            document.getElementById("loi-rejection-date-error").classList.remove("paragraph-class");
-        }
-
- 
        
   </script> 

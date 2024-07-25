@@ -135,15 +135,6 @@ class LetterOfIndentController extends Controller
                     $letterOfIndent = LetterOfIndent::select('id')->find($query->id);
                     return view('letter_of_indents.actions.loi_template_links',compact('templateTypes','letterOfIndent'));
                 })
-                ->addColumn('approval_button', function($query, Request $request) {
-                    $type = $request->tab;
-                    $total_loi_quantity = DB::table('letter_of_indent_items')->select('letter_of_indent_id','quantity')
-                    ->where('letter_of_indent_id', $query->id)
-                    ->sum('quantity');
-       
-                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date')->find($query->id);
-                    return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','total_loi_quantity','type'));
-                })
                 ->editColumn('is_expired', function($query) {
                     $LOI = LetterOfIndent::select('id','is_expired','client_id')->find($query->id);
     
@@ -178,9 +169,16 @@ class LetterOfIndentController extends Controller
                                 ->sum('quantity');
                     return $loiQuantity;
                 })
-                ->addColumn('action', function($query,Request $request) {
-                    $letterOfIndent = LetterOfIndent::select('id','is_expired')->find($query->id);
+                ->addColumn('approval_button', function($query, Request $request) {
                     $type = $request->tab;
+
+                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status')->find($query->id);
+                    return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
+                })
+                ->addColumn('action', function($query,Request $request) {
+                    $letterOfIndent = LetterOfIndent::select('id','is_expired','signature')->find($query->id);
+                    $type = $request->tab;
+                   
                     return view('letter_of_indents.actions.action',compact('letterOfIndent','type'));
                 })
                 ->rawColumns(['so_number','loi_templates','loi_quantity','action'])
@@ -441,6 +439,9 @@ class LetterOfIndentController extends Controller
 
     }
 
+
+  
+  
   
     // public function pdfMerge($letterOfIndentId)
     // {
@@ -733,13 +734,28 @@ class LetterOfIndentController extends Controller
         return response(true);
 
     }
-    public function utilizationQuantityUpdate(Request $request, $id) {
+    public function utilizationQuantityUpdate(Request $request,$id) {
         (new UserActivityController)->createActivity('LOI Utilization quantity updated.');
-
+        info("reached");
+        info($request->all());
+        
         $LOI = LetterOfIndent::find($id);
-        $LOI->utilized_quantity = $request->utilized_quantity;
+        if($request->letter_of_indent_ids) {
+            foreach($request->letter_of_indent_ids as $key => $LOIItemId){
+                info($LOIItemId);
+                $LOIItem = LetterOfIndentItem::find($LOIItemId);
+                if($LOIItem->utilized_quantity !== $request->utilized_quantity[$key]) {
+                    $LOIItem->utilized_quantity = $request->utilized_quantity[$key];
+                    $LOIItem->save();
+                }
+            }
+        }
+        $LoiUtilizationQuantity = LetterOfIndentItem::where('letter_of_indent_id', $id)->sum('utilized_quantity');
+        $LOI->utilized_quantity = $LoiUtilizationQuantity;
         $LOI->updated_by = Auth::id(); 
         $LOI->save();
+
+        // return response(true,200);
         return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
     }
 
