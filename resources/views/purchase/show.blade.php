@@ -2205,9 +2205,8 @@
                                 $haspostdebit = $transition->transaction_type == "Pre-Debit";
                                 $hasreleased = $transition->transaction_type == "Released";
                                 $hasdebit = $transition->transaction_type == "Debit";
-                                $hasrejectioned = $transition->transaction_type == "Rejected";
                                 @endphp
-                                @if ($haspostdebit || $hasreleased || $hasdebit || $hasrejectioned)
+                                @if ($haspostdebit || $hasreleased || $hasdebit)
                                 <button class="btn btn-info btn-sm" onclick="openSwiftDetailsModal({{ $transition->id }})">
                                     <i class="fa fa-eye"></i> View
                                 </button>
@@ -2269,6 +2268,7 @@
                                         <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
                                     @elseif($transition->transaction_type == "Request For Payment")
                                         <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
+                                        <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
                                                     @endif
                                                 </td>
                                             @endif

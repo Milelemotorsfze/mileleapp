@@ -892,7 +892,7 @@ $pendingvendorfol = DB::table('purchasing_order')
     <tbody>
       @php
 
-    $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
+    $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Not Approved')->count();
     $vehiclescountpaymentreq = DB::table('vehicles')
     ->where('purchasing_order_id', $purchasingOrder->id)
     ->where(function ($query) {
