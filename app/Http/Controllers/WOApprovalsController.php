@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WorkOrder;
 use App\Models\WOApprovals;
 use Illuminate\Http\Request;
 
@@ -66,9 +67,9 @@ class WOApprovalsController extends Controller
     {
         $data = WOApprovals::where('work_order_id', $id)->where('type', 'finance')->orderBy('id','DESC')->get();
         $workOrder = WorkOrder::where('id',$id)->first();
+        $type = $workOrder->type;
         $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
         $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
-        $type = $workOrder->type;
         return view('work_order.export_exw.finance-approval-history-page', compact('data','type','id','previous','next'));
     }
 

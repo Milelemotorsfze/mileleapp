@@ -1,188 +1,306 @@
+@extends('layouts.main')
 <head>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Load jQuery before DataTables -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <style>
         .select2-container {
             width: 100% !important;
         }
         table {
-            width:100% !important;
+            width: 100% !important;
+        }
+        .details-row {
+            display: none;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: -1px;
         }
     </style>
 </head>
+@section('content')
 <body>
-<div class="row mt-1">
-    <div class="table-responsive">
-        <!-- Clear All Filters Button -->
-        <button id="clear-filters" class="btn btn-info btn-sm mb-3">Clear All Filters</button>
+<div class="card">
+    <div class="card-header">
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+        @endphp
+        @if ($hasPermission)
+        <h4 class="card-title">
+        @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order Finance Approval History
+        </h4>
+        <a class="btn btn-sm btn-info float-end form-label" href="{{ url()->previous() }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
-        <table class="table table-striped table-editable table-edits table-condensed my-datatableclass">
-            <thead style="background-color: #e6f1ff">
-                <tr>
-                    <th>Date & Time</th>
-                    <th>User</th>
-                    <th>Type</th>
-                    <th>Field</th>
-                    <th>Old Value</th>
-                    <th>New Value</th>
-                </tr>
-                <!-- <tr>
-                    <th><input type="text" id="date-time-filter" placeholder="Search Date & Time" class="column-filter form-control" /></th>
-                    <th>
-                        <select class="column-filter form-control" id="user-filter" multiple="multiple">
-                        </select>
-                    </th>
-                    <th>
-                        <select class="column-filter form-control" id="type-filter" multiple="multiple">
-                        </select>
-                    </th>
-                    <th>
-                        <select class="column-filter form-control" id="field-filter" multiple="multiple">
-                        </select>
-                    </th>
-                    <th><input type="text" placeholder="Search Old Value" class="column-filter form-control" /></th>
-                    <th><input type="text" placeholder="Search New Value" class="column-filter form-control" /></th>
-                </tr> -->
-            </thead>
-            <tbody>
-                @foreach($data as $dataone)
-                    <tr>
-                        <td>{{ $dataone->changed_at->format('d M Y, H:i:s') }}</td>
-                        <td>{{ $dataone->user->name }}</td> 
-                        <td>{{ $dataone->type }}</td>
-                        <td>{{ $dataone->field }}</td>                      
-                        <td>{{ $dataone->old_value }}</td>
-                        <td>{{ $dataone->new_value }}</td>
-                    </tr>
+        @endif
+        @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+            <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
                 @endforeach
-            </tbody>
-        </table>
+            </ul>
+        </div>
+        @endif
+        @if (Session::has('error'))
+        <div class="alert alert-danger">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('error') }}
+        </div>
+        @endif
+        @if (Session::has('success'))
+        <div class="alert alert-success" id="success-alert">
+            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+            {{ Session::get('success') }}
+        </div>
+        @endif
+    </div>
+    <div class="card-body">
+        <div class="row mt-1">
+            <div class="table-responsive">
+                <table class="table table-striped table-editable table-edits table-condensed my-datatableclass">
+                    <thead style="background-color: #e6f1ff">
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                            <th>Action At</th>
+                            <th>Comments</th>
+                            <th>Approval By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(count($data) > 0)
+                            <div hidden>{{$i=0;}}</div>
+                            @foreach($data as $approval)
+                                <tr data-id="{{ $approval->id }}">
+                                    <td>{{ ++$i }}</td>
+                                    <td>{{ $approval->created_at->format('d M Y, H:i:s') ?? '' }}</td>
+                                    <td>
+                                        <label class="badge @if($approval->status == 'pending') badge-soft-info @elseif($approval->status == 'approved') badge-soft-success @elseif($approval->status == 'rejected') badge-soft-danger @endif">{{ $approval->status ?? ''}}</label>
+                                    </td>
+                                    <td>@if($approval->action_at != '')
+                                            {{ \Carbon\Carbon::parse($approval->action_at)->format('d M Y, H:i:s') }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $approval->comments ?? '' }}</td>
+                                    <td>{{ $approval->user->name ?? '' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary view-details-btn" data-id="{{ $approval->id }}">Details</button>
+                                        @if($approval->status == 'pending')
+                                            <a title="Finance Approval" style="margin-top:0px;" class="btn btn-sm btn-info" 
+                                            data-bs-toggle="modal" data-bs-target="#financeApprovalModal_{{$approval->id}}">
+                                                <i class="fas fa-hourglass-start" title="Finance Approval"></i> Approval
+                                            </a>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="financeApprovalModal_{{$approval->id}}" tabindex="-1" aria-labelledby="financeApprovalModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="financeApprovalModalLabel">Finance Approval</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="mb-3">
+                                                                <label for="financeComment_{{$approval->id}}" class="form-label">Comments</label>
+                                                                <textarea class="form-control" id="financeComment_{{$approval->id}}" rows="3"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-sm btn-danger btn-finance-approval" id="rejectButton" 
+                                                            data-id="{{ $approval->id}}"
+                                                            data-status="reject">Reject</button>
+                                                            <button type="button" class="btn btn-sm btn-success btn-finance-approval" id="approveButton" 
+                                                            data-id="{{ $approval->id}}"
+                                                            data-status="approve">Approve</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr class="details-row" id="details-{{ $approval->id }}">
+                                @php
+                                $sortedHistories = $approval->recordHistories->sortBy('field');
+                                @endphp
+                                    <td colspan="7">
+                                        <table>
+                                            @if($approval->status == 'pending')
+                                            <thead>
+                                                <tr>
+                                                    <th>Amount Received As</th>
+                                                    <th>Amount Received</th>
+                                                    <th>Balance Amount</th>
+                                                    <th>Currency</th>
+                                                    <th>SO Total Amount</th>
+                                                    <th>SO Vehicle Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @if($approval->workOrder->deposit_received_as == 'total_deposit') 
+                                                        Total Deposit
+                                                        @elseif($approval->workOrder->deposit_received_as == 'custom_deposit')
+                                                        Custom Deposit
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $approval->workOrder->amount_received ?? '' }}</td>
+                                                    <td>{{ $approval->workOrder->balance_amount ?? '' }}</td>
+                                                    <td>{{ $approval->workOrder->currency ?? '' }}</td>
+                                                    <td>{{ $approval->workOrder->so_total_amount ?? '' }}</td>
+                                                    <td>{{ $approval->workOrder->so_vehicle_quantity ?? '' }}</td>
+                                                </tr>
+    
+                                                @if($approval->workOrder->deposit_received_as == 'custom_deposit')
+                                                    <tr style="border-top:1px solid #e9e9ef;"> 
+                                                        <td colspan="6">
+                                                            <table>
+                                                                <tr>
+                                                                    <td><strong>Deposit Against Vehicles</strong></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        @php
+                                                                        $sortedVehicles = $approval->workOrder->depositAganistVin->sortBy('vin');
+                                                                        $vinList = $sortedVehicles->pluck('vin')->filter()->implode(', ');
+                                                                        @endphp
+                                                                        {{$vinList}}
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                                @if(count($approval->workOrder->vehicles) > 0)
+                                                    @foreach($approval->workOrder->vehicles as $vehicle)
+                                                        <table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">                                                      
+                                                            @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
+                                                                @foreach($workOrder->vehicles as $vehicle)
+                                                                    <tr class="custom-border-top">
+                                                                        <th colspan="4">{{$vehicle->vin ?? 'NA'}}</th>
+                                                                    </tr>
+                                                                    @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
+                                                                    <tr>
+                                                                        <th colspan="4">Service Breakdown</th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Addon Code</th>
+                                                                        <th>Addon Name</th>
+                                                                        <th>Quantity</th>
+                                                                        <th>Addon Description</th>
+                                                                    </tr>
+                                                                        @foreach($vehicle->addons as $addon)
+                                                                        <tr>
+                                                                            <td>{{$addon->addon_code ?? 'NA'}}</td>
+                                                                            <td>{{$addon->addon_name ?? 'NA'}}</td>
+                                                                            <td>{{$addon->addon_quantity ?? 'NA'}}</td>
+                                                                            <td>{{$addon->addon_description ?? 'NA'}}</td>
+                                                                        </tr>
+                                                                        @endforeach
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                        </table>
+                                                    @endforeach
+                                                @endif
+                                            </tbody>
+                                            @else
+                                            <thead>
+                                                <tr>
+                                                    @foreach($sortedHistories as $history)
+                                                    @php
+                                                    $label = $history->field;
+                                                    if ($history->field == 'total_deposit') {
+                                                        $label = 'Total Deposit';
+                                                    } elseif ($history->field == 'custom_deposit') {
+                                                        $label = 'Custom Deposit';
+                                                    }
+                                                    @endphp
+                                                    <th>{{ $label }}</th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    @foreach($sortedHistories as $history)
+                                                        <td>{{ $history->new_value }}</td>
+                                                    @endforeach
+                                                </tr>
+                                            </tbody>
+                                            @endif
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="7">No data history available.</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script> 
-        
+<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // $('#user_id').select2({
-        //     allowClear: true,
-        //     placeholder: "Select User",
-        // });
-
-        // // Initialize DataTable with column filters
+        // Initialize DataTable with column filters
         // var table = $('.my-datatableclass').DataTable();
+        
+        $('.view-details-btn').on('click', function() {
+            var id = $(this).data('id');
+            var detailsRow = $('#details-' + id);
 
-        // // Initialize date and time range picker
-        // $('#date-time-filter').daterangepicker({
-        //     autoUpdateInput: false,  // Do not auto-update the input with the selected range
-        //     timePicker: true,
-        //     timePickerIncrement: 30,
-        //     locale: {
-        //         format: 'MM/DD/YYYY hh:mm A',
-        //         cancelLabel: 'Clear'
-        //     }
-        // });
+            if (detailsRow.is(':visible')) {
+                detailsRow.hide();
+            } else {
+                detailsRow.insertAfter($('tr[data-id="' + id + '"]')).show();
+            }
+        });
 
-        // // Apply the date range filter on user selection
-        // $('#date-time-filter').on('apply.daterangepicker', function(ev, picker) {
-        //     $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A') + ' - ' + picker.endDate.format('MM/DD/YYYY hh:mm A'));
-        //     table.draw();
-        // });
-
-        // // Clear the date range filter
-        // $('#date-time-filter').on('cancel.daterangepicker', function(ev, picker) {
-        //     $(this).val('');
-        //     // picker.setStartDate(moment().startOf('day'));
-        //     // picker.setEndDate(moment().endOf('day'));
-        //     table.draw();
-        // });
-
-        // // Custom filtering function for date and time range
-        // $.fn.dataTable.ext.search.push(
-        //     function(settings, data, dataIndex) {
-        //         var min = $('#date-time-filter').data('daterangepicker').startDate;
-        //         var max = $('#date-time-filter').data('daterangepicker').endDate;
-        //         var startDate = moment(data[0], 'DD MMM YYYY, HH:mm:ss');
-        //         if (!min.isValid() || !max.isValid() || $('#date-time-filter').val() === '') {
-        //             return true;
-        //         }
-        //         return startDate.isBetween(min, max, undefined, '[]');
-        //     }
-        // );
-
-        // // Get unique user names for the dropdown filter
-        // var userColumnIndex = 1; // Index of the User column
-        // table.column(userColumnIndex).data().unique().sort().each(function (d, j) {
-        //     $('#user-filter').append('<option value="' + d + '">' + d + '</option>')
-        // });
-
-        // // Initialize Select2 for the user filter
-        // $('#user-filter').select2({
-        //     placeholder: "Select User",
-        //     allowClear: true
-        // });
-
-        // // Get unique types for the multi-select dropdown filter
-        // var typeColumnIndex = 2; // Index of the Type column
-        // table.column(typeColumnIndex).data().unique().sort().each(function (d, j) {
-        //     $('#type-filter').append('<option value="' + d + '">' + d + '</option>')
-        // });
-
-        // // Initialize Select2 for the type filter
-        // $('#type-filter').select2({
-        //     placeholder: "Select Type",
-        //     allowClear: true
-        // });
-        // // Get unique field names for the multi-select dropdown filter
-        // var fieldColumnIndex = 3; // Index of the Field column
-        // table.column(fieldColumnIndex).data().unique().sort().each(function (d, j) {
-        //     $('#field-filter').append('<option value="' + d + '">' + d + '</option>')
-        // });
-
-        // // Initialize Select2 for the field filter
-        // $('#field-filter').select2({
-        //     placeholder: "Select Field",
-        //     allowClear: true
-        // });
-        // // Apply the search
-        // table.columns().every(function () {
-        //     var that = this;
-
-        //     $('input', this.header()).on('keyup change clear', function () {
-        //         if (that.search() !== this.value) {
-        //             that.search(this.value).draw();
-        //         }
-        //     });
-
-        //     $('select', this.header()).on('change', function () {
-        //         var selectedOptions = $(this).val();
-        //         var searchValue = selectedOptions ? selectedOptions.join('|') : '';
-        //         that.search(searchValue, true, false).draw();
-        //     });
-        // });
-
-        // // Clear all filters on button click
-        // $('#clear-filters').click(function() {
-        //     // Clear text inputs
-        //     $('.column-filter').val('').trigger('change');
-        //     // Clear Select2 dropdowns
-        //     $('#user-filter').val(null).trigger('change');
-        //     $('#type-filter').val(null).trigger('change');
-        //     $('#field-filter').val(null).trigger('change');
-        //     // Clear date range picker
-        //     $('#date-time-filter').val('');
-        //     // $('#date-time-filter').data('daterangepicker').setStartDate(moment().startOf('day'));
-        //     // $('#date-time-filter').data('daterangepicker').setEndDate(moment().endOf('day'));
-        //     $('#date-time-filter').trigger('cancel.daterangepicker');
-
-        //     // Redraw the table
-        //     table.search('').columns().search('').draw();
-        // });
+        $('.btn-finance-approval').click(function (e) { 
+            var id = $(this).attr('data-id');
+            var status = $(this).attr('data-status');
+            var comments = $('#financeComment_'+id).val();
+            let url = '{{ route('work-order.finance-approval') }}';
+            alertify.confirm('Are you sure you want to '+status+' this work order ?', function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status: status,
+                            comments: comments,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (data) {                        
+                            if(data == 'success') {
+                                window.location.reload();
+                                alertify.success(status + " Successfully")
+                            }
+                            else if(data == 'error') {
+                                window.location.reload();
+                                alertify.error("Can't Approve, It was approved already..")
+                            }
+                        }
+                    });
+                }
+            }).set({title:"Confirmation"});
+        });
     });
 </script>
 </body>
+@endsection

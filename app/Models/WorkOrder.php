@@ -136,6 +136,10 @@ class WorkOrder extends Model
     {
         return $this->hasMany(WOVehicles::class,'work_order_id','id');
     }
+    public function depositAganistVin()
+    {
+        return $this->hasMany(WOVehicles::class,'work_order_id','id')->where('deposit_received','yes');
+    }
     public function vehiclesWithTrashed()
     {
         return $this->hasMany(WOVehicles::class, 'work_order_id', 'id')->withTrashed();

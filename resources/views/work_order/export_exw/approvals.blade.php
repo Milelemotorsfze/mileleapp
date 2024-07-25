@@ -30,11 +30,11 @@
             </div>
         </div>
     </div>
-@elseif(isset($workOrder) && $workOrder->finance_approval_status != 'Approved')	
+@elseif(isset($workOrder) && $workOrder->finance_approval_status == 'Approved')	
 	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success" >
 		<i class="fa fa-check-square" aria-hidden="true"></i> Finance Approved
 	</a>
-@elseif(isset($workOrder) && $workOrder->finance_approval_status != 'Rejected')	
+@elseif(isset($workOrder) && $workOrder->finance_approval_status == 'Rejected')	
 	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-danger" >
 		<i class="fa fa-times" aria-hidden="true"></i> Finance Rejected
 	</a>
@@ -70,11 +70,11 @@
             </div>
         </div>
     </div>
-@elseif(isset($workOrder) && $workOrder->coo_approval_status != 'Approved')	
+@elseif(isset($workOrder) && $workOrder->coo_approval_status == 'Approved')	
 	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success" >
 		<i class="fa fa-check-square" aria-hidden="true"></i> COO Approved
 	</a>
-@elseif(isset($workOrder) && $workOrder->coo_approval_status != 'Rejected')	
+@elseif(isset($workOrder) && $workOrder->coo_approval_status == 'Rejected')	
 	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-danger" >
 		<i class="fa fa-times" aria-hidden="true"></i> COO Rejected
 	</a>
@@ -103,6 +103,7 @@
         </div>
     </div>
 </div>
+@if(isset($workOrder))
 <a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:5px!important;" class="btn btn-sm btn-info"
 	href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
 	<i class="fas fa-eye"></i> COO Approval History
@@ -111,7 +112,7 @@
 	href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
 	<i class="fas fa-eye"></i> Finance Approval History
 </a>
-
+@endif
 <script type="text/javascript">
 
     $(document).ready(function () { 
