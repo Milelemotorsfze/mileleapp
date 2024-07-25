@@ -30,7 +30,7 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
         @endphp
         @if ($hasPermission)
-        <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
+        <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" title="View LOI Item Deatails & Update Utilized Quantity" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
             <i class="fa fa-list"></i>
         </button>
         <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
@@ -124,9 +124,10 @@
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                 
                                                     <dt class="d-lg-none d-xl-none d-xxl-none">Utilized Quantity</dt>
-                                                    <input type="hidden" name="letter_of_indent_ids[]" value="{{ $LOIItem->id}}" >
-                                                    <input type="number" min="0" placeholder="Utilized Quantity" required max="{{$LOIItem->quantity}}" 
-                                                        name="utilized_quantity[]" value="{{ $LOIItem->utilized_quantity }}" class="form-control" >
+                                                    <input type="hidden" name="letter_of_indent_item_ids[]" value="{{ $LOIItem->id}}" >
+                                                    <input type="number" min="0" placeholder="Utilized Quantity" 
+                                                    @if($type !== 'SUPPLIER_RESPONSE')  readonly @endif 
+                                                    required max="{{$LOIItem->quantity}}" name="utilized_quantity[]" value="{{ $LOIItem->utilized_quantity }}" class="form-control" >
                                             
                                                 </div>
                                             </div>
