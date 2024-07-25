@@ -1,5 +1,6 @@
 @extends('layouts.table')
 @section('content')
+
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-list');
         @endphp
@@ -36,8 +37,8 @@
                 </div>
             @endif
         </div>
-        <div class="m-3">
-            {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
+        <div class="m-3 table-responsive">
+            {!! $html->table(['class' => 'table table-bordered table-striped']) !!}
         </div>
         @endif
 @endsection

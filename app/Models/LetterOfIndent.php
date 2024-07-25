@@ -16,26 +16,37 @@ class LetterOfIndent extends Model
     public const LOI_CATEGORY_END_USER_CHANGED = "End User Changed";
     public const LOI_CATEGORY_QUANTITY_INFLATE = "Quantity Inflate";
     public const LOI_SUBMISION_STATUS_NEW = "New";
-    public const LOI_STATUS_WAITING_FOR_APPROVAL = "Waiting For Approval";
-    public const LOI_STATUS_SUPPLIER_APPROVED = "Supplier Approved";
-    public const LOI_STATUS_SUPPLIER_REJECTED = "Supplier Rejected";
+    public const LOI_STATUS_WAITING_FOR_APPROVAL = "Waiting For approval";
+    public const LOI_STATUS_SUPPLIER_APPROVED = "Approved by Supplier";
+    public const LOI_STATUS_SUPPLIER_REJECTED = "Rejected by Supplier";
     public const LOI_STATUS_PARTIAL_APPROVED = "Partialy Utilized LOI";
     public const LOI_STATUS_APPROVED = "Fully Utilized LOI";
-    public const LOI_STATUS_REJECTED = "Rejected";
+    // public const LOI_STATUS_REJECTED = "Rejected";
     public const LOI_STATUS_NEW = "New";
     public const LOI_STATUS_PFI_CREATED = "PFI Created";
     public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
+    public const LOI_STATUS_EXPIRED = "Expired";
 
     protected $appends = [
         'total_loi_quantity',
-        // 'total_approved_quantity',
-        'is_pfi_pending_for_loi',
-        'is_loi_expired'
     ];
 
-    public function customer()
+    
+    public function createdBy()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
+    public function salesPerson()
+    {
+        return $this->belongsTo(User::class,'sales_person_id','id');
+    }
+    public function client()
+    {
+        return $this->belongsTo(Clients::class,'client_id','id');
     }
     public function supplier()
     {
@@ -66,41 +77,6 @@ class LetterOfIndent extends Model
     
         return $letterOfIndentItemQty;
     }
-    // public function getTotalApprovedQuantityAttribute() {
-    //     $letterOfIndentItemApprovedQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
-    //         ->sum('approved_quantity');
-    //     if(!$letterOfIndentItemApprovedQty) {
-    //         return 0;
-    //     }
-    //     return $letterOfIndentItemApprovedQty;
-    // }
-    public function getIsPfiPendingForLoiAttribute() {
-        $approvedloiItem = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $this->id);
-
-        if($approvedloiItem->count() > 0) {
-            $isPfiPending = $approvedloiItem->whereNull('pfi_id')->get();
-            if($isPfiPending->count() > 0) {
-                return true;
-            }
-        }
-         return false;
-    }
-    public function getIsLoiExpiredAttribute() {
-        $LOI = LetterOfIndent::find($this->id);
-       
-        $LOItype = $LOI->customer->type;
-        $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-        if($LOIExpiryCondition) {
-            $loiYear = Carbon::parse($LOI->date)->format('Y');
-          
-            $expiryYear = Carbon::now()->addYears(2);
-        
-            if($loiYear > $expiryYear) {
-                $LOI->is_expired = true;
-                $LOI->save();
-                return true;
-            }
-        }
-        return $LOI->is_expired;
-    }
-}
+   
+   
+   }

@@ -70,7 +70,7 @@
                     <table id="basic-details" >
                         <tr>
                             <td class="fw-bold">CUSTOMER:</td>
-                            <td class="fw-bold">{{ strtoupper($letterOfIndent->customer->name) }}</td>
+                            <td class="fw-bold">{{ strtoupper($letterOfIndent->client->name) }}</td>
                             <td class="fw-bold">QUOTATION NUMBER: </td>
                             <td><span class="bg-light-grey ">53426725967498</span></td>
                         </tr>
@@ -94,7 +94,7 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+                            <td>{{ strtoupper($letterOfIndent->client->country->name ?? '') }}</td>
                             <td></td>
                             <td></td>
                         </tr>

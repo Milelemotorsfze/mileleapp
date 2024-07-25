@@ -64,11 +64,11 @@
                             <tr>
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
-                                <td>{{ $customer->type }}</td>
+                                <td>{{ $customer->customertype }}</td>
                                 <td>{{ $customer->country->name ?? '' }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M y') }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M Y') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm document-btn" title="To view Customer Documents" data-bs-toggle="modal" data-bs-target="#view--docs-{{$customer->id}}">
                                         <i class="fa fa-file-pdf"></i>
@@ -79,7 +79,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-customer');
                                         @endphp
                                         @if ($hasPermission)
-                                        <a title="Edit Customer Details" class="btn btn-sm btn-info" href="{{ route('dm-customers.edit', $customer->id) }}">
+                                        <a title="Edit Customer Details" class="btn btn-sm btn-info mt-1" href="{{ route('dm-customers.edit', $customer->id) }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i>
                                         </a>
                                         @endif
@@ -89,7 +89,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');
                                         @endphp
                                         @if ($hasPermission)
-                                            @if($customer->is_deletable == true)
+                                            @if($customer->is_deletable == true && $customer->created_by == Auth::id())
                                                 <button data-url="{{ route('dm-customers.destroy', $customer->id) }}" data-id="{{ $customer->id }}"
                                                     class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
                                             @endif
@@ -105,22 +105,22 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                @if($customer->passport_file)
+                                                @if($customer->passport)
                                                     <div class="row p-2">
                                                         <h4>Passport</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('customers/passports/'.$customer->passport_file) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/passports/'.$customer->passport) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
-                                                @if($customer->trade_license_file)
+                                                @if($customer->tradelicense)
                                                     <div class="row p-2">
                                                         <h4>Trade License</h4>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('customers/trade_licenses/'.$customer->trade_license_file) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('storage/app/public/tradelicenses/'.$customer->tradelicense) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -75,7 +75,6 @@
         <script>
         $(document).ready(function ()
         {
-
             alertify.set('notifier','position', 'top-right','delay', 40);
 			// datatables
             $('.my-datatable').DataTable();
@@ -89,13 +88,8 @@
             $('#dtBasicExample6').DataTable();
             $('#dtBasicExample7').DataTable();
             $('#dtBasicExample8').DataTable();
-            $('#new-LOI-table').DataTable();
-            $('#waiting-for-approval-LOI-table').DataTable();
-            $('#supplier-response-LOI-table').DataTable();
-            $('#milele-approved-LOI-table').DataTable();
-            $('#supplier-rejected-LOI-table').DataTable();
-            $('#milele-partial-approved-LOI-table').DataTable();
             $('#vehicle-pictures-table').DataTable();
+            $('#loi-criteria-country-table').DataTable();
             $('#PFI-table').DataTable();
             $('#warranty-table').DataTable();
             $('#warranty-brands-table').DataTable();

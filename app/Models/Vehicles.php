@@ -12,7 +12,7 @@ class Vehicles extends Model
     use SoftDeletes;
     use HasFactory;
     protected $table = 'vehicles';
-    public const VEHICLE_STATUS_INCOMING = 'Incoming Stock';
+    public const VEHICLE_STATUS_INCOMING = 'Approved';
     public const FILTER_PREVIOUS_YEAR_SOLD = 'PREVIOUS YEAR SOLD';
     public const FILTER_PREVIOUS_MONTH_SOLD = 'PREVIOUS MONTH SOLD';
     public const FILTER_YESTERDAY_SOLD = 'YESTERDAY SOLD';

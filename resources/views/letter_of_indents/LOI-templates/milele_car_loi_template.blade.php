@@ -20,12 +20,14 @@
         #so-details td {
             border: none;
             padding: 5px;
+            font-size: 10px;
+            font-family: arial, sans-serif;
         }
         #so-items td, th{
-            border: 1px solid #1c1b1b;
-            text-align: left;
-            padding: 8px;
-            font-size: 14px;
+            border: 1px solid #D3D3D3;
+            /* text-align: left; */
+            /* padding: 8px; */
+            font-size: 10px;
         }
         .left {
             text-align: left;
@@ -40,7 +42,9 @@
         }
         .header{
             background-color: #000000;
-            padding: 10px;
+            padding-right: 20px;
+            /* padding-left: 10px; */
+            font-family: arial, sans-serif;
         }
         .border-outline {
             border: 1px solid #0f0f0f;
@@ -51,6 +55,14 @@
             .container{
                 max-width: 850px; !important;
             }
+        }
+        .county-name{
+            display: list-item;
+            list-style: none;
+            padding-left: 30px;
+            margin-left: 55px;
+            font-weight:600px;
+            font-size:12px;
         }
     </style>
     <div class="row" >
@@ -75,72 +87,73 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <img src="{{ url('images/milele_car_logo.png') }}" height="75px" width="100px" ><span class="logo-txt"></span>
+                                        <img src="{{ url('images/milele_car_logo.png') }}" height="65px" width="90px" >
+                                        <!-- <span class="logo-txt"></span> -->
                                     </td>
                                     <td style="text-align: end">
-                                        <h1 style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
+                                        <span style="color: #FFFFFF; font-size: 35px;">SALES ORDER</span>
                                     </td>
                                 </tr>
                             </table>
                         </div>
                         <div style="background-color: #f6f5f5">
-                            <b><p style="padding-left: 5px;font-weight: bold;padding-top: 10px">Milele Motors FZCO</p></b>
+                            <p style="padding-left: 5px;font-weight: 600px;padding-top: 10px;font-size:14px">Milele Motors FZCO</p>
                             <table id="so-details">
                                 <tr>
-                                    <td class="left">VAT TRN - 100057588400003</td>
-                                    <td></td>
-                                    <td class="last" style="padding-right: 20px">SO NO: <span style="background-color: black;color: black">1234567790898233</span></td>
+                                    <td class="left" style="padding-top:0px;">VAT TRN - 100057588400003</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last" style="padding-right: 20px;padding-top:0px;color:#D3D3D3">SO NO: <span style="background-color: black;color: black;text-align:left">1234567790898233</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="left">Ras al khor 3, Yard 11 - DAZ</td>
-                                    <td></td>
-                                    <td class="last" >Date :
-                                        <span> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </span>
+                                    <td class="left" style="padding-top:0px;">Ras al khor 3, Yard 11 - DAZ</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last" style="padding-top:0px;padding-right: 70px;" ><span style="color:#D3D3D3"> DATE </span> 
+                                        <span class="left"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('M d Y')}} </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td >Dubai, U.A.E</td>
-                                    <td></td>
-                                    <td class="last ">Customer ID: <span style="background-color: black;color: black">123455555</span></td>
+                                    <td style="padding-top:0px;">Dubai, U.A.E</td>
+                                    <td style="padding-top:0px;"></td>
+                                    <td class="last" style="padding-top:0px;color:#D3D3D3;padding-right: 20px;">CUSTOMER ID
+                                         <span style="background-color: black;color: black">123455555hhhhhhh</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="left">+971 43235991</td>
-                                    <td></td>
-                                    <td class="last">Sales Order Type: Sales Of Motor Vehicle</td>
+                                    <td class="left"  style="padding-top:0px;">+971 43235991</td>
+                                    <td  style="padding-top:0px;"></td>
+                                    <td class="last"  style="padding-top:0px;"> <span style="color:#D3D3D3;">SALES ORDER TYPE </span> Sales Of Motor Vehicle</td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <span style="margin-right: 50px;padding-right: 50px"> To </span>
-                                        <span  style="list-style: none;" >
-                                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->name ?? '' }}</span>
-                                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->country->name ?? '' }} </span>
+                                    <td style="padding-bottom:0px">
+                                        <span style="margin-right: 50px;padding-right: 20px;color:#D3D3D3;"> TO </span>
+                                        <!-- <span  style="list-style: none;" > -->
+                                        <span style="font-size:12px;font-weight:600px" >{{ strtoupper($letterOfIndent->client->name ?? '') }}</span>
+                                       <span class="county-name">{{ strtoupper($letterOfIndent->client->country->name ?? '') }} </span>
                                     </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td style="padding:0px">
                                         <span style="margin-right: 55px;padding-right: 30px"> </span>
-                                        <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
+                                        <span style="background-color: black;font-size: 35px;color: black">11111111111111111111r</span>
                                     </td>
                                 </tr>
                             </table>
-                            <br>
-                            <br>
-                            <table id="so-items" >
-                                <tr style="background-color: black;color: #FFFFFF" >
-                                    <th>QUANTITY</th>
+                      
+                            <table id="so-items" style="margin-top:5px;" >
+                                <tr style="background-color: black;color: #FFFFFF;text-align:center" >
+                                    <th style="text-align:center;padding-left:8px;padding-right:8px;">QUANTITY</th>
                                     <th>DESCRIPTION</th>
-                                    <th width="100px">UNIT PRICE</th>
-                                    <th width="100px">LINE TOTAL </th>
+                                    <th width="100px" style="border-bottom:none">UNIT PRICE</th>
+                                    <th width="100px" style="border-bottom:none">LINE TOTAL </th>
                                 </tr>
                                 @foreach($letterOfIndentItems as $letterOfIndentItem)
                                     <tr>
-                                        <td>{{$letterOfIndentItem->quantity}}</td>
+                                        <td style="text-align:center">{{$letterOfIndentItem->quantity}}</td>
                                         <td>
                                             {{ $letterOfIndentItem->masterModel->milele_loi_description ?? ''}}
                                         </td>
-                                        <td style="background-color: black;color: black" >0</td>
-                                        <td style="background-color: black;color: black" >0</td>
+                                        <td style="background-color: black;color: black;border:none;" >0</td>
+                                        <td style="background-color: black;color: black;border:none;" >0</td>
                                     </tr>
                                 @endforeach
                                 <tr>
@@ -148,20 +161,20 @@
                                     <td>CNF - SHIPMENT AND TRANSPORTATION
                                         <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>
                                     </td>
-                                    <td  style="background-color: black;color: black"></td>
-                                    <td  style="background-color: black;color: black"></td>
+                                    <td  style="background-color: black;color: black;border:none;"></td>
+                                    <td  style="background-color: black;color: black;border:none;"></td>
                                 </tr>
                               
                                 <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
-                                    <td colspan="2" style="border: none;">Name:
-                                        <span style="margin-left: 10px"> {{ $letterOfIndent->customer->name ?? '' }} </span>
+                                    <td colspan="2" style="border: none;padding-top:0px">Name:
+                                        <span style="margin-left: 10px"> {{ strtoupper($letterOfIndent->client->name ?? '') }} </span>
                                     </td>
 
-                                    <td style="border: none;text-align: end">SUBTOTAL</td>
-                                    <td  style="border: none;background-color: black;color: black" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">SUBTOTAL</td>
+                                    <td  style="border: none;background-color: black;color: black;padding-top:0px" ></td>
                                 </tr >
                                 <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF;" id="date-div">
-                                    <td colspan="2" style="border: none">Date:
+                                    <td colspan="2" style="border: none;padding-top:0px">Date / Place:
                                         <span>
                                          {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
                                     </span>
@@ -170,18 +183,18 @@
                                     {{--                                <td style="border: none">--}}
                                     {{--                                  --}}
                                     {{--                                </td>--}}
-                                    <td style="border: none;text-align: end">SALES VAT</td>
-                                    <td  style="border: none;background-color: black;color: black" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">SALES VAT</td>
+                                    <td  style="border: none;background-color: black;color: black;padding-top:0px" ></td>
                                 </tr>
                                 <tr style=";background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
-                                    <td colspan="2" style="border: none">
+                                    <td colspan="2" style="border: none;padding-top:0px">
                                         @if($letterOfIndent->signature)
                                             <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 100px;width: 150px">
                                         @endif
                                     </td>
 
-                                    <td style="border: none;text-align: end">TOTAL</td>
-                                    <td style="background-color: #000000;border: none" ></td>
+                                    <td style="border: none;text-align: end;padding-top:0px">TOTAL</td>
+                                    <td style="background-color: #000000;border: none;padding-top:0px" ></td>
                                 </tr>
                             </table>
                         </div>

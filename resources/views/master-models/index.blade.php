@@ -37,8 +37,8 @@
                     </div>
                 @endif
             </div>
-            <div class="m-3">
-                {!! $html->table(['class' => 'table table-bordered table-striped table-responsive thead-dark','id'=> 'model-table']) !!}
+            <div class="m-3 table-responsive">
+                {!! $html->table(['class' => 'table table-bordered table-striped thead-dark','id'=> 'model-table']) !!}
             </div>
     @endif
         @endcan

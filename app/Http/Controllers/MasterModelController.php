@@ -29,8 +29,17 @@ class MasterModelController extends Controller
                     return Carbon::parse($query->created_at)->format('d M Y');
                 })
                 ->editColumn('created_by', function($query) {
-                    return $query->CreatedBy->name ?? '';
+                    return $query->createdBy->name ?? '';
                 })
+                ->editColumn('updated_by', function($query) {
+                    return $query->updatedBy->name ?? '';
+                })
+                ->editColumn('updated_at', function($query) {
+                   return Carbon::parse($query->updated_at)->format('d M Y');
+                })
+                ->editColumn('master_model_line_id', function($query) {
+                    return $query->variant->master_model_lines->model_line ?? '';
+                 })
                 ->editColumn('variant_id', function($query) {
                     return $query->variant->name ?? '';
                 })
@@ -54,10 +63,15 @@ class MasterModelController extends Controller
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],
             ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
             ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
+            ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Model Line'],
             ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI Description'],
             ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'Milele LOI Description'],
             ['data' => 'amount_uae', 'name' => 'amount_uae','title' => 'Amount in UAE '],
             ['data' => 'amount_belgium', 'name' => 'amount_belgium','title' => 'Amount in Belgium '],
+            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
+            ['data' => 'created_by', 'name' => 'created_by','title' => 'Created By'],
+            ['data' => 'updated_at', 'name' => 'updated_at','title' => 'Updated At'],
+            ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
 
         ]);
@@ -98,11 +112,13 @@ class MasterModelController extends Controller
         }
 
         $model = new MasterModel();
+        $variant = Varaint::find($request->variant_id);
 
         $model->steering = $request->steering;
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
+        $model->master_model_line_id = $variant->master_model_lines->id ?? '';
         $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
         $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
@@ -164,11 +180,13 @@ class MasterModelController extends Controller
         }
 
         $model = MasterModel::find($id);
+        $variant = Varaint::find($request->variant_id);
 
         $model->steering = $request->steering;
         $model->model = $request->model;
         $model->sfx = $request->sfx;
         $model->variant_id = $request->variant_id;
+        $model->master_model_line_id = $variant->master_model_lines->id ?? '';
         $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
         $model->amount_belgium = $request->amount_belgium ? $request->amount_belgium : 0;
         $model->model_year = $request->model_year;
@@ -191,7 +209,9 @@ class MasterModelController extends Controller
         (new UserActivityController)->createActivity('Deleted Master Model.');
 
         $masterModel = MasterModel::find($id);
+        $masterModel->deleted_by = Auth::id();
         $masterModel->delete();
+        $masterModel->save();
 
         return response(true);
     }

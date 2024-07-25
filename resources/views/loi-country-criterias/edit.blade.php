@@ -58,15 +58,26 @@
 
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Restricted Model Line </label>
-                                    <select class="form-control widthinput" multiple name="master_model_line_id" id="model_line" autofocus>
+                                    <label for="choices-single-default" class="form-label">Restricted Model Lines </label>
+                                    <select class="form-control widthinput" multiple name="restricted_master_model_line_ids[]" id="restricted_model_line" autofocus>
                                         @foreach($modelLines as $modelLine)
-                                            <option value="{{ $modelLine->id }}" {{ $modelLine->id == $loiCountryCriteria->master_model_line_id ? 'selected' : "" }} > {{ $modelLine->model_line }} </option>
+                                            <option value="{{ $modelLine->id }}"
+                                            {{ (in_array ($modelLine->model_line, $loiCountryCriteria->restricted_model_lines)) ? 'selected' : ''  }}>  {{ $modelLine->model_line }} </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Allowed Model Lines </label>
+                                    <select class="form-control widthinput" multiple name="allowed_master_model_line_ids[]" id="allowed_model_line" autofocus>
+                                        @foreach($modelLines as $modelLine)
+                                            <option value="{{ $modelLine->id }}"
+                                            {{ (in_array ($modelLine->model_line, $loiCountryCriteria->allowed_model_lines)) ? 'selected' : ''  }}> {{ $modelLine->model_line }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Maximum QTY/Passport </label>
@@ -134,10 +145,15 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
-        $('#model_line').select2({
-            placeholder : 'Select Model Line',
+        $('#restricted_model_line').select2({
+            placeholder : 'Select Restricted Model Lines',
             allowClear: true,
-            maximumSelectionLength: 1
+            // maximumSelectionLength: 1
+        });
+        $('#allowed_model_line').select2({
+            placeholder : 'Select Allowed Model Lines',
+            allowClear: true,
+            // maximumSelectionLength: 1
         });
         $('#is_only_company_allowed').select2({
             placeholder : 'Select Option',

@@ -99,7 +99,7 @@
             // console.error(error);
           });
         $('input[type=file]').on('change',function(){
-            $(this).valid();
+            // $(this).valid(); // COMMENTED BECAUSE IT MAKE error in console when onchange of file
         });
         $('input[type=date]').on('change',function(){
             $(this).valid();

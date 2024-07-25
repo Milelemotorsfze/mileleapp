@@ -13,7 +13,7 @@
     @if ($hasPermission)
         @if($masterModel->is_deletable == true)
             <button data-url="{{ route('master-models.destroy', $masterModel->id) }}" data-id="{{ $masterModel->id }}"
-                class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
+                class="btn btn-danger btn-sm btn-delete mt-1"><i class="fa fa-trash"></i></button>
         @endif
     @endif
 @endcan

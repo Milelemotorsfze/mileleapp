@@ -24,4 +24,9 @@ class MasterModelLines extends Model
     {
         return $this->hasMany(AddonTypes::class,'model_id','id');
     }
+    public function restricredOrAllowedModelLines() 
+    {
+
+        return $this->hasMany(LoiAllowedOrRestrictedModelLines::class,'model_line_id','id');
+    }
 }

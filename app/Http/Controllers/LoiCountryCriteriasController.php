@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\Customer;
+use App\Models\Clients;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\MasterModelLines;
+use App\Models\LoiAllowedOrRestrictedModelLines;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,59 +25,9 @@ class LoiCountryCriteriasController extends Controller
     {
         (new UserActivityController)->createActivity('Open LOI Restricted Counties List');
 
-        $loiCountryCriteria = LoiCountryCriteria::with(['country','modelLine'])->orderBy('id','DESC')->get();
+        $loiCountryCriterias = LoiCountryCriteria::orderBy('id','DESC')->get();
 
-        if (request()->ajax()) {
-            return DataTables::of($loiCountryCriteria)
-                ->editColumn('created_at', function($query) {
-                    return Carbon::parse($query->created_at)->format('d M Y');
-                })
-                ->editColumn('master_model_line_id', function($query) {
-                    return $query->modelLine->model_line ?? '';
-                })
-                ->editColumn('is_loi_restricted', function($query) {
-                    if($query->is_loi_restricted == true) {
-                        return 'Yes';
-                    }else{
-                        return 'No';
-                    }
-                })
-                ->editColumn('is_only_company_allowed', function($query) {
-                    if($query->is_only_company_allowed == 1) {
-                        return 'YES';
-                    }else if($query->is_only_company_allowed == 2){
-                        return 'No';
-                    }else{
-                        return 'None';
-                    }
-                })
-
-                ->editColumn('updated_by', function($query) {
-                    return $query->updatedBy->name ?? '';
-                })
-                ->addColumn('action', function(LoiCountryCriteria $loiCountryCriteria) {
-                    return view('loi-country-criterias.action',compact('loiCountryCriteria'));
-                })
-                ->rawColumns(['action'])
-                ->toJson();
-        }
-
-        $html = $builder->columns([
-            ['data' => 'id', 'name' => 'id','title' => 'S.No'],
-            ['data' => 'country.name', 'name' => 'country.name','title' => 'Country'],
-            ['data' => 'status', 'name' => 'status','title' => 'Status'],
-            ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Restricted Model Line'],
-            ['data' => 'is_loi_restricted', 'name' => 'is_loi_restricted','title' => 'Is LOI Restricted'],
-            ['data' => 'is_only_company_allowed', 'name' => 'is_only_company_allowed','title' => 'Is Only Company Allowed'],
-            ['data' => 'max_qty_per_passport', 'name' => 'max_qty_per_passport','title' => 'Maximum QTY/ Passport'],
-            ['data' => 'max_qty_for_company', 'name' => 'max_qty_for_company','title' => 'Maximum QTY/ Company'],
-            ['data' => 'min_qty_for_company', 'name' => 'min_qty_for_company','title' => 'Minimum QTY/ Company'],
-            ['data' => 'comment', 'name' => 'comment','title' => 'Comment'],
-            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
-            ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
-            ['data' => 'action', 'name' => 'action','title' => 'Action'],
-        ]);
-        return view('loi-country-criterias.index', compact('html'));
+        return view('loi-country-criterias.index', compact('loiCountryCriterias'));
     }
 
     /**
@@ -105,14 +57,35 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria = new LoiCountryCriteria();
         $loiCountryCriteria->country_id = $request->country_id;
         $loiCountryCriteria->comment = $request->comment;
-        $loiCountryCriteria->updated_by = Auth::id();
+        $loiCountryCriteria->created_by = Auth::id();
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
-        $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
         $loiCountryCriteria->status = LoiCountryCriteria::STATUS_ACTIVE;
+        if($request->allowed_master_model_line_ids) {
+           
+            foreach($request->allowed_master_model_line_ids as $allowedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $allowedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_allowed = true;
+                $loiModelLine->save();
+            }
+        }
+        if($request->restricted_master_model_line_ids) {
+            foreach($request->restricted_master_model_line_ids as $restrictedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $restrictedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_restricted = true;
+                $loiModelLine->save();
+            }
+
+        }
 
         $loiCountryCriteria->save();
 
@@ -160,12 +133,35 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
-//        $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
-        $loiCountryCriteria->master_model_line_id  = $request->master_model_line_id;
+        $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->save();
+        LoiAllowedOrRestrictedModelLines::where('country_id', $request->country_id)->delete();
+
+        if($request->allowed_master_model_line_ids) {
+           
+            foreach($request->allowed_master_model_line_ids as $allowedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $allowedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_allowed = true;
+                $loiModelLine->save();
+            }
+        }
+        if($request->restricted_master_model_line_ids) {
+            foreach($request->restricted_master_model_line_ids as $restrictedModelLine) {
+
+                $loiModelLine = new LoiAllowedOrRestrictedModelLines();
+                $loiModelLine->model_line_id = $restrictedModelLine;
+                $loiModelLine->country_id = $request->country_id;
+                $loiModelLine->is_restricted = true;
+                $loiModelLine->save();
+            }
+
+        }
 
         (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
 
@@ -181,7 +177,10 @@ class LoiCountryCriteriasController extends Controller
         (new UserActivityController)->createActivity('Deleted Entry in  LOI Restricted Counties.');
 
         $loiCountryCriteria = LoiCountryCriteria::find($id);
+        $loiModeLlines = LoiAllowedOrRestrictedModelLines::where('country_id', $loiCountryCriteria->country_id)->delete();
         $loiCountryCriteria->delete();
+        $loiCountryCriteria->deleted_by = Auth::id();
+        $loiCountryCriteria->save();
 
         return response(true);
     }
@@ -191,14 +190,15 @@ class LoiCountryCriteriasController extends Controller
 
         $loiCountryCriteria = LoiCountryCriteria::find($request->id);
         $loiCountryCriteria->status = $request->status;
+        $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->save();
 
         return response(true);
     }
     public function CheckCountryCriteria(Request $request)
     {
-    
-        $customer = Customer::find($request->customer_id);
+        // info($request->all());
+        $customer = Clients::find($request->customer_id);
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
         $data = [];
 
@@ -206,7 +206,7 @@ class LoiCountryCriteriasController extends Controller
         $year = Carbon::parse($request->loi_date)->format('Y');
         $totalUnitCountUsed = LetterOfIndentItem::with('LOI')
                                     ->whereHas('LOI', function($query) use($year, $request){
-                                        $query->where('customer_id', $request->customer_id)
+                                        $query->where('client_id', $request->customer_id)
                                         ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
                                         ->whereYear('date', $year);
                                     })
@@ -217,13 +217,14 @@ class LoiCountryCriteriasController extends Controller
         if(!empty($LoiCountryCriteria->comment)) {
             $data['comment'] = $LoiCountryCriteria->comment;
         }
-    
+        $data['error'] = 0;
         if(!empty($LoiCountryCriteria->is_only_company_allowed && $LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES)) {
           
-            if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($request->customer_type !== \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
             
-                $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
-                $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
+                $data['validation_error'] = 'Only Company Can allow to Create LOI for this Country.';
+                $data['validation_error'] = 'Company can Only Create LOI.';
+                $data['error'] = 1;
             }
         }
         if($quantity > 0) {
@@ -231,20 +232,74 @@ class LoiCountryCriteriasController extends Controller
             if($totalUnitCountUsed > 0) {
                $msg = 'Already ' .$totalUnitCountUsed.' unit is used by this customer!';    
             }
-            if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
+            if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL) {
                 if($quantity > $LoiCountryCriteria->max_qty_per_passport) {
-                    $data['max_qty_per_passport_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
+                    $data['validation_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_per_passport.' ). '.$msg;
+                    $data['error'] = 1;
                 }
             }
-            if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
                 if($LoiCountryCriteria->min_qty_for_company > $quantity) {
-                    $data['min_qty_per_company_error'] = 'Total Quantity should be greater than allowed quantity( '.$LoiCountryCriteria->min_qty_for_company.' ). '.$msg;
+                    $data['validation_error'] = 'Total Quantity should be greater than allowed quantity( '.$LoiCountryCriteria->min_qty_for_company.' ). '.$msg;
+                    $data['error'] = 1;
                 }
             }
-            if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+            if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY) {
                 if($LoiCountryCriteria->max_qty_for_company < $quantity) {
-                    $data['max_qty_per_company_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_for_company.' ). '.$msg;
+                    $data['validation_error'] = 'Total Quantity should be less than allowed quantity( '.$LoiCountryCriteria->max_qty_for_company.' ). '.$msg;
+                    $data['error'] = 1;
                 }
+            }
+        }
+
+        if($request->selectedModelLineIds) {
+                $LOIRestrictedCountries = MasterModelLines::with('restricredOrAllowedModelLines')
+                        ->whereHas('restricredOrAllowedModelLines', function($query) use($customer) {
+                            $query->where('is_restricted', true)
+                            ->where('country_id', $customer->country_id);
+                        })->pluck('model_line')->toArray();
+
+            $LOIAllowedCountries = MasterModelLines::with('restricredOrAllowedModelLines')
+                        ->whereHas('restricredOrAllowedModelLines', function($query) use($customer) {
+                            $query->where('is_allowed', true)
+                            ->where('country_id', $customer->country_id);
+                        })->pluck('model_line')->toArray();
+
+            // info($LOIRestrictedCountries);
+            $restrictedModelLinesChoosen = [];
+            $notAllowedModelLinesChoosen = [];
+
+            foreach($request->selectedModelLineIds as $modelLine) {
+                if($LOIRestrictedCountries) {
+                    if(in_array($modelLine, $LOIRestrictedCountries)) {
+                        // info("model line is restrcied");
+                        // info($modelLine);
+                        $restrictedModelLinesChoosen[] = $modelLine;
+                    }
+                }
+                
+                if($LOIAllowedCountries) {
+                    if(!in_array($modelLine, $LOIAllowedCountries) ) {
+                        info("model line is not allowed");
+                        info($modelLine);
+                        $notAllowedModelLinesChoosen[] = $modelLine;
+                    }
+                }              
+            }
+            // info("allowed list");
+            // info($LOIAllowedCountries);
+            // info("model line which is not included in allwed list");
+            // info($notAllowedModelLinesChoosen);
+           
+            if($restrictedModelLinesChoosen) {
+                $modelLines = array_unique($restrictedModelLinesChoosen);
+                $data['validation_error'] = 'Model Line '.implode(", ", $modelLines).' is restricted to this country!';
+                $data['error'] = 1;
+            }
+            if($notAllowedModelLinesChoosen) {
+                $modelLines2 = array_unique($notAllowedModelLinesChoosen);
+                $data['validation_error'] = 'Model Line '.implode(", ", $modelLines2).' is not allowed to this country!';
+                $data['error'] = 1;
             }
         }
         return response()->json($data);

@@ -37,6 +37,8 @@ class WOVehicles extends Model
         'updated_by',
         'deleted_by',
         'deposit_received',
+        'comment_id',
+        'deleted_comment_id',
     ];
     protected $appends = [
         'certification_per_vin_name',
@@ -82,5 +84,9 @@ class WOVehicles extends Model
     public function DeletedBy()
     {
         return $this->hasOne(User::class,'id','deleted_by');
+    }
+    public function workOrder()
+    {
+        return $this->hasOne(WorkOrder::class,'id','work_order_id');
     }
 }

@@ -1,41 +1,24 @@
-<style>
-    .select2-container {
-        width: 100% !important;
-    }
-</style>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
 <div class="row m-0">
-    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-        <label class="col-form-label">Date Range</label>
+    <div class="col-md-1 col-xxl-1 col-lg-1 col-sm-12">
+        <label class="col-form-label">Filter By VIN</label>
     </div>
-    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <input type="text" id="date_range" class="form-control widthinput" placeholder="Date Range">
-    </div>
-    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-        <label class="col-form-label">User</label>
-    </div>
-    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
-            @foreach($users as $user)
-            <option value="{{$user->id ?? ''}}">{{$user->name ?? ''}}</option>
-            @endforeach
+    <div class="col-md-11 col-xxl-11 col-lg-11 col-sm-12">
+        <select id="vin-filter" class="form-control" multiple="multiple">
         </select>
-    </div>
-    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-        <label class="col-form-label">Type</label>
-    </div>
-    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <input type="text" id="type" class="form-control widthinput" placeholder="Type">
-    </div>
-    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-        <label class="col-form-label">Field</label>
-    </div>
-    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-        <input type="text" id="field" class="form-control widthinput" placeholder="Field">
     </div>
 </div>
 <div class="row mt-1">
     <div class="table-responsive">
-        <table class="table table-striped table-editable table-edits table table-condensed my-datatable" >
+        <table id="myVehAddonTable" class="table table-striped table-editable table-edits table table-condensed my-datatable" >
             <thead style="background-color: #e6f1ff">
                 <tr>
                     <th>Action</th>
@@ -75,14 +58,16 @@
             @if(isset($workOrder) && isset($workOrder->vehiclesWithTrashed) && count($workOrder->vehiclesWithTrashed) > 0)
             <div hidden>{{$i=0;}}</div>
                 @foreach($workOrder->vehiclesWithTrashed as $vehicle)
-                    <tr>
-                        <td><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Vehicle Data History" class="btn btn-sm btn-warning" 
-                        href="{{route('wo-vehicles.data-history',$vehicle->id ?? '')}}">
-                                            <i class="fa fa-eye" aria-hidden="true"></i>
-                                            </a></td>
+                    <tr class="vehicle-row" data-vin="{{ $vehicle->vin ?? '' }}" data-id="{{ $vehicle->id ?? '' }}" style="border-top: 2px solid rgb(166, 166, 166);">
+                        <td>
+                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Vehicle Data History" class="btn btn-sm btn-warning" 
+                                    href="{{route('wo-vehicles.data-history',$vehicle->id ?? '')}}">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                        </td>
                         <td>{{ ++$i }}</td>
                         <td>{{ $vehicle->boe_number }}</td>
-                        <td>{{ $vehicle->vin ?? '' }}</td> 
+                        <td class="vin-class">{{ $vehicle->vin ?? '' }}</td> 
                         <td>{{ $vehicle->brand ?? ''}}</td>
                         <td>{{ $vehicle->variant ?? '' }}</td>
                         <td>{{ $vehicle->engine ?? ''}}</td> 
@@ -104,39 +89,85 @@
                         <td>{{ $vehicle->shipment ?? ''}}</td>
                         @endif
                         <td>{{ $vehicle->deposit_received ?? ''}}</td>
-                        <td>{{$vehicle->CreatedBy->name ?? ''}}</td>
                         <td>@if($vehicle->created_at != ''){{\Carbon\Carbon::parse($vehicle->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                        <td>{{$vehicle->UpdatedBy->name ?? ''}}</td>
+                        <td>{{$vehicle->CreatedBy->name ?? ''}}</td>                        
                         <td>@if($vehicle->updated_at != '' && $vehicle->updated_at != $vehicle->created_at){{\Carbon\Carbon::parse($vehicle->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                        <td>{{$vehicle->DeletedBy->name ?? ''}}</td>
+                        <td>{{$vehicle->UpdatedBy->name ?? ''}}</td>
                         <td>@if($vehicle->deleted_at != ''){{\Carbon\Carbon::parse($vehicle->deleted_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                        <td>{{$vehicle->DeletedBy->name ?? ''}}</td>
                     </tr>
                     @if(isset($vehicle->addonsWithTrashed) && count($vehicle->addonsWithTrashed) > 0)
-                        <tr><th colspan="26">Service Breakdown</th></tr>
+                        <tr class="service-breakdown" data-vin="{{ $vehicle->vin ?? '' }}"><th colspan="@if(isset($type) && $type == 'export_cnf') 29 @else 28 @endif">Service Breakdown</th></tr>
                         @foreach($vehicle->addonsWithTrashed as $addon)
-                        <tr>
+                        <tr class="service-breakdown" data-vin="{{ $vehicle->vin ?? '' }}">
                             <td><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Addon Data History" class="btn btn-sm btn-warning" 
                         href="{{route('wo-vehicle-addon.data-history',$addon->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                             </a></td>
                             <td colspan="5">{{$addon->addon_code ?? 'NA'}}</td>
                             <td colspan="2">Qty : {{$addon->addon_quantity ?? 'NA'}}</td>
-                            <td colspan="18">{{$addon->addon_description ?? 'NA'}}</td>
+                            <td colspan="@if(isset($type) && $type == 'export_cnf') 21 @else 20 @endif">{{$addon->addon_description ?? 'NA'}}</td>
                         </tr>
                         @endforeach
                     @else
-                    <tr>
-                        <td colspan="26">No addons available for this vehicle.</td>
+                    <tr  class="service-breakdown" data-vin="{{ $vehicle->vin ?? '' }}">
+                        <td colspan="@if(isset($type) && $type == 'export_cnf') 29 @else 28 @endif">No addons available for this vehicle.</td>
                     </tr>
                     @endif
                 @endforeach
             @else
                 <tr>
-                    <td colspan="5">No data history available.</td>
+                    <td colspan="@if(isset($type) && $type == 'export_cnf') 29 @else 28 @endif">No data history available.</td>
                 </tr>
             @endif
             </tbody>
         </table>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<script type="text/javascript">
+     $(document).ready(function() {
+       // Initialize an empty Set to store unique VINs
+       const uniqueVins = new Set();
+
+        // Loop through each element with the class 'vin-class' to extract VINs
+        $('.vin-class').each(function() {
+            const vin = $(this).text().trim();
+            if (vin) {
+                uniqueVins.add(vin);
+            }
+        });
+
+        // Convert the Set to an array and sort it
+        const sortedVins = Array.from(uniqueVins).sort();
+
+        // Populate the dropdown with the sorted unique VINs
+        sortedVins.forEach(function(vin) {
+            $('#vin-filter').append(new Option(vin, vin));
+        });
+
+        // Initialize Select2 on the #vin-filter element
+        $('#vin-filter').select2({
+            placeholder: 'Select VIN',
+            allowClear: true
+        });
+
+        // Event handler for the change event of the dropdown
+        $('#vin-filter').on('change', function() {
+            const selectedVins = $(this).val();
+            
+            if (selectedVins && selectedVins.length > 0) {
+                // Show rows with the selected VINs and their service breakdown
+                $('.vehicle-row, .service-breakdown').hide();
+                selectedVins.forEach(function(vin) {
+                    $(`.vehicle-row[data-vin="${vin}"], .service-breakdown[data-vin="${vin}"]`).show();
+                });
+            } else {
+                // Show all rows if no VIN is selected
+                $('.vehicle-row, .service-breakdown').show();
+            }
+        });
+    });
+</script>
+</body>
