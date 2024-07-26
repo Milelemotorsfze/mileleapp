@@ -203,5 +203,28 @@
         </div>
     </div>
     
-       
+     <script>
+         $('.btn-request-supplier-approval').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            console.log(url);
+            console.log(id);
+            var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Approval Request Send Successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
   </script> 
