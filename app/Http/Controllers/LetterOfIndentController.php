@@ -43,7 +43,8 @@ class LetterOfIndentController extends Controller
      */
     public function index(Builder $builder, Request $request)
     {
-      
+           
+
         (new UserActivityController)->createActivity('Open LOI Listing Page.');
 
         $tab = $request->tab;
@@ -136,10 +137,10 @@ class LetterOfIndentController extends Controller
                     return view('letter_of_indents.actions.loi_template_links',compact('templateTypes','letterOfIndent'));
                 })
                 ->editColumn('is_expired', function($query) {
-                    $LOI = LetterOfIndent::select('id','is_expired','client_id')->find($query->id);
+                    $LOI = LetterOfIndent::select('id','is_expired','client_id','date')->find($query->id);
                     $LOItype = $LOI->client->customertype;
                     $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-                    if($LOIExpiryCondition && $LOI->is_expired == false) {        
+                    if($LOIExpiryCondition) {        
                         $currentDate = Carbon::now();
                         $year = $LOIExpiryCondition->expiry_duration_year;
                         $expiryDate = Carbon::parse($LOI->date)->addYears($year);
@@ -147,6 +148,9 @@ class LetterOfIndentController extends Controller
                         // do not make status expired, becasue to know at which status stage it got expired
                         if($currentDate->gt($expiryDate) == true) {
                             $LOI->is_expired = true;              
+                            $LOI->save();  
+                        }else{
+                            $LOI->is_expired = false;              
                             $LOI->save();  
                         }
                     }
