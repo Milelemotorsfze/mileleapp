@@ -12,6 +12,7 @@ use App\Models\PFI;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
 use App\Mail\DPEmailNotification;
+use App\Mail\DPrealeasedEmailNotification;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -4418,10 +4419,16 @@ public function submitPaymentDetails(Request $request)
                 $vendorPayment->save();
             }
             $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+            $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
             foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
                 $vehicleTransaction->status = 'Initiate';
                 $vehicleTransaction->save();
             }
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            $recipients = ['waqar.younas@milele.com'];
+            Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4448,6 +4455,7 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->save();
     }
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'Approved';
         $vehicleTransaction->save();
@@ -4455,8 +4463,11 @@ public function submitPaymentDetails(Request $request)
         $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
         $vehiclespaid->save();
     }
-    // $recipients = ['team.dp@milele.com'];
-    //             Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
+    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    $currency = $supplierAccountTransaction->account_currency;
+    $recipients = ['waqar.younas@milele.com'];
+    Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)

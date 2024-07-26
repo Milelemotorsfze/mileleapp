@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DPEmailNotification extends Mailable
+class DPrealeasedEmailNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -39,8 +39,8 @@ class DPEmailNotification extends Mailable
 
     public function build()
     {
-        return $this->subject('Purchase Order Payment Initiation')
-                    ->view('emails.dp_initiation_notification')
+        return $this->subject('Purchase Order Payment Released')
+                    ->view('emails.dp_released_notification')
                     ->with([
                         'ponumber' => $this->ponumber,
                         'pl_number' => $this->pl_number,
