@@ -37,6 +37,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
+
         (new UserActivityController)->createActivity('Open Customer Create Page');
 
         $countries = Country::all();
@@ -48,6 +49,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        
         (new UserActivityController)->createActivity('New Customer Created');
 
         $this->validate($request, [

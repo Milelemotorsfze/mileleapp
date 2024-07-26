@@ -151,7 +151,7 @@ class LetterOfIndentController extends Controller
                         }
                     }
 
-                    if($query->is_expired == true) {
+                    if($LOI->is_expired == true) {
                         return  'Expired';
                     }else{
                         return 'Not Expired';
@@ -187,12 +187,13 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
+
         (new UserActivityController)->createActivity('Open LOI Create Page.');
         
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Clients::whereNotNull('country_id')->get();
-        $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::where('is_milele', true)->groupBy('model')->orderBy('id','ASC')->get();
         $salesPersons = User::where('status','active')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models','salesPersons'));
