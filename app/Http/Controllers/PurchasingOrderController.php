@@ -4427,7 +4427,7 @@ public function submitPaymentDetails(Request $request)
             $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
             $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
             $currency = $supplierAccountTransaction->account_currency;
-            $recipients = ['waqar.younas@milele.com'];
+            $recipients = ['team.dp@milele.com'];
             Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
@@ -4466,7 +4466,7 @@ public function submitPaymentDetails(Request $request)
     $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     $currency = $supplierAccountTransaction->account_currency;
-    $recipients = ['waqar.younas@milele.com'];
+    $recipients = ['team.dp@milele.com'];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
