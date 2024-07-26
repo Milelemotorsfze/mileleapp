@@ -63,7 +63,7 @@
                 <p style="margin-bottom: 0px;"> <span class="fw-bold">Full Name: </span> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
                 <p> <span class="fw-bold">Address: </span>  {{  strtoupper($letterOfIndent->client->country->name) ?? ''}} </p>
                 <p>Dear Milele Motors,</p>
-                <p>I, ({{ ucfirst($letterOfIndent->client->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
+                <p>I, ({{ ucfirst($letterOfIndent->client->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following model(s) from your company.</p>
                 <h5 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline;color: black">Requirements:</h5>
                 <table  style="width:100%;">
                     @foreach($letterOfIndentItems as $key => $letterOfIndentItem)             
@@ -87,7 +87,7 @@
 
                 <p style="margin-top:20px;">
                     I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
-                    purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
+                    purchasing your vehicles under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
                     I would like to declare that the purchased automobile(s) will be registered within the designated country,
                     and this acquisition is not intended for resale purposes.
                 </p>
