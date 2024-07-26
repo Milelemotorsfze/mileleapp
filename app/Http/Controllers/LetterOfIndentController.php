@@ -696,7 +696,6 @@ class LetterOfIndentController extends Controller
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
-            $LOI->review = $request->review;
             $msg = 'Rejected';
 
         }elseif ($request->status == 'APPROVE') {
@@ -705,6 +704,7 @@ class LetterOfIndentController extends Controller
             $msg = 'Approved';
 
         }
+        $LOI->review = $request->review;
         $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->updated_by = Auth::id();
         $LOI->save();
@@ -738,7 +738,7 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('LOI Utilization quantity updated.');
         
         $LOI = LetterOfIndent::find($id);
-        DB::  DB::beginTransaction();
+         DB::beginTransaction();
             if($request->letter_of_indent_item_ids) {
                 foreach($request->letter_of_indent_item_ids as $key => $LOIItemId){
                     info($LOIItemId);
