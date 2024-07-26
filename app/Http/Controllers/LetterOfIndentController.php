@@ -140,7 +140,7 @@ class LetterOfIndentController extends Controller
                     $LOI = LetterOfIndent::select('id','is_expired','client_id','date')->find($query->id);
                     $LOItype = $LOI->client->customertype;
                     $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-                    if($LOIExpiryCondition) {        
+                    if($LOIExpiryCondition && $LOI->is_expired == false) {        
                         $currentDate = Carbon::now();
                         $year = $LOIExpiryCondition->expiry_duration_year;
                         $expiryDate = Carbon::parse($LOI->date)->addYears($year);
