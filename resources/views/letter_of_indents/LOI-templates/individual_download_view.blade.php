@@ -8,6 +8,7 @@
         .content{
             font-family: arial, sans-serif;
             padding: 10px;
+            text-align:justify
         }
         .center {
             display: block;
@@ -49,7 +50,7 @@
 
         <p>Dear Milele Motors,</p>
 
-        <p>I, ({{ strtoupper($letterOfIndent->client->name) ?? ''}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
+        <p>I, ({{ strtoupper($letterOfIndent->client->name) ?? ''}}) am writing this letter to express my sincere intention to purchase the following model(s) from your company.</p>
         <h3 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline">Requirements:</h3>
 
         <table  style="width:100%;">
@@ -77,7 +78,7 @@
         </table>
         <p style="margin-top:20px;">
             I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
-            purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
+            purchasing your vehicles under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
             I would like to declare that the purchased automobile(s) will be registered within the designated country,
             and this acquisition is not intended for resale purposes.
         </p>
