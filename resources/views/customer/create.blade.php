@@ -13,7 +13,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Create New Customer</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('dm-customers.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
             </div>
             <div class="card-body">
@@ -46,7 +46,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Name</label>
-                                <input type="text" class="form-control" name="name"  placeholder="Enter Name">
+                                <input type="text" class="form-control" name="name" value="{{ old('name')}}"  placeholder="Enter Name">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-12">
@@ -55,7 +55,7 @@
                                 <select class="form-control" name="country_id" id="country" autofocus>
                                     <option ></option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country->id}}"> {{ $country->name }} </option>
+                                        <option value="{{$country->id}}" @if( old('country_id') == $country->id) selected="selected" @endif  > {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -65,9 +65,12 @@
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control" name="type" id="customer-type">
                                     <option value="" disabled>Type</option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
-                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}
+                                    @if( old('type') == 'Individual' ) selected="selected" @endif >{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}
+                                    @if( old('type') == 'Company') selected="selected" @endif >{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
+                                    @if( old('type') == 'Government') selected="selected" @endif >{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
                                 </select>
                             </div>
                         </div>
@@ -87,7 +90,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
-                                <textarea class="form-control" name="address" rows="5" cols="25"></textarea>
+                                <textarea class="form-control" name="address" rows="5" cols="25">{{ old('address')}}</textarea>
                             </div>
                         </div>
                         <br>

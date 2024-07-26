@@ -126,7 +126,7 @@
                                                     <dt class="d-lg-none d-xl-none d-xxl-none">Utilized Quantity</dt>
                                                     <input type="hidden" name="letter_of_indent_item_ids[]" value="{{ $LOIItem->id}}" >
                                                     <input type="number" min="0" placeholder="Utilized Quantity" 
-                                                    @if($type !== 'SUPPLIER_RESPONSE')  readonly @endif 
+                                                    @if($type == 'NEW')  readonly @endif 
                                                     required max="{{$LOIItem->quantity}}" name="utilized_quantity[]" value="{{ $LOIItem->utilized_quantity }}" class="form-control" >
                                             
                                                 </div>
@@ -142,7 +142,7 @@
 
                     </div>
                     <div class="modal-footer">
-                       @if($type == 'SUPPLIER_RESPONSE' && $letterOfIndent->is_expired == false)
+                       @if($type !== 'NEW' && $letterOfIndent->is_expired == false)
                             <button type="submit" class="btn btn-info" 
                            data-url="{{route('utilization-quantity-update', $letterOfIndent->id) }}">Update</button> 
                         @endif 
