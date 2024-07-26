@@ -37,6 +37,7 @@ class CustomerController extends Controller
      */
     public function create()
     {
+
         (new UserActivityController)->createActivity('Open Customer Create Page');
 
         $countries = Country::all();
@@ -48,55 +49,68 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        
         (new UserActivityController)->createActivity('New Customer Created');
 
         $this->validate($request, [
-            'name' => 'required|unique:clients,name',
+            'name' => 'required',
             'country_id' => 'required',
             'type' => 'required',
         ]);
 
-        $client = new Clients();
-        $client->name = $request->name;
-        $client->country_id = $request->country_id;
-        $client->customertype = $request->type;
-        $client->address = $request->address;
-        $client->created_by = Auth::id();
-        $client->is_demand_planning_customer = true;
-
-
-        if ($request->has('passport_file'))
-        {
-            $file = $request->file('passport_file');
-
-            $extension = $file->getClientOriginalExtension();
-            $fileName = 'passport'.time().'.'.$extension;
-            $destinationPath = 'Customers/passports';
-            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
-                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+            $isCustomerExist = Clients::where('name', $request->name)
+                                    ->where('is_demand_planning_customer', true)->first();
+            
+            if($isCustomerExist) {
+                return redirect()->back()->with('error', 'This customer name is already existing!');
             }
-            $file->move($destinationPath, $fileName);
+        DB::beginTransaction();
 
-            // $customer->passport_file = $fileName;
-            $client->tradelicense = $fileName;
-        }
-        if ($request->has('trade_license_file'))
-        {
-            $file = $request->file('trade_license_file');
+            $client = new Clients();
+            $client->name = $request->name;
+            $client->country_id = $request->country_id;
+            $client->customertype = $request->type;
+            $client->address = $request->address;
+            $client->created_by = Auth::id();
+            $client->is_demand_planning_customer = true;
 
-            $extension = $file->getClientOriginalExtension();
-            $fileName2 = 'trade_license'.time().'.'.$extension;       
-            $destinationPath = 'Customers/trade_licenses';
-            if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
-                \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+
+            if ($request->has('passport_file'))
+            {
+                $file = $request->file('passport_file');
+
+                $extension = $file->getClientOriginalExtension();
+                $fileName = 'passport'.time().'.'.$extension;
+                // $destinationPath = 'Customers/passports';
+                $destinationPath = 'storage/app/public/passports';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+                $file->storeAs('passports', $fileName);
+                $file->move($destinationPath, $fileName);
+
+                $client->passport = $fileName;
             }
-            $file->move($destinationPath, $fileName);
+            if ($request->has('trade_license_file'))
+            {
+                $file = $request->file('trade_license_file');
 
-            // $customer->trade_license_file = $fileName2;
-            $client->passport = $fileName2;
-        }
-       
-        $client->save();
+                $extension = $file->getClientOriginalExtension();
+                $fileName2 = 'trade_license'.time().'.'.$extension;
+                // $destinationPath = 'Customers/trade_licenses';
+
+                $destinationPath2 = 'storage/app/public/tradelicenses';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath2)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath2, $mode = 0777, true, true);
+                }
+                $file->storeAs('tradelicenses', $fileName2);
+                $file->move($destinationPath2, $fileName2);
+                $client->tradelicense = $fileName2;
+
+            }
+        
+            $client->save();
+        DB::commit();
         // $customer->save();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
@@ -131,11 +145,17 @@ class CustomerController extends Controller
         (new UserActivityController)->createActivity('Customer Detail Updated');
 
         $this->validate($request, [
-            'name' => 'required|unique:clients,name,'.$id,
+            'name' => 'required',
             'country_id' => 'required',
             'type' => 'required',
         ]);
-
+            $isCustomerExist = Clients::where('name', $request->name)
+                                    ->whereNot('id',$id)
+                                    ->where('is_demand_planning_customer', true)->first();
+            
+            if($isCustomerExist) {
+                return redirect()->back()->with('error', 'This customer name is already existing!');
+            }
         DB::beginTransaction();
 
         $client = Clients::find($id);
