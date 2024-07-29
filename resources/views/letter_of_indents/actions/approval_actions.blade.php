@@ -100,7 +100,7 @@
                                     </div>
                                     <div class="row mt-2">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
-                                            <dt class="form-label font-size-13 text-muted">Reason :</dt>
+                                            <dt class="form-label font-size-13 text-muted">Remark :</dt>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
                                             <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
@@ -187,6 +187,14 @@
                                 <input type="date" name="loi_approval_date" id="approval-date"
                                         required class="form-control widthinput">
                                 <span id="loi-approval-date-error" class="text-danger"> </span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
+                                <dt class="form-label font-size-13 text-muted">Remark :</dt>
+                            </div>
+                            <div class="col-lg-8 col-md-12 col-sm-12">
+                                <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
                             </div>
                         </div>
                         <input type="hidden" value="{{ $letterOfIndent->id }}" id="id" name="id">
