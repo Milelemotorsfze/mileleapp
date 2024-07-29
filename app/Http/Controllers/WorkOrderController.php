@@ -1391,7 +1391,7 @@ class WorkOrderController extends Controller
                                             'type' => $changeType,
                                             'user_id' => Auth::id(),
                                             'changed_at' => Carbon::now(),
-                                            'comment_vehicle_id' =>$CreatedVehComMap->id,
+                                            // 'comment_vehicle_id' =>$CreatedVehComMap->id,
                                         ]);
                                         $canDeleteCreatedVehComMap = false;
                                     }
@@ -1483,7 +1483,7 @@ class WorkOrderController extends Controller
                                         'type' => 'Change',
                                         'user_id' => Auth::id(),
                                         'changed_at' => Carbon::now(),
-                                        'comment_vehicle_id' =>$CreatedVehComMap->id,
+                                        // 'comment_vehicle_id' =>$CreatedVehComMap->id,
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
                                     $canCreateFinanceApproval = true;

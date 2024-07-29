@@ -941,6 +941,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
+@php
+$allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
 <script type="text/javascript">
 	
 	// Declare commentIdCounter only once
@@ -959,6 +962,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var selectedCustomerContact = '';
 	var selectedCustomerAddress = '';
 	var onChangeSelectedVins = [];
+	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
         var workOrder = {!! json_encode($workOrder) !!};
     @else
@@ -1157,6 +1161,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					});
 					$select.trigger('change.select2');
 				});
+				if (authUserPermission === 'true') {
+					var table = document.getElementById('myTable');
+					if (table) {
+						var inputs = table.querySelectorAll('input');
+						inputs.forEach(function(input) {
+						input.readOnly = true;
+						});
+						var selects = table.querySelectorAll('select');
+						selects.forEach(function(input) {
+						input.disabled = true;
+						});
+					}
+					var deleteVehicleLine = document.querySelectorAll('.remove-row');
+					deleteVehicleLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var deleteAddonLine = document.querySelectorAll('.remove-addon-row');
+					deleteAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var createAddonLine = document.querySelectorAll('.create-addon-row');
+					createAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+				}
 			}
 			else {
 				$("#boe-div").hide();
@@ -1974,6 +2003,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
 				}
 
+				const elementsByClass = document.getElementsByClassName('transport_type');
+
+				if (elementsByClass.length > 0) {
+					Array.from(elementsByClass).forEach(function(element) {
+						element.disabled = false;
+					});
+				}
+
+				const deposit_received_asClass = document.getElementsByClassName('deposit_received_as');
+
+				if (deposit_received_asClass.length > 0) {
+					Array.from(deposit_received_asClass).forEach(function(element) {
+						element.disabled = false;
+					});
+				}
+
+				
+				$('#airline').prop('disabled', false).trigger('change');
+				$('#currency').prop('disabled', false).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', false).trigger('change');	
+				$('#vin_multiple').prop('disabled', false).trigger('change');	
+				$('#brn_file').prop('disabled', false).trigger('change');
+				$('#signed_pfi').prop('disabled', false).trigger('change');	
+				$('#signed_contract').prop('disabled', false).trigger('change');	
+				$('#payment_receipts').prop('disabled', false).trigger('change');	
+				$('#noc').prop('disabled', false).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', false).trigger('change');	
+				$('#enduser_passport').prop('disabled', false).trigger('change');	
+				$('#enduser_contract').prop('disabled', false).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
+				var table = document.getElementById('myTable');
+				if (table) {
+					var selects = table.querySelectorAll('select');
+					selects.forEach(function(input) {
+					input.disabled = false;
+					});
+				}
+				$('.dynamicselect2').prop('disabled', false);
 				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));
@@ -2210,7 +2277,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							}
 						});
 					});
-
+					if (authUserPermission === 'true') {
+						$('.dynamicselect2').prop('disabled', true);
+						$('.remove_node_btn_frm_field').prop('disabled', true);
+						$('.add_new_frm_field_btn').prop('disabled', true);
+					}
 					disableSelectedOptions();
 				} else {
 					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
@@ -3144,5 +3215,71 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		}
 	});
 </script>
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
+
+@if ($hasPermission)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of input field IDs and classes to disable
+            const fieldsToDisable = [
+                'transport_type', // Class name for radio buttons
+                'brn',
+                'container_number',
+                'airline_reference_id',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'deposit_received_as',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_date',
+            ];
+
+            // Disable each field by ID or class
+            fieldsToDisable.forEach(function(field) {
+                const elementsById = document.getElementById(field);
+                const elementsByClass = document.getElementsByClassName(field);
+
+                if (elementsById) {
+                    elementsById.readOnly = true;
+                }
+
+                if (elementsByClass.length > 0) {
+                    Array.from(elementsByClass).forEach(function(element) {
+                        element.disabled = true;
+                    });
+                }
+				$('#airline').prop('disabled', true).trigger('change');
+				$('#currency').prop('disabled', true).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');	
+				$('#vin_multiple').prop('disabled', true).trigger('change');
+				$('#brn_file').prop('disabled', true).trigger('change');	
+				$('#signed_pfi').prop('disabled', true).trigger('change');	
+				$('#signed_contract').prop('disabled', true).trigger('change');	
+				$('#payment_receipts').prop('disabled', true).trigger('change');	
+				$('#noc').prop('disabled', true).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', true).trigger('change');	
+				$('#enduser_passport').prop('disabled', true).trigger('change');	
+				$('#enduser_contract').prop('disabled', true).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', true).trigger('change');				
+            });
+			var deleteButtons = document.querySelectorAll('.delete-button');
+			deleteButtons.forEach(function(button) {
+				button.disabled = true;
+			});
+        });
+    </script>
+@endif
 
 @endsection
