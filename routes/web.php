@@ -461,6 +461,8 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
         ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
+    ->name('update-loi-comment');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);

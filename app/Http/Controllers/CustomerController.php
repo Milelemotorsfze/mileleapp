@@ -81,7 +81,6 @@ class CustomerController extends Controller
 
                 $extension = $file->getClientOriginalExtension();
                 $fileName = 'passport'.time().'.'.$extension;
-                // $destinationPath = 'Customers/passports';
                 $destinationPath = 'storage/app/public/passports';
                 if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
                     \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
@@ -97,7 +96,6 @@ class CustomerController extends Controller
 
                 $extension = $file->getClientOriginalExtension();
                 $fileName2 = 'trade_license'.time().'.'.$extension;
-                // $destinationPath = 'Customers/trade_licenses';
 
                 $destinationPath2 = 'storage/app/public/tradelicenses';
                 if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath2)) {
