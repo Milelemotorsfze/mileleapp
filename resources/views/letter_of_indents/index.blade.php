@@ -93,6 +93,7 @@
                                     <th>Is Expired</th>
                                     <th>LOI Quantity</th>
                                     <th>LOI Templates</th>
+                                    <th>Comments</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated By</th>
@@ -122,7 +123,9 @@
                                     <th>Status</th>
                                     <th>Is Expired</th>
                                     <th>LOI Quantity</th>
+                                    <th>Utilized Quantity</th>
                                     <th>LOI Templates</th>
+                                    <th>Comments</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated By</th>
@@ -155,6 +158,7 @@
                                     <th>Approved Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>Remarks</th>
+                                    <th>Comments</th>
                                     <th>LOI Templates</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
@@ -196,7 +200,8 @@
             {'data' : 'submission_status', 'name': 'submission_status' },        
             {'data' : 'is_expired', 'name': 'is_expired' },   
             {'data' : 'loi_quantity', 'name': 'loi_quantity' },   
-            {'data' : 'loi_templates', 'name': 'loi_templates', orderable: false, searchable: false },   
+            {'data' : 'loi_templates', 'name': 'loi_templates' },   
+            {'data' : 'comments', 'name': 'comments' },   
             {'data' : 'created_by', 'name': 'createdBy.name' },      
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
@@ -224,8 +229,10 @@
             {'data' : 'sales_person_id', 'name': 'salesPerson.name' },        
             {'data' : 'submission_status', 'name': 'submission_status' },        
             {'data' : 'is_expired', 'name': 'is_expired' },   
-            {'data' : 'loi_quantity', 'name': 'loi_quantity' },   
-            {'data' : 'loi_templates', 'name': 'loi_templates' },   
+            {'data' : 'loi_quantity', 'name': 'loi_quantity' }, 
+            {'data' : 'utilized_quantity', 'name': 'utilized_quantity' },    
+            {'data' : 'loi_templates', 'name': 'loi_templates' },
+            {'data' : 'comments', 'name': 'comments' },      
             {'data' : 'created_by', 'name': 'createdBy.name' },       
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
@@ -257,6 +264,7 @@
             {'data' : 'status', 'name': 'status' },        
             {'data' : 'loi_approval_date', 'name': 'loi_approval_date' },   
             {'data' : 'review', 'name': 'review' },   
+            {'data' : 'comments', 'name': 'comments' },   
             {'data' : 'loi_templates', 'name': 'loi_templates' },   
             {'data' : 'created_by', 'name': 'createdBy.name' },     
             {'data' : 'created_at', 'name': 'created_at' },        

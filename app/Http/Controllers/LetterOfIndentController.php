@@ -331,7 +331,6 @@ class LetterOfIndentController extends Controller
                         $loiSoNumber->so_number = $soNumber;
                         $loiSoNumber->save();
                     }
-
                 }
             }
             if ($request->template_type) {

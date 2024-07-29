@@ -7,8 +7,11 @@
         /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
-            padding: 10px;
-            text-align:justify
+            /* padding: 10px; */
+            text-align:justify;
+            margin-top:40px;
+            margin-right:20px !important;
+            margin-left:10px !important;
         }
         .center {
             display: block;
