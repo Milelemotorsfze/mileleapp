@@ -42,5 +42,16 @@ class WOApprovals extends Model
             'wo_addon_history_id' // Local key on WOApprovalAddonDataHistory table
         );
     }
-
+    // Define the relationship to WOVehicleRecordHistory through the pivot table WOApprovalVehicleDataHistory
+    public function vehicleRecordHistories()
+    {
+        return $this->hasManyThrough(
+            WOVehicleRecordHistory::class,
+            WOApprovalVehicleDataHistory::class,
+            'w_o_approvals_id', // Foreign key on WOApprovalVehicleDataHistory table
+            'id', // Foreign key on WOVehicleRecordHistory table
+            'id', // Local key on WOApprovals table
+            'wo_vehicle_history_id' // Local key on WOApprovalVehicleDataHistory table
+        );
+    }
 }

@@ -84,14 +84,12 @@ class WOApprovalsController extends Controller
 
     public function fetchCooApprovalHistory($id)
     {
-        // Fetch data from the database
-        $data = YourModel::where('approval_type', 'coo')->get();
-
-        // Store data in session or pass it to the view
-        session(['cooApprovalHistory' => $data]);
-
-        // Return a response indicating success
-        return response()->json(['success' => true]);
+        $data = WOApprovals::where('work_order_id', $id)->where('type', 'coo')->orderBy('id','DESC')->get();
+        $workOrder = WorkOrder::where('id',$id)->first();
+        $type = $workOrder->type;
+        $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
+        $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
+        return view('work_order.export_exw.coo-approval-history-page', compact('data','type','id','previous','next'));
     }
 
     public function showCooApprovalHistoryPage($id)

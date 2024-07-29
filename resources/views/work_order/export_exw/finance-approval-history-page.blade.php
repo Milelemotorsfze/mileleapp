@@ -248,55 +248,49 @@
                                                             </table>
                                                         </td>
                                                     </tr>
-                                                @endif
-                                               
+                                                @endif                                              
                                                 @if(count($approval->vehicleAddonRecordHistories) > 0)
-    <tr>
-        <td colspan="6">
-            <table style="font-size:12px!important;">
-                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
-                    <th colspan="4">Service Breakdown</th>
-                </tr>
-                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
-                    <th>VIN</th>
-                    <th>Addon Code</th>
-                    <th>Addon Quantity</th>
-                    <th>Addon Description</th>
-                </tr>
-                @php
-                    $groupedByVin = $approval->vehicleAddonRecordHistories->groupBy(function($history) {
-                        return $history->addon->vehicle->vin ?? 'N/A';
-                    });
-                @endphp
-                @foreach($groupedByVin as $vin => $vinHistories)
-                    @php
-                        $rowCount = $vinHistories->groupBy('w_o_vehicle_addon_id')->count();
-                    @endphp
-                    @foreach($vinHistories->groupBy('w_o_vehicle_addon_id') as $addonId => $addonHistories)
-                        @php
-                            $addonCode = $addonHistories->firstWhere('field_name', 'addon_code')->new_value ?? 'N/A';
-                            $addonQuantity = $addonHistories->firstWhere('field_name', 'addon_quantity')->new_value ?? 'N/A';
-                            $addonDescription = $addonHistories->firstWhere('field_name', 'addon_description')->new_value ?? 'N/A';
-                        @endphp
-                        <tr  style="border-bottom:1px solid #e9e9ef;">
-                            @if ($loop->first)
-                                <td rowspan="{{$rowCount}}">{{$vin}}</td>
-                            @endif
-                            <td >{{$addonCode}}</td>
-                            <td>{{$addonQuantity}}</td>
-                            <td>{{$addonDescription}}</td>
-                        </tr>
-                    @endforeach
-                @endforeach
-            </table>
-        </td>
-    </tr>
-@endif
-
-
-
-
-                                                                                           
+                                                    <tr>
+                                                        <td colspan="6">
+                                                            <table style="font-size:12px!important;">
+                                                                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
+                                                                    <th colspan="4">Service Breakdown</th>
+                                                                </tr>
+                                                                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
+                                                                    <th>VIN</th>
+                                                                    <th>Addon Code</th>
+                                                                    <th>Addon Quantity</th>
+                                                                    <th>Addon Description</th>
+                                                                </tr>
+                                                                @php
+                                                                    $groupedByVin = $approval->vehicleAddonRecordHistories->groupBy(function($history) {
+                                                                        return $history->addon->vehicle->vin ?? 'N/A';
+                                                                    });
+                                                                @endphp
+                                                                @foreach($groupedByVin as $vin => $vinHistories)
+                                                                    @php
+                                                                        $rowCount = $vinHistories->groupBy('w_o_vehicle_addon_id')->count();
+                                                                    @endphp
+                                                                    @foreach($vinHistories->groupBy('w_o_vehicle_addon_id') as $addonId => $addonHistories)
+                                                                        @php
+                                                                            $addonCode = $addonHistories->firstWhere('field_name', 'addon_code')->new_value ?? 'N/A';
+                                                                            $addonQuantity = $addonHistories->firstWhere('field_name', 'addon_quantity')->new_value ?? 'N/A';
+                                                                            $addonDescription = $addonHistories->firstWhere('field_name', 'addon_description')->new_value ?? 'N/A';
+                                                                        @endphp
+                                                                        <tr  style="border-bottom:1px solid #e9e9ef;">
+                                                                            @if ($loop->first)
+                                                                                <td rowspan="{{$rowCount}}">{{$vin}}</td>
+                                                                            @endif
+                                                                            <td >{{$addonCode}}</td>
+                                                                            <td>{{$addonQuantity}}</td>
+                                                                            <td>{{$addonDescription}}</td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                @endforeach
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                @endif                                                                                         
                                             @endif
                                         </table>
                                     </td>
