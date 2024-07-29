@@ -3715,7 +3715,14 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-                $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
+                if($purchasingOrder->is_demand_planning_po == 1)
+            {
+                $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+            }
+            else
+            {
+                $recipients = ['abdul@milele.com', 'team.finance@milele.com'];  
+            }
                 Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
             }
         }
@@ -4427,8 +4434,11 @@ public function submitPaymentDetails(Request $request)
             $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
             $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
             $currency = $supplierAccountTransaction->account_currency;
+            if($purchasingOrder->is_demand_planning_po == 1)
+            {
             $recipients = ['team.dp@milele.com'];
             Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4466,8 +4476,11 @@ public function submitPaymentDetails(Request $request)
     $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     $currency = $supplierAccountTransaction->account_currency;
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
     $recipients = ['team.dp@milele.com'];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)
