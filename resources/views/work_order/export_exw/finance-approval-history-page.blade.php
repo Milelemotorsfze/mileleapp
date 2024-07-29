@@ -130,46 +130,42 @@
                                 $sortedHistories = $approval->recordHistories->sortBy('field');
                                 @endphp
                                     <td colspan="7">
-                                        <table>
+                                        <table style="font-size:12px!important;">
                                             @if($approval->status == 'pending')
-                                            <thead>
                                                 <tr>
-                                                    <th>Amount Received As</th>
-                                                    <th>Amount Received</th>
-                                                    <th>Balance Amount</th>
-                                                    <th>Currency</th>
-                                                    <th>SO Total Amount</th>
-                                                    <th>SO Vehicle Quantity</th>
+                                                    <th style="background-color: #dbecff;">Amount Received</th>
+                                                    <th style="background-color: #dbecff;">Balance Amount</th>
+                                                    <th style="background-color: #dbecff;">Currency</th>                                                    
+                                                    <th style="background-color: #dbecff;">Deposit Received As</th>
+                                                    <th style="background-color: #dbecff;">SO Total Amount</th>
+                                                    <th style="background-color: #dbecff;">SO Vehicle Quantity</th>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
                                                 <tr>
-                                                    <td>
-                                                        @if($approval->workOrder->deposit_received_as == 'total_deposit') 
-                                                        Total Deposit
-                                                        @elseif($approval->workOrder->deposit_received_as == 'custom_deposit')
-                                                        Custom Deposit
-                                                        @endif
-                                                    </td>
                                                     <td>{{ $approval->workOrder->amount_received ?? '' }}</td>
                                                     <td>{{ $approval->workOrder->balance_amount ?? '' }}</td>
                                                     <td>{{ $approval->workOrder->currency ?? '' }}</td>
+                                                    <td>
+                                                        @if($approval->workOrder->deposit_received_as == 'total_deposit') 
+                                                            Total Deposit
+                                                        @elseif($approval->workOrder->deposit_received_as == 'custom_deposit')
+                                                            Custom Deposit
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $approval->workOrder->so_total_amount ?? '' }}</td>
                                                     <td>{{ $approval->workOrder->so_vehicle_quantity ?? '' }}</td>
                                                 </tr>
-    
                                                 @if($approval->workOrder->deposit_received_as == 'custom_deposit')
-                                                    <tr style="border-top:1px solid #e9e9ef;"> 
+                                                    <tr> 
                                                         <td colspan="6">
-                                                            <table>
-                                                                <tr>
+                                                            <table style="font-size:12px!important;">
+                                                                <tr style="background-color: #dbecff;">
                                                                     <td><strong>Deposit Against Vehicles</strong></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>
                                                                         @php
-                                                                        $sortedVehicles = $approval->workOrder->depositAganistVin->sortBy('vin');
-                                                                        $vinList = $sortedVehicles->pluck('vin')->filter()->implode(', ');
+                                                                            $sortedVehicles = $approval->workOrder->depositAganistVin->sortBy('vin');
+                                                                            $vinList = $sortedVehicles->pluck('vin')->filter()->implode(', ');
                                                                         @endphp
                                                                         {{$vinList}}
                                                                     </td>
@@ -178,65 +174,131 @@
                                                         </td>
                                                     </tr>
                                                 @endif
-                                                @if(count($approval->workOrder->vehicles) > 0)
-                                                    @foreach($approval->workOrder->vehicles as $vehicle)
-                                                        <table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">                                                      
-                                                            @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
-                                                                @foreach($workOrder->vehicles as $vehicle)
-                                                                    <tr class="custom-border-top">
-                                                                        <th colspan="4">{{$vehicle->vin ?? 'NA'}}</th>
-                                                                    </tr>
-                                                                    @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
-                                                                    <tr>
-                                                                        <th colspan="4">Service Breakdown</th>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Addon Code</th>
-                                                                        <th>Addon Name</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Addon Description</th>
-                                                                    </tr>
-                                                                        @foreach($vehicle->addons as $addon)
-                                                                        <tr>
-                                                                            <td>{{$addon->addon_code ?? 'NA'}}</td>
-                                                                            <td>{{$addon->addon_name ?? 'NA'}}</td>
-                                                                            <td>{{$addon->addon_quantity ?? 'NA'}}</td>
-                                                                            <td>{{$addon->addon_description ?? 'NA'}}</td>
+                                                @if($approval->workOrder->vehicles->count() > 0)
+                                                    <tr>
+                                                        <td colspan="6">
+                                                            <table style="font-size:12px!important;">
+                                                                @php $serviceBreakdownShown = false; @endphp
+                                                                @foreach($approval->workOrder->vehicles->sortBy('vin') as $vehicle)
+                                                                    @if(isset($vehicle->addons) && $vehicle->addons->count() > 0)
+                                                                        @if(!$serviceBreakdownShown)
+                                                                            <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
+                                                                                <th colspan="3">Service Breakdown</th>
+                                                                            </tr>
+                                                                            @php $serviceBreakdownShown = true; @endphp
+                                                                        @endif
+                                                                        <tr style="border-top:1px solid #e9e9ef;">
+                                                                            <th colspan="3">Vin : {{$vehicle->vin ?? ''}}</th>
                                                                         </tr>
+                                                                        <tr>
+                                                                            <th>Addon Name</th>
+                                                                            <th>Quantity</th>
+                                                                            <th>Addon Description</th>
+                                                                        </tr>
+                                                                        @foreach($vehicle->addons->sortBy('addon_code') as $addon)
+                                                                            <tr>
+                                                                                <td>{{$addon->addon_code ?? ''}}</td>
+                                                                                <td>{{$addon->addon_quantity ?? ''}}</td>
+                                                                                <td>{{$addon->addon_description ?? ''}}</td>
+                                                                            </tr>
                                                                         @endforeach
                                                                     @endif
                                                                 @endforeach
-                                                            @endif
-                                                        </table>
-                                                    @endforeach
+                                                            </table>
+                                                        </td>
+                                                    </tr>
                                                 @endif
-                                            </tbody>
                                             @else
-                                            <thead>
+                                                <tr style="background-color: #dbecff;">
+                                                    @foreach($sortedHistories as $history)
+                                                        @php
+                                                            $label = $history->field;
+                                                        @endphp
+                                                        <th>{{ $label }}</th>
+                                                    @endforeach
+                                                </tr>
                                                 <tr>
                                                     @foreach($sortedHistories as $history)
                                                     @php
-                                                    $label = $history->field;
-                                                    if ($history->field == 'total_deposit') {
-                                                        $label = 'Total Deposit';
-                                                    } elseif ($history->field == 'custom_deposit') {
-                                                        $label = 'Custom Deposit';
+                                                    $newVal = $history->new_value;
+                                                    if ($history->new_value == 'total_deposit') {
+                                                        $newVal = 'Total Deposit';
+                                                    } elseif ($history->new_value == 'custom_deposit') {
+                                                        $newVal = 'Custom Deposit';
                                                     }
                                                     @endphp
-                                                    <th>{{ $label }}</th>
+                                                        <td>{{ $newVal }}</td>
                                                     @endforeach
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    @foreach($sortedHistories as $history)
-                                                        <td>{{ $history->new_value }}</td>
-                                                    @endforeach
-                                                </tr>
-                                            </tbody>
+                                                @if(count($approval->appVehAgaDepo) > 0)
+                                                    <tr>
+                                                        <td colspan="6">
+                                                            <table style="font-size:12px!important;">
+                                                                <tr style="background-color: #dbecff;">
+                                                                    <td><strong>Deposit Against Vehicles</strong></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        @php
+                                                                            $vinList = $approval->appVehAgaDepo->pluck('vehicle.vin')->filter()->sort()->implode(', ');
+                                                                        @endphp
+                                                                        {{$vinList}}
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                               
+                                                @if(count($approval->vehicleAddonRecordHistories) > 0)
+    <tr>
+        <td colspan="6">
+            <table style="font-size:12px!important;">
+                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
+                    <th colspan="4">Service Breakdown</th>
+                </tr>
+                <tr style="border-top:1px solid #e9e9ef;background-color: #dbecff;">
+                    <th>VIN</th>
+                    <th>Addon Code</th>
+                    <th>Addon Quantity</th>
+                    <th>Addon Description</th>
+                </tr>
+                @php
+                    $groupedByVin = $approval->vehicleAddonRecordHistories->groupBy(function($history) {
+                        return $history->addon->vehicle->vin ?? 'N/A';
+                    });
+                @endphp
+                @foreach($groupedByVin as $vin => $vinHistories)
+                    @php
+                        $rowCount = $vinHistories->groupBy('w_o_vehicle_addon_id')->count();
+                    @endphp
+                    @foreach($vinHistories->groupBy('w_o_vehicle_addon_id') as $addonId => $addonHistories)
+                        @php
+                            $addonCode = $addonHistories->firstWhere('field_name', 'addon_code')->new_value ?? 'N/A';
+                            $addonQuantity = $addonHistories->firstWhere('field_name', 'addon_quantity')->new_value ?? 'N/A';
+                            $addonDescription = $addonHistories->firstWhere('field_name', 'addon_description')->new_value ?? 'N/A';
+                        @endphp
+                        <tr  style="border-bottom:1px solid #e9e9ef;">
+                            @if ($loop->first)
+                                <td rowspan="{{$rowCount}}">{{$vin}}</td>
+                            @endif
+                            <td >{{$addonCode}}</td>
+                            <td>{{$addonQuantity}}</td>
+                            <td>{{$addonDescription}}</td>
+                        </tr>
+                    @endforeach
+                @endforeach
+            </table>
+        </td>
+    </tr>
+@endif
+
+
+
+
+                                                                                           
                                             @endif
                                         </table>
-
                                     </td>
                                 </tr>
                             @endforeach

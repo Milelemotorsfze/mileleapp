@@ -31,4 +31,12 @@ class WOVehicleAddonRecordHistory extends Model
     {
         return $this->hasOne(User::class,'id','user_id');
     }
+    // Define the inverse relationship to WOApprovalAddonDataHistory
+    public function approvalAddonDataHistories()
+    {
+        return $this->hasMany(WOApprovalAddonDataHistory::class, 'wo_addon_history_id');
+    }
+    public function addon() {
+        return $this->belongsTo(WOVehicleAddons::class,'w_o_vehicle_addon_id','id');
+    }
 }

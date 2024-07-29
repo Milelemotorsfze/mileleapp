@@ -28,4 +28,7 @@ class WOVehicleAddons extends Model
     {
         return $this->hasOne(WOVehicles::class,'id','w_o_vehicle_id');
     }
+    public function vehicle() {
+        return $this->belongsTo(WOVehicles::class,'w_o_vehicle_id','id');
+    }
 }

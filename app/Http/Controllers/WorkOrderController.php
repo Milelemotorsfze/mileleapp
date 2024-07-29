@@ -14,6 +14,7 @@ use App\Models\CommentFile;
 use App\Models\WORecordHistory;
 use App\Models\WOApprovals;
 use App\Models\WOApprovalDataHistory;
+use App\Models\WOApprovalDepositAganistVehicle;
 use App\Models\WOApprovalAddonDataHistory;
 use App\Models\WOApprovalVehicleDataHistory;
 use App\Models\Customer;
@@ -1743,6 +1744,7 @@ class WorkOrderController extends Controller
             try {
                 $authId = Auth::id();
                 $woApprovals = WOApprovals::where('id', $request->id)->first();
+                $workOrder = WorkOrder::where('id',$woApprovals->work_order_id)->first();             
     
                 if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
                     $woApprovals->action_at = Carbon::now();
@@ -1752,7 +1754,7 @@ class WorkOrderController extends Controller
                     $woApprovals->status = ($request->status == 'approve') ? 'approved' : 'rejected';
                     $woApprovals->update();
     
-                    $fields = ['so_total_amount', 'currency', 'so_vehicle_quantity', 'amount_received', 'balance_amount'];
+                    $fields = ['so_total_amount', 'currency', 'so_vehicle_quantity', 'amount_received', 'balance_amount','deposit_received_as'];
     
                     $woHistory = WORecordHistory::where('work_order_id', $woApprovals->work_order_id)
                         ->whereIn('field_name', $fields)
@@ -1765,6 +1767,15 @@ class WorkOrderController extends Controller
                             'w_o_approvals_id' => $woApprovals->id,
                             'wo_history_id' => $record->id
                         ]);
+                    }
+                    if($workOrder->deposit_received_as == 'custom_deposit') {
+                        $depAgnVeh = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->where('deposit_received','yes')->select('id')->get();
+                        foreach($depAgnVeh as $depAgnVehId) {                      
+                            WOApprovalDepositAganistVehicle::create([
+                                'w_o_approvals_id' => $woApprovals->id,
+                                'w_o_vehicle_id' => $depAgnVehId->id
+                            ]);
+                        }
                     }
     
                     $woVehicleIds = WOVehicles::where('work_order_id', $woApprovals->work_order_id)->pluck('id');
