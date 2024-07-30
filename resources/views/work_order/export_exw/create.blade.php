@@ -2376,10 +2376,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-		function addVIN() { console.log('inside addVIN function');
-			var selectedVIN = $("#vin_multiple").val();
-			if (selectedVIN != '' && selectedVIN.length > 0) {
-				for (var j = 0; j < selectedVIN.length; j++) {
+		function addVIN() { console.log('inside addVIN function'); console.log(vins);
+			var selectedVIN = $("#vin_multiple").val(); console.log(selectedVIN); console.log('length'+ selectedVIN.length)
+			if (selectedVIN != '' && selectedVIN.length > 0) { console.log('if length greater than zero');
+				for (var j = 0; j < selectedVIN.length; j++) { console.log('foreach');
 					for (var i = 0; i < vins.length; i++) {
 						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
 							var data = { 
