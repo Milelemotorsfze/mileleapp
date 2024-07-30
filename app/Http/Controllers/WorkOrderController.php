@@ -117,7 +117,19 @@ class WorkOrderController extends Controller
             $q = $q->where('type','employee');
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
-        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
+        // $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
+        $vins = Vehicles::orderBy('vin', 'ASC')
+        ->whereNotNull('vin')
+        ->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')
+        ->get()
+        ->unique('vin');
+    
+    if ($vins->isEmpty()) {
+        dd('No VINs found');
+    } else {
+        // Log data structure
+        \Log::info($vins->toJson()); 
+    }
         return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users','addons','charges'));
     }
     /**
