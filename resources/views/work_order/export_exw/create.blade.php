@@ -2379,9 +2379,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		function addVIN() { console.log('inside addVIN function'); console.log(vins);
 			var selectedVIN = $("#vin_multiple").val(); console.log(selectedVIN); console.log('length'+ selectedVIN.length)
 			if (selectedVIN != '' && selectedVIN.length > 0) { console.log('if length greater than zero');
-				for (var j = 0; j < selectedVIN.length; j++) { console.log('foreach');
-					for (var i = 0; i < vins.length; i++) {
-						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
+				for (var j = 0; j < selectedVIN.length; j++) { console.log('foreach');  console.log('vin length '+vins.length);
+					for (var i = 0; i < vins.length; i++) { console.log('inside '); console.log(vins[i].vin); console.log(selectedVIN[j]);
+						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { console.log('here');
 							var data = { 
 								id: '',
 								vehicle_id : vins[i]?.id ?? '',
@@ -2405,6 +2405,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 								special_request_or_remarks: '',
 								shipment: '',
 							};
+							console.log('data ' +data);
 							drawTableRow(data);
 						}
 					}
