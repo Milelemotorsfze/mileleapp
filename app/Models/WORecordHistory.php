@@ -90,5 +90,8 @@ class WORecordHistory extends Model
     {
         return $this->hasOne(User::class,'id','user_id');
     }
-    
+    public function approvals()
+    {
+        return $this->belongsToMany(WOApprovals::class, 'w_o_approval_data_histories', 'wo_history_id', 'w_o_approvals_id');
+    }
 }

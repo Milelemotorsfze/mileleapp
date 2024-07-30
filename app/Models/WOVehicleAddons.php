@@ -22,10 +22,13 @@ class WOVehicleAddons extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'comment_id',
+        'delete_cvm_id',
     ];
     public function workOrderVehicle()
     {
         return $this->hasOne(WOVehicles::class,'id','w_o_vehicle_id');
+    }
+    public function vehicle() {
+        return $this->belongsTo(WOVehicles::class,'w_o_vehicle_id','id');
     }
 }

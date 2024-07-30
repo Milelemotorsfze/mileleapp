@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -440,6 +441,13 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
+
+    Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
+    // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
+
+    Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
+    // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
+
     // Demand & Planning Module
 
     // suppliers
