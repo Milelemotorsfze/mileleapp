@@ -1339,8 +1339,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					addAddon();
 				}
 			});
-			$("body").on("click", ".add-vehicle-btn", function () {
-				if (validateVINSelection() && validateAddonSelection()) {
+			$("body").on("click", ".add-vehicle-btn", function () { console.log('inside onclick event');
+				if (validateVINSelection() && validateAddonSelection()) { console.log('inside validation');
 					addVIN();
 				}
 			});
@@ -2376,7 +2376,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-		function addVIN() {
+		function addVIN() { console.log('inside addVIN function');
 			var selectedVIN = $("#vin_multiple").val();
 			if (selectedVIN != '' && selectedVIN.length > 0) {
 				for (var j = 0; j < selectedVIN.length; j++) {
@@ -2433,7 +2433,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$(this).remove();
 			});
 		}
-		function drawTableRow(data) {
+		function drawTableRow(data) { console.log('inside drawTableRow');
+			console.log(data);
 			// Get the table body element by ID
 			var tableBody = document.querySelector('#myTable tbody');
 
