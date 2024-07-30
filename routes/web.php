@@ -935,7 +935,7 @@ Route::get('/d', function () {
     Route::get('/get-swift-details/{id}', [PurchasingOrderController::class, 'getSwiftDetails'])->name('getSwiftDetails');
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
-    
+    Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
 
 
 
