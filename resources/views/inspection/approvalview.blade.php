@@ -151,6 +151,7 @@
                     <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
                     <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
                     <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
+                    <option value="5.9" @if($variant_request->engine == '5.9') selected @endif>5.9</option>
                     <option value="6" @if($variant_request->engine == '6') selected @endif>6</option>
                     <option value="6.2" @if($variant_request->engine == '6.2') selected @endif>6.2</option>
                     <option value="6.7" @if($variant_request->engine == '6.7') selected @endif>6.7</option>
