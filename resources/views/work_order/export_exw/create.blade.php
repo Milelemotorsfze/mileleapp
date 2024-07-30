@@ -1000,6 +1000,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		});	
 	}
 	$(document).ready(function () { 
+		console.log(vins);
+		console.log(vins.length);
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
 			  document.getElementById('submit').click();
