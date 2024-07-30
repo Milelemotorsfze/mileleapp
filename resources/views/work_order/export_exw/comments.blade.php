@@ -180,7 +180,7 @@
         // Process wo_histories for additional divs
         let historiesHtml = '';
 
-        const baseUrl = 'http://127.0.0.1:8000';
+        const baseUrl = '{{env('BASE_URL')}}';
 
         if (wo_histories.length >= 1) {
             const orderedItems = wo_histories.sort((a, b) => a.field.localeCompare(b.field));

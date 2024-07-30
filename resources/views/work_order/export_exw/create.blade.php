@@ -205,7 +205,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
 							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
-					<div class="col-xxl-5 col-lg-11 col-md-11">
+					<div class="col-xxl-4 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
                         <input hidden id="customer_type" name="customer_type" value="existing">
                         <input hidden id="customer_reference_id" name="customer_reference_id" value="">
@@ -219,11 +219,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="Other">
                         <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
                     </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="switchToDropdown">
                         <a title="Choose Customer Name" onclick="switchToDropdown()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
                     </div>
@@ -465,7 +465,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
 							autofocus onkeyup="sanitizeQuantity(this)">
 					</div>
-					<div class="col-xxl-2 col-lg-2 col-md-2">
+					<div class="col-xxl-3 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
@@ -492,7 +492,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							</div>
 						</div>
 					</div>
-					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
+					<div class="col-xxl-2 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
 							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
@@ -1055,7 +1055,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 				// Check if workOrder.customer_company_number is not null or undefined
 				var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-
 				iti.setNumber(fullPhoneNumber);
 				sanitizeNumberInput(input);
 
@@ -1064,7 +1063,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				sanitizeNumberInput(input);
 
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
-				freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
+					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+				} 
 				sanitizeNumberInput(input);
 
 				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
@@ -1225,7 +1226,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							}
 							if (customers[i].customer_company_number != null) { 
 								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-
+								console.log('hiiiii');
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
@@ -2597,12 +2598,26 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			var currentRow = thirdRow; // Start with the thirdRow
 			if (data.addons && data.addons.length > 0) {
 				for (var j = 0; j < data.addons.length; j++) {
+
+					var DateToBeformat = new Date(data.addons[j].created_at);
+
+					var optionsDate = { day: '2-digit', month: 'short', year: 'numeric' };
+					var optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+					// Format date and time separately
+					var formattedDate = DateToBeformat.toLocaleDateString('en-GB', optionsDate);
+					var formattedTime = DateToBeformat.toLocaleTimeString('en-GB', optionsTime);
+
+					// Combine the formatted date and time
+					var addonDate = formattedDate + ', ' + formattedTime;
+
+
 					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
 					var addonValue = data.addons[j].addon_code;
 					var addonQuantity = data.addons[j].addon_quantity;
 					var addonDescription = data.addons[j].addon_description;
 					if(addonValue != null) {
-						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 						addonIndex++; // Increment addonIndex after calling drawTableAddon
 					}
 				}
@@ -2611,11 +2626,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			// Gather data from all dynamically added addon input fields
 			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
+				var addonDate = '';
 				var addonValue = $(`#addons_${addonId}`).val();
 				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
 				var addonDescription = $(`#addon_description_${addonId}`).val();
 				if(addonValue != null) { 
-					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 					addonIndex++; // Increment addonIndex after calling drawTableAddon
 				}
 			});
@@ -2623,7 +2639,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			allVehicleRows.push(lastRow);
 			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
 		}
-		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId, addonValue, addonQuantity, addonDescription) { 
+		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId,addonDate, addonValue, addonQuantity, addonDescription) { 
 			var removeAddonCell = createAddonRemoveButton();
 			
 			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
@@ -2634,6 +2650,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			var serviceBreakdownLabelCell = document.createElement('td');
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = addonDate; 
 
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
@@ -2653,16 +2674,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 			var addonDescriptionCell = document.createElement('td');
 			if(type == 'export_cnf') {
-				addonDescriptionCell.colSpan = 15;
+				addonDescriptionCell.colSpan = 14;
 			}
 			else {
-				addonDescriptionCell.colSpan = 14;
+				addonDescriptionCell.colSpan = 13;
 			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
 
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
@@ -2764,6 +2786,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = '';
+
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
@@ -2782,16 +2809,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 			var addonDescriptionCell = document.createElement('td');
 			if(type == 'export_cnf') {
-				addonDescriptionCell.colSpan = 14;
+				addonDescriptionCell.colSpan = 13;
 			}
 			else {
-				addonDescriptionCell.colSpan = 15;
+				addonDescriptionCell.colSpan = 14;
 			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);

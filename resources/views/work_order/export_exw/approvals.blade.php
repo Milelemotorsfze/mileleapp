@@ -104,7 +104,7 @@
     </div>
 </div>
 @if(isset($workOrder))
-<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:5px!important;" class="btn btn-sm btn-info"
+<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:20px!important;" class="btn btn-sm btn-info"
 	href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
 	<i class="fas fa-eye"></i> COO Approval History
 </a>
