@@ -26,11 +26,11 @@
                 <tr>
                     <td>{{ $vin->vin }}</td>
                     <td>{{ $vin->variant->name ?? 'N/A' }}</td>
-                    <td>{{ $vin->variant->master_model_lines->brand->name ?? 'N/A' }}</td>
+                    <td>{{ $vin->variant->master_model_lines->brand->brand_name ?? 'N/A' }}</td>
                     <td>{{ $vin->interior->name ?? 'N/A' }}</td>
                     <td>{{ $vin->exterior->name ?? 'N/A' }}</td>
                     <td>{{ $vin->warehouseLocation->name ?? 'N/A' }}</td>
-                    <td>{{ $vin->document->name ?? 'N/A' }}</td>
+                    <td>{{ $vin->document->document_with ?? 'N/A' }}</td>
                 </tr>
             @endforeach
         </tbody>
