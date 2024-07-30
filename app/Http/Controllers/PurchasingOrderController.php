@@ -4703,4 +4703,13 @@ public function paymentconfirm(Request $request)
     }
     return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
+    public function getdata()
+    {
+        $vins = Vehicles::orderBy('vin', 'ASC')
+        ->whereNotNull('vin')
+        ->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')
+        ->get()
+        ->unique('vin');
+        return view('test', compact('vins'));
+    }
 }

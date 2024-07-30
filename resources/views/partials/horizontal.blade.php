@@ -846,7 +846,6 @@
                                 </div>
                             </li>
                             @endif
-                          
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
