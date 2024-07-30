@@ -112,7 +112,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
             @include('work_order.export_exw.approvals')
         </div>
         <div class="col-lg-1 col-md-1 col-sm-1 col-1">
-            <a style="margin-top:2px; margin-bottom:2px; float:right;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
+            <a style="margin-top:0px; margin-bottom:1.25rem; float:left;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
                 <i class="fa fa-edit" aria-hidden="true"></i> Edit
             </a>
         </div>
@@ -179,7 +179,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
                             </li>   
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicles & Addons Data History</a>
                             </li>                          
                         </ul>
                     </div>
@@ -723,17 +723,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <th colspan="19">Service Breakdown</th>
                                                         </tr>
                                                         <tr>
-                                                            <th colspan="1">Addon Code</th>
-                                                            <th colspan="2">Addon Name</th>
+                                                            <th colspan="2">Created Date & Time</th>
+                                                            <th colspan="4">Addon Code</th>
                                                             <th colspan="1">Quantity</th>
-                                                            <th colspan="15">Addon Description</th>
+                                                            <th colspan="12">Addon Description</th>
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>
-                                                                <td colspan="1">{{$addon->addon_code ?? 'NA'}}</td>
-                                                                <td colspan="2">{{$addon->addon_name ?? 'NA'}}</td>
-                                                                <td colspan="1">{{$addon->addon_quantity ?? 'NA'}}</td>
-                                                                <td colspan="15">{{$addon->addon_description ?? 'NA'}}</td>
+                                                                <td colspan="2">@if($addon->created_at != ''){{\Carbon\Carbon::parse($addon->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                                                                <td colspan="4">{{$addon->addon_code ?? ''}}</td>
+                                                                <td colspan="1">{{$addon->addon_quantity ?? ''}}</td>
+                                                                <td colspan="12">{{$addon->addon_description ?? ''}}</td>
                                                             </tr>
                                                             @endforeach
                                                         @endif
@@ -956,7 +956,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         </div>
                         <div class="tab-pane fade" id="wo_vehicle_data_history">
                             <div class="card-header text-center">
-                                <center style="font-size:12px;">WO Vehicle Data History</center>
+                                <center style="font-size:12px;">WO Vehicles & Addons Data History</center>
                             </div>
                             <div class="card-body">
                                 @include('work_order.export_exw.vehicle_data_history')

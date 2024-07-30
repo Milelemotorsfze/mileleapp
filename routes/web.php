@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -440,6 +441,13 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
+
+    Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
+    // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
+
+    Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
+    // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
+
     // Demand & Planning Module
 
     // suppliers
@@ -463,6 +471,8 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
         ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
+    ->name('update-loi-comment');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
@@ -918,7 +928,9 @@ Route::get('/d', function () {
     Route::post('/request-initiated-payment', [PurchasingOrderController::class, 'requestinitiatedPayment']);
     Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
     Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
-    
+    Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
+    Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
+    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
     Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
     Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
     Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
@@ -936,11 +948,6 @@ Route::get('/d', function () {
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
     Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
-
-
-
-
-
 
 
 

@@ -1,39 +1,83 @@
-@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
-    @if($workOrder->finance_approved_at != '' || $workOrder->coe_office_approved_at != '')
-        <a title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-            <i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
-        </a>
-    @elseif($workOrder->finance_approved_at == '' && $workOrder->coe_office_approved_at == '')
-        <a title="Revert Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
-            <i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
-        </a>
-    @endif
-@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
-    <a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-    <i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
+
+@if(isset($workOrder) && isset($workOrder->financePendingApproval))
+	<a title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
+       data-bs-toggle="modal" data-bs-target="#financeApprovalModal">
+        <i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
     </a>
+    <!-- Modal -->
+    <div class="modal fade" id="financeApprovalModal" tabindex="-1" aria-labelledby="financeApprovalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="financeApprovalModalLabel">Finance Approval</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="financeComment" class="form-label">Comments</label>
+                        <textarea class="form-control" id="financeComment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-danger btn-finance-approval" id="rejectButton" 
+					data-id="{{ $workOrder->financePendingApproval->id}}"
+					data-status="reject">Reject</button>
+                    <button type="button" class="btn btn-sm btn-success btn-finance-approval" id="approveButton" 
+					data-id="{{ $workOrder->financePendingApproval->id}}"
+					data-status="approve">Approve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@elseif(isset($workOrder) && $workOrder->finance_approval_status == 'Approved')	
+	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success" >
+		<i class="fa fa-check-square" aria-hidden="true"></i> Finance Approved
+	</a>
+@elseif(isset($workOrder) && $workOrder->finance_approval_status == 'Rejected')	
+	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-danger" >
+		<i class="fa fa-times" aria-hidden="true"></i> Finance Rejected
+	</a>
 @endif
-@if(isset($workOrder) && $workOrder->finance_approved_at != '')
-    <a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-    <i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
-    </a>
-@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->coe_office_approved_at == '')
-    <a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-    <i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
-    </a>
-@endif
-@if(isset($workOrder) && $workOrder->coe_office_approved_at != '')
-    <a  title="COO Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-    <i class="fas fa-check-circle" title="COO Office"></i> COO Office Approved
-    </a>
-@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at != '')
-    <a  title="COO Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+@if(isset($workOrder) && isset($workOrder->cooPendingApproval))
+	<a title="COO Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
+       data-bs-toggle="modal" data-bs-target="#cooApprovalModal">
         <i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Approval
     </a>
-@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at == '')
-    <a  title="COO Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-direct-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-        <i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Direct Approval
-    </a>
+    <!-- Modal -->
+    <div class="modal fade" id="cooApprovalModal" tabindex="-1" aria-labelledby="cooApprovalModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cooApprovalModalLabel">COO Office Approval</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="cooComment" class="form-label">Comments</label>
+                        <textarea class="form-control" id="cooComment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-danger btn-coe-office-approval" id="rejectButton" 
+					data-id="{{ $workOrder->cooPendingApproval->id}}"
+					data-status="reject">Reject</button>
+                    <button type="button" class="btn btn-sm btn-success btn-coe-office-approval" id="approveButton" 
+					data-id="{{ $workOrder->cooPendingApproval->id}}"
+					data-status="approve">Approve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@elseif(isset($workOrder) && $workOrder->coo_approval_status == 'Approved')	
+	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success" >
+		<i class="fa fa-check-square" aria-hidden="true"></i> COO Approved
+	</a>
+@elseif(isset($workOrder) && $workOrder->coo_approval_status == 'Rejected')	
+	<a style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-danger" >
+		<i class="fa fa-times" aria-hidden="true"></i> COO Rejected
+	</a>
 @endif
 
 <!-- Modal -->
@@ -59,66 +103,25 @@
         </div>
     </div>
 </div>
+@if(isset($workOrder))
+<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:20px!important;" class="btn btn-sm btn-info"
+	href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
+	<i class="fas fa-eye"></i> COO Approval History
+</a>
+<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important;" class="btn btn-sm btn-info" 
+	href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
+	<i class="fas fa-eye"></i> Finance Approval History
+</a>
+@endif
 <script type="text/javascript">
+
     $(document).ready(function () { 
-        $('.btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Confirm, It was Confirmed already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.revert-btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.revert-sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Revert, It was reverted already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
 		$('.btn-finance-approval').click(function (e) { 
 			var id = $(this).attr('data-id');
+			var status = $(this).attr('data-status');
+			var comments = $('#financeComment').val();
 			let url = '{{ route('work-order.finance-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+			var confirm = alertify.confirm('Are you sure you want to '+status+' this work order ?',function (e) {
 				if (e) {
 					$.ajax({
 						type: "POST",
@@ -126,6 +129,8 @@
 						dataType: "json",
 						data: {
 							id: id,
+							status: status,
+							comments: comments,
 							_token: '{{ csrf_token() }}'
 						},
 						success: function (data) {						
@@ -144,8 +149,10 @@
 		})
 		$('.btn-coe-office-approval').click(function (e) { 
 			var id = $(this).attr('data-id');
+			var status = $(this).attr('data-status');
+			var comments = $('#financeComment').val();
 			let url = '{{ route('work-order.coe-office-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
+			var confirm = alertify.confirm('Are you sure you want to '+status+' this work order ?',function (e) {
 				if (e) {
 					$.ajax({
 						type: "POST",
@@ -153,6 +160,8 @@
 						dataType: "json",
 						data: {
 							id: id,
+							status: status,
+							comments: comments,
 							_token: '{{ csrf_token() }}'
 						},
 						success: function (data) {						

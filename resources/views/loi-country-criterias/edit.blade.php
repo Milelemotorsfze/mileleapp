@@ -13,7 +13,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Edit LOI Restricted Countries</h4>
-                <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('loi-country-criterias.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)

@@ -93,12 +93,13 @@
                                     <th>Is Expired</th>
                                     <th>LOI Quantity</th>
                                     <th>LOI Templates</th>
+                                    <th>Comments</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
                                     <th>Send Supplier Approval</th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -122,13 +123,15 @@
                                     <th>Status</th>
                                     <th>Is Expired</th>
                                     <th>LOI Quantity</th>
+                                    <th>Utilized Quantity</th>
                                     <th>LOI Templates</th>
+                                    <th>Comments</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
                                     <th>Approve / Reject </th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -152,16 +155,16 @@
                                     <th>Is Expired</th>
                                     <th>LOI Quantity</th>
                                     <th>Utilized Quantity</th>
-                                    <th>Approvd Status</th>
+                                    <th>Approved Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>Remarks</th>
+                                    <th>Comments</th>
                                     <th>LOI Templates</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Utilization QTY Update</th>
-                                    <th width="100px">Action</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -181,25 +184,27 @@
             var table1 = $('.new-LOI-table').DataTable({
             processing: true,
             serverSide: true,
+            searching:true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}",
         columns: [
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
-            {'data' : 'cutomer_name', 'name' : 'cutomer_name'},
-            {'data' : 'customer_type', 'name': 'customer_type' },        
-            {'data' : 'customer_country', 'name': 'customer_country' },        
+            {'data' : 'client.name', 'name' : 'client.name'},
+            {'data' : 'client.customertype', 'name': 'client.customertype' },          
+            {'data' : 'client.country.name', 'name': 'client.country.name' },        
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
-            {'data' : 'so_number', 'name': 'so_number' },  
-            {'data' : 'sales_person', 'name': 'sales_person' },        
+            {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
+            {'data' : 'sales_person_id', 'name': 'salesPerson.name' },        
             {'data' : 'submission_status', 'name': 'submission_status' },        
             {'data' : 'is_expired', 'name': 'is_expired' },   
             {'data' : 'loi_quantity', 'name': 'loi_quantity' },   
-            {'data' : 'loi_templates', 'name': 'loi_templates', orderable: false, searchable: false },   
-            {'data' : 'createdBy', 'name': 'createdBy' },      
+            {'data' : 'loi_templates', 'name': 'loi_templates' },   
+            {'data' : 'comments', 'name': 'comments' },   
+            {'data' : 'created_by', 'name': 'createdBy.name' },      
             {'data' : 'created_at', 'name': 'created_at' },        
-            {'data' : 'updated_by', 'name': 'updated_by' },        
+            {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },        
             {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },      
             {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -207,6 +212,7 @@
         
         });
             var table2 = $('.waiting-for-approval-table').DataTable({
+            searching:true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'WAITING_FOR_APPROVAL']) }}",
@@ -214,20 +220,22 @@
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex','title' : 'S.NO:', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
-            {'data' : 'cutomer_name', 'name' : 'cutomer_name'},
-            {'data' : 'customer_type', 'name': 'customer_type' },        
-            {'data' : 'customer_country', 'name': 'customer_country' },        
+            {'data' : 'client.name', 'name' : 'client.name'},
+            {'data' : 'client.customertype', 'name': 'client.customertype' },         
+            {'data' : 'client.country.name', 'name': 'client.country.name' },         
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
-            {'data' : 'so_number', 'name': 'so_number' },  
-            {'data' : 'sales_person', 'name': 'sales_person' },        
+            {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
+            {'data' : 'sales_person_id', 'name': 'salesPerson.name' },        
             {'data' : 'submission_status', 'name': 'submission_status' },        
             {'data' : 'is_expired', 'name': 'is_expired' },   
-            {'data' : 'loi_quantity', 'name': 'loi_quantity' },   
-            {'data' : 'loi_templates', 'name': 'loi_templates' },   
-            {'data' : 'createdBy', 'name': 'createdBy' },      
+            {'data' : 'loi_quantity', 'name': 'loi_quantity' }, 
+            {'data' : 'utilized_quantity', 'name': 'utilized_quantity' },    
+            {'data' : 'loi_templates', 'name': 'loi_templates' },
+            {'data' : 'comments', 'name': 'comments' },      
+            {'data' : 'created_by', 'name': 'createdBy.name' },       
             {'data' : 'created_at', 'name': 'created_at' },        
-            {'data' : 'updated_by', 'name': 'updated_by' },        
+            {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },  
             {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },    
             {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -235,6 +243,7 @@
         
      });
         var table3 = $('.supplier-response-table').DataTable({
+            searching:true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'SUPPLIER_RESPONSE']) }}",
@@ -242,34 +251,32 @@
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex','title' : 'S.NO:', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
-            {'data' : 'cutomer_name', 'name' : 'cutomer_name'},
-            {'data' : 'customer_type', 'name': 'customer_type' },        
-            {'data' : 'customer_country', 'name': 'customer_country' },        
+            {'data' : 'client.name', 'name' : 'client.name'},
+            {'data' : 'client.customertype', 'name': 'client.customertype' },        
+            {'data' : 'client.country.name', 'name': 'client.country.name' },        
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
-            {'data' : 'so_number', 'name': 'so_number' },  
-            {'data' : 'sales_person', 'name': 'sales_person' },        
+            {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
+            {'data' : 'sales_person_id', 'name': 'salesPerson.name' },        
             {'data' : 'is_expired', 'name': 'is_expired' },   
             {'data' : 'loi_quantity', 'name': 'loi_quantity' },   
             {'data' : 'utilized_quantity', 'name': 'utilized_quantity' },        
-            {'data' : 'submission_status', 'name': 'submission_status' },        
+            {'data' : 'status', 'name': 'status' },        
             {'data' : 'loi_approval_date', 'name': 'loi_approval_date' },   
             {'data' : 'review', 'name': 'review' },   
+            {'data' : 'comments', 'name': 'comments' },   
             {'data' : 'loi_templates', 'name': 'loi_templates' },   
-            {'data' : 'createdBy', 'name': 'createdBy' },      
+            {'data' : 'created_by', 'name': 'createdBy.name' },     
             {'data' : 'created_at', 'name': 'created_at' },        
-            {'data' : 'updated_by', 'name': 'updated_by' },        
+            {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },  
-            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },           
+            // {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },           
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
         
         });
 
-          
-           
-           
-        });
+    });
 
         
        
