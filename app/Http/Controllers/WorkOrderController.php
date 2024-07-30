@@ -118,7 +118,6 @@ class WorkOrderController extends Controller
         })->get();
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        dd($vins);
         return view('work_order.export_exw.create',compact('type','customers','customerCount','airlines','vins','users','addons','charges'));
     }
     /**

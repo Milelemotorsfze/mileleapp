@@ -1001,7 +1001,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	}
 	$(document).ready(function () { 
 		console.log(vins);
-		console.log(vins.length);
+		console.log(Array.isArray(vins)); // Check if vins is an array
+    	console.log(vins.length); // Check length of vins
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
 			  document.getElementById('submit').click();
