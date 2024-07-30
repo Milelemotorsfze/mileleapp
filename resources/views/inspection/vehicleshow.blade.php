@@ -165,6 +165,7 @@
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
                                         <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
+                                        <option value="5.9" {{ old('engine') == '5.9' ? 'selected' : '' }}>5.9</option>
                                         <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
                                         <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
                                         <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
