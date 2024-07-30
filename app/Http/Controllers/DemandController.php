@@ -131,8 +131,6 @@ class DemandController extends Controller
             }
          
         }
-
-
         $data = $data->groupBy('sfx')->pluck('sfx');
     
         return $data;

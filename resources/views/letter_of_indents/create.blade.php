@@ -34,7 +34,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Add New LOI</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
             </div>
             <div class="card-body">
@@ -145,10 +145,10 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Dealer</label>
                                 <select class="form-control widthinput" name="dealers" id="dealer">
-                                    <option value="Trans Cars">Trans Cars</option>
                                     <option value="Milele Motors">Milele Motors</option>
+                                    <option value="Trans Cars">Trans Cars</option>                                 
                                 </select>
-                                <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
+                                <input type="hidden" name="dealers" value="Milele Motors" id="dealer-input">
                                 @error('dealers')
                                 <span role="alert">
                                     <strong>{{ $message }}</strong>
@@ -172,8 +172,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Template Type </label>
                                 <select class="form-control widthinput" multiple name="template_type[]" id="template-type">
-                                    <option value="trans_cars">Trans Cars</option>
-                                    <option value="milele_cars" disabled>Milele Cars</option>
+                                    <option value="trans_cars" disabled>Trans Cars</option>
+                                    <option value="milele_cars" >Milele Cars</option>
                                     <option value="individual">Individual</option>
                                     <option value="business">Business</option>
 
