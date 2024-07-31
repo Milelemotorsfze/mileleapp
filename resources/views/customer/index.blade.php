@@ -83,8 +83,7 @@
                                             <i class="fa fa-edit" aria-hidden="true"></i>
                                         </a>
                                         @endif
-                                    @endcan
-                                    zdvfgvdgfdgdfdfs 
+                                    @endcan 
                                     @can('delete-customer')
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');

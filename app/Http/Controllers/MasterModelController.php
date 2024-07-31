@@ -21,7 +21,7 @@ class MasterModelController extends Controller
     {
         (new UserActivityController)->createActivity('Open the listing page of Master Models.');
 
-        $masterModel = MasterModel::orderBy('id','DESC')->get();
+        $masterModel = MasterModel::orderBy('id','DESC');
 
         if (request()->ajax()) {
             return DataTables::of($masterModel)
@@ -53,6 +53,7 @@ class MasterModelController extends Controller
                     return  number_format($query->amount_belgium);
                 })
                 ->rawColumns(['action'])
+                 
                 ->toJson();
         }
 
@@ -74,6 +75,9 @@ class MasterModelController extends Controller
             ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
 
+        ])->parameters([  
+            'dom'          => 'Bfrtip',  
+            'buttons'      => ['excel', 'csv'],  
         ]);
 
         return view('master-models.index', compact('html'));

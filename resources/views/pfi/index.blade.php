@@ -51,7 +51,7 @@
                                 <td>{{ $pfi->letterOfIndent->dealers ?? ''}}</td>
                                 <td>{{ $pfi->delivery_location }}</td>
                                 <td>{{ $pfi->currency }}</td>
-                                <td>{{ $pfi->letterOfIndent->client->name }}</td>
+                                <td>{{ $pfi->letterOfIndent->client->name ?? ''}}</td>
                                 <td>{{ $pfi->letterOfIndent->client->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
                                 <td>{{ $pfi->released_amount }}</td>

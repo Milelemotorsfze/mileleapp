@@ -20,6 +20,7 @@ use App\Models\Supplier;
 use App\Models\LoiSoNumber;
 use App\Models\SupplierInventory;
 use App\Models\User;
+use App\Models\PfiItem;
 use App\Models\LOIExpiryCondition;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -171,8 +172,16 @@ class LetterOfIndentController extends Controller
                 ->addColumn('action', function($query,Request $request) {
                     $letterOfIndent = LetterOfIndent::select('id','is_expired','signature','comments')->find($query->id);
                     $type = $request->tab;
+                    $pfiQtySum = PfiItem::with('letterOfIndentItem')
+                    ->whereHas('letterOfIndentItem', function($query) use($letterOfIndent) {
+                        $query->where('letter_of_indent_id', $letterOfIndent->id);
+                    })->sum('pfi_quantity');
+
+                    $loiQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
+                                        ->where('letter_of_indent_id', $query->id)
+                                        ->sum('quantity'); 
                    
-                    return view('letter_of_indents.actions.action',compact('letterOfIndent','type'));
+                    return view('letter_of_indents.actions.action',compact('letterOfIndent','type','pfiQtySum','loiQuantity'));
                 })
                 ->rawColumns(['so_number','loi_templates','loi_quantity','created_by','updated_by',
                         'sales_person_id','is_expired','action','status'])
@@ -236,7 +245,7 @@ class LetterOfIndentController extends Controller
             $country = Country::find($request->country);
             $countryName = strtoupper(substr($country->name, 0, 3));
 
-            $customer->is_demand_planning_customer = true;
+            // $customer->is_demand_planning_customer = true;
             $customer->save();
 
             $names = explode(" ", $customer->name);
@@ -634,9 +643,10 @@ class LetterOfIndentController extends Controller
                     $LOIItem->save();
                 }
             }
-
+            
+            $LOI->soNumbers()->delete();
             if($request->so_number) {
-                $LOI->soNumbers()->delete();
+              
                 $soNumbers = $request->so_number;
                 foreach($soNumbers as $soNumber) {
                     if(!empty($soNumber)) {
