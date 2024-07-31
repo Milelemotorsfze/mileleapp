@@ -89,7 +89,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');
                                         @endphp
                                         @if ($hasPermission)
-                                            @if($customer->is_deletable == true && $customer->created_by == Auth::id())
+                                            @if($customer->is_deletable == true )
                                                 <button data-url="{{ route('dm-customers.destroy', $customer->id) }}" data-id="{{ $customer->id }}"
                                                     class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
                                             @endif
