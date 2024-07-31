@@ -950,7 +950,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	let commentIdCounter = 1;
     // $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
-	var vins = {!! json_encode($vins) !!}
+	var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 	var customerCount =  $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
@@ -1000,9 +1000,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		});	
 	}
 	$(document).ready(function () { 
-		console.log(vins);
-		console.log(Array.isArray(vins)); // Check if vins is an array
-    	console.log(vins.length); // Check length of vins
+		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
 			  document.getElementById('submit').click();
@@ -1229,7 +1227,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							}
 							if (customers[i].customer_company_number != null) { 
 								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-								console.log('hiiiii');
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
@@ -1342,8 +1339,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					addAddon();
 				}
 			});
-			$("body").on("click", ".add-vehicle-btn", function () { console.log('inside onclick event');
-				if (validateVINSelection() && validateAddonSelection()) { console.log('inside validation');
+			$("body").on("click", ".add-vehicle-btn", function () { 
+				if (validateVINSelection() && validateAddonSelection()) { 
 					addVIN();
 				}
 			});
@@ -2379,12 +2376,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-		function addVIN() { console.log('inside addVIN function'); console.log(vins);
-			var selectedVIN = $("#vin_multiple").val(); console.log(selectedVIN); console.log('length'+ selectedVIN.length)
-			if (selectedVIN != '' && selectedVIN.length > 0) { console.log('if length greater than zero');
-				for (var j = 0; j < selectedVIN.length; j++) { console.log('foreach');  console.log('vin length '+vins.length);
-					for (var i = 0; i < vins.length; i++) { console.log('inside '); console.log(vins[i].vin); console.log(selectedVIN[j]);
-						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { console.log('here');
+		function addVIN() { 
+			var selectedVIN = $("#vin_multiple").val(); 
+			if (selectedVIN != '' && selectedVIN.length > 0) { 
+				for (var j = 0; j < selectedVIN.length; j++) { 
+					for (var i = 0; i < vins.length; i++) { 
+						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { 
 							var data = { 
 								id: '',
 								vehicle_id : vins[i]?.id ?? '',
@@ -2408,7 +2405,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 								special_request_or_remarks: '',
 								shipment: '',
 							};
-							console.log('data ' +data);
 							drawTableRow(data);
 						}
 					}
@@ -2437,8 +2433,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$(this).remove();
 			});
 		}
-		function drawTableRow(data) { console.log('inside drawTableRow');
-			console.log(data);
+		function drawTableRow(data) { 
 			// Get the table body element by ID
 			var tableBody = document.querySelector('#myTable tbody');
 
