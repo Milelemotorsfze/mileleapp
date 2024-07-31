@@ -212,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}"
+                            <option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
 							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
                         </select> 
@@ -970,13 +970,19 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
     @endif
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
-	var input = document.querySelector("#customer_company_number");
-	var iti = window.intlTelInput(input, { 
+	var input = document.querySelector("#customer_company_number"); console.log('1');
+	// var iti = window.intlTelInput(input, { 
+	// 	separateDialCode: true,
+	// 	preferredCountries:["ae"],
+	// 	hiddenInput: "full",
+	// 	utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	// });
+	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
 		separateDialCode: true,
-		preferredCountries: ["ae"],
+		preferredCountries:["ae"],
 		hiddenInput: "full",
 		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-	});
+	}); console.log('2');
 	var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
 		separateDialCode: true,
 		preferredCountries:["ae"],
@@ -1053,22 +1059,25 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-
 				// Check if workOrder.customer_company_number is not null or undefined
-				var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-				iti.setNumber(fullPhoneNumber);
-				sanitizeNumberInput(input);
+				// var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+				// iti.setNumber(fullPhoneNumber);
+				// sanitizeNumberInput(input);
 
+				var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+				iti.setNumber(customer_company_numberFull);
+				sanitizeNumberInput(input);
+				console.log('3');
 				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
 				sanitizeNumberInput(input);
-
+console.log('12');
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
 				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
 					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
 				} 
 				sanitizeNumberInput(input);
-
+console.log('13');
 				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
 				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
 				if(workOrder.transport_type == 'air') {
@@ -1081,7 +1090,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					roadRelation();
 					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
 					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
-					sanitizeNumberInput(input);				
+					sanitizeNumberInput(input);	console.log('14');			
 				}
 			}
 			
@@ -1212,13 +1221,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		// INTEL INPUT START
 			
 			// Function to set customer relations
-			function setCustomerRelations(selectedCustomerName) {
+			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');            
-				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+				$('#customer_company_number').val('');   console.log('4');         
+				if (selectedCustomerUniqueId != null) {
 					for (var i = 0; i < customerCount; i++) {
-						if (customers[i].customer_name == selectedCustomerName[0]) { 
+						if (customers[i].unique_id == selectedCustomerUniqueId) { 
 							if (customers[i].customer_address != null) {
 								$('#customer_address').val(customers[i]?.customer_address);
 							}
@@ -1230,7 +1239,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
-								sanitizeNumberInput(input);
+								sanitizeNumberInput(input); console.log('5');
 							}
 						}
 					}
@@ -1307,8 +1316,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		// CUSTOMER NAME ONCHANGE START
 			 // Handle customer name change
 			 $('#customer_name').on('change', function() { 
-				var selectedCustomerName = $(this).val(); 
-				setCustomerRelations(selectedCustomerName);
+				// var selectedCustomerName = $(this).val(); 
+				var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
+				setCustomerRelations(selectedCustomerUniqueId);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
@@ -1991,7 +2001,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 
 				// Update phone numbers if elements are defined
-				if (typeof iti !== 'undefined') {
+				if (typeof iti !== 'undefined') { console.log('6');
 					$('#customer_company_number_full').val(iti.getNumber());
 				}
 				if (typeof customer_representative_contact !== 'undefined') {
@@ -2089,7 +2099,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		if (parts.length > 2) {
 			value = parts[0] + '.' + parts.slice(1).join('');
 		}
-
 		input.value = value;
 		setDepositBalance();
 	}
@@ -3067,7 +3076,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	// HIDE FIELDS END
 
 	// CUSTOMER DETAILS SECTION START
-        function checkValue() {
+        function checkValue() { console.log('7');
 			selectedCustomerEmail = $('#customer_email').val();
 			selectedCustomerAddress = $('#customer_address').val();
 			selectedCustomerContact = $('#customer_company_number').val();
@@ -3088,13 +3097,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             switchToDropdown.style.display = 'inline';
             $('#customer_address').val(newCustomerAddress);
 			$('#customer_email').val(newCustomerEmail);
-			$('#customer_company_number').val(newCustomerContact);
+			$('#customer_company_number').val(newCustomerContact); console.log('8');
         }
 
-        function switchToDropdown() {
+        function switchToDropdown() { condole.log('drop');
 			newCustomerEmail = $('#customer_email').val();
 			newCustomerAddress = $('#customer_address').val();
-			newCustomerContact = $('#customer_company_number').val();
+			newCustomerContact = $('#customer_company_number').val();console.log('9');
             $('#customer_type').val('existing');
             var textInput = document.getElementById('textInput');
             var Other = document.getElementById('Other');
@@ -3116,17 +3125,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 // setCustomerRelations(selectedCustomerName);
 				$('#customer_address').val(selectedCustomerAddress);
 				$('#customer_email').val(selectedCustomerEmail);
-				$('#customer_company_number').val(selectedCustomerContact);
+				$('#customer_company_number').val(selectedCustomerContact); console.log('10');
             }
 			else {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');
+				$('#customer_company_number').val(''); console.log('11');
 			}
         }
-
-       
-		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
