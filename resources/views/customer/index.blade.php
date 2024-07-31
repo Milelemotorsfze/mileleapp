@@ -84,12 +84,13 @@
                                         </a>
                                         @endif
                                     @endcan
+                                    zdvfgvdgfdgdfdfs 
                                     @can('delete-customer')
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');
                                         @endphp
                                         @if ($hasPermission)
-                                            @if($customer->is_deletable == true )
+                                            @if($customer->is_deletable == true && $customer->created_by == Auth::id())
                                                 <button data-url="{{ route('dm-customers.destroy', $customer->id) }}" data-id="{{ $customer->id }}"
                                                     class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
                                             @endif
