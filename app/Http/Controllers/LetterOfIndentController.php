@@ -170,12 +170,13 @@ class LetterOfIndentController extends Controller
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
                 ->addColumn('action', function($query,Request $request) {
-                    $letterOfIndent = LetterOfIndent::select('id','is_expired','signature','comments')->find($query->id);
+                    $letterOfIndent = LetterOfIndent::select('id','is_expired','signature','comments','utilized_quantity')->find($query->id);
                     $type = $request->tab;
                     $pfiQtySum = PfiItem::with('letterOfIndentItem')
                     ->whereHas('letterOfIndentItem', function($query) use($letterOfIndent) {
                         $query->where('letter_of_indent_id', $letterOfIndent->id);
                     })->sum('pfi_quantity');
+                    $pfiQtySum = $pfiQtySum + $letterOfIndent->utilized_quantity;
 
                     $loiQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
                                         ->where('letter_of_indent_id', $query->id)

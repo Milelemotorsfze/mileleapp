@@ -140,7 +140,7 @@ class PFIController extends Controller
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
-        $destination = 'PFI_document_withsign';
+        // $destination = 'PFI_document_withsign';
 
         if ($request->has('file'))
         {
@@ -173,33 +173,33 @@ class PFIController extends Controller
         }
         
         // document sealing
-        if($request->has('file')) {
-            try {
+        // if($request->has('file')) {
+        //     try {
             
-                $pdf = new Fpdi();
-                $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+        //         $pdf = new Fpdi();
+        //         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
     
-                for ($i=1; $i <= $pageCount; $i++)
-                {
-                    $pdf->AddPage();
-                    $tplIdx = $pdf->importPage($i);
-                    $pdf->useTemplate($tplIdx);
-                    if($i == $pageCount) {
-                        $pdf->Image('milele_seal.png', 80, 230, 50,35);
-                    }
-                }
+        //         for ($i=1; $i <= $pageCount; $i++)
+        //         {
+        //             $pdf->AddPage();
+        //             $tplIdx = $pdf->importPage($i);
+        //             $pdf->useTemplate($tplIdx);
+        //             if($i == $pageCount) {
+        //                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
+        //             }
+        //         }
     
-                $signedFileName = 'signed_'.time().'.'.$extension;
-                $directory = public_path('PFI_Document_with_sign');
-                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-                $pdf->Output($directory.'/'.$signedFileName,'F');
-                $pfi->pfi_document_with_sign = $signedFileName;
-            }catch (\Exception $e) {
+        //         $signedFileName = 'signed_'.time().'.'.$extension;
+        //         $directory = public_path('PFI_Document_with_sign');
+        //         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        //         $pdf->Output($directory.'/'.$signedFileName,'F');
+        //         $pfi->pfi_document_with_sign = $signedFileName;
+        //     }catch (\Exception $e) {
     
-                return redirect()->back()->with('error', $e->getMessage());
-            }
-            $pfi->save();
-        }
+        //         return redirect()->back()->with('error', $e->getMessage());
+        //     }
+            // $pfi->save();
+        // }
        
         DB::commit();
 
@@ -318,33 +318,33 @@ class PFIController extends Controller
             if (File::exists(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign))) {
                 File::delete(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign));
             }
-            if (File::exists(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign))) {
-                File::delete(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign));
-            }
+            // if (File::exists(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign))) {
+            //     File::delete(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign));
+            // }
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
 
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+            // $pdf = new Fpdi();
+            // $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
 
-            for ($i=1; $i <= $pageCount; $i++)
-            {
-                $pdf->AddPage();
-                $tplIdx = $pdf->importPage($i);
-                $pdf->useTemplate($tplIdx);
-                if($i == $pageCount) {
-                    $pdf->Image('milele_seal.png', 80, 230, 50,35);
-                }
-            }
+            // for ($i=1; $i <= $pageCount; $i++)
+            // {
+            //     $pdf->AddPage();
+            //     $tplIdx = $pdf->importPage($i);
+            //     $pdf->useTemplate($tplIdx);
+            //     if($i == $pageCount) {
+            //         $pdf->Image('milele_seal.png', 80, 230, 50,35);
+            //     }
+            // }
 
-            $signedFileName = 'signed_'.time().'.'.$extension;
-            $directory = public_path('PFI_Document_with_sign');
-            \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-            $pdf->Output($directory.'/'.$signedFileName,'F');
-            $pfi->pfi_document_with_sign = $signedFileName;
+            // $signedFileName = 'signed_'.time().'.'.$extension;
+            // $directory = public_path('PFI_Document_with_sign');
+            // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+            // $pdf->Output($directory.'/'.$signedFileName,'F');
+            // $pfi->pfi_document_with_sign = $signedFileName;
         }
 
         $pfi->save();

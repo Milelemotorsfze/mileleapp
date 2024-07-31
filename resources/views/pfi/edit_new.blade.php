@@ -8,6 +8,16 @@
         .widthinput{
             height: 32px!important;
         }
+        .overlay
+        {
+            position: fixed; /* Positioning and size */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); /* color */
+            display: none; /* making it hidden by default */
+        }
     </style>
     @can('PFI-create')
         @php
@@ -319,7 +329,7 @@
             </div>
         @endif
         @endcan
-    
+    <div class="overlay"></div>
 @endsection
 @push('scripts')
     <script>
@@ -527,6 +537,7 @@
         }
 
         $('form').on('submit', function(e){
+            $('.overlay').show();
             let quantitySum = 0;
             $('.pfi-quantities').each(function() {
                 var quantity = $(this).val();
@@ -535,10 +546,12 @@
             });
             console.log(quantitySum);
             if(quantitySum <= 0) {
+                $('.overlay').hide();
                 e.preventDefault();
                 alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
             }else {
                 if($("#form-create").valid()) {
+                    $('.overlay').hide();
                     $('#form-create').submit();
                 }else{
                     e.preventDefault();
