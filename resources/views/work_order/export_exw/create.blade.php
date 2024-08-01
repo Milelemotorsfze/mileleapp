@@ -1675,18 +1675,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 batch: {
                     required: true,
                 },
-                // customer_reference_id: {
-
-                // },
-                // customer_reference_type: {
-
-                // },
                 new_customer_name: {
                     noSpaces: true,
                 },
-                // existing_customer_name: {
-
-                // }
                 customer_email: {
                     noSpaces: true,
                     customEmail: true,
@@ -1737,8 +1728,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     required: true,
                     noSpaces: true,
                 },
-                // transport_type: {
-                // },
                 brn_file: {
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
@@ -1749,10 +1738,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 container_number: {
                     noSpaces: true,
                 },
-                // airline_reference_id: {
-                // }
-                // airline: {
-                // },
                 airway_bill: {
                     noSpaces: true,
                 },
@@ -1779,8 +1764,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 transportation_company_details: {
                     noSpaces: true,
                 },
-                // currency: {
-                // },
                 so_total_amount: {
 					noSpaces: true,
 					number: true,
@@ -1792,11 +1775,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 },
 				"deposit_aganist_vehicle[]": {
 					customDepositVehicleRequired: true
-				},
-                // amount_received: {
-                // },
-                // balance_amount: {
-                // },				
+				},				
                 delivery_location: {
                     noSpaces: true,
                 },
@@ -1838,61 +1817,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
-                // DYNAMIC FIELDS
-                // vin: {
-                // 	// required: true,
-                // },
-                // brand: {
-                // 	// required: true,
-                // },
-                // variant: {
-                // 	// required: true,
-                // },
-                // engine: {
-                // 	// required: true,
-                // },
-                // model_description: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // steering: {
-                // 	// required: true,
-                // },
-                // exterior_colour: {
-                // 	// required: true,
-                // },
-                // interior_colour: {
-                // 	// required: true,
-                // },
-                // warehouse: {
-                // 	// required: true,
-                // },
-                // territory: {
-                // 	// required: true,
-                // },
-                // preferred_destination: {
-                // 	// required: true,
-                // },
-                // import_document_type: {
-                // 	// required: true,
-                // },
-                // ownership_name: {
-                // 	// required: true,
-                // },
-                // modification_or_jobs_to_perform_per_vin: {
-                // 	// required: true,
-                // },
-                // certification_per_vin: {
-                // 	// required: true,
-                // },
-                // special_request_or_remarks: {
-                // 	// required: true,
-                // },
             },
             messages: {
                 brn_file:{
@@ -3081,7 +3005,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			$('#customer_company_number').val(newCustomerContact);
         }
 
-        function switchToDropdown() { condole.log('drop');
+        function switchToDropdown() {
 			newCustomerEmail = $('#customer_email').val();
 			newCustomerAddress = $('#customer_address').val();
 			newCustomerContact = $('#customer_company_number').val();
