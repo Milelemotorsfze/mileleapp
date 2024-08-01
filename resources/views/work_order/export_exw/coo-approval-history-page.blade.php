@@ -25,7 +25,7 @@
 <div class="card">
     <div class="card-header">
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
         @endphp
         @if ($hasPermission)
         <h4 class="card-title">

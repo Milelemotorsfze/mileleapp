@@ -1,9 +1,14 @@
 
 @if(isset($workOrder) && isset($workOrder->financePendingApproval))
-	<a title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
-       data-bs-toggle="modal" data-bs-target="#financeApprovalModal">
-        <i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
-    </a>
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-finance-approval']);
+	@endphp
+	@if ($hasPermission)
+		<a title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
+		data-bs-toggle="modal" data-bs-target="#financeApprovalModal">
+			<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
+		</a>
+	@endif
     <!-- Modal -->
     <div class="modal fade" id="financeApprovalModal" tabindex="-1" aria-labelledby="financeApprovalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -40,10 +45,15 @@
 	</a>
 @endif
 @if(isset($workOrder) && isset($workOrder->cooPendingApproval))
-	<a title="COO Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
-       data-bs-toggle="modal" data-bs-target="#cooApprovalModal">
-        <i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Approval
-    </a>
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-coo-office-approval']);
+	@endphp
+	@if ($hasPermission)
+		<a title="COO Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info" 
+		data-bs-toggle="modal" data-bs-target="#cooApprovalModal">
+			<i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Approval
+		</a>
+	@endif
     <!-- Modal -->
     <div class="modal fade" id="cooApprovalModal" tabindex="-1" aria-labelledby="cooApprovalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -105,16 +115,26 @@
 </div>
 @if(isset($workOrder))
 @if($workOrder->coo_approval_status != '')
-<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:20px!important;" class="btn btn-sm btn-info"
-	href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
-	<i class="fas fa-eye"></i> COO Approval History
-</a>
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+	@endphp
+	@if ($hasPermission)
+		<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:3px!important;" class="btn btn-sm btn-info"
+			href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
+			<i class="fas fa-eye"></i> COO Approval History
+		</a>
+	@endif
 @endif
 @if($workOrder->finance_approval_status != '')
-<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important;" class="btn btn-sm btn-info" 
-	href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
-	<i class="fas fa-eye"></i> Finance Approval History
-</a>
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+	@endphp
+	@if ($hasPermission)
+		<a style="margin-top:0px;margin-bottom:1.25rem; float:right!important;" class="btn btn-sm btn-info" 
+			href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
+			<i class="fas fa-eye"></i> Finance Approval History
+		</a>
+	@endif
 @endif
 @endif
 <script type="text/javascript">
