@@ -970,19 +970,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
     @endif
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
-	var input = document.querySelector("#customer_company_number"); console.log('1');
-	// var iti = window.intlTelInput(input, { 
-	// 	separateDialCode: true,
-	// 	preferredCountries:["ae"],
-	// 	hiddenInput: "full",
-	// 	utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-	// });
+	var input = document.querySelector("#customer_company_number");
 	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
 		separateDialCode: true,
 		preferredCountries:["ae"],
 		hiddenInput: "full",
 		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-	}); console.log('2');
+	});
 	var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
 		separateDialCode: true,
 		preferredCountries:["ae"],
@@ -1059,27 +1053,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-				// Check if workOrder.customer_company_number is not null or undefined
-				// var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-				// iti.setNumber(fullPhoneNumber);
-				// sanitizeNumberInput(input);
-
 				var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
 				iti.setNumber(customer_company_numberFull);
-				sanitizeNumberInput(input);
-				console.log('3');
 				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
-				sanitizeNumberInput(input);
-console.log('12');
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
 				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
 					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
 				} 
-				sanitizeNumberInput(input);
-console.log('13');
-				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
-				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
 				if(workOrder.transport_type == 'air') {
 					airRelation();
 				}
@@ -1090,7 +1071,7 @@ console.log('13');
 					roadRelation();
 					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
 					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
-					sanitizeNumberInput(input);	console.log('14');			
+					sanitizeNumberInput(input);			
 				}
 			}
 			
@@ -1224,7 +1205,7 @@ console.log('13');
 			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');   console.log('4');         
+				$('#customer_company_number').val('');         
 				if (selectedCustomerUniqueId != null) {
 					for (var i = 0; i < customerCount; i++) {
 						if (customers[i].unique_id == selectedCustomerUniqueId) { 
@@ -1239,7 +1220,7 @@ console.log('13');
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
-								sanitizeNumberInput(input); console.log('5');
+								sanitizeNumberInput(input);
 							}
 						}
 					}
@@ -2001,7 +1982,7 @@ console.log('13');
 				}
 
 				// Update phone numbers if elements are defined
-				if (typeof iti !== 'undefined') { console.log('6');
+				if (typeof iti !== 'undefined') {
 					$('#customer_company_number_full').val(iti.getNumber());
 				}
 				if (typeof customer_representative_contact !== 'undefined') {
@@ -3076,7 +3057,7 @@ console.log('13');
 	// HIDE FIELDS END
 
 	// CUSTOMER DETAILS SECTION START
-        function checkValue() { console.log('7');
+        function checkValue() {
 			selectedCustomerEmail = $('#customer_email').val();
 			selectedCustomerAddress = $('#customer_address').val();
 			selectedCustomerContact = $('#customer_company_number').val();
@@ -3097,13 +3078,13 @@ console.log('13');
             switchToDropdown.style.display = 'inline';
             $('#customer_address').val(newCustomerAddress);
 			$('#customer_email').val(newCustomerEmail);
-			$('#customer_company_number').val(newCustomerContact); console.log('8');
+			$('#customer_company_number').val(newCustomerContact);
         }
 
         function switchToDropdown() { condole.log('drop');
 			newCustomerEmail = $('#customer_email').val();
 			newCustomerAddress = $('#customer_address').val();
-			newCustomerContact = $('#customer_company_number').val();console.log('9');
+			newCustomerContact = $('#customer_company_number').val();
             $('#customer_type').val('existing');
             var textInput = document.getElementById('textInput');
             var Other = document.getElementById('Other');
@@ -3125,12 +3106,12 @@ console.log('13');
                 // setCustomerRelations(selectedCustomerName);
 				$('#customer_address').val(selectedCustomerAddress);
 				$('#customer_email').val(selectedCustomerEmail);
-				$('#customer_company_number').val(selectedCustomerContact); console.log('10');
+				$('#customer_company_number').val(selectedCustomerContact);
             }
 			else {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val(''); console.log('11');
+				$('#customer_company_number').val('');
 			}
         }
 	// CUSTOMER DETAILS SECTION END
