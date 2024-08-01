@@ -212,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}"
+                            <option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
 							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
                         </select> 
@@ -971,9 +971,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	var input = document.querySelector("#customer_company_number");
-	var iti = window.intlTelInput(input, { 
+	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
 		separateDialCode: true,
-		preferredCountries: ["ae"],
+		preferredCountries:["ae"],
 		hiddenInput: "full",
 		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 	});
@@ -1053,24 +1053,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-
-				// Check if workOrder.customer_company_number is not null or undefined
-				var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-				iti.setNumber(fullPhoneNumber);
-				sanitizeNumberInput(input);
-
+				var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+				iti.setNumber(customer_company_numberFull);
 				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
-				sanitizeNumberInput(input);
-
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
 				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
 					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
 				} 
-				sanitizeNumberInput(input);
-
-				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
-				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
 				if(workOrder.transport_type == 'air') {
 					airRelation();
 				}
@@ -1081,7 +1071,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					roadRelation();
 					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
 					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
-					sanitizeNumberInput(input);				
+					sanitizeNumberInput(input);			
 				}
 			}
 			
@@ -1212,13 +1202,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		// INTEL INPUT START
 			
 			// Function to set customer relations
-			function setCustomerRelations(selectedCustomerName) {
+			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');            
-				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+				$('#customer_company_number').val('');         
+				if (selectedCustomerUniqueId != null) {
 					for (var i = 0; i < customerCount; i++) {
-						if (customers[i].customer_name == selectedCustomerName[0]) { 
+						if (customers[i].unique_id == selectedCustomerUniqueId) { 
 							if (customers[i].customer_address != null) {
 								$('#customer_address').val(customers[i]?.customer_address);
 							}
@@ -1307,8 +1297,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		// CUSTOMER NAME ONCHANGE START
 			 // Handle customer name change
 			 $('#customer_name').on('change', function() { 
-				var selectedCustomerName = $(this).val(); 
-				setCustomerRelations(selectedCustomerName);
+				// var selectedCustomerName = $(this).val(); 
+				var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
+				setCustomerRelations(selectedCustomerUniqueId);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
@@ -1684,18 +1675,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 batch: {
                     required: true,
                 },
-                // customer_reference_id: {
-
-                // },
-                // customer_reference_type: {
-
-                // },
                 new_customer_name: {
                     noSpaces: true,
                 },
-                // existing_customer_name: {
-
-                // }
                 customer_email: {
                     noSpaces: true,
                     customEmail: true,
@@ -1746,8 +1728,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     required: true,
                     noSpaces: true,
                 },
-                // transport_type: {
-                // },
                 brn_file: {
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
@@ -1758,10 +1738,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 container_number: {
                     noSpaces: true,
                 },
-                // airline_reference_id: {
-                // }
-                // airline: {
-                // },
                 airway_bill: {
                     noSpaces: true,
                 },
@@ -1788,8 +1764,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 transportation_company_details: {
                     noSpaces: true,
                 },
-                // currency: {
-                // },
                 so_total_amount: {
 					noSpaces: true,
 					number: true,
@@ -1801,11 +1775,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 },
 				"deposit_aganist_vehicle[]": {
 					customDepositVehicleRequired: true
-				},
-                // amount_received: {
-                // },
-                // balance_amount: {
-                // },				
+				},				
                 delivery_location: {
                     noSpaces: true,
                 },
@@ -1847,61 +1817,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
                     maxsize : 1073741824,
                 },
-                // DYNAMIC FIELDS
-                // vin: {
-                // 	// required: true,
-                // },
-                // brand: {
-                // 	// required: true,
-                // },
-                // variant: {
-                // 	// required: true,
-                // },
-                // engine: {
-                // 	// required: true,
-                // },
-                // model_description: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // steering: {
-                // 	// required: true,
-                // },
-                // exterior_colour: {
-                // 	// required: true,
-                // },
-                // interior_colour: {
-                // 	// required: true,
-                // },
-                // warehouse: {
-                // 	// required: true,
-                // },
-                // territory: {
-                // 	// required: true,
-                // },
-                // preferred_destination: {
-                // 	// required: true,
-                // },
-                // import_document_type: {
-                // 	// required: true,
-                // },
-                // ownership_name: {
-                // 	// required: true,
-                // },
-                // modification_or_jobs_to_perform_per_vin: {
-                // 	// required: true,
-                // },
-                // certification_per_vin: {
-                // 	// required: true,
-                // },
-                // special_request_or_remarks: {
-                // 	// required: true,
-                // },
             },
             messages: {
                 brn_file:{
@@ -2089,7 +2004,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		if (parts.length > 2) {
 			value = parts[0] + '.' + parts.slice(1).join('');
 		}
-
 		input.value = value;
 		setDepositBalance();
 	}
@@ -3124,9 +3038,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#customer_company_number').val('');
 			}
         }
-
-       
-		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START

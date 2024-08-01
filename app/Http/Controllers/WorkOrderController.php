@@ -75,42 +75,49 @@ class WorkOrderController extends Controller
 
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
-            'customer_name', 
+            DB::raw('TRIM(customer_name) as customer_name'), 
             'customer_email', 
             'customer_company_number', 
             'customer_address',
             DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\WorkOrder' as reference_type"),
+            DB::raw('NULL as country_id'), // Assuming WorkOrder does not have is_demand_planning_customer field
+            DB::raw('NULL as is_demand_planning_customer'),
+            DB::raw("CONCAT(TRIM(customer_name), '_', IFNULL(customer_email, ''), '_', IFNULL(customer_company_number, '')) as unique_id")
         );
 
         // Select and transform data from the Clients table
         $clients = Clients::select(
-            DB::raw('name as customer_name'), 
+            DB::raw('TRIM(name) as customer_name'), 
             DB::raw('email as customer_email'), 
             DB::raw('phone as customer_company_number'), 
             DB::raw('NULL as customer_address'),
             DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\Clients' as reference_type"),
+            'country_id',
+            'is_demand_planning_customer',
+            DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
         );
 
-        // Select and transform data from the Customer table
-        $dpCustomers = Customer::select(
-            DB::raw('name as customer_name'), 
-            DB::raw('NULL as customer_email'), 
-            DB::raw('NULL as customer_company_number'), 
-            DB::raw('address as customer_address'),
-            DB::raw('(IF(address IS NOT NULL, 1, 0)) as score'),
-            DB::raw("'App\\Models\\Customer' as reference_type"),
-        )->distinct();
+        // Combine the results using union
+        $combinedResults = $workOrders
+            ->union($clients)
+            ->get();
 
-        // Combine the results
-        $combinedResults = $workOrders->union($clients)->union($dpCustomers)->get();
+        // Clean up customer names in PHP
+        $combinedResults = $combinedResults->map(function ($item) {
+            // Replace multiple spaces with a single space
+            $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
+            return $item;
+        });
 
-        // Process combined results to remove duplicates based on customer_name
-        $customers = $combinedResults->groupBy('customer_name')->map(function($items) {
+        // Process combined results to remove duplicates based on unique_id
+        $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
             // Sort items by score in descending order and then take the first item
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
+
+
         // Get the count of customers
         $customerCount = $customers->count();
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
@@ -587,53 +594,51 @@ class WorkOrderController extends Controller
         $type = $workOrder->type;
         $workOrder = WorkOrder::where('id',$workOrder->id)
         ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval')->first();
-        // $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
-        // $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
-        // // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
-        
-        // $customers = $dpCustomers->union($clients)->get();
-        // // ->union($workOrders)
-        // $customers = $customers->unique('customer_name');
-        // // $errorMsg ="This page will coming very soon !";
-        // // return view('hrm.notaccess',compact('errorMsg'));
-         // Select data from the WorkOrder table
-         $workOrders = WorkOrder::select(
-            'customer_name', 
+        // Select data from the WorkOrder table
+        $workOrders = WorkOrder::select(
+            DB::raw('TRIM(customer_name) as customer_name'), 
             'customer_email', 
             'customer_company_number', 
             'customer_address',
             DB::raw('(IF(customer_email IS NOT NULL, 1, 0) + IF(customer_company_number IS NOT NULL, 1, 0) + IF(customer_address IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\WorkOrder' as reference_type"),
+            DB::raw('NULL as country_id'), // Assuming WorkOrder does not have is_demand_planning_customer field
+            DB::raw('NULL as is_demand_planning_customer'),
+            DB::raw("CONCAT(TRIM(customer_name), '_', IFNULL(customer_email, ''), '_', IFNULL(customer_company_number, '')) as unique_id")
         );
 
         // Select and transform data from the Clients table
         $clients = Clients::select(
-            DB::raw('name as customer_name'), 
+            DB::raw('TRIM(name) as customer_name'), 
             DB::raw('email as customer_email'), 
             DB::raw('phone as customer_company_number'), 
             DB::raw('NULL as customer_address'),
             DB::raw('(IF(email IS NOT NULL, 1, 0) + IF(phone IS NOT NULL, 1, 0)) as score'),
             DB::raw("'App\\Models\\Clients' as reference_type"),
+            'country_id',
+            'is_demand_planning_customer',
+            DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
         );
 
-        // Select and transform data from the Customer table
-        $dpCustomers = Customer::select(
-            DB::raw('name as customer_name'), 
-            DB::raw('NULL as customer_email'), 
-            DB::raw('NULL as customer_company_number'), 
-            DB::raw('address as customer_address'),
-            DB::raw('(IF(address IS NOT NULL, 1, 0)) as score'),
-            DB::raw("'App\\Models\\Customer' as reference_type"),
-        )->distinct();
+        // Combine the results using union
+        $combinedResults = $workOrders
+            ->union($clients)
+            ->get();
 
-        // Combine the results
-        $combinedResults = $workOrders->union($clients)->union($dpCustomers)->get();
+        // Clean up customer names in PHP
+        $combinedResults = $combinedResults->map(function ($item) {
+            // Replace multiple spaces with a single space
+            $item->customer_name = preg_replace('/\s+/', ' ', trim($item->customer_name));
+            return $item;
+        });
 
-        // Process combined results to remove duplicates based on customer_name
-        $customers = $combinedResults->groupBy('customer_name')->map(function($items) {
+        // Process combined results to remove duplicates based on unique_id
+        $customers = $combinedResults->groupBy('unique_id')->map(function($items) {
             // Sort items by score in descending order and then take the first item
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
+
+
         // Get the count of customers
         $customerCount = $customers->count();
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
@@ -642,7 +647,8 @@ class WorkOrderController extends Controller
         // $accSpaKits = AddonDetails::select('addon_code')->distinct();
         
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
-        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
+        $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin')
+        ->values();
         $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
                 IF(addon_descriptions.description IS NOT NULL AND addon_descriptions.description != '', CONCAT(' - ', addon_descriptions.description), '')) as addon_name
                 "),DB::raw("'App\\Models\\AddonDetails' as reference_type"))
@@ -676,7 +682,9 @@ class WorkOrderController extends Controller
             ->get();
         // Merge collections
         $addons = $accessories->merge($spareParts)->merge($kit);
-        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'));
+        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'))->with([
+            'vinsJson' => $vins->toJson(), // Single encoding here
+        ]);
     }
 
     /**

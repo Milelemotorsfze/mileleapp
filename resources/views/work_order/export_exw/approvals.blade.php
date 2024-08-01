@@ -104,14 +104,18 @@
     </div>
 </div>
 @if(isset($workOrder))
+@if($workOrder->coo_approval_status != '')
 <a style="margin-top:0px;margin-bottom:1.25rem; float:right!important; margin-left:20px!important;" class="btn btn-sm btn-info"
 	href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
 	<i class="fas fa-eye"></i> COO Approval History
 </a>
+@endif
+@if($workOrder->finance_approval_status != '')
 <a style="margin-top:0px;margin-bottom:1.25rem; float:right!important;" class="btn btn-sm btn-info" 
 	href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
 	<i class="fas fa-eye"></i> Finance Approval History
 </a>
+@endif
 @endif
 <script type="text/javascript">
 
