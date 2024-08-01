@@ -566,7 +566,6 @@ class LetterOfIndentController extends Controller
             $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
             $yearCode = Carbon::now()->format('y');
             $year = Carbon::now()->format('Y');
-
             $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)
                                         ->whereNot('id', $id)
                                         ->whereYear('date', $year)->count();
