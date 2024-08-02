@@ -87,6 +87,7 @@ class WorkOrder extends Model
     protected $appends = [
         'finance_approval_status',
         'coo_approval_status',
+        'total_number_of_boe'
     ];
     public function getFinanceApprovalStatusAttribute() {
         $status = '';
@@ -111,6 +112,14 @@ class WorkOrder extends Model
             $status = 'Rejected';
         }
         return $status;
+    }
+    public function getTotalNumberOfBOEAttribute() {
+        $uniqueBoeCount = '';
+        $uniqueBoeCount = WOVehicles::where('work_order_id', $this->id)
+        ->whereNull('deleted_at')
+        ->distinct()
+        ->count('boe_number');
+        return $uniqueBoeCount;
     }
     public function CreatedBy()
     {
