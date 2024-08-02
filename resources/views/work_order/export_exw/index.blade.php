@@ -95,6 +95,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
 							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Approval Status</center>
+							</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
                             <th rowspan="2" class="light">Date</th>
@@ -151,15 +154,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="light">Created At</th>
                             <th rowspan="2" class="dark">Last Updated By</th>
                             <th rowspan="2" class="dark">Last Updated At</th>
-                            <th rowspan="2" class="light">Sales Support Data Confirmation By</th>
-                            <th rowspan="2" class="light">Sales Support Data Confirmation At</th>
-                            <th rowspan="2" class="dark">Finance Approval By</th>
-                            <th rowspan="2" class="dark">Finance Approval At</th>
-                            <th rowspan="2" class="light">COO Office Approval By</th>
-                            <th rowspan="2" class="light">COO Office Approval At</th>
 							<th rowspan="2" class="dark">Total Number Of BOE</th>
 						</tr>
 						<tr>
+							<td class="dark">Finance</td>
+							<td class="dark">COO Office</td>
 							<td class="dark">Name</td>
                             <td class="dark">Email</td>
 							<td class="dark">Contact</td>
@@ -207,20 +206,51 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         @endphp
                                         @if ($hasPermission)
                                         <li>
-                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('work-order.show',$data->id ?? '')}}">
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i> View Details
                                             </a>
                                         </li>
                                         @endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$data->id ?? '')}}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
+										@endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <li>
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Finance Approval History" class="btn btn-sm btn-info" href="{{route('fetchFinanceApprovalHistory',$data->id)}}">
+                                            <i class="fa fa-history" aria-hidden="true"></i> 
+											Fin. Approval Log
+                                            </a>
+                                        </li>
+										@endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <li>
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="COO Office Approval History" class="btn btn-sm btn-info" href="{{route('fetchCooApprovalHistory',$data->id)}}">
+                                            <i class="fa fa-history" aria-hidden="true"></i> COO Approval Log
+                                            </a>
+                                        </li>
+										@endif
 									</ul>
 								</div>                         
                             </td>
 							<td>{{ ++$i }}</td>
+							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
+							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
                             <td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
@@ -368,16 +398,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
                             <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-
-                            <td>{{$data->salesSupportDataConfirmationBy->name ?? ''}}</td>
-                            <td>@if($data->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($data->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                            
-							<td>{{$data->financeApprovalBy->name ?? ''}}</td>
-                            <td>@if($data->finance_approved_at != ''){{\Carbon\Carbon::parse($data->finance_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                            
-							<td>{{$data->COOApprovalBy->name ?? ''}}</td>
-                            <td>@if($data->coe_office_approved_at != ''){{\Carbon\Carbon::parse($data->coe_office_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-							<td></td>
+							<td>@if($data->total_number_of_boe != 0){{$data->total_number_of_boe ?? ''}}@endif</td>
 						</tr>
 						@endforeach
 					</tbody>

@@ -643,7 +643,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">NA</span>
+                                                    <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
                                                 </div>
                                             </div>
                                         </div>

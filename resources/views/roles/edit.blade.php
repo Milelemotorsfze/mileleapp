@@ -19,7 +19,7 @@
                 <div class="row">                                                
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+                        {{ Form::checkbox('permission[]', $permission->id, in_array($permission->id, old('permission', $rolePermissions)) ? true : false, ['class' => 'name']) }}
                     </div>
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
