@@ -2906,7 +2906,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                { data: 'so_number', name: 'so_number', searchable: false},
+                { data: 'so_number', name: 'so_number'},
               {
               data: 'id',
               name: 'id',

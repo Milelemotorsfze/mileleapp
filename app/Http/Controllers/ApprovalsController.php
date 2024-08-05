@@ -606,17 +606,17 @@ class ApprovalsController extends Controller
             $existingVariantId = $existingVariantop->id;
             $vehicle = Vehicles::where('varaints_id', $existingVariantId)->where('id', $inspection->vehicle_id)->first();
             if ($vehicle) {
-                $oldVariantName = Varaint::find($vehicle->variants_id)->name;
+                $oldVariantName = Varaint::find($vehicle->varaints_id)->name;
                 $newVariantName = Varaint::find($existingVariantId)->name;
-                if($vehicle->variants_id != $existingVariantId)
+                if($vehicle->varaints_id != $existingVariantId)
                 {
                     $newvariantstorehistory = New VehicleVariantHistories ();
-                    $newvariantstorehistory->varaints_old = $vehicle->variants_id;
+                    $newvariantstorehistory->varaints_old = $vehicle->varaints_id;
                     $newvariantstorehistory->varaints_new = $existingVariantId;
                     $newvariantstorehistory->vehicles_id = $inspection->vehicle_id;
                     $newvariantstorehistory->save();
                 }
-                Vehicles::where('id', $inspection->vehicle_id)->update(['variants_id' => $existingVariantId]);
+                Vehicles::where('id', $inspection->vehicle_id)->update(['varaints_id' => $existingVariantId]);
                 $updatedVehicle = Vehicles::find($inspection->vehicle_id);
                 $vehicleslog = new Vehicleslog();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -884,12 +884,12 @@ class ApprovalsController extends Controller
         $variantlog->created_by = auth()->user()->id;
         $variantlog->save();
         $vehicle = Vehicles::where('id', $inspection->vehicle_id)->first();
-        $oldVariantName = Varaint::where('id', $vehicle->variants_id)->pluck('name')->first();
+        $oldVariantName = Varaint::where('id', $vehicle->varaints_id)->pluck('name')->first();
         $newVariantName = Varaint::where('id', $variantId)->pluck('name')->first();
-        if($vehicle->variants_id != $variantId)
+        if($vehicle->varaints_id != $variantId)
         {
             $newvariantstorehistory = New VehicleVariantHistories ();
-            $newvariantstorehistory->varaints_old = $vehicle->variants_id;
+            $newvariantstorehistory->varaints_old = $vehicle->varaints_id;
             $newvariantstorehistory->varaints_new = $variantId;
             $newvariantstorehistory->vehicles_id = $inspection->vehicle_id;
             $newvariantstorehistory->save();
