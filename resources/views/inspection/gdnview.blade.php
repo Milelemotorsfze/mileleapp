@@ -45,6 +45,10 @@
         {{ session('success') }}
     </div>
 @endif
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('netsuite-gdn-number-adding');
+                    @endphp
+                    @if ($hasPermission)
     <h4 class="card-title">
      GRN Info
      <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -270,4 +274,5 @@
         });
     });
 </script>
+@endif
 @endsection
