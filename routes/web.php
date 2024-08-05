@@ -949,5 +949,10 @@ Route::get('/d', function () {
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
     Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
 
+    //Netsuite GDN
+    Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
+    Route::post('netsuitegdn/submit', [ApprovalsController::class, 'submitGdn'])->name('netsuitegdn.submit');
+    Route::post('netsuitegdn/add', [ApprovalsController::class, 'addGdn'])->name('netsuitegdn.add');
+
 
 

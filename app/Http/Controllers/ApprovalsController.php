@@ -34,6 +34,7 @@ use App\Models\VariantItems;
 use App\Models\Variantlog;
 use App\Models\VehicleVariantHistories;
 use App\Models\Grn;
+use App\Models\Gdn;
 
 
 
@@ -1363,4 +1364,156 @@ public function submitGrn(Request $request)
         'message' => 'Netsuite GRN added successfully',
     ]);
 }
+public function addingnetsuitegdn(Request $request)
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open The Netsuite GDN";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+    if ($request->ajax()) {
+        $status = $request->input('status');
+        if ($status == "pending") {
+            $data = Vehicles::select([
+                    'vehicles.id',
+                    'brands.brand_name',
+                    DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
+                    'vehicles.vin',
+                    'varaints.name as variant',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'so.so_number'
+                ])
+                ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
+                ->leftJoin('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
+                ->leftJoin('so', 'so.id', '=', 'vehicles.so_id')
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->whereNotNull('vehicles.vin')
+                ->whereNotNull('vehicles.so_id')
+                ->whereNotNull('vehicles.gdn_id')
+                ->whereNull('gdn.gdn_number')
+                ->groupBy('vehicles.id');
+        } else {
+            $data = Vehicles::select([
+                'vehicles.id',
+                    'brands.brand_name',
+                    DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndateauto"),
+                    'vehicles.vin',
+                    'varaints.name as variant',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'so.so_number',
+                    'gdn.gdn_number'
+            ])
+            ->leftJoin('vehicle_variant_histories', 'vehicle_variant_histories.vehicles_id', '=', 'vehicles.id')
+                ->leftJoin('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
+                ->leftJoin('so', 'so.id', '=', 'vehicles.so_id')
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->whereNotNull('vehicles.so_id')
+                ->whereNotNull('vehicles.gdn_id')
+            ->whereNotNull('vehicles.vin')
+            ->whereNotNull('gdn.gdn_number')
+            ->groupBy('vehicles.id');
+        }
+
+        return DataTables::of($data)->toJson();
+    }
+
+    return view('inspection.gdnview');
+}
+public function submitGdn(Request $request)
+    {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'gdn' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        // Retrieve the vehicle by ID
+        $vehicle = Vehicles::find($request->vehicle_id);
+        if (!$vehicle) {
+            info("pouch");
+            return response()->json([
+                'success' => false,
+                'message' => 'Vehicle not found',
+            ], 404);
+        }
+        // Retrieve the GRN record by grn_id in the vehicle record
+        $gdnRecord = Gdn::find($vehicle->gdn_id);
+        info($vehicle->grn_id);
+        if (!$gdnRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'GRN record not found',
+            ], 404);
+        }
+        // Update the GRN record with the new GRN number
+        $gdnRecord->gdn_number = $request->gdn;
+        $gdnRecord->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Netsuite GRN updated successfully',
+        ]);
+    }
+    public function addGdn(Request $request)
+    {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'gdn' => 'required|string|max:255',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+    
+        // Retrieve the vehicle by ID
+        $vehicle = Vehicles::find($request->vehicle_id);
+        
+        if (!$vehicle) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vehicle not found',
+            ], 404);
+        }
+    
+        // Create new GRN record
+        $gdnRecord = new Gdn();
+        $gdnRecord->gdn_number = $request->gdn;
+        $gdnRecord->date = now(); // Assuming you want to use the current date
+        $gdnRecord->save();
+        // Associate the GRN with the vehicle
+        $vehicle->gdn_id = $gdnRecord->id;
+        $vehicle->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Netsuite GRN added successfully',
+        ]);
+    }
 }

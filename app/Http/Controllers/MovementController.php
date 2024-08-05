@@ -247,9 +247,6 @@ class MovementController extends Controller
             $gdn = new Gdn();
             $gdn->date = $date;
             $gdn->save();
-            $gdnNumber = $gdn->id;
-            $gdn->gdn_number = $gdnNumber;
-            $gdn->save();
             Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
             $vehicleId = Vehicles::whereIn('vin', $gdnVins)->pluck('id');
             $vehicleslog = new Vehicleslog();
