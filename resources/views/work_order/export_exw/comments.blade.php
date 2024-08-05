@@ -720,7 +720,7 @@
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
                 <div class="row">
                     <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-                        <img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+                        <img class="rounded-circle header-profile-user" src="{{ env('BASE_URL') }}/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
                     </div>
                     <div class="col-xxl-11 col-lg-11 col-md-11">
                         <div class="comment-text" style="font-size:12px;">
