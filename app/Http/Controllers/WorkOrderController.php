@@ -1299,6 +1299,7 @@ class WorkOrderController extends Controller
                 $vehicle->deleted_comment_id = $CommentId;
                 $vehicle->save();
                 $canDeleteComment = false;
+                $canCreateCOOApproval = true;
             }
 
             // Now delete the vehicles
