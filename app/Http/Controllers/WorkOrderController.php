@@ -1002,7 +1002,7 @@ class WorkOrderController extends Controller
                             }
                             // Change the vehicle data
                             $vehicle->$field = $newValue;
-
+                            dd('1');
                             // Store the change in history
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $vehicle->id,
@@ -1087,7 +1087,7 @@ class WorkOrderController extends Controller
                             
                                     // Change the vehicle data
                                     $addon->$field = $newValue;
-                            
+                                    dd('2');
                                     // Store the change in history
                                     WOVehicleAddonRecordHistory::create([
                                         'w_o_vehicle_addon_id' => $addon->id,
@@ -1208,6 +1208,7 @@ class WorkOrderController extends Controller
 
                     // Store each non-null, non-array field in the data history
                     foreach ($nonNullVehicleData as $field => $value) { 
+                        dd('3');
                         WOVehicleRecordHistory::create([
                             'w_o_vehicle_id' => $woVehicles->id,
                             'field_name' => $field,
@@ -1334,6 +1335,7 @@ class WorkOrderController extends Controller
             
                                 // Create history record based on whether the vehicle ID exists in $NewVehicleIdArr
                                 if (in_array($woVehicle->id, $NewVehicleIdArr)) {
+                                    dd('4');
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
                                         'field_name' => 'boe_number',
@@ -1346,6 +1348,7 @@ class WorkOrderController extends Controller
                                     ]);
                                     $canDeleteCreatedVehComMap = false;
                                 } else {
+                                    dd('5');
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
                                         'field_name' => 'boe_number',
@@ -1381,6 +1384,7 @@ class WorkOrderController extends Controller
                                     }
                                     if (in_array($vinUpdate->id, $NewVehicleIdArr)) {
                                         // Create history record
+                                        dd('6');
                                         WOVehicleRecordHistory::create([
                                             'w_o_vehicle_id' => $vinUpdate->id,
                                             'field_name' => 'boe_number',
@@ -1394,6 +1398,7 @@ class WorkOrderController extends Controller
                                         $canDeleteCreatedVehComMap = false;
                                     }
                                     else {
+                                        dd('7');
                                         WOVehicleRecordHistory::create([
                                             'w_o_vehicle_id' => $vinUpdate->id,
                                             'field_name' => 'boe_number',
@@ -1433,6 +1438,7 @@ class WorkOrderController extends Controller
                                 $woVehicle->save();
                                 if (in_array($woVehicle->id, $NewVehicleIdArr)) {
                                     // Create history record
+                                    dd('8');
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
                                         'field_name' => 'deposit_received',
@@ -1447,6 +1453,7 @@ class WorkOrderController extends Controller
                                     $canCreateFinanceApproval = true;
                                 }
                                 else {
+                                    dd('9');
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
@@ -1471,6 +1478,7 @@ class WorkOrderController extends Controller
                                 $vinUpdate->save();
                                 if (in_array($vinUpdate->id, $NewVehicleIdArr)) {
                                     // Create history record
+                                    dd('10');
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $vinUpdate->id,
                                         'field_name' => 'deposit_received',
@@ -1485,6 +1493,7 @@ class WorkOrderController extends Controller
                                     $canCreateFinanceApproval = true;
                                 }
                                 else {
+                                    dd('11');
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $vinUpdate->id,
@@ -1511,6 +1520,7 @@ class WorkOrderController extends Controller
                     if($woVehicle->deposit_received == 'yes') {
                         if (in_array($woVehicle->id, $NewVehicleIdArr)) {
                             // Create history record
+                            dd('10');
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $woVehicle->id,
                                 'field_name' => 'deposit_received',
@@ -1525,6 +1535,7 @@ class WorkOrderController extends Controller
                             $canCreateFinanceApproval = true;
                         }
                         else {
+                            dd('11');
                             // Create history record
                             WOVehicleRecordHistory::create([
                                 'w_o_vehicle_id' => $woVehicle->id,
