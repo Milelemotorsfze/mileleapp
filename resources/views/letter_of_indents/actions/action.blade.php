@@ -47,7 +47,8 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
             @endphp
             @if ($hasPermission)
-                @if($letterOfIndent->is_expired == false && $type !== 'NEW' && $pfiQtySum < $loiQuantity) 
+                @if($letterOfIndent->is_expired == false && $pfiQtySum < $loiQuantity && 
+                $letterOfIndent->status !== \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED && $type !== 'NEW') 
                     <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                         <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
                     </a>

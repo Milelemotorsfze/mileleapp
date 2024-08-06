@@ -198,6 +198,15 @@ class LetterOfIndentController extends Controller
     public function create()
     {
 
+        // $loiItemCodes = DB::table('loi_item_codes')->get();
+        // foreach($loiItemCodes as $loiItemCode) {
+        //     DB::table('letter_of_indent_items')
+        //         ->where('id', $loiItemCode->loi_item_id)
+        //         ->update([
+        //             'code' => $loiItemCode->code,
+        //         ]);
+        // }
+
         (new UserActivityController)->createActivity('Open LOI Create Page.');
         
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');

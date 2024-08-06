@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class LetterOfIndentItem extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $fillable = [
+        'id', 'code'
+      ];
 //    public $timestamps = false;
     protected $appends = [
         'steering',
