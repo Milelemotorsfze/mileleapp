@@ -123,7 +123,7 @@
                                     </a>
                                 </li>
                                 @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo','list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">

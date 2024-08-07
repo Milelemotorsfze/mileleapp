@@ -59,6 +59,14 @@
         @endif
     </div>
     <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                <label for="choices-single-default" class="form-label"><strong>WO Number</strong></label> :
+                @if(count($data) > 0)
+                    {{ $data->first()->workOrder->wo_number ?? '' }}
+                @endif
+            </div>
+        </div>
         <div class="row mt-1">
             <div class="table-responsive">
                 <table class="table table-striped table-editable table-edits table-condensed my-datatableclass">
