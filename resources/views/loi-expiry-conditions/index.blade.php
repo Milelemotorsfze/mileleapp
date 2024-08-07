@@ -26,13 +26,13 @@
                     </div>
                 @endif
                 @if (Session::has('error'))
-                    <div class="alert alert-danger" >
+                    <div class="alert alert-danger mt-3 mb-0" >
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('error') }}
                     </div>
                 @endif
                 @if (Session::has('success'))
-                    <div class="alert alert-success" id="success-alert">
+                    <div class="alert alert-success mt-3 mb-0" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('success') }}
                     </div>

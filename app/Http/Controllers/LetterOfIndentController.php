@@ -142,8 +142,7 @@ class LetterOfIndentController extends Controller
                     }else{
                         $msg = 'Not Expired';
                         return '<button class="btn btn-sm btn-info">'.$msg.'</button>';
-                    }
-                                            
+                    }                                           
                  })
                 ->addColumn('loi_quantity', function($query) {
                     $loiQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
@@ -165,7 +164,7 @@ class LetterOfIndentController extends Controller
                 })
                 ->addColumn('approval_button', function($query, Request $request) {
                     $type = $request->tab;
-
+                   
                     $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status')->find($query->id);
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
@@ -197,15 +196,6 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-
-        // $loiItemCodes = DB::table('loi_item_codes')->get();
-        // foreach($loiItemCodes as $loiItemCode) {
-        //     DB::table('letter_of_indent_items')
-        //         ->where('id', $loiItemCode->loi_item_id)
-        //         ->update([
-        //             'code' => $loiItemCode->code,
-        //         ]);
-        // }
 
         (new UserActivityController)->createActivity('Open LOI Create Page.');
         
@@ -239,7 +229,8 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI)
         {
-            DB::beginTransaction();      
+            DB::beginTransaction();    
+
             try{
 
             $LOI = new LetterOfIndent();
@@ -781,6 +772,17 @@ class LetterOfIndentController extends Controller
 
         // return response(true,200);
         return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
+    }
+    public function statusUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('LOI Status updated as New.');
+        
+        $LOI = LetterOfIndent::find($id);
+        $LOI->status = $request->status;
+        $LOI->submission_status = $request->status;
+        $LOI->save();
+
+        return redirect()->back()->with('success', 'Status updated as "New" successfully.');
+
     }
 
 }

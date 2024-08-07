@@ -110,6 +110,7 @@ use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
 use App\Http\Controllers\LOIExpiryConditionController;
+use App\Http\Controllers\LOIItemController;
 
 /*
 /*
@@ -468,6 +469,9 @@ Route::get('/d', function () {
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
+    Route::resource('letter-of-indent-items', LOIItemController::class);
+    Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
+                ->name('letter-of-indents.status-update'); 
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);

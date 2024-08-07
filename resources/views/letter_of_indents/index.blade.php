@@ -28,13 +28,14 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
                     @endphp
                     @if ($hasPermission)
-
                         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
+                <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" title="Model-SFX Detail View" href="{{ route('letter-of-indent-items.index') }}" >
+                    <i class="fa fa-table" ></i> </a>
                 <div class="card-body">
                     @if (count($errors) > 0)
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger mt-3 mb-0">
                             <strong>Whoops!</strong> There were some problems with your input.<br><br>
                             <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                             <ul>
@@ -45,14 +46,14 @@
                         </div>
                     @endif
                     @if (Session::has('error'))
-                        <div class="alert alert-danger" >
+                        <div class="alert alert-danger mt-3 mb-0" >
                             <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                             {{ Session::get('error') }}
                         </div>
                     @endif
                     @if (Session::has('success'))
-                        <div class="alert alert-success" id="success-alert">
-                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        <div class="alert alert-success mt-3 mb-0" id="success-alert">
+                            <button type="button" class="btn-close p-0 close " data-dismiss="alert">x</button>
                             {{ Session::get('success') }}
                         </div>
                     @endif
@@ -130,7 +131,7 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Approve / Reject </th>
+                                    <th>Status Update</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
