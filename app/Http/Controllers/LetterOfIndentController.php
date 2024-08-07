@@ -425,7 +425,7 @@ class LetterOfIndentController extends Controller
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
         }
-        else {
+        else if($request->type == 'Individual') {
             if($request->download == 1) {
                 $width = $request->width;
                 try{
@@ -439,6 +439,19 @@ class LetterOfIndentController extends Controller
                 
             }
             return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
+        }else{
+            if($request->download == 1) {
+                try{
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
+                    compact('letterOfIndent'));
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
+               
+                return $pdfFile->download($fileName);
+                
+            }
+            return view('letter_of_indents.LOI-templates.general_template', compact('letterOfIndent'));
         }
 
         return redirect()->back()->withErrors("error", "Something went wrong!Please try again");
