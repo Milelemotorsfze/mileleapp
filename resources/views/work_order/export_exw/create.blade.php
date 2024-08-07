@@ -1754,7 +1754,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     noSpaces: true,
                 },
                 brn_file: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 brn: {
@@ -1811,35 +1811,35 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     date: true,
                 },
                 signed_pfi: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 signed_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 payment_receipts: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 noc: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_trade_license: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_passport: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 vehicle_handover_person_id: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
             },
