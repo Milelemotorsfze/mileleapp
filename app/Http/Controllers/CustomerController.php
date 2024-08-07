@@ -59,10 +59,11 @@ class CustomerController extends Controller
         ]);
 
             $isCustomerExist = Clients::where('name', $request->name)
+                                    ->where('country_id', $request->country_id)
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
-                return redirect()->back()->with('error', 'This customer name is already existing!');
+                return redirect()->back()->with('error', 'This customer name and country is already existing!');
             }
         DB::beginTransaction();
 
@@ -148,11 +149,12 @@ class CustomerController extends Controller
             'type' => 'required',
         ]);
             $isCustomerExist = Clients::where('name', $request->name)
+                                    ->where('country_id', $request->country_id)
                                     ->whereNot('id',$id)
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
-                return redirect()->back()->with('error', 'This customer name is already existing!');
+                return redirect()->back()->with('error', 'This customer name and country is already existing!');
             }
         DB::beginTransaction();
 
