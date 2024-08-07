@@ -21,7 +21,7 @@
         <table id="myVehAddonTable" class="table table-striped table-editable table-edits table table-condensed my-datatable" >
             <thead style="background-color: #e6f1ff">
                 <tr>
-                    <th>Action</th>
+                    <th>History</th>
                     <th>Sl No</th>
                     <th>BOE Number</th>
                     <th>VIN</th>
@@ -104,9 +104,10 @@
                         href="{{route('wo-vehicle-addon.data-history',$addon->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                             </a></td>
+                            <td colspan="3">Creatd At : {{ $addon->created_at->format('d M Y, H:i:s') }}</td>
                             <td colspan="5">{{$addon->addon_code ?? 'NA'}}</td>
                             <td colspan="2">Qty : {{$addon->addon_quantity ?? 'NA'}}</td>
-                            <td colspan="@if(isset($type) && $type == 'export_cnf') 21 @else 20 @endif">{{$addon->addon_description ?? 'NA'}}</td>
+                            <td colspan="@if(isset($type) && $type == 'export_cnf') 18 @else 17 @endif">Addon Desc. : {{$addon->addon_description ?? 'NA'}}</td>
                         </tr>
                         @endforeach
                     @else
