@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
 use App\Mail\DPEmailNotification;
 use App\Mail\DPrealeasedEmailNotification;
+use App\Mail\EmailNotificationInitiate;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -52,6 +53,10 @@ use App\Models\PurchasedOrderMessages;
 use App\Models\PurchasedOrderReplies;
 use App\Models\Purchasedorderoldplfiles;
 use App\Models\VehiclesSupplierAccountTransaction;
+use App\Models\DepartmentNotifications;
+use App\Mail\EmailNotificationrequest;
+use App\Mail\VINEmailNotification;
+
 
 class PurchasingOrderController extends Controller
 {
@@ -1616,6 +1621,7 @@ public function checkcreatevins(Request $request)
 {
 
     $updatedData = $request->json()->all();
+    $updatedVins = [];
     foreach ($updatedData as $data) {
         $vehicleId = $data['id'];
         $fieldName = $data['name'];
@@ -1655,6 +1661,9 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->created_by = auth()->user()->id;
                     $vehicleslog->role = Auth::user()->selectedRole;
                     $vehicleslog->save();
+                    if ($field == 'vin') {
+                        $updatedVins[] = $fieldValue; // Collect updated VINs
+                    }
                     if ($field == 'int_colour') {
                         $newfield = "Interior Colour";
                         $oldval = ColorCode::find($change['old_value']);
@@ -1733,11 +1742,66 @@ public function checkcreatevins(Request $request)
 
                     $purchasingOrder->status = 'Pending Approval';
                     $purchasingOrder->save();
+                    
                 }
 
             }
         }
     }
+            if (!empty($updatedVins)) {
+            // Fetch vehicles with updated VINs
+            $groupedVehicles = Vehicles::whereIn('vin', $updatedVins)->with([
+                'variant.master_model_lines.brand',
+                'variant.brand',
+                'interior',
+                'exterior'
+            ])->get()->groupBy('purchasing_order_id');
+            
+            foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
+                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                if ($purchasingOrder) {
+                    $recipients = $purchasingOrder->is_demand_planning_po == 1 
+                        ? ['waqar.younas@milele.com'] 
+                        : ['waqar.younas@milele.com'];
+    
+                    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                    $vehicleDetails = $vehicles->map(function ($vehicle) {
+                        return [
+                            'vin' => $vehicle->vin,
+                            'brand' => $vehicle->variant->brand->brand_name ?? '',
+                            'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
+                            'variant' => $vehicle->variant->name ?? '',
+                            'int_colour' => $vehicle->interior->name ?? '',
+                            'ext_colour' => $vehicle->exterior->name ?? '',
+                        ];
+                    });
+    
+                    // Send email notification
+                    Mail::to($recipients)->send(new VINEmailNotification(
+                        $purchasingOrder->po_number, 
+                        $purchasingOrder->pl_number, 
+                        $orderUrl, 
+                        count($vehicles), 
+                        now()->format('d M Y'), 
+                        $vehicleDetails
+                    ));
+    
+                    // Save notification details to the database
+                    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                        "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                        "Stage: " . "Goods Received Note\n" .
+                        "Number of Units: " . count($vehicles) . "\n" .
+                        "GRN Date: " . now()->format('d M Y') . "\n" .
+                        "Order URL: " . $orderUrl;
+                    
+                    $notification = new DepartmentNotifications();
+                    $notification->module = 'Logistics';
+                    $notification->type = 'Information';
+                    $notification->detail = $detailText;
+                    $notification->save();
+                }
+            }
+        }
     return response()->json(['message' => 'Data updated successfully']);
 }
 public function purchasingupdateStatus(Request $request)
@@ -3717,11 +3781,11 @@ public function updatePrices(Request $request)
                 ]);
                 if($purchasingOrder->is_demand_planning_po == 1)
             {
-                $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+                $recipients = ['team.dp@milele.com'];
             }
             else
             {
-                $recipients = ['abdul@milele.com', 'team.finance@milele.com'];  
+                $recipients = ['abdul@milele.com'];
             }
                 Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
             }
@@ -4325,10 +4389,36 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->save();
     }
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'Request For Payment';
         $vehicleTransaction->save();
     }
+    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    $currency = $supplierAccountTransaction->account_currency;
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+    $recipients = ['team.finance@milele.com'];
+    Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    else
+    {
+    $recipients = ['team.finance@milele.com'];
+    Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+          "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+          "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+          "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+          "Stage: " . "Payment Requested for Initiation\n" .
+          "Number of Units: " . $transactionCount . " Vehicles\n" .
+          "Order URL: " . $orderUrl;
+        $notification = New DepartmentNotifications();
+        $notification->module = 'Procurement';
+        $notification->type = 'Information';
+        $notification->detail = $detailText;
+        $notification->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);  
 }
     public function getVendorAndBalance($purchaseOrderId)
@@ -4369,11 +4459,36 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->save();
     }
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'pending';
         $vehicleTransaction->save();
     }
-
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            if($purchasingOrder->is_demand_planning_po == 1)
+            {
+            $recipients = ['team.dp@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            else
+            {
+            $recipients = ['abdul@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                  "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                  "Stage: " . "Payment Initiation\n" .
+                  "Number of Units: " . $transactionCount . " Vehicles\n" .
+                  "Order URL: " . $orderUrl;
+            $notification = New DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
     public function submitPayment(Request $request)
@@ -4437,8 +4552,25 @@ public function submitPaymentDetails(Request $request)
             if($purchasingOrder->is_demand_planning_po == 1)
             {
             $recipients = ['team.dp@milele.com'];
-            Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
+            else
+            {
+            $recipients = ['abdul@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                  "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                  "Stage: " . "Payment Initiation\n" .
+                  "Number of Units: " . $transactionCount . " Vehicles\n" .
+                  "Order URL: " . $orderUrl;
+            $notification = New DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4478,9 +4610,26 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-    $recipients = ['team.dp@milele.com'];
+        $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
+    else 
+    {
+        $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+    Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+    "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+    "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+    "Stage: " . "Payment Released\n" .
+    "Number of Units: " . $transactionCount . " Vehicles\n" .
+    "Order URL: " . $orderUrl;
+    $notification = New DepartmentNotifications();
+    $notification->module = 'Procurement';
+    $notification->type = 'Information';
+    $notification->detail = $detailText;
+    $notification->save();
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)

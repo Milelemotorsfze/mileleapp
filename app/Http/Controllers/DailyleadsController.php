@@ -28,6 +28,7 @@ use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Logs;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Response;
 
@@ -269,7 +270,7 @@ class DailyleadsController extends Controller
                     $join->on('lead_closed.so_id', '=', 'so.id')
                          ->whereNotNull('lead_closed.so_id');
                 });
-                $data->addSelect(DB::raw("IFNULL(so.so_number, '') as so_number"));
+                $data->addSelect('so.so_number');
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
