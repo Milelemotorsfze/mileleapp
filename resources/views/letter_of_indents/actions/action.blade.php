@@ -23,7 +23,17 @@
             @endif
         @endcan
     @endif
-   
+    <!-- @can('loi-status-update')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-status-update');
+        @endphp
+        @if ($hasPermission)
+            @if($letterOfIndent->is_expired == false)
+                <button type="button" data-bs-toggle="modal"  data-bs-target="#update-expiry-status-{{ $letterOfIndent->id }}"
+                class="btn btn-warning btn-sm " title="Update Expiry Status">Expiry Status Update</button>              
+            @endif
+        @endif
+    @endcan -->
 
     @can('LOI-list')
         @php
@@ -218,6 +228,7 @@
             </div>
         </div>
     </div>
+    
     <script>
          $('.loi-button-delete').on('click',function(){
             let id = $(this).attr('data-id');
@@ -240,6 +251,26 @@
                     });
                 }
             }).set({title:"Delete Item"})
+        });
+        $('.loi-expiry-status-update').on('click',function(){
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to make this LOI Expired?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Expiry Status updated as "Expired" successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Update Expired Status"})
         });
         
     </script>

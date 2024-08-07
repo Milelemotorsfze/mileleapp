@@ -140,8 +140,9 @@ class LetterOfIndentController extends Controller
                         $msg = 'Expired';
                         return  '<button class="btn btn-sm btn-secondary">'.$msg.'</button>';
                     }else{
-                        $msg = 'Not Expired';
-                        return '<button class="btn btn-sm btn-info">'.$msg.'</button>';
+                        
+                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $LOI->id) . '">Not Expired</button>';
+                       return $msg;
                     }                                           
                  })
                 ->addColumn('loi_quantity', function($query) {
@@ -796,6 +797,16 @@ class LetterOfIndentController extends Controller
 
         return redirect()->back()->with('success', 'Status updated as "New" successfully.');
 
+    }
+    public function ExpiryStatusUpdate($id) {
+
+        (new UserActivityController)->createActivity('LOI Expiry Status updated as Expired.');
+        
+        $LOI = LetterOfIndent::find($id);
+        $LOI->is_expired = true;
+        $LOI->save();
+
+        return response(true);
     }
 
 }

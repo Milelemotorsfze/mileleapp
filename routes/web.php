@@ -472,6 +472,8 @@ Route::get('/d', function () {
     Route::resource('letter-of-indent-items', LOIItemController::class);
     Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
                 ->name('letter-of-indents.status-update'); 
+    Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
+    ->name('letter-of-indents.loi-expiry-status-update'); 
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
