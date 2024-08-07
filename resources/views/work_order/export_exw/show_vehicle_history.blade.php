@@ -24,7 +24,7 @@
     @endphp
     @if ($hasPermission)
     <h4 class="card-title">
-        @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order Vehicle Data History
+        @if(isset($woVehicle) && $woVehicle->workOrder->type == 'export_exw') Export EXW @elseif(isset($woVehicle) && $woVehicle->workOrder->type == 'export_cnf') Export CNF @elseif(isset($woVehicle) && $woVehicle->workOrder->type == 'local_sale') Local Sale @endif Work Order Vehicle Data History
     </h4>
     @endif
     <a class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -78,7 +78,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                     <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                         <center>
                             <label for="choices-single-default" class="form-label"><strong>VIN</strong></label> : 
-                            {{$woVehicle && $woVehicle->vin ? $woVehicle->vin : 'NA'}}
+                            {{$woVehicle && $woVehicle->vin ? $woVehicle->vin : 'NA'}} 
+                            @if($woVehicle && $woVehicle->deleted_at != '') <label class="badge badge-soft-danger">Not Available</label> @endif
                         </center>
                     </div>
                 </div>

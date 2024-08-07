@@ -264,7 +264,7 @@
             const orderedNewVehicles = validNewVehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             newVehiclesHtml = `
-                <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
+                <table class="my-datatable" style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${new_vehicles.length} vehicles added as new</th></tr>
                         <tr style="border-width: 1;">
@@ -427,7 +427,7 @@
             const orderedRemovedVehicles = removed_vehicles.sort((a, b) => a.vin.localeCompare(b.vin));
 
             removedVehiclesHtml = `
-                <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
+                <table class="my-datatable" style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${removed_vehicles.length} vehicles removed</th></tr>
                         <tr style="border-top:2px solid #d3d3df;">
@@ -507,7 +507,7 @@
             const orderedUpdatedVehicles = validUpdatedVehicles.sort((a, b) => a.vehicle.vin.localeCompare(b.vehicle.vin));
 
             updatedVehiclesHtml = `
-                <table style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
+                <table class="my-datatable" style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr>
                             <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;border-bottom:1px solid #e9e9ef; background-color:#e6f1ff!important;">

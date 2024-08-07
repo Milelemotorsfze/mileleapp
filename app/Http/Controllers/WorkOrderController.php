@@ -1745,7 +1745,7 @@ class WorkOrderController extends Controller
         }
     }
     public function vehicleDataHistory($id) {
-        $woVehicle = WOVehicles::where('id',$id)->first();
+        $woVehicle = WOVehicles::withTrashed()->where('id', $id)->first();
         $datas = WOVehicleRecordHistory::where('w_o_vehicle_id',$id)->get();
         return view('work_order.export_exw.show_vehicle_history',compact('datas','woVehicle'));
     }
