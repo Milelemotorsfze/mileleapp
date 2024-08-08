@@ -932,45 +932,67 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
         <script>
 $(document).ready(function() {
+  // Add custom sorting function for currency
+  $.fn.dataTable.ext.type.order['currency-pre'] = function(data) {
+    if (data === 'N/A') {
+      return 0;
+    }
+    
+    var matches = data.match(/([\D]+)\s?([\d,\.]+)/);
+    if (matches) {
+      var currency = matches[1].trim();
+      var number = parseFloat(matches[2].replace(/,/g, ''));
+      
+      // You can add logic here to handle different currencies if needed
+      return number;
+    }
+    return parseFloat(data.replace(/,/g, ''));
+  };
+
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
-  pageLength: 10,
-  order: [[1, 'desc']],
-        columnDefs: [
-            {
-                targets: 1,
-                type: 'date',
-            }
-        ],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (columnName === "statuss") {
-        return;
+    pageLength: 10,
+    order: [[1, 'desc']],
+    columnDefs: [
+      {
+        targets: 1,
+        type: 'date',
+      },
+      {
+        targets: 3, // Assuming the total cost column index is 3
+        type: 'currency',
       }
+    ],
+    initComplete: function() {
+      this.api().columns().every(function(d) {
+        var column = this;
+        var columnId = column.index();
+        var columnName = $(column.header()).attr('id');
+        if (columnName === "statuss") {
+          return;
+        }
 
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%'
+        var selectWrapper = $('<div class="select-wrapper"></div>');
+        var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+          .appendTo(selectWrapper)
+          .select2({
+            width: '100%'
+          });
+        select.on('change', function() {
+          var selectedValues = $(this).val();
+          column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
         });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
+        selectWrapper.appendTo($(column.header()));
+        $(column.header()).addClass('nowrap-td');
 
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
+        column.data().unique().sort().each(function(d, j) {
+          select.append('<option value="' + d + '">' + d + '</option>');
+        });
       });
-    });
-  }
-});
+    }
+  });
+
   $('.dataTables_filter input').on('keyup', function() {
     dataTable.search(this.value).draw();
   });

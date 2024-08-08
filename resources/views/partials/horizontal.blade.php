@@ -1,4 +1,8 @@
 <style>
+    .dropdown-menu-scrollable {
+        max-height: 90vh; /* Adjust this value as needed */
+        overflow-y: auto;
+    }
     .badge-notification {
       top: -20;
       right: 0;
@@ -1548,23 +1552,23 @@
 
                 <!-- Second div with role name -->
                 <div class="nav-item rolename-button" id="rolename-dropdown-button">
-                    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
-                        @php
-                        $selectedrole = Auth::user()->selectedRole;
-                        $selected = DB::table('roles')->where('id', $selectedrole)->first();
-                        $roleselected = $selected ? $selected->name : null;
-                        @endphp
-                        {{ $roleselected }}
-                    </button>
-                    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end">
-                        @foreach ($assignedRoles as $role)
-                        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
-                            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        @endforeach
-                    </div>
-                </div>
+    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
+        @php
+        $selectedrole = Auth::user()->selectedRole;
+        $selected = DB::table('roles')->where('id', $selectedrole)->first();
+        $roleselected = $selected ? $selected->name : null;
+        @endphp
+        {{ $roleselected }}
+    </button>
+    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable">
+        @foreach ($assignedRoles as $role)
+        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
+            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
+        </a>
+        <div class="dropdown-divider"></div>
+        @endforeach
+    </div>
+</div>
 
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
