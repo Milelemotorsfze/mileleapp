@@ -4432,7 +4432,10 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                     method: 'GET',
                     success: function(response) {
                         if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
-                            vehicleTable = $('#vehicleTable').DataTable();
+                            vehicleTable = $('#vehicleTable').DataTable({
+            "pageLength": 10, // This will display all rows by default
+            "lengthMenu": [[-1, 10, 25, 50, 100], ["All", 10, 25, 50, 100]] // Adding "All" option in the length menu
+        });
                         } else {
                             vehicleTable.clear().draw();
                         }
@@ -4467,7 +4470,10 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                         });
                         $('#vehicleTableContainer').show();
                         if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
-                            vehicleTable = $('#vehicleTable').DataTable();
+                                    vehicleTable = $('#vehicleTable').DataTable({
+            "pageLength": 10, // This will display all rows by default
+            "lengthMenu": [[-1, 10, 25, 50, 100], ["All", 10, 25, 50, 100]] // Adding "All" option in the length menu
+        });
                         }
                     }
                 });
