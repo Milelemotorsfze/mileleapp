@@ -142,6 +142,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th colspan="3" class="light">
 								<center>Delivery</center>
 							</th>
+							@if(isset($type) && ($type == 'export_cnf'))
+							 	<th rowspan="2" class="light">Prefered Shipping Line</th>
+								<th rowspan="2" class="light">Bill of Loading</th>
+								<th rowspan="2" class="light">Shipper</th>
+								<th rowspan="2" class="light">Consignee</th>
+								<th rowspan="2" class="light">Notify Party</th>
+								<th rowspan="2" class="light">Special/In Transit/Other Requests</th>
+							@endif
                             <th rowspan="2" class="dark">Signed PFI</th>
                             <th rowspan="2" class="dark">Signed Contract</th>
                             <th rowspan="2" class="dark">Payment Receipts</th>
@@ -312,6 +320,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->delivery_location ?? ''}}</td>
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
+							@if(isset($type) && ($type == 'export_cnf'))
+								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
+								<td>{{$data->bill_of_loading_details ?? ''}}</td>
+								<td>{{$data->shipper ?? ''}}</td>
+								<td>{{$data->consignee ?? ''}}</td>
+								<td>{{$data->notify_party ?? ''}}</td>
+								<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
+							@endif
                             <td>
 								@if($data->signed_pfi)
 									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">

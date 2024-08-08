@@ -632,6 +632,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<i class="fa fa-plus" aria-hidden="true"></i> Add BOE</a>
 					</div>
 				</div>
+				@if(isset($type) && ($type == 'export_cnf'))
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<label for="preferred_shipping_line_of_customer" class="col-form-label text-md-end"> Prefered Shipping Line for Customer :</label>
+						<input id="preferred_shipping_line_of_customer" type="text" class="form-control widthinput @error('preferred_shipping_line_of_customer') is-invalid @enderror" name="preferred_shipping_line_of_customer"
+							placeholder="Enter Prefered Shipping Line for Customer" value="{{ isset($workOrder) ? $workOrder->preferred_shipping_line_of_customer : '' }}" 
+							autocomplete="preferred_shipping_line_of_customer" autofocus onkeyup="sanitizeInput(this)">
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="bill_of_loading_details" class="col-form-label text-md-end">{{ __("Bill of Loading Details" ) }}</label>
+						<textarea rows="5" id="bill_of_loading_details" type="text" class="form-control @error('bill_of_loading_details') is-invalid @enderror"
+							name="bill_of_loading_details" placeholder="Enter Bill of Loading Details" value="{{ isset($workOrder) ? $workOrder->bill_of_loading_details : '' }}"  autocomplete="bill_of_loading_details"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->bill_of_loading_details : '' }}</textarea>
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="shipper" class="col-form-label text-md-end">{{ __("Shipper" ) }}</label>
+						<textarea rows="5" id="shipper" type="text" class="form-control @error('shipper') is-invalid @enderror"
+							name="shipper" placeholder="Enter Shipper" value="{{ isset($workOrder) ? $workOrder->shipper : '' }}"  autocomplete="shipper"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->shipper : '' }}</textarea>
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="consignee" class="col-form-label text-md-end">{{ __("Consignee" ) }}</label>
+						<textarea rows="5" id="consignee" type="text" class="form-control @error('consignee') is-invalid @enderror"
+							name="consignee" placeholder="Enter Consignee" value="{{ isset($workOrder) ? $workOrder->consignee : '' }}"  autocomplete="consignee"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->consignee : '' }}</textarea>
+					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6">
+						<label for="notify_party" class="col-form-label text-md-end">{{ __("Notify Party" ) }}</label>
+						<textarea rows="3" id="notify_party" type="text" class="form-control @error('notify_party') is-invalid @enderror"
+							name="notify_party" placeholder="Enter Notify Party" value="{{ isset($workOrder) ? $workOrder->notify_party : '' }}"  autocomplete="notify_party"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->notify_party : '' }}</textarea>
+					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6">
+						<label for="special_or_transit_clause_or_request" class="col-form-label text-md-end">{{ __("Special/In Transit/Other Requests" ) }}</label>
+						<textarea rows="3" id="special_or_transit_clause_or_request" type="text" class="form-control @error('special_or_transit_clause_or_request') is-invalid @enderror"
+							name="special_or_transit_clause_or_request" placeholder="Enter Special/In Transit/Other Requests" value="{{ isset($workOrder) ? $workOrder->special_or_transit_clause_or_request : '' }}"  autocomplete="special_or_transit_clause_or_request"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->special_or_transit_clause_or_request : '' }}</textarea>
+					</div>
+				</div>
+				@endif
 			</div>
 		</div>
 		<div class="card">
@@ -1811,6 +1851,34 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 },
                 delivery_date: {
                     date: true,
+                },
+				preferred_shipping_line_of_customer: {
+                    noSpaces: true,
+                },
+				bill_of_loading_details: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				shipper: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				consignee: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				notify_party: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				special_or_transit_clause_or_request: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
                 },
                 signed_pfi: {
                     extension: "jpg|jpeg|png|pdf",

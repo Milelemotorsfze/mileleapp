@@ -39,6 +39,7 @@
 	}
     .form-label {
         font-size:12px!important;
+        font-weight: 600!important;
     }
     .data-font {
         font-size:12px!important;
@@ -219,458 +220,640 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                                             <div class="row">
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> SO Number </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->so_number ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> WO Number </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->wo_number ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Date </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? 'NA'}}@endif</span>
-                                                </div>
-                                                @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))							
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Batch </label>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Name </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_name ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="data-font">{{$workOrder->batch ?? 'NA'}}</span>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Email </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_email ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                @endif	
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Name </label>
                                                 </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Email </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_email ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Company Email </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_company_number ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Address </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_address ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Representative Name</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_representative_name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Representative Email</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_representative_email ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Customer Representative Contact</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->customer_representative_contact ?? 'NA'}}</span>
-                                                </div>
-                                                @if(isset($type) && $type == 'export_exw')	
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Freight Agent Name </label>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Company Email </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_company_number ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="data-font">{{$workOrder->freight_agent_name ?? 'NA'}}</span>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Address </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_address ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Freight Agent Email </label>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Representative Name</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_representative_name ?? 'NA'}}</span>
+                                                        </div> 
                                                     </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="data-font">{{$workOrder->freight_agent_email ?? 'NA'}}</span>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Representative Email</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_representative_email ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                        <label for="choices-single-default" class="form-label"> Freight Agent Contact Number </label>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Customer Representative Contact</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->customer_representative_contact ?? 'NA'}}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span class="data-font">{{$workOrder->freight_agent_contact_number ?? 'NA'}}</span>
+                                                </div>
+                                                @if(isset($type) && $type == 'export_exw')
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Freight Agent Name </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->freight_agent_name ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                @endif   
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Freight Agent Email </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->freight_agent_email ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Freight Agent Contact Number </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->freight_agent_contact_number ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif 
                                                 @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Port Of Loading </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->port_of_loading ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Port Of Discharge </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->port_of_discharge ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Final Destination </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->final_destination ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Transport Type </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->transport_type ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> BRN Fille </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->brn_file)
-                                                            <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>                              
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
-                                            <div class="row">
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Airline </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->airline ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Airway Bill </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->airway_bill ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Airway Details </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->airway_details ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> BRN </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->brn ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Container Number </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->container_number ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Shipping Line </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->shipping_line ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Forward Import Code </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->forward_import_code ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Trailer Number Plate </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->trailer_number_plate ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Transporting Driver Contact Number </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->transporting_driver_contact_number ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Transportation Company </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->transportation_company ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Transportation Company Details</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->transportation_company_details ?? 'NA'}}</span>
-                                                </div>                              
-                                                @endif         
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> SO Vehicle Quantity </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->so_vehicle_quantity ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> SO Total Amount </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->so_total_amount != 0.00) {{$workOrder->so_total_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Amount Received </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->amount_received != 0.00) {{$workOrder->amount_received ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Balance Amount </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->balance_amount != 0.00) {{$workOrder->balance_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Delivery Location </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->delivery_location ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Delivery Contact Person </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->delivery_contact_person ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Delivery Date </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->delivery_date != ''){{\Carbon\Carbon::parse($workOrder->delivery_date)->format('d M Y') ?? 'NA'}} @else NA @endif</span>
-                                                </div>                                 
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Signed PFI </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->signed_pfi)
-                                                            <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>                            
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
-                                            <div class="row">
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Signed Contract </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->signed_contract)
-                                                            <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Payment Receipts </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->payment_receipts)
-                                                            <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> NOC </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->noc)
-                                                            <a href="{{ url('wo/noc/' . $workOrder->noc) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> End User Trade License </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->enduser_trade_license)
-                                                            <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> End User Passport </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->enduser_passport)
-                                                            <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> End User Contract </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->enduser_contract)
-                                                            <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label">Vehicle Handover To Person ID</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">
-                                                        @if($workOrder->vehicle_handover_person_id)
-                                                            <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" target="_blank">
-                                                                <button class="btn btn-primary m-2 btn-style">View</button>
-                                                            </a>
-                                                            <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download>
-                                                                <button class="btn btn-info btn-style">Download</button>
-                                                            </a>
-                                                        @else
-                                                            NA
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Created By</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->CreatedBy->name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Created At </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->created_at != ''){{\Carbon\Carbon::parse($workOrder->created_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Updated By</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->UpdatedBy->name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Updated At </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Sales Support Data Confirmation By</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->salesSupportDataConfirmationBy->name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Sales Support Data Confirmation At</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Finance Approval By </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->financeApprovalBy->name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Finance Approved At </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->finance_approved_at != ''){{\Carbon\Carbon::parse($workOrder->finance_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COO Office Approval By </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->COOApprovalBy->name ?? 'NA'}}</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COO Office Approved At </label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->coe_office_approved_at != ''){{\Carbon\Carbon::parse($workOrder->coe_office_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
-                                                </div>
-                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
-                                                </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
-                                                </div>
-                                            </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Port Of Loading </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->port_of_loading ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Port Of Discharge </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->port_of_discharge ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Final Destination </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->final_destination ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Transport Type </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{$workOrder->transport_type ?? 'NA'}}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                    @if($workOrder->transport_type == 'air')                                                
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Airline </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->airline ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Airway Bill </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->airway_bill ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Airway Details </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->airway_details ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @elseif($workOrder->transport_type == 'sea') 
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> BRN </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->brn ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Container Number </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->container_number ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Shipping Line </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->shipping_line ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Forward Import Code </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->forward_import_code ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @elseif($workOrder->transport_type == 'sea') 
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Trailer Number Plate </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->trailer_number_plate ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Transporting Driver Contact Number </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->transporting_driver_contact_number ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Transportation Company </label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->transportation_company ?? 'NA'}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label"> Transportation Company Details</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">{{$workOrder->transportation_company_details ?? 'NA'}}</span>
+                                                                </div>   
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endif 
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> SO Vehicle Quantity </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->so_vehicle_quantity ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> SO Total Amount </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->so_total_amount != 0.00) {{$workOrder->so_total_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Amount Received </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->amount_received != 0.00) {{$workOrder->amount_received ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Balance Amount </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->balance_amount != 0.00) {{$workOrder->balance_amount ?? 'NA'}} {{$workOrder->currency ?? ''}} @else NA @endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Delivery Location </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->delivery_location ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Delivery Contact Person </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->delivery_contact_person ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Delivery Date </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->delivery_date != ''){{\Carbon\Carbon::parse($workOrder->delivery_date)->format('d M Y') ?? 'NA'}} @else NA @endif</span>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                                @if($workOrder->type == 'export_cnf')
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Prefered Shipping Line for Customer</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->preferred_shipping_line_of_customer ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Bill of Loading Details</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->bill_of_loading_details ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Shipper</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->shipper ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Consignee</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->consignee ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Notify Party</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->notify_party ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Special/In Transit/Other Requests</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->special_or_transit_clause_or_request ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Created By</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->CreatedBy->name ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Created At </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->created_at != ''){{\Carbon\Carbon::parse($workOrder->created_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Updated By</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">{{$workOrder->UpdatedBy->name ?? 'NA'}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Updated At </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @if($workOrder->transport_type == 'air' || $workOrder->transport_type == 'sea')
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> BRN Fille </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    @if($workOrder->brn_file)
+                                                                        <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" target="_blank">
+                                                                            <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                        </a>
+                                                                        <a href="{{ url('wo/brn_file/' . $workOrder->brn_file) }}" download>
+                                                                            <button class="btn btn-info btn-style">Download</button>
+                                                                        </a>
+                                                                    @else
+                                                                        NA
+                                                                    @endif
+                                                                </span>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Signed PFI </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->signed_pfi)
+                                                                    <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/signed_pfi/' . $workOrder->signed_pfi) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Signed Contract </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->signed_contract)
+                                                                    <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/signed_contract/' . $workOrder->signed_contract) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Payment Receipts </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->payment_receipts)
+                                                                    <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/payment_receipts/' . $workOrder->payment_receipts) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> NOC </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->noc)
+                                                                    <a href="{{ url('wo/noc/' . $workOrder->noc) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/noc/' . $workOrder->noc) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> End User Trade License </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->enduser_trade_license)
+                                                                    <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/enduser_trade_license/' . $workOrder->enduser_trade_license) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> End User Passport </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->enduser_passport)
+                                                                    <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/enduser_passport/' . $workOrder->enduser_passport) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> End User Contract </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->enduser_contract)
+                                                                    <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/enduser_contract/' . $workOrder->enduser_contract) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label">Vehicle Handover To Person ID</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                @if($workOrder->vehicle_handover_person_id)
+                                                                    <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" target="_blank">
+                                                                        <button class="btn btn-primary m-2 btn-style">View</button>
+                                                                    </a>
+                                                                    <a href="{{ url('wo/vehicle_handover_person_id/' . $workOrder->vehicle_handover_person_id) }}" download>
+                                                                        <button class="btn btn-info btn-style">Download</button>
+                                                                    </a>
+                                                                @else
+                                                                    NA
+                                                                @endif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>  
                                         </div>
                                     </div>
                                 </div>
