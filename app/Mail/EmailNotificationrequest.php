@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DPrealeasedEmailNotification extends Mailable
+class EmailNotificationrequest extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -40,7 +40,7 @@ class DPrealeasedEmailNotification extends Mailable
     public function build()
     {
         return $this->subject('PO # ' . $this->ponumber . ' Status Update')
-                    ->view('emails.dp_released_notification')
+                    ->view('emails.dp_request_notification')
                     ->with([
                         'ponumber' => $this->ponumber,
                         'pl_number' => $this->pl_number,

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment Initiation Notification</title>
+    <title>Variant Update Notification</title>
     <style>
         body {
             font-family: 'Arial, sans-serif';
@@ -85,31 +85,39 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Payment Initiation</h1>
+            <h1>Variant Update Notification</h1>
         </div>
         <div class="content">
             <p>Dear Team,</p>
-            <p>We are pleased to inform you that the purchase order payment initiation has been successfully completed. Below are the details:</p>
+            <p>We are pleased to inform you that the following vehicle Variant Is updated after inspection. Below are the details:</p>
             <table>
                 <tr>
                     <th>PO Number</th>
-                    <td>{{ $ponumber }}</td>
+                    <td>{{ $poNumber }}</td>
                 </tr>
                 <tr>
                     <th>PFI Number</th>
-                    <td>{{ $pl_number }}</td>
+                    <td>{{ $plNumber }}</td>
                 </tr>
                 <tr>
-                    <th>Payment Amount</th>
-                    <td>{{ $transaction_amount }}</td>
+                    <th>Vehicle VIN</th>
+                    <td>{{ $vehiclesVIN }}</td>
                 </tr>
                 <tr>
-                    <th>Total Amount</th>
-                    <td>{{ $totalcost }}</td>
+                    <th>Vehicle Brand</th>
+                    <td>{{ $brandName }}</td>
                 </tr>
                 <tr>
-                    <th>Number of Units</th>
-                    <td>{{ $transactionCount }} Vehicles</td>
+                    <th>Vehicle Model Line</th>
+                    <td>{{ $modelLine }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Old Variant</th>
+                    <td>{{ $oldVariantName }}</td>
+                </tr>
+                <tr>
+                    <th>Vehicle New Variant</th>
+                    <td>{{ $newVariantName }}</td>
                 </tr>
             </table>
             <p>For more details, you can view the purchase order by clicking the button below:</p>

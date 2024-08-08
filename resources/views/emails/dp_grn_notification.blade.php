@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Payment Initiation Notification</title>
+    <title> Goods Received Note (GRN) Notification</title>
     <style>
         body {
             font-family: 'Arial, sans-serif';
@@ -85,32 +85,47 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Payment Initiation</h1>
+            <h1>Goods Received Note (GRN)</h1>
         </div>
         <div class="content">
             <p>Dear Team,</p>
-            <p>We are pleased to inform you that the purchase order payment initiation has been successfully completed. Below are the details:</p>
+            <p>We are pleased to inform you that the Following Vehicle Goods Received Note (GRN) Done Succefully. Below are the details:</p>
             <table>
                 <tr>
                     <th>PO Number</th>
-                    <td>{{ $ponumber }}</td>
+                    <td>{{ $poNumber }}</td>
                 </tr>
                 <tr>
                     <th>PFI Number</th>
-                    <td>{{ $pl_number }}</td>
+                    <td>{{ $plNumber }}</td>
                 </tr>
                 <tr>
-                    <th>Payment Amount</th>
-                    <td>{{ $transaction_amount }}</td>
+                    <th>Vehicle Count</th>
+                    <td>{{ $vehicleCount }}</td>
                 </tr>
+            </table>
+            <p>Below are the details of the vehicles:</p>
+            <table>
                 <tr>
-                    <th>Total Amount</th>
-                    <td>{{ $totalcost }}</td>
+                    <th>Brand</th>
+                    <th>Model Line</th>
+                    <th>Variant</th>
+                    <th>VIN</th>
+                    <th>Interior Colour</th>
+                    <th>Exterior Colour</th>
+                    <th>GRN Date</th>
                 </tr>
+                @foreach($vehicles as $vehicle)
                 <tr>
-                    <th>Number of Units</th>
-                    <td>{{ $transactionCount }} Vehicles</td>
+                <td>{{ $vehicle['brand'] }}</td>
+                    <td>{{ $vehicle['model_line'] }}</td>
+                    <td>{{ $vehicle['variant'] }}</td>
+                    <td>{{ $vehicle['vin'] }}</td>
+                    <td>{{ $vehicle['int_colour'] }}</td>
+                    <td>{{ $vehicle['ext_colour'] }}</td>
+                    <td>{{ $vehicle['grn_date'] }}</td>
                 </tr>
+                @endforeach
             </table>
             <p>For more details, you can view the purchase order by clicking the button below:</p>
             <p><a href="{{ $orderUrl }}" class="button">View Purchase Order</a></p>

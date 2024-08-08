@@ -2905,8 +2905,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             return `<span class="remarks-text">${data}</span>`;
         }
     }
-},
-                { data: 'so_number', name: 'so_number'},
+              },
+              { data: 'so_number', name: 'so.so_number', searchable: true },
               {
               data: 'id',
               name: 'id',
