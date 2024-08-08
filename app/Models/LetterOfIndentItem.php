@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class LetterOfIndentItem extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $fillable = [
+        'id', 'code'
+      ];
 //    public $timestamps = false;
     protected $appends = [
         'steering',
@@ -26,7 +29,7 @@ class LetterOfIndentItem extends Model
 //    }
     public function masterModel()
     {
-        return $this->belongsTo(MasterModel::class);
+        return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
     public function getSteeringAttribute()
     {

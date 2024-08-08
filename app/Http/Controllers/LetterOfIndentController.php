@@ -140,10 +140,10 @@ class LetterOfIndentController extends Controller
                         $msg = 'Expired';
                         return  '<button class="btn btn-sm btn-secondary">'.$msg.'</button>';
                     }else{
-                        $msg = 'Not Expired';
-                        return '<button class="btn btn-sm btn-info">'.$msg.'</button>';
-                    }
-                                            
+                        
+                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $LOI->id) . '">Not Expired</button>';
+                       return $msg;
+                    }                                           
                  })
                 ->addColumn('loi_quantity', function($query) {
                     $loiQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
@@ -165,7 +165,7 @@ class LetterOfIndentController extends Controller
                 })
                 ->addColumn('approval_button', function($query, Request $request) {
                     $type = $request->tab;
-
+                   
                     $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status')->find($query->id);
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
@@ -230,7 +230,8 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI)
         {
-            DB::beginTransaction();      
+            DB::beginTransaction();    
+
             try{
 
             $LOI = new LetterOfIndent();
@@ -425,7 +426,7 @@ class LetterOfIndentController extends Controller
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
         }
-        else {
+        else if($request->type == 'Individual') {
             if($request->download == 1) {
                 $width = $request->width;
                 try{
@@ -439,6 +440,19 @@ class LetterOfIndentController extends Controller
                 
             }
             return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
+        }else{
+            if($request->download == 1) {
+                try{
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
+                    compact('letterOfIndent'));
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
+               
+                return $pdfFile->download($fileName);
+                
+            }
+            return view('letter_of_indents.LOI-templates.general_template', compact('letterOfIndent'));
         }
 
         return redirect()->back()->withErrors("error", "Something went wrong!Please try again");
@@ -772,6 +786,27 @@ class LetterOfIndentController extends Controller
 
         // return response(true,200);
         return redirect()->back()->with('success', 'Utilization quantity updated Successfully.');
+    }
+    public function statusUpdate(Request $request, $id) {
+        (new UserActivityController)->createActivity('LOI Status updated as New.');
+        
+        $LOI = LetterOfIndent::find($id);
+        $LOI->status = $request->status;
+        $LOI->submission_status = $request->status;
+        $LOI->save();
+
+        return redirect()->back()->with('success', 'Status updated as "New" successfully.');
+
+    }
+    public function ExpiryStatusUpdate($id) {
+
+        (new UserActivityController)->createActivity('LOI Expiry Status updated as Expired.');
+        
+        $LOI = LetterOfIndent::find($id);
+        $LOI->is_expired = true;
+        $LOI->save();
+
+        return response(true);
     }
 
 }
