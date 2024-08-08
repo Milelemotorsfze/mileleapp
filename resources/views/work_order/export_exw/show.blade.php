@@ -62,11 +62,36 @@
     /* table.dataTable {
         border-collapse: none!important;
     } */
-    .custom-border-top {
-        /* border-bottom: 1px solid #b3b3b3 !important; */
-        border-top: 1px solid #b3b3b3 !important;
-    }
 
+/* Style for the table headers */
+.my-datatable th {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
+    padding: 2px; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the table cells */
+.my-datatable td {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
+    padding: 2px; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the entire table */
+.my-datatable {
+    border-collapse: collapse; /* Ensure borders do not double */
+    width: 100%; /* Make the table take up the full width */
+}
+
+.custom-border-top {
+    border-top: 2px solid #b3b3b3; /* Add a custom top border to rows with this class */
+}
 </style>
 @section('content')
 @php
@@ -74,7 +99,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title form-label"> Work Order Details</h4>
+	<h4 class="card-title form-label">@if(isset($workOrder) && $workOrder->type == 'export_exw') Export EXW @elseif(isset($workOrder) && $workOrder->type == 'export_cnf') Export CNF @elseif(isset($workOrder) && $workOrder->type == 'local_sale') Local Sale @endif Work Order Details</h4>
 	@if($previous != '')
 	<a  class="btn btn-sm btn-info float-first form-label" href="{{ route('work-order.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
@@ -107,21 +132,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	@endif
 </div>
 <div class="card-body">
+    <div class="row">
+        <div class="col-lg-11 col-md-11 col-sm-11 col-11">    
+            @include('work_order.export_exw.approvals')
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-1">
+            <a style="margin-top:0px; margin-bottom:1.25rem; float:left;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
+                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+            </a>
+        </div>
+    </div>
+   
 	<div class="tab-content">
 		<div class="tab-pane fade show active" id="requests">
 			<br>
 			<div class="card">
 				<div class="card-header" style="background-color:#e8f3fd;">
 					<div class="row">
-						<div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> SO Number </strong></label></center>
+								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label></center>
 							</div>
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><span class="data-font">{{ $workOrder->so_number ?? '' }}</span></center>
+								<center><span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
 							</div>
 						</div>
-						<div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 								<center><label for="choices-single-default" class="form-label"> <strong> WO Number</strong></label></center>
 							</div>
@@ -131,10 +167,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label></center>
+								<center><label for="choices-single-default" class="form-label"> <strong> SO Number </strong></label></center>
 							</div>
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
+								<center><span class="data-font">{{ $workOrder->so_number ?? '' }}</span></center>
 							</div>
 						</div>
                         @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
@@ -168,7 +204,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
                             </li>   
                             <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+                                <a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicles & Addons Data History</a>
                             </li>                          
                         </ul>
                     </div>
@@ -617,13 +653,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <span class="data-font">@if($workOrder->finance_approved_at != ''){{\Carbon\Carbon::parse($workOrder->finance_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COE Office Approval By </label>
+                                                    <label for="choices-single-default" class="form-label"> COO Office Approval By </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">{{$workOrder->coeOfficeApprovalBy->name ?? 'NA'}}</span>
+                                                    <span class="data-font">{{$workOrder->COOApprovalBy->name ?? 'NA'}}</span>
                                                 </div>
                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                    <label for="choices-single-default" class="form-label"> COE Office Approved At </label>
+                                                    <label for="choices-single-default" class="form-label"> COO Office Approved At </label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                     <span class="data-font">@if($workOrder->coe_office_approved_at != ''){{\Carbon\Carbon::parse($workOrder->coe_office_approved_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
@@ -632,7 +668,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                    <span class="data-font">NA</span>
+                                                    <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -712,17 +748,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <th colspan="19">Service Breakdown</th>
                                                         </tr>
                                                         <tr>
-                                                            <th colspan="1">Addon Code</th>
-                                                            <th colspan="2">Addon Name</th>
+                                                            <th colspan="2">Created Date & Time</th>
+                                                            <th colspan="4">Addon Code</th>
                                                             <th colspan="1">Quantity</th>
-                                                            <th colspan="15">Addon Description</th>
+                                                            <th colspan="12">Addon Description</th>
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>
-                                                                <td colspan="1">{{$addon->addon_code ?? 'NA'}}</td>
-                                                                <td colspan="2">{{$addon->addon_name ?? 'NA'}}</td>
-                                                                <td colspan="1">{{$addon->addon_quantity ?? 'NA'}}</td>
-                                                                <td colspan="15">{{$addon->addon_description ?? 'NA'}}</td>
+                                                                <td colspan="2">@if($addon->created_at != ''){{\Carbon\Carbon::parse($addon->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                                                                <td colspan="4">{{$addon->addon_code ?? ''}}</td>
+                                                                <td colspan="1">{{$addon->addon_quantity ?? ''}}</td>
+                                                                <td colspan="12">{{$addon->addon_description ?? ''}}</td>
                                                             </tr>
                                                             @endforeach
                                                         @endif
@@ -945,7 +981,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         </div>
                         <div class="tab-pane fade" id="wo_vehicle_data_history">
                             <div class="card-header text-center">
-                                <center style="font-size:12px;">WO Vehicle Data History</center>
+                                <center style="font-size:12px;">WO Vehicles & Addons Data History</center>
                             </div>
                             <div class="card-body">
                                 @include('work_order.export_exw.vehicle_data_history')

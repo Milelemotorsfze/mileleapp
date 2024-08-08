@@ -1,5 +1,10 @@
 @extends('layouts.table')
 <style>
+     /* Custom style for Select2 dropdown with orange highlight */
+     .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #1e90ff;
+        color: white;
+    }
   .table-responsive {
   overflow: auto;
   max-height: 650px; /* Adjust the max-height to your desired value */
@@ -69,6 +74,19 @@ th.nowrap-td {
                     @endphp
                     @if ($hasPermission)
     <div class="card-header">
+    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-available-funds');
+                    @endphp
+                    @if ($hasPermission)
+    <a class="btn btn-sm btn-info" href="#" style="text-align: right; margin-right: 10px;">
+    Total Outflows : {{ number_format($suggestedPaymentTotalAED, 0, '', ',') }} AED
+</a>
+<a class="btn btn-sm btn-success" href="#" style="text-align: right;">
+    Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED
+</a>
+@endif
+  <br>
+  <br>
         <h4 class="card-title">
             Purchase Orders Summary
         </h4>
@@ -121,6 +139,11 @@ th.nowrap-td {
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.status', 'Approved');
     })
+    ->whereNotExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
+    })
     ->count();
         @endphp
         @else
@@ -133,6 +156,11 @@ th.nowrap-td {
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.status', 'Approved');
+    })
+    ->whereNotExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
     })
     ->count();
         @endphp
@@ -150,47 +178,51 @@ th.nowrap-td {
         @if ($hasPermission)
         @php
     $userId = auth()->user()->id;
-    $inProgressPurchasingOrders = DB::table('vehicles')
-        ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('purchasing_order')
-                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                ->where('purchasing_order.status', '<>', 'Cancelled');
-        })
-        ->where(function ($query) {
-            $query->where('status', 'Request for Payment')
-                ->orWhere(function ($query) {
-                    $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                          ->where(function ($query) {
-                              $query->whereNotNull('payment_status')
-                                    ->where('payment_status', '<>', '');
-                          });
-                });
-        })
-        ->distinct('vehicles.purchasing_order_id')
-        ->count('vehicles.purchasing_order_id');
-        @endphp
-        @else
-        @php    
-        $inProgressPurchasingOrders = DB::table('vehicles')
-    ->whereExists(function ($query) use ($userId) {
-        $query->select(DB::raw(1))
-            ->from('purchasing_order')
-            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-            ->where('purchasing_order.status', '<>', 'Cancelled');
-    })
+    $inProgressPurchasingOrders = DB::table('purchasing_order')
     ->where(function ($query) {
-        $query->where('status', 'Request for Payment')
-            ->orWhere(function ($query) {
-                $query->whereNotIn('payment_status', ['Payment Initiate', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+        $query->where('purchasing_order.status', 'Approved')
+              ->orWhereNot('purchasing_order.status', 'Cancelled');
+    })
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
                     ->where(function ($query) {
-                        $query->whereNotNull('payment_status')
-                            ->where('payment_status', '<>', '');
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                        ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
                     });
             });
     })
-    ->distinct('vehicles.purchasing_order_id')
-    ->count('vehicles.purchasing_order_id');
+    ->count();
+        @endphp
+        @else
+        @php    
+        $inProgressPurchasingOrders = DB::table('purchasing_order')
+    ->where(function ($query) {
+        $query->where('purchasing_order.status', 'Approved')
+              ->orWhereNot('purchasing_order.status', 'Cancelled');
+    })
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                        ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
+            });
+    })
+    ->count();
 @endphp
 @endif
     @if ($inProgressPurchasingOrders > 0)
@@ -206,26 +238,47 @@ th.nowrap-td {
         @endphp
         @if ($hasPermission)
         @php
-    $completedPos = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-    ->orwhere('purchasing_order.status', 'Cancelled')
+        $completedPos = DB::table('purchasing_order')
+    ->where(function ($query) {
+        $query->where('purchasing_order.status', 'Approved')
+              ->orWhere('purchasing_order.status', 'Cancelled');
+    })
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Incoming Stock');
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+                    });
+            });
     })
-        ->count();
+    ->count();
     @endphp
         @else
         @php
-    $completedPos = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
+        $completedPos = DB::table('purchasing_order')
+    ->where(function ($query) {
+        $query->where('purchasing_order.status', 'Approved')
+              ->orWhere('purchasing_order.status', 'Cancelled');
+    })
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Incoming Stock');
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+                    });
+            });
     })
     ->count();
     @endphp
@@ -302,26 +355,26 @@ th.nowrap-td {
     @if ($hasPermission)
     @php
     $pendingpaymentrelsa = DB::table('purchasing_order')
-                ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated');
-            })
-            ->count();
+    ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Pre-Debit');
+    })
+    ->count();
         @endphp
         @else
         @php
         $pendingpaymentrelsa = DB::table('purchasing_order')
-                ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated');
-            })
-            ->count();
+    ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Pre-Debit');
+    })
+    ->count();
             @endphp
         @endif
         @if ($pendingpaymentrelsa > 0)
@@ -356,25 +409,25 @@ th.nowrap-td {
     @php
     $pendingreleasereqs = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
-            })
-            ->count();
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment');
+    })
+    ->count();
         @endphp
         @else
         @php
         $pendingreleasereqs = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
-            })
-            ->count();
+        ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment');
+    })
+    ->count();
             @endphp
             @endif
         @if ($pendingreleasereqs > 0)
@@ -399,25 +452,25 @@ th.nowrap-td {
     @php
     $pendingdebitaps = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Approved');
-            })
-            ->count();
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released');
+    })
+    ->count();
         @endphp
         @else
         @php
     $pendingdebitaps = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Approved');
-            })
-            ->count();
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released');
+    })
+    ->count();
         @endphp
         @endif
         @if ($pendingdebitaps > 0)
@@ -482,26 +535,25 @@ th.nowrap-td {
     @if ($hasPermission)
     @php
         $pendingints = DB::table('purchasing_order')
-            ->where('purchasing_order.status', 'Approved')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.status', 'Request for Payment');
-            })
-            ->count();
+        ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request');
+    })
+    ->count();
         @endphp
         @else
         @php
         $pendingints = DB::table('purchasing_order')
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.status', 'Request for Payment');
-            })
-            ->count();
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request');
+    })
+    ->count();
         @endphp
         @endif
         @if ($pendingints > 0)
@@ -514,7 +566,7 @@ th.nowrap-td {
 <tr onclick="window.location='{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}">
-        Rejected Payment Releases
+        Rejected
         </a>
     </td>
     <td style="font-size: 12px;">
@@ -527,24 +579,24 @@ th.nowrap-td {
         $paymentreleasedrejection = DB::table('purchasing_order')
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Rejected');
-            })
-            ->count();
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected');
+    })
+    ->count();
         @endphp
         @else
         @php
         $paymentreleasedrejection = DB::table('purchasing_order')
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('vehicles')
-                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Release Rejected');
-            })
-            ->count();
+        $query->select(DB::raw(1))
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected');
+    })
+    ->count();
         @endphp
         @endif
         @if ($paymentreleasedrejection > 0)
@@ -578,13 +630,20 @@ th.nowrap-td {
         @if ($hasPermission)
         @php
         $pendingvendorfol = DB::table('purchasing_order')
-    ->where('status', 'Approved')
+    ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->count();
@@ -592,13 +651,20 @@ th.nowrap-td {
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where('status', 'Approved')
+    ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->count();
@@ -628,25 +694,23 @@ $pendingvendorfol = DB::table('purchasing_order')
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->Where('payment_status', 'Payment Completed');
-            });
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Debit')
+            ->whereNull('supplier_account_transaction.vendor_payment_status');
     })
     ->count();
 @endphp
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where('status', 'Approved')
+->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->Where('payment_status', 'Payment Completed');
-            });
+            ->from('supplier_account_transaction')
+            ->whereColumn('purchasing_order.id', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Debit')
+            ->whereNull('supplier_account_transaction.vendor_payment_status');
     })
     ->count();
 @endphp
@@ -702,7 +766,7 @@ $pendingvins = DB::table('purchasing_order')
             No records found
         @endif
     </td>
-<tr onclick="window.location='{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}';">
+<!-- <tr onclick="window.location='{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}">
         Pending Incoming Confirmation
@@ -748,7 +812,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             No records found
         @endif
     </td>
-</tr>
+</tr> -->
 </tr>
 </tbody>
   </table>
@@ -789,6 +853,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                     <th style="vertical-align: middle; text-align: center;">PO Date</th>
                     <th style="vertical-align: middle; text-align: center;">Vendor Name</th>
                     <th style="vertical-align: middle; text-align: center;">Total Vehicles</th>
+                    <th style="vertical-align: middle; text-align: center;">Total Cost</th>
                     <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Vehicle Status</th>
                 </tr>
                 </thead>
@@ -811,6 +876,13 @@ $pendingvendorfol = DB::table('purchasing_order')
                         @endphp
                         {{ $vehicleCount }}
                     </td>
+                    <td style="vertical-align: middle; text-align: center;">
+                        @if(isset($purchasingOrder->totalcost) && $purchasingOrder->totalcost != 0)
+                            {{ $purchasingOrder->currency }} {{ number_format($purchasingOrder->totalcost) }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
                     <td>
                     <table id="dtBasicExample20" class="table table-striped table-editable table-edits table table-bordered table-sm">
                     <thead>
@@ -820,7 +892,7 @@ $pendingvendorfol = DB::table('purchasing_order')
     <tbody>
       @php
 
-    $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
+    $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Not Approved')->count();
     $vehiclescountpaymentreq = DB::table('vehicles')
     ->where('purchasing_order_id', $purchasingOrder->id)
     ->where(function ($query) {
@@ -860,52 +932,93 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
         <script>
 $(document).ready(function() {
+  // Conversion rates from other currencies to AED
+  var conversionRates = {
+    'AED': 1,
+    'USD': 3.67,
+    'EUR': 4.1,
+    'JPY': 0.034,
+    'CAD': 2.85,
+    // Add other currencies and their conversion rates here
+  };
+
+  // Custom sorting function for currency
+  $.fn.dataTable.ext.type.order['currency-pre'] = function(data) {
+    if (data === 'N/A') {
+      return 0;
+    }
+
+    var matches = data.match(/([\D]+)?\s?([\d,\.]+)/);
+    if (matches && matches[2]) {
+      var currency = matches[1] ? matches[1].trim() : 'AED'; // Default to 'AED' if currency is missing
+      var number = parseFloat(matches[2].replace(/,/g, ''));
+      var conversionRate = conversionRates[currency] || 1; // Default to 1 if currency not found
+      return number * conversionRate;
+    }
+    return 0;
+  };
+
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
-  pageLength: 10,
-  order: [[1, 'desc']],
-        columnDefs: [
-            {
-                targets: 1,
-                type: 'date',
-            }
-        ],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (columnName === "statuss") {
-        return;
+    pageLength: 10,
+    order: [[1, 'desc']], // Date column descending
+    columnDefs: [
+      {
+        targets: 1,
+        type: 'date',
+        orderSequence: ['desc', 'asc'] // Date column only descending
+      },
+      {
+        targets: 4, // Ensure the correct column index for the total cost
+        type: 'currency',
+        orderSequence: ['asc', 'desc'] // Total cost ascending
       }
+      // You can specify other columns if needed
+    ],
+    initComplete: function() {
+      this.api().columns().every(function() {
+        var column = this;
+        var columnName = $(column.header()).attr('id');
+        if (columnName === "statuss") {
+          return;
+        }
 
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
+        var selectWrapper = $('<div class="select-wrapper"></div>');
+        var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+          .appendTo(selectWrapper)
+          .select2({
+            width: '100%'
+          });
+        select.on('change', function() {
+          var selectedValues = $(this).val();
+          column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
         });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
+        selectWrapper.appendTo($(column.header()));
+        $(column.header()).addClass('nowrap-td');
 
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
+        column.data().unique().sort(function(a, b) {
+          var aValue = $.fn.dataTable.ext.type.order['currency-pre'](a);
+          var bValue = $.fn.dataTable.ext.type.order['currency-pre'](b);
+          return aValue - bValue;
+        }).each(function(d) {
+          select.append('<option value="' + d + '">' + d + '</option>');
+        });
       });
-    });
-  }
-});
+    }
+  });
+
   $('.dataTables_filter input').on('keyup', function() {
     dataTable.search(this.value).draw();
   });
+
+  // Apply custom CSS class after Select2 dropdown is opened
+  $(document).on('select2:open', function() {
+    $('.select2-dropdown').addClass('select2-orange-highlight');
+  });
 });
-    </script>
-        <script>
+</script>
+<script>
         // Set timer for error message
         setTimeout(function() {
             $('#error-message').fadeOut('slow');
@@ -915,8 +1028,8 @@ $(document).ready(function() {
         setTimeout(function() {
             $('#success-message').fadeOut('slow');
         }, 2000);
-    </script>
-    <script>
+</script>
+<script>
   function confirmCancel() {
     var confirmDialog = confirm("Are you sure you want to cancel this purchase order?");
     if (confirmDialog) {
@@ -965,8 +1078,6 @@ $(document).ready(function() {
         });
     });
 });
-
-
 </script>
     </div>
     @else

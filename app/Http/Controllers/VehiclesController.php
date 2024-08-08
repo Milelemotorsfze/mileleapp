@@ -47,8 +47,8 @@ class VehiclesController extends Controller
     {
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss);
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss);
             $data = $data->where(function ($query) {
                 $query->whereNull('gdn_id')
                       ->orWhere(function ($subQuery) {
@@ -863,8 +863,8 @@ class VehiclesController extends Controller
             $data = Vehicles::whereIn('id',$vehicleIds)->paginate(100);
 
         }else{
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss);
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss);
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
@@ -1100,8 +1100,8 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
-            $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+        $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -1149,8 +1149,8 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('grn_id')
             ->whereNull('inspection_date');
@@ -1193,8 +1193,8 @@ class VehiclesController extends Controller
     {
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->whereNull('grn_id')
             ->whereNull('gdn_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
@@ -2112,8 +2112,8 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('so_id')
             ->whereNull('pdi_date');
@@ -2173,8 +2173,8 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('so_id');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
@@ -2217,8 +2217,8 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('inspection_date')
             ->whereNull('so_id');
@@ -2262,8 +2262,8 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('grn_id')
 		    ->whereNull('netsuit_grn_number');
@@ -2306,8 +2306,8 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         if ($hasPermission) {
             $fieldValues = ['so_number', 'so_date', 'sales_person_id', 'reservation_start_date', 'reservation_end_date'];
-            $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+        $data = Vehicles::where('status', $statuss)
                 ->where('latest_location', $warehouseId)
                 ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
                 ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
@@ -2356,8 +2356,8 @@ class VehiclesController extends Controller
         $warehouseId = $request->query('warehouse_id');
         $today = today();
         if ($hasPermission) {
-            $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+            $statuss = "Approved";
+            $data = Vehicles::where('status', $statuss)
             ->where('latest_location', $warehouseId)
             ->whereNotNull('reservation_end_date')
             ->where('reservation_end_date', '<=', $today)
@@ -2408,7 +2408,7 @@ public function viewalls(Request $request)
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
         $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
-            $subQuery->where('status', 'Incoming Stock')
+            $subQuery->where('status', 'Approved')
                      ->whereNull('gdn_id');
             $subQuery->orWhereHas('Gdn', function ($gdnSubQuery) {
                 $gdnSubQuery->whereNotNull('gdn_id')
@@ -2701,6 +2701,68 @@ public function viewalls(Request $request)
         $useractivities->activity = "View the Stock Status Wise";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
+        // Variant detail computation
+$variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+->orderBy('id', 'DESC')
+->get();
+
+$sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+$normalizationMap = [
+'COO' => 'COO',
+'SFX' => 'SFX',
+'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+'HeadLamp Type' => 'HeadLamp Type',
+'infotainment type' => 'infotainment type',
+'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+'Speakers' => 'Speakers',
+'sunroof' => 'sunroof'
+];
+
+foreach ($variants as $variant) {
+$details = [];
+$otherDetails = [];
+foreach ($variant->variantItems as $item) {
+    $modelSpecification = $item->model_specification;
+    $modelSpecificationOption = $item->model_specification_option;
+    if ($modelSpecification && $modelSpecificationOption) {
+        $name = $modelSpecification->name;
+        $optionName = $modelSpecificationOption->name;
+        $normalized = null;
+        foreach ($normalizationMap as $key => $values) {
+            if (is_array($values)) {
+                if (in_array($name, $values)) {
+                    $normalized = $key;
+                    break;
+                }
+            } elseif ($name === $values) {
+                $normalized = $key;
+                break;
+            }
+        }
+
+        if ($normalized) {
+            $name = $normalized;
+        }
+        if (in_array(strtolower($optionName), ['yes', 'no'])) {
+            if (strtolower($optionName) === 'yes') {
+                $optionName = $name;
+            } else {
+                continue;
+            }
+        }
+        if (in_array($name, $sequence)) {
+            $index = array_search($name, $sequence);
+            $details[$index] = $optionName;
+        } else {
+            $otherDetails[] = $optionName;
+        }
+    }
+}
+ksort($details);
+$variant->detail = implode(', ', array_merge($details, $otherDetails));
+$variant->save();
+}
         if ($request->ajax()) {
             $status = $request->input('status');
             if($status === "Incoming")
@@ -3264,7 +3326,7 @@ private function fetchPost($variant, $exteriorColor)
                     $current_status = 'Request to CEO Office for Payment Release';
                     $next_stage = 'CEO Office Payment Released';
                 }
-                if ($vehicle->status == 'Incoming Stock' && $vehicle->grn_id == NULL) {
+                if ($vehicle->status == 'Approved' && $vehicle->grn_id == NULL) {
                     $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
                     $current_status = 'Incoming Vehicles / Pending GRN';
                     $next_stage = 'GRN Done';
@@ -3350,4 +3412,31 @@ private function fetchPost($variant, $exteriorColor)
     $pdf = PDF::loadView('Reports.pdi', $data);
     return $pdf->stream('vehicle-details-pdi.pdf');
 }
+public function hold(Request $request, $id)
+{
+    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+    $currentDateTime = Carbon::now($dubaiTimeZone);
+    $vehicle = Vehicles::find($id);
+    $vehicleslog = new Vehicleslog();
+    $vehicleslog->time = $currentDateTime->toTimeString();
+    $vehicleslog->date = $currentDateTime->toDateString();
+    $vehicleslog->status = 'Hold Vehicle';
+    $vehicleslog->vehicles_id = $id;
+    $vehicleslog->field = "Vehicle Status";
+    $vehicleslog->old_value =  $vehicle->status;
+    $vehicleslog->new_value = $request->status;
+    $vehicleslog->created_by = auth()->user()->id;
+    $vehicleslog->save();
+    $purchasingOrder = PurchasingOrder::where('id', $vehicle->purchasing_order_id)->first();
+    $purchasingOrder->status = "Pending Approval";
+    $purchasingOrder->save();
+    if ($request->status === 'hold') {
+        $vehicle->status = 'Hold';
+    } else {
+        $vehicle->status = 'Not Approved';
+    }
+    $vehicle->save();
+    return response()->json(['success' => true]);
+}
+
     }

@@ -1,7 +1,27 @@
 @extends('layouts.main')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	#overlay {
+		position: fixed;
+		display: none;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0,0,0,0.5);
+		z-index: 2;
+		cursor: wait;
+	}
+	#overlay-content {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: white;
+	}
 	.btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;
@@ -11,9 +31,6 @@
 	}
 	.reply {
 		margin-left: 30px; 
-		margin-top: 10px;
-	}
-	.reply-button {
 		margin-top: 10px;
 	}
 	.replies {
@@ -110,6 +127,31 @@
     .select2-container {
         width: 100% !important;
     }
+	/* Style for the table headers */
+.my-datatable th {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the table cells */
+.my-datatable td {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the entire table */
+.my-datatable {
+    border-collapse: collapse; /* Ensure borders do not double */
+    width: 100%; /* Make the table take up the full width */
+}
 </style>
 @include('layouts.formstyle')
 @section('content')
@@ -132,72 +174,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
-	@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
-			@if($workOrder->finance_approved_at != '' || $workOrder->coe_office_approved_at != '')
-				<a title="Sales Support Data Confirmed" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-					<i class="fas fa-check-circle" title="Sales Support Data Confirmed"></i> Sales Support Data Confirmed
-				</a>
-			@elseif($workOrder->finance_approved_at == '' && $workOrder->coe_office_approved_at == '')
-				<a title="Revert Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
-					<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
-				</a>
-			@endif
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
-			<a  title="Sales Support Data Confirmation" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-			<i class="fas fa-hourglass-start" title="Sales Support Data Confirmation"></i> Sales Support Data Confirmation
-			</a>
-		@endif
-		@if(isset($workOrder) && $workOrder->finance_approved_at != '')
-		<a  title="Finance Approved" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fas fa-check-circle" title="Finance Approved"></i> Finance Approved
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->coe_office_approved_at == '')
-		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-finance-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="Finance Approval"></i> Finance Approval
-		</a>
-		@endif
-		@if(isset($workOrder) && $workOrder->coe_office_approved_at != '')
-		<a  title="COE Office" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-		<i class="fas fa-check-circle" title="COE Office"></i> COE Office Approved
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at != '')
-		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-		<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
-		COE Office Approval
-		</a>
-		@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approved_at == '')
-			<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-info btn-coe-office-direct-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
-			<i class="fas fa-hourglass-start" title="COE Office Approval"></i> 
-			COE Office Direct Approval
-			</a>
-		@endif
-
-		<!-- Modal -->
-		<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="approvalModalLabel">COE Office Direct Approval</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<!-- <span aria-hidden="true">&times;</span> -->
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group">
-					<label for="approvalComments">Comments</label>
-					<textarea class="form-control" id="approvalComments" rows="3"></textarea>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-					<button type="button" class="btn btn-primary" id="submitApproval">Submit</button>
-				</div>
-				</div>
-			</div>
+	@include('work_order.export_exw.approvals')
+	<div class="row">
+		<div class="col-xxl-12 col-lg-12 col-md-12">
+			<button style="float:right;" class="btn btn-sm btn-success" id="submit-from-top">Submit</button>
 		</div>
-	<!-- <div class="col-xxl-12 col-lg-12 col-md-12">
-		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
-	</div> -->
+	</div>
+	</br>
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
     @if(isset($workOrder))
@@ -247,25 +230,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
 							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
-					<div class="col-xxl-5 col-lg-11 col-md-11">
+					<div class="col-xxl-4 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
                         <input hidden id="customer_type" name="customer_type" value="existing">
                         <input hidden id="customer_reference_id" name="customer_reference_id" value="">
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}"
+                            <option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
 							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
                         </select> 
 						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="Other">
                         <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
                     </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="switchToDropdown">
                         <a title="Choose Customer Name" onclick="switchToDropdown()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
                     </div>
@@ -277,13 +260,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
-						<!-- <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
-							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
-							value="" autocomplete="customer_company_number[full]" autofocus onkeyup="sanitizeNumberInput(this)"> -->
 							<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]') is-invalid @enderror" 
 							name="customer_company_number[main]" placeholder="Enter Customer Contact Number" value="" autocomplete="customer_company_number[full]" autofocus 
 							onkeyup="sanitizeNumberInput(this)">
-
+							<input type="hidden" id="customer_company_number_full" name="customer_company_number[full]" value="{{ isset($workOrder) ? $workOrder->customer_company_number : '' }}">
 					</div></div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
@@ -311,6 +291,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
 							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Representative Contact Number"
 							value="" autocomplete="customer_representative_contact[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="customer_representative_contact_full" name="customer_representative_contact[full]" value="{{ isset($workOrder) ? $workOrder->customer_representative_contact : '' }}">
 					</div>
 					</div>
 					@if(isset($type) && $type == 'export_exw')
@@ -333,6 +314,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
 							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
 							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
 					</div>
 					</div>
 					@endif
@@ -398,7 +380,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
-							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
+							<label for="airline" class="col-form-label text-md-end">{{ __('Choose Airline') }}</label>
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 									<option value="{{$airline->name}}" 
@@ -444,6 +426,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
 							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
 							value="" autocomplete="transporting_driver_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="transporting_driver_contact_number_full" name="transporting_driver_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->transporting_driver_contact_number : '' }}">
 					</div>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
@@ -507,7 +490,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
 							autofocus onkeyup="sanitizeQuantity(this)">
 					</div>
-					<div class="col-xxl-2 col-lg-2 col-md-2">
+					<div class="col-xxl-3 col-lg-2 col-md-2">
 						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
@@ -534,7 +517,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							</div>
 						</div>
 					</div>
-					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
+					<div class="col-xxl-2 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
 							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
@@ -545,7 +528,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
-						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
+						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Against Vehicle :</label>
 						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
 						</select>
 					</div>
@@ -930,6 +913,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</div>
 	</div>
 	<br>
+	@if(isset($workOrder))
 	<div class="card mt-3">
 		<div class="card-header text-center">
 			<h4 class="card-title">Data History</h4>
@@ -941,7 +925,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<a class="nav-link form-label active" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
 					</li>   
 					<li class="nav-item">
-						<a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+						<a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicles & Addons Data History</a>
 					</li>                          
 				</ul>
 			</div>
@@ -957,7 +941,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="tab-pane fade" id="wo_vehicle_data_history">
 					<div class="card-header text-center">
-						<center style="font-size:12px;">WO Vehicle Data History</center>
+						<center style="font-size:12px;">WO Vehicles & Addons Data History</center>
 					</div>
 					<div class="card-body">
 						@include('work_order.export_exw.vehicle_data_history')
@@ -967,9 +951,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 		</div>
 	</div>
+	@endif
 </div>
 <br>
-<div class="overlay"></div>
+<div id="overlay">
+	<div id="overlay-content">
+		<h2>Submitting, please wait...</h2>
+	</div>
+</div>
 @else
 <div class="card-header">
 	<p class="card-title">Sorry ! You don't have permission to access this page</p>
@@ -977,17 +966,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-<script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script> -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+@php
+$allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
 <script type="text/javascript">
+	
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
-    $('#work-order-history-table').DataTable();
+    // $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
-	var vins = {!! json_encode($vins) !!}
+	var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 	var customerCount =  $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
@@ -999,13 +987,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var selectedCustomerContact = '';
 	var selectedCustomerAddress = '';
 	var onChangeSelectedVins = [];
+	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
         var workOrder = {!! json_encode($workOrder) !!};
     @else
         var workOrder = null;
     @endif
+
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
+	var input = document.querySelector("#customer_company_number");
+	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
+		separateDialCode: true,
+		preferredCountries:["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
+	var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
+		separateDialCode: true,
+		preferredCountries:["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
+	if(type == 'export_exw') {
+		var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
+			separateDialCode: true,
+			preferredCountries:["ae"],
+			hiddenInput: "full",
+			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+		});
+	}
+	if(type == 'export_exw' || type == 'export_cnf') {
+		var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+			separateDialCode: true,
+			preferredCountries:["ae"],
+			hiddenInput: "full",
+			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+		});	
+	}
 	$(document).ready(function () { 
+		console.log('Is vins an array:', Array.isArray(vins));
+		document.getElementById('submit-from-top').addEventListener('click', function() { 
+			  // Trigger a click on the submit button of the form
+			  document.getElementById('submit').click();
+		});
 		// SELECT 2 START
 			$('#customer_name').select2({
 				allowClear: true,
@@ -1024,6 +1048,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#balance-amount-div").show();
 				$("#deposit-aganist-vehicle-div").hide();
 				selectedDepositReceivedValue = 'total_deposit';
+				setDepositBalance();
 			}
 			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
 				$("#amount-received-div").show();
@@ -1031,6 +1056,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#deposit-aganist-vehicle-div").show();
 				selectedDepositReceivedValue = 'custom_deposit';
 				setDepositAganistVehicleDropdownOptions();
+				setDepositBalance();
 			}
 
 			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
@@ -1052,9 +1078,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-				$('#customer_company_number').val(workOrder.customer_company_number);
-				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
-				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
+				var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+				iti.setNumber(customer_company_numberFull);
+				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
+				customer_representative_contact.setNumber(customer_representative_contactFull);
+				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
+				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
+					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+				} 
 				if(workOrder.transport_type == 'air') {
 					airRelation();
 				}
@@ -1063,7 +1094,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 				else if(workOrder.transport_type == 'road') {
 					roadRelation();
-					$('#transporting_driver_contact_number').val(workOrder.transporting_driver_contact_number);					
+					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
+					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
+					sanitizeNumberInput(input);			
 				}
 			}
 			
@@ -1145,6 +1178,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					});
 					$select.trigger('change.select2');
 				});
+				if (authUserPermission === 'true') {
+					var table = document.getElementById('myTable');
+					if (table) {
+						var inputs = table.querySelectorAll('input');
+						inputs.forEach(function(input) {
+						input.readOnly = true;
+						});
+						var selects = table.querySelectorAll('select');
+						selects.forEach(function(input) {
+						input.disabled = true;
+						});
+					}
+					var deleteVehicleLine = document.querySelectorAll('.remove-row');
+					deleteVehicleLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var deleteAddonLine = document.querySelectorAll('.remove-addon-row');
+					deleteAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var createAddonLine = document.querySelectorAll('.create-addon-row');
+					createAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+				}
 			}
 			else {
 				$("#boe-div").hide();
@@ -1167,21 +1225,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// SELECT 2 END
 
 		// INTEL INPUT START
-			var input = document.querySelector("#customer_company_number");
-			var iti = window.intlTelInput(input, {
-				separateDialCode: true,
-				preferredCountries: ["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
+			
 			// Function to set customer relations
-			function setCustomerRelations(selectedCustomerName) {
+			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');            
-				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+				$('#customer_company_number').val('');         
+				if (selectedCustomerUniqueId != null) {
 					for (var i = 0; i < customerCount; i++) {
-						if (customers[i].customer_name == selectedCustomerName[0]) { 
+						if (customers[i].unique_id == selectedCustomerUniqueId) { 
 							if (customers[i].customer_address != null) {
 								$('#customer_address').val(customers[i]?.customer_address);
 							}
@@ -1189,9 +1241,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								$('#customer_email').val(customers[i]?.customer_email);
 							}
 							if (customers[i].customer_company_number != null) { 
-								var fullPhoneNumber = customers[i].customer_company_number.replace(/\s+/g, '');
-								console.log("Full Phone Number (no spaces):", fullPhoneNumber); // Debugging log
-
+								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
@@ -1201,20 +1251,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					}
 				}
 			}
-			var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
-			if(type == 'export_exw') {
-				var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});
-			}
+			
 		// INTEL INPUT END
 
 		// TRANSPORT TYPE ONCHANGE START
@@ -1276,13 +1313,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#container-number-div").hide();
 				$("#trailer-number-plate-div").show();
 				$("#transportation-company-div").show();
-				$("#transporting-driver-contact-number-div").show();				
-				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});	
+				$("#transporting-driver-contact-number-div").show();
 				$("#airway-details-div").hide();
 				$("#transportation-company-details-div").show();
 			}
@@ -1291,8 +1322,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// CUSTOMER NAME ONCHANGE START
 			 // Handle customer name change
 			 $('#customer_name').on('change', function() { 
-				var selectedCustomerName = $(this).val(); 
-				setCustomerRelations(selectedCustomerName);
+				// var selectedCustomerName = $(this).val(); 
+				var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
+				setCustomerRelations(selectedCustomerUniqueId);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
@@ -1309,6 +1341,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$("#deposit-aganist-vehicle-div").show();
 					setDepositAganistVehicleDropdownOptions();
 				}
+				setDepositBalance();
 			});
 		// DEPOSIT RECEIVED AS ONCHANGE END
 
@@ -1322,8 +1355,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					addAddon();
 				}
 			});
-			$("body").on("click", ".add-vehicle-btn", function () {
-				if (validateVINSelection() && validateAddonSelection()) {
+			$("body").on("click", ".add-vehicle-btn", function () { 
+				if (validateVINSelection() && validateAddonSelection()) { 
 					addVIN();
 				}
 			});
@@ -1564,159 +1597,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			vehicleAddonDropdown(dataId)
         });
 
-		$('.btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Confirm, It was Confirmed already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.revert-btn-sales-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.revert-sales-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Revert, It was reverted already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-finance-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.finance-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Approve, It was approved already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-coe-office-approval').click(function (e) { 
-			var id = $(this).attr('data-id');
-			let url = '{{ route('work-order.coe-office-approval') }}';
-			var confirm = alertify.confirm('Are you sure you want to approve this work order ?',function (e) {
-				if (e) {
-					$.ajax({
-						type: "POST",
-						url: url,
-						dataType: "json",
-						data: {
-							id: id,
-							_token: '{{ csrf_token() }}'
-						},
-						success: function (data) {						
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-								window.location.reload();
-								alertify.error("Can't Approve, It was approved already..")
-							}
-						}
-					});
-				}
-			}).set({title:"Confirmation"})
-		})
-		$('.btn-coe-office-direct-approval').click(function (e) {
-			var id = $(this).attr('data-id');
-			$('#approvalModal').data('id', id).modal('show');
-		});
-
-		$('#submitApproval').click(function (e) {
-			var id = $('#approvalModal').data('id');
-			var comments = $('#approvalComments').val();
-			let url = '{{ route('work-order.coe-office-approval') }}';
-
-			if (!comments) {
-			alertify.error("Please add comments.");
-			return;
-			}
-
-			var confirm = alertify.confirm('Are you sure you want to approve this work order?', function (e) {
-			if (e) {
-				$.ajax({
-				type: "POST",
-				url: url,
-				dataType: "json",
-				data: {
-					id: id,
-					comments: comments,
-					_token: '{{ csrf_token() }}'
-				},
-				success: function (data) {
-					$('#approvalModal').modal('hide');
-					if (data == 'success') {
-					window.location.reload();
-					alertify.success("Successfully Approved");
-					} else if (data == 'error') {
-					window.location.reload();
-					alertify.error("Can't Approve, It was approved already.");
-					}
-				}
-				});
-			}
-			}).set({ title: "Confirmation" });
-		});
+		
 		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
 			// Select all input, select, and textarea elements and disable them
-			var elements = document.querySelectorAll('#WOForm button');
+			var elements = document.querySelectorAll('#WOForm #submit');
 			// #WOForm input, #WOForm select, #WOForm textarea, 
-			console.log(elements);
 			elements.forEach(function(element) {
 				element.disabled = true;
 			});
@@ -1743,10 +1628,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 		}, "No leading or trailing spaces allowed");
 
-        // Add custom validation rule for numeric input only (excluding spaces)
-        $.validator.addMethod("numericOnly", function(value, element) {
-            return this.optional(element) || /^[0-9+]+$/.test(value);
-        }, "Please enter a valid number");
+		// Add custom validation rule for numeric input only (excluding spaces)
+		$.validator.addMethod("numericOnly", function(value, element) {
+			// Remove spaces before validation
+			value = value.replace(/\s+/g, '');
+			return this.optional(element) || /^[0-9+]+$/.test(value);
+		}, "Please enter a valid number");
 
         // Add custom validation rule for address field (no multiple consecutive spaces)
         $.validator.addMethod("validAddress", function(value, element) {
@@ -1792,17 +1679,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			return true;
 		}, "All work order vehicles should be selected under one BOE per VIN field.");
-		// Custom method to ensure every element with the class `dynamicselect2` has a value
-		// $.validator.addMethod("allBOERequired", function(value, element) {
-		// 	let isValid = true;
-		// 	$('.dynamicselect2').each(function() {
-		// 		if (!$(this).val()) {
-		// 			isValid = false; // If any element doesn't have a value, set isValid to false
-		// 			return false; // break out of the loop once a value is found missing
-		// 		}
-		// 	});
-		// 	return isValid;
-		// }, "Every BOE must be selected");
+		// Add a custom validator method for checking if the value is a year with 4 digits
+		$.validator.addMethod("year4digits", function(value, element) {
+			return this.optional(element) || /^\d{4}$/.test(value);
+		}, "Please enter a valid year with 4 digits.");
     // ADD CUSTOM VALIDATION RULE END
 
 	// CLIENT SIDE VALIDATION START
@@ -1822,70 +1702,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 batch: {
                     required: true,
                 },
-                // customer_reference_id: {
-
-                // },
-                // customer_reference_type: {
-
-                // },
                 new_customer_name: {
-                    // required: true,
                     noSpaces: true,
                 },
-                // existing_customer_name: {
-
-                // }
                 customer_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "customer_company_number[main]": {
-                    // validContactNumber: true,
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 customer_address: {
-                    // required: true,
 					noSpaces: true,
                     validAddress: true,
                     maxlength: 255
                 },
                 customer_representative_name: {
-                    // required: true,
                     noSpaces: true,
                 },
                 customer_representative_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "customer_representative_contact[main]": {
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 freight_agent_name: {
-                    // required: true,
                     noSpaces: true,
                 },
                 freight_agent_email: {
-                    // required: true,
                     noSpaces: true,
                     customEmail: true,
                 },
                 "freight_agent_contact_number[main]": {
-                    // noMultipleSpaces: true,
                     numericOnly: true,
                     minlength: 5,
                     maxlength: 20,
                 },
                 port_of_loading: {
                     required: true,
-                    // noSpaces: true,
+					noSpaces: true,
                 },
                 port_of_discharge: {
                     required: true,
@@ -1895,25 +1755,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     required: true,
                     noSpaces: true,
                 },
-                // transport_type: {
-                // },
                 brn_file: {
-                    // required: true,
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 brn: {
-                    // required: true,
                     noSpaces: true,
                 },
                 container_number: {
-                    // required: true,
                     noSpaces: true,
                 },
-                // airline_reference_id: {
-                // }
-                // airline: {
-                // },
                 airway_bill: {
                     noSpaces: true,
                 },
@@ -1940,24 +1791,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 transportation_company_details: {
                     noSpaces: true,
                 },
-                // currency: {
-                // },
                 so_total_amount: {
 					noSpaces: true,
 					number: true,
-					min: 0 // Ensures the price is a non-negative number
+					min: 0
                 },
                 so_vehicle_quantity: {
 					digits: true,
-					min: 1 // Ensure it's a positive integer
+					min: 1 
                 },
 				"deposit_aganist_vehicle[]": {
 					customDepositVehicleRequired: true
-				},
-                // amount_received: {
-                // },
-                // balance_amount: {
-                // },				
+				},				
                 delivery_location: {
                     noSpaces: true,
                 },
@@ -1967,100 +1812,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 delivery_date: {
                     date: true,
                 },
-				// "boe[1][vin][]": {
-				// 	required:true,
-				// },
-				//  id="boe_vin_${index}" 
-				// dynamicselect2: {
-				// 	allBOERequired: true
-				// },
                 signed_pfi: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 signed_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 payment_receipts: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 noc: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_trade_license: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_passport: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 vehicle_handover_person_id: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
-                // DYNAMIC FIELDS
-                // vin: {
-                // 	// required: true,
-                // },
-                // brand: {
-                // 	// required: true,
-                // },
-                // variant: {
-                // 	// required: true,
-                // },
-                // engine: {
-                // 	// required: true,
-                // },
-                // model_description: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // steering: {
-                // 	// required: true,
-                // },
-                // exterior_colour: {
-                // 	// required: true,
-                // },
-                // interior_colour: {
-                // 	// required: true,
-                // },
-                // warehouse: {
-                // 	// required: true,
-                // },
-                // territory: {
-                // 	// required: true,
-                // },
-                // preferred_destination: {
-                // 	// required: true,
-                // },
-                // import_document_type: {
-                // 	// required: true,
-                // },
-                // ownership_name: {
-                // 	// required: true,
-                // },
-                // modification_or_jobs_to_perform_per_vin: {
-                // 	// required: true,
-                // },
-                // certification_per_vin: {
-                // 	// required: true,
-                // },
-                // special_request_or_remarks: {
-                // 	// required: true,
-                // },
             },
             messages: {
                 brn_file:{
@@ -2115,22 +1898,92 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$(element).removeClass('is-invalid');
 				}
 			},
-			submitHandler: function(form) { 
+			submitHandler: function(form) {  
 				// Prevent default form submission
 				event.preventDefault();
-
+				// Show the overlay
+				$('#overlay').show();
 				// Collect all comments
 				const comments = [];
-				if(workOrder == null) {
-					document.querySelectorAll('#comments-section .comment').forEach(comment => {
-						const commentId = comment.getAttribute('data-comment-id');
-						const parentId = comment.getAttribute('data-parent-id');
-						const text = comment.querySelector('.col-xxl-11').childNodes[0].textContent.trim();
+				if (workOrder == null) {
+					const commentElements = document.querySelectorAll('#comments-section .comment');
+					
+					if (commentElements.length > 0) {
+						commentElements.forEach(comment => {
+							const commentId = comment.getAttribute('data-comment-id');
+							const parentId = comment.getAttribute('data-parent-id');
+							const dateTime = comment.getAttribute('data-date-time');
+							const textElement = comment.querySelector('.comment-text');
+							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img`);
+							const files = Array.from(fileElements).map(file => ({
+								src: file.src,
+								name: file.alt
+							}));
 
-						comments.push({ commentId, parentId, text });
+							if (textElement) {
+								const text = textElement.textContent.trim();
+								comments.push({ commentId, parentId, text, dateTime, files });
+							} else {
+								console.warn('Text element is missing for a comment:', comment);
+							}
+						});
+					} else {
+						console.warn('No comments found in #comments-section.');
+					}
+				}
+
+				// Update phone numbers if elements are defined
+				if (typeof iti !== 'undefined') {
+					$('#customer_company_number_full').val(iti.getNumber());
+				}
+				if (typeof customer_representative_contact !== 'undefined') {
+					$('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
+				}
+				if (typeof freight_agent_contact_number !== 'undefined') {
+					$('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
+				}
+				if (typeof transporting_driver_contact_number !== 'undefined') {
+					$('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
+				}
+
+				const elementsByClass = document.getElementsByClassName('transport_type');
+
+				if (elementsByClass.length > 0) {
+					Array.from(elementsByClass).forEach(function(element) {
+						element.disabled = false;
 					});
 				}
 
+				const deposit_received_asClass = document.getElementsByClassName('deposit_received_as');
+
+				if (deposit_received_asClass.length > 0) {
+					Array.from(deposit_received_asClass).forEach(function(element) {
+						element.disabled = false;
+					});
+				}
+
+				
+				$('#airline').prop('disabled', false).trigger('change');
+				$('#currency').prop('disabled', false).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', false).trigger('change');	
+				$('#vin_multiple').prop('disabled', false).trigger('change');	
+				$('#brn_file').prop('disabled', false).trigger('change');
+				$('#signed_pfi').prop('disabled', false).trigger('change');	
+				$('#signed_contract').prop('disabled', false).trigger('change');	
+				$('#payment_receipts').prop('disabled', false).trigger('change');	
+				$('#noc').prop('disabled', false).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', false).trigger('change');	
+				$('#enduser_passport').prop('disabled', false).trigger('change');	
+				$('#enduser_contract').prop('disabled', false).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
+				var table = document.getElementById('myTable');
+				if (table) {
+					var selects = table.querySelectorAll('select');
+					selects.forEach(function(input) {
+					input.disabled = false;
+					});
+				}
+				$('.dynamicselect2').prop('disabled', false);
 				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));
@@ -2154,7 +2007,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						throw new Error(data.message);
 					}
 				}).catch(error => {
-					// Optionally display the error message to the user
+					console.error('Form submission error:', error);
+				}).finally(() => {
+					// Hide the overlay
+					$('#overlay').hide();
 				});
 			}
         });
@@ -2175,7 +2031,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		if (parts.length > 2) {
 			value = parts[0] + '.' + parts.slice(1).join('');
 		}
-
 		input.value = value;
 		setDepositBalance();
 	}
@@ -2183,8 +2038,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	function setDepositBalance() {
 		var totalAmount = $('#so_total_amount').val();
 		var amountReceived = $('#amount_received').val();
-		var balanceAmount = '';
-		if(totalAmount != '' && amountReceived != '') {
+		var balanceAmount = ''; 
+		if(totalAmount != '' && amountReceived != '' && selectedDepositReceivedValue != '') { 
 			balanceAmount = Number(totalAmount) - Number(amountReceived);
 		}
 		document.getElementById('balance_amount').value = balanceAmount;
@@ -2274,7 +2129,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<div class="col-xxl-2 col-lg-2 col-md-2">
 							<div class="row">
 								<div class="col-xxl-12 col-lg-12 col-md-12">
-									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
+									<label class="col-form-label text-md-end">Addon :</label>
 									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
 										<!-- Add-on options will be dynamically populated -->
 										@foreach($addons as $addon)
@@ -2286,13 +2141,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									</select>
 								</div>
 								<div class="col-xxl-12 col-lg-12 col-md-12">
-									<label for="addon_quantity_${index}" class="col-form-label text-md-end">Quantity :</label>
+									<label class="col-form-label text-md-end">Quantity :</label>
 									<input type="number" name="addon_quantity[]" id="addon_quantity_${index}" class="form-control widthinput" placeholder="Enter Quantity">
 								</div>
 							</div>
 						</div>
 						<div class="col-xxl-9 col-lg-9 col-md-9">
-							<label for="addon_description_${index}" class="col-form-label text-md-end">Addon Description :</label>
+							<label class="col-form-label text-md-end">Addon Description :</label>
 							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Description"></textarea>
 						</div>
 						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer_addon">
@@ -2321,57 +2176,62 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// ADDON DYNAMICALLY ADD AND REMOVE END
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
-	function addChild() {
-        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+		function addChild() {
+			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-        // Check if there are any available options
-        if (getAvailableOptions().length > 0) {
-            if (index <= addedVins.length) {
-                var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
-                var newRow = $(`
-                    <div class="row form_field_outer_row" id="${index}">
-                        <div class="col-xxl-11 col-lg-11 col-md-11">
-                            <label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-                            <select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-                                ${options}
-                            </select>
-                        </div>
-                        <div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                            <a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                `);
+			// Check if there are any available options
+			if (getAvailableOptions().length > 0) {
+				if (index <= addedVins.length) {
+					var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+					var newRow = $(`
+						<div class="row form_field_outer_row" id="${index}">
+							<div class="col-xxl-11 col-lg-11 col-md-11">
+								<span class="error">* </span>
+								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+									${options}
+								</select>
+							</div>
+							<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+								<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
+						</div>
+					`);
 
-                // Append the new row to the container
-                $(".form_field_outer").append(newRow);
+					// Append the new row to the container
+					$(".form_field_outer").append(newRow);
 
-                // Initialize Select2 only on the newly added element
-                $(`#boe_vin_${index}`).select2({
-                    allowClear: true,
-                    placeholder: "Choose VIN Per BOE",
-                });
+					// Initialize Select2 only on the newly added element
+					$(`#boe_vin_${index}`).select2({
+						allowClear: true,
+						placeholder: "Choose VIN Per BOE",
+					});
 
-                // Add validation rules for all dynamicselect2 elements
-                $('.dynamicselect2').each(function() {
-                    $(this).rules('add', {
-                        required: true,
-						allVinsSelected: true,
-                        messages: {
-                            required: "This field is required."
-                        }
-                    });
-                });
-
-                disableSelectedOptions();
-            } else {
-                alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
-            }
-        } else {
-            alert("Sorry! No available options to select.");
-        }
-    }
+					// Add validation rules for all dynamicselect2 elements
+					$('.dynamicselect2').each(function() {
+						$(this).rules('add', {
+							required: true,
+							allVinsSelected: true,
+							messages: {
+								required: "This field is required."
+							}
+						});
+					});
+					if (authUserPermission === 'true') {
+						$('.dynamicselect2').prop('disabled', true);
+						$('.remove_node_btn_frm_field').prop('disabled', true);
+						$('.add_new_frm_field_btn').prop('disabled', true);
+					}
+					disableSelectedOptions();
+				} else {
+					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+				}
+			} else {
+				alert("Sorry! No available options to select.");
+			}
+		}
 		function getAvailableOptions() {
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
@@ -2451,18 +2311,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				});
 
 				// Refresh Select2 to apply changes
-				$select.select2();
+				// $select.select2(); // COMMENTED BECAUSE OF UNSELECT OF  VIN PER BOE CAUSE ERROR IN CONSOLE
 			});
 		}
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-		function addVIN() {
-			var selectedVIN = $("#vin_multiple").val();
-			if (selectedVIN != '' && selectedVIN.length > 0) {
-				for (var j = 0; j < selectedVIN.length; j++) {
-					for (var i = 0; i < vins.length; i++) {
-						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
+		function addVIN() { 
+			var selectedVIN = $("#vin_multiple").val(); 
+			if (selectedVIN != '' && selectedVIN.length > 0) { 
+				for (var j = 0; j < selectedVIN.length; j++) { 
+					for (var i = 0; i < vins.length; i++) { 
+						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { 
 							var data = { 
 								id: '',
 								vehicle_id : vins[i]?.id ?? '',
@@ -2514,7 +2374,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
-		function drawTableRow(data) {
+		function drawTableRow(data) { 
 			// Get the table body element by ID
 			var tableBody = document.querySelector('#myTable tbody');
 
@@ -2550,6 +2410,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var importTypeCell = createEditableCell(data.import_document_type, 'Enter Import Document Type','vehicle['+data.vehicle_id+'][import_document_type]');
 			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
 			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
+			if(type == 'export_cnf') {
+				var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+			}
 
 			// Append cells to the first row
 			firstRow.appendChild(removeIconCell);
@@ -2569,6 +2432,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			firstRow.appendChild(importTypeCell);
 			firstRow.appendChild(ownershipCell);
 			firstRow.appendChild(CertificationPerVINCell);
+			if(type == 'export_cnf') {
+				firstRow.appendChild(shipmentCell);
+			}
 			// firstRow.style.borderTop = '1px solid #b3b3b3';
 
 			// Second Row Elements
@@ -2581,7 +2447,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			modificationLabelCell.textContent = 'Modification/Jobs';
 
 			var modificationInputCell = document.createElement('td');
-			modificationInputCell.colSpan = 15;
+			if(type == 'export_cnf') {
+				modificationInputCell.colSpan = 16;
+			}
+			else {
+				modificationInputCell.colSpan = 15;
+			}
 			var modificationInputElement = document.createElement('input');
 			modificationInputElement.name ='vehicle['+data.vehicle_id+'][modification_or_jobs_to_perform_per_vin]';
 			modificationInputElement.type = 'text';
@@ -2590,6 +2461,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			modificationInputElement.style.width = '100%';
 			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
 			modificationInputCell.appendChild(modificationInputElement);
+
+			// Add validation rule for modificationInputElement
+			$(modificationInputElement).rules('add', {
+				noSpaces: true,
+				messages: {
+					noSpaces: "No leading or trailing spaces allowed."
+				}
+			});
 
 			// Append cells to the second row
 			secondRow.appendChild(emptyLabelCell);
@@ -2606,7 +2485,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			specialRequestLabelCell.textContent = 'Special Request/Remarks';
 
 			var specialRequestInputCell = document.createElement('td');
-			specialRequestInputCell.colSpan = 15;
+			if(type == 'export_cnf') {
+				specialRequestInputCell.colSpan = 16;
+			}
+			else {
+				specialRequestInputCell.colSpan = 15;
+			}
 			var specialRequestInputElement = document.createElement('input');
 			specialRequestInputElement.name ='vehicle['+data.vehicle_id+'][special_request_or_remarks]';
 			specialRequestInputElement.type = 'text';
@@ -2615,7 +2499,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			specialRequestInputElement.style.width = '100%';
 			specialRequestInputElement.value = data.special_request_or_remarks;
 			specialRequestInputCell.appendChild(specialRequestInputElement);
-
+			// Add validation rule for specialRequestInputCell
+			$(specialRequestInputCell).rules('add', {
+				noSpaces: true,
+				messages: {
+					noSpaces: "No leading or trailing spaces allowed."
+				}
+			});
 
 			// Append cells to the third row
 			thirdRow.appendChild(emptyLabelThirdRowCell);
@@ -2624,7 +2514,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			// Last Row Elements
 			var createAddon = createAddonCell(data.vehicle_id);
-			createAddon.colSpan = 17;
+			if(type == 'export_cnf') {
+				createAddon.colSpan = 18;
+			}
+			else {
+				createAddon.colSpan = 17;
+			}
 			// Append cells to the last row
 			lastRow.appendChild(createAddon);
 
@@ -2644,12 +2539,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var currentRow = thirdRow; // Start with the thirdRow
 			if (data.addons && data.addons.length > 0) {
 				for (var j = 0; j < data.addons.length; j++) {
+
+					var DateToBeformat = new Date(data.addons[j].created_at);
+
+					var optionsDate = { day: '2-digit', month: 'short', year: 'numeric' };
+					var optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+					// Format date and time separately
+					var formattedDate = DateToBeformat.toLocaleDateString('en-GB', optionsDate);
+					var formattedTime = DateToBeformat.toLocaleTimeString('en-GB', optionsTime);
+
+					// Combine the formatted date and time
+					var addonDate = formattedDate + ', ' + formattedTime;
+
+
 					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
 					var addonValue = data.addons[j].addon_code;
 					var addonQuantity = data.addons[j].addon_quantity;
 					var addonDescription = data.addons[j].addon_description;
 					if(addonValue != null) {
-						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 						addonIndex++; // Increment addonIndex after calling drawTableAddon
 					}
 				}
@@ -2658,11 +2567,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			// Gather data from all dynamically added addon input fields
 			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
+				var addonDate = '';
 				var addonValue = $(`#addons_${addonId}`).val();
 				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
 				var addonDescription = $(`#addon_description_${addonId}`).val();
 				if(addonValue != null) { 
-					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 					addonIndex++; // Increment addonIndex after calling drawTableAddon
 				}
 			});
@@ -2670,7 +2580,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			allVehicleRows.push(lastRow);
 			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
 		}
-		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId, addonValue, addonQuantity, addonDescription) { 
+		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId,addonDate, addonValue, addonQuantity, addonDescription) { 
 			var removeAddonCell = createAddonRemoveButton();
 			
 			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
@@ -2682,6 +2592,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
 
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = addonDate; 
+
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
@@ -2689,7 +2604,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
-			addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
+			addonQuantityCell.innerHTML = '<input class="child_addon_id_'+data.vehicle_id+'" type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
 				+ '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
 				+ '<div class="input-group">'
 				+ '<div class="input-group-append">'
@@ -2699,12 +2614,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				+ '</div>';
 
 			var addonDescriptionCell = document.createElement('td');
-			addonDescriptionCell.colSpan = 14;
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_' + addonIndex + '" placeholder="Enter Addon Description">';
+			if(type == 'export_cnf') {
+				addonDescriptionCell.colSpan = 14;
+			}
+			else {
+				addonDescriptionCell.colSpan = 13;
+			}
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
 
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
@@ -2714,7 +2635,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			
 			// Append the addon row after the third row
 			thirdRow.insertAdjacentElement('afterend', addonRow);
-			
+			// Add validation rules for all dynamicselectaddon elements
+			$("#addon_quantity_"+data.vehicle_id+"_"+addonIndex).rules('add', {
+				digits: true,
+				min: 1 // Ensure it's a positive integer
+			});
+			$("#addon_description_"+data.vehicle_id+"_"+addonIndex).rules('add', {
+				noSpaces: true,
+			});
 			return addonRow; // Return the newly created addonRow to be used as the next reference row
 		}
 
@@ -2752,13 +2680,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			allVehicleRows.each(function(index) {
 				var row = $(this);			
 				// Update hidden input field for addon_code
-				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
+				row.find('.child_addon_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]').attr('id', 'addons_' + className + '_' + index);
 
 				// Update quantity input field within the specific div structure
-				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id', 'addon_quantity_' + className + '_' + index);
 
 				// Update description input field within the <td> element
-				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + index);
+				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + className + '_' + index);
+				
+				// Update hidden input field for addon ID
+				row.find('.child_addon_id_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
+
 				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {
 					$('#addons_' + className + '_' + index).select2({
@@ -2795,6 +2727,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = '';
+
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
@@ -2812,12 +2749,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			+'</div>';
 
 			var addonDescriptionCell = document.createElement('td');
-			addonDescriptionCell.colSpan = 14;
+			if(type == 'export_cnf') {
+				addonDescriptionCell.colSpan = 13;
+			}
+			else {
+				addonDescriptionCell.colSpan = 14;
+			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
@@ -2938,11 +2881,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			inputElement.name = name;
 			inputElement.value = value;
 			inputElement.style.border = 'none';
-			// inputElement.style.width = '100%';
+
+			// Generate a unique ID for the input element
+			var uniqueId = name.replace(/[\[\]]+/g, '_'); // Replace square brackets with underscores
+			inputElement.id = uniqueId;
+
+			// Append the input element to the cell
 			cell.appendChild(inputElement);
+
+			// Add validation rules using the ID as the selector
+			setTimeout(function() {
+				var rules = {
+					noSpaces: true,
+					messages: {
+						noSpaces: "No leading or trailing spaces allowed."
+					}
+				};
+				
+				// Add custom validation for model year fields
+				if (name.includes('model_year') || name.includes('model_year_to_mention_on_documents')) {
+					rules.year4digits = true;
+				}
+				
+				// Apply the validation rules
+				$('#'+uniqueId).rules('add', rules);
+			}, 0);
+
 			return cell;
 		}
-
 		function createCellWithRemoveButton() {
 			var cell = document.createElement('td');
 			var removeButton = document.createElement('a');
@@ -2989,16 +2955,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
 				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
-
-			// Ensure certification_per_vin is an array
-			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
-
 			options.forEach(function(optionData) {
 				var option = document.createElement('option');
 				option.value = optionData.value;
 				option.textContent = optionData.text;
-				
-				if (certification_per_vin.includes(optionData.value)) {
+
+				if (certification_per_vin==optionData.value) {
 					option.selected = true;
 				}
 				
@@ -3010,8 +2972,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$(selectElement).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
-				placeholder: "Choose "
+				placeholder: "Choose ",
+				initSelection: function(element, callback) {
+					var selectedValues = certification_per_vin.map(function(value) {
+						return options.find(option => option.value === value);
+					});
+					callback(selectedValues);
+				}
 			});
+
+			// Set the selected values for select2
+			$(selectElement).val(certification_per_vin).trigger('change');
 
 			return cell;
 		}
@@ -3094,27 +3065,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('#customer_company_number').val('');
 			}
         }
-
-       
-		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
-		function setWo() {
-			var SONumber = $('#so_number').val();
-			// Step 1: Split the string to get the part after "SO-"
-			let parts = SONumber.split("SO-");
-			if (parts.length < 2) {
-				throw new Error("Invalid SO Number format");
-			}
-			// Step 2: Remove leading zeros from the part after "SO-"
-			let numberPart = parts[1].replace(/^0+/, '');
-			var WONumber = "WO-";
-			if(numberPart != '') {
-				WONumber = WONumber+numberPart;
-			}
-			document.getElementById('wo_number').value = WONumber;
-		}
+	function setWo() {
+        var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+
+        if (SONumber === '') { // Check if the input is empty
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        // Step 1: Split the string to get the part after "SO-"
+        let parts = SONumber.split("SO-");
+        if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        // Step 2: Remove leading zeros from the part after "SO-"
+        let numberPart = parts[1].replace(/^0+/, '');
+        if (numberPart === '') { // Check if the number part is empty after removing leading zeros
+            document.getElementById('wo_number').value = ''; // Clear the WO Number field
+            return; // Exit the function
+        }
+
+        var WONumber = "WO-" + numberPart; // Construct the WO Number
+        document.getElementById('wo_number').value = WONumber; // Set the WO Number field
+    }
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
@@ -3203,5 +3181,71 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		}
 	});
 </script>
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
+
+@if ($hasPermission)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of input field IDs and classes to disable
+            const fieldsToDisable = [
+                'transport_type', // Class name for radio buttons
+                'brn',
+                'container_number',
+                'airline_reference_id',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'deposit_received_as',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_date',
+            ];
+
+            // Disable each field by ID or class
+            fieldsToDisable.forEach(function(field) {
+                const elementsById = document.getElementById(field);
+                const elementsByClass = document.getElementsByClassName(field);
+
+                if (elementsById) {
+                    elementsById.readOnly = true;
+                }
+
+                if (elementsByClass.length > 0) {
+                    Array.from(elementsByClass).forEach(function(element) {
+                        element.disabled = true;
+                    });
+                }
+				$('#airline').prop('disabled', true).trigger('change');
+				$('#currency').prop('disabled', true).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');	
+				$('#vin_multiple').prop('disabled', true).trigger('change');
+				$('#brn_file').prop('disabled', true).trigger('change');	
+				$('#signed_pfi').prop('disabled', true).trigger('change');	
+				$('#signed_contract').prop('disabled', true).trigger('change');	
+				$('#payment_receipts').prop('disabled', true).trigger('change');	
+				$('#noc').prop('disabled', true).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', true).trigger('change');	
+				$('#enduser_passport').prop('disabled', true).trigger('change');	
+				$('#enduser_contract').prop('disabled', true).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', true).trigger('change');				
+            });
+			var deleteButtons = document.querySelectorAll('.delete-button');
+			deleteButtons.forEach(function(button) {
+				button.disabled = true;
+			});
+        });
+    </script>
+@endif
 
 @endsection

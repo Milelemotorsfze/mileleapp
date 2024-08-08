@@ -18,6 +18,10 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
                     @endphp
                     @if ($hasPermission)
+                    <a class="btn btn-sm btn-primary float-end" href="{{ route('netsuitegdn.addingnetsuitegdn') }}" text-align: right>
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i> Netsuite GDN
+                </a>
+<p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transection
       </a>

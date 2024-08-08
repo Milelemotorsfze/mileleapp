@@ -84,6 +84,43 @@ class WorkOrder extends Model
         'updated_by',
         'deleted_by',
     ];
+    protected $appends = [
+        'finance_approval_status',
+        'coo_approval_status',
+        'total_number_of_boe'
+    ];
+    public function getFinanceApprovalStatusAttribute() {
+        $status = '';
+        $data = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
+        if($data && $data->status == 'pending') {
+            $status = 'Pending';
+        } else if($data && $data->status == 'approved') {
+            $status = 'Approved';
+        }else if($data && $data->status == 'rejected') {
+            $status = 'Rejected';
+        }
+        return $status;
+    }
+    public function getCooApprovalStatusAttribute() {
+        $status = '';
+        $data = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
+        if($data && $data->status == 'pending') {
+            $status = 'Pending';
+        } else if($data && $data->status == 'approved') {
+            $status = 'Approved';
+        }else if($data && $data->status == 'rejected') {
+            $status = 'Rejected';
+        }
+        return $status;
+    }
+    public function getTotalNumberOfBOEAttribute() {
+        $uniqueBoeCount = '';
+        $uniqueBoeCount = WOVehicles::where('work_order_id', $this->id)
+        ->whereNull('deleted_at')
+        ->distinct()
+        ->count('boe_number');
+        return $uniqueBoeCount;
+    }
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
@@ -100,9 +137,17 @@ class WorkOrder extends Model
     {
         return $this->hasOne(User::class,'id','finance_approval_by');
     }
+    public function COOApprovalBy()
+    {
+        return $this->hasOne(User::class,'id','coe_office_approval_by');
+    }
     public function vehicles()
     {
         return $this->hasMany(WOVehicles::class,'work_order_id','id');
+    }
+    public function depositAganistVin()
+    {
+        return $this->hasMany(WOVehicles::class,'work_order_id','id')->where('deposit_received','yes');
     }
     public function vehiclesWithTrashed()
     {
@@ -115,5 +160,29 @@ class WorkOrder extends Model
     public function dataHistories()
     {
         return $this->hasMany(WORecordHistory::class,'work_order_id','id');
+    }
+    public function financePendingApproval() {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->where('status', 'pending');
+    }
+    public function cooPendingApproval() {
+        return $this->hasOne(WOApprovals::class)
+        ->where('type', 'coo')
+        ->where('status', 'pending');
+    }
+    public function latestFinanceApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'finance')
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latestOfMany('action_at');
+    }
+    public function latestCooPendingApproval()
+    {
+        return $this->hasOne(WOApprovals::class)
+            ->where('type', 'coo')
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latestOfMany('action_at');
     }
 }

@@ -66,4 +66,8 @@ class PurchasingOrder extends Model
     {
         return $this->belongsTo(Country::class, 'fd');
     }
+    public function purchasedOrderPaidAmounts()
+    {
+        return $this->hasMany(PurchasedOrderPaidAmounts::class, 'purchasing_order_id');
+    }
 }

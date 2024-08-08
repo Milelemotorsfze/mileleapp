@@ -7,9 +7,12 @@ use App\Models\LetterOfIndentItem;
 use App\Models\LetterOfIndent;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
+use Illuminate\Support\Facades\Log;
 use App\Models\PFI;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
+use App\Mail\DPEmailNotification;
+use App\Mail\DPrealeasedEmailNotification;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -37,6 +40,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Carbon\CarbonTimeZone;
 use App\Models\UserActivities;
+use App\Models\BankAccounts;
 use App\Models\Purchasinglog;
 use App\Models\PurchasedOrderPaidAmounts;
 use App\Models\VendorPaymentAdjustments;
@@ -46,7 +50,8 @@ use App\Models\SupplierAccountTransaction;
 use App\Models\PurchasedOrderPriceChanges;
 use App\Models\PurchasedOrderMessages;
 use App\Models\PurchasedOrderReplies;
-
+use App\Models\Purchasedorderoldplfiles;
+use App\Models\VehiclesSupplierAccountTransaction;
 
 class PurchasingOrderController extends Controller
 {
@@ -55,6 +60,28 @@ class PurchasingOrderController extends Controller
      */
     public function index()
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $useractivities =  New UserActivities();
         $useractivities->activity = "Purchasing Order Index Page View";
         $useractivities->users_id = Auth::id();
@@ -78,6 +105,7 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }else{
@@ -91,6 +119,7 @@ class PurchasingOrderController extends Controller
     ->whereHas('vehicles', function ($query) {
         $query->whereNotNull('id');
     })
+    ->whereNotNull('totalcost') // Added condition
     ->orderBy('po_date', 'desc')
     ->get();
         }
@@ -113,6 +142,7 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }else{
@@ -126,119 +156,245 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filter($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filtercancel($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterapprovedonly($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', 'Approved')
-    ->whereExists(function ($query) {
-        $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Approved');
-    })
-            ->groupBy('purchasing_order.id')
-            ->get();
-        }
-        else{
-        $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.status', 'Approved')
-        // ->where(function ($query) use ($userId) {
-        //     $query->where('purchasing_order.created_by', $userId)
-        //         ->orWhere('purchasing_order.created_by', 16);
-        // })
-    ->whereExists(function ($query) {
-        $query->select(DB::raw(1))
-            ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Approved');
-    })
-        ->groupBy('purchasing_order.id')
-        ->get();
-        }
-        return view('warehouse.index', compact('data'));
-    }
-    public function filterapproved($status)
-    {
-        $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
-        if ($hasPermission){
-        $data = PurchasingOrder::with('purchasing_order_items')
-        ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                ->where('purchasing_order.status', '<>', 'Cancelled')
-                ->where(function ($query) {
-                    $query->where('status', 'Request for Payment')
-                        ->orWhere(function ($query) {
-                            $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                                ->where(function ($query) {
-                                    $query->whereNotNull('payment_status')
-                                        ->where('payment_status', '<>', '');
-                                });
-                        });
-                });
-        })
-        ->groupBy('purchasing_order.id')
-        ->get();
-    }
-        else{
-            $data = PurchasingOrder::with('purchasing_order_items')
-            // ->where(function ($query) use ($userId) {
-            //     $query->where('purchasing_order.created_by', $userId)
-            //         ->orWhere('purchasing_order.created_by', 16);
-            // })
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('purchasing_order.status', '<>', 'Cancelled')
-                    ->where(function ($query) {
-                        $query->where('status', 'Request for Payment')
-                            ->orWhere(function ($query) {
-                                $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                                    ->where(function ($query) {
-                                        $query->whereNotNull('payment_status')
-                                            ->where('payment_status', '<>', '');
-                                    });
+                    ->where('vehicles.status', 'Approved');
+            })
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('supplier_account_transaction')
+                    ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
+            })
+            ->groupBy('purchasing_order.id')
+            ->get();                
+        }
+        else{
+        $data = PurchasingOrder::with('purchasing_order_items')
+        ->where('purchasing_order.status', 'Approved')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('vehicles')
+                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->where('vehicles.status', 'Approved');
+        })
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id');
+        })
+        ->groupBy('purchasing_order.id')
+        ->get();        
+        }
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    }
+    public function filterapproved($status)
+    {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where(function ($query) {
+                $query->where('purchasing_order.status', 'Approved')
+                      ->orWhereNot('purchasing_order.status', 'Cancelled');
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                    ->where('vehicles.status', 'Approved')
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                            ->from('vehicle_purchasing_cost')
+                            ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                            ->where(function ($query) {
+                                $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                                      ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
                             });
                     });
             })
             ->groupBy('purchasing_order.id')
-            ->get();
+            ->get();        
+    }
+        else{
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where(function ($query) {
+                $query->where('purchasing_order.status', 'Approved')
+                      ->orWhereNot('purchasing_order.status', 'Cancelled');
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+                    ->where('vehicles.status', 'Approved')
+                    ->whereExists(function ($query) {
+                        $query->select(DB::raw(1))
+                            ->from('vehicle_purchasing_cost')
+                            ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                            ->where(function ($query) {
+                                $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                                      ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                            });
+                    });
+            })
+            ->groupBy('purchasing_order.id')
+            ->get(); 
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterincomings($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
-    $data = PurchasingOrder::with('purchasing_order_items')
+        $data = PurchasingOrder::with('purchasing_order_items')
     ->where('status', 'Approved')
-    ->whereNotExists(function ($query) {
+    ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+            });
     })
     ->groupBy('purchasing_order.id')
     ->get();
@@ -246,81 +402,149 @@ class PurchasingOrderController extends Controller
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
-    // ->where(function ($query) use ($userId) {
-    //     $query->where('purchasing_order.created_by', $userId)
-    //         ->orWhere('purchasing_order.created_by', 16);
-    // })
     ->where('status', 'Approved')
-    ->whereNotExists(function ($query) {
+    ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+            ->whereColumn('purchasing_order.id', 'vehicles.purchasing_order_id')
+            ->where('status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->whereColumn('vehicle_purchasing_cost.unit_price', 'vehicle_purchasing_cost.total_paid_amount');
+            });
     })
     ->groupBy('purchasing_order.id')
     ->get();
 }
-    return view('warehouse.index', compact('data'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
     public function filterpayment($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Request for Payment')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
         else
         {
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.created_by', $userId)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.status', 'Request for Payment')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Initiate Payment Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpaymentrejectioned($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
         else
         {
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.created_by', $userId)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Rejected')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpaymentrel($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+           ->where('supplier_account_transaction.transaction_type', 'Pre-Debit')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -333,16 +557,38 @@ else
         //         ->orWhere('purchasing_order.created_by', 16);
         // })
         ->where('purchasing_order.status', $status)
-        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-        ->where('vehicles.payment_status', 'Payment Initiated')
+        ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+       ->where('supplier_account_transaction.transaction_type', 'Pre-Debit')
         ->select('purchasing_order.*')
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterintentreq($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -368,17 +614,39 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingrelease($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -391,23 +659,45 @@ else
             //         ->orWhere('purchasing_order.created_by', 16);
             // })
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Request For Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingdebits($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Approved')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -417,16 +707,38 @@ else
             $data = PurchasingOrder::with('purchasing_order_items')
             // ->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
-            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Release Approved')
+            ->join('supplier_account_transaction', 'purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
+            ->where('supplier_account_transaction.transaction_type', 'Released')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
     }
     public function filterpendingfellow($status)
     {
+        $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -434,10 +746,11 @@ else
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Payment Completed');
+                    $query->Where('transaction_type', 'Debit')
+                    ->whereNull('vendor_payment_status');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -450,19 +763,42 @@ else
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->from('supplier_account_transaction')
+                ->whereColumn('purchasing_order.id', '=', 'supplier_account_transaction.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Payment Completed');
+                    $query->Where('transaction_type', 'Debit')
+                    ->whereNull('vendor_payment_status');
                 });
         })
         ->groupBy('purchasing_order.id')
         ->get();
     }
-    return view('warehouse.index', compact('data'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function filterconfirmation($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -495,21 +831,50 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function paymentinitiation($status)
 {
+    $bankaccounts = BankAccounts::get();
+    $exchangeRates = [
+        'USD' => 3.67,
+        'EUR' => 4.20,
+        'JPY' => 0.034,
+        'CAD' => 2.89,
+        'AED' => 1
+    ];
+    $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+        return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+    }, 0);
+    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+        $purchasingOrder = $payment->purchasingOrder;
+        if ($purchasingOrder) {
+            $currency = $purchasingOrder->currency;
+            $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+            return $carry + $amountInAED;
+        }
+        return $carry;
+    }, 0);
+    $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
-$data = PurchasingOrder::with('purchasing_order_items')
+    $data = PurchasingOrder::with('purchasing_order_items')
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->groupBy('purchasing_order.id')
@@ -518,20 +883,26 @@ $data = PurchasingOrder::with('purchasing_order_items')
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
-    // ->where('created_by', $userId)->orWhere('created_by', 16)
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
-            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where(function ($query) {
-                $query->where('status', 'Approved');
+            ->whereColumn('vehicles.purchasing_order_id', 'purchasing_order.id')
+            ->where('vehicles.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_purchasing_cost')
+                    ->whereColumn('vehicle_purchasing_cost.vehicles_id', 'vehicles.id')
+                    ->where(function ($query) {
+                        $query->whereColumn('vehicle_purchasing_cost.unit_price', '!=', 'vehicle_purchasing_cost.total_paid_amount')
+                              ->orWhereNull('vehicle_purchasing_cost.total_paid_amount');
+                    });
             });
     })
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
     /**
      * Show the form for creating a new resource.
@@ -806,10 +1177,16 @@ public function getBrandsAndModelLines(Request $request)
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
         $vendorPaymentAdjustments = VendorPaymentAdjustments::where('purchasing_order_id', $id)
-        ->where('status', '!=', 'Paid')
-        ->select('type', DB::raw('SUM(totalamount) as total_amount', 'amount', DB::raw('SUM(totalamount) as total_adjusted_amount')))
-        ->groupBy('type')
-        ->get();  
+    ->where(function ($query) {
+        $query->where('status', '!=', 'Paid')
+              ->where('status', '!=', 'pending')
+              ->where('status', '!=', 'Rejected')
+              ->where('status', '!=', 'Request For Payment')
+              ->Where('status', '!=', 'Approved');
+    })
+    ->select('type', DB::raw('SUM(totalamount) as total_amount'), 'amount', DB::raw('SUM(amount) as total_adjusted_amount'))
+    ->groupBy('type')
+    ->get();
         $totalSum = $vendorPaymentAdjustments->sum('total_amount');
     $alreadypaidamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Paid')->sum('amount');
     $totalSurcharges = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
@@ -818,11 +1195,7 @@ public function getBrandsAndModelLines(Request $request)
     $totalDiscounts = intval(PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
     ->where('change_type', 'discount')
     ->sum('price_change'));
-    $intialamount = DB::table('vehicles')
-    ->join('vehicle_purchasing_cost', 'vehicles.id', '=', 'vehicle_purchasing_cost.vehicles_id')
-    ->where('vehicles.purchasing_order_id', $id)
-    ->where('vehicles.payment_status', 'Payment Initiated Request')
-    ->sum('vehicle_purchasing_cost.unit_price');
+    $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
     $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
@@ -885,12 +1258,32 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrderSwiftCopies = PurchasingOrderSwiftCopies::where('purchasing_order_id', $id)->orderBy('created_at', 'desc')
         ->get();
         $purchasedorderevents = PurchasingOrderEventsLog::where('purchasing_order_id', $id)->get();
+        $oldPlFiles = Purchasedorderoldplfiles::where('purchasing_order_id', $id)->get();
+        $transitions = SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('transaction_amount', '!=', 0)
+        ->with('purchaseOrder')
+        ->orderBy('created_at', 'asc')
+        ->get();
+        $groupedTransitions = $transitions->groupBy('purchaseOrder.po_number');
+        foreach ($groupedTransitions as $po_number => $transactions) {
+        foreach ($transactions as $index => $transaction) {
+        $transaction->row_number = $index + 1;
+        $transaction->vehicle_count = \DB::table('vehicles_supplier_account_transaction')
+                                        ->where('sat_id', $transaction->id)
+                                        ->count();
+        }
+        }
+        $accounts = SupplierAccount::with('supplier')->where('id', $id)->first();
+        $additionalpaymentpend = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'pending')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
+        $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
     }
     public function edit($id)
     {
@@ -1446,7 +1839,7 @@ public function purchasingupdateStatus(Request $request)
     {
         $vehicle = Vehicles::findOrFail($id);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
-        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process'|| $vehicle->status == 'Payment Requested') {
+        if ($vehicle->status == 'Approved') {
             if($hasPermission)
             {
                 $purchasinglog = new Purchasinglog();
@@ -1895,6 +2288,7 @@ public function paymentreleasesconfirm($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+
             if($vehicle->model_id) {
                 // get the loi item and update the utilization quantity
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
@@ -1921,7 +2315,6 @@ public function paymentreleasesconfirm($id)
                 }
             }
             DB::commit();
-
         return redirect()->back()->with('success', 'Payment Payment Release Approved confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -1973,6 +2366,29 @@ public function paymentrelconfirmdebited(Request $request, $id)
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
+            $purchasedorder = PurchasingOrder::where('id', $vehicle->purchasing_order_id);
+            $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
+            $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Approved')
+                ->sum('amount');
+            if (!$supplieraccountchange) {
+            $supplieraccountchange = new SupplierAccount();
+            $supplieraccountchange->suppliers_id = $purchasedorder->vendors_id;
+            $supplieraccountchange->current_balance += $paymentad;
+            $supplieraccountchange->currency = $purchasedorder;
+            $supplieraccountchange->opening_balance = 0;
+            $supplieraccountchange->save();
+            }
+            $supplieracc->current_balance += $paymentad;
+            $supplieraccountchange->save();
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $vehicle->purchasing_order_id;
+            $supplieraccount->supplier_account_id = $supplieraccountchange->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $purchasedorder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
         }
     if ($vehicle) {
         DB::beginTransaction();
@@ -2120,38 +2536,66 @@ public function purchasingallupdateStatusrel(Request $request)
     $status = $request->input('status');
     $remarks = $request->input('remarks', null);
     $vehicles = DB::table('vehicles')
-        ->where('payment_status', 'Payment Initiated')
-        ->where('purchasing_order_id', $id)
-        ->get();
+    ->where('purchasing_order_id', $id)
+    ->where(function($query) {
+        $query->where('payment_status', 'Payment Initiated')
+              ->orWhere('remaining_payment_status', 'Payment Initiated');
+    })
+    ->get();
     if ($status == 'Approved') {
         $PurchasingOrder = PurchasingOrder::find($id);
-        $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
-        if ($supplieracc) {
-            $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
-                ->where('status', 'Suggested Payment')
-                ->sum('amount');
-            $supplieracc->current_balance += $paymentad;
-            $supplieracc->save();
-            PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
-                ->where('status', 'Suggested Payment')
-                ->update(['status' => 'Paid']);
-            VendorPaymentAdjustments::where('purchasing_order_id', $id)
+        VendorPaymentAdjustments::where('purchasing_order_id', $id)
                 ->where('status', 'pending')
-                ->update(['status' => 'Paid']);
-            if($paymentad != 0)
-            {
-            $supplieraccount = new SupplierAccountTransaction();
-            $supplieraccount->transaction_type = "Debit";
-            $supplieraccount->purchasing_order_id = $id;
-            $supplieraccount->supplier_account_id = $supplieracc->id;
-            $supplieraccount->created_by = auth()->user()->id;
-            $supplieraccount->account_currency = $PurchasingOrder->currency;
-            $supplieraccount->transaction_amount = $paymentad;
-            $supplieraccount->save();
-            }
+                ->update(['status' => 'Approved']);
+        PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Suggested Payment')
+                ->update(['status' => 'Approved']);
+        SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('status', 'pending')
+        ->where('transaction_type', 'Pre-Debit')
+        ->update([
+            'status' => 'Approved',
+            'remarks' => 'Approved For Released Payment'
+        ]);
         }
-        } 
+    elseif ($status == 'Rejected') {
+        PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Suggested Payment')->delete();
+        VendorPaymentAdjustments::where('purchasing_order_id', $id)->where('status', 'Pending')->delete();
+    }
     foreach ($vehicles as $vehicle) {
+        if($vehicle->remaining_payment_status == 'Payment Initiated')
+        {
+            if ($status == 'Approved') {
+                $paymentStatus = 'Payment Release Approved';
+                $updateData = ['remaining_payment_status' => $paymentStatus,
+                'procurement_vehicle_remarks' => null
+            ];
+            } elseif ($status == 'Rejected') {
+                $paymentStatus = 'Payment Release Rejected';
+                $updateData = [
+                    'remaining_payment_status' => $paymentStatus,
+                    'procurement_vehicle_remarks' => $remarks
+                ];
+            }
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update($updateData);
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Payment Initiated Status';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = 'Remanining Payment Status';
+            $vehicleslog->old_value = 'Payment Initiated';
+            $vehicleslog->new_value = 'Payment Relased';
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+        }
+        else
+        {
         if ($status == 'Approved') {
                 $paymentStatus = 'Payment Release Approved';
                 $updateData = ['payment_status' => $paymentStatus,
@@ -2213,6 +2657,7 @@ public function purchasingallupdateStatusrel(Request $request)
                     }
                 }
             }
+        }
     }
     return redirect()->back()->with('success', 'Payment Status Updated');
 }
@@ -2248,6 +2693,7 @@ public function allpaymentreqss(Request $request)
 }
 public function allpaymentreqssfin(Request $request)
 {
+    $percentage =  $request->input('percentage');
     $id = $request->input('orderId');
     $status = $request->input('status');
     if($status == "Approved")
@@ -2265,7 +2711,14 @@ public function allpaymentreqssfin(Request $request)
             ->where('id', $vehicle->id)
             ->update(['status' => $status, 'payment_status' => $payment_status]);
             $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicle->id)->value('unit_price');
-            $totalCost += $vehicleCost;
+            $adjustedCost = $vehicleCost * ($percentage / 100);
+            $totalCost +=  $adjustedCost;
+            $currentPercentage = DB::table('vehicles')->where('id', $vehicle->id)->value('purchased_paid_percentage');
+            $currentPercentage = $currentPercentage ?? 0; // Treat null as 0
+            $newPercentage = $currentPercentage + $percentage;
+            DB::table('vehicles')
+            ->where('id', $vehicle->id)
+            ->update(['purchased_paid_percentage' => $newPercentage]);
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -2283,6 +2736,7 @@ public function allpaymentreqssfin(Request $request)
             $paymentinti = New PurchasedOrderPaidAmounts();
             $paymentinti->amount = $totalCost;
             $paymentinti->purchasing_order_id = $id;
+            $paymentinti->percentage = $percentage;
             $paymentinti->created_by = auth()->user()->id;
             $paymentinti->status = "Request For Payment";
             $paymentinti->save();
@@ -2322,16 +2776,25 @@ public function allpaymentreqssfinpay(Request $request)
     $id = $request->input('orderId');
     $status = $request->input('status');
     $vehicles = DB::table('vehicles')
-    ->where('purchasing_order_id', $id)
-    ->where('status', 'Payment Requested')
-    ->where('payment_status', 'Payment Initiated Request')
-    ->get();
+        ->where('purchasing_order_id', $id)
+        ->where(function($query) {
+            $query->where('status', 'Payment Requested')
+                  ->where('payment_status', 'Payment Initiated Request');
+        })
+        ->orWhere('remaining_payment_status', 'Payment Requested')
+        ->get();
     foreach ($vehicles as $vehicle) {
         $status = 'Payment Requested';
         $payment_status = 'Payment Initiated';
-        DB::table('vehicles')
-            ->where('id', $vehicle->id)
-            ->update(['status' => $status, 'payment_status' => $payment_status]);
+        if(isset($vehicle->remaining_payment_status) && $vehicle->remaining_payment_status == "Payment Requested") {
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['remaining_payment_status' => 'Payment Initiated']);
+        } else {
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['status' => $status, 'payment_status' => $payment_status]);
+        }
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
                 $vehicleslog = new Vehicleslog();
@@ -2362,6 +2825,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount + $remainingAmount;
                 $VendorPaymentAdjustments->remaining_amount = $remainingAmount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount + $remainingAmount;
@@ -2369,11 +2833,12 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Adjustment the payment";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
                 $purchasingordereventsLog->created_by = auth()->user()->id;
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->purchasing_order_id = $id;
                 $purchasingordereventsLog->field = "Price";
                 $purchasingordereventsLog->new_value = $adjustmentAmount + $remainingAmount;
                 $purchasingordereventsLog->description = $description;
@@ -2391,6 +2856,7 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
                 $VendorPaymentAdjustments->remaining_amount = $intialamount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount;
@@ -2398,11 +2864,12 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Pay the Balance of with this PO";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
                 $purchasingordereventsLog->created_by = auth()->user()->id;
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->purchasing_order_id = $id;
                 $purchasingordereventsLog->field = "Price";
                 $purchasingordereventsLog->new_value = $adjustmentAmount;
                 $purchasingordereventsLog->description = $description;
@@ -2419,18 +2886,20 @@ public function allpaymentreqssfinpay(Request $request)
                 $VendorPaymentAdjustments->totalamount = $adjustmentAmount;
                 $VendorPaymentAdjustments->remaining_amount = $intialamount - $adjustmentAmount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $paidaccount = New PurchasedOrderPaidAmounts();
                 $paidaccount->amount = $adjustmentAmount;
                 $paidaccount->created_by = auth()->user()->id;
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $totalcost = $intialamount;
                 $description = "Partial Payment to the Vendor";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
                 $purchasingordereventsLog->created_by = auth()->user()->id;
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->purchasing_order_id = $id;
                 $purchasingordereventsLog->field = "Price";
                 $purchasingordereventsLog->new_value = $adjustmentAmount;
                 $purchasingordereventsLog->description = $description;
@@ -2439,13 +2908,14 @@ public function allpaymentreqssfinpay(Request $request)
             else
             {
                 $VendorPaymentAdjustments = New VendorPaymentAdjustments();
-                $VendorPaymentAdjustments->amount = $adjustmentAmount;
+                $VendorPaymentAdjustments->amount = $intialamount;
                 $VendorPaymentAdjustments->type = "No Adjustment";
                 $VendorPaymentAdjustments->supplier_account_id = $purchasedorder->vendors_id;
                 $VendorPaymentAdjustments->purchasing_order_id = $id;
                 $VendorPaymentAdjustments->created_by = auth()->user()->id;
                 $VendorPaymentAdjustments->totalamount = $intialamount;
                 $VendorPaymentAdjustments->save();
+                $VendorPaymentAdjustmentsid = $VendorPaymentAdjustments->id;
                 $totalcost = $intialamount;
                 $adjustmentAmount = $intialamount;
                 $paidaccount = New PurchasedOrderPaidAmounts();
@@ -2454,17 +2924,28 @@ public function allpaymentreqssfinpay(Request $request)
                 $paidaccount->purchasing_order_id = $purchasedorder->id;
                 $paidaccount->status = "Suggested Payment";
                 $paidaccount->save();
+                $paidaccountid = $paidaccount->id;
                 $description = "Payment to the vendor without any adjustment";
                 $purchasingordereventsLog = new PurchasingOrderEventsLog();
                 $purchasingordereventsLog->event_type = "Payment Adjustment";
                 $purchasingordereventsLog->created_by = auth()->user()->id;
-                $purchasingordereventsLog->purchasing_order_id = $purchasingOrderId;
+                $purchasingordereventsLog->purchasing_order_id = $id;
                 $purchasingordereventsLog->field = "Price";
                 $purchasingordereventsLog->new_value = $adjustmentAmount;
                 $purchasingordereventsLog->description = $description;
                 $purchasingordereventsLog->save();
             }
-            PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->update(['status' => 'Initiated Payment']);
+            $paymentOrderStatus = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+    ->where('status', 'Request For Payment')
+    ->get();
+
+if ($paymentOrderStatus->isNotEmpty()) {
+    foreach ($paymentOrderStatus as $paymentOrder) {
+        $paymentOrder->status = 'Initiated Payment';
+        $paymentOrder->save();
+    }
+    info($paymentOrderStatus);
+}
             $currency = $purchasedorder->currency;
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
             if (!$supplieraccountchange) {
@@ -2478,48 +2959,60 @@ public function allpaymentreqssfinpay(Request $request)
         else{
         if($totalcost != 0)
         {
-        switch ($currency) {
-    case "USD":
-        $totalcostconverted = $totalcost * 3.67;
-        break;
-    case "EUR":
-        $totalcostconverted = $totalcost * 3.94;
-        break;
-    case "GBP":
-        $totalcostconverted = $totalcost * 4.67;
-        break;
-    case "JPY":
-        $totalcostconverted = $totalcost * 0.023;
-        break;
-    case "CAD":
-        $totalcostconverted = $totalcost * 2.68;
-        break;
-    default:
-        $totalcostconverted = $totalcost;
-        }
-        $supplieraccountchange->current_balance -= $totalcostconverted;
-        $supplieraccountchange->save();
-        }
-        $supplieraccount = new SupplierAccountTransaction();
-        $supplieraccount->transaction_type = "Credit";
-        $supplieraccount->purchasing_order_id = $purchasedorder->id;
-        $supplieraccount->supplier_account_id = $supplieraccountchange->id;
-        $supplieraccount->created_by = auth()->user()->id;
-        $supplieraccount->account_currency = $currency;
-        $supplieraccount->transaction_amount = $totalcost;
-        $supplieraccount->save();
-    }
-            return redirect()->back()->with('success', 'Payment Status Updated');
+                switch ($currency) {
+            case "USD":
+                $totalcostconverted = $totalcost * 3.67;
+                break;
+            case "EUR":
+                $totalcostconverted = $totalcost * 3.94;
+                break;
+            case "GBP":
+                $totalcostconverted = $totalcost * 4.67;
+                break;
+            case "JPY":
+                $totalcostconverted = $totalcost * 0.023;
+                break;
+            case "CAD":
+                $totalcostconverted = $totalcost * 2.68;
+                break;
+            default:
+                $totalcostconverted = $totalcost;
+                }
+                $supplieraccountchange->current_balance -= $totalcostconverted;
+                $supplieraccountchange->save();
+                }
+                $supplieraccount = new SupplierAccountTransaction();
+                $supplieraccount->transaction_type = "Pre-Debit";
+                $supplieraccount->purchasing_order_id = $purchasedorder->id;
+                $supplieraccount->supplier_account_id = $supplieraccountchange->id;
+                $supplieraccount->created_by = auth()->user()->id;
+                $supplieraccount->account_currency = $currency;
+                $supplieraccount->transaction_amount = $totalcost;
+                $supplieraccount->save();
+                $supplieraccountid = $supplieraccount->id;
+                foreach ($vehicles as $vehicle) {
+                    $updatevehicle = New VehiclesSupplierAccountTransaction();
+                    $updatevehicle->vehicles_id =  $vehicle->id;
+                    $updatevehicle->sat_id = $supplieraccountid;
+                    $updatevehicle->vpa_id = $VendorPaymentAdjustmentsid;
+                    $updatevehicle->popa_id = $paidaccountid;
+                    $updatevehicle->save();
+                }
+            }
+                    return redirect()->back()->with('success', 'Payment Status Updated');
        }
        public function allpaymentreqssfinpaycomp(Request $request)
        {
            $id = $request->input('orderId');
            $status = $request->input('status');
            $vehicles = DB::table('vehicles')
-           ->where('purchasing_order_id', $id)
-           ->where('status', 'Payment Requested')
-           ->where('payment_status', 'Payment Release Approved')
-           ->get();
+        ->where('purchasing_order_id', $id)
+        ->where(function($query) {
+            $query->where('status', 'Payment Requested')
+                  ->where('payment_status', 'Payment Release Approved');
+        })
+        ->orWhere('remaining_payment_status', 'Payment Release Approved')
+        ->get();
            $vehicleCount = $vehicles->count();
            if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -2537,13 +3030,49 @@ public function allpaymentreqssfinpay(Request $request)
             $swiftcopy->batch_no = $batchNo;
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
+            $PurchasingOrder = PurchasingOrder::where('id', $id)->first();
+            $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
+        if ($supplieracc) {
+            $paymentad = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Approved')
+                ->sum('amount');
+            $supplieracc->current_balance += $paymentad;
+            $supplieracc->save();
+            PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)
+                ->where('status', 'Approved')
+                ->update(['status' => 'Paid']);
+            VendorPaymentAdjustments::where('purchasing_order_id', $id)
+                ->where('status', 'Approved')
+                ->update(['status' => 'Paid']);
+            if($paymentad != 0)
+            {
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $id;
+            $supplieraccount->supplier_account_id = $supplieracc->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $PurchasingOrder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
+            }
+        }
         }        
            foreach ($vehicles as $vehicle) {
+            if($vehicle->remaining_payment_status == 'Payment Release Approved')
+            {
+                $remaining_payment_status = 'Payment Completed';
+                DB::table('vehicles')
+                    ->where('id', $vehicle->id)
+                    ->update(['remaining_payment_status' => $remaining_payment_status]);
+            }
+            else
+            {
                $status = 'Payment Completed';
                $payment_status = 'Payment Completed';
                DB::table('vehicles')
                    ->where('id', $vehicle->id)
                    ->update(['status' => $status, 'payment_status' => $payment_status]);
+            }
                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                    $currentDateTime = Carbon::now($dubaiTimeZone);
                        $vehicleslog = new Vehicleslog();
@@ -2732,25 +3261,31 @@ public function allpaymentreqssfinpay(Request $request)
     $purchasingOrder->status = "Pending Approval";
 
     if ($request->hasFile('uploadPL')) {
+        $oldpl = New Purchasedorderoldplfiles(); 
+        $oldpl->purchasing_order_id = $purchasingOrder->id;
+        $oldpl->file_path = $purchasingOrder->pl_file_path;
+        $oldpl->save();
+        $description = "The PFI Document is Updated";
+        $purchasingordereventsLog = new PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Update PO PFI Document";
+        $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->field = "PFI Document";
+        $purchasingordereventsLog->description = $description;
+        $purchasingordereventsLog->save();
         // Get file with extension
         $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
-
         // Get just the filename
         $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-
         // Get just the extension
         $extension = $request->file('uploadPL')->getClientOriginalExtension();
-
         // Create a unique filename to store
         $fileNameToStore = $filename.'_'.time().'.'.$extension;
-
         // Move the file to the public storage path
         $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
-
         // Update the file path in the purchasing order
         $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
     }
-
     // Save the purchasing order
     $purchasingOrder->save();
 
@@ -2811,6 +3346,28 @@ public function allpaymentreqssfinpay(Request $request)
 }       
         public function pendingvins($status)
 {
+    $bankaccounts = BankAccounts::get();
+        $exchangeRates = [
+            'USD' => 3.67,
+            'EUR' => 4.20,
+            'JPY' => 0.034,
+            'CAD' => 2.89,
+            'AED' => 1
+        ];
+        $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
+            return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
+        }, 0);
+        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
+            $purchasingOrder = $payment->purchasingOrder;
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $amountInAED = $payment->amount * ($exchangeRates[$currency] ?? 1);
+                return $carry + $amountInAED;
+            }
+            return $carry;
+        }, 0);
+        $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -2841,41 +3398,50 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
 }
 public function rerequestpayment(Request $request)
 {
     $id = $request->input('orderId');
     $status = $request->input('status');
     $vehicles = DB::table('vehicles')
-    ->where('purchasing_order_id', $id)
-    ->where('status', 'Payment Requested')
-    ->orwhere('status', 'Payment Rejected')
-    ->where('payment_status', 'Payment Release Rejected')
-    ->get();
+        ->where('purchasing_order_id', $id)
+        ->where(function($query) {
+            $query->where('status', 'Payment Rejected')
+                  ->orWhere('remaining_payment_status', 'Payment Rejected')
+                  ->orWhere('payment_status', 'Payment Release Rejected');
+        })
+        ->get();
     info($vehicles);
     foreach ($vehicles as $vehicle) {
-        $status = 'Payment Requested';
-        $payment_status = 'Payment Initiated Request';
-        DB::table('vehicles')
-            ->where('id', $vehicle->id)
-            ->update(['status' => $status, 'payment_status' => $payment_status]);
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'Re Payment Initiated';
-                $vehicleslog->vehicles_id = $vehicle->id;
-                $vehicleslog->field = "Vehicle Status, Payment Status";
-                $vehicleslog->old_value = "Payment Re Initiate Request";
-                $vehicleslog->new_value = "Payment Release Rejected";
-                $vehicleslog->created_by = auth()->user()->id;
-                $vehicleslog->role = Auth::user()->selectedRole;
-                $vehicleslog->save();
-            }
-            return redirect()->back()->with('success', 'Payment Status Updated');
-       }
+        if ($vehicle->payment_status == 'Payment Release Rejected') {
+            $status = 'Payment Requested';
+            $payment_status = 'Payment Initiated Request';
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['status' => $status, 'payment_status' => $payment_status]);
+        } else {
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['remaining_payment_status' => 'Payment Requested']);
+        }
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Re Payment Initiated';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Vehicle Status, Payment Status";
+        $vehicleslog->old_value = "Payment Re Initiate Request";
+        $vehicleslog->new_value = $vehicle->status == 'Payment Rejected' ? "Payment Release Rejected" : "Payment Requested";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+    }
+
+    return redirect()->back()->with('success', 'Payment Status Updated');
+}
        public function repaymentintiation($id)
        {
            $vehicle = Vehicles::find($id);
@@ -3006,11 +3572,7 @@ public function getSupplierAndAmount($orderId) {
     if ($order) {
         $vendors_id = $order->vendors_id;
         $supplier = SupplierAccount::where('suppliers_id', $vendors_id)->first();
-        $requestedcost = DB::table('vehicles')
-        ->join('vehicle_purchasing_cost', 'vehicles.id', '=', 'vehicle_purchasing_cost.vehicles_id')
-        ->where('vehicles.purchasing_order_id', $orderId)
-        ->where('vehicles.payment_status', 'Payment Initiated Request')
-        ->sum('vehicle_purchasing_cost.unit_price');
+        $requestedcost =PurchasedOrderPaidAmounts::where('purchasing_order_id', $orderId)->where('status', 'Request For Payment')->sum('amount');
         $current_amount = $supplier->current_balance;
         $totalamount = $order->totalcost;
         $requestedcost = $requestedcost;
@@ -3041,7 +3603,19 @@ public function updatePrices(Request $request)
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderCurrency = $purchasingOrder->currency;
     $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+
+    if(!$supplierAccount) {
+        $createsupplieracc = new SupplierAccount();
+        $createsupplieracc->opening_balance = 0;
+        $createsupplieracc->current_balance = 0;
+        $createsupplieracc->suppliers_id = $purchasingOrder->vendors_id;
+        $createsupplieracc->currency = $orderCurrency; 
+        $createsupplieracc->save();
+        $supplierAccount = $createsupplieracc;
+    }
+
     $accountCurrency = $supplierAccount->currency;
+
     $conversionRates = [
         'USD' => 3.67,
         'EUR' => 3.94,
@@ -3049,28 +3623,32 @@ public function updatePrices(Request $request)
         'JPY' => 0.023,
         'CAD' => 2.69
     ];
+
     $totalDifference = 0;
     $priceChanges = [];
     $totalAmountOfChanges = 0;
     $totalVehiclesChanged = 0;
+
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
         $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicleId)->first();
         $oldPrice = $vehicleCost->unit_price;
         $priceDifference = $oldPrice - $newPrice;
+
         if ($priceDifference != 0) {
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
+            
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();
             $vehicleslog->date = $currentDateTime->toDateString();
             $vehicleslog->status = 'Update Vehicles Price';
             $vehicleslog->vehicles_id = $vehicleId;
             $vehicleslog->field = "Price";
-            $vehicleslog->old_value = $vehicleCost->unit_price;
+            $vehicleslog->old_value = $oldPrice;
             $vehicleslog->new_value = $newPrice;
-            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->created_by = $userId;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
             $statuses = [
@@ -3079,89 +3657,82 @@ public function updatePrices(Request $request)
                 'Vendor Confirmed', 
                 'Incoming Stock'
             ];
+
             $vehiclesalreadypaid = Vehicles::where('id', $vehicleId)
-                               ->whereIn('payment_status', $statuses)
-                               ->first();
-            if($vehiclesalreadypaid)
-            {
-                if ($vehicleCost->unit_price > $newPrice) {
-                    $changeType = 'discount';
-                } else {
-                    $changeType = 'Surcharge';
-                }
-                $priceChange = abs($vehicleCost->unit_price - $newPrice);
-                $priceupdates = New PurchasedOrderPriceChanges ();
-                $priceupdates->purchasing_order_id = $purchasingOrderId;
-                $priceupdates->vehicles_id = $vehicleId;
-                $priceupdates->original_price = $vehicleCost->unit_price;
-                $priceupdates->new_price = $newPrice;
-                $priceupdates->price_change = $priceChange;
-                $priceupdates->change_type = $changeType;
-                $priceupdates->save();
+                ->where(function($query) use ($statuses) {
+                    $query->whereIn('payment_status', $statuses)
+                        ->where('purchased_paid_percentage', 100)
+                        ->whereNull('remaining_payment_status');
+                })
+                ->first();
+            $vehicleAlreadyPaidOrRemainingInStatuses = Vehicles::where('id', $vehicleId)
+                ->where(function($query) use ($statuses) {
+                    $query->whereIn('payment_status', $statuses)
+                        ->where('purchased_paid_percentage', 100)
+                        ->orWhereIn('remaining_payment_status', $statuses);
+                })
+                ->first();
+            $priceChange = abs($priceDifference);
+            $changeType = $priceDifference > 0 ? 'discount' : 'surcharge';
+
+            $priceupdates = new PurchasedOrderPriceChanges();
+            $priceupdates->purchasing_order_id = $purchasingOrderId;
+            $priceupdates->vehicles_id = $vehicleId;
+            $priceupdates->original_price = $oldPrice;
+            $priceupdates->new_price = $newPrice;
+            $priceupdates->price_change = $priceChange;
+            $priceupdates->change_type = $changeType;
+            $priceupdates->save();
+
+            $vehicle = Vehicles::find($vehicleId);
+            $priceChanges[] = [
+                'vehicle_reference' => $vehicle->id,
+                'Vin' => $vehicle->vin,
+                'variant_name' => $vehicle->variant->name,
+                'old_price' => $oldPrice,
+                'new_price' => $newPrice,
+                'changed_by' => auth()->user()->name,
+            ];
+
+            $totalAmountOfChanges += $priceDifference;
+            $totalVehiclesChanged++;
+
+            if ($orderCurrency !== $accountCurrency) {
+                $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
+            } else {
+                $priceDifferenceInAccountCurrency = $priceDifference;
             }
+
+            $totalDifference += $priceDifferenceInAccountCurrency;
+
             $vehicleCost->update(['unit_price' => $newPrice]);
-            $updatepriceinpaid = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Request For Payment')->orderBy('created_at', 'desc')->first();
-            $updatePerformed = false;
-            if ($updatepriceinpaid) {
-                if ($priceDifference > 0) {
-                    $updatepriceinpaid->amount -= $priceDifference; 
-                } else {
-                    $updatepriceinpaid->amount += abs($priceDifference);
-                }
-                $updatepriceinpaid->save();
-                $updatePerformed = true;
+
+            if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
+                $supplierAccount->current_balance += $totalDifference;
+                $supplierAccount->save();
+
+                SupplierAccountTransaction::create([
+                    'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
+                    'purchasing_order_id' => $purchasingOrderId,
+                    'supplier_account_id' => $supplierAccount->id,
+                    'created_by' => $userId,
+                    'account_currency' => $accountCurrency,
+                    'transaction_amount' => abs($totalDifference),
+                ]);
+                if($purchasingOrder->is_demand_planning_po == 1)
+            {
+                $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
             }
-            $vehicles = Vehicles::where('id', $vehicleId)->first();
-            if ($vehicles && ($vehicles->payment_status == '' || $vehicles->payment_status == 'Payment Initiated Request')) {
-                continue;
+            else
+            {
+                $recipients = ['abdul@milele.com', 'team.finance@milele.com'];  
             }
-            if (!$updatePerformed) {
-            $updatepriceinpaidint = PurchasedOrderPaidAmounts::where('purchasing_order_id', $purchasingOrderId)->where('status', 'Initiated Payment')->orderBy('created_at', 'desc')->first();
-            if ($updatepriceinpaidint) {
-                if ($priceDifference > 0) {
-                    $updatepriceinpaidint->amount -= $priceDifference;
-                } else {
-                    $updatepriceinpaidint->amount += abs($priceDifference);
-                }
-                $updatepriceinpaidint->save();
+                Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
             }
-         }
-         $vehicle = Vehicles::find($vehicleId);
-         $priceChanges[] = [
-             'vehicle_reference' => $vehicle->id,
-             'Vin' => $vehicle->vin,
-             'variant_name' => $vehicle->variant->name,
-             'old_price' => abs($oldPrice),
-             'new_price' => $newPrice,
-             'changed_by' => auth()->user()->name,
-         ];
-         $totalAmountOfChanges += $priceDifference;
-         $totalVehiclesChanged++;
         }
-        if ($orderCurrency !== $accountCurrency) {
-            $priceDifferenceInAccountCurrency = $this->convertCurrency($priceDifference, $orderCurrency, $accountCurrency, $conversionRates);
-        } else {
-            $priceDifferenceInAccountCurrency = $priceDifference;
-        }
-        $totalDifference += $priceDifferenceInAccountCurrency;
     }
-    if ($totalDifference != 0) {
-        $supplierAccount->current_balance += $totalDifference;
-        $supplierAccount->save();
-        SupplierAccountTransaction::create([
-            'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
-            'purchasing_order_id' => $purchasingOrderId,
-            'supplier_account_id' => $supplierAccount->id,
-            'created_by' => $userId,
-            'account_currency' => $accountCurrency,
-            'transaction_amount' => abs($totalDifference),
-        ]);
-    }
+
     $purchasingOrder->update(['totalcost' => $totalPrice]);
-    $ponumber = $purchasingOrder->po_number;
-    $recipients = ['team.dp@milele.com', 'abdul@milele.com', 'team.finance@milele.com'];
-    Mail::to($recipients)->send(new PriceChangeNotification($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
-    return response()->json(['message' => 'Prices updated successfully']);
 }
 private function convertCurrency($amount, $fromCurrency, $toCurrency, $conversionRates)
 {
@@ -3258,4 +3829,891 @@ public function updateVariants(Request $request)
     }
     return response()->json(['success' => true]);
 }
+public function paymentremanings($id)
+{
+$useractivities =  New UserActivities();
+$useractivities->activity = "Request for Remaining Payments";
+$useractivities->users_id = Auth::id();
+$useractivities->save();
+$vehicle = Vehicles::find($id);
+if ($vehicle) {
+    $vehicle->remaining_payment_status = 'Request for Payment';
+    $vehicle->save();
+    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+    $currentDateTime = Carbon::now($dubaiTimeZone);
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Request for Remaining Payment';
+        $vehicleslog->vehicles_id = $id;
+        $vehicleslog->field = "Vehicle Payment Remaining Status";
+        $vehicleslog->old_value = "Partial Payment";
+        $vehicleslog->new_value = "Request for Initiate Payment";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        $purchasingordereventsLog = new PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Request for Payment";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+            $purchasingordereventsLog->purchasing_order_id = $vehicle->purchasing_order_id;
+            $purchasingordereventsLog->field = "Vehicle Payment Remaining Status";
+            $purchasingordereventsLog->old_value = "Partial Payment";
+            $purchasingordereventsLog->new_value = "Request for Initiate Payment";
+            $purchasingordereventsLog->description = "PO Creator Request the Payment to the Againt of the Vehicle Ref $id";
+            $purchasingordereventsLog->save();
+    return redirect()->back()->with('success', 'Payment confirmed. Vehicle status updated.');
+    }
+    return redirect()->back()->with('error', 'Vehicle not found.');
+    }
+    public function allpaymentreqssfinremainig(Request $request)
+    {
+        $percentage =  $request->input('percentage');
+        $id = $request->input('orderId');
+        $status = $request->input('status');
+        if($status == "Approved")
+        {
+        $vehicles = DB::table('vehicles')
+        ->where('purchasing_order_id', $id)
+        ->where('remaining_payment_status', 'Request for Payment')
+        ->get();
+        $totalCost = 0;
+        foreach ($vehicles as $vehicle) {
+            $status = 'Payment Requested';
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['remaining_payment_status' => $status]);
+                $vehicleCost = VehiclePurchasingCost::where('vehicles_id', $vehicle->id)->value('unit_price');
+                $adjustedCost = $vehicleCost * ($percentage / 100);
+                $totalCost +=  $adjustedCost;
+                $currentPercentage = DB::table('vehicles')->where('id', $vehicle->id)->value('purchased_paid_percentage');
+                $currentPercentage = $currentPercentage ?? 0; // Treat null as 0
+                $newPercentage = $currentPercentage + $percentage;
+                DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['purchased_paid_percentage' => $newPercentage]);
+                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'Payment Initiated Request';
+                $vehicleslog->vehicles_id = $vehicle->id;
+                $vehicleslog->field = "Payment Status";
+                $vehicleslog->old_value = "Request for Initiate Payment";
+                $vehicleslog->new_value = "Payment Initiated Request";
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+                }
+                $paymentinti = New PurchasedOrderPaidAmounts();
+                $paymentinti->amount = $totalCost;
+                $paymentinti->purchasing_order_id = $id;
+                $paymentinti->percentage = $percentage;
+                $paymentinti->created_by = auth()->user()->id;
+                $paymentinti->status = "Request For Payment";
+                $paymentinti->save();
+            }
+                else
+                {
+                    $vehicles = DB::table('vehicles')
+                    ->where('purchasing_order_id', $id)
+                    ->where('remaining_payment_status', 'Request for Payment')
+                    ->get();
+                    foreach ($vehicles as $vehicle) {
+                        $status = Null;
+                        DB::table('vehicles')
+                            ->where('id', $vehicle->id)
+                            ->update(['remaining_payment_status' => $status]);
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            $currentDateTime = Carbon::now($dubaiTimeZone);
+                            $vehicleslog = new Vehicleslog();
+                            $vehicleslog->time = $currentDateTime->toTimeString();
+                            $vehicleslog->date = $currentDateTime->toDateString();
+                            $vehicleslog->status = 'Reamining Payment Initiated Request Rejected';
+                            $vehicleslog->vehicles_id = $vehicle->id;
+                            $vehicleslog->field = "Payment Status";
+                            $vehicleslog->old_value = "Reamining Request for Initiate Payment";
+                            $vehicleslog->new_value = "Reamining Payment Initiated Request Rejected";
+                            $vehicleslog->created_by = auth()->user()->id;
+                            $vehicleslog->role = Auth::user()->selectedRole;
+                            $vehicleslog->save();
+                             }   
+                }
+         return redirect()->back()->with('success', 'Payment Status Updated');
+}
+public function requestAdditionalPayment(Request $request)
+    {
+        $id = $request->input('id');
+        $totalSurcharges = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Pending')->update(['status' => 'Initiated Request']);
+        return response()->json(['message' => 'Submitted Additional Payment Request successfully']);
+    }
+    public function requestinitiatedPayment(Request $request)
+    {
+        $id = $request->input('id');
+        $totalcost = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Initiated Request')->sum('price_change');
+        PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('change_type', 'Surcharge')->where('status', 'Initiated Request')->update(['status' => 'Initiated']);
+        $purchasingOrder = PurchasingOrder::find($id);
+        $orderCurrency = $purchasingOrder->currency;
+        $supplierAccount = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)->first();
+        $supplieraccounttransition = new SupplierAccountTransaction();
+                $supplieraccounttransition->transaction_type = "Pre-Debit";
+                $supplieraccounttransition->purchasing_order_id = $id;
+                $supplieraccounttransition->supplier_account_id = $supplierAccount->id;
+                $supplieraccounttransition->created_by = auth()->user()->id;
+                $supplieraccounttransition->account_currency = $orderCurrency;
+                $supplieraccounttransition->transaction_amount = $totalcost;
+                $supplieraccounttransition->payment_category = "Additional Payment";
+                $supplieraccounttransition->remarks = "Additional Payment";
+                $supplieraccounttransition->save();
+        return response()->json(['message' => 'Submitted Additional Payment Request successfully']);
+    }
+    public function requestReleasedPayment(Request $request)
+    {
+    $id = $request->input('id');
+    PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+        ->where('change_type', 'Surcharge')
+        ->where('status', 'Initiated')
+        ->update(['status' => 'Approved']);
+    $transition = SupplierAccountTransaction::where('purchasing_order_id', $id)
+        ->where('transaction_type', 'Pre-Debit')
+        ->where('payment_category', 'Additional Payment')
+        ->first();
+    if ($transition) {
+        $transition->status = 'Approved';
+        $transition->remarks = 'Approved For Released Payment';
+        $transition->save();
+    }
+    return response()->json(['message' => 'Additional Payment Approved successfully']);
+    }
+    public function completedadditionalpayment(Request $request)
+    {
+        $id = $request->input('orderIdadditional');
+        $status = $request->input('statusadditional');
+        $vehicleCount = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+        ->where('change_type', 'Surcharge')
+        ->where('status', 'Approved')
+        ->count();
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);            
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+            $PurchasingOrder = PurchasingOrder::where('id', $id)->first();
+            info($PurchasingOrder);
+            $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
+        if ($supplieracc) {
+            $paymentad = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+                        ->where('change_type', 'Surcharge')
+                        ->where('status', 'Approved')
+                        ->sum('price_change');
+            $supplieracc->current_balance += $paymentad;
+            $supplieracc->save();
+            PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
+            ->where('change_type', 'Surcharge')
+            ->where('status', 'Approved')
+            ->update(['status' => 'Paid']);
+            if($paymentad != 0)
+            {
+            $supplieraccount = new SupplierAccountTransaction();
+            $supplieraccount->transaction_type = "Debit";
+            $supplieraccount->purchasing_order_id = $id;
+            $supplieraccount->supplier_account_id = $supplieracc->id;
+            $supplieraccount->created_by = auth()->user()->id;
+            $supplieraccount->account_currency = $PurchasingOrder->currency;
+            $supplieraccount->transaction_amount = $paymentad;
+            $supplieraccount->save();
+            $paymentspaid = New PurchasedOrderPaidAmounts();
+            $paymentspaid->amount = $paymentad;
+            $paymentspaid->created_by = auth()->user()->id;
+            $paymentspaid->purchasing_order_id = $id;
+            $paymentspaid->status = "Paid";
+            $paymentspaid->percentage = "100";
+            $paymentspaid->save();
+            $vendoradjustmentpaid = New VendorPaymentAdjustments();
+            $vendoradjustmentpaid->amount = $paymentad;
+            $vendoradjustmentpaid->type = 'Additional Payment';
+            $vendoradjustmentpaid->supplier_account_id = $supplieracc->id;
+            $vendoradjustmentpaid->purchasing_order_id = $id;
+            $vendoradjustmentpaid->created_by = auth()->user()->id;
+            $vendoradjustmentpaid->totalamount = $paymentad;
+            $vendoradjustmentpaid->status = 'Paid';
+            $vendoradjustmentpaid->remaining_amount = 0;
+            $vendoradjustmentpaid->save();
+            }
+        }
+    }
+                return redirect()->back()->with('success', 'Payment Status Updated');
+           }
+           public function getVehicles($purchaseOrderId) {
+            $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+            ->where('status', 'Approved')
+                ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
+                ->get();
+        
+            return response()->json($vehicles);
+        }
+        
+        public function getVehicleDetails($vehicleId) {
+            $vehicle = Vehicles::with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
+                ->find($vehicleId);
+        
+            return response()->json($vehicle);
+        }
+        public function savePaymentDetails(Request $request)
+{
+    try { // Added try-catch for overall error handling
+        $paymentOption = $request->input('paymentOption');
+        $purchaseOrderId = $request->input('purchaseOrderId');
+        $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
+        
+        // Get purchase order details
+        $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
+        if (!$purchaseOrder) { // Check if purchase order exists
+            return response()->json(['error' => 'Purchase order not found'], 404);
+        }
+        $supplierAccountId = $purchaseOrder->vendors_id;
+        
+        // Check if supplier account exists, if not create a new one
+        $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
+        if (!$supplierAccount) {
+            $supplierAccount = new SupplierAccount();
+            $supplierAccount->suppliers_id = $supplierAccountId;
+            $supplierAccount->currency = $purchaseOrder->currency;
+            if (!$supplierAccount->save()) {
+                return response()->json(['error' => 'Failed to create supplier account'], 500);
+            }
+        }
+        
+        $accountCurrency = $supplierAccount->currency;
+        $transactionType = 'Draft';
+        $status = 'Draft';
+        $transactionAmount = 0;
+        
+        if ($paymentOption == 'purchasedOrder') {
+            $purchasedOrderOption = $request->input('purchasedOrderOption');
+            $transactionAmount = $request->input('amount');
+            // Handle equalDivided case
+            if ($purchasedOrderOption == 'equalDivided') {
+                $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                    ->where('status', 'approved')
+                                    ->get();
+                $totalVehicles = $vehicles->count();
+                if ($totalVehicles > 0) {
+                    $transactionAmount = $transactionAmount / $totalVehicles;
+                }
+            }
+        } else {
+            $vehicles = $request->input('vehicles');
+            foreach ($vehicles as $vehicle) {
+                $transactionAmount += $vehicle['initiatedPrice'];
+            }
+        }
+        
+        // Store in supplier_account_transaction table
+        $supplierAccountTransaction = new SupplierAccountTransaction();
+        $supplierAccountTransaction->transaction_type = $transactionType;
+        $supplierAccountTransaction->purchasing_order_id = $purchaseOrderId;
+        $supplierAccountTransaction->supplier_account_id = $supplierAccount->id;
+        $supplierAccountTransaction->created_by = $createdBy;
+        $supplierAccountTransaction->account_currency = $accountCurrency;
+        $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->status = $status;
+        
+        if (!$supplierAccountTransaction->save()) {
+            return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
+        }
+        
+        $adjustmentAmount = $request->input('adjustmentAmount');
+        $vendorpayment = new VendorPaymentAdjustments();
+        $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
+        $vendorpayment->type = $adjustmentAmount ? 'Adjustment' : 'No Adjustment';
+        $vendorpayment->supplier_account_id = $supplierAccount->id; // Correct foreign key reference
+        $vendorpayment->purchasing_order_id = $purchaseOrderId;
+        $vendorpayment->created_by = $createdBy;
+        $vendorpayment->totalamount = $transactionAmount;
+        $vendorpayment->status = 'Draft';
+        $vendorpayment->sat_id = $supplierAccountTransaction->id;
+        $vendorpayment->remaining_amount = $adjustmentAmount ? $transactionAmount - $adjustmentAmount : 0;
+        
+        if (!$vendorpayment->save()) {
+            return response()->json(['error' => 'Failed to save vendor payment adjustment'], 500);
+        }
+        
+        // Store in Purchased Order Paid Amounts
+        $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+        $purchasedorderpaidamounts->amount = $transactionAmount;
+        $purchasedorderpaidamounts->created_by = $createdBy;
+        $purchasedorderpaidamounts->purchasing_order_id = $purchaseOrderId;
+        $purchasedorderpaidamounts->status = 'Draft';
+        $purchasedorderpaidamounts->sat_id = $supplierAccountTransaction->id;
+        
+        if (!$purchasedorderpaidamounts->save()) {
+            return response()->json(['error' => 'Failed to save purchased order paid amounts'], 500);
+        }
+
+        // If vehicles are involved, store in vehicles_supplier_account_transaction table
+        if ($paymentOption == 'vehicle' || ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided')) {
+            if ($paymentOption == 'vehicle') {
+                $vehicles = $request->input('vehicles');
+            } else {
+                $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                    ->where('status', 'approved')
+                                    ->get();
+            }
+            foreach ($vehicles as $vehicle) {
+                $vehiclesSupplierAccountTransaction = new VehiclesSupplierAccountTransaction();
+                $vehiclesSupplierAccountTransaction->vehicles_id = $vehicle['vehicleId'];
+                $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
+                $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
+                $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                $vehiclesSupplierAccountTransaction->status = 'Draft';
+                if (!$vehiclesSupplierAccountTransaction->save()) {
+                    return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
+                }
+            }
+        }
+        return response()->json(['message' => 'Payment details saved successfully'], 200);
+    } catch (Exception $e) { // Catch any exception
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
+public function submitPaymentDetails(Request $request)
+{
+    try { // Added try-catch for overall error handling
+        $paymentOption = $request->input('paymentOption');
+        $purchaseOrderId = $request->input('purchaseOrderId');
+        $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
+        
+        // Get purchase order details
+        $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
+        if (!$purchaseOrder) { // Check if purchase order exists
+            return response()->json(['error' => 'Purchase order not found'], 404);
+        }
+        $supplierAccountId = $purchaseOrder->vendors_id;
+        
+        // Check if supplier account exists, if not create a new one
+        $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
+        if (!$supplierAccount) {
+            $supplierAccount = new SupplierAccount();
+            $supplierAccount->suppliers_id = $supplierAccountId;
+            $supplierAccount->currency = $purchaseOrder->currency;
+            if (!$supplierAccount->save()) {
+                return response()->json(['error' => 'Failed to create supplier account'], 500);
+            }
+        }
+        
+        $accountCurrency = $supplierAccount->currency;
+        $transactionType = 'Initiate Payment Request';
+        $status = 'Initiate Payment Request';
+        $transactionAmount = 0;
+        
+        if ($paymentOption == 'purchasedOrder') {
+            $purchasedOrderOption = $request->input('purchasedOrderOption');
+            $transactionAmount = $request->input('amount');
+            // Handle equalDivided case
+            if ($purchasedOrderOption == 'equalDivided') {
+                $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                    ->where('status', 'approved')
+                                    ->get();
+                $totalVehicles = $vehicles->count();
+                if ($totalVehicles > 0) {
+                    $transactionAmount = $transactionAmount / $totalVehicles;
+                }
+            }
+        } else {
+            $vehicles = $request->input('vehicles');
+            foreach ($vehicles as $vehicle) {
+                $transactionAmount += $vehicle['initiatedPrice'];
+            }
+        }
+        
+        // Store in supplier_account_transaction table
+        $supplierAccountTransaction = new SupplierAccountTransaction();
+        $supplierAccountTransaction->transaction_type = $transactionType;
+        $supplierAccountTransaction->purchasing_order_id = $purchaseOrderId;
+        $supplierAccountTransaction->supplier_account_id = $supplierAccount->id;
+        $supplierAccountTransaction->created_by = $createdBy;
+        $supplierAccountTransaction->account_currency = $accountCurrency;
+        $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->status = $status;
+        
+        if (!$supplierAccountTransaction->save()) {
+            return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
+        }
+        
+        $adjustmentAmount = $request->input('adjustmentAmount');
+        $vendorpayment = new VendorPaymentAdjustments();
+        $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
+        $vendorpayment->type = $adjustmentAmount ? 'Adjustment' : 'No Adjustment';
+        $vendorpayment->supplier_account_id = $supplierAccount->id; // Correct foreign key reference
+        $vendorpayment->purchasing_order_id = $purchaseOrderId;
+        $vendorpayment->created_by = $createdBy;
+        $vendorpayment->totalamount = $transactionAmount;
+        $vendorpayment->status = 'pending';
+        $vendorpayment->sat_id = $supplierAccountTransaction->id;
+        $vendorpayment->remaining_amount = $adjustmentAmount ? $transactionAmount - $adjustmentAmount : 0;
+        
+        if (!$vendorpayment->save()) {
+            return response()->json(['error' => 'Failed to save vendor payment adjustment'], 500);
+        }
+        
+        // Store in Purchased Order Paid Amounts
+        $purchasedorderpaidamounts = new PurchasedOrderPaidAmounts();
+        $purchasedorderpaidamounts->amount = $transactionAmount;
+        $purchasedorderpaidamounts->created_by = $createdBy;
+        $purchasedorderpaidamounts->purchasing_order_id = $purchaseOrderId;
+        $purchasedorderpaidamounts->status = 'Initiate Payment Request';
+        $purchasedorderpaidamounts->sat_id = $supplierAccountTransaction->id;
+        
+        if (!$purchasedorderpaidamounts->save()) {
+            return response()->json(['error' => 'Failed to save purchased order paid amounts'], 500);
+        }
+
+        // If vehicles are involved, store in vehicles_supplier_account_transaction table
+        if ($paymentOption == 'vehicle' || ($paymentOption == 'purchasedOrder' && $purchasedOrderOption == 'equalDivided')) {
+            if ($paymentOption == 'vehicle') {
+                $vehicles = $request->input('vehicles');
+            } else {
+                $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+                                    ->where('status', 'approved')
+                                    ->get();
+            }
+            foreach ($vehicles as $vehicle) {
+                $vehiclesSupplierAccountTransaction = new VehiclesSupplierAccountTransaction();
+                $vehiclesSupplierAccountTransaction->vehicles_id = $vehicle['vehicleId'];
+                $vehiclesSupplierAccountTransaction->sat_id = $supplierAccountTransaction->id;
+                $vehiclesSupplierAccountTransaction->popa_id = $purchasedorderpaidamounts->id;
+                $vehiclesSupplierAccountTransaction->vpa_id = $vendorpayment->id;
+                $vehiclesSupplierAccountTransaction->amount = $vehicle['initiatedPrice'];
+                $vehiclesSupplierAccountTransaction->status = 'pending';
+                if (!$vehiclesSupplierAccountTransaction->save()) {
+                    return response()->json(['error' => 'Failed to save vehicle supplier account transaction'], 500);
+                }
+            }
+        }
+        return response()->json(['message' => 'Payment details saved successfully'], 200);
+    } catch (Exception $e) { // Catch any exception
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
+    public function handleActionInitiate(Request $request)
+{
+    $transitionId = $request->input('id');
+        
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Request For Payment';
+        $supplierAccountTransaction->status = 'Request For Payment';
+        $supplierAccountTransaction->save();
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Request For Payment';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Request For Payment';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Request For Payment';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Payment details saved successfully'], 200);  
+}
+    public function getVendorAndBalance($purchaseOrderId)
+    {
+        $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
+        if (!$purchaseOrder) {
+            return response()->json(['error' => 'Purchase order not found'], 404);
+        }
+
+        $vendorId = $purchaseOrder->vendors_id;
+        $supplierAccount = SupplierAccount::where('suppliers_id', $vendorId)->first();
+        if (!$supplierAccount) {
+            return response()->json(['error' => 'Supplier account not found'], 404);
+        }
+        return response()->json([
+            'supplier_account_id' => $supplierAccount->id,
+            'current_balance' => $supplierAccount->current_balance,
+        ]);
+    }
+    public function submitforpayment(Request $request)
+    {
+    $transitionId = $request->input('id');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Initiate Payment Request';
+        $supplierAccountTransaction->status = 'Initiate Payment Request';
+        $supplierAccountTransaction->save();
+    }
+
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Initiate Payment Request';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'pending';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'pending';
+        $vehicleTransaction->save();
+    }
+
+    return response()->json(['message' => 'Payment details saved successfully'], 200);
+    }
+    public function submitPayment(Request $request)
+    {
+        try {
+            $transitionId = $request->input('transitionId');
+            $bankAccount = $request->input('bankAccount');
+            $file = $request->file('file');
+            $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+            if ($supplierAccountTransaction) {
+                if ($file) {
+                    $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->move(public_path('storage/transition_file'), $fileNameToStore);
+                    $supplierAccountTransaction->transition_file = 'storage/transition_file/' . $fileNameToStore;
+                }
+                $supplierAccountTransaction->transaction_type = 'Pre-Debit';
+                $supplierAccountTransaction->status = 'pending';
+                $supplierAccountTransaction->bank_accounts_id =  $bankAccount;
+                $supplierAccountTransaction->save();
+                $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+                {
+                    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+                    if ($purchasingOrder) {
+                        $currency = $purchasingOrder->currency;
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                        // Conversion rates
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.023,
+                            "AED" => 1,
+                            "CAD" => 2.68
+                        ];
+                        $conversionRate = $conversionRates[$currency] ?? 1;
+                        $totalcostconverted = $transactionAmount * $conversionRate;
+                        $supplierAccount->current_balance -= $totalcostconverted;
+                        $supplierAccount->save();
+                }
+            }
+            }
+            $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+            if ($purchasedOrderPaidAmounts) {
+                $purchasedOrderPaidAmounts->status = 'Suggested Payment';
+                $purchasedOrderPaidAmounts->save();
+            }
+            $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+            if ($vendorPayment) {
+                $vendorPayment->status = 'Initiate';
+                $vendorPayment->save();
+            }
+            $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+            $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+            foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+                $vehicleTransaction->status = 'Initiate';
+                $vehicleTransaction->save();
+            }
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            if($purchasingOrder->is_demand_planning_po == 1)
+            {
+            $recipients = ['team.dp@milele.com'];
+            Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+        } catch (\Exception $e) {
+            Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function approveTransition(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Released';
+        $supplierAccountTransaction->status = 'Approved';
+        $supplierAccountTransaction->save();
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Approved';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Approved';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Approved';
+        $vehicleTransaction->save();
+        $vehiclespaid = VehiclePurchasingCost::where('vehicles_id', $vehicleTransaction->vehicles_id)->first();
+        $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
+        $vehiclespaid->save();
+    }
+    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    $currency = $supplierAccountTransaction->account_currency;
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+    $recipients = ['team.dp@milele.com'];
+    Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    return response()->json(['success' => true, 'transition_id' => $transitionId]);
+    }
+    public function rejectTransition(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $remarks = $request->input('remarks');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Rejected';
+        $supplierAccountTransaction->status = 'Rejected';
+        $supplierAccountTransaction->remarks = $remarks;
+        $supplierAccountTransaction->save();
+        $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+        {
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            if ($purchasingOrder) {
+                $currency = $purchasingOrder->currency;
+                $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                // Conversion rates
+                $conversionRates = [
+                    "USD" => 3.67,
+                    "EUR" => 3.94,
+                    "GBP" => 4.67,
+                    "JPY" => 0.023,
+                    "AED" => 1,
+                    "CAD" => 2.68
+                ];
+                $conversionRate = $conversionRates[$currency] ?? 1;
+                $totalcostconverted = $transactionAmount * $conversionRate;
+                $supplierAccount->current_balance += $totalcostconverted;
+                $supplierAccount->save();
+        }
+    }
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Rejected';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Rejected';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Rejected';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Transition rejected successfully.']);
+    }
+    public function rejectTransitionlinitiate(Request $request)
+    {
+    $transitionId = $request->input('transition_id');
+    $remarks = $request->input('remarks');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->transaction_type = 'Rejected';
+        $supplierAccountTransaction->status = 'Rejected';
+        $supplierAccountTransaction->remarks = $remarks;
+        $supplierAccountTransaction->save();
+    }
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Rejected';
+        $purchasedOrderPaidAmounts->save();
+    }
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Rejected';
+        $vendorPayment->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Rejected';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Transition rejected successfully.']);
+    }
+    public function uploadSwiftFile(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'swiftFile' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx',
+        'transition_id' => 'required|integer'
+    ]);
+
+    try {
+        $transitionId = $request->input('transition_id');
+        $file = $request->file('swiftFile');
+
+        // Check if the file and transaction exist
+        if ($file && $supplierAccountTransaction = SupplierAccountTransaction::find($transitionId)) {
+            $fileNameToStore = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('storage/swift_copies'), $fileNameToStore);
+            $vehicleCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
+            $latestBatch = DB::table('purchasing_order_swift_copies')
+                ->where('purchasing_order_id', $supplierAccountTransaction->purchasing_order_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+            $batchNo = $latestBatch ? $latestBatch->batch_no + 1 : 1;
+            $swiftcopy = new PurchasingOrderSwiftCopies();
+            $swiftcopy->purchasing_order_id = $supplierAccountTransaction->purchasing_order_id;
+            $swiftcopy->uploaded_by = auth()->user()->id;
+            $swiftcopy->number_of_vehicles = $vehicleCount;
+            $swiftcopy->batch_no = $batchNo;
+            $swiftcopy->sat_id = $transitionId;
+            $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
+            $swiftcopy->save();
+            $supplierAccountTransaction->transaction_type = 'Debit';
+            $supplierAccountTransaction->status = 'Paid';
+            $supplierAccountTransaction->save();
+            $supplierAccount = SupplierAccount::find($supplierAccountTransaction->supplier_account_id);
+            if ($supplierAccount) {
+                $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);
+                if ($purchasingOrder) {
+                    $currency = $purchasingOrder->currency;
+                    $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                    $conversionRates = [
+                        "USD" => 3.67,
+                        "EUR" => 3.94,
+                        "GBP" => 4.67,
+                        "JPY" => 0.023,
+                        "AED" => 1,
+                        "CAD" => 2.68
+                    ];
+                    $conversionRate = $conversionRates[$currency] ?? 1;
+                    $totalCostConverted = $transactionAmount * $conversionRate;
+                    $supplierAccount->current_balance += $totalCostConverted;
+                    $supplierAccount->save();
+                }
+            }
+            $this->updateRelatedStatuses($transitionId);
+
+            return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Invalid transition ID or file'], 422);
+        }
+    } catch (\Exception $e) {
+        Log::error('Payment submission failed', ['error' => $e->getMessage()]);
+        return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
+    }
+}
+
+private function updateRelatedStatuses($transitionId)
+{
+    // Update PurchasedOrderPaidAmounts
+    $purchasedOrderPaidAmounts = PurchasedOrderPaidAmounts::where('sat_id', $transitionId)->first();
+    if ($purchasedOrderPaidAmounts) {
+        $purchasedOrderPaidAmounts->status = 'Paid';
+        $purchasedOrderPaidAmounts->save();
+    }
+
+    // Update VendorPaymentAdjustments
+    $vendorPayment = VendorPaymentAdjustments::where('sat_id', $transitionId)->first();
+    if ($vendorPayment) {
+        $vendorPayment->status = 'Paid';
+        $vendorPayment->save();
+    }
+
+    // Update VehiclesSupplierAccountTransactions
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Paid';
+        $vehicleTransaction->save();
+    }
+}
+public function getSwiftDetails($id)
+{
+    try {
+        $supplierAccountTransaction = SupplierAccountTransaction::find($id);
+
+        if (!$supplierAccountTransaction) {
+            return response()->json(['success' => false, 'message' => 'Transaction not found'], 404);
+        }
+        $swiftCopy = DB::table('purchasing_order_swift_copies')
+            ->where('sat_id', $id)
+            ->first();
+        $bankAccount = DB::table('bank_accounts')
+            ->where('id', $supplierAccountTransaction->bank_accounts_id)
+            ->first();
+
+        $bankMaster = null;
+        if ($bankAccount) {
+            $bankMaster = DB::table('bank_master')
+                ->where('id', $bankAccount->bank_master_id)
+                ->first();
+        }
+
+        $swiftDetails = [
+            'transition_id' => $supplierAccountTransaction->id,
+            'transition_file' => $supplierAccountTransaction->transition_file ? asset($supplierAccountTransaction->transition_file) : null,
+            'swift_copy_file' => $swiftCopy ? asset($swiftCopy->file_path) : null,
+            'bank_accounts_id' => $supplierAccountTransaction->bank_accounts_id ?? 'N/A',
+            'account_number' => $bankAccount->account_number ?? 'N/A',
+            'currency' => $bankAccount->currency ?? 'N/A',
+            'current_balance' => $bankAccount->current_balance ?? 'N/A',
+            'bank_name' => $bankMaster->bank_name ?? 'N/A',
+        ];
+
+        info($swiftDetails);
+        return response()->json(['success' => true, 'data' => $swiftDetails]);
+    } catch (\Exception $e) {
+        Log::error('Failed to fetch swift details', ['error' => $e->getMessage()]);
+        return response()->json(['success' => false, 'message' => 'Error fetching details', 'error' => $e->getMessage()], 500);
+    }
+}
+public function paymentconfirm(Request $request)
+    {
+    $transitionId = $request->input('id');
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
+    if ($supplierAccountTransaction) {
+        $supplierAccountTransaction->vendor_payment_status = 'Confirmed';
+        $supplierAccountTransaction->save();
+    }
+    $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
+        $vehicleTransaction->status = 'Confirmed';
+        $vehicleTransaction->save();
+    }
+    return response()->json(['message' => 'Payment details saved successfully'], 200);
+    }
+    public function getdata()
+    {
+        $vins = Vehicles::orderBy('vin', 'ASC')
+        ->whereNotNull('vin')
+        ->with('variant.master_model_lines.brand', 'interior', 'exterior', 'warehouseLocation', 'document')
+        ->get()
+        ->unique('vin');
+        return view('test', compact('vins'));
+    }
 }

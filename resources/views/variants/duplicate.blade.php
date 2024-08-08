@@ -188,6 +188,7 @@
                                             <option value="5.3" {{ isset($variant) && $variant->engine == '5.3' ? 'selected' : '' }}>5.3</option>
                                             <option value="5.6" {{ isset($variant) && $variant->engine == '5.6' ? 'selected' : '' }}>5.6</option>
                                             <option value="5.7" {{ isset($variant) && $variant->engine == '5.7' ? 'selected' : '' }}>5.7</option>
+                                            <option value="5.9" {{ isset($variant) && $variant->engine == '5.9' ? 'selected' : '' }}>5.9</option>
                                             <option value="6.0" {{ isset($variant) && $variant->engine == '6.0' ? 'selected' : '' }}>6.0</option>
                                             <option value="6.2" {{ isset($variant) && $variant->engine == '6.2' ? 'selected' : '' }}>6.2</option>
                                             <option value="6.7" {{ isset($variant) && $variant->engine == '6.7' ? 'selected' : '' }}>6.7</option>

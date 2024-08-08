@@ -211,6 +211,7 @@ class InspectionController extends Controller
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->whereNotNull('vehicles.inspection_date')
                 ->whereNotNull('vehicles.so_id')
+                ->whereNull('pdi_date')
                 ->whereNull('vehicles.gdn_id')
                 ->where(function ($query) {
                     $query->where('inspection_status', '!=', 'Pending')
