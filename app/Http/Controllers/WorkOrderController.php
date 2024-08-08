@@ -488,6 +488,9 @@ class WorkOrderController extends Controller
                     }
                 }  
             }
+            if(isset($request->deposit_received_as) && $request->deposit_received_as != '') {
+                $canCreateFinanceApproval = true;
+            }
             if($canCreateFinanceApproval == true) {
                 WOApprovals::create([
                     'work_order_id' => $workOrder->id,
@@ -696,8 +699,10 @@ class WorkOrderController extends Controller
         try { 
             $canCreateFinanceApproval = false;
             $canCreateCOOApproval = false;
-            $authId = Auth::id();
-            
+            if((isset($request->deposit_received_as) && $request->deposit_received_as != '') || $request->deposit_received_as != $workOrder->deposit_received_as) {
+                $canCreateFinanceApproval = true;
+            }
+            $authId = Auth::id();            
             $newComment = WOComments::create([
                 'work_order_id' => $workOrder->id,
                 'text' => "The work order data was changed as follows by ".auth()->user()->name, // Allow null text
@@ -1564,7 +1569,6 @@ class WorkOrderController extends Controller
                     $deleteComment->delete();
                 }
             }
-            
             if($canCreateFinanceApproval == true) {
                 $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
                 if($financePendingApproval == null) { 

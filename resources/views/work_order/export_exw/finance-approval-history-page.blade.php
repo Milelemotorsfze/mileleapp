@@ -18,6 +18,30 @@
             padding: 10px;
             margin-top: -1px;
         }
+        .addon-table th {
+            border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
+            border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
+            border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
+            border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
+            padding: 3px!important; /* Add padding for better readability */
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Style for the table cells */
+        .addon-table td {
+            border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
+            border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
+            border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
+            border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
+            padding: 3px!important; /* Add padding for better readability */
+            text-align: left; /* Align text to the left */
+        }
+
+        /* Style for the entire table */
+        .addon-table {
+            border-collapse: collapse; /* Ensure borders do not double */
+            width: 100%; /* Make the table take up the full width */
+        }
     </style>
 </head>
 @section('content')
@@ -185,7 +209,7 @@
                                                 @if($approval->workOrder->vehicles->count() > 0)
                                                     <tr>
                                                         <td colspan="6">
-                                                            <table style="font-size:12px!important;">
+                                                            <table style="font-size:12px!important;" class="addon-table">
                                                                 @php $serviceBreakdownShown = false; @endphp
                                                                 @foreach($approval->workOrder->vehicles->sortBy('vin') as $vehicle)
                                                                     @if(isset($vehicle->addons) && $vehicle->addons->count() > 0)
@@ -195,7 +219,7 @@
                                                                             </tr>
                                                                             @php $serviceBreakdownShown = true; @endphp
                                                                         @endif
-                                                                        <tr style="border-top:1px solid #e9e9ef;">
+                                                                        <tr style="border-top:1px solid #e9e9ef;background-color:#f5faff;">
                                                                             <th colspan="3">Vin : {{$vehicle->vin ?? ''}}</th>
                                                                         </tr>
                                                                         <tr>
