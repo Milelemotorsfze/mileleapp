@@ -61,6 +61,15 @@ class WorkOrder extends Model
         'delivery_contact_person',
         'delivery_date',
 
+        // Only for Export CNF Start
+        'preferred_shipping_line_of_customer',
+        'bill_of_loading_details',
+        'shipper',
+        'consignee',
+        'notify_party',
+        'special_or_transit_clause_or_request',
+        // Only for Export CNF End
+
         'signed_pfi',
         'signed_contract',
         'payment_receipts',
