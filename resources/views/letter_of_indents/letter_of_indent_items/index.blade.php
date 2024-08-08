@@ -29,7 +29,7 @@
                     @endphp
                     @if ($hasPermission)
 
-                        <!-- <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a> -->
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indent-items.index', ['export' => 'EXCEL'] ) }}" ><i class="fa fa-download" aria-hidden="true"></i> Export</a>
                     @endif
                 @endcan
                 <div class="card-body">
@@ -138,15 +138,7 @@
             {'data' : 'is_expired', 'name': 'is_expired' },   
             {'data' : 'l_o_i.submission_status', 'name': 'LOI.submission_status' },        
             {'data' : 'so_number', 'name': 'LOI.soNumbers.so_number' }     
-        ],
-        dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'excel', exportOptions: { modifier: { page: 'all', search: 'none' } } },
-                    { extend: 'csv',   exportOptions: { modifier: { page: 'all', search: 'none' } } },
-           
-                ],
-              
-        
+        ]
         });
         
     });

@@ -29,7 +29,7 @@ class LetterOfIndentItem extends Model
 //    }
     public function masterModel()
     {
-        return $this->belongsTo(MasterModel::class);
+        return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
     public function getSteeringAttribute()
     {
