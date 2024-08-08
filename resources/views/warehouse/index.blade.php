@@ -932,41 +932,52 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
         <script>
 $(document).ready(function() {
-  // Add custom sorting function for currency
+  // Conversion rates from other currencies to AED
+  var conversionRates = {
+    'AED': 1,
+    'USD': 3.67,
+    'EUR': 4.1,
+    'JPY': 0.034,
+    'CAD': 2.85,
+    // Add other currencies and their conversion rates here
+  };
+
+  // Custom sorting function for currency
   $.fn.dataTable.ext.type.order['currency-pre'] = function(data) {
     if (data === 'N/A') {
       return 0;
     }
-    
-    var matches = data.match(/([\D]+)\s?([\d,\.]+)/);
-    if (matches) {
-      var currency = matches[1].trim();
+
+    var matches = data.match(/([\D]+)?\s?([\d,\.]+)/);
+    if (matches && matches[2]) {
+      var currency = matches[1] ? matches[1].trim() : 'AED'; // Default to 'AED' if currency is missing
       var number = parseFloat(matches[2].replace(/,/g, ''));
-      
-      // You can add logic here to handle different currencies if needed
-      return number;
+      var conversionRate = conversionRates[currency] || 1; // Default to 1 if currency not found
+      return number * conversionRate;
     }
-    return parseFloat(data.replace(/,/g, ''));
+    return 0;
   };
 
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
     pageLength: 10,
-    order: [[1, 'desc']],
+    order: [[1, 'desc']], // Date column descending
     columnDefs: [
       {
         targets: 1,
         type: 'date',
+        orderSequence: ['desc', 'asc'] // Date column only descending
       },
       {
-        targets: 3, // Assuming the total cost column index is 3
+        targets: 4, // Ensure the correct column index for the total cost
         type: 'currency',
+        orderSequence: ['asc', 'desc'] // Total cost ascending
       }
+      // You can specify other columns if needed
     ],
     initComplete: function() {
-      this.api().columns().every(function(d) {
+      this.api().columns().every(function() {
         var column = this;
-        var columnId = column.index();
         var columnName = $(column.header()).attr('id');
         if (columnName === "statuss") {
           return;
@@ -986,7 +997,11 @@ $(document).ready(function() {
         selectWrapper.appendTo($(column.header()));
         $(column.header()).addClass('nowrap-td');
 
-        column.data().unique().sort().each(function(d, j) {
+        column.data().unique().sort(function(a, b) {
+          var aValue = $.fn.dataTable.ext.type.order['currency-pre'](a);
+          var bValue = $.fn.dataTable.ext.type.order['currency-pre'](b);
+          return aValue - bValue;
+        }).each(function(d) {
           select.append('<option value="' + d + '">' + d + '</option>');
         });
       });
@@ -998,7 +1013,7 @@ $(document).ready(function() {
   });
 
   // Apply custom CSS class after Select2 dropdown is opened
-  $(document).on('select2:open', function(e) {
+  $(document).on('select2:open', function() {
     $('.select2-dropdown').addClass('select2-orange-highlight');
   });
 });
