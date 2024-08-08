@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Carbon\Carbon;
+use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
@@ -18,8 +19,8 @@ class LOIItemController extends Controller
     {
         $data = LetterOfIndentItem::orderBy('updated_at','DESC')->with([
                 'LOI' => function ($query) {
-                    $query->select('id','uuid','client_id','date','category',
-                    'is_expired','dealers','submission_status','sales_person_id','created_by','updated_by');
+                    $query->select('id','uuid','client_id','date','category','loi_approval_date',
+                    'is_expired','dealers','status','sales_person_id','review','comments');
                 },
                 'LOI.client'  => function ($query) {
                     $query->select('id','name','customertype','country_id');
@@ -27,14 +28,8 @@ class LOIItemController extends Controller
                 'LOI.client.country'  => function ($query) {
                     $query->select('id','name');
                 },
-                'LOI.createdBy' => function ($query) {
-                    $query->select('id','name');
-                },
-                'LOI.updatedBy' => function($query){
-                    $query->select('id','name');
-                },
                 'masterModel' => function($query){
-                    $query->select('id','model', 'sfx','master_model_line_id');
+                    $query->select('id','model', 'sfx','master_model_line_id','steering');
                 },
                 'masterModel.modelLine' => function($query){
                     $query->select('id','model_line');
@@ -48,7 +43,7 @@ class LOIItemController extends Controller
 
                 if($request->export == 'EXCEL') {
                     $data = $data->get();
-                  return   (new FastExcel($data))->download('loi-items.csv', function ($data) {
+                  return (new FastExcel($data))->download('LOI-ITEMS.csv', function ($data) {
                     $soNumbers = LoiSoNumber::where('letter_of_indent_id', $data->LOI->id)
                                      ->pluck('so_number')->toArray();
 
@@ -61,6 +56,7 @@ class LOIItemController extends Controller
                         return [
                             'LOI Number' => $data->LOI->uuid,
                             'LOI Date' => $data->LOI->date,
+                            'LOI Approval Date' => $data->LOI->loi_approval_date,
                             'Dealer' => $data->LOI->dealers,
                             'Category' => $data->LOI->category,
                             'Customer Name' => $data->LOI->client->name ?? '',
@@ -69,16 +65,18 @@ class LOIItemController extends Controller
                             'Matrix Code' => $data->uuid,
                             'Model' => $data->masterModel->model,
                             'SFX' => $data->masterModel->sfx,
+                            'Steering' => $data->masterModel->steering,
                             'Model Line' => $data->masterModel->modelLine->model_line,
                             'Quantity' => $data->quantity,
                             'Utilized Quantity' => $data->utilized_quantity,
                             'Remaining Quantity' => $data->quantity - $data->utilized_quantity,
                             'Sales Person' => $data->LOI->salesPerson->name ?? '',
                             'So Numbers' => $soNumbers,
-                            'Status' => $data->LOI->submission_status,
+                            'Status' => $data->LOI->status,
                             'Is Expired' => $is_expired,
-                            'Created Date' => Carbon::parse($data->created_at)->format('d-m-Y'),
-                            'Created By' => $data->createdBy->name ?? '',
+                            'Approval Remarks' => $data->LOI->review,
+                            'LOI Comments' => $data->LOI->comments
+                            
                         ];
                     });
                 }
@@ -87,29 +85,14 @@ class LOIItemController extends Controller
         if (request()->ajax()) {
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn('created_at', function($query) {
-                    return Carbon::parse($query->created_at)->format('d M Y');
-                })
                 ->addColumn('loi_date', function($query) {
                     return Carbon::parse($query->LOI->date)->format('d M Y') ?? '';
                 })
+                ->addColumn('loi_approval_date', function($query) {
+                    return Carbon::parse($query->LOI->loi_approval_date)->format('d M Y') ?? '';
+                })
                 ->addColumn('remaining_quantity', function($query) {
                     return $query->quantity - $query->utilized_quantity;
-                })
-                ->editColumn('updated_at', function($query) {                  
-                    if($query->LOI->updated_at){
-                        return Carbon::parse($query->LOI->updated_at)->format('d M Y') ?? '';
-                    }
-                })
-                ->addColumn('updated_by', function($query) {                  
-                    if($query->LOI->updated_by){
-                        return $query->LOI->updatedBy->name ?? '';
-                    }
-                })
-                ->addColumn('created_by', function($query) {
-                    if($query->LOI->created_by){
-                        return $query->LOI->createdBy->name ?? '';
-                    }
                 })
                 ->addColumn('so_number', function($query) {
                     $soNumbers = LoiSoNumber::where('letter_of_indent_id', $query->LOI->id)
@@ -132,8 +115,20 @@ class LOIItemController extends Controller
                         return '<button class="btn btn-sm btn-info">'.$msg.'</button>';
                     }                                           
                  })
-                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number','updated_by',
-                'created_by'])
+                 ->addColumn('status', function($query) {
+                    if($query->LOI->status == LetterOfIndent::LOI_STATUS_NEW) {
+                        return  '<button class="btn btn-sm btn-primary">'.LetterOfIndent::LOI_STATUS_NEW.'</button>';
+                    }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL) {
+                         return '<button class="btn btn-sm btn-warning">'.LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL.'</button>';
+                     }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED) {
+                         return  '<button class="btn btn-sm btn-success">'.LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED.'</button>';
+                     }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED) {
+                         return  '<button class="btn btn-sm btn-danger">'.LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED.'</button>';
+                     }else{
+                        return $query->LOI->status;
+                     }                                       
+                 })
+                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number','status','loi_approval_date'])
                 ->toJson();
             }
         
