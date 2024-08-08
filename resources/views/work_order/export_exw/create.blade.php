@@ -1628,10 +1628,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 		}, "No leading or trailing spaces allowed");
 
-        // Add custom validation rule for numeric input only (excluding spaces)
-        $.validator.addMethod("numericOnly", function(value, element) {
-            return this.optional(element) || /^[0-9+]+$/.test(value);
-        }, "Please enter a valid number");
+		// Add custom validation rule for numeric input only (excluding spaces)
+		$.validator.addMethod("numericOnly", function(value, element) {
+			// Remove spaces before validation
+			value = value.replace(/\s+/g, '');
+			return this.optional(element) || /^[0-9+]+$/.test(value);
+		}, "Please enter a valid number");
 
         // Add custom validation rule for address field (no multiple consecutive spaces)
         $.validator.addMethod("validAddress", function(value, element) {
