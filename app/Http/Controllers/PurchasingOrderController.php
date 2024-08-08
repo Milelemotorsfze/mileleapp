@@ -104,6 +104,7 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }else{
@@ -117,6 +118,7 @@ class PurchasingOrderController extends Controller
     ->whereHas('vehicles', function ($query) {
         $query->whereNotNull('id');
     })
+    ->whereNotNull('totalcost') // Added condition
     ->orderBy('po_date', 'desc')
     ->get();
         }
@@ -139,6 +141,7 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }else{
@@ -152,6 +155,7 @@ class PurchasingOrderController extends Controller
             ->whereHas('vehicles', function ($query) {
                 $query->whereNotNull('id');
             })
+            ->whereNotNull('totalcost') // Added condition
             ->orderBy('po_date', 'desc')
             ->get();
         }
