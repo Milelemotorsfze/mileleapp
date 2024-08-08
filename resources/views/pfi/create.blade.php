@@ -51,7 +51,7 @@
                                             Customer :
                                         </div>
                                         <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->customer->name ?? '' }}
+                                            {{ $letterOfIndent->client->name ?? '' }}
                                         </div>
                                     </div>
                                     <div class="row">
@@ -72,7 +72,7 @@
                                            Country :
                                         </div>
                                         <div class="col-sm-6">
-                                            {{ $letterOfIndent->customer->country->name ?? '' }}
+                                            {{ $letterOfIndent->client->country->name ?? '' }}
                                         </div>
                                     </div>
                                     <div class="row">
@@ -167,12 +167,7 @@
                                                     <input type="file" id="file" class="form-control" name="file" accept="application/pdf">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="choices-single-default" class="form-label">Comment</label>
-                                                    <textarea class="form-control" name="comment" rows="5" cols="25"></textarea>
-                                                </div>
-                                            </div>
+                                          
                                             <div class="col-lg-4 col-md-6 mmc-items-div" hidden>
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">Delivery Location</label>
@@ -186,6 +181,12 @@
                                                         <option value="USD">USD</option>
                                                         <option value="EUR">EUR</option>
                                                     </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="choices-single-default" class="form-label">Comment</label>
+                                                    <textarea class="form-control" name="comment" rows="5" cols="25"></textarea>
                                                 </div>
                                             </div>
                                         </div>

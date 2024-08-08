@@ -161,7 +161,7 @@ class Supplier extends Model
     public function getIsDeletableAttribute()
     {
         $vendorAddons =  SupplierAddons::where('supplier_id', $this->id)->count();
-        if($vendorAddons <=0) {
+        if($vendorAddons <= 0) {
             $supplierInventories = SupplierInventory::where('supplier_id', $this->id)->count();
             if($supplierInventories <= 0) {
                 $demands = Demand::where('supplier_id', $this->id)->count();
@@ -171,7 +171,6 @@ class Supplier extends Model
                         $purchaseOrders = PurchasingOrder::where('vendors_id', $this->id)->count();
                         if($purchaseOrders <= 0) {
                            return true;
-
                         }
                     }
                 }

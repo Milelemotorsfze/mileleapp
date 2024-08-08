@@ -90,4 +90,10 @@ class BanksController extends Controller
         $bank->delete();
         return redirect()->route('banks.index')->with('success', 'Bank deleted successfully.');
     }
+    public function getBanks()
+    {
+        $banks = BankMaster::all();
+        info($banks);
+        return response()->json($banks);
+    }
 }

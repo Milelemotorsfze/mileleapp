@@ -51,7 +51,7 @@
                                             Customer :
                                         </div>
                                         <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->customer->name ?? '' }}
+                                            {{ $letterOfIndent->client->name ?? '' }}
                                         </div>
                                     </div>
                                     <div class="row">
@@ -72,7 +72,7 @@
                                             Country :
                                         </div>
                                         <div class="col-sm-6">
-                                            {{ $letterOfIndent->customer->country->name ?? '' }}
+                                            {{ $letterOfIndent->client->country->name ?? '' }}
                                         </div>
                                     </div>
 

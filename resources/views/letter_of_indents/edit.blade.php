@@ -16,7 +16,16 @@
         .error {
             color: #fd625e;
         }
-
+        .overlay
+        {
+            position: fixed; /* Positioning and size */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); /* color */
+            display: none; /* making it hidden by default */
+        }
     </style>
     @can('LOI-edit')
         @php
@@ -61,7 +70,7 @@
                                 <select class="form-control widthinput" autofocus multiple name="country" id="country" >
                                     <option disabled>Select Country</option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->customer->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
+                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->client->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -71,21 +80,17 @@
                                 <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
                                 <select class="form-control widthinput" name="customer_type"  id="customer-type">
                                     <option value="" disabled>Select Customer Type</option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->client->customertype ? 'selected' : ''}}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}
                                     </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY == $letterOfIndent->client->customertype ? 'selected' : ''}}>
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}
                                     </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
-                                    </option>
-                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
+                                    <option value={{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->client->customertype ? 'selected' : ''}} >
+                                        {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}
                                     </option>
                                 </select>
                             </div>
@@ -93,18 +98,25 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer</label>
-                                <select class="form-control widthinput" multiple name="customer_id" id="customer" >
+                                <select class="form-control widthinput" multiple name="client_id" id="customer" >
                                     @foreach($possibleCustomers as $customer)
-                                        <option value="{{ $letterOfIndent->customer_id }}"
-                                            {{ $letterOfIndent->customer_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
+                                        <option value="{{ $letterOfIndent->client_id }}"
+                                            {{ $letterOfIndent->client_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
+                        <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
+                                <input type="date" class="form-control widthinput" id="date" name="date"
+                                    value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                                <select class="form-control widthinput" name="category" id="choices-single-default">
+                                <select class="form-control widthinput" multiple name="category" id="loi-category">
                                     <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
                                         {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
                                         {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
@@ -126,14 +138,7 @@
                                         {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
                                     </option>
                                 </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                                <input type="date" class="form-control widthinput" id="date" name="date"
-                                    value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
-                            </div>
+                            </div>                          
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
@@ -167,9 +172,9 @@
                                     <option value="milele_cars"  {{ in_array('milele_cars',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->dealers == 'Trans Cars' ? 'disabled' : '' }}>Milele Cars</option>
                                     <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : '' }}
-                                        {{ $letterOfIndent->customer->type == 'Company' ? 'disabled' : '' }}>Individual</option>
+                                        {{ $letterOfIndent->client->customertype == 'Company' || $letterOfIndent->client->customertype == 'Government' ? 'disabled' : '' }}>Individual</option>
                                     <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
-                                        {{ $letterOfIndent->customer->type == 'Individual' ? 'disabled' : '' }}>Business</option>
+                                        {{ $letterOfIndent->client->customertype == 'Individual' ? 'disabled' : '' }}>Business</option>
                                 </select>
                             </div>
                         </div>
@@ -188,42 +193,45 @@
                         </div>
                     </div>
 
-                        <div class="card" id="soNumberDiv">
-                            <div class="card-header">
-                                <h4 class="card-title">
-                                    So Numbers
-                                </h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row soNumberMain">
-                                    <div hidden>{{$i=0;}}</div>
-                                    @foreach($letterOfIndent->soNumbers as $soNumber)
-                                    <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
-                                    <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-{{$i}}">
-                                        <div class="row mt-2">
-                                            <div class="col-xxl-9 col-lg-6 col-md-12">
-                                                <input id="so_number_{{$i}}" type="text" class="form-control widthinput so_number" name="so_number[{{$i}}]"
-                                                    placeholder="So Number" value="{{$soNumber->so_number}}"
-                                                    autocomplete="so_number" oninput=uniqueCheckSoNumber()>
-                                                <span id="soNumberError_{{$i}}" class="error is-invalid soNumberError"></span>
-                                            </div>
-                                            <div class="col-xxl-3 col-lg-1 col-md-1">
-                                                <a class="btn btn-sm btn-danger removeSoNumber" data-index="{{$i}}" >
-                                                <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </div>
+                    <div class="card" id="soNumberDiv">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                So Numbers
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row soNumberMain">
+                                <div hidden>{{$i=0;}}</div>
+                                @foreach($letterOfIndent->soNumbers as $soNumber)
+                                <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+                                <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-{{$i}}">
+                                    <div class="row mt-2">
+                                        <div class="col-xxl-9 col-lg-6 col-md-12">
+                                            <input id="so_number_{{$i}}" type="text" class="form-control widthinput so_number" name="so_number[{{$i}}]"
+                                                placeholder="So Number" value="{{$soNumber->so_number}}"
+                                                autocomplete="so_number" oninput=uniqueCheckSoNumber()>
+                                            <span id="soNumberError_{{$i}}" class="error is-invalid soNumberError"></span>
+                                        </div>
+                                        <div class="col-xxl-3 col-lg-1 col-md-1">
+                                            <a class="btn btn-sm btn-danger removeSoNumber" data-index="{{$i}}" >
+                                            <i class="fas fa-trash-alt"></i>
+                                            </a>
                                         </div>
                                     </div>
-                                    @endforeach
                                 </div>
-                                <div class="row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12" id="soNumberDivBr">
-                                        <a id="addSoNumberBtn" style="float: right;" class="btn btn-sm btn-info">
-                                        <i class="fa fa-plus" aria-hidden="true"></i> Add So Numbers</a>
-                                    </div>
+
+
+                                
+                                @endforeach
+                            </div>
+                            <div class="row">
+                                <div class="col-xxl-12 col-lg-12 col-md-12" id="soNumberDivBr">
+                                    <a id="addSoNumberBtn" style="float: right;" class="btn btn-sm btn-info">
+                                    <i class="fa fa-plus" aria-hidden="true"></i> Add So Numbers</a>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                     <div class="row">
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -251,13 +259,12 @@
                         </div>
                     </div>
 
-            <div class="alert m-2" role="alert" hidden id="country-comment-div">
-                <span id="country-comment"></span><br>
-                <span class="error" id="max-individual-quantity-error"></span>
-                <span class="error" id="min-company-quantity-error"></span>
-                <span class="error" id="max-company-quantity-error"></span>
-                <span class="error" id="company-only-allowed-error"></span>
-            </div>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
+                        <span id="country-comment"></span><br>
+                    </div>
+                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="loi-country-validation-div">                       
+                        <span class="error" id="validation-error"></span>
+                    </div>
                     <div class="card mt-2" >
                             <div class="card-header">
                                 <h4 class="card-title">LOI Items</h4>
@@ -271,7 +278,7 @@
                                         <label class="form-label">SFX</label>
                                     </div>
                                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                        <label class="form-label">Model Year</label>
+                                        <label class="form-label">Model Line</label>
                                     </div>
                                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                                         <label class="form-label">LOI Description</label>
@@ -357,6 +364,8 @@
 
                 </form>
             </div>
+            <input type="hidden" id="is-country-validation-error" value="0">
+            <div class="overlay"></div>
         @endif
     @endcan
 @endsection
@@ -375,13 +384,7 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                // if (file.type.match("application/pdf"))
-                // {
-                //     const objectUrl = URL.createObjectURL(file);
-                //     const iframe = document.createElement("iframe");
-                //     iframe.src = objectUrl;
-                //     previewFile.appendChild(iframe);
-                // }else
+                
                  if (file.type.match("image/*"))
                 {
                     const objectUrl = URL.createObjectURL(file);
@@ -413,6 +416,13 @@
             let dealer = '{{ $letterOfIndent->dealers }}';
             showSignatureRemoveButton(dealer);
 
+            $('#loi-category').select2({
+                placeholder : 'Select LOI Category',
+                allowClear: true,
+                maximumSelectionLength: 1
+            }).on('change', function() {
+                $('#loi-category-error').remove();
+            });
             $('#template-type').select2({
                 placeholder : 'Select Template Type',
                 allowClear: true,
@@ -476,22 +486,24 @@
                         previousSelected = customerType;
                     
                         $('#template-type').val('').trigger('change');
-                        if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
+                        if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}') {
                             $('#template-type option[value=business]').prop('disabled', true);
                             $('#template-type option[value=individual]').prop('disabled', false);
 
-                        } else if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
+                        } else if (customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}' || customerType == '{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}') {
                             $('#template-type option[value=individual]').prop('disabled', true);
                             $('#template-type option[value=business]').prop('disabled', false);
                         } else {
                             $('#template-type option[value=individual]').prop('disabled', false);
                             $('#template-type option[value=business]').prop('disabled', false);
                         }
-                        checkCountryCriterias();
+                       
                     }
                 }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){ 
                     $('#customer-type').val(previousSelected);
                 } );
+
+                checkCountryCriterias();
              
             });
 
@@ -517,7 +529,23 @@
                     total_quantities += parseInt($(this).val());
                 }
             });
-            if(customer.length > 0 && customer_type.length > 0 && total_quantities > 0 && date.length > 0) {
+
+                var model_lines = $('.model_lines').val();
+                var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+                console.log(totalIndex);
+                var selectedModelLineIds = [];
+                for(let i=1; i<=totalIndex; i++)
+                {
+                    var eachSelectedModelLineId = $('#model-line-'+i).val();
+
+                    if(eachSelectedModelLineId) {
+                        selectedModelLineIds.push(eachSelectedModelLineId);
+                    }
+                }
+                console.log(selectedModelLineIds);
+            if(customer.length > 0 && customer_type.length > 0 && date.length > 0) {
+              
+                $('.overlay').show();
                 $.ajax({
                     type: "GET",
                     url: url,
@@ -526,60 +554,44 @@
                         loi_date:date,
                         customer_id: customer[0],
                         customer_type: customer_type,
-                        total_quantities:total_quantities
+                        total_quantities:total_quantities,
+                        selectedModelLineIds:selectedModelLineIds
                     },
                     success:function (data) {
-                        formValid = true;
-                        $('#country-comment-div').removeClass('alert-danger').addClass("alert-success");
+                        console.log(data);
+                        $('#is-country-validation-error').val(data.error);
                        
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
-                        
                         }
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
-                        if(data.customer_type_error) {
-                            formValid = false;
-                            $('#customer-type-error').html(data.customer_type_error);
-                            $('#customer-type-error').attr('hidden', true);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }
-                        else{
-                            $('#customer-type-error').attr('hidden', true);
-                        }
-                        if (data.max_qty_per_passport_error) {
-                            formValid = false;
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                        } else {
-                            $('#max-individual-quantity-error').html('');
-                        }
-                        if(data.min_qty_per_company_error) {
-                            formValid = false;
-                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                         
-                            $('#min-company-quantity-error').html('');
-                        }
-                        if(data.max_qty_per_company_error) {
-                            formValid = false;
-                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
+                        if(data.error == 1) {
+                           
+                            $('.country-validation').removeClass('alert-success').addClass("alert-danger");
+                            $('#loi-country-validation-div').attr('hidden', false);
+                           
                         }else{
                            
-                            $('#max-company-quantity-error').html('');
+                            $('.country-validation').removeClass('alert-danger').addClass("alert-success");
+                            $('#loi-country-validation-div').attr('hidden', true);
                         }
-                        if(data.company_only_allowed_error) {
-                            formValid = false;
-                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
-                            $('#country-comment-div').removeClass('alert-success').addClass("alert-danger");
-                        }else{
-                    
-                            $('#company-only-allowed-error').html('');
+                       
+                        if(data.validation_error) {
+                         console.log(data.validation_error);
+                            $('#validation-error').html(data.validation_error);
+                            $('#validation-error').attr('hidden', false);
+                         
                         }
+                        else{
+                            $('#validation-error').attr('hidden', true);
+                        }
+
+
+                       
+                        $('.overlay').hide();
                     }
                 });
             }
@@ -617,16 +629,11 @@
                 }).on('change', function() {
                     $(this).valid();
                 });
-                // $('#model-year-'+i).select2({
-                //     placeholder : 'Select Model Year',
-                //     allowClear: true,
-                //     maximumSelectionLength: 1
-                // }).on('change', function() {
-                //     $(this).valid();
-                // });
+               
             }
 
             function getCustomers() {
+                $('.overlay').show();
                 var country = $('#country').val();
                 var customer_type = $('#customer-type').val();
 
@@ -642,10 +649,11 @@
                     success: function (data) {
                         $('#customer').empty();
                         jQuery.each(data, function (key, value) {
-                            var selectedId = '{{ $letterOfIndent->customer_id }}';
+                            var selectedId = '{{ $letterOfIndent->client_id }}';
                             $('#customer').append('<option value="' + value.id + ' " >' + value.name + '</option>');
                             checkCountryCriterias();
                         });
+                        $('.overlay').hide();
                     }
                 });
             }
@@ -671,7 +679,7 @@
         $("#form-update").validate({
             ignore: [],
             rules: {
-                customer_id: {
+                client_id: {
                     required: true,
                 },
                 category: {
@@ -703,14 +711,16 @@
                 },
                 "files[]": {
                     fileCheck:true,
-                    extension: "png|jpeg|jpg"
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880  
                 },
                 loi_signature: {
                     required:function(element) {
                         let currentDealer = '{{ $letterOfIndent->dealers }}';
                         return $("#dealer").val() == 'Milele Motors' && currentDealer == 'Trans Cars'
                     },
-                    extension: "png|jpeg|jpg|svg"
+                    extension: "png|jpeg|jpg|svg",
+                      maxsize:5242880  
                 }
             },
                 messages: {
@@ -769,7 +779,7 @@
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                           <input type="text" readonly placeholder="Model Line" class="form-control widthinput text-dark model-lines"
-                          value="{{$letterOfIndentItem->masterModel->modelLine->model_line ?? ''}}" data-index="${index}" id="model-line-${index}">
+                           data-index="${index}" id="model-line-${index}">
 
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
@@ -801,11 +811,6 @@
                 allowClear: true,
                 maximumSelectionLength: 1
             });
-            // $('#model-year-' + index).select2({
-            //     placeholder: 'Select Model Year',
-            //     allowClear: true,
-            //     maximumSelectionLength: 1
-            // });
             let type = 'add-new';
             getModels(index,type);
         });
@@ -818,9 +823,7 @@
                 var modelLine = $('#model-line-'+indexNumber).val();
                 var model = $('#model-'+indexNumber).val();
                 var sfx = $('#sfx-'+indexNumber).val();
-                // if(modelYear[0]) {
-                //     appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
-                // }
+               
                 if(model[0]) {
                     appendModel(indexNumber,model[0]);
                 }
@@ -861,12 +864,7 @@
                         maximumSelectionLength:1,
                         allowClear: true
                     });
-                    // $('#model-year-'+index).select2
-                    // ({
-                    //     placeholder: 'Select Model Year',
-                    //     maximumSelectionLength:1,
-                    //     allowClear: true
-                    // });
+                  
                 });
                 enableDealer();
                 checkCountryCriterias();
@@ -889,11 +887,10 @@
             $('#sfx-'+index+'-error').remove();
             getLOIDescription(index);
             var value = e.params.data.text;
-
-            hideSFX(index, value)
+            hideSFX(index, value);
+         
         });
        
-
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
@@ -901,37 +898,26 @@
             $('#model-line-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
-            // $('#model-year-'+index).empty();
-
-            // var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            // if(modelYear[0]){
-            //     appendModelYear(index, model[0],sfx,modelYear[0])
-            // }
-            appendSFX(index,model[0],sfx)
+            appendSFX(index,model[0],sfx);
+            $('#quantity-'+index).val("");
 
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
             let index = $(this).attr('data-index');
-
-            // var modelYear =  $('#model-year-'+index).val();
-           
             var sfx = $('#sfx-'+index).val();
             var model = e.params.data.id;
-            // if(modelYear[0]){
-            //     appendModelYear(index, model,sfx[0],modelYear[0])
-            // }
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
             enableDealer();
 
             $('#sfx-'+index).empty();
-            // $('#model-year-'+index).empty();
             $('#model-line-'+index).val("");
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
+            $('#quantity-'+index).val("");
 
         });
 
@@ -943,7 +929,7 @@
             }
         }
         function getModels(index,type) {
-
+            $('.overlay').show();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
             let dealer = $('#dealer').val();
 
@@ -956,7 +942,7 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
-            console.log(selectedModelIds);
+           
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",
                 type: "GET",
@@ -1002,11 +988,12 @@
                             }
                         }
                     }
+                    $('.overlay').hide();
                 }
             });
         }
         function getSfx(index) {
-
+            $('.overlay').show();
             let model = $('#model-'+index).val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
@@ -1038,11 +1025,13 @@
                     jQuery.each(data, function(key,value){
                         $('#sfx-'+index).append('<option value="'+ value +'">'+ value +'</option>');
                     });
+                    $('.overlay').hide();
                 }
             });
         }
       
         function getLOIDescription(index) {
+            $('.overlay').show();
             let model = $('#model-'+index).val();
             let sfx = $('#sfx-'+index).val();
             let dealer = $('#dealer').val();
@@ -1059,7 +1048,6 @@
                     module: 'LOI',
                 },
                 success:function (data) {
-                    console.log(data);
                     $('#loi-description-'+index).val("");
                     let quantity = data.quantity;
                     let modelId = data.master_model_id;
@@ -1069,48 +1057,39 @@
                     $('#loi-description-'+index).val(LOIDescription);
                     $('#master-model-id-'+index).val(modelId);
                     $('#model-line-'+index).val(data.model_line);
+                    $('.overlay').hide();
+                    checkCountryCriterias();
                 }
             });
         }
 
         function appendSFX(index,unSelectedmodel,sfx){
-            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
+           for(let i=1; i<=totalIndex; i++)
+           {
+            var model = $('#model-'+i).val();
+               if(i != index && unSelectedmodel == model[0] ) {  
+                   // chcek the model is same as unselected model,
+                   $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}));     
+               }
+           }
+       }
+       function hideSFX(index, value) {
+         
+         var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+         let model = $('#model-'+index).val();        
             for(let i=1; i<=totalIndex; i++)
             {
-                if(i != index) {
-                    var model = $('#model-'+i).val();
-                    if(unSelectedmodel == model[0] ) {
-                        // chcek this option value alredy exist in dropdown list or not.
-                        var currentId = 'sfx-' + i;
-                        var isOptionExist = 'no';
-                        $('#' + currentId +' option').each(function () {
-
-                            if (this.text == sfx) {
-                                isOptionExist = 'yes';
-                                return false;
-                            }
-                        });
-                        if(isOptionExist == 'no'){
-                            $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}))
-
-                        }
-
-                    }
+                let currentmodel = $('#model-'+i).val();               
+                if(i != index && currentmodel == model[0]) {
+                    console.log(i);
+                    console.log("detach sfx");
+                    var currentId = 'sfx-' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
             }
         }
-        function hideSFX(index, value) {
-        
-         var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-         for(let i=1; i<=totalIndex; i++)
-         {
-             if(i != index) {
-                 var currentId = 'sfx-' + i;
-                 $('#' + currentId + ' option[value=' + value + ']').detach();       
-             }
-         }
-     }
 
         function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
@@ -1118,7 +1097,8 @@
             for(let i=1; i<=totalIndex; i++)
             {
                 if(i != index) {
-                    // if(unSelectedmodel == model[0] ) {
+                    let model = $('#model-'+i).val();
+                    if(unSelectedmodel == model[0] ) {
                     // chcek this option value alredy exist in dropdown list or not.
                     var currentId = 'model-' + i;
                     var isOptionExist = 'no';
@@ -1131,10 +1111,9 @@
                     });
                     if(isOptionExist == 'no'){
                         $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
-
                     }
 
-                    // }
+                    }
                 }
             }
         }
@@ -1232,8 +1211,9 @@
         }
         $('#submit-button').click(function (e) {
             e.preventDefault();
+            let isValidCountryCheck = $('#is-country-validation-error').val();
             uniqueCheckSoNumber();
-            if (formValid == true) {
+            if (formValid == true && isValidCountryCheck == 0) {
                 if($("#form-update").valid()) {
                     $('#form-update').unbind('submit').submit();
                 }

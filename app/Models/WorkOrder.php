@@ -84,6 +84,7 @@ class WorkOrder extends Model
         'updated_by',
         'deleted_by',
     ];
+    
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
@@ -99,6 +100,10 @@ class WorkOrder extends Model
     public function financeApprovalBy()
     {
         return $this->hasOne(User::class,'id','finance_approval_by');
+    }
+    public function COOApprovalBy()
+    {
+        return $this->hasOne(User::class,'id','coe_office_approval_by');
     }
     public function vehicles()
     {

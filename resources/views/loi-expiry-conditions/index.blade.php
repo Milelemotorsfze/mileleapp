@@ -7,7 +7,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">
-                    LOI Mapping Criteria
+                    LOI Expiry Criteria
                 </h4>
                 <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
@@ -43,6 +43,9 @@
                             <th>Catgeory Name</th>
                             <th>Expiry Duration (Years)</th>
                             <th>Created At</th>
+                            <th>Created By</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -54,10 +57,13 @@
                                     <td>{{ $loiExpiryCondition->category_name }}</td>
                                     <td>{{ $loiExpiryCondition->expiry_duration_year }}</td>
                                     <td>{{ \Illuminate\Support\Carbon::parse($loiExpiryCondition->created_at)->format('d M Y') ?? '' }}</td>
+                                    <td>{{ $loiExpiryCondition->createdBy->name ?? '' }}</td> 
+                                     <td>{{ \Illuminate\Support\Carbon::parse($loiExpiryCondition->updated_at)->format('d M Y') ?? '' }}</td>
+                                     <td>{{ $loiExpiryCondition->updatedBy->name ?? '' }}</td>
                                     <td>
-                                        @can('edit-loi-mapping-criterias')
+                                        @can('edit-loi-expiry-criterias')
                                             @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-loi-mapping-criterias');
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-loi-expiry-criterias');
                                             @endphp
                                             @if ($hasPermission)
                                             
