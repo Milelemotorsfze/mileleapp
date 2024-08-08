@@ -20,6 +20,8 @@
                         @if ($hasPermission)
                             <a  class="btn btn-sm btn-info float-end" title="Create New Customer" href="{{ route('dm-customers.create') }}" >
                                 <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                            <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" href="{{ route('dm-customers.index', ['export' => 'EXCEL'] ) }}" >
+                            <i class="fa fa-download" aria-hidden="true"></i> Export</a>
                         @endif
                     @endcan
                 </h4>

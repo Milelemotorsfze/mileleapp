@@ -7,8 +7,6 @@ use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
 use App\Models\LoiSoNumber;
 use Rap2hpoutre\FastExcel\FastExcel;
-use App\User;
-use App\Exports\LOIItemsExport;
 use Illuminate\Http\Request;
 
 class LOIItemController extends Controller
@@ -21,7 +19,7 @@ class LOIItemController extends Controller
         $data = LetterOfIndentItem::orderBy('updated_at','DESC')->with([
                 'LOI' => function ($query) {
                     $query->select('id','uuid','client_id','date','category',
-                    'is_expired','dealers','submission_status','sales_person_id');
+                    'is_expired','dealers','submission_status','sales_person_id','created_by','updated_by');
                 },
                 'LOI.client'  => function ($query) {
                     $query->select('id','name','customertype','country_id');
@@ -79,6 +77,8 @@ class LOIItemController extends Controller
                             'So Numbers' => $soNumbers,
                             'Status' => $data->LOI->submission_status,
                             'Is Expired' => $is_expired,
+                            'Created Date' => Carbon::parse($data->created_at)->format('d-m-Y'),
+                            'Created By' => $data->createdBy->name ?? '',
                         ];
                     });
                 }
@@ -96,11 +96,21 @@ class LOIItemController extends Controller
                 ->addColumn('remaining_quantity', function($query) {
                     return $query->quantity - $query->utilized_quantity;
                 })
-                // ->addColumn('updated_by', function($query) {                  
-                //     if($query->updated_by){
-                //         return $query->updatedBy->name ?? '';
-                //     }
-                // })
+                ->editColumn('updated_at', function($query) {                  
+                    if($query->LOI->updated_at){
+                        return Carbon::parse($query->LOI->updated_at)->format('d M Y') ?? '';
+                    }
+                })
+                ->addColumn('updated_by', function($query) {                  
+                    if($query->LOI->updated_by){
+                        return $query->LOI->updatedBy->name ?? '';
+                    }
+                })
+                ->addColumn('created_by', function($query) {
+                    if($query->LOI->created_by){
+                        return $query->LOI->createdBy->name ?? '';
+                    }
+                })
                 ->addColumn('so_number', function($query) {
                     $soNumbers = LoiSoNumber::where('letter_of_indent_id', $query->LOI->id)
                             ->pluck('so_number')->toArray();
@@ -122,7 +132,8 @@ class LOIItemController extends Controller
                         return '<button class="btn btn-sm btn-info">'.$msg.'</button>';
                     }                                           
                  })
-                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number'])
+                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number','updated_by',
+                'created_by'])
                 ->toJson();
             }
         

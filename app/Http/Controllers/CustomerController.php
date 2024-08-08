@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
+use Rap2hpoutre\FastExcel\FastExcel;
 use Storage;
 
 class CustomerController extends Controller
@@ -25,10 +27,24 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         (new UserActivityController)->createActivity('Open Customer List Page');
         $customers = Clients::where('is_demand_planning_customer', true)->orderBy('updated_at','DESC')->get();
+
+        if($request->export == 'EXCEL') {
+            $customer = Clients::all();
+            return (new FastExcel($customers))->download('customers.csv', function ($customers) {
+                return [
+                    'Name' => $customers->name,
+                    'Customer Type' => $customers->customertype,
+                    'Country' => $customers->country->name ?? '',
+                    'Address' => $customers->address,
+                    'Created At' => Carbon::parse($customers->created_at)->format('d-m-Y'),
+                    'Created By' => $customers->createdBy->name ?? '',
+                ];
+            });
+        }
         return view('customer.index', compact('customers'));
     }
 
