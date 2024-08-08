@@ -1649,6 +1649,7 @@ public function checkcreatevins(Request $request)
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vinChanges = [];
                 foreach ($changes as $field => $change) {
                     $vehicleslog = new Vehicleslog();
                     $vehicleslog->time = $currentDateTime->toTimeString();
@@ -1663,6 +1664,10 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->save();
                     if ($field == 'vin') {
                         $updatedVins[] = $fieldValue; // Collect updated VINs
+                        $vinChanges[] = [
+                            'old_vin' => $change['old_value'],
+                            'new_vin' => $change['new_value'],
+                        ]; // Store VIN changes
                     }
                     if ($field == 'int_colour') {
                         $newfield = "Interior Colour";
@@ -1748,60 +1753,57 @@ public function checkcreatevins(Request $request)
             }
         }
     }
-            if (!empty($updatedVins)) {
-            // Fetch vehicles with updated VINs
-            $groupedVehicles = Vehicles::whereIn('vin', $updatedVins)->with([
-                'variant.master_model_lines.brand',
-                'variant.brand',
-                'interior',
-                'exterior'
-            ])->get()->groupBy('purchasing_order_id');
-            
-            foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
-                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
-                if ($purchasingOrder) {
-                    $recipients = $purchasingOrder->is_demand_planning_po == 1 
-                        ? ['waqar.younas@milele.com'] 
-                        : ['waqar.younas@milele.com'];
-    
-                    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
-                    $vehicleDetails = $vehicles->map(function ($vehicle) {
-                        return [
-                            'vin' => $vehicle->vin,
-                            'brand' => $vehicle->variant->brand->brand_name ?? '',
-                            'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
-                            'variant' => $vehicle->variant->name ?? '',
-                            'int_colour' => $vehicle->interior->name ?? '',
-                            'ext_colour' => $vehicle->exterior->name ?? '',
-                        ];
-                    });
-    
-                    // Send email notification
-                    Mail::to($recipients)->send(new VINEmailNotification(
-                        $purchasingOrder->po_number, 
-                        $purchasingOrder->pl_number, 
-                        $orderUrl, 
-                        count($vehicles), 
-                        now()->format('d M Y'), 
-                        $vehicleDetails
-                    ));
-    
-                    // Save notification details to the database
-                    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-                        "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-                        "Stage: " . "Goods Received Note\n" .
-                        "Number of Units: " . count($vehicles) . "\n" .
-                        "GRN Date: " . now()->format('d M Y') . "\n" .
-                        "Order URL: " . $orderUrl;
-                    
-                    $notification = new DepartmentNotifications();
-                    $notification->module = 'Logistics';
-                    $notification->type = 'Information';
-                    $notification->detail = $detailText;
-                    $notification->save();
-                }
+    if (!empty($updatedVins)) {
+        $groupedVehicles = Vehicles::whereIn('vin', $updatedVins)->with([
+            'variant.master_model_lines.brand',
+            'variant.brand',
+            'interior',
+            'exterior'
+        ])->get()->groupBy('purchasing_order_id');
+        foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
+            $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+            if ($purchasingOrder) {
+                $recipients = $purchasingOrder->is_demand_planning_po == 1 
+                ? ['team.logistics@milele.com'] 
+                : ['team.logistics@milele.com', 'abdul@milele.com'];
+
+                $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
+                    $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
+                    return [
+                        'brand' => $vehicle->variant->brand->brand_name ?? '',
+                        'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
+                        'variant' => $vehicle->variant->name ?? '',
+                        'old_vin' => $vinChange['old_vin'] ?? '', // Include old VIN
+                        'new_vin' => $vehicle->vin,
+                        'int_colour' => $vehicle->interior->name ?? '',
+                        'ext_colour' => $vehicle->exterior->name ?? '',
+                    ];
+                })->toArray(); // Ensure it's an array
+                Mail::to($recipients)->send(new VINEmailNotification(
+                    $purchasingOrder->po_number, 
+                    $purchasingOrder->pl_number, 
+                    $orderUrl, 
+                    count($vehicles), 
+                    $vehicleDetails
+                ));
+                // Save notification details to the database
+                $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+              "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+              "Stage: Update The VIN\n" .
+              "Number of Units: " . count($vehicles) . "\n" .
+              "Old VIN: " . ($vinChange['old_vin'] ?? '') . "\n" .
+              "New VIN: " . $vehicle->vin . "\n" .
+              "Order URL: " . $orderUrl;
+                $notification = new DepartmentNotifications();
+                $notification->module = 'Procurement';
+                $notification->type = 'Information';
+                $notification->detail = $detailText;
+                $notification->save();
             }
         }
+    }
+
     return response()->json(['message' => 'Data updated successfully']);
 }
 public function purchasingupdateStatus(Request $request)
