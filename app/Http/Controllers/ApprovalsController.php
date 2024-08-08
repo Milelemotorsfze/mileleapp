@@ -649,7 +649,7 @@ class ApprovalsController extends Controller
                 $modelLine = $variant->master_model_lines->model_line;
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
-                $recipients = ['waqar.younas@milele.com'];
+                $recipients = ['team.dp@milele.com'];
                 Mail::to($recipients)->send(new QCUpdateNotification(
     $purchasingOrder->po_number,
     $purchasingOrder->pl_number,
@@ -664,7 +664,7 @@ class ApprovalsController extends Controller
                 }
                 else
                 {
-                $recipients = ['waqar.younas@milele.com'];
+                $recipients = ['abdul@milele.com'];
                 Mail::to($recipients)->send(new QCUpdateNotification(
     $purchasingOrder->po_number,
     $purchasingOrder->pl_number,
@@ -975,7 +975,7 @@ class ApprovalsController extends Controller
                 $modelLine = $variant->master_model_lines->model_line;
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
-                $recipients = ['waqar.younas@milele.com'];
+                $recipients = ['team.dp@milele.com'];
                 Mail::to($recipients)->send(new QCUpdateNotification(
     $purchasingOrder->po_number,
     $purchasingOrder->pl_number,
@@ -990,7 +990,7 @@ class ApprovalsController extends Controller
                 }
                 else
                 {
-                $recipients = ['waqar.younas@milele.com'];
+                $recipients = ['abdul@milele.com'];
                 Mail::to($recipients)->send(new QCUpdateNotification(
     $purchasingOrder->po_number,
     $purchasingOrder->pl_number,
