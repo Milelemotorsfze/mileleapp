@@ -15,14 +15,22 @@ class ReassignLeads extends Command
     public function handle()
     {
         $leads = Calls::where('status', 'new')
-                     ->where('created_at', '<', Carbon::now()->subDay())
-                     ->get();
+                 ->where(function ($query) {
+                     $query->where(function ($q) {
+                         $q->whereNull('assign_time')
+                           ->where('created_at', '<', Carbon::now()->subDay());
+                     })
+                     ->orWhere(function ($q) {
+                         $q->whereNotNull('assign_time')
+                           ->where('assign_time', '<', Carbon::now()->subDay());
+                     });
+                 })
+                 ->get();
         foreach ($leads as $lead) {
             $newSalesPersonId = $this->getNewSalesPersonId($lead->id);
             $lead->sales_person = $newSalesPersonId;
             $lead->assign_time = Carbon::now();
             $lead->save();
-
             $this->info("Lead {$lead->id} reassigned to sales person {$lead->sales_person}");
         }
     }

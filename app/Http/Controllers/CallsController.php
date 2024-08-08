@@ -472,6 +472,7 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
             'custom_brand_model' => $request->input('custom_brand_model'),
             'language' => $request->input('language'),
             'created_at' => $formattedDate,
+            'assign_time' => $formattedDate,
             'created_by' => Auth::id(),
             'status' => "New",
         ];
@@ -942,6 +943,7 @@ return view('calls.resultbrand', compact('data'));
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
+                $call->assign_time = $formattedDate;
                 $call->created_by = Auth::id();
                 $call->status = "New";
                 $call->location = $row[3];

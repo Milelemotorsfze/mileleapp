@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -109,8 +110,10 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\MigrationDataCheckController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
+use App\Http\Controllers\BankAccountsController;
 use App\Http\Controllers\LOIExpiryConditionController;
 use App\Http\Controllers\LOIItemController;
+use App\Http\Controllers\BanksController;
 
 /*
 /*
@@ -439,6 +442,13 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
+
+    Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
+    // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
+
+    Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
+    // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
+
     // Demand & Planning Module
 
     // suppliers
@@ -656,6 +666,7 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::post('/update-warehouse-remarks', [WarehouseController::class, 'updatewarehouseremarks'])->name('warehouse.updatewarehouseremarks');
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
+    Route::get('vehicles/payment-paymentremanings/{id}', [PurchasingOrderController::class, 'paymentremanings'])->name('vehicles.paymentremanings');
     Route::post('purchasing_order/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
     Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
     Route::get('/vehicles/approvedcancel/{id}', [PurchasingOrderController::class, 'approvedcancel'])->name('vehicles.approvedcancel');
@@ -689,6 +700,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-allstatusrel', [PurchasingOrderController::class, 'purchasingallupdateStatusrel'])->name('purchasing.updateallStatusrel');
     Route::post('/update-purchasing-allpaymentreqss', [PurchasingOrderController::class, 'allpaymentreqss'])->name('purchasing.allpaymentreqss');
     Route::post('/update-purchasing-allpaymentreqssfin', [PurchasingOrderController::class, 'allpaymentreqssfin'])->name('purchasing.allpaymentreqssfin');
+    Route::post('/update-purchasing-allpaymentreqssfinremainig', [PurchasingOrderController::class, 'allpaymentreqssfinremainig'])->name('purchasing.allpaymentreqssfinremainig');
     Route::post('/update-purchasing-allpaymentreqssfinpay', [PurchasingOrderController::class, 'allpaymentreqssfinpay'])->name('purchasing.allpaymentreqssfinpay');
     Route::post('/update-purchasing-rerequestpayment', [PurchasingOrderController::class, 'rerequestpayment'])->name('purchasing.rerequestpayment');
     Route::post('/update-purchasing-allpaymentreqssfinpaycomp', [PurchasingOrderController::class, 'allpaymentreqssfinpaycomp'])->name('purchasing.allpaymentreqssfinpaycomp');
@@ -895,6 +907,7 @@ Route::get('/d', function () {
     Route::resource('vendoraccount', VendorAccountController::class);
     Route::get('/account/{id}', [VendorAccountController::class, 'view'])->name('vendoraccount.view');
     Route::get('/get-supplier-and-amount/{orderId}', [PurchasingOrderController::class, 'getSupplierAndAmount']);
+    Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
@@ -906,11 +919,46 @@ Route::get('/d', function () {
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
 
+    //Bank Accounts
+    Route::resource('bankaccounts', BankAccountsController::class);
+    Route::post('/bankaccounts/update_balance', [BankAccountsController::class, 'updateBalance'])->name('bankaccounts.update_balance');
+    Route::get('/bankaccount/{id}', [BankAccountsController::class, 'show'])->name('bankaccount.show');
+    Route::resource('banks', BanksController::class);
 
 
     // Migration Data check Route
     Route::resource('migrations', MigrationDataCheckController::class);
 
+    //Addinational Payments
+    Route::post('/request-additional-payment', [PurchasingOrderController::class, 'requestAdditionalPayment']);
+    Route::post('/request-initiated-payment', [PurchasingOrderController::class, 'requestinitiatedPayment']);
+    Route::post('/request-released-payment', [PurchasingOrderController::class, 'requestreleasedPayment']);
+    Route::post('/update-purchasing-additionalpaymentcomplete', [PurchasingOrderController::class, 'completedadditionalpayment'])->name('purchasing.completedadditionalpayment');
+    Route::get('netsuitegrn/addingnetsuitegrn', [ApprovalsController::class, 'addingnetsuitegrn'])->name('netsuitegrn.addingnetsuitegrn');
+    Route::post('netsuitegrn/submit', [ApprovalsController::class, 'submitGrn'])->name('netsuitegrn.submit');
+    Route::post('netsuitegrn/add', [ApprovalsController::class, 'addGrn'])->name('netsuitegrn.add');
+    Route::get('/get-vehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesByPurchaseOrderId']);
+    Route::get('/getVehicles/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehicles']);
+    Route::get('/getVehicleDetails/{vehicleId}', [PurchasingOrderController::class, 'getVehicleDetails']);
+    Route::post('/savePaymentDetails', [PurchasingOrderController::class, 'savePaymentDetails']);
+    Route::post('/submitPaymentDetails', [PurchasingOrderController::class, 'submitPaymentDetails']);
+    Route::post('/transition/actioninitiate', [PurchasingOrderController::class, 'handleActioninitiate'])->name('transition.actioninitiate');
+    Route::get('/get-vendor-and-balance/{purchaseOrderId}', [PurchasingOrderController::class, 'getVendorAndBalance']);
+    Route::post('/transition/submitforpayment', [PurchasingOrderController::class, 'submitforpayment'])->name('transition.submitforpayment');
+    Route::post('/submit-payment', [PurchasingOrderController::class, 'submitPayment']);
+    Route::post('/approve-transition', [PurchasingOrderController::class, 'approveTransition'])->name('approve.transition');
+    Route::post('/reject-transition', [PurchasingOrderController::class, 'rejectTransition']);
+    Route::post('/reject-transition-linitiate', [PurchasingOrderController::class, 'rejectTransitionlinitiate']);
+    Route::post('/upload-swift-file', [PurchasingOrderController::class, 'uploadSwiftFile'])->name('uploadSwiftFile');
+    Route::get('/get-swift-details/{id}', [PurchasingOrderController::class, 'getSwiftDetails'])->name('getSwiftDetails');
+    Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
+    Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
+    Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
+
+    //Netsuite GDN
+    Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
+    Route::post('netsuitegdn/submit', [ApprovalsController::class, 'submitGdn'])->name('netsuitegdn.submit');
+    Route::post('netsuitegdn/add', [ApprovalsController::class, 'addGdn'])->name('netsuitegdn.add');
 
 
 

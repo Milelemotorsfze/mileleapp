@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\BanksController;
+use App\Http\Controllers\BankAccountsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,3 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/banks', [BanksController::class, 'getBanks']);
+Route::get('/bank-accounts', [BankAccountsController::class, 'getBankAccounts']);
+

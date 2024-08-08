@@ -73,6 +73,8 @@ namespace App\Http\Controllers;
             $empProfile->user_id = $user->id;
             $empProfile->first_name = $request->input('name');
             $empProfile->company_number = $request->input('phone');
+            $empProfile->department_id = $request->input('department');
+            $empProfile->designation_id = $request->input('designation');
             $empProfile->save();
             $empJob = new EmpJob();
             $empProfileId = $empProfile->id;
@@ -87,15 +89,15 @@ namespace App\Http\Controllers;
                 $salesmanstatus->remarks = "Account Created";
                 $salesmanstatus->created_by = Auth::id();
                 $salesmanstatus->save();
-                $languages = $request->input('lauguages');
+            }
+            $languages = $request->input('lauguages');
                 foreach ($languages as $language) {
                     $salesPersonLanguage = new SalesPersonLaugauges();
                     $salesPersonLanguage->sales_person = $user->id;
                     $salesPersonLanguage->language = $language;
                     $salesPersonLanguage->save();
                 }
-            }
-            $user->assignRole($request->roles[0]);
+            $user->assignRole($request->input('roles'));
             $data['email'] = $user->email;
             $data['emailEncrypt'] = Crypt::encryptString($user->email);
             $data['name'] = $user->name;

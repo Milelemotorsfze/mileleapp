@@ -115,30 +115,30 @@ class MovementController extends Controller
                 $query->where('latest_location', '!=', '2')
                       ->orWhereNull('latest_location');
             })
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Approved')
             ->pluck('vin');
     $purchasing_order = PurchasingOrder::where('status', 'Approved')
             ->whereHas('vehicles', function ($query) {
             $query->whereNull('grn_id')
             ->whereNotNull('vin')
-            ->where('status', 'Incoming Stock');
+            ->where('status', 'Approved');
             })
     ->get();
     $po = PurchasingOrder::where('status', 'Approved')
     ->whereDoesntHave('vehicles', function ($query) {
         $query->whereNull('grn_id')
-        ->where('status', 'Incoming Stock');
+        ->where('status', 'Approved');
     })
     ->pluck('po_number');
     $so_number = So::whereDoesntHave('vehicles', function ($query) {
         $query->whereNull('grn_id')
         ->whereNotNull('vin')
-                ->where('status', 'Incoming Stock');
+                ->where('status', 'Approved');
     })
     ->pluck('so_number');
     $so = So::whereHas('vehicles', function ($query) {
         $query->whereNull('grn_id')
-              ->where('status', 'Incoming Stock');
+              ->where('status', 'Approved');
     })
     ->get();     
         }
@@ -152,30 +152,30 @@ class MovementController extends Controller
             $query->where('latest_location', '!=', '2')
                   ->orWhereNull('latest_location');
         })
-        ->where('payment_status', '=', 'Incoming Stock')
+        ->where('status', '=', 'Approved')
         ->pluck('vin'); 
         $purchasing_order = PurchasingOrder::where('status', 'Approved')
     ->whereHas('vehicles', function ($query) {
         $query->whereNull('gdn_id')
         ->whereNotNull('vin')
-              ->where('status', 'Incoming Stock');
+              ->where('status', 'Approved');
     })
     ->get();
     $po = PurchasingOrder::where('status', 'Approved')
     ->whereDoesntHave('vehicles', function ($query) {
         $query->whereNotNull('gdn_id')
-        ->where('status', 'Incoming Stock');
+        ->where('status', 'Approved');
     })
     ->pluck('po_number');
     $so_number = So::whereDoesntHave('vehicles', function ($query) {
         $query->whereNotNull('gdn_id')
         ->whereNotNull('vin')
-                ->where('status', 'Incoming Stock');
+                ->where('status', 'Approved');
     })
     ->pluck('so_number');
     $so = So::whereHas('vehicles', function ($query) {
         $query->whereNull('gdn_id')
-              ->where('status', 'Incoming Stock');
+              ->where('status', 'Approved');
     })
     ->get();
         }      
@@ -229,7 +229,6 @@ class MovementController extends Controller
             $grn->date = $date;
             $grn->save();
             $grnNumber = $grn->id;
-            $grn->grn_number = $grnNumber;
             $grn->save();
             Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
             $vehicleId = Vehicles::whereIn('vin', $grnVins)->pluck('id');
@@ -247,9 +246,6 @@ class MovementController extends Controller
         if (!empty($gdnVins)) {
             $gdn = new Gdn();
             $gdn->date = $date;
-            $gdn->save();
-            $gdnNumber = $gdn->id;
-            $gdn->gdn_number = $gdnNumber;
             $gdn->save();
             Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
             $vehicleId = Vehicles::whereIn('vin', $gdnVins)->pluck('id');
@@ -461,7 +457,6 @@ public function grnfilepost(Request $request)
             if ($vehicle) {
                 $grn = grn::find($vehicle->grn_id);
                 if ($grn) {
-                    $grn->grn_number = $grnNumber;
                     $grn->date = $grnDate;
                     $grn->save();
                     $existingVins[] = $vin;
@@ -493,7 +488,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('grn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Approved')
             ->pluck('id');
         }
         else
@@ -502,7 +497,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Approved')
             ->pluck('id');
         }
         info($vehicles);
@@ -555,7 +550,7 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
-            ->where('payment_status', '=', 'Incoming Stock')
+            ->where('status', '=', 'Approved')
             ->pluck('id');
             info($vehicles);
             $vehicleDetails = [];

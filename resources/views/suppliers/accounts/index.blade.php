@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-accounts');
+  @endphp
+  @if ($hasPermission)
   <div class="card-header">
   @if(session('success'))
     <div class="alert alert-success">
@@ -51,4 +55,9 @@
     </div>
 </div>
 </div>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

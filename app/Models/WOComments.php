@@ -25,4 +25,24 @@ class WOComments extends Model
     {
         return $this->hasMany(WOComments::class, 'parent_id');
     }
+
+    public function files()
+    {
+        return $this->hasMany(CommentFile::class, 'comment_id');
+    }
+    public function wo_histories() {
+        return $this->hasMany(WORecordHistory::class, 'comment_id');
+    }
+    public function removed_vehicles() {
+        return $this->hasMany(WOVehicles::class, 'deleted_comment_id')->withTrashed();
+    }
+    public function new_vehicles()
+    {
+        return $this->hasMany(CommentVehicleMapping::class, 'comment_id')
+            ->where('type', 'store');
+    }
+    public function updated_vehicles() {
+        return $this->hasMany(CommentVehicleMapping::class, 'comment_id')
+            ->where('type', 'update');
+    }
 }
