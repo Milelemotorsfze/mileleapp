@@ -14,8 +14,10 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
                     @endphp
                     @if ($hasPermission)
-                        <a  class="btn btn-sm btn-info float-end" href="{{ route('master-models.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-                    @endif
+                        <a  class="btn btn-sm btn-info float-end"  href="{{ route('master-models.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                        <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" href="{{ route('master-models.index', ['export' => 'EXCEL'] ) }}" >
+                        <i class="fa fa-download" aria-hidden="true"></i> Export</a>
+                        @endif
                 @endcan
             </div>
             <div class="card-body">

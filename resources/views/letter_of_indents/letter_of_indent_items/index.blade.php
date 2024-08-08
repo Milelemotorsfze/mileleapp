@@ -83,10 +83,10 @@
                                 <th>Is Expired</th>  
                                 <th>Status</th>   
                                 <th>SO Numbers</th>                         
-                               <!--    <th>Created By</th>
+                                <th>Created By</th>
                                 <th>Created At</th>
                                 <th>Updated By</th>
-                                <th>Updated At</th> -->
+                                <th>Updated At</th> 
                              
                             </tr>
                         </thead>
@@ -102,18 +102,7 @@
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function () {
-            var table1 = $('.LOI-Items-table').DataTable({   
-            //     dom: 'Bfrtip',
-            //     buttons: ['csv','excel'],
-            //     // layout: {
-            //     //     topStart: 'buttons'
-            //     // },
-            //     exportOptions: {
-            //     modifier: {
-            //       page: 'all',
-            //     }
-            // },
-          
+            var table1 = $('.LOI-Items-table').DataTable({      
             processing: true,
             serverSide: true,
             searching:true,
@@ -137,7 +126,11 @@
             {'data' : 'sales_person_id', 'name': 'LOI.salesPerson.name' },     
             {'data' : 'is_expired', 'name': 'is_expired' },   
             {'data' : 'l_o_i.submission_status', 'name': 'LOI.submission_status' },        
-            {'data' : 'so_number', 'name': 'LOI.soNumbers.so_number' }     
+            {'data' : 'so_number', 'name': 'LOI.soNumbers.so_number' },
+            {'data' : 'created_by', 'name': 'LOI.createdBy.name' },      
+            {'data' : 'created_at', 'name': 'created_at' },        
+            {'data' : 'updated_by', 'name': 'LOI.updatedBy.name' },        
+            {'data' : 'updated_at', 'name': 'updated_at' },     
         ]
         });
         
