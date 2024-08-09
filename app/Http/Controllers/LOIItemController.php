@@ -62,7 +62,7 @@ class LOIItemController extends Controller
                             'Customer Name' => $data->LOI->client->name ?? '',
                             'Customer Type' => $data->LOI->client->customertype ?? '',
                             'Country' => $data->LOI->client->country->name ?? '',
-                            'Matrix Code' => $data->uuid,
+                            'Item Code' => $data->code,
                             'Model' => $data->masterModel->model,
                             'SFX' => $data->masterModel->sfx,
                             'Steering' => $data->masterModel->steering,

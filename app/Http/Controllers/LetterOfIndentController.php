@@ -329,7 +329,7 @@ class LetterOfIndentController extends Controller
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
-                    $LOIItem->uuid = $code;
+                    // $LOIItem->uuid = $code;
                     $LOIItem->code = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
@@ -669,7 +669,7 @@ class LetterOfIndentController extends Controller
                     $LOIItem->letter_of_indent_id = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
                     $LOIItem->quantity = $quantity;
-                    $LOIItem->uuid = $code;
+                    // $LOIItem->uuid = $code;
                     $LOIItem->code = $code;
                     $LOIItem->save();
                 }
