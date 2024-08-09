@@ -44,7 +44,7 @@ class WORecordHistory extends Model
             'customer_representative_email' => 'Customer Representative Email',
             'customer_representative_name' => 'Customer Representative Name',
             // date is not coming in history table
-            'delivery_contact_person' => 'Delivery Contact Person',
+            'delivery_contact_person' => 'Delivery Contact Person Name',
             'delivery_date' => 'Delivery Date',
             'delivery_location' => 'Delivery Location',
             'deposit_received_as' => 'Deposit Received As',
