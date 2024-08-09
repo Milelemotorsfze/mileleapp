@@ -57,6 +57,8 @@ use App\Models\DepartmentNotifications;
 use App\Mail\EmailNotificationrequest;
 use App\Mail\VINEmailNotification;
 use App\Mail\PurchaseOrderUpdated;
+use App\Mail\ChangeVariantNotification;
+
 
 class PurchasingOrderController extends Controller
 {
@@ -3895,6 +3897,13 @@ public function updateVariants(Request $request)
             $vehicleslog->save();
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
+            // Collect data for the email
+            $changedVariants[] = [
+                'vehicle_id' => $vehicle->id,
+                'vin' => $vehicle->vin,
+                'old_variant' => $vehicleslog->old_value,
+                'new_variant' => $vehicleslog->new_value,
+            ];
         }
     }
     PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)->delete();
@@ -3909,6 +3918,13 @@ public function updateVariants(Request $request)
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
+    $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+    $recipients = ['waqar.younas@milele.com'];
+    Mail::to($recipients)->send(new ChangeVariantNotification(
+        $purchasingOrderId,
+        $changedVariants
+    ));
     return response()->json(['success' => true]);
 }
 public function paymentremanings($id)
