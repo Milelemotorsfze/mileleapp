@@ -221,6 +221,7 @@ class LetterOfIndentController extends Controller
             'dealers' => 'required'
           
         ]);
+        // return $request->all();
 
         $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
@@ -361,8 +362,14 @@ class LetterOfIndentController extends Controller
             DB::commit();
 
             (new UserActivityController)->createActivity('Created New LOI.');
+
+            // if(in_array('general',$request->template_type)) {
+            //     $type = 'general';
+            // }else{
+            //     $type = $request->template_type[0];
+            // }
         
-            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0] ]);
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
 
         }else{
 
@@ -426,7 +433,7 @@ class LetterOfIndentController extends Controller
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
         }
-        else if($request->type == 'Individual') {
+        else if($request->type == 'individual') {
             if($request->download == 1) {
                 $width = $request->width;
                 try{
@@ -691,6 +698,12 @@ class LetterOfIndentController extends Controller
             return $e->getMessage();
         }
             DB::commit();
+
+            // if(in_array('general',$request->template_type)) {
+            //     $type = 'general';
+            // }else{
+            //     $type = $request->template_type[0];
+            // }
 
             return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
 
