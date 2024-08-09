@@ -56,7 +56,7 @@ use App\Models\VehiclesSupplierAccountTransaction;
 use App\Models\DepartmentNotifications;
 use App\Mail\EmailNotificationrequest;
 use App\Mail\VINEmailNotification;
-
+use App\Mail\PurchaseOrderUpdated;
 
 class PurchasingOrderController extends Controller
 {
@@ -3321,12 +3321,15 @@ if ($paymentOrderStatus->isNotEmpty()) {
         }
     }
     $purchasingOrder->status = "Pending Approval";
-
+    $changedFields = [];
     if ($request->hasFile('uploadPL')) {
+        if($purchasingOrder->pl_file_path)
+        {
         $oldpl = New Purchasedorderoldplfiles(); 
         $oldpl->purchasing_order_id = $purchasingOrder->id;
         $oldpl->file_path = $purchasingOrder->pl_file_path;
         $oldpl->save();
+        }
         $description = "The PFI Document is Updated";
         $purchasingordereventsLog = new PurchasingOrderEventsLog();
         $purchasingordereventsLog->event_type = "Update PO PFI Document";
@@ -3350,7 +3353,6 @@ if ($paymentOrderStatus->isNotEmpty()) {
     }
     // Save the purchasing order
     $purchasingOrder->save();
-
     // Log changes
     foreach ($fieldsToUpdate as $field) {
         if ($oldValues[$field] != $purchasingOrder->$field) {
@@ -3392,6 +3394,11 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 $oldValue = $oldport;
                 $newValue = $newport;
             }
+            $changedFields[] = [
+                'field' => ucfirst(str_replace('_', ' ', $field)),
+                'old_value' => $oldValue,
+                'new_value' => $newValue,
+            ];
             $purchasingordereventsLog = new PurchasingOrderEventsLog();
             $purchasingordereventsLog->event_type = "Update PO Basic Details";
             $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
@@ -3403,7 +3410,16 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $purchasingordereventsLog->save();
         }
     }
-
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+        $recipients = ['team.dp@milele.com'];
+    }
+    else
+    {
+        $recipients = ['abdul@milele.com'];
+    }
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
     return response()->json(['message' => 'Purchase order details updated successfully'], 200);
 }       
         public function pendingvins($status)
