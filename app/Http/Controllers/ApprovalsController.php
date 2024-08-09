@@ -530,7 +530,7 @@ class ApprovalsController extends Controller
             $inspection->processing_date = $currentDate;
             $inspection->approval_remarks = $comments;
             $inspection->approval_date = $currentDate;
-            // $inspection->save();
+            $inspection->save();
             VehicleApprovalRequests::where('inspection_id', $inspectionId)
             ->where('status', 'Pending')
             ->update(['status' => 'reinspection']);
@@ -550,13 +550,13 @@ class ApprovalsController extends Controller
             $inspection->status = 'approved';
             $inspection->process_remarks = $comments;
             $inspection->processing_date = $currentDate;
-            // $inspection->save();
+            $inspection->save();
             $incident = Incident::where('inspection_id', $inspectionId)->first();
             if($incident)
             {
             $incident->status = "approved";
             $incident->reported_date = $currentDateTime->toDateString();
-            // $incident->save();
+            $incident->save();
             }
             $vehicles = Vehicles::find($inspection->vehicle_id);
             if($inspection->stage == "GRN")
@@ -573,7 +573,7 @@ class ApprovalsController extends Controller
             {
                 $vehicles->qc_remarks = $comments;
             }
-            // $vehicles->save();
+            $vehicles->save();
         $selectedSpecifications = [];
         foreach ($request->all() as $key => $value) {
             if (strpos($key, 'specification_') !== false) {
