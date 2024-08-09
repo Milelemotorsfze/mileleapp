@@ -87,8 +87,6 @@
                                 <th>SO Numbers</th>  
                                 <th>Approval Remarks</th>
                                 <th>LOI Comment</th>                       
-                                
-                             
                             </tr>
                         </thead>
                         <tbody>
@@ -118,7 +116,7 @@
             {'data' : 'l_o_i.client.customertype', 'name': 'LOI.client.customertype' },  
             {'data' : 'l_o_i.category', 'name': 'LOI.category' },        
             {'data' : 'l_o_i.client.country.name', 'name': 'LOI.client.country.name' },        
-            {'data' : 'uuid', 'name': 'uuid' },        
+            {'data' : 'code', 'name': 'code' },        
             {'data' : 'master_model.model', 'name': 'masterModel.model' },        
             {'data' : 'master_model.sfx', 'name': 'masterModel.sfx' },  
             {'data' : 'master_model.steering', 'name': 'masterModel.steering' },          
