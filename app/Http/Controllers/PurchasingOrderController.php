@@ -3415,11 +3415,11 @@ if ($paymentOrderStatus->isNotEmpty()) {
     if (!empty($changedFields)) {
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['waqar.younas@milele.com'];
+        $recipients = ['team.dp@milele.com'];
     }
     else
     {
-        $recipients = ['waqar.younas@milele.com'];
+        $recipients = ['abdul@milele.com'];
     }
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
