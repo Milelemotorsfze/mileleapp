@@ -313,11 +313,11 @@ class LetterOfIndentController extends Controller
                     
                 if($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
-                    $length = 7;
-                    $offset = 4;
-                    $prefix = "LOI-";
+                    $length = 6;
+                    $offset = 2;
+                    $prefix = "L ";
                     if($latestRow){
-                        $latestUUID =  $latestRow->uuid;
+                        $latestUUID =  $latestRow->code;
                         $latestUUIDNumber = substr($latestUUID, $offset, $length);
 
                         $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
@@ -330,6 +330,7 @@ class LetterOfIndentController extends Controller
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
                     $LOIItem->uuid = $code;
+                    $LOIItem->code = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
                 }
@@ -651,11 +652,13 @@ class LetterOfIndentController extends Controller
                     ->first();
                 if ($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
-                    $length = 7;
-                    $offset = 4;
-                    $prefix = "LOI-";
+                    info("latest row");
+                    info($latestRow);
+                    $length = 6;
+                    $offset = 2;
+                    $prefix = "L ";
                     if($latestRow){
-                        $latestUUID =  $latestRow->uuid;
+                        $latestUUID =  $latestRow->code;
                         $latestUUIDNumber = substr($latestUUID, $offset, $length);
                         $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
                         $code =  $prefix.$newCode;
@@ -667,6 +670,7 @@ class LetterOfIndentController extends Controller
                     $LOIItem->master_model_id = $masterModel->id ?? '';
                     $LOIItem->quantity = $quantity;
                     $LOIItem->uuid = $code;
+                    $LOIItem->code = $code;
                     $LOIItem->save();
                 }
             }
