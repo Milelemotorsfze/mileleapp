@@ -176,6 +176,7 @@
                                     <option value="milele_cars" >Milele Cars</option>
                                     <option value="individual">Individual</option>
                                     <option value="business">Business</option>
+                                    <option value="general">General</option>
 
                                 </select>
                             </div>

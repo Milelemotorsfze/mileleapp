@@ -363,13 +363,13 @@ class LetterOfIndentController extends Controller
 
             (new UserActivityController)->createActivity('Created New LOI.');
 
-            // if(in_array('general',$request->template_type)) {
-            //     $type = 'general';
-            // }else{
-            //     $type = $request->template_type[0];
-            // }
+            if(in_array('general',$request->template_type)) {
+                $type = 'general';
+            }else{
+                $type = $request->template_type[0];
+            }
         
-            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $type]);
 
         }else{
 
@@ -699,13 +699,13 @@ class LetterOfIndentController extends Controller
         }
             DB::commit();
 
-            // if(in_array('general',$request->template_type)) {
-            //     $type = 'general';
-            // }else{
-            //     $type = $request->template_type[0];
-            // }
+            if(in_array('general',$request->template_type)) {
+                $type = 'general';
+            }else{
+                $type = $request->template_type[0];
+            }
 
-            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $type]);
 
         }else{
             return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");

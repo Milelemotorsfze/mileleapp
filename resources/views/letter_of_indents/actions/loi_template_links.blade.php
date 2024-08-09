@@ -3,6 +3,3 @@
     {{ ucwords( str_replace('_', ' ', $LOITemplate) )}}
 </a>
 @endforeach
-<a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'General' ]) }}">
-    General
-</a>

@@ -175,6 +175,7 @@
                                         {{ $letterOfIndent->client->customertype == 'Company' || $letterOfIndent->client->customertype == 'Government' ? 'disabled' : '' }}>Individual</option>
                                     <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->client->customertype == 'Individual' ? 'disabled' : '' }}>Business</option>
+                                        <option value="general" {{ in_array('general',$LOITemplates) ? 'selected' : '' }}>General</option>
                                 </select>
                             </div>
                         </div>
