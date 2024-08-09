@@ -612,9 +612,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							autofocus  onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
-						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person :</label>
+						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person Name :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
-							placeholder="Enter Delivery Contact Person" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
+							placeholder="Enter Delivery Contact Person Name" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
 							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeInput(this)">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
