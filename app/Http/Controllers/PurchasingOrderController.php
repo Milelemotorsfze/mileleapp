@@ -3412,16 +3412,18 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $purchasingordereventsLog->save();
         }
     }
+    if (!empty($changedFields)) {
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com'];
+        $recipients = ['waqar.younas@milele.com'];
     }
     else
     {
-        $recipients = ['abdul@milele.com'];
+        $recipients = ['waqar.younas@milele.com'];
     }
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
+}
     return response()->json(['message' => 'Purchase order details updated successfully'], 200);
 }       
         public function pendingvins($status)
@@ -3871,6 +3873,7 @@ public function storeMessages(Request $request)
 }
 public function updateVariants(Request $request)
 {
+    $changedVariants = [];
     $variants = $request->input('variants');
     $purchasingOrderId = $request->input('purchasing_order_id');
     foreach ($variants as $variant) {
@@ -3884,7 +3887,7 @@ public function updateVariants(Request $request)
             $vehicleslog->time = $currentDateTime->toTimeString();
             $vehicleslog->date = $currentDateTime->toDateString();
             $vehicleslog->status = 'Update Vehicles Varaint';
-            $vehicleslog->vehicles_id = $vehicleId;
+            $vehicleslog->vehicles_id = $vehicle->id;
             $vehicleslog->field = "Varaint";
             $vehicleslog->old_value = $vehicle->varaints_id;
             $vehicleslog->new_value = $variant['variant_id'];
@@ -3894,12 +3897,17 @@ public function updateVariants(Request $request)
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
             // Collect data for the email
+            if($vehicleslog->old_value != $vehicleslog->new_value)
+            {
+            $oldVariantName = Varaint::where('id', $vehicleslog->old_value)->value('name');
+            $newVariantName = Varaint::where('id', $vehicleslog->new_value)->value('name');
             $changedVariants[] = [
-                'vehicle_id' => $vehicle->id,
+                'vehicleid' => $vehicle->id,
                 'vin' => $vehicle->vin,
-                'old_variant' => $vehicleslog->old_value,
-                'new_variant' => $vehicleslog->new_value,
+                'oldvariant' => $oldVariantName,
+                'newvariant' => $newVariantName,
             ];
+        }
         }
     }
     PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)->delete();
@@ -3914,13 +3922,16 @@ public function updateVariants(Request $request)
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
+    info($changedVariants);
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
     $recipients = ['waqar.younas@milele.com'];
     Mail::to($recipients)->send(new ChangeVariantNotification(
-        $purchasingOrderId,
-        $changedVariants
-    ));
+        $purchasingOrder->po_number,
+        $purchasingOrder->pl_number,
+        $changedVariants, // Correct order
+        $orderUrl
+    ));    
     return response()->json(['success' => true]);
 }
 public function paymentremanings($id)

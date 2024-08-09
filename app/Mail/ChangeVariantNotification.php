@@ -13,35 +13,28 @@ class ChangeVariantNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $purchasingOrderId;
+    public $poNumber;
+    public $plNumber;
     public $changedVariants;
     public $orderUrl;
 
-    public function __construct($poNumber, $plNumber, $vehiclesVIN, $brandName, $modelLine, $oldVariantName, $newVariantName, $orderUrl)
+    public function __construct($poNumber, $plNumber, $changedVariants, $orderUrl)
     {
         $this->poNumber = $poNumber;
         $this->plNumber = $plNumber;
-        $this->vehiclesVIN = $vehiclesVIN;
-        $this->brandName = $brandName;
-        $this->modelLine = $modelLine;
-        $this->oldVariantName = $oldVariantName;
-        $this->newVariantName = $newVariantName;
+        $this->changedVariants = $changedVariants;
         $this->orderUrl = $orderUrl;
     }
 
     public function build()
     {
         return $this->subject('PO # ' . $this->poNumber . ' Status Update')
-                    ->view('emails.dp_qc_update_notification')
+                    ->view('emails.dp_changevariant_notification')
                     ->with([
                         'poNumber' => $this->poNumber,
-                        'plNumber' => $this->plNumber,
-                        'vehiclesVIN' => $this->vehiclesVIN,
-                        'brandName' => $this->brandName,
-                        'modelLine' => $this->modelLine,
-                        'oldVariantName' => $this->oldVariantName,
-                        'newVariantName' => $this->newVariantName,
-                        'orderUrl' => $this->orderUrl,
+                'plNumber' => $this->plNumber,
+                'changedVariants' => $this->changedVariants,
+                'orderUrl' => $this->orderUrl,
                     ]);
     }
 }
