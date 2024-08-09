@@ -334,6 +334,15 @@ class MigrationDataCheckController extends Controller
     }
     public function index()
     {
+        $loiItemCodes = DB::table('loi_item_codes')->get();
+        foreach($loiItemCodes as $loiItemCode) {
+            DB::table('letter_of_indent_items')
+                ->where('id', $loiItemCode->loi_item_id)
+                ->update([
+                    'code' => $loiItemCode->code,
+                ]);
+        }
+        
         // $lois = LetterOfIndent::all();
         // foreach($lois as $loi) {
         //     $loi->utilized_quantity =  $loi->total_loi_quantity;
@@ -389,6 +398,16 @@ class MigrationDataCheckController extends Controller
            
            return "all LOI have unique so number are unique";
     
+    }
+    public function LOIItemCodeCheck(){
+        $loiItemCodes = DB::table('loi_item_codes')->get();
+        foreach($loiItemCodes as $loiItemCode) {
+            DB::table('letter_of_indent_items')
+                ->where('id', $loiItemCode->loi_item_id)
+                ->update([
+                    'code' => $loiItemCode->code,
+                ]);
+        }
     }
 
     /**
