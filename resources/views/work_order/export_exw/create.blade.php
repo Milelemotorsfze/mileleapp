@@ -1647,6 +1647,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 		}
 	});
+	// Function to set the minimum date to today's date
+	document.addEventListener("DOMContentLoaded", function() {
+		var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+		document.getElementById("delivery_date").setAttribute("min", today);
+	});
 	// ADD CUSTOM VALIDATION RULES START
         // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
@@ -1694,7 +1699,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
+		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
+		$.validator.addMethod("greaterThanExisting", function(value, element) {
+			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
+			var numericPart = parseInt(value.split('-')[1], 10);
 
+			// Check if the extracted number is greater than 6500
+			return this.optional(element) || numericPart > 6500;
+		}, "SO Number must be greater than SO-006500");
 		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
 		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
 			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
@@ -1738,6 +1750,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					SONumberFormat: true,
 					notSO000000: true,
 					uniqueSO: true,
+					greaterThanExisting: true, 
 				},
                 batch: {
                     required: true,
