@@ -87,7 +87,6 @@
     </div>
 </div>
     @if($letterOfIndent->LOIDocuments->count() > 0)
-        <div class="page_break"></div>
         <div class="row">
             @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
             <img src="{{ public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  class="mt-2">
