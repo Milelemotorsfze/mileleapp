@@ -44,7 +44,7 @@
 @section('content')
 <div class="card-header">
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
 	@endphp
 	@if ($hasPermission)
 	<h4 class="card-title">
@@ -84,7 +84,7 @@
 	@endif
 </div>
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
 @endphp
 @if ($hasPermission)
 <div class="tab-pane fade show" id="telephonic_interview">
@@ -131,7 +131,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th colspan="5" class="dark">
 								<center>SO</center>
 							</th>
-                            <th colspan="3" class="light">
+                            <th colspan="4" class="light">
 								<center>Delivery</center>
 							</th>
 							@if(isset($type) && ($type == 'export_cnf'))
@@ -179,7 +179,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td class="dark">Balance</td>
 
                             <td class="light">Location</td>
-                            <td class="light">Contact Person</td>
+                            <td class="light">Contact Person Name</td>
+							<td class="light">Contact Person No.</td>
                             <td class="light">Date</td>
                             <td class="light">Trade License</td>
                             <td class="light">Passport</td>
@@ -197,7 +198,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</button>
 									<ul class="dropdown-menu dropdown-menu-start">
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','export-cnf-wo-details','local-sale-wo-details']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
                                         @endphp
                                         @if ($hasPermission)
                                         <li>
@@ -327,6 +328,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
 							<td>{{$data->delivery_location ?? ''}}</td>
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
+							<td>{{$data->delivery_contact_person_number ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
 							@if(isset($type) && ($type == 'export_cnf'))
 								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>

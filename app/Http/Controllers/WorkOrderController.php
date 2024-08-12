@@ -135,9 +135,28 @@ class WorkOrderController extends Controller
      */
     public function index($type)
     {
-        $datas = WorkOrder::where('type',$type)->latest()->get();
-        return view('work_order.export_exw.index',compact('type','datas'));
+        $authId = Auth::id();
+
+        // Store permission checks
+        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
+        ]);
+
+        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+            'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
+        ]);
+
+        // Build the query with conditional adjustments
+        $datas = WorkOrder::where('type', $type)
+            ->when($hasLimitedAccess, function ($query) use ($authId) {
+                return $query->where('created_by', $authId);
+            })
+            ->latest()
+            ->get();
+
+        return view('work_order.export_exw.index', compact('type', 'datas'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -162,6 +181,7 @@ class WorkOrderController extends Controller
             // Ensure these fields are properly converted to strings
             $input['customer_company_number'] = $request->customer_company_number['full'] ?? null;
             $input['customer_representative_contact'] = $request->customer_representative_contact['full'] ?? null;
+            $input['delivery_contact_person_number'] = $request->delivery_contact_person_number['full'] ?? null;
             $input['freight_agent_contact_number'] = $request->freight_agent_contact_number['full'] ?? null;
             $input['transporting_driver_contact_number'] = $request->transporting_driver_contact_number['full'] ?? null;
             $input['created_by'] = $authId;
@@ -273,6 +293,7 @@ class WorkOrderController extends Controller
             $nestedFields = [
                 'customer_company_number' => 'full',
                 'customer_representative_contact' => 'full',
+                'delivery_contact_person_number' => 'full',
                 'freight_agent_contact_number' => 'full',
                 'transporting_driver_contact_number' => 'full'
             ];
@@ -577,17 +598,61 @@ class WorkOrderController extends Controller
      */
     public function show(WorkOrder $workOrder)
     {
-        // $errorMsg ="This page will coming very soon !";
-        // return view('hrm.notaccess',compact('errorMsg'));
+        $authId = Auth::id();
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)->with('comments','financePendingApproval','cooPendingApproval')->first();
-        $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
-        $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
-        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
-            $q = $q->where('type','employee');
-        })->get();
-        return view('work_order.export_exw.show',compact('type','users','workOrder','previous','next'));
+    
+        // Store permission checks to avoid redundant calls
+        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+            'export-exw-wo-details', 'export-cnf-wo-details', 'local-sale-wo-details'
+        ]);
+    
+        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+            'current-user-export-exw-wo-details', 'current-user-export-cnf-wo-details', 'current-user-local-sale-wo-details'
+        ]);
+    
+        // Build the base query with necessary relationships
+        $query = WorkOrder::where('id', $workOrder->id)
+            ->with([
+                'comments',
+                'financePendingApproval',
+                'cooPendingApproval'
+            ]);
+    
+        // Adjust the query based on user permissions
+        if ($hasLimitedAccess) {
+            $query->where('created_by', $authId);
+        }
+    
+        // Fetch the current work order
+        $workOrder = $query->firstOrFail();
+    
+        // Retrieve previous and next work order IDs
+        $previous = WorkOrder::where('type', $type)
+            ->where('id', '<', $workOrder->id)
+            ->when($hasLimitedAccess, function($query) use ($authId) {
+                return $query->where('created_by', $authId);
+            })
+            ->max('id');
+    
+        $next = WorkOrder::where('type', $type)
+            ->where('id', '>', $workOrder->id)
+            ->when($hasLimitedAccess, function($query) use ($authId) {
+                return $query->where('created_by', $authId);
+            })
+            ->min('id');
+    
+        // Get active users excluding specific IDs
+        $users = User::where('status', 'active')
+            ->whereNotIn('id', [1, 16])
+            ->whereHas('empProfile', function($q) {
+                $q->where('type', 'employee');
+            })
+            ->orderBy('name', 'ASC')
+            ->get();
+    
+        return view('work_order.export_exw.show', compact('type', 'users', 'workOrder', 'previous', 'next'));
     }
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -719,6 +784,7 @@ class WorkOrderController extends Controller
             $nestedFields = [
                 'customer_company_number',
                 'customer_representative_contact',
+                'delivery_contact_person_number',
                 'freight_agent_contact_number',
                 'transporting_driver_contact_number'
             ];
