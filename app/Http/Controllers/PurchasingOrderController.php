@@ -58,6 +58,7 @@ use App\Mail\EmailNotificationrequest;
 use App\Mail\VINEmailNotification;
 use App\Mail\PurchaseOrderUpdated;
 use App\Mail\ChangeVariantNotification;
+use App\Models\Dnaccess;
 
 
 class PurchasingOrderController extends Controller
@@ -1768,7 +1769,6 @@ public function checkcreatevins(Request $request)
                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
                 ? ['team.logistics@milele.com'] 
                 : ['team.logistics@milele.com', 'abdul@milele.com'];
-
                 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
                 $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
                     $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
@@ -1802,6 +1802,20 @@ public function checkcreatevins(Request $request)
                 $notification->type = 'Information';
                 $notification->detail = $detailText;
                 $notification->save();
+                if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
             }
         }
     }
@@ -3423,6 +3437,35 @@ if ($paymentOrderStatus->isNotEmpty()) {
     }
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+    "Stage: " . "Changing Into Purchased Order\n" .
+    "Order URL: " . $orderUrl . "\n\n" .
+    "Changed Fields:\n";
+
+foreach ($changedFields as $changedField) {
+$detailText .= $changedField['field'] . ": From '" . $changedField['old_value'] . "' to '" . $changedField['new_value'] . "'\n";
+}
+// Save the notification
+$notification = new DepartmentNotifications();
+$notification->module = 'Procurement';
+$notification->type = 'Information';
+$notification->detail = $detailText;
+$notification->save();
+if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
 }
     return response()->json(['message' => 'Purchase order details updated successfully'], 200);
 }       
@@ -3810,6 +3853,41 @@ else
     $recipients = ['abdul@milele.com'];
 }
 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+// Format the detail text including the price changes information
+$detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+"PFI Number: " . $purchasingOrder->pl_number . "\n" .
+"Stage: " . "Price Change\n" .
+"Order URL: " . $orderUrl . "\n\n" .
+"Price Changes:\n";
+
+foreach ($priceChanges as $priceChange) {
+$detailText .= "Vehicle ID: " . $priceChange['vehicle_reference'] .
+     " (VIN: " . $priceChange['Vin'] . ", Variant: " . $priceChange['variant_name'] . "): " .
+     "From '" . number_format($priceChange['old_price'], 2) . "' to '" .
+     number_format($priceChange['new_price'], 2) . "'\n" .
+     "Changed by: " . $priceChange['changed_by'] . "\n";
+}
+
+// Save the notification
+$notification = new DepartmentNotifications();
+$notification->module = 'Procurement';
+$notification->type = 'Information';
+$notification->detail = $detailText;
+$notification->save();
+if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
     Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged,$orderUrl));
 
         }
@@ -3933,6 +4011,39 @@ public function updateVariants(Request $request)
     {
         $recipients = ['abdul@milele.com']; 
     }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Stage: " . "Variant Change\n" .
+                  "Order URL: " . $orderUrl . "\n\n" .
+                  "Changed Variants:\n";
+
+    foreach ($changedVariants as $changedVariant) {
+        $detailText .= "Vehicle ID: " . $changedVariant['vehicleid'] . 
+                       " (VIN: " . $changedVariant['vin'] . "): From '" . 
+                       $changedVariant['oldvariant'] . "' to '" . 
+                       $changedVariant['newvariant'] . "'\n";
+    }
+
+    // Save the notification
+    $notification = new DepartmentNotifications();
+    $notification->module = 'Procurement';
+    $notification->type = 'Information';
+    $notification->detail = $detailText;
+    $notification->save();
+    if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
     Mail::to($recipients)->send(new ChangeVariantNotification(
         $purchasingOrder->po_number,
         $purchasingOrder->pl_number,
@@ -4471,6 +4582,20 @@ public function submitPaymentDetails(Request $request)
         $notification->type = 'Information';
         $notification->detail = $detailText;
         $notification->save();
+        if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
     return response()->json(['message' => 'Payment details saved successfully'], 200);  
 }
     public function getVendorAndBalance($purchaseOrderId)
@@ -4541,6 +4666,20 @@ public function submitPaymentDetails(Request $request)
             $notification->type = 'Information';
             $notification->detail = $detailText;
             $notification->save();
+            if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
     return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
     public function submitPayment(Request $request)
@@ -4623,6 +4762,20 @@ public function submitPaymentDetails(Request $request)
             $notification->type = 'Information';
             $notification->detail = $detailText;
             $notification->save();
+            if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4682,6 +4835,20 @@ public function submitPaymentDetails(Request $request)
     $notification->type = 'Information';
     $notification->detail = $detailText;
     $notification->save();
+    if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)

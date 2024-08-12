@@ -588,4 +588,8 @@ class User extends Authenticatable
     public function joiningReport() {
         return $this->hasMany(JoiningReport::class,'employee_id','id');
     }
+    public function department()
+    {
+        return $this->hasOneThrough(MasterDepartment::class, EmpProfile::class, 'user_id', 'id', 'id', 'department_id');
+    }
 }

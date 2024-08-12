@@ -113,6 +113,8 @@ use App\Http\Controllers\VendorAccountController;
 use App\Http\Controllers\BankAccountsController;
 use App\Http\Controllers\LOIExpiryConditionController;
 use App\Http\Controllers\BanksController;
+use App\Http\Controllers\DepartmentNotificationsController;
+
 
 /*
 /*
@@ -837,7 +839,6 @@ Route::get('/d', function () {
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
-    });
     Route::get('candidate/documents/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_documents.send_form');
     Route::post('candidate/store_docs', [CandidatePersonalInfoController::class, 'storeDocs'])->name('candidate.storeDocs');
     Route::get('candidate/success_docs', [CandidatePersonalInfoController::class, 'successDocs'])->name('candidate.successDocs');
@@ -953,6 +954,8 @@ Route::get('/d', function () {
     Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
     Route::post('netsuitegdn/submit', [ApprovalsController::class, 'submitGdn'])->name('netsuitegdn.submit');
     Route::post('netsuitegdn/add', [ApprovalsController::class, 'addGdn'])->name('netsuitegdn.add');
-
-
+    Route::resource('departmentnotifications', DepartmentNotificationsController::class);
+    
+    
+});
 

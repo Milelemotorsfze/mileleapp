@@ -1618,6 +1618,20 @@
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('department-notification');
+                        @endphp
+                        @if ($hasPermission)
+                        <a class="dropdown-item" href="{{ route('departmentnotifications.index') }}">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                            @php
+                            $departmentnotificationscount = DB::table('department_notifications')
+                                ->count();
+                            @endphp
+                            <span class="badge badge-danger row-badge2 badge-notificationing">{{$departmentnotificationscount}}</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
                         @canany(['master-module-list', 'master-module-create', 'master-module-edit'])
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-module-list', 'master-module-create', 'master-module-edit']);
