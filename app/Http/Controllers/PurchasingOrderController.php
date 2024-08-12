@@ -1805,7 +1805,7 @@ public function checkcreatevins(Request $request)
                 if($purchasingOrder->is_demand_planning_po == 1)
                 {
                     $dnaccess = New Dnaccess();
-                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->master_departments_id = 8; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 } 
@@ -1813,6 +1813,10 @@ public function checkcreatevins(Request $request)
                 {
                     $dnaccess = New Dnaccess();
                     $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 8; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
@@ -3846,11 +3850,11 @@ public function updatePrices(Request $request)
 }
 if($purchasingOrder->is_demand_planning_po == 1)
 {
-    $recipients = ['team.dp@milele.com'];
+    $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
 }
 else
 {
-    $recipients = ['abdul@milele.com'];
+    $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
 }
 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
 // Format the detail text including the price changes information
@@ -3880,11 +3884,19 @@ if($purchasingOrder->is_demand_planning_po == 1)
                     $dnaccess->master_departments_id = 4; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
                 } 
                 else
                 {
                     $dnaccess = New Dnaccess();
                     $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
@@ -4005,7 +4017,7 @@ public function updateVariants(Request $request)
     $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.finance@milele.com'];
+        $recipients = ['team.dp@milele.com'];
     }
     else
     {
@@ -4567,7 +4579,7 @@ public function submitPaymentDetails(Request $request)
     }
     else
     {
-    $recipients = ['abdul@milele.com'];
+        $recipients = ['team.finance@milele.com'];
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4585,14 +4597,14 @@ public function submitPaymentDetails(Request $request)
         if($purchasingOrder->is_demand_planning_po == 1)
                 {
                     $dnaccess = New Dnaccess();
-                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->master_departments_id = 1; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 } 
                 else
                 {
                     $dnaccess = New Dnaccess();
-                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->master_departments_id = 1; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
@@ -4841,11 +4853,19 @@ public function submitPaymentDetails(Request $request)
                     $dnaccess->master_departments_id = 4; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
                 } 
                 else
                 {
                     $dnaccess = New Dnaccess();
                     $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
