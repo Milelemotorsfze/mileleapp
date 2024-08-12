@@ -3796,7 +3796,6 @@ public function updatePrices(Request $request)
             if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
                 $supplierAccount->current_balance += $totalDifference;
                 $supplierAccount->save();
-
                 SupplierAccountTransaction::create([
                     'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
                     'purchasing_order_id' => $purchasingOrderId,
@@ -3805,16 +3804,18 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-                if($purchasingOrder->is_demand_planning_po == 1)
-            {
-                $recipients = ['team.dp@milele.com'];
-            }
-            else
-            {
-                $recipients = ['abdul@milele.com'];
-            }
-                Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
-            }
+}
+if($purchasingOrder->is_demand_planning_po == 1)
+{
+    $recipients = ['team.dp@milele.com'];
+}
+else
+{
+    $recipients = ['abdul@milele.com'];
+}
+$orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+    Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged,$orderUrl));
+
         }
     }
 
@@ -3926,10 +3927,16 @@ public function updateVariants(Request $request)
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
-    info($changedVariants);
     $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
     $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
-    $recipients = ['waqar.younas@milele.com'];
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+        $recipients = ['team.finance@milele.com'];
+    }
+    else
+    {
+        $recipients = ['abdul@milele.com']; 
+    }
     Mail::to($recipients)->send(new ChangeVariantNotification(
         $purchasingOrder->po_number,
         $purchasingOrder->pl_number,
@@ -4453,7 +4460,7 @@ public function submitPaymentDetails(Request $request)
     }
     else
     {
-    $recipients = ['team.finance@milele.com'];
+    $recipients = ['abdul@milele.com'];
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
