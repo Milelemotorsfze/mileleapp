@@ -1625,9 +1625,14 @@
                         <a class="dropdown-item" href="{{ route('departmentnotifications.index') }}">
                             <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
                             @php
-                            $departmentnotificationscount = DB::table('department_notifications')
-                                ->count();
-                            @endphp
+$userDepartmentId = auth()->user()->empProfile->department_id;
+
+$departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('departments', function($query) use ($userDepartmentId) {
+    $query->where('master_departments_id', $userDepartmentId);
+})->whereDoesntHave('viewedLogs', function($query) {
+    $query->where('users_id', auth()->id());
+})->count();
+@endphp
                             <span class="badge badge-danger row-badge2 badge-notificationing">{{$departmentnotificationscount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
