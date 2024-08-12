@@ -59,6 +59,7 @@ class WorkOrder extends Model
 
         'delivery_location',
         'delivery_contact_person',
+        'delivery_contact_person_number',
         'delivery_date',
 
         // Only for Export CNF Start

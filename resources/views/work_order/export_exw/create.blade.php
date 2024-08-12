@@ -605,19 +605,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<label for="delivery_location" class="col-form-label text-md-end"> Delivery Location :</label>
 						<input id="delivery_location" type="text" class="form-control widthinput @error('delivery_location') is-invalid @enderror" name="delivery_location"
 							placeholder="Enter Delivery Location" value="{{ isset($workOrder) ? $workOrder->delivery_location : '' }}" autocomplete="delivery_location" 
 							autofocus  onkeyup="sanitizeInput(this)">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person Name :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
 							placeholder="Enter Delivery Contact Person Name" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
 							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeInput(this)">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="delivery_contact_person_number" class="col-form-label text-md-end"> Delivery Contact Person Number :</label>
+						<input id="delivery_contact_person_number" type="tel" class="widthinput contact form-control @error('delivery_contact_person_number[full]')
+							is-invalid @enderror" name="delivery_contact_person_number[main]" placeholder="Enter Customer Representative Contact Number"
+							value="" autocomplete="delivery_contact_person_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="delivery_contact_person_number_full" name="delivery_contact_person_number[full]" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person_number : '' }}">
+					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<label for="delivery_date" class="col-form-label text-md-end"> Delivery Date  :</label>
 						<input id="delivery_date" type="date" class="form-control widthinput @error('delivery_date') is-invalid @enderror" name="delivery_date"
 							placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
@@ -1048,6 +1055,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		hiddenInput: "full",
 		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 	});
+	var delivery_contact_person_number = window.intlTelInput(document.querySelector("#delivery_contact_person_number"), {
+		separateDialCode: true,
+		preferredCountries:["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
 	if(type == 'export_exw') {
 		var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
 			separateDialCode: true,
@@ -1122,6 +1135,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				iti.setNumber(customer_company_numberFull);
 				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
+				var delivery_contact_person_numberFull = workOrder.delivery_contact_person_number ? workOrder.delivery_contact_person_number.replace(/\s+/g, '') : '';
+				delivery_contact_person_number.setNumber(delivery_contact_person_numberFull);
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
 				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
 					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
@@ -1647,6 +1662,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 		}
 	});
+	// Function to set the minimum date to today's date
+	document.addEventListener("DOMContentLoaded", function() {
+		var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+		document.getElementById("delivery_date").setAttribute("min", today);
+	});
 	// ADD CUSTOM VALIDATION RULES START
         // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
@@ -1694,7 +1714,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
+		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
+		$.validator.addMethod("greaterThanExisting", function(value, element) {
+			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
+			var numericPart = parseInt(value.split('-')[1], 10);
 
+			// Check if the extracted number is greater than 6500
+			return this.optional(element) || numericPart > 6500;
+		}, "SO Number must be greater than SO-006500");
 		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
 		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
 			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
@@ -1738,6 +1765,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					SONumberFormat: true,
 					notSO000000: true,
 					uniqueSO: true,
+					greaterThanExisting: true, 
 				},
                 batch: {
                     required: true,
@@ -1771,6 +1799,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     minlength: 5,
                     maxlength: 20,
                 },
+				"delivery_contact_person_number[main]": {
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },				
                 freight_agent_name: {
                     noSpaces: true,
                 },
@@ -2007,6 +2040,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				if (typeof customer_representative_contact !== 'undefined') {
 					$('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
 				}
+				if (typeof delivery_contact_person_number !== 'undefined') {
+					$('#delivery_contact_person_number_full').val(delivery_contact_person_number.getNumber());
+				}				
 				if (typeof freight_agent_contact_number !== 'undefined') {
 					$('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
 				}
