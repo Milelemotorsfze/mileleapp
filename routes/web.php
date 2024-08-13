@@ -961,7 +961,8 @@ Route::get('/d', function () {
     Route::post('netsuitegdn/submit', [ApprovalsController::class, 'submitGdn'])->name('netsuitegdn.submit');
     Route::post('netsuitegdn/add', [ApprovalsController::class, 'addGdn'])->name('netsuitegdn.add');
     Route::resource('departmentnotifications', DepartmentNotificationsController::class);
-    
+    Route::post('/save-dn-numbers', [PurchasingOrderController::class, 'saveDnNumbers'])->name('save.dnNumbers');
+    Route::get('/getVehiclesdn/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesdn']);
     
 });
 
