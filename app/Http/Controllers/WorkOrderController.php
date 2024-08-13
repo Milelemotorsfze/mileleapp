@@ -37,6 +37,7 @@ use Exception;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
+        $authId = Auth::id();
         (new UserActivityController)->createActivity('Open '.$type.' work order create page');
 
         $kit = AddonDetails::select('addon_details.id','addon_details.addon_code',DB::raw("CONCAT(addons.name, 
@@ -72,7 +73,14 @@ class WorkOrderController extends Controller
             ->get();
         // Merge collections
         $addons = $accessories->merge($spareParts)->merge($kit);
+        // Store permission checks
+        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
+        ]);
 
+        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+            'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
+        ]);
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'), 
@@ -99,6 +107,13 @@ class WorkOrderController extends Controller
             DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
         );
 
+        // Apply the permission-based condition
+        if ($hasLimitedAccess) {
+            // Add the created_by condition for limited access
+            $workOrders->where('created_by', $authId);
+            $clients->where('created_by', $authId);
+        }
+
         // Combine the results using union
         $combinedResults = $workOrders
             ->union($clients)
@@ -117,9 +132,9 @@ class WorkOrderController extends Controller
             return $items->sortByDesc('score')->first();
         })->values()->sortBy('customer_name');
 
-
         // Get the count of customers
         $customerCount = $customers->count();
+
         $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->get();
@@ -659,9 +674,27 @@ class WorkOrderController extends Controller
      */
     public function edit(WorkOrder $workOrder)
     {
+        $authId = Auth::id();
+        // Store permission checks
+        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+            'edit-all-export-exw-work-order', 'edit-all-export-cnf-work-order', 'edit-all-local-sale-work-order'
+        ]);
+
+        $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
+            'edit-current-user-export-exw-work-order', 'edit-current-user-export-cnf-work-order', 'edit-current-user-local-sale-work-order'
+        ]);
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)
-        ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval')->first();
+        // Build the query to retrieve the work order
+        $workOrderQuery = WorkOrder::where('id', $workOrder->id)
+        ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
+
+        // Apply the created_by condition if the user has limited access
+        if ($hasLimitedAccess) {
+        $workOrderQuery->where('created_by', $authId);
+        }
+
+        // Execute the query to get the work order
+        $workOrder = $workOrderQuery->first();
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'), 
@@ -687,7 +720,12 @@ class WorkOrderController extends Controller
             'is_demand_planning_customer',
             DB::raw("CONCAT(TRIM(name), '_', IFNULL(email, ''), '_', IFNULL(phone, ''), '_', IFNULL(country_id, '')) as unique_id")
         );
-
+        // Apply the permission-based condition
+        if ($hasLimitedAccess) {
+            // Add the created_by condition for limited access
+            $workOrders->where('created_by', $authId);
+            $clients->where('created_by', $authId);
+        }
         // Combine the results using union
         $combinedResults = $workOrders
             ->union($clients)
@@ -1787,6 +1825,32 @@ class WorkOrderController extends Controller
             // 'updated_vehicles.deleteMappingAddons'
             ->get();
         return response()->json(['comments' => $comments]);
+    }
+    public function uniqueWO(Request $request) { 
+        $validator = Validator::make($request->all(), [
+            'wo_number' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $wo = WorkOrder::where('wo_number',$request->wo_number);
+                if($request->id != NULL || $request->id != '') { 
+                    $wo = $wo->whereNot('id',$request->id);
+                }
+                $wo =$wo->get();
+                if(count($wo) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               dd($e);
+           }
+        }
     }
     public function uniqueSO(Request $request) { 
         $validator = Validator::make($request->all(), [

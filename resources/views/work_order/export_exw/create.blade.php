@@ -216,7 +216,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus>
+							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 10; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
@@ -469,7 +469,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					@endif
 				</div>
-				<hr>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
+					<center>Vehicle Informations</center>
+				</h4>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
+						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
+							@foreach($vins as $vin)
+							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<a  title="Add VIN" style="margin-top:38px;float:right;"
+							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<a  title="Add VIN" style="margin-top:38px; float:left;"
+							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+					</div>
+				</div>
+				</br>
+				<div class="row">
+					<div class="table-responsive">
+						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+							<tr style="border-bottom:1px solid #b3b3b3;">
+								<th>Action</th>
+								<th>VIN</th>
+								<th>Brand</th>
+								<th>Variant</th>
+								<th>Engine</th>
+								<th>Model Description</th>
+								<th>Model Year</th>
+								<th>Model Year to mention on Documents</th>
+								<th>Steering</th>
+								<th>Exterior Colour</th>
+								<th>Interior Colour</th>
+								<th>Warehouse</th>
+								<th>Territory</th>
+								<th>Preferred Destination</th>
+								<th>Import Document Type</th>
+								<th>Ownership Name</th>
+								<th>Certification Per VIN</th>
+								@if(isset($type) && $type == 'export_cnf')
+								<th>Shipment</th>
+								@endif
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
+					<center>SO Details</center>
+				</h4>
+			</div>
+			<div class="card-body">
 				<div class="row">
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
@@ -534,69 +604,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="card">
-			<div class="card-header">
-				<h4 class="card-title">
-					<center>Vehicle Informations</center>
-				</h4>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
-						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
-							@foreach($vins as $vin)
-							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a  title="Add VIN" style="margin-top:38px;float:right;"
-							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a  title="Add VIN" style="margin-top:38px; float:left;"
-							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
-					</div>
-				</div>
-				</br>
-				<div class="row">
-					<div class="table-responsive">
-						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
-							<tr style="border-bottom:1px solid #b3b3b3;">
-								<th>Action</th>
-								<th>VIN</th>
-								<th>Brand</th>
-								<th>Variant</th>
-								<th>Engine</th>
-								<th>Model Description</th>
-								<th>Model Year</th>
-								<th>Model Year to mention on Documents</th>
-								<th>Steering</th>
-								<th>Exterior Colour</th>
-								<th>Interior Colour</th>
-								<th>Warehouse</th>
-								<th>Territory</th>
-								<th>Preferred Destination</th>
-								<th>Import Document Type</th>
-								<th>Ownership Name</th>
-								<th>Certification Per VIN</th>
-								@if(isset($type) && $type == 'export_cnf')
-								<th>Shipment</th>
-								@endif
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
+		</div>	
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
@@ -1714,6 +1722,22 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
+		// Custom method to check if the SO number is unique
+		$.validator.addMethod("uniqueWO", function(element) {
+			var result = false;
+			var WoId = $("#wo_id").val(); 
+			var wo_number = $("#wo_number").val(); 
+			$.ajax({
+				type: "POST",
+				async: false,
+				url: "{{route('work-order.uniqueWO')}}", // script to validate in server side
+				data: {_token: '{{csrf_token()}}', wo_number: wo_number, id: WoId},
+				success: function(data) {
+					result = (data == true) ? true : false;
+				}
+			});
+			return result; 
+		}, "This WO Number is already taken! Try another.");
 		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
 		$.validator.addMethod("greaterThanExisting", function(value, element) {
 			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
@@ -1764,11 +1788,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					noSpaces: true,
 					SONumberFormat: true,
 					notSO000000: true,
-					uniqueSO: true,
-					greaterThanExisting: true, 
+					// uniqueWO: true,
+					// uniqueSO: true,
+					// greaterThanExisting: true, 
 				},
+				wo_number: {
+                    // required: true,
+					uniqueWO: true,
+                },
                 batch: {
                     required: true,
+					// uniqueWO: true,
                 },
                 new_customer_name: {
                     noSpaces: true,
@@ -2251,8 +2281,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							</div>
 						</div>
 						<div class="col-xxl-9 col-lg-9 col-md-9">
-							<label class="col-form-label text-md-end">Addon Description :</label>
-							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Description"></textarea>
+							<label class="col-form-label text-md-end">Addon Custom Details :</label>
+							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Custom Details"></textarea>
 						</div>
 						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer_addon">
 							<a class="btn_round_big remove_node_btn_frm_field_addon" title="Remove Row" style="margin-top:50%;">
@@ -2724,7 +2754,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			else {
 				addonDescriptionCell.colSpan = 13;
 			}
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
@@ -2859,7 +2889,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			else {
 				addonDescriptionCell.colSpan = 14;
 			}
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
@@ -3173,30 +3203,38 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-        var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+		var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+		var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
 
-        if (SONumber === '') { // Check if the input is empty
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		if (SONumber === '' || selectedBatch === '') { // Check if either input is empty
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        // Step 1: Split the string to get the part after "SO-"
-        let parts = SONumber.split("SO-");
-        if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		// Step 1: Split the string to get the part after "SO-"
+		let parts = SONumber.split("SO-");
+		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        // Step 2: Remove leading zeros from the part after "SO-"
-        let numberPart = parts[1].replace(/^0+/, '');
-        if (numberPart === '') { // Check if the number part is empty after removing leading zeros
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		// Step 2: Remove leading zeros from the part after "SO-"
+		let numberPart = parts[1].replace(/^0+/, '');
+		if (numberPart === '') { // Check if the number part is empty after removing leading zeros
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        var WONumber = "WO-" + numberPart; // Construct the WO Number
-        document.getElementById('wo_number').value = WONumber; // Set the WO Number field
-    }
+		// Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
+		let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+
+		// Construct the WO Number with batch information
+		var WONumber = "WO-" + numberPart + "-B" + batchNumber;
+
+		// Set the WO Number field
+		document.getElementById('wo_number').value = WONumber;
+	}
+
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
