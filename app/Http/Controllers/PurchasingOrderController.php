@@ -59,6 +59,7 @@ use App\Mail\VINEmailNotification;
 use App\Mail\PurchaseOrderUpdated;
 use App\Mail\ChangeVariantNotification;
 use App\Models\Dnaccess;
+use App\Models\VehicleDn;
 
 
 class PurchasingOrderController extends Controller
@@ -4295,7 +4296,6 @@ public function requestAdditionalPayment(Request $request)
             ->where('status', 'Approved')
                 ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
                 ->get();
-        
             return response()->json($vehicles);
         }
         
@@ -5100,4 +5100,53 @@ public function paymentconfirm(Request $request)
         ->unique('vin');
         return view('test', compact('vins'));
     }
+    // Method to save DN numbers
+    public function saveDnNumbers(Request $request)
+{
+    $purchasingOrderId = $request->input('purchasingOrderId');
+    $type = $request->input('type');
+    if ($type == 'full') {
+        $dnNumber = $request->input('dnNumber');
+        // Save the DN number for the full PO using the $purchasingOrderId
+        // Example: Save to the PurchasingOrder model (Assuming you have such a model)
+        // $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+        // $purchasingOrder->dn_number = $dnNumber;
+        // $purchasingOrder->save();
+    } else if ($type == 'vehicle') {
+        $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
+    $batchNumber = 1;
+    foreach ($vehicles as $vehicle) {
+        $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                   ->orderBy('created_at', 'desc')
+                                   ->first();
+        if ($latestVehicleDn) {
+            $batchNumber = $latestVehicleDn->batch + 1;
+            break;
+        }
+    }
+        $vehicleDNData = $request->input('vehicleDNData');
+        foreach ($vehicleDNData as $vehicleData) {
+            $vehicleId = $vehicleData['vehicleId'];
+            $dnNumber = $vehicleData['dnNumber'];
+            $vehicledn = New VehicleDn();
+            $vehicledn->dn_number = $dnNumber;
+            $vehicledn->vehicles_id = $vehicleId;
+            $vehicledn->created_by = Auth::id();
+            $vehicledn->batch = $batchNumber;
+            $vehicledn->save();
+            $vehicle = Vehicles::find($vehicleId);
+            $vehicle->dn_id = $vehicledn->id;
+            $vehicle->save();
+        }
+    }
+    return response()->json(['success' => true]);
+}
+public function getVehiclesdn($purchaseOrderId) {
+    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+    ->where('status', 'Approved')
+    ->whereNull('dn_id')
+        ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
+        ->get();
+    return response()->json($vehicles);
+}
 }
