@@ -173,17 +173,8 @@ class LetterOfIndentController extends Controller
                     $letterOfIndent = LetterOfIndent::select('id','is_expired','signature','comments','utilized_quantity',
                     'status')->find($query->id);
                     $type = $request->tab;
-                    $pfiQtySum = PfiItem::with('letterOfIndentItem')
-                    ->whereHas('letterOfIndentItem', function($query) use($letterOfIndent) {
-                        $query->where('letter_of_indent_id', $letterOfIndent->id);
-                    })->sum('pfi_quantity');
-                    $pfiQtySum = $pfiQtySum + $letterOfIndent->utilized_quantity;
-
-                    $loiQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
-                                        ->where('letter_of_indent_id', $query->id)
-                                        ->sum('quantity'); 
-                   
-                    return view('letter_of_indents.actions.action',compact('letterOfIndent','type','pfiQtySum','loiQuantity'));
+                     
+                    return view('letter_of_indents.actions.action',compact('letterOfIndent','type'));
                 })
                 ->rawColumns(['so_number','loi_templates','loi_quantity','created_by','updated_by',
                         'sales_person_id','is_expired','action','status'])
@@ -574,133 +565,151 @@ class LetterOfIndentController extends Controller
             DB::beginTransaction();
             try{
 
-            $LOI = LetterOfIndent::find($id);
+                $LOI = LetterOfIndent::find($id);
 
-            $customer = Clients::find($request->client_id);
-            $country = Country::find($request->country);
-            $countryName = strtoupper(substr($country->name, 0, 3));
+                $customer = Clients::find($request->client_id);
+                $country = Country::find($request->country);
+                $countryName = strtoupper(substr($country->name, 0, 3));
 
-            $names = explode(" ", $customer->name, 3);
-            $customerNameCode = "";
-            foreach ($names as $name) {
-                $customerNameCode .= strtoupper(mb_substr($name, 0, 1));
-            }
-            $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
-            $yearCode = Carbon::now()->format('y');
-            $year = Carbon::now()->format('Y');
-            $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)
-                                        ->whereNot('id', $id)
-                                        ->whereYear('date', $year)->count();
-
-            $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
-
-            $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
-            $LOI->uuid = $uuid;
-
-            $LOI->client_id = $request->client_id;
-            $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
-            $LOI->category = $request->category;
-            $LOI->dealers = $request->dealers;
-            $LOI->sales_person_id = $request->sales_person_id;
-            $LOI->updated_by = Auth::id();
-            if($request->is_signature_removed == 1) {
-                $LOI->signature = NULL;
-            }
-            if ($request->has('loi_signature'))
-            {
-                $file = $request->file('loi_signature');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time().'.'.$extension;
-                $destinationPath = 'LOI-Signature';
-                $file->move($destinationPath, $fileName);
-
-                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
-                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                $names = explode(" ", $customer->name, 3);
+                $customerNameCode = "";
+                foreach ($names as $name) {
+                    $customerNameCode .= strtoupper(mb_substr($name, 0, 1));
                 }
-                $filePath = public_path('LOI-Signature/' . $file);
-                $LOI->signature = $fileName;
+                $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
+                $yearCode = Carbon::now()->format('y');
+                $year = Carbon::now()->format('Y');
+                $customerTotalLoiCount = LetterOfIndent::where('client_id', $request->client_id)
+                                            ->whereNot('id', $id)
+                                            ->whereYear('date', $year)->count();
 
-            }
+                $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
-            $LOI->save();
+                $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
+                $LOI->uuid = $uuid;
 
-            if ($request->has('files')) {
-                foreach ($request->file('files') as $key => $file) {
+                $LOI->client_id = $request->client_id;
+                $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
+                $LOI->category = $request->category;
+                $LOI->dealers = $request->dealers;
+                $LOI->sales_person_id = $request->sales_person_id;
+                $LOI->updated_by = Auth::id();
+                if($request->is_signature_removed == 1) {
+                    $LOI->signature = NULL;
+                }
+                if ($request->has('loi_signature'))
+                {
+                    $file = $request->file('loi_signature');
                     $extension = $file->getClientOriginalExtension();
-                    $fileName = $key . time() . '.' . $extension;
-                    $destinationPath = 'LOI-Documents';
+                    $fileName = time().'.'.$extension;
+                    $destinationPath = 'LOI-Signature';
                     $file->move($destinationPath, $fileName);
-                    $LoiDocument = new LetterOfIndentDocument();
 
-                    $LoiDocument->loi_document_file = $fileName;
-                    $LoiDocument->letter_of_indent_id = $LOI->id;
-                    $LoiDocument->save();
-                }
-            }
-            $LOI->letterOfIndentItems()->delete();
-            $LOI->LOITemplates()->delete();
-            if($request->deletedIds) {
-                LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
-                // delet ethe corresponding file also
-            }
-
-            $quantities = $request->quantity;
-            foreach ($quantities as $key => $quantity) {
-                $masterModel = MasterModel::where('sfx', $request->sfx[$key])
-                    ->where('model', $request->models[$key])
-                    ->orderBy('model_year','DESC')
-                    ->first();
-                if ($masterModel) {
-                    $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
-                    info("latest row");
-                    info($latestRow);
-                    $length = 6;
-                    $offset = 2;
-                    $prefix = "L ";
-                    if($latestRow){
-                        $latestUUID =  $latestRow->code;
-                        $latestUUIDNumber = substr($latestUUID, $offset, $length);
-                        $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
-                        $code =  $prefix.$newCode;
-                    }else{
-                        $code = $prefix.'001';
+                    if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                        \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
                     }
-                    $LOIItem = new LetterOfIndentItem();
-                    $LOIItem->letter_of_indent_id = $LOI->id;
-                    $LOIItem->master_model_id = $masterModel->id ?? '';
-                    $LOIItem->quantity = $quantity;
-                    // $LOIItem->uuid = $code;
-                    $LOIItem->code = $code;
-                    $LOIItem->save();
+                    $filePath = public_path('LOI-Signature/' . $file);
+                    $LOI->signature = $fileName;
+
                 }
-            }
+
+                $LOI->save();
+
+                if ($request->has('files')) {
+                    foreach ($request->file('files') as $key => $file) {
+                        $extension = $file->getClientOriginalExtension();
+                        $fileName = $key . time() . '.' . $extension;
+                        $destinationPath = 'LOI-Documents';
+                        $file->move($destinationPath, $fileName);
+                        $LoiDocument = new LetterOfIndentDocument();
+
+                        $LoiDocument->loi_document_file = $fileName;
+                        $LoiDocument->letter_of_indent_id = $LOI->id;
+                        $LoiDocument->save();
+                    }
+                }
             
-            $LOI->soNumbers()->delete();
-            if($request->so_number) {
-              
-                $soNumbers = $request->so_number;
-                foreach($soNumbers as $soNumber) {
-                    if(!empty($soNumber)) {
-                        $loiSoNumber = new LoiSoNumber();
-                        $loiSoNumber->letter_of_indent_id = $LOI->id;
-                        $loiSoNumber->so_number = $soNumber;
-                        $loiSoNumber->save();
+                $LOI->LOITemplates()->delete();
+                if($request->deletedIds) {
+                    LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
+                    // delete the corresponding file also
+                }
+
+                $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();
+                $updatedRows = [];
+                $quantities = $request->quantity;
+                foreach ($quantities as $key => $quantity) {
+                    $masterModel = MasterModel::where('sfx', $request->sfx[$key])
+                    ->where('model', $request->models[$key])
+                    ->pluck('id')->toArray();
+
+                    if($masterModel) 
+                    {
+                        $isItemExist = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
+                                ->whereIn('master_model_id', $masterModel)                      
+                                ->first();
+                        if($isItemExist) {
+                            $isItemExist->quantity = $quantity;
+                            $isItemExist->update();
+                            $updatedRows[] = $isItemExist->id;
+                            
+                        }else{
+                            $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
+                            
+                            $length = 6;
+                            $offset = 2;
+                            $prefix = "L ";
+                            if($latestRow){
+                                $latestUUID =  $latestRow->code;
+                                $latestUUIDNumber = substr($latestUUID, $offset, $length);
+                                $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+                                $code =  $prefix.$newCode;
+                            }else{
+                                $code = $prefix.'001';
+                            }
+                            $model = MasterModel::where('sfx', $request->sfx[$key])
+                                            ->where('model', $request->models[$key])
+                                            ->orderBy('model_year','DESC')
+                                            ->first();
+                            $LOIItem = new LetterOfIndentItem();
+                            $LOIItem->letter_of_indent_id = $LOI->id;
+                            $LOIItem->master_model_id = $model->id ?? '';
+                            $LOIItem->quantity = $quantity;
+                            // $LOIItem->uuid = $code;
+                            $LOIItem->code = $code;
+                            $LOIItem->save();
+                        }
+                    }
+                }  
+                $deletedRows = array_diff($alreadyAddedRows,$updatedRows);
+                LetterOfIndentItem::whereIn('id', $deletedRows)->delete();
+
+                $LOI->soNumbers()->delete();
+                if($request->so_number) {
+                
+                    $soNumbers = $request->so_number;
+                    foreach($soNumbers as $soNumber) {
+                        if(!empty($soNumber)) {
+                            $loiSoNumber = new LoiSoNumber();
+                            $loiSoNumber->letter_of_indent_id = $LOI->id;
+                            $loiSoNumber->so_number = $soNumber;
+                            $loiSoNumber->save();
+                        }
                     }
                 }
-            }
-            if ($request->template_type) {
-                $LOI->LOITemplates()->delete();
-                foreach ($request->template_type as $template) {
-                    $LOITemplate = new  LoiTemplate();
-                    $LOITemplate->template_type = $template;
-                    $LOITemplate->letter_of_indent_id = $LOI->id;
-                    $LOITemplate->save();
+                if ($request->template_type) {
+                    $LOI->LOITemplates()->delete();
+                    foreach ($request->template_type as $template) {
+                        $LOITemplate = new  LoiTemplate();
+                        $LOITemplate->template_type = $template;
+                        $LOITemplate->letter_of_indent_id = $LOI->id;
+                        $LOITemplate->save();
+                    }
                 }
-            }
 
-        }catch (\Exception $e){
-            return $e->getMessage();
-        }
+            }catch (\Exception $e){
+                return $e->getMessage();
+            }
             DB::commit();
 
             if(in_array('general',$request->template_type)) {
@@ -734,6 +743,9 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('Supplier Approved successfully.');
     
         $LOI = LetterOfIndent::find($request->id);
+        DB::beginTransaction();
+        info($request->all());
+
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
@@ -749,7 +761,11 @@ class LetterOfIndentController extends Controller
         $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->updated_by = Auth::id();
         $LOI->save();
-        return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
+
+        DB::commit();
+
+        return response()->json($msg);
+        // return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
     }
     public function updateComment(Request $request) {
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');

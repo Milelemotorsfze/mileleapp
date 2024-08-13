@@ -23,17 +23,7 @@
             @endif
         @endcan
     @endif
-    <!-- @can('loi-status-update')
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-status-update');
-        @endphp
-        @if ($hasPermission)
-            @if($letterOfIndent->is_expired == false)
-                <button type="button" data-bs-toggle="modal"  data-bs-target="#update-expiry-status-{{ $letterOfIndent->id }}"
-                class="btn btn-warning btn-sm " title="Update Expiry Status">Expiry Status Update</button>              
-            @endif
-        @endif
-    @endcan -->
+
 
     @can('LOI-list')
         @php
@@ -51,21 +41,7 @@
         </button>
         @endif
     @endcan
-    <!-- To Create LOI -->
-        @can('PFI-create')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
-            @endphp
-            @if ($hasPermission)
-                @if($letterOfIndent->is_expired == false && $pfiQtySum < $loiQuantity && 
-                $letterOfIndent->status !== \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED && $type !== 'NEW') 
-                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                        <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
-                    </a>
-                @endif
-            @endif
-        @endcan
-
+       
 
     <!-- To View LOI Items -->
     <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -245,7 +221,8 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
-                            location.reload();
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
                             alertify.success('LOI Deleted successfully.');
                         }
                     });
@@ -265,7 +242,12 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
-                            location.reload();
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
+                            var table2 = $('.waiting-for-approval-table').DataTable();
+                            table2.ajax.reload();
+                            var table3 = $('.supplier-response-table').DataTable();
+                            table3.ajax.reload();
                             alertify.success('Expiry Status updated as "Expired" successfully.');
                         }
                     });
