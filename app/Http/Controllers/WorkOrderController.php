@@ -1788,6 +1788,32 @@ class WorkOrderController extends Controller
             ->get();
         return response()->json(['comments' => $comments]);
     }
+    public function uniqueWO(Request $request) { 
+        $validator = Validator::make($request->all(), [
+            'wo_number' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $wo = WorkOrder::where('wo_number',$request->wo_number);
+                if($request->id != NULL || $request->id != '') { 
+                    $wo = $wo->whereNot('id',$request->id);
+                }
+                $wo =$wo->get();
+                if(count($wo) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               dd($e);
+           }
+        }
+    }
     public function uniqueSO(Request $request) { 
         $validator = Validator::make($request->all(), [
             'so_number' => 'required',

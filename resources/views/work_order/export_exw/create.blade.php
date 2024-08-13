@@ -216,7 +216,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus>
+							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 10; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
@@ -1714,6 +1714,22 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
+		// Custom method to check if the SO number is unique
+		$.validator.addMethod("uniqueWO", function(element) {
+			var result = false;
+			var WoId = $("#wo_id").val(); 
+			var wo_number = $("#wo_number").val(); 
+			$.ajax({
+				type: "POST",
+				async: false,
+				url: "{{route('work-order.uniqueWO')}}", // script to validate in server side
+				data: {_token: '{{csrf_token()}}', wo_number: wo_number, id: WoId},
+				success: function(data) {
+					result = (data == true) ? true : false;
+				}
+			});
+			return result; 
+		}, "This WO Number is already taken! Try another.");
 		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
 		$.validator.addMethod("greaterThanExisting", function(value, element) {
 			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
@@ -1764,11 +1780,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					noSpaces: true,
 					SONumberFormat: true,
 					notSO000000: true,
+					// uniqueWO: true,
 					// uniqueSO: true,
 					// greaterThanExisting: true, 
 				},
+				wo_number: {
+                    // required: true,
+					uniqueWO: true,
+                },
                 batch: {
                     required: true,
+					// uniqueWO: true,
                 },
                 new_customer_name: {
                     noSpaces: true,
@@ -3173,30 +3195,38 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-        var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+		var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+		var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
 
-        if (SONumber === '') { // Check if the input is empty
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		if (SONumber === '' || selectedBatch === '') { // Check if either input is empty
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        // Step 1: Split the string to get the part after "SO-"
-        let parts = SONumber.split("SO-");
-        if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		// Step 1: Split the string to get the part after "SO-"
+		let parts = SONumber.split("SO-");
+		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        // Step 2: Remove leading zeros from the part after "SO-"
-        let numberPart = parts[1].replace(/^0+/, '');
-        if (numberPart === '') { // Check if the number part is empty after removing leading zeros
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
+		// Step 2: Remove leading zeros from the part after "SO-"
+		let numberPart = parts[1].replace(/^0+/, '');
+		if (numberPart === '') { // Check if the number part is empty after removing leading zeros
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
 
-        var WONumber = "WO-" + numberPart; // Construct the WO Number
-        document.getElementById('wo_number').value = WONumber; // Set the WO Number field
-    }
+		// Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
+		let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+
+		// Construct the WO Number with batch information
+		var WONumber = "WO-" + numberPart + "-B" + batchNumber;
+
+		// Set the WO Number field
+		document.getElementById('wo_number').value = WONumber;
+	}
+
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
