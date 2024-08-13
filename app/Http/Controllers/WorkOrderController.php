@@ -690,7 +690,7 @@ class WorkOrderController extends Controller
 
         // Apply the created_by condition if the user has limited access
         if ($hasLimitedAccess) {
-        $workOrderQuery->where('created_by', $authUserId);
+        $workOrderQuery->where('created_by', $authId);
         }
 
         // Execute the query to get the work order
