@@ -39,6 +39,8 @@ use App\Models\Gdn;
 use App\Models\PurchasingOrder;
 use App\Mail\QCUpdateNotification;
 use App\Models\DepartmentNotifications;
+use App\Models\Dnaccess;
+
 
 
 
@@ -688,6 +690,20 @@ class ApprovalsController extends Controller
                     $notification->type = 'Information';
                     $notification->detail = $detailText;
                     $notification->save();
+                    if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
             }
         }
         else
@@ -1015,6 +1031,20 @@ class ApprovalsController extends Controller
         $notification->type = 'Information';
         $notification->detail = $detailText;
         $notification->save();
+        if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
         }  
             return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Approval successfully Done.');
     }
