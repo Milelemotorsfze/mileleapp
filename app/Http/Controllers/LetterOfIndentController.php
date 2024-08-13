@@ -744,7 +744,6 @@ class LetterOfIndentController extends Controller
     
         $LOI = LetterOfIndent::find($request->id);
         DB::beginTransaction();
-        info($request->all());
 
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
@@ -764,8 +763,8 @@ class LetterOfIndentController extends Controller
 
         DB::commit();
 
-        return response()->json($msg);
-        // return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
+        // return response()->json($msg);
+        return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
     }
     public function updateComment(Request $request) {
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');
