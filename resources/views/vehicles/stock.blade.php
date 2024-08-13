@@ -145,7 +145,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Full Stock
+        <a class="nav-link" data-bs-toggle="pill" href="#tab7">All Vehicles
           <span class="badge badge-danger row-badge7 badge-notification"></span>
         </a>
       </li>
@@ -164,9 +164,14 @@
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample1')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
@@ -205,9 +210,14 @@
       </div>  
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample2')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -247,9 +257,14 @@
       </div> 
       <div class="tab-pane fade show" id="tab3">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -289,9 +304,14 @@
       </div> 
       <div class="tab-pane fade show" id="tab4">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample4')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -333,9 +353,14 @@
       </div> 
       <div class="tab-pane fade show" id="tab5">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample5')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -377,9 +402,14 @@
       </div> 
       <div class="tab-pane fade show" id="tab6">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -422,9 +452,14 @@
       </div>
       <div class="tab-pane fade show" id="tab7">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample7')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -467,9 +502,14 @@
       </div>
       <div class="tab-pane fade show" id="tab8">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample8')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
