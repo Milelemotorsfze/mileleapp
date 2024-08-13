@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\QuotationItem;
 use Carbon\Carbon;
 use App\Models\Brand;
+use App\Models\User;
+use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\Varaint;
 use App\Models\PreOrder;
 use App\Models\PreOrdersItems;
@@ -119,8 +121,10 @@ class SalesOrderController extends Controller
                     break;
                 }
                     }
-                    }  
-                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails')); 
+                    }
+                    $saleperson = User::find($calls->sales_person);
+                    $empProfile = EmployeeProfile::where('user_id', $calls->sales_person)->first();
+                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson')); 
             }  
             public function storesalesorder(Request $request, $quotationId)
             {
@@ -278,7 +282,9 @@ class SalesOrderController extends Controller
                         break;
                     }
                         }
-                        }  
-                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems'));  
+                        } 
+                        $saleperson = User::find($calls->sales_person);
+                        $empProfile = EmployeeProfile::where('user_id', $calls->sales_person)->first(); 
+                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
         }
