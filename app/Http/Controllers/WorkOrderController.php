@@ -677,15 +677,24 @@ class WorkOrderController extends Controller
         $authId = Auth::id();
         // Store permission checks
         $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
+            'edit-all-export-exw-work-order', 'edit-all-export-cnf-work-order', 'edit-all-local-sale-work-order'
         ]);
 
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
-            'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
+            'edit-current-user-export-exw-work-order', 'edit-current-user-export-cnf-work-order', 'edit-current-user-local-sale-work-order'
         ]);
         $type = $workOrder->type;
-        $workOrder = WorkOrder::where('id',$workOrder->id)
-        ->with('vehicles.addons','comments','financePendingApproval','cooPendingApproval')->first();
+        // Build the query to retrieve the work order
+        $workOrderQuery = WorkOrder::where('id', $workOrder->id)
+        ->with('vehicles.addons', 'comments', 'financePendingApproval', 'cooPendingApproval');
+
+        // Apply the created_by condition if the user has limited access
+        if ($hasLimitedAccess) {
+        $workOrderQuery->where('created_by', $authId);
+        }
+
+        // Execute the query to get the work order
+        $workOrder = $workOrderQuery->first();
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'), 

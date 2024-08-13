@@ -469,7 +469,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					@endif
 				</div>
-				<hr>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
+					<center>Vehicle Informations</center>
+				</h4>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
+						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
+							@foreach($vins as $vin)
+							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<a  title="Add VIN" style="margin-top:38px;float:right;"
+							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<a  title="Add VIN" style="margin-top:38px; float:left;"
+							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+					</div>
+				</div>
+				</br>
+				<div class="row">
+					<div class="table-responsive">
+						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+							<tr style="border-bottom:1px solid #b3b3b3;">
+								<th>Action</th>
+								<th>VIN</th>
+								<th>Brand</th>
+								<th>Variant</th>
+								<th>Engine</th>
+								<th>Model Description</th>
+								<th>Model Year</th>
+								<th>Model Year to mention on Documents</th>
+								<th>Steering</th>
+								<th>Exterior Colour</th>
+								<th>Interior Colour</th>
+								<th>Warehouse</th>
+								<th>Territory</th>
+								<th>Preferred Destination</th>
+								<th>Import Document Type</th>
+								<th>Ownership Name</th>
+								<th>Certification Per VIN</th>
+								@if(isset($type) && $type == 'export_cnf')
+								<th>Shipment</th>
+								@endif
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
+					<center>SO Details</center>
+				</h4>
+			</div>
+			<div class="card-body">
 				<div class="row">
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
@@ -534,69 +604,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="card">
-			<div class="card-header">
-				<h4 class="card-title">
-					<center>Vehicle Informations</center>
-				</h4>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
-						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
-							@foreach($vins as $vin)
-							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}}</option>
-							@endforeach
-						</select>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a  title="Add VIN" style="margin-top:38px;float:right;"
-							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<a  title="Add VIN" style="margin-top:38px; float:left;"
-							class="btn btn-sm btn-info modal-button add-vehicle-btn"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
-					</div>
-				</div>
-				</br>
-				<div class="row">
-					<div class="table-responsive">
-						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
-							<tr style="border-bottom:1px solid #b3b3b3;">
-								<th>Action</th>
-								<th>VIN</th>
-								<th>Brand</th>
-								<th>Variant</th>
-								<th>Engine</th>
-								<th>Model Description</th>
-								<th>Model Year</th>
-								<th>Model Year to mention on Documents</th>
-								<th>Steering</th>
-								<th>Exterior Colour</th>
-								<th>Interior Colour</th>
-								<th>Warehouse</th>
-								<th>Territory</th>
-								<th>Preferred Destination</th>
-								<th>Import Document Type</th>
-								<th>Ownership Name</th>
-								<th>Certification Per VIN</th>
-								@if(isset($type) && $type == 'export_cnf')
-								<th>Shipment</th>
-								@endif
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
+		</div>	
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
