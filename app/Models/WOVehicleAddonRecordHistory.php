@@ -21,7 +21,7 @@ class WOVehicleAddonRecordHistory extends Model
     public function getFieldAttribute() {
         $fieldMapping = [
             'addon_code' => 'Addon Code',
-            'addon_description' => 'Addon Description',
+            'addon_description' => 'Addon Custom Details',
             'addon_quantity' => 'Addon Quantity',
         ];
     

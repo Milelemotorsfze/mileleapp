@@ -225,7 +225,7 @@
                                                                         <tr>
                                                                             <th>Addon Name</th>
                                                                             <th>Quantity</th>
-                                                                            <th>Addon Description</th>
+                                                                            <th>Addon Custom Details</th>
                                                                         </tr>
                                                                         @foreach($vehicle->addons->sortBy('addon_code') as $addon)
                                                                             <tr>
@@ -292,7 +292,7 @@
                                                                     <th>VIN</th>
                                                                     <th>Addon Code</th>
                                                                     <th>Addon Quantity</th>
-                                                                    <th>Addon Description</th>
+                                                                    <th>Addon Custom Details</th>
                                                                 </tr>
                                                                 @php
                                                                     $groupedByVin = $approval->vehicleAddonRecordHistories->groupBy(function($history) {

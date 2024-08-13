@@ -944,7 +944,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <th colspan="2">Created Date & Time</th>
                                                             <th colspan="4">Addon Code</th>
                                                             <th colspan="1">Quantity</th>
-                                                            <th colspan="12">Addon Description</th>
+                                                            <th colspan="12">Addon Custom Details</th>
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>

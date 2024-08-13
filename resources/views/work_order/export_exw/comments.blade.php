@@ -371,7 +371,7 @@
                             <th colspan="2" style="padding-left:5px; padding-top:5px;padding-bottom:5px; font-size:12px!important;">Service Breakdown</th>
                             <th colspan="5" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon</th>
                             <th colspan="1" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Quantity</th>
-                            <th colspan="11" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Description</th>
+                            <th colspan="11" style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Custom Details</th>
                         </tr>
                     `;
                     
@@ -600,7 +600,7 @@
                         <tr style="border:1px solid #e9e9ef;">
                             <th style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Quantity</th>
-                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Description</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Custom Details</th>
                         </tr>
                     `;
                     
@@ -653,7 +653,7 @@
                         <tr style="border:1px solid #e9e9ef;">
                             <th style="padding-left:5px;padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Quantity</th>
-                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Description</th>
+                            <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">Addon Custom Details</th>
                         </tr>
                     `;
                     
