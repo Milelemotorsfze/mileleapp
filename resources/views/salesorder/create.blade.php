@@ -67,16 +67,12 @@
                     <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->document_validity}}</label>
                 </div>
                 </div>
-                @php
-                $user = \Illuminate\Support\Facades\Auth::user();
-                $empProfile = $user->empProfile;
-                @endphp
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->name }}
+                        {{ $saleperson->name}}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -92,7 +88,7 @@
                         Sales Email ID :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->email }}
+                        {{ $saleperson->email }}
                     </div>
                 </div>
                 <div class="row mt-2">
