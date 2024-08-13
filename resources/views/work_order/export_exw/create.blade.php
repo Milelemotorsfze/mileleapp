@@ -1764,8 +1764,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					noSpaces: true,
 					SONumberFormat: true,
 					notSO000000: true,
-					uniqueSO: true,
-					greaterThanExisting: true, 
+					// uniqueSO: true,
+					// greaterThanExisting: true, 
 				},
                 batch: {
                     required: true,
