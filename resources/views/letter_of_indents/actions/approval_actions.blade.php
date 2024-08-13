@@ -213,7 +213,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary " id="status-change-button-approve">Submit</button>
+                    <button type="submit" class="btn btn-primary" >Submit</button>
                 </div>
                 </form>
                 
@@ -268,11 +268,37 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
-                            location.reload();
+                            var table = $('.new-LOI-table').DataTable();
+                            table.ajax.reload();
                             alertify.success('Approval Request Send Successfully.');
                         }
                     });
                 }
             }).set({title:"Delete Item"})
         });
+        // $('#loi-approve-form').submit(function (event) {
+        //     event.preventDefault();
+        //     var formData = $(this).serialize();
+        //     console.log("clicekd");
+        //     console.log(formData);
+        //     $.ajax({
+        //         url: $(this).attr('action'),
+        //         type: 'POST',
+        //         dataType:"json"
+        //         data: formData,
+        //           _token: '{{ csrf_token() }}'\
+        
+        //         success: function (response)
+        //          {
+        //             console.log(response);
+        //             var table1 = $('.waiting-for-approval-table').DataTable();
+        //             table1.ajax.reload();
+        //             alertify.success('Supplier Approved successfully.');
+
+        //             },
+        //             error: function (error) {
+        //         console.error(error);
+        //     }
+        //      });
+        // });
   </script> 

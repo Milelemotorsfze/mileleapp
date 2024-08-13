@@ -63,9 +63,9 @@ class LetterOfIndentItem extends Model
     // }
     public function getInventoryQuantityAttribute()
     {
+      
         $masterModel = MasterModel::find($this->master_model_id);
-        $masterModelIds = MasterModel::where('model_year', $masterModel->model_year)
-            ->where('model', $masterModel->model)
+        $masterModelIds = MasterModel::where('model', $masterModel->model)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
         // confirm we should not conside the steering for unique combination
         $inventoryCount = SupplierInventory::whereIn('master_model_id', $masterModelIds)
