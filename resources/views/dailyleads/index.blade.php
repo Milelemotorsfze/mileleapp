@@ -2885,7 +2885,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
+                { data: 'cdealvalues', name: 'cdealvalues', searchable: false},
                 {
     data: 'csalesnotes',
     name: 'csalesnotes',
