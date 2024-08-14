@@ -547,7 +547,6 @@ public function grnfilepost(Request $request)
             ->where('status', '=', 'Approved')
             ->pluck('id');
         }
-        info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);
