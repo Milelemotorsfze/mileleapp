@@ -206,7 +206,7 @@ class DailyleadsController extends Controller
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(quotations.deal_value, ' ', quotations.currency) as ddealvalues"), ('quotations.signature_status as signature_status')
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status')
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
             } elseif ($status === 'Negotiation') {
@@ -224,7 +224,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y %m %d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect(
@@ -249,7 +249,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y %m %d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect(
@@ -263,7 +263,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(lead_closed.date, '%Y %m %d'), '') as cdate"),
                     DB::raw("IFNULL(lead_closed.sales_notes, '') as csalesnotes"),
                     DB::raw("IFNULL(lead_closed.so_id, '') as so_id"),
-                    DB::raw("CONCAT(IFNULL(lead_closed.dealvalues, ''), ' ', IFNULL(lead_closed.currency, '')) as cdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as cdealvalues"),
                 );
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
                 $data->leftJoin('so', function ($join) {

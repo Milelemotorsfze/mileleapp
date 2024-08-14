@@ -149,7 +149,7 @@ class SalesOrderController extends Controller
                 $closed->call_id = $calls->id;
                 $closed->created_by = Auth::id();
                 $closed->dealvalues = $request->input('total_payment');
-                $closed->currency = $request->input('so_date');
+                $closed->currency = $qoutation->currency;
                 $closed->so_id = $so->id;
                 $closed->save();
                 $vins = $request->input('vehicle_vin');
