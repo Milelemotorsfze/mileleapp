@@ -699,8 +699,13 @@ class WorkOrderController extends Controller
         $workOrderQuery->where('created_by', $authId);
         }
 
-        // Execute the query to get the work order
-        $workOrder = $workOrderQuery->first();
+         try {
+             // Execute the query to get the work order
+            $workOrder = $workOrderQuery->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            $errorMsg = "Sorry! You don't have permission to access this page.";
+            return view('hrm.notaccess', compact('errorMsg'));
+        }
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'), 
