@@ -1581,11 +1581,12 @@
                                 <th id="variants_detail">Variants Detail</th>
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
-                                <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
+                                <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>Engine Number</th>
                                 <th>VIN Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
+                                <th>Production Date</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1683,6 +1684,7 @@
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
@@ -1712,6 +1714,7 @@
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
@@ -1742,6 +1745,7 @@
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
 							@endif
                             @endif
                             @php
@@ -1776,6 +1780,7 @@
                             <td>{{ $vehicles->vin }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
+                                <td>{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             <td>
                             @if($vehicles->status ==="Approved")
@@ -2207,6 +2212,7 @@
                           <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
                           <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
+                          <td>{{ $vehiclesdel->ppmmyyy ? \Carbon\Carbon::parse($vehiclesdel->ppmmyyy)->format('d-M-Y') : '' }}</td>
                           <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
                          <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
                                 </tr>
@@ -2279,6 +2285,7 @@
                           <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
                           <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
+                          <td>{{ $vehiclesdel->ppmmyyy ? \Carbon\Carbon::parse($vehiclesdel->ppmmyyy)->format('d-M-Y') : '' }}</td>
                           <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
                          <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
                                 </tr>
@@ -2480,6 +2487,8 @@
                                             Payment Status
                                         @elseif($vehicleslog->field === "estimation_date")
                                             Estimated Date
+                                            @elseif($vehicleslog->field === "ppmmyyy")
+                                            Production Month
                                         @elseif($vehicleslog->field === "territory")
                                             Territory
                                         @elseif($vehicleslog->field === "vin")
@@ -2498,6 +2507,12 @@
                                         <td>{{$colourold}}</td>
                                         <td>{{$colournew}}</td>
                                     @elseif($vehicleslog->field === "estimation_date")
+                                        @if($vehicleslog->old_value)
+                                            <td>{{ date('d-M-Y', strtotime($vehicleslog->old_value)) }}</td>
+                                        @else
+                                            <td></td>
+                                        @endif
+                                        @elseif($vehicleslog->field === "ppmmyyy")
                                         @if($vehicleslog->old_value)
                                             <td>{{ date('d-M-Y', strtotime($vehicleslog->old_value)) }}</td>
                                         @else
@@ -2916,15 +2931,25 @@
                         selectElement.removeAttribute('disabled');
                     }
                     const isEstimationDateColumn = field.classList.contains('estimation_date');
+                    const isPpmmyyyDateColumn = field.classList.contains('ppmmyyy');
                     const fieldValue = field.innerText.trim();
                     const isNullValue = fieldValue === '';
-                    if (isNullValue && !isEstimationDateColumn) {
+                    if (isNullValue && !isEstimationDateColumn && !isPpmmyyyDateColumn) {
                         return;
                     }
                     if (isEstimationDateColumn) {
                         const inputField = document.createElement('input');
                         inputField.type = 'date';
                         inputField.name = 'oldestimated_arrival[]';
+                        inputField.value = fieldValue;
+                        inputField.classList.add('form-control');
+                        field.innerHTML = '';
+                        field.appendChild(inputField);
+                    }
+                    if (isPpmmyyyDateColumn) {
+                        const inputField = document.createElement('input');
+                        inputField.type = 'date';
+                        inputField.name = 'ppmmyyy[]';  // Adjust this name as needed
                         inputField.value = fieldValue;
                         inputField.classList.add('form-control');
                         field.innerHTML = '';
