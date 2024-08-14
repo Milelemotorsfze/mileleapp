@@ -2545,7 +2545,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
 			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
 			if(type == 'export_cnf') {
-				var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+				var shipmentCell = createEditableSelect2ShipmentCell(data.vin,data.vehicle_id,data.shipment);
+				// var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
 			}
 
 			// Append cells to the first row
@@ -3120,7 +3121,54 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 			return cell;
 		}
+		function createEditableSelect2ShipmentCell(vin, vehicle_id, shipment) {
+			// var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+			var cell = document.createElement('td');
+			var selectElement = document.createElement('select');
+			selectElement.id = 'shipment_' + vin;
+			selectElement.name = 'vehicle[' + vehicle_id + '][shipment]';
+			selectElement.className = 'form-control widthinput';
+			selectElement.multiple = true;
+			selectElement.style.width = '100%';
+			  
+			var options = [
+				{ value: '20 Ft', text: '20 Ft' },
+				{ value: '40 Ft 2 Car Loading', text: '40 Ft 2 Car Loading' },
+				{ value: '40 Ft 3 Car Loading', text: '40 Ft 3 Car Loading' },
+				{ value: '40 Ft 4 Car Loading', text: '40 Ft 4 Car Loading' },
+				{ value: 'RORO', text: 'RORO' },
+			];
+			options.forEach(function(optionData) {
+				var option = document.createElement('option');
+				option.value = optionData.value;
+				option.textContent = optionData.text;
 
+				if (shipment==optionData.value) {
+					option.selected = true;
+				}
+				
+				selectElement.appendChild(option);
+			});
+
+			cell.appendChild(selectElement);
+
+			$(selectElement).select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder: "Choose ",
+				initSelection: function(element, callback) {
+					var selectedValues = shipment.map(function(value) {
+						return options.find(option => option.value === value);
+					});
+					callback(selectedValues);
+				}
+			});
+
+			// Set the selected values for select2
+			$(selectElement).val(shipment).trigger('change');
+
+			return cell;
+		}
 
 	// ADD AND REMOVE VEHICLE TO WO END
 
