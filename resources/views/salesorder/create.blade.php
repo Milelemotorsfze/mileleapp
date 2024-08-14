@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-check form-check-inline">
-                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}}</label>
+                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}} To Sales Order</label>
                         </div>
                     </div>
                 </div>

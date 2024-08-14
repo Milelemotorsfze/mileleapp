@@ -957,6 +957,6 @@ Route::get('/d', function () {
     Route::resource('departmentnotifications', DepartmentNotificationsController::class);
     Route::post('/save-dn-numbers', [PurchasingOrderController::class, 'saveDnNumbers'])->name('save.dnNumbers');
     Route::get('/getVehiclesdn/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesdn']);
-    
+    Route::post('/saleorderstoreupdate/{QuotationId}', [SalesOrderController::class, 'storesalesorderupdate'])->name('salesorder.storesalesorderupdate');
 });
 
