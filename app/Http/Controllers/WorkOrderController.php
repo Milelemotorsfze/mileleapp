@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Validator;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -638,9 +639,14 @@ class WorkOrderController extends Controller
             $query->where('created_by', $authId);
         }
     
-        // Fetch the current work order
-        $workOrder = $query->firstOrFail();
-    
+        try {
+            // Fetch the current work order
+            $workOrder = $query->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            $errorMsg = "Sorry! You don't have permission to access this page.";
+            return view('hrm.notaccess', compact('errorMsg'));
+        }
+        
         // Retrieve previous and next work order IDs
         $previous = WorkOrder::where('type', $type)
             ->where('id', '<', $workOrder->id)
