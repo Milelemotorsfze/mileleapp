@@ -116,7 +116,7 @@ use App\Http\Controllers\LOIItemController;
 use App\Http\Controllers\BanksController;
 use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
-
+use App\Http\Controllers\VehicleNetsuiteCostController;
 
 /*
 /*
@@ -967,5 +967,7 @@ Route::get('/d', function () {
     Route::get('/getVehiclesdn/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesdn']);
     Route::post('/saleorderstoreupdate/{QuotationId}', [SalesOrderController::class, 'storesalesorderupdate'])->name('salesorder.storesalesorderupdate');
     Route::get('/not-access', [AccessController::class, 'notAccessPage'])->name('not_access_page');
+
+    Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);
 });
 
