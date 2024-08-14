@@ -2779,7 +2779,7 @@ $variant->save();
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'varaints.id as variant_id',
                         'varaints.detail as variant_detail',
                         'varaints.seat',
@@ -2798,6 +2798,7 @@ $variant->save();
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                     ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
@@ -2828,7 +2829,7 @@ $variant->save();
                         'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail as variant_detail',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2846,6 +2847,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
@@ -2879,7 +2881,7 @@ $variant->save();
                         'varaints.model_detail',
                         'varaints.id as variant_id',
                         'varaints.detail as variant_detail',
-                        'purchasing_order.fd',
+                       'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2897,6 +2899,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
@@ -2932,7 +2935,7 @@ $variant->save();
                         'vehicles.territory',
                         'vehicles.grn_remark',
                         'vehicles.engine',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.detail as variant_detail',
@@ -2955,6 +2958,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
@@ -2985,7 +2989,7 @@ $variant->save();
                          'vehicles.engine',
                          'vehicles.grn_remark',
                          'brands.brand_name',
-                         'purchasing_order.fd',
+                         'countries.name as fd',
                          'varaints.name as variant',
                          'varaints.id as variant_id',
                          'varaints.model_detail',
@@ -3007,6 +3011,7 @@ $variant->save();
                          DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
@@ -3038,7 +3043,7 @@ $variant->save();
                         'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -3058,6 +3063,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
@@ -3089,7 +3095,7 @@ $variant->save();
                         'vehicles.ppmmyyy',
                         'vehicles.vin as vin',
                         'vehicles.engine',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.detail as variant_detail',
@@ -3115,6 +3121,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
@@ -3143,7 +3150,7 @@ $variant->save();
                         'vehicles.ppmmyyy',
                         'vehicles.vin as vin',
                         'vehicles.engine',
-                        'purchasing_order.fd',
+                        'countries.name as fd',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.detail as variant_detail',
@@ -3169,6 +3176,7 @@ $variant->save();
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
