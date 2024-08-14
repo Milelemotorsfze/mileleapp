@@ -8,7 +8,7 @@
         </h4>
     </div>
     <div class="card-body">
-    <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
+    <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorderupdate', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
     @csrf
     <div class="row">
             <div class="col-sm-4">
@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-check form-check-inline">
-                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}}</label>
+                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}} To Sales Order</label>
                         </div>
                     </div>
                 </div>
@@ -327,32 +327,37 @@
         <div class="row">
     <h6>Vehicles</h6>
     <div class="col-md-12">
-        @foreach($quotationItems as $quotationItem)
-        <div class="mb-1">
-            <h6>{{ $quotationItem->description }}</h6>
-            <div class="row">
-                @for ($i = 0; $i < $quotationItem->quantity; $i++)
-                <div class="col-md-2 mb-3">
-                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
-                        <option value="" selected>Select VIN</option>
-                        @foreach($vehicles[$quotationItem->id] as $vehicle)
-                        @if($vehicle->inspection_status != "Pending")
+    @foreach($quotationItems as $quotationItem)
+<div class="mb-1">
+    <h6>{{ $quotationItem->description }}</h6>
+    <div class="row">
+        @for ($i = 0; $i < $quotationItem->quantity; $i++)
+        <div class="col-md-2 mb-3">
+            @php
+                // Get the corresponding so_item for this specific loop iteration
+                $soItem = $soitems->where('quotation_items_id', $quotationItem->id)->skip($i)->first();
+                $soItemId = $soItem ? $soItem->id : null;
+                $selectedVehicleId = $soItem ? $soItem->vehicles_id : null;
+            @endphp
+            <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="soitem_{{ $soItemId }}" class="form-control select2">
+                <option value="" selected>Select VIN</option>
+                @foreach($vehicles[$quotationItem->id] as $vehicle)
+                    @if($vehicle->inspection_status != "Pending")
                         @php
-                            $selected = '';
-                            if ($quotationVin = $quotationItem->quotationVins->where('quotation_items_id', $vehicle->vin)->first()) {
-                                $selected = 'selected';
-                            }
+                            // Determine if this vehicle should be selected
+                            $selected = ($vehicle->id == $selectedVehicleId) ? 'selected' : '';
                         @endphp
-                        <option value="{{ $vehicle->vin }}" {{ $selected }}>{{ $vehicle->vin }}</option>
-                        @endif
-                        @endforeach
-                    </select>
-                </div>
-                @endfor
-            </div>
-            <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
+                        <option value="{{ $vehicle->id }}" {{ $selected }}>{{ $vehicle->vin }}</option>
+                    @endif
+                @endforeach
+            </select>
         </div>
-        @endforeach
+        @endfor
+    </div>
+    <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
+</div>
+@endforeach
+
     </div>
 </div>
         <hr>
@@ -378,7 +383,7 @@
         <div class="row">
             <div class="col-md-2 mb-3">
                 <label for="receiving_payment">Total Receiving Payment</label>
-                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="" readonly>
+                <input type="number" class="form-control" id="receiving_payment" name="receiving_payment" value="{{$sodetails->receiving}}" readonly>
             </div>
             <div class="col-md-2 mb-3">
                 <label for="advance_payment_performa">Payment In Performa</label>
@@ -386,7 +391,7 @@
             </div>
             <div class="col-md-2 mb-3">
                 <label for="payment_so">Payment In SO</label>
-                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="" required>
+                <input type="number" class="form-control payment" id="payment_so" name="payment_so" value="{{$sodetails->paidinso}}" required>
             </div>
         </div>
     </div>
@@ -395,12 +400,16 @@
     <div class="col-md-12">
         <div class="col-md-2 mb-3">
             <label for="balance_payment">Balance Payment</label>
-            <input type="number" class="form-control" id="balance_payment" value="" readonly>
+            @php
+            $balance = $sodetails->total - $sodetails->receiving;
+            @endphp
+            <input type="number" class="form-control" id="balance_payment" value="{{$balance}}" readonly>
         </div>
             </div>
         </div>
         </br>
         </br>
+        <input type="hidden" name="so_id" value="{{ $sodetails->id }}">
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
