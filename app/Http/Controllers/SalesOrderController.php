@@ -102,7 +102,7 @@ class SalesOrderController extends Controller
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
-                    $variants = Variant::where('master_model_lines_id', $item->reference_id)->get();
+                    $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantId = $variant->id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
@@ -110,7 +110,7 @@ class SalesOrderController extends Controller
                     }
                     break;
                 case 'App\Models\Brand':
-                    $variants = Variant::where('brand_id', $item->reference_id)->get();
+                    $variants = Varaint::where('brand_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantId = $variant->id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
@@ -122,9 +122,40 @@ class SalesOrderController extends Controller
                 }
                     }
                     }
+                    $alreadyAddedQuotationIds = $quotationItems->pluck('id')->toArray();
+
+        $addons = QuotationItem::whereIn('reference_type', ['App\Models\AddonDetails', 'App\Models\Addon'])
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $hidedAddonSum = QuotationItem::where('reference_type', 'App\Models\AddonDetails')
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', false)->sum('total_amount');
+        $shippingCharges = QuotationItem::where('reference_type', 'App\Models\Shipping')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+
+        $shippingDocuments = QuotationItem::where('reference_type', 'App\Models\ShippingDocuments')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+
+        $otherDocuments = QuotationItem::where('reference_type', 'App\Models\OtherLogisticsCharges')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+
+        $shippingCertifications = QuotationItem::where('reference_type', 'App\Models\ShippingCertification')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
                     $saleperson = User::find($calls->sales_person);
                     $empProfile = EmployeeProfile::where('user_id', $calls->sales_person)->first();
-                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson')); 
+                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson',             'addons', 
+                    'OtherAddons', 
+                    'addonsTotalAmount', 
+                    'shippingCharges', 
+                    'shippingDocuments', 
+                    'otherDocuments', 
+                    'shippingCertifications')); 
             }  
             public function storesalesorder(Request $request, $quotationId)
             {
@@ -265,7 +296,7 @@ class SalesOrderController extends Controller
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
-                        $variants = Variant::where('master_model_lines_id', $item->reference_id)->get();
+                        $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
@@ -273,7 +304,7 @@ class SalesOrderController extends Controller
                         }
                         break;
                     case 'App\Models\Brand':
-                        $variants = Variant::where('brand_id', $item->reference_id)->get();
+                        $variants = Varaint::where('brand_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
