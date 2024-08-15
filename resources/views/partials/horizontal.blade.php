@@ -909,7 +909,7 @@
                                         <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
-                                <li class="nav-item dropdown">
+                                <!-- <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="" id="topnav-more" role="button">
                                         <i data-feather="upload-cloud"></i>
                                         <span data-key="t-extra-pages">Posting Records</span>
@@ -932,7 +932,7 @@
                                             @endif
                                         @endforeach
                                     </div>
-                                </li>
+                                </li> -->
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
                                         <i data-feather="shopping-bag"></i>
