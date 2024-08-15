@@ -3251,7 +3251,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-		
 		var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
 		var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
 
