@@ -925,7 +925,7 @@
                                         @endforeach
                                     </div>
                                 </li> -->
-                                <li class="nav-item dropdown">
+                                <!-- <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
                                         <i data-feather="shopping-bag"></i>
                                         <span data-key="t-extra-pages">Purchashing & Payments</span>
@@ -943,7 +943,7 @@
                                         <i data-feather="command"></i>
                                         <span data-key="t-extra-pages">Movements</span>
                                     </a>
-                                </li>
+                                </li> -->
                                 @endif
                                 @endcan
                                 @can('view-po-details')
