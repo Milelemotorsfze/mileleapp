@@ -3252,9 +3252,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
 		var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
-		var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
+		var selectedBatch = '';
+		if(type == 'export_exw' || type == 'export_cnf') {
+			var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
+		}
 
-		if (SONumber === '' || selectedBatch === '') { // Check if either input is empty
+		if (SONumber === '') { // Check if SO Number is empty
 			document.getElementById('wo_number').value = ''; // Clear the WO Number field
 			return; // Exit the function
 		}
@@ -3273,15 +3276,27 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			return; // Exit the function
 		}
 
-		// Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
-		let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+		// Check if the sale type is 'local_sale'
+		if (type === 'local_sale') {
+			// Construct the WO Number without batch information
+			var WONumber = "WO-" + numberPart;
+		} else {
+			// Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
+			let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
 
-		// Construct the WO Number with batch information
-		var WONumber = "WO-" + numberPart + "-B" + batchNumber;
+			if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
+				document.getElementById('wo_number').value = ''; // Clear the WO Number field
+				return; // Exit the function
+			}
+
+			// Construct the WO Number with batch information
+			var WONumber = "WO-" + numberPart + "-B" + batchNumber;
+		}
 
 		// Set the WO Number field
 		document.getElementById('wo_number').value = WONumber;
 	}
+
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
