@@ -102,13 +102,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 <div class="card-header">
 	<h4 class="card-title form-label">@if(isset($workOrder) && $workOrder->type == 'export_exw') Export EXW @elseif(isset($workOrder) && $workOrder->type == 'export_cnf') Export CNF @elseif(isset($workOrder) && $workOrder->type == 'local_sale') Local Sale @endif Work Order Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first form-label" href="{{ route('work-order.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a class="btn btn-sm btn-info" href="{{ route('work-order.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first form-label" href="{{ route('work-order.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info" href="{{ route('work-order.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
-	<a  class="btn btn-sm btn-info float-end form-label" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-	@if (count($errors) > 0)
+    @include('work_order.export_exw.approvals')
+    <a style="margin-right:0px;margin-left:0px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
+        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+    </a>
+	<a  class="btn btn-sm btn-info" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<label style="font-size: 119%;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+    <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+    @if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
 		<button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
@@ -133,17 +139,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	@endif
 </div>
 <div class="card-body">
-    <div class="row">
-        <div class="col-lg-11 col-md-11 col-sm-11 col-11">    
-            @include('work_order.export_exw.approvals')
-        </div>
-        <div class="col-lg-1 col-md-1 col-sm-1 col-1">
-            <a style="margin-top:0px; margin-bottom:1.25rem; float:left;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
-                <i class="fa fa-edit" aria-hidden="true"></i> Edit
-            </a>
-        </div>
-    </div>
-   
 	<div class="tab-content">
 		<div class="tab-pane fade show active" id="requests">
 			<br>
@@ -152,35 +147,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 					<div class="row">
                         <div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label></center>
-							</div>
-							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
+								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label> : <span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
 							</div>
 						</div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> WO Number</strong></label></center>
-							</div>
-							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><span class="data-font">{{ $workOrder->wo_number ?? '' }}</span></center>
+								<center><label for="choices-single-default" class="form-label"> <strong> WO Number</strong></label> : <span class="data-font">{{ $workOrder->wo_number ?? '' }}</span></center>
 							</div>
 						</div>
 						<div class="col-lg-3 col-md-3 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> SO Number </strong></label></center>
-							</div>
-							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><span class="data-font">{{ $workOrder->so_number ?? '' }}</span></center>
+								<center><label for="choices-single-default" class="form-label"> <strong> SO Number </strong></label> : <span class="data-font">{{ $workOrder->so_number ?? '' }}</span></center>
 							</div>
 						</div>
                         @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
                             <div class="col-lg-3 col-md-3 col-sm-6 col-12">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label></center>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <center><span class="data-font">{{ $workOrder->batch ?? '' }}</span></center>
+                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">{{ $workOrder->batch ?? '' }}</span></center>
                                 </div>
                             </div>
                         @endif
@@ -190,11 +173,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                     <div class="portfolio">
                         <ul class="nav nav-pills nav-fill" id="my-tab">
                             <li class="nav-item">
-                                <a class="nav-link active form-label" data-bs-toggle="pill" href="#general-info"> General Info</a>
+                                <a class="nav-link active form-label" data-bs-toggle="pill" href="#general-info"> General and Vehicles-Addons Info</a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#vehicles_addons"> Vehicles & Addons</a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#documents"> Documents</a>
                             </li>
@@ -213,7 +196,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="general-info">
                             <div class="card">
-                                <div class="card-header">
+                                <div class="card-header" style="background-color : #e8f3fd!important;">
                                     <h4 class="card-title">
                                         <center style="font-size:12px;">General Informations</center>
                                     </h4>
@@ -265,7 +248,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Customer Representative Name</label>
+                                                            <label for="choices-single-default" class="form-label"> Customer Rep. Name</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->customer_representative_name ?? 'NA'}}</span>
@@ -275,7 +258,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Customer Representative Email</label>
+                                                            <label for="choices-single-default" class="form-label"> Customer Rep. Email</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->customer_representative_email ?? 'NA'}}</span>
@@ -285,7 +268,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Customer Representative Contact</label>
+                                                            <label for="choices-single-default" class="form-label"> Customer Rep. Contact</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->customer_representative_contact ?? 'NA'}}</span>
@@ -316,7 +299,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                         <div class="row">
                                                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                                <label for="choices-single-default" class="form-label"> Freight Agent Contact Number </label>
+                                                                <label for="choices-single-default" class="form-label"> Freight Agent Contact </label>
                                                             </div>
                                                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                                 <span class="data-font">{{$workOrder->freight_agent_contact_number ?? 'NA'}}</span>
@@ -533,7 +516,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Delivery Contact Person Name</label>
+                                                            <label for="choices-single-default" class="form-label"> Delivery Contact Name</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->delivery_contact_person ?? 'NA'}}</span>
@@ -543,7 +526,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Delivery Contact Person No.</label>
+                                                            <label for="choices-single-default" class="form-label"> Delivery Contact No.</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->delivery_contact_person_number ?? 'NA'}}</span>
@@ -564,7 +547,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Prefered Shipping Line for Customer</label>
+                                                            <label for="choices-single-default" class="form-label"> Prefered Shipping Line</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->preferred_shipping_line_of_customer ?? 'NA'}}</span>
@@ -614,7 +597,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Special/In Transit/Other Requests</label>
+                                                            <label for="choices-single-default" class="form-label"> Special/In Transit Req.</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->special_or_transit_clause_or_request ?? 'NA'}}</span>
@@ -845,7 +828,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label">Vehicle Handover To Person ID</label>
+                                                            <label for="choices-single-default" class="form-label">Handover Person ID</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">
@@ -868,10 +851,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tab-pane fade" id="vehicles_addons">
+                        <!-- </div> -->
+                        <!-- <div class="tab-pane fade" id="vehicles_addons"> -->
                             <div class="card">
-                                <div class="card-header">
+                                <div class="card-header" style="background-color : #e8f3fd!important;">
                                     <h4 class="card-title">
                                         <center style="font-size:12px;">Vehicles and Addons Informations</center>
                                     </h4>
@@ -880,7 +863,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                     <div class="row">
                                         <div class="table-responsive">
                                             <table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
-                                                <tr style="border-bottom:1px solid #b3b3b3;">
+                                                <tr style="border-bottom:1px solid #b3b3b3; background-color : #e8f3fd!important;">
                                                     <th>BOE</th>
                                                     <th>VIN</th>
                                                     <th>Brand</th>
@@ -888,7 +871,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <th>Engine</th>
                                                     <th>Model Description</th>
                                                     <th>Model Year</th>
-                                                    <th>Model Year to mention on Documents</th>
+                                                    <th>Document Model Year</th>
                                                     <th>Steering</th>
                                                     <th>Exterior Colour</th>
                                                     <th>Interior Colour</th>
@@ -905,7 +888,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 </tr>
                                                 @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
                                                     @foreach($workOrder->vehicles as $vehicle)
-                                                    <tr class="custom-border-top">
+                                                    <tr class="custom-border-top" style="background-color : #f6fafe!important;">
                                                         <td>{{$vehicle->boe_number ?? 'NA'}}</td>
                                                         <td>{{$vehicle->vin ?? 'NA'}}</td>
                                                         <td>{{$vehicle->brand ?? 'NA'}}</td>
