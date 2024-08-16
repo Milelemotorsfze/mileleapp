@@ -903,6 +903,19 @@
                                 </li>
                                 @endif
                                 @endcan
+                                @can('View-daily-movemnets')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnets');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movement.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="command"></i>
+                                        <span data-key="t-extra-pages">Movements</span>
+                                    </a>
+                                </li>
+                                @endif
+                                @endcan
                                 @can('view-po-details')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
