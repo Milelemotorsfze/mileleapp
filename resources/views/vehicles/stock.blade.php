@@ -293,6 +293,7 @@
                   <th>GRN Date</th>
                   <th>Inspection Date</th>
                   <th>Inspection Remarks</th>
+                  <th>Aging</th>
                   <th>GRN Report</th>
                 </tr>
               </thead>
@@ -764,6 +765,19 @@
         { data: 'date', name: 'grn.date' },
         { data: 'inspection_date', name: 'inspection_date' },
         { data: 'grn_remark', name: 'vehicles.grn_remark' },
+        { 
+            data: null,
+            render: function(data, type, row) {
+                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
+                var currentDate = new Date();
+                var timeDiff = currentDate - grnDate;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
+
+                return daysDiff + ' days';
+            },
+            searchable: false, // Disable searching for this column
+            orderable: false // Disable ordering from the server-side for this column
+        },
         { 
             data: 'id', 
             name: 'id',
