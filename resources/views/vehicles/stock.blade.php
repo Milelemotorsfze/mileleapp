@@ -73,6 +73,47 @@
      Stock Info
     </h4>
     <br>
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="bookingForm" method="POST" action="{{ route('booking.savedirectly') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="booking_start_date">Booking Start Date</label>
+                        <input type="date" class="form-control" id="booking_start_date" name="booking_start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking_end_date">Booking End Date</label>
+                        <input type="date" class="form-control" id="booking_end_date" name="booking_end_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">Sales Person</label>
+                        <select class="form-control" id="salesperson" name="salesperson" required>
+                        @foreach($salesperson as $salesperson)
+                                <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
+                            @endforeach
+                           
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -801,6 +842,15 @@ table3.on('draw', function () {
         $('.row-badge3').hide();
     }
 });
+$('#dtBasicExample3 tbody').on('click', 'tr', function () {
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+    @endphp
+    @if ($hasPermission)
+        var data = table3.row(this).data();
+        openBookingModal(data.id);
+    @endif
+});
         var table4 = $('#dtBasicExample4').DataTable({
           processing: true,
             serverSide: true,
@@ -871,6 +921,15 @@ table3.on('draw', function () {
                 $('.row-badge4').hide();
             }
         });
+        $('#dtBasicExample4 tbody').on('click', 'tr', function () {
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+    @endphp
+    @if ($hasPermission)
+        var data = table4.row(this).data();
+        openBookingModal(data.id);
+    @endif
+});
         var table5 = $('#dtBasicExample5').DataTable({
           processing: true,
             serverSide: true,
@@ -1437,7 +1496,6 @@ function fetchVehicleData(vehicleId) {
 function showNoImagePopup() {
     $('#noImageModal').modal('show');
 }
-
 function displayGallery(imageUrls) {
     var carouselImages = document.getElementById("carouselImages");
     carouselImages.innerHTML = "";
@@ -1453,9 +1511,32 @@ function displayGallery(imageUrls) {
 }
 </script>
 <script>
+  function openBookingModal(vehicleId) {
+    $('#vehicle_id').val(vehicleId);
+    $('#bookingModal').modal('show');
+}
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
+    $('#bookingForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#bookingModal').modal('hide');
+            alert('Booking saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+            alert('An error occurred while saving the booking.');
+        }
+    });
+});
+
 </script>
 @endsection

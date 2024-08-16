@@ -2702,10 +2702,13 @@ public function viewalls(Request $request)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         // Variant detail computation
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
 ->get();
-
 $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
 $normalizationMap = [
 'COO' => 'COO',
@@ -2935,6 +2938,7 @@ $variant->save();
                         'vehicles.territory',
                         'vehicles.grn_remark',
                         'vehicles.engine',
+                        'varaints.model_detail',
                         'countries.name as fd',
                         'brands.brand_name',
                         'varaints.name as variant',
@@ -2958,11 +2962,12 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('users', 'vehicles.booking_person_id', '=', 'users.id')
                     ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                     ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
@@ -2972,7 +2977,7 @@ $variant->save();
                     ->whereNotNull('vehicles.inspection_date')
                     ->whereNull('vehicles.gdn_id')
                     ->whereNull('vehicles.so_id')
-                    ->whereDate('vehicles.reservation_end_date', '<=', now())
+                    ->whereDate('vehicles.reservation_end_date', '>=', now())
                     ->whereNotNull('vehicles.grn_id');
                     $data = $data->groupBy('vehicles.id');  
                 }
@@ -3195,7 +3200,7 @@ $variant->save();
                 return DataTables::of($data)->toJson();
             }
         }
-        return view('vehicles.stock');
+        return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
     public function generategrnPDF(Request $request)
     {

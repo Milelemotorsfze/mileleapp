@@ -962,5 +962,6 @@ Route::get('/d', function () {
     Route::get('/not-access', [AccessController::class, 'notAccessPage'])->name('not_access_page');
 
     Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);
+    Route::post('/booking/savedirectly', [BookingController::class, 'storedirect'])->name('booking.savedirectly');
 });
 
