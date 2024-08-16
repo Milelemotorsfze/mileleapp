@@ -844,7 +844,7 @@ table3.on('draw', function () {
 });
 $('#dtBasicExample3 tbody').on('click', 'tr', function () {
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
         var data = table3.row(this).data();
@@ -923,7 +923,7 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
         });
         $('#dtBasicExample4 tbody').on('click', 'tr', function () {
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
         var data = table4.row(this).data();
