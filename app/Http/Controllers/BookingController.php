@@ -17,6 +17,7 @@ use App\Models\MasterModelLines;
 use App\Models\Varaint;
 use App\Models\Vehicles;
 use App\Models\Quotation;
+use Carbon\Carbon;
 use App\Models\QuotationItem;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -609,5 +610,44 @@ public function approval(Request $request)
     $query->whereNull('vehicles.gdn_id');
     $availableVehicles = $query->get();
     return response()->json($availableVehicles);
-    }    
+    }
+    public function storedirect(Request $request)
+    {
+        info("waqar");
+    $validatedData = $request->validate([
+        'vehicle_id' => 'required|exists:vehicles,id',
+        'booking_start_date' => 'required|date',
+        'booking_end_date' => 'required|date|after_or_equal:booking_start_date',
+        'salesperson' => 'required|exists:users,id',
+        'remarks' => 'nullable|string',
+    ]);
+    $days = Carbon::parse($validatedData['booking_start_date'])->diffInDays(Carbon::parse($validatedData['booking_end_date']));
+    
+    $bookingRequest = new BookingRequest();
+    $bookingRequest->date = now();
+    $bookingRequest->vehicle_id = $validatedData['vehicle_id'];
+    $bookingRequest->created_by = $validatedData['salesperson'];
+    $bookingRequest->status = 'Approved';
+    $bookingRequest->process_by = Auth::id(); // Assuming you meant 'processed_by'
+    $bookingRequest->process_date = now();
+    $bookingRequest->days = $days;
+    $bookingRequest->bookingnotes = $validatedData['remarks'];
+    $bookingRequest->save();
+    $booking = new Booking();
+    $booking->date = now();
+    $booking->booking_start_date = $validatedData['booking_start_date'];
+    $booking->booking_end_date = $validatedData['booking_end_date'];
+    $booking->vehicle_id = $validatedData['vehicle_id'];
+    $booking->booking_requests_id = $bookingRequest->id;
+    $booking->sales_person_id = $validatedData['salesperson'];
+    $booking->save();
+    $vehicle = Vehicles::find($validatedData['vehicle_id']);
+    if ($vehicle) {
+        $vehicle->reservation_start_date = $validatedData['booking_start_date'];
+        $vehicle->reservation_end_date = $validatedData['booking_end_date'];
+        $vehicle->booking_person_id = $validatedData['salesperson'];
+        $vehicle->save();
+    }
+    return redirect()->route('vehicles.statuswise', ['status' => 'Incoming']);
+    }
     }
