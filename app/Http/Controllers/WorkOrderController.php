@@ -680,6 +680,7 @@ class WorkOrderController extends Controller
      */
     public function edit(WorkOrder $workOrder)
     {
+        $previous = $next = '';
         $authId = Auth::id();
         // Store permission checks
         $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
@@ -706,6 +707,21 @@ class WorkOrderController extends Controller
             $errorMsg = "Sorry! You don't have permission to access this page.";
             return view('hrm.notaccess', compact('errorMsg'));
         }
+          // Retrieve previous and next work order IDs
+          $previous = WorkOrder::where('type', $type)
+          ->where('id', '<', $workOrder->id)
+          ->when($hasLimitedAccess, function($query) use ($authId) {
+              return $query->where('created_by', $authId);
+          })
+          ->max('id');
+  
+      $next = WorkOrder::where('type', $type)
+          ->where('id', '>', $workOrder->id)
+          ->when($hasLimitedAccess, function($query) use ($authId) {
+              return $query->where('created_by', $authId);
+          })
+          ->min('id');
+
         // Select data from the WorkOrder table
         $workOrders = WorkOrder::select(
             DB::raw('TRIM(customer_name) as customer_name'), 
@@ -799,7 +815,7 @@ class WorkOrderController extends Controller
             ->get();
         // Merge collections
         $addons = $accessories->merge($spareParts)->merge($kit);
-        return view('work_order.export_exw.create',compact('workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'))->with([
+        return view('work_order.export_exw.create',compact('previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }

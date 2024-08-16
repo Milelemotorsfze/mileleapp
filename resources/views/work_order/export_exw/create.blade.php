@@ -161,7 +161,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> @if(isset($workOrder)) Edit @else Create @endif @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -174,12 +173,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
+	<div>
+	@if(isset($previous) && $previous != '')
+	<a class="btn btn-sm btn-info" href="{{ route('work-order.edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	@endif
+	@if(isset($next) && $next != '')
+	<a  class="btn btn-sm btn-info" href="{{ route('work-order.edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	@endif
 	@include('work_order.export_exw.approvals')
-	<div class="row">
-		<div class="col-xxl-12 col-lg-12 col-md-12">
-			<button style="float:right;" class="btn btn-sm btn-success" id="submit-from-top">Submit</button>
-		</div>
-	</div>
+	<a class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
+	
+	<a class="btn btn-sm btn-success float-end" id="submit-from-top">Submit</a>
+	@if(isset($workOrder))
+	<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+    <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+    @endif
+	</div> 
 	</br>
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
@@ -3377,6 +3386,48 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}
 	});
 </script>
+@php
+$hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-and-edit-amount']);
+@endphp
+
+@if ($hasAmountPermission)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of input field IDs and classes to disable
+            const fieldsToDisable = [
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'deposit_received_as',
+                'amount_received',
+                'balance_amount',
+            ];
+
+            // Disable each field by ID or class
+            fieldsToDisable.forEach(function(field) {
+                const elementsById = document.getElementById(field);
+                const elementsByClass = document.getElementsByClassName(field);
+
+                if (elementsById) {
+                    elementsById.readOnly = true;
+                }
+
+                if (elementsByClass.length > 0) {
+                    Array.from(elementsByClass).forEach(function(element) {
+                        element.disabled = true;
+                    });
+                }
+				$('#currency').prop('disabled', true).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');				
+            });
+			var deleteButtons = document.querySelectorAll('.delete-button');
+			deleteButtons.forEach(function(button) {
+				button.disabled = true;
+			});
+        });
+    </script>
+@endif
+
+
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
 @endphp
