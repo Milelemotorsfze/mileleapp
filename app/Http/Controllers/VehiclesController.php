@@ -2813,7 +2813,8 @@ $variant->save();
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                     ->whereNull('vehicles.inspection_date')
                     ->whereNull('vehicles.gdn_id')
-                    ->whereNull('vehicles.grn_id');
+                    ->whereNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');
                 }
                 else if($status === "Pending Inspection")
@@ -2863,7 +2864,8 @@ $variant->save();
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                     ->whereNull('vehicles.inspection_date')
                     ->whereNull('vehicles.gdn_id')
-                    ->whereNotNull('vehicles.grn_id');
+                    ->whereNotNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 } 
                 else if($status === "Available Stock")
@@ -2917,6 +2919,7 @@ $variant->save();
                     ->whereNull('vehicles.gdn_id')
                     ->whereNull('vehicles.so_id')
                     ->whereNotNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved')
                     ->where(function($query) {
                         $query->whereDate('vehicles.reservation_end_date', '<', now())
                               ->orWhereNull('vehicles.reservation_end_date');
@@ -2978,7 +2981,8 @@ $variant->save();
                     ->whereNull('vehicles.gdn_id')
                     ->whereNull('vehicles.so_id')
                     ->whereDate('vehicles.reservation_end_date', '>=', now())
-                    ->whereNotNull('vehicles.grn_id');
+                    ->whereNotNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "Sold")
@@ -3030,7 +3034,8 @@ $variant->save();
                     ->whereNotNull('vehicles.inspection_date')
                     ->whereNull('vehicles.gdn_id')
                     ->whereNotNull('vehicles.so_id')
-                    ->whereNotNull('vehicles.grn_id');
+                    ->whereNotNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "Delivered")
@@ -3082,7 +3087,8 @@ $variant->save();
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                     ->whereNotNull('vehicles.inspection_date')
                     ->whereNotNull('vehicles.gdn_id')
-                    ->whereNotNull('vehicles.grn_id');
+                    ->whereNotNull('vehicles.grn_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "allstock")
@@ -3137,7 +3143,8 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id');
+                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "dpvehicles")
