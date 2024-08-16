@@ -3200,6 +3200,7 @@ $variant->save();
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->where('vehicles.status', 'Approved')
                     ->where('purchasing_order.is_demand_planning_po', '=', '1');
                     $data = $data->groupBy('vehicles.id');  
                 }
