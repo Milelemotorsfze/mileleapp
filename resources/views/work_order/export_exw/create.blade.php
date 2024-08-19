@@ -227,7 +227,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
 								<option value="">Choose Batch</option>
-								@for ($i = 1; $i <= 10; $i++)
+								@for ($i = 1; $i <= 50; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
 								@endfor
 							</select>
