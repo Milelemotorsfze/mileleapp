@@ -1,6 +1,13 @@
 @extends('layouts.table')
 <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
 <style>
+    .details-control {
+            cursor: pointer;
+            color: blue;
+        }
+        .details-control:hover {
+            text-decoration: underline;
+        }
     .my-text {
       font-weight: bold;
       font-size: 20px;
@@ -30,6 +37,66 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
+@php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
+        @endphp
+        @if ($hasPermission)
+        <div class="card">
+    <div class="card-body px-0">
+        <div class="table-responsive px-3">
+            <div class="card-header align-items-center">
+                <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">UAE Vehicle Stock</h4>
+            </div>
+            <table id="vehicleStockTable" class="table table-striped table-bordered">
+                <thead class="bg-soft-secondary">
+                    <tr>
+                        <th></th> <!-- For the expandable control -->
+                        <th>Variant Name</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dpdashboarduae->groupBy('variant_name') as $variantName => $vehicles)
+                    <tr>
+                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
+                        <td>{{ $variantName }}</td>
+                        <td>{{ $vehicles->sum('qty') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body px-0">
+        <div class="table-responsive px-3">
+            <div class="card-header align-items-center">
+                <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Belgium Vehicle Stock</h4>
+            </div>
+            <table id="vehicleStockTableBelgium" class="table table-striped table-bordered">
+                <thead class="bg-soft-secondary">
+                    <tr>
+                        <th></th> <!-- For the expandable control -->
+                        <th>Variant Name</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dpdashboardnon->groupBy('variant_name') as $variantName => $vehicles)
+                    <tr>
+                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
+                        <td>{{ $variantName }}</td>
+                        <td>{{ $vehicles->sum('qty') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+@endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('finance-dashboard-summary');
         @endphp
@@ -1405,4 +1472,94 @@ $(function() {
 
         });
     </script>
+    <script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        var table = $('#vehicleStockTable').DataTable();
+
+        // Add event listener for opening and closing details
+        $('#vehicleStockTable tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                $(this).text('+');
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                var vehicles = $(this).data('vehicles');
+                var detailsHtml = generateDetailsHtml(vehicles);
+
+                row.child(detailsHtml).show();
+                $(this).text('-');
+                tr.addClass('shown');
+            }
+        });
+
+        // Function to generate HTML for the expandable row
+        function generateDetailsHtml(vehicles) {
+            var html = '<table class="table table-sm">';
+            html += '<thead><tr><th>Int Colour</th><th>Ext Colour</th><th>Qty</th></tr></thead>';
+            html += '<tbody>';
+            
+            vehicles.forEach(function(vehicle) {
+                html += '<tr>';
+                html += '<td>' + vehicle.int_colour + '</td>';
+                html += '<td>' + vehicle.ext_colour + '</td>';
+                html += '<td>' + vehicle.qty + '</td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        var table = $('#vehicleStockTableBelgium').DataTable();
+
+        // Add event listener for opening and closing details
+        $('#vehicleStockTableBelgium tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                $(this).text('+');
+                tr.removeClass('shown');
+            } else {
+                // Open this row
+                var vehicles = $(this).data('vehicles');
+                var detailsHtml = generateDetailsHtml(vehicles);
+
+                row.child(detailsHtml).show();
+                $(this).text('-');
+                tr.addClass('shown');
+            }
+        });
+
+        // Function to generate HTML for the expandable row
+        function generateDetailsHtml(vehicles) {
+            var html = '<table class="table table-sm">';
+            html += '<thead><tr><th>Int Colour</th><th>Ext Colour</th><th>Qty</th></tr></thead>';
+            html += '<tbody>';
+            
+            vehicles.forEach(function(vehicle) {
+                html += '<tr>';
+                html += '<td>' + vehicle.int_colour + '</td>';
+                html += '<td>' + vehicle.ext_colour + '</td>';
+                html += '<td>' + vehicle.qty + '</td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+    });
+</script>
 @endpush
