@@ -2,6 +2,11 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.custom-checkbox {
+		width: 30px;   /* Set the width */
+		height: 30px;  /* Set the height */
+		border: 1px solid #ced4da!important; /* Set the border color */
+	}
 	#overlay {
 		position: fixed;
 		display: none;
@@ -217,12 +222,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
 							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()">
-							<!-- @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif -->
+							<!-- @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif -->						
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
-						<div class="dropdown-option-div">
-							
+					<div class="col-xxl-1 col-lg-2 col-md-2">
+						<label for="is_batch" class="col-form-label text-md-end">Is Batch ?</label></br>
+						<input type="checkbox" id="is_batch" name="is_batch" value="yes" class="custom-checkbox @error('is_batch') is-invalid @enderror" 
+							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()">				
+					</div>
+					<div class="col-xxl-2 col-lg-4 col-md-4 select-button-main-div">
+						<div id="batchDropdownSection" class="dropdown-option-div" style="display: @if(isset($workOrder) && $workOrder->is_batch == 1) block @else none @endif;">							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
@@ -1050,6 +1059,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	var selectedCustomerEmail = '';
 	var selectedCustomerContact = '';
 	var selectedCustomerAddress = '';
+	let isBatchChecked = false; // Initialize the variable to store the checked state
 	var onChangeSelectedVins = [];
 	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
@@ -1802,9 +1812,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					// greaterThanExisting: true, 
 				},
 				wo_number: {
-                    // required: true,
-					uniqueWO: true,
-                },
+					uniqueWO: function() {
+						return $("#wo_number").val() !== ''; // Apply the uniqueWO validation only if wo_number is not empty
+					}
+				},
                 batch: {
                     required: true,
 					// uniqueWO: true,
@@ -3260,44 +3271,64 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-		var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
-		var selectedBatch = '';
-		if(type == 'export_exw' || type == 'export_cnf') {
-			var selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
-		}
-		if (SONumber === '') { // Check if SO Number is empty
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
-		}
-		// Step 1: Split the string to get the part after "SO-"
-		let parts = SONumber.split("SO-");
-		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
-		}
-		// Step 2: Remove leading zeros from the part after "SO-"
-		let numberPart = parts[1].replace(/^0+/, '');
-		if (numberPart === '') { // Check if the number part is empty after removing leading zeros
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
-		}
-		// Check if the sale type is 'local_sale'
-		if (type === 'local_sale') {
-			// Construct the WO Number without batch information
-			var WONumber = "WO-" + numberPart;
-		} else {
-			// Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
-			let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
-			if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
-				document.getElementById('wo_number').value = ''; // Clear the WO Number field
-				return; // Exit the function
-			}
-			// Construct the WO Number with batch information
-			var WONumber = "WO-" + numberPart + "-B" + batchNumber;
-		}
-		// Set the WO Number field
-		document.getElementById('wo_number').value = WONumber;
-	}
+    var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+    var selectedBatch = '';
+    
+    if (type == 'export_exw' || type == 'export_cnf') {
+        selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
+    }
+    
+    if (SONumber === '') { // Check if SO Number is empty
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    // Step 1: Split the string to get the part after "SO-"
+    let parts = SONumber.split("SO-");
+    if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    // Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
+    let numberPart = parts[1];
+    if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    let WONumber = '';
+    
+    // Check if the sale type is 'local_sale'
+    if (type === 'local_sale') {
+        // Construct the WO Number without batch information
+        WONumber = "WO-" + numberPart + "-LD";
+    } else {
+        if (isBatchChecked) {
+            // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
+            let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+            if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
+                document.getElementById('wo_number').value = ''; // Clear the WO Number field
+                return; // Exit the function
+            }
+
+            // Format batch number as B01, B02, ..., B09, B10, etc.
+            let formattedBatchNumber = batchNumber.padStart(2, '0');
+
+            // Construct the WO Number with batch information
+            WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
+        } else {
+            // Construct the WO Number with "-SB" when the batch is not checked
+            WONumber = "WO-" + numberPart + "-SD";
+        }
+    }
+    
+    // Set the WO Number field
+    document.getElementById('wo_number').value = WONumber;
+}
+
+
+
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
@@ -3384,6 +3415,36 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#vehicle-handover-person-id-file-delete').val(1);
 			}
 		}
+	});
+	function toggleBatchDropdown() {
+		const isBatchCheckbox = document.getElementById('is_batch');
+		
+		// Ensure the checkbox element exists before accessing its properties
+		if (isBatchCheckbox) {
+			isBatchChecked = isBatchCheckbox.checked; // Update the value of isBatchChecked
+			
+			const batchDropdown = document.getElementById('batchDropdownSection');
+			
+			if (isBatchChecked) {
+				batchDropdown.style.display = 'block';
+			} else {
+				batchDropdown.style.display = 'none';
+			}
+		}
+		setWo();
+	}
+
+	// Run the function on page load if the checkbox exists
+	document.addEventListener('DOMContentLoaded', function () {
+		const isBatchCheckbox = document.getElementById('is_batch');
+		
+		if (isBatchCheckbox) {
+			toggleBatchDropdown(); // Call to set the initial state
+			
+			// Update the value of isBatchChecked on page load
+			isBatchChecked = isBatchCheckbox.checked;
+		}
+		setWo();
 	});
 </script>
 @php
