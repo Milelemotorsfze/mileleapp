@@ -1632,18 +1632,17 @@ public function submitGdn(Request $request)
     
         // Retrieve the vehicle by ID
         $vehicle = Vehicles::find($request->vehicle_id);
-        
         if (!$vehicle) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vehicle not found',
             ], 404);
         }
-    
+        $oldgdn = Gdn::where('id', $vehicle->gdn_id)->first();
         // Create new GRN record
         $gdnRecord = new Gdn();
         $gdnRecord->gdn_number = $request->gdn;
-        $gdnRecord->date = now(); // Assuming you want to use the current date
+        $gdnRecord->date = $oldgdn->date;
         $gdnRecord->save();
         // Associate the GRN with the vehicle
         $vehicle->gdn_id = $gdnRecord->id;
