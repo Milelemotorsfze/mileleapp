@@ -268,8 +268,35 @@ class WorkOrderController extends Controller
                     }
                 }
             }
+            if(!isset($request->is_batch)) {
+                $input['batch'] = NULL;
+                $input['is_batch'] = 0;
+            }
+            else {
+                $input['is_batch'] = 1;
+            }
             $workOrder = WorkOrder::create($input);
         
+            if(isset($request->is_batch)) {
+                WORecordHistory::create([
+                    'work_order_id' => $workOrder->id,
+                    'user_id' => $authId,
+                    'field_name' => 'batch',
+                    'old_value' => NULL,
+                    'new_value' => $request->batch,
+                    'type' => 'Set',
+                    'changed_at' => Carbon::now()
+                ]);
+                WORecordHistory::create([
+                    'work_order_id' => $workOrder->id,
+                    'user_id' => $authId,
+                    'field_name' => 'is_batch',
+                    'old_value' => NULL,
+                    'new_value' => 1,
+                    'type' => 'Set',
+                    'changed_at' => Carbon::now()
+                ]);               
+            }
             // Handle customer name changes based on customer type
             if ($request->customer_type == 'new' && !is_null($request->new_customer_name)) {
                 WORecordHistory::create([
@@ -297,7 +324,7 @@ class WorkOrderController extends Controller
                 '_token', 'customerCount', 'type', 'customer_type', 'comments', 'currency', 
                 'wo_id', 'new_customer_name', 'brn_file', 'signed_pfi', 'signed_contract', 
                 'payment_receipts', 'noc', 'enduser_trade_license', 'enduser_passport', 
-                'enduser_contract', 'vehicle_handover_person_id'
+                'enduser_contract', 'vehicle_handover_person_id','batch','is_batch'
             ];
 
             // Filter out non-null, non-array values, and exclude specified fields
@@ -844,7 +871,14 @@ class WorkOrderController extends Controller
             // Initialize newData array
             $newData = [];
             $newData = $request->all();
-    
+            if(isset($request->is_batch)) {
+                $newData['is_batch'] = 1;
+                $newData['batch'] = $request->batch;
+            }
+            else {
+                $newData['is_batch'] = 0;
+                $newData['batch'] = NULL;
+            }
             // Extract full values for specific nested fields
             $nestedFields = [
                 'customer_company_number',

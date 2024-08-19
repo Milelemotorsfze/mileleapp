@@ -61,6 +61,7 @@ class WORecordHistory extends Model
             'freight_agent_contact_number.full' => 'Freight Agent Contact Number',
             'freight_agent_email' => 'Freight Agent Email',
             'freight_agent_name' => 'Freight Agent Name',
+            'is_batch' => 'Is Batch',
             'noc' => 'NOC',
             'payment_receipts' => 'Payment Receipts',
             'port_of_discharge' => 'Port Of Discharge',
