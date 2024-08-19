@@ -970,5 +970,6 @@ Route::get('/d', function () {
 
     Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);
     Route::post('/booking/savedirectly', [BookingController::class, 'storedirect'])->name('booking.savedirectly');
+    Route::get('/salesorder/cancel/{id}', [SalesOrderController::class, 'cancel'])->name('salesorder.cancel');
 });
 
