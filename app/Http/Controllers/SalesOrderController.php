@@ -21,6 +21,7 @@ use App\Models\PreOrder;
 use App\Models\PreOrdersItems;
 use App\Models\QuotationDetail;
 use App\Models\Soitems;
+use App\Models\Solog;
 use App\Models\MasterModelLines;
 
 use Illuminate\Http\Request;
@@ -384,5 +385,43 @@ class SalesOrderController extends Controller
         }
     }
     return redirect()->route('dailyleads.index')->with('success', 'Sales Order updated successfully.');
+}
+public function cancel($id)
+{
+    $quotation = Quotation::where('calls_id', $id)->first();
+    $calls = Calls::find($id);
+    $calls->status = 'Quoted';
+    $calls->save();
+    $leadclosed = Closed::where('call_id', $id)->first();
+    $leadclosed->delete();
+    $so = So::where('quotation_id', $quotation->id)->first();
+    $soitems = Soitems::where('so_id', $so->id)->get();
+    foreach ($soitems as $soitem) {
+        $vehicle = Vehicles::find($soitem->vehicles_id);
+        if ($vehicle) {
+            $vehicle->so_id = null;
+            $vehicle->reservation_start_date = null;
+            $vehicle->reservation_end_date = null;
+            $vehicle->booking_person_id = null;
+            $vehicle->save();
+        }
+    }
+    foreach ($soitems as $soitem) {
+        $soitem->delete();
+    }
+    $bookingrequest = BookingRequest::where('calls_id', $id)->first();
+    if ($bookingrequest) {
+        $bookingrequest->status = 'Rejected';
+        $bookingrequest->save();
+    }
+    $solog = New Solog();
+    $solog->time = now()->format('H:i:s');
+    $solog->date = now()->format('Y-m-d');
+    $solog->status = 'SO Cancel';
+    $solog->created_by = Auth::id();
+    $solog->so_id = $so->id;
+    $solog->role = Auth::user()->selectedRole;
+    $solog->save();
+    return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
 }
         }
