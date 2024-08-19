@@ -116,6 +116,7 @@ use App\Http\Controllers\BanksController;
 use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
+use App\Http\Controllers\StockMessageController;
 
 /*
 /*
@@ -964,5 +965,10 @@ Route::get('/d', function () {
     Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);
     Route::post('/booking/savedirectly', [BookingController::class, 'storedirect'])->name('booking.savedirectly');
     Route::get('/salesorder/cancel/{id}', [SalesOrderController::class, 'cancel'])->name('salesorder.cancel');
+
+    //Stock Messages
+    Route::get('/stockmessages/{vehicleId}', [StockMessageController::class, 'stockgetMessages'])->name('stockmessages.get');
+    Route::post('/stockmessages', [StockMessageController::class, 'stocksendMessage'])->name('stockmessages.send');
+    Route::post('/stockreplies', [StockMessageController::class, 'stocksendReply'])->name('stockreplies.send');
 });
 

@@ -61,6 +61,106 @@
       border-radius: 50%;
       padding: 0.3rem 0.6rem;
     }
+    .comments-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fixed-height {
+    height: 280px; /* Adjust the height as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.message-card, .message-reply {
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.message-card .card-body, .message-reply {
+    padding: 1rem;
+}
+
+.message-reply {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.reply-input {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.avatar-small {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-left: 5px;
+}
+
+.send-icon {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    border: none;
+    background: none;
+    font-size: 0.1rem;
+    color: #28a745;
+    cursor: pointer;
+}
+
+.send-icongt {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    border: none;
+    background: none;
+    font-size: 0.01rem;
+    color: #28a745;
+    cursor: pointer;
+}
+.message-input-wrapper, .reply-input-wrapper {
+    position: relative;
+}
+
+.message-input-wrapper textarea, .reply-input-wrapper textarea {
+    padding-right: 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
   </style>
 @section('content')
 @if(session('success'))
@@ -73,6 +173,31 @@
      Stock Info
     </h4>
     <br>
+    <!-- Chat Modal -->
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="chatModalLabel">Comments Box</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="comments-header">
+            <h6>Comments & Remarks</h6>
+          </div>
+          <div id="messages" class="fixed-height"></div>
+          <div class="message-input-wrapper mb-3">
+            <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
+            <button id="send-message" class="btn btn-success send-icon">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -241,6 +366,7 @@
                   <th>SO</th>
                   <th>SO Date</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -288,6 +414,7 @@
                   <th>SO</th>
                   <th>SO Date</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -336,6 +463,7 @@
                   <th>Inspection Remarks</th>
                   <th>Aging</th>
                   <th>GRN Report</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -385,6 +513,7 @@
                   <th>Reservation Start</th>
                   <th>Reservation End</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -434,6 +563,7 @@
                   <th>SO Date</th>
                   <th>So Number</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -484,6 +614,7 @@
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>PDI Report</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -534,6 +665,7 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -584,6 +716,7 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -667,7 +800,16 @@
                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' }
+                { data: 'name', name: 'users.name' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             buttons: [
@@ -739,6 +881,15 @@
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'name', name: 'users.name' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -829,7 +980,16 @@
                     return 'Not Available';
                 }
             }
-        }
+        },
+        {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
     ],
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
 });
@@ -910,6 +1070,15 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'reservation_start_date', name: 'reservation_start_date' },
                 { data: 'reservation_end_date', name: 'reservation_end_date' },
                 { data: 'name', name: 'users.name' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -988,7 +1157,16 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' }
+                { data: 'name', name: 'users.name' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -1069,8 +1247,17 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                     return 'Not Available';
                 }
             }
-        }
-            ],
+        },
+            {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
+          ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table6.on('draw', function () {
@@ -1140,6 +1327,15 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
             ],
             columnDefs: [
         {
@@ -1233,7 +1429,16 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' }, 
+                { data: 'gdndate', name: 'gdn.date' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            }, 
             ],
             columnDefs: [
         {
@@ -1512,6 +1717,7 @@ function displayGallery(imageUrls) {
 </script>
 <script>
   function openBookingModal(vehicleId) {
+    console.log(vehicleId);
     $('#vehicle_id').val(vehicleId);
     $('#bookingModal').modal('show');
 }
@@ -1537,6 +1743,161 @@ function displayGallery(imageUrls) {
         }
     });
 });
+</script>
+<script>
+let currentVehicleId = null;
+function openChatModal(vehicleId) {
+    currentVehicleId = vehicleId;  // Store the vehicleId in a global variable
+    $('#chatModal').modal('show');
+    loadMessages(vehicleId);
+}
 
+function loadMessages(vehicleId) {
+  console.log("pouch");
+    $.get(`/stockmessages/${vehicleId}`, function(data) {
+        $('#messages').empty();
+        data.forEach(function(message) {
+            displayMessage(message);
+        });
+        scrollToBottom();
+    });
+}
+
+function scrollToBottom() {
+    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const messageDate = new Date(date);
+    const diff = Math.floor((now - messageDate) / 1000);
+    if (diff < 60) return `${diff} seconds ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    return `${Math.floor(diff / 86400)} days ago`;
+}
+
+function getInitials(name) {
+    return name.charAt(0).toUpperCase();
+}
+
+function getAvatarColor(name) {
+    const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'];
+    const charCode = name.charCodeAt(0);
+    return colors[charCode % colors.length];
+}
+
+function displayMessage(message) {
+    const replies = message.replies || [];
+    const messageTime = formatTimeAgo(message.created_at);
+    const userInitial = getInitials(message.user.name);
+    const userColor = getAvatarColor(message.user.name);
+    const messageHtml = `
+        <div class="card message-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div class="user-info">
+                        <div class="avatar" style="background-color: ${userColor};">${userInitial}</div>
+                        <strong class="user-name">${message.user.name}</strong>
+                    </div>
+                    <small class="text-muted">${messageTime}</small>
+                </div>
+                <p class="mt-2">${message.message}</p>
+                <div id="replies-${message.id}">
+                    ${replies.map(reply => `
+                        <div class="message-reply">
+                            <div class="d-flex justify-content-between">
+                                <div class="user-info">
+                                    <div class="avatar avatar-small" style="background-color: ${getAvatarColor(reply.user.name)};">${getInitials(reply.user.name)}</div>
+                                    <strong class="user-name">${reply.user.name}</strong>
+                                </div>
+                                <small class="text-muted">${formatTimeAgo(reply.created_at)}</small>
+                            </div>
+                            <p class="mt-1">${reply.reply}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <a href="javascript:void(0)" class="reply-link" data-message-id="${message.id}">Reply</a>
+                <div class="reply-input-wrapper input-group mt-2" style="display:none;" id="reply-input-${message.id}">
+                    <textarea class="form-control reply-message" placeholder="Reply..." rows="1"></textarea>
+                    <button class="btn btn-success btn-sm send-reply" data-message-id="${message.id}">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    $('#messages').append(messageHtml);
+}
+let csrfToken = $('meta[name="csrf-token"]').attr('content');
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': csrfToken
+    }
+});
+function sendMessage() {
+    const message = $('#message').val();
+    if (message.trim() !== '') {
+        $.post('/stockmessages', { vehicle_id: currentVehicleId, message: message }, function(data) {
+            displayMessage(data);
+            $('#message').val('');
+            scrollToBottom();
+        });
+    }
+}
+
+function sendReply(messageId) {
+    const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
+    if (reply.trim() !== '') {
+        $.post('/stockreplies', { message_id: messageId, reply: reply }, function(data) {
+            const replyHtml = `
+                <div class="message-reply">
+                    <div class="d-flex justify-content-between">
+                        <div class="user-info">
+                            <div class="avatar avatar-small" style="background-color: ${getAvatarColor(data.user.name)};">${getInitials(data.user.name)}</div>
+                            <strong class="user-name">${data.user.name}</strong>
+                        </div>
+                        <small class="text-muted">${formatTimeAgo(data.created_at)}</small>
+                    </div>
+                    <p class="mt-1">${data.reply}</p>
+                </div>
+            `;
+            $(`#replies-${messageId}`).append(replyHtml);
+            $(`#reply-input-${messageId}`).find('.reply-message').val('');
+            $(`#reply-input-${messageId}`).hide();
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#send-message').on('click', function() {
+        sendMessage();
+    });
+
+    $('#message').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            sendMessage();
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.reply-link', function() {
+        const messageId = $(this).data('message-id');
+        $(`#reply-input-${messageId}`).toggle();
+    });
+
+    $(document).on('keypress', '.reply-message', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            const messageId = $(this).closest('.reply-input-wrapper').attr('id').split('-')[2];
+            sendReply(messageId);
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.send-reply', function() {
+        const messageId = $(this).data('message-id');
+        sendReply(messageId);
+    });
+});
 </script>
 @endsection
