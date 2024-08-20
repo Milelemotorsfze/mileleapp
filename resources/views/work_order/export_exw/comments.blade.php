@@ -886,6 +886,10 @@
             return;
         }
 
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
+        submitButton.prop('disabled', true);
+
         // Create a FormData object to hold the comment data
         const formData = new FormData();
         formData.append('text', commentText.trim() === '' ? '' : commentText); // Store text as null if empty
@@ -898,6 +902,7 @@
                 formData.append('files[]', file);
             } else {
                 alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
                 return;
             }
         }
@@ -914,9 +919,13 @@
             success: function(response) {
                 console.log('Comment added:', response); // Log the response
                 addComment(response);
+                // Re-enable the submit button after successful submission
+                submitButton.prop('disabled', false);
             },
             error: function(error) {
                 console.error('Error adding comment:', error);
+                // Re-enable the submit button in case of an error
+                submitButton.prop('disabled', false);
             }
         });
     }
