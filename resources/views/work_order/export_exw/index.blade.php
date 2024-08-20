@@ -251,8 +251,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))							
-							    <td>{{$data->batch ?? ''}}</td>	
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))															
+							    <td>
+									@if($data->is_batch == 'yes')
+										{{$data->batch ?? ''}}
+									@else 'Single Batch'
+									@elseif
+								</td>	
                             @endif						
 							<td>{{$data->customer_name ?? ''}}</td>
 							<td>{{$data->customer_email ?? ''}}</td>
