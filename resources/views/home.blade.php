@@ -41,64 +41,125 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         @endphp
         @if ($hasPermission)
+        
         <div class="card">
-    <div class="card-body px-0">
-        <div class="table-responsive px-3">
-            <div class="card-header align-items-center">
-                <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">UAE Vehicle Stock</h4>
+        <div class="card-body px-0">
+            <div class="table-responsive px-3">
+                <div class="card-header align-items-center">
+                    <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">UAE Vehicle Stock</h4>
+                </div>
+                <table id="vehicleStockTable" class="table table-striped table-bordered">
+                    <thead class="bg-soft-secondary">
+                        <tr>
+                            <th></th> <!-- For the expandable control -->
+                            <th>Model</th>
+                            <th>SFX</th>
+                            <th>Variant Name</th>
+                            <th>Free Stock</th>
+                            <th>Total Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dpdashboarduae as $variant)
+                            <tr>
+                                <td>
+                                    <a href="#" class="expand-row" data-variant-id="{{ $variant->varaints_id }}">+</a>
+                                </td>
+                                    @php
+                                        $modelsfx = DB::table('master_models')->where('variant_id', $variant->varaints_id)->first();
+                                    @endphp
+                                    <td>{{ $modelsfx->model ?? '' }}</td>
+                                    <td>{{ $modelsfx->sfx ?? '' }}</td>
+                                <td>{{ $variant->variant_name }}</td>
+                                <td>
+                                    @php
+                                        $vehicleCount = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('so_id')
+                                            ->whereNull('gdn_id')
+                                            ->where(function ($query) {
+                                                $query->whereNull('vehicles.reservation_end_date')
+                                                      ->orWhere('vehicles.reservation_end_date', '<', now());
+                                            })
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCount }}
+                                </td>
+                                <td>
+                                    @php
+                                        $vehicleCountfull = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('gdn_id')
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCountfull }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-            <table id="vehicleStockTable" class="table table-striped table-bordered">
-                <thead class="bg-soft-secondary">
-                    <tr>
-                        <th></th> <!-- For the expandable control -->
-                        <th>Variant Name</th>
-                        <th>Free Stock</th>
-                        <th>Total Quaility</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($dpdashboarduae->groupBy('variant_name') as $variantName => $vehicles)
-                    <tr>
-                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
-                        <td>{{ $variantName }}</td>
-                        <td>{{ $vehicles->sum('qty') }}</td>
-                        <td>{{ $vehicles->sum('total_qty') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
         </div>
     </div>
-</div>
 <div class="card">
     <div class="card-body px-0">
         <div class="table-responsive px-3">
             <div class="card-header align-items-center">
                 <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Belgium Vehicle Stock</h4>
             </div>
-            <table id="vehicleStockTableBelgium" class="table table-striped table-bordered">
-                <thead class="bg-soft-secondary">
-                    <tr>
-                        <th></th> <!-- For the expandable control -->
-                        <th>Variant Name</th>
-                        <th>Free Stock</th>
-                        <th>Total Quaility</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($dpdashboardnon->groupBy('variant_name') as $variantName => $vehicles)
-                    <tr>
-                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
-                        <td>{{ $variantName }}</td>
-                        <td>{{ $vehicles->sum('qty') }}</td>
-                        <td>{{ $vehicles->sum('total_qty') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <table id="vehicleStockTablebelgium" class="table table-striped table-bordered">
+                    <thead class="bg-soft-secondary">
+                        <tr>
+                            <th></th> <!-- For the expandable control -->
+                            <th>Model</th>
+                            <th>SFX</th>
+                            <th>Variant Name</th>
+                            <th>Free Stock</th>
+                            <th>Total Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dpdashboardnon as $variant)
+                            <tr>
+                                <td>
+                                    <a href="#" class="expand-row-belgium" data-variant-id="{{ $variant->varaints_id }}">+</a>
+                                </td>
+                                    @php
+                                        $modelsfx = DB::table('master_models')->where('variant_id', $variant->varaints_id)->first();
+                                    @endphp
+                                    <td>{{ $modelsfx->model ?? '' }}</td>
+                                    <td>{{ $modelsfx->sfx ?? '' }}</td>
+                                <td>{{ $variant->variant_name }}</td>
+                                <td>
+                                    @php
+                                        $vehicleCount = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('so_id')
+                                            ->whereNull('gdn_id')
+                                            ->where(function ($query) {
+                                                $query->whereNull('vehicles.reservation_end_date')
+                                                      ->orWhere('vehicles.reservation_end_date', '<', now());
+                                            })
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCount }}
+                                </td>
+                                <td>
+                                    @php
+                                        $vehicleCountfull = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('gdn_id')
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCountfull }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 @endif
 @php
@@ -1476,94 +1537,147 @@ $(function() {
 
         });
     </script>
-    <script>
-    $(document).ready(function() {
-        // Initialize DataTable
-        var table = $('#vehicleStockTable').DataTable();
-
-        // Add event listener for opening and closing details
-        $('#vehicleStockTable tbody').on('click', 'td.details-control', function() {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                $(this).text('+');
-                tr.removeClass('shown');
-            } else {
-                // Open this row
-                var vehicles = $(this).data('vehicles');
-                var detailsHtml = generateDetailsHtml(vehicles);
-
-                row.child(detailsHtml).show();
-                $(this).text('-');
-                tr.addClass('shown');
-            }
-        });
-
-        // Function to generate HTML for the expandable row
-        function generateDetailsHtml(vehicles) {
-            var html = '<table class="table table-sm">';
-            html += '<thead><tr><th>Int Colour</th><th>Ext Colour</th><th>Qty</th></tr></thead>';
-            html += '<tbody>';
-            
-            vehicles.forEach(function(vehicle) {
-                html += '<tr>';
-                html += '<td>' + vehicle.int_colour + '</td>';
-                html += '<td>' + vehicle.ext_colour + '</td>';
-                html += '<td>' + vehicle.qty + '</td>';
-                html += '</tr>';
-            });
-
-            html += '</tbody></table>';
-            return html;
-        }
-    });
-</script>
+    <!-- Add JavaScript to handle row expansion -->
 <script>
-    $(document).ready(function() {
-        // Initialize DataTable
-        var table = $('#vehicleStockTableBelgium').DataTable();
+$(document).ready(function() {
+    // Initialize DataTables
+    var table = $('#vehicleStockTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "order": [],
+        "columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ]
+    });
 
-        // Add event listener for opening and closing details
-        $('#vehicleStockTableBelgium tbody').on('click', 'td.details-control', function() {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
+    // Handle row expansion
+    $('#vehicleStockTable tbody').on('click', 'a.expand-row', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var variantId = $(this).data('variantId');
 
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                $(this).text('+');
-                tr.removeClass('shown');
-            } else {
-                // Open this row
-                var vehicles = $(this).data('vehicles');
-                var detailsHtml = generateDetailsHtml(vehicles);
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+            $(this).text('+');
+        } else {
+            // Open this row - create a detail row
+            var detailHtml = getDetailRowHtml(variantId);
+            row.child(detailHtml).show();
+            tr.addClass('shown');
+            $(this).text('-');
+        }
+    });
 
-                row.child(detailsHtml).show();
-                $(this).text('-');
-                tr.addClass('shown');
+    // Function to get the HTML for the detail row
+    function getDetailRowHtml(variantId) {
+        var detailHtml = '<table class="table table-bordered">' +
+                            '<thead class="bg-light">' +
+                                '<tr>' +
+                                    '<th>Interior Colour</th>' +
+                                    '<th>Exterior Colour</th>' +
+                                    '<th>Free Stock</th>' +
+                                    '<th>Total Stock</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>';
+
+        // Fetch data via an AJAX call or using existing data
+        $.ajax({
+            url: '/vehicle-details-dp',  // Route defined in web.php
+            method: 'GET',
+            data: { variant_id: variantId },
+            async: false, // For simplicity, keep this synchronous
+            success: function(data) {
+                data.details.forEach(function(detail) {
+                    detailHtml += '<tr>' +
+                                    '<td>' + detail.intColourName + '</td>' +
+                                    '<td>' + detail.exColourName + '</td>' +
+                                    '<td>' + detail.freeStock + '</td>' +
+                                    '<td>' + detail.totalStock + '</td>' +
+                                  '</tr>';
+                });
             }
         });
 
-        // Function to generate HTML for the expandable row
-        function generateDetailsHtml(vehicles) {
-            var html = '<table class="table table-sm">';
-            html += '<thead><tr><th>Int Colour</th><th>Ext Colour</th><th>Qty</th></tr></thead>';
-            html += '<tbody>';
-            
-            vehicles.forEach(function(vehicle) {
-                html += '<tr>';
-                html += '<td>' + vehicle.int_colour + '</td>';
-                html += '<td>' + vehicle.ext_colour + '</td>';
-                html += '<td>' + vehicle.qty + '</td>';
-                html += '</tr>';
-            });
+        detailHtml += '</tbody></table>';
 
-            html += '</tbody></table>';
-            return html;
+        return detailHtml;
+    }
+});
+    </script>
+    <script>
+$(document).ready(function() {
+    // Initialize DataTables
+    var table = $('#vehicleStockTablebelgium').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "order": [],
+        "columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ]
+    });
+
+    // Handle row expansion
+    $('#vehicleStockTablebelgium tbody').on('click', 'a.expand-row-belgium', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var variantId = $(this).data('variantId');
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+            $(this).text('+');
+        } else {
+            // Open this row - create a detail row
+            var detailHtmlbelgium = getDetailRowHtml(variantId);
+            row.child(detailHtmlbelgium).show();
+            tr.addClass('shown');
+            $(this).text('-');
         }
     });
-</script>
+
+    // Function to get the HTML for the detail row
+    function getDetailRowHtml(variantId) {
+        var detailHtmlbelgium = '<table class="table table-bordered">' +
+                            '<thead class="bg-light">' +
+                                '<tr>' +
+                                    '<th>Interior Colour</th>' +
+                                    '<th>Exterior Colour</th>' +
+                                    '<th>Free Stock</th>' +
+                                    '<th>Total Stock</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>';
+
+        // Fetch data via an AJAX call or using existing data
+        $.ajax({
+            url: '/vehicle-details-dpbelgium',  // Route defined in web.php
+            method: 'GET',
+            data: { variant_id: variantId },
+            async: false, // For simplicity, keep this synchronous
+            success: function(data) {
+                data.details.forEach(function(detailbelgium) {
+                    detailHtmlbelgium += '<tr>' +
+                                    '<td>' + detailbelgium.intColourName + '</td>' +
+                                    '<td>' + detailbelgium.exColourName + '</td>' +
+                                    '<td>' + detailbelgium.freeStock + '</td>' +
+                                    '<td>' + detailbelgium.totalStock + '</td>' +
+                                  '</tr>';
+                });
+            }
+        });
+
+        detailHtmlbelgium += '</tbody></table>';
+
+        return detailHtmlbelgium;
+    }
+});
+    </script>
 @endpush
