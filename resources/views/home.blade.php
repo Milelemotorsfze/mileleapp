@@ -57,32 +57,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                @php
-            $totalFreeStock = 0;
-            $totalQuantity = 0;
-        @endphp
                     @foreach($dpdashboarduae->groupBy('variant_name') as $variantName => $vehicles)
-                    @php
-            $variantFreeStock = $vehicles->sum('qty');
-            $variantTotalQty = $vehicles->sum('total_qty');
-            $totalFreeStock += $variantFreeStock;
-            $totalQuantity += $variantTotalQty;
-        @endphp
-        <tr>
-            <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
-            <td>{{ $variantName }}</td>
-            <td>{{ $variantFreeStock }}</td> <!-- Display Free Stock -->
-            <td>{{ $variantTotalQty }}</td> <!-- Display Total Qty -->
-        </tr>
+                    <tr>
+                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
+                        <td>{{ $variantName }}</td>
+                        <td>{{ $vehicles->sum('qty') }}</td>
+                        <td>{{ $vehicles->sum('total_qty') }}</td>
+                    </tr>
                     @endforeach
                 </tbody>
-                <tfoot>
-        <tr>
-            <th colspan="2">Total</th>
-            <th>{{ $totalFreeStock }}</th>
-            <th>{{ $totalQuantity }}</th>
-        </tr>
-    </tfoot>
             </table>
         </div>
     </div>
@@ -103,32 +86,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                @php
-            $totalFreeStock = 0;
-            $totalQuantity = 0;
-        @endphp
                     @foreach($dpdashboardnon->groupBy('variant_name') as $variantName => $vehicles)
-                    @php
-            $variantFreeStock = $vehicles->sum('qty');
-            $variantTotalQty = $vehicles->sum('total_qty');
-            $totalFreeStock += $variantFreeStock;
-            $totalQuantity += $variantTotalQty;
-        @endphp
-        <tr>
-            <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
-            <td>{{ $variantName }}</td>
-            <td>{{ $variantFreeStock }}</td> <!-- Display Free Stock -->
-            <td>{{ $variantTotalQty }}</td> <!-- Display Total Qty -->
-        </tr>
+                    <tr>
+                        <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
+                        <td>{{ $variantName }}</td>
+                        <td>{{ $vehicles->sum('qty') }}</td>
+                        <td>{{ $vehicles->sum('total_qty') }}</td>
+                    </tr>
                     @endforeach
                 </tbody>
-                <tfoot>
-        <tr>
-            <th colspan="2">Total</th>
-            <th>{{ $totalFreeStock }}</th>
-            <th>{{ $totalQuantity }}</th>
-        </tr>
-    </tfoot>
             </table>
         </div>
     </div>
