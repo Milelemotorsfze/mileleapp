@@ -543,14 +543,33 @@ class WorkOrderController extends Controller
                     // Save files associated with the comment
                     if (isset($comment['files']) && is_array($comment['files'])) { 
                         foreach ($comment['files'] as $file) {
+                            // Check if the filename exceeds 50 characters
+                            $originalFileName = $file['name'];
+                            if (strlen($originalFileName) > 50) {
+                                // Extract file extension
+                                $extension = pathinfo($originalFileName, PATHINFO_EXTENSION);
+
+                                // Truncate the filename and append a unique identifier
+                                $baseName = pathinfo($originalFileName, PATHINFO_FILENAME);
+                                $truncatedName = substr($baseName, 0, 30); // Truncate to 30 characters
+
+                                // Append a unique identifier
+                                $uniqueIdentifier = uniqid(); // You can use time() or any other unique string generator
+                                $newFileName = $truncatedName . '_' . $uniqueIdentifier . '.' . $extension;
+                            } else {
+                                // Use the original filename if it's within the length limit
+                                $newFileName = $originalFileName;
+                            }
+
+                            // Save the file data (image or PDF) to the database
                             CommentFile::create([
                                 'comment_id' => $newCommentId,
-                                'file_name' => $file['name'],
-                                'file_data' => $file['src'],
+                                'file_name' => $newFileName,
+                                'file_data' => $file['src'], // This stores the base64 data
                             ]);
                         }
                     }
-                }  
+                }
             }
             if(isset($request->deposit_received_as) && $request->deposit_received_as != '') {
                 $canCreateFinanceApproval = true;

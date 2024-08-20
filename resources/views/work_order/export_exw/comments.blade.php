@@ -77,14 +77,23 @@
 </div>
 <script>
     var workOrder = {!! json_encode($workOrder) !!};
+    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; // Define at the global level
+
     document.getElementById('comment-files').addEventListener('change', function() {
         previewFiles(this.files, 'file-previews');
     });
+
     function previewFiles(files, previewContainerId, commentId) {
         const previewContainer = document.getElementById(previewContainerId);
         previewContainer.innerHTML = ''; // Clear previous previews
 
         for (const file of files) {
+            // Check if the file type is allowed
+            if (!allowedFileTypes.includes(file.type)) {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                continue; // Skip this file
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.createElement('div');
@@ -96,11 +105,17 @@
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     `;
-                } else {
-                    preview.innerHTML = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
+                } else if (file.type === 'application/pdf') {
+                    preview.innerHTML = `
+                        <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    `;
                 }
 
                 previewContainer.appendChild(preview);
@@ -168,7 +183,17 @@
                         <img src="${file.file_data}" alt="${file.file_name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${file.file_data}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                `;
+            } else if (file.file_data.startsWith('data:application/pdf')) {
+                return `
+                    <div class="file-preview m-1" data-comment-id="${id}">
+                        <embed src="${file.file_data}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${file.file_data}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 `;
@@ -824,6 +849,18 @@
         });
     }
 
+    function viewPDF(src) {
+        const newWindow = window.open();
+        newWindow.document.write(`<embed src="${src}" type="application/pdf" style="width: 100%; height: 100%;">`);
+    }
+    function downloadFile(src, filename) {
+        const link = document.createElement('a');
+        link.href = src;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     function toggleReadMore(id) {
         const comment = $(`#comment-${id}`);
         const readMoreLink = comment.find('.read-more');
@@ -840,7 +877,6 @@
     }
 
     function addCommentFromInput(parentId = null) {
-        // Get the comment text and file inputs
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
         const filesInput = parentId ? $(`#reply-files-${parentId}`)[0].files : $('#comment-files')[0].files;
 
@@ -857,9 +893,15 @@
         formData.append('work_order_id', workOrder.id);
 
         // Append files to the FormData object
-        Array.from(filesInput).forEach(file => {
-            formData.append('files[]', file);
-        });
+        for (const file of filesInput) {
+            if (allowedFileTypes.includes(file.type)) { // Use the globally defined allowedFileTypes
+                formData.append('files[]', file);
+            } else {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                return;
+            }
+        }
+
         $.ajax({
             url: '/comments', // Laravel route to handle comment storage
             type: 'POST',
@@ -878,7 +920,6 @@
             }
         });
     }
-
     function showReplyForm(commentId) {
         $(`#reply-form-${commentId}`).toggle();
          // Add event listener for reply file input
