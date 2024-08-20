@@ -138,6 +138,10 @@
 
         if (commentText.trim() === '' && commentFiles.length === 0) return;
 
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
+        submitButton.prop('disabled', true);
+
         const currentDateTime = new Date();
         const formattedDateTime = formatDateTime(currentDateTime);
 
@@ -226,6 +230,13 @@
             }
 
             commentIdCounter++;
+
+            // Re-enable the submit button after operation is complete
+            submitButton.prop('disabled', false);
+        }).catch(error => {
+            console.error('Error processing files:', error);
+            // Re-enable the submit button in case of an error
+            submitButton.prop('disabled', false);
         });
     }
     function showReplyForm(commentId) {
