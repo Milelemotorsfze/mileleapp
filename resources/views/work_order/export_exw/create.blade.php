@@ -3302,7 +3302,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
     // Check if the sale type is 'local_sale'
     if (type === 'local_sale') {
         // Construct the WO Number without batch information
-        WONumber = "WO-" + numberPart + "-LD";
+        WONumber = "WO-" + numberPart + "-LS";
     } else {
         if (isBatchChecked) {
             // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
@@ -3319,7 +3319,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
         } else {
             // Construct the WO Number with "-SB" when the batch is not checked
-            WONumber = "WO-" + numberPart + "-SD";
+            WONumber = "WO-" + numberPart + "-SW";
         }
     }
     
