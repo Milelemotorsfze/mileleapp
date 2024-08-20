@@ -249,10 +249,7 @@ $totalvariantss = [
             ->join('purchasing_order', 'purchasing_order_items.purchasing_order_id', '=', 'purchasing_order.id')
             ->whereNull('vehicles.gdn_id')
             ->where('brands.brand_name', 'Toyota')
-            ->where(function($query) {
-                $query->where('vehicles.latest_location', '!=', 38)
-                      ->orWhereNull('vehicles.latest_location');
-            })
+            ->where('vehicles.latest_location', '!=', 38)
             ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
             ->select(
                 'varaints.name as variant_name', 
@@ -272,10 +269,7 @@ $totalvariantss = [
             ->join('purchasing_order', 'purchasing_order_items.purchasing_order_id', '=', 'purchasing_order.id')
             ->whereNull('vehicles.gdn_id')
             ->where('brands.brand_name', 'Toyota')
-            ->where(function($query) {
-                $query->where('vehicles.latest_location', '=', 38)
-                      ->orWhereNull('vehicles.latest_location');
-            })
+            ->where('vehicles.latest_location', '=', 38)
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select(
                 'varaints.name as variant_name', 
