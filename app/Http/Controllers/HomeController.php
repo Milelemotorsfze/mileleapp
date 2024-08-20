@@ -245,43 +245,41 @@ $totalvariantss = [
             ->join('brands', 'varaints.brands_id', '=', 'brands.id')
             ->join('color_codes as int_colours', 'vehicles.int_colour', '=', 'int_colours.id')
             ->join('color_codes as ext_colours', 'vehicles.ex_colour', '=', 'ext_colours.id')
+            ->join('purchasing_order_items', 'varaints.id', '=', 'purchasing_order_items.variant_id')
+            ->join('purchasing_order', 'purchasing_order_items.purchasing_order_id', '=', 'purchasing_order.id')
             ->whereNull('vehicles.gdn_id')
-            ->whereNull('vehicles.so_id')
-            ->where(function ($query) {
-                $query->whereNull('vehicles.reservation_end_date')
-                      ->orWhere('vehicles.reservation_end_date', '<', now());
-            })
             ->where('brands.brand_name', 'Toyota')
             ->where('vehicles.latest_location', '!=', 38)
+            ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
             ->select(
                 'varaints.name as variant_name', 
-                DB::raw('count(vehicles.id) as qty'),
+                DB::raw('sum(case when vehicles.so_id is null and (vehicles.reservation_end_date is null or vehicles.reservation_end_date < now()) then 1 else 0 end) as qty'),
+                DB::raw('count(vehicles.id) as total_qty'),
                 'int_colours.name as int_colour',
                 'ext_colours.name as ext_colour'
             )
             ->groupBy('vehicles.varaints_id', 'varaints.name', 'int_colours.name', 'ext_colours.name')
-            ->get();
+            ->get(); 
             $dpdashboardnon = DB::table('vehicles')
             ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->join('brands', 'varaints.brands_id', '=', 'brands.id')
             ->join('color_codes as int_colours', 'vehicles.int_colour', '=', 'int_colours.id')
             ->join('color_codes as ext_colours', 'vehicles.ex_colour', '=', 'ext_colours.id')
+            ->join('purchasing_order_items', 'varaints.id', '=', 'purchasing_order_items.variant_id')
+            ->join('purchasing_order', 'purchasing_order_items.purchasing_order_id', '=', 'purchasing_order.id')
             ->whereNull('vehicles.gdn_id')
-            ->whereNull('vehicles.so_id')
-            ->where(function ($query) {
-                $query->whereNull('vehicles.reservation_end_date')
-                      ->orWhere('vehicles.reservation_end_date', '<', now());
-            })
             ->where('brands.brand_name', 'Toyota')
             ->where('vehicles.latest_location', '=', 38)
+            ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
             ->select(
                 'varaints.name as variant_name', 
-                DB::raw('count(vehicles.id) as qty'),
+                DB::raw('sum(case when vehicles.so_id is null and (vehicles.reservation_end_date is null or vehicles.reservation_end_date < now()) then 1 else 0 end) as qty'),
+                DB::raw('count(vehicles.id) as total_qty'),
                 'int_colours.name as int_colour',
                 'ext_colours.name as ext_colour'
             )
             ->groupBy('vehicles.varaints_id', 'varaints.name', 'int_colours.name', 'ext_colours.name')
-            ->get();
+            ->get();        
             return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
