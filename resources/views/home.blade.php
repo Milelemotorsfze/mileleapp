@@ -52,7 +52,8 @@
                     <tr>
                         <th></th> <!-- For the expandable control -->
                         <th>Variant Name</th>
-                        <th>Quantity</th>
+                        <th>Free Stock</th>
+                        <th>Total Quaility</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +62,7 @@
                         <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
                         <td>{{ $variantName }}</td>
                         <td>{{ $vehicles->sum('qty') }}</td>
+                        <td>{{ $vehicles->sum('total_qty') }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -79,7 +81,8 @@
                     <tr>
                         <th></th> <!-- For the expandable control -->
                         <th>Variant Name</th>
-                        <th>Quantity</th>
+                        <th>Free Stock</th>
+                        <th>Total Quaility</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,6 +91,7 @@
                         <td class="details-control" data-vehicles='@json($vehicles)'>+</td>
                         <td>{{ $variantName }}</td>
                         <td>{{ $vehicles->sum('qty') }}</td>
+                        <td>{{ $vehicles->sum('total_qty') }}</td>
                     </tr>
                     @endforeach
                 </tbody>
