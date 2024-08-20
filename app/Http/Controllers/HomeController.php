@@ -250,7 +250,7 @@ $totalvariantss = [
             ->whereNull('vehicles.gdn_id')
             ->where('brands.brand_name', 'Toyota')
             ->where('vehicles.latest_location', '!=', 38)
-            ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
+            ->where('purchasing_order.is_demand_planning_po', true)
             ->select(
                 'varaints.name as variant_name', 
                 DB::raw('sum(case when vehicles.so_id is null and (vehicles.reservation_end_date is null or vehicles.reservation_end_date < now()) then 1 else 0 end) as qty'),
