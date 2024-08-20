@@ -977,5 +977,7 @@ Route::get('/d', function () {
     Route::get('/stockmessages/{vehicleId}', [StockMessageController::class, 'stockgetMessages'])->name('stockmessages.get');
     Route::post('/stockmessages', [StockMessageController::class, 'stocksendMessage'])->name('stockmessages.send');
     Route::post('/stockreplies', [StockMessageController::class, 'stocksendReply'])->name('stockreplies.send');
+    Route::get('/vehicle-details-dp', [StockMessageController::class, 'getVehicleDetailsdp'])->name('vehicle.detailsdp');
+    Route::get('/vehicle-details-dpbelgium', [StockMessageController::class, 'getVehicleDetailsdpbelgium'])->name('vehicle.detailsdpbelgium');
 });
 

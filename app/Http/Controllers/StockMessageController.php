@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use  App\Models\StockMessage;
+use Illuminate\Support\Facades\DB;
 use  App\Models\StockReply;
 use Illuminate\Http\Request;
 
@@ -105,4 +106,63 @@ class StockMessageController extends Controller
 
         return response()->json($reply->load('user'));
     }
+    public function getVehicleDetailsdp(Request $request)
+    {
+        $variantId = $request->input('variant_id');
+
+        // Fetch details from the database
+        $details = DB::table('vehicles')
+            ->select('int_colour', 'ex_colour', DB::raw('SUM(CASE WHEN so_id IS NULL THEN 1 ELSE 0 END) as free_stock'), DB::raw('COUNT(*) as total_stock'))
+            ->where('varaints_id', $variantId)
+            ->whereNull('gdn_id')
+            ->groupBy('int_colour', 'ex_colour')
+            ->get();
+
+        // Prepare the data to send back
+        $data = [];
+        foreach ($details as $detail) {
+            $intColourName = DB::table('color_codes')->where('id', $detail->int_colour)->value('name');
+            $exColourName = DB::table('color_codes')->where('id', $detail->ex_colour)->value('name');
+
+            $data[] = [
+                'intColourName' => $intColourName,
+                'exColourName' => $exColourName,
+                'freeStock' => $detail->free_stock,
+                'totalStock' => $detail->total_stock,
+            ];
+        }
+
+        // Return the data as JSON
+        return response()->json(['details' => $data]);
+    }
+    public function getVehicleDetailsdpbelgium(Request $request)
+    {
+        $variantId = $request->input('variant_id');
+
+        // Fetch details from the database
+        $details = DB::table('vehicles')
+            ->select('int_colour', 'ex_colour', DB::raw('SUM(CASE WHEN so_id IS NULL THEN 1 ELSE 0 END) as free_stock'), DB::raw('COUNT(*) as total_stock'))
+            ->where('varaints_id', $variantId)
+            ->whereNull('gdn_id')
+            ->groupBy('int_colour', 'ex_colour')
+            ->get();
+
+        // Prepare the data to send back
+        $data = [];
+        foreach ($details as $detail) {
+            $intColourName = DB::table('color_codes')->where('id', $detail->int_colour)->value('name');
+            $exColourName = DB::table('color_codes')->where('id', $detail->ex_colour)->value('name');
+
+            $data[] = [
+                'intColourName' => $intColourName,
+                'exColourName' => $exColourName,
+                'freeStock' => $detail->free_stock,
+                'totalStock' => $detail->total_stock,
+            ];
+        }
+
+        // Return the data as JSON
+        return response()->json(['details' => $data]);
+    }
+    
 }
