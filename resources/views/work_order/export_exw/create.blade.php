@@ -2065,10 +2065,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							const parentId = comment.getAttribute('data-parent-id');
 							const dateTime = comment.getAttribute('data-date-time');
 							const textElement = comment.querySelector('.comment-text');
-							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img`);
+							
+							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img, .file-preview[data-comment-id="${commentId}"] embed`);
+							
 							const files = Array.from(fileElements).map(file => ({
 								src: file.src,
-								name: file.alt
+								name: file.alt || file.getAttribute('src').split('/').pop() // Use file name for images and PDFs
 							}));
 
 							if (textElement) {

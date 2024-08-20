@@ -168,7 +168,17 @@
                         <img src="${file.file_data}" alt="${file.file_name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${file.file_data}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                `;
+            } else if (file.file_data.startsWith('data:application/pdf')) {
+                return `
+                    <div class="file-preview m-1" data-comment-id="${id}">
+                        <embed src="${file.file_data}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${file.file_data}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 `;
@@ -824,6 +834,18 @@
         });
     }
 
+    function viewPDF(src) {
+        const newWindow = window.open();
+        newWindow.document.write(`<embed src="${src}" type="application/pdf" style="width: 100%; height: 100%;">`);
+    }
+    function downloadFile(src, filename) {
+        const link = document.createElement('a');
+        link.href = src;
+        link.download = filename;  // Set the download attribute with the filename
+        document.body.appendChild(link);  // Append the link to the body
+        link.click();  // Programmatically click the link to trigger the download
+        document.body.removeChild(link);  // Remove the link from the document
+    }
     function toggleReadMore(id) {
         const comment = $(`#comment-${id}`);
         const readMoreLink = comment.find('.read-more');
