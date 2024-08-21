@@ -2226,73 +2226,7 @@
         <div></div> <!-- Empty div to take up space on the left -->
         <a href="#" class="btn btn-sm btn-success adddnnumberbutton-btn" data-id="{{ $purchasingOrder->id }}" data-bs-toggle="modal" data-bs-target="#addDNModalUnique">Add New DN Numbers</a>
     </div>
-    <div class="table-responsive mt-4">
-        <table id="dtBasicExample8" class="table table-striped table-editable table-edits table-bordered">
-            <thead class="bg-soft-secondary">
-                <tr>  
-                    <th>Ref No</th>
-                    <th>Brand</th>
-                    <th>Model Line</th>
-                    <th>Variant</th>
-                    <th>Variants Detail</th>
-                    <th>Exterior Colour</th>
-                    <th>Interior Colour</th>
-                    <th>VIN Number</th>
-                    <th>Territory</th>
-                    <th>Estimated Arrival</th>
-                    <th>Remarks</th>
-                    <th>DN Number</th>
-                </tr>
-            </thead>
-            <tbody>
-                            @foreach($vehiclesdel as $vehiclesdel)
-                                <tr>
-                                <td>{{ $vehiclesdel->id }}</td>
-                                @can('view-vehicle-model-sfx')
-                                @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
-                                @endphp
-                                @if ($hasPermission)
-                                    <td>
-                                        @if($vehiclesdel->model_id)
-                                            {{ $vehiclesdel->masterModel->model ?? ''  }} - {{ $vehiclesdel->masterModel->sfx ?? '' }}
-                                        @endif
-                                    </td>
-                                @endif
-                            @endcan
-                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->brand->brand_name)) }}</td>
-                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->master_model_lines->model_line)) }}</td>
-                            <td>{{ ucfirst($vehiclesdel->variant->name) }}</td>
-                        @php
-                        $words = explode(' ', ucfirst(strtolower($vehiclesdel->variant->detail)));
-                        $shortDetail = implode(' ', array_slice($words, 0, 3));
-                        $remainingDetail = implode(' ', array_slice($words, 3));
-                        @endphp
-                        <td>
-                            <span class="short-detail">{{ $shortDetail }}</span>
-                            @if(count($words) > 5)
-                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
-                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
-                            @endif
-                        </td>
-                        @if (!is_null($vehiclesdel->VehiclePurchasingCost->unit_price) && !is_numeric($vehiclesdel->VehiclePurchasingCost->unit_price))
-                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
-                        @else
-                        <td>{{ $vehiclesdel->VehiclePurchasingCost->unit_price }}</td>
-                        @endif
-                          <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
-                          <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
-                          <td>{{ $vehiclesdel->ppmmyyy ? \Carbon\Carbon::parse($vehiclesdel->ppmmyyy)->format('d-M-Y') : '' }}</td>
-                          <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
-                         <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
-                                </tr>
-                                @endforeach
-                    </tbody>
-                    </table>
-                    </div>
+    
             </div>
         </div>
     </div>
