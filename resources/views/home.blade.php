@@ -77,6 +77,7 @@
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
                                             ->whereNull('gdn_id')
+                                            ->where('vehicles.status', 'Approved')
                                             ->where(function ($query) {
                                                 $query->whereNull('vehicles.reservation_end_date')
                                                       ->orWhere('vehicles.reservation_end_date', '<', now());
@@ -89,6 +90,7 @@
                                     @php
                                         $vehicleCountfull = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
+                                            ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->count();
                                     @endphp
@@ -135,6 +137,7 @@
                                         $vehicleCount = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
+                                            ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->where(function ($query) {
                                                 $query->whereNull('vehicles.reservation_end_date')
@@ -148,6 +151,7 @@
                                     @php
                                         $vehicleCountfull = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
+                                            ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->count();
                                     @endphp
