@@ -411,8 +411,16 @@ $existingspecifications = Varaint::with('VariantItems')
         {
             $f = "EV";
         }
-    $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $gearbox . ' ' . $fuel_type;
-    }
+        if($gearbox == "Auto")
+        {
+            $gearbox = "AT";
+        }
+        if($gearbox == "Manual")
+        {
+            $gearbox = "MT";
+        }
+        $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+        }
     $variant_details= $request->input('variant');
     if($variant_details == null)
     {

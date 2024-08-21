@@ -1300,6 +1300,16 @@
                                         </div>
                                         @endif
                                         @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-bank-accounts');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vehiclenetsuitecost.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Netsuite Vehicle Price</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('shipping-master');
                                         @endphp
                                         @if ($hasPermission)
