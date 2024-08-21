@@ -1368,6 +1368,7 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
+                        $canDeleteComment = true;
                     }
                     // ADDON END..............................
                 } else {
@@ -1474,6 +1475,7 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
+                        $canDeleteComment = true;
                     }
                 }
             }
