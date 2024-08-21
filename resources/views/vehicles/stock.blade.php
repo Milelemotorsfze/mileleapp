@@ -843,7 +843,6 @@
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
-                { data: 'fd', name: 'countries.name' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
