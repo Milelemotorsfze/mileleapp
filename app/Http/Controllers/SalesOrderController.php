@@ -239,6 +239,14 @@ class SalesOrderController extends Controller
                 //         $preOrderItem->save();
                 //     }  
                 // }
+                $solog = New Solog();
+                $solog->time = now()->format('H:i:s');
+                $solog->date = now()->format('Y-m-d');
+                $solog->status = 'SO Created';
+                $solog->created_by = Auth::id();
+                $solog->so_id = $so->id;
+                $solog->role = Auth::user()->selectedRole;
+                $solog->save();
                 return redirect()->route('dailyleads.index')->with('success', 'Sales Order created successfully.'); 
             } 
         public function updatesalesorder ($id) 
@@ -295,7 +303,6 @@ class SalesOrderController extends Controller
     // Validate and retrieve the Sales Order ID
     $so_id = $request->input('so_id');
     $so = So::findOrFail($so_id);
-
     // Update the Sales Order fields
     $so->so_number = $request->input('so_number');
     $so->so_date = $request->input('so_date');
@@ -308,7 +315,7 @@ class SalesOrderController extends Controller
 
     // Delete existing Soitems records related to the Sales Order ID
     Soitems::where('so_id', $so->id)->delete();
-
+    Vehicles::where('so_id', $so->id)->update(['so_id' => null]);
     // Process the selected VINs
     $vins = $request->input('vehicle_vin');
     $selectedVinsWithNull = [];
@@ -384,6 +391,14 @@ class SalesOrderController extends Controller
             }
         }
     }
+    $solog = New Solog();
+    $solog->time = now()->format('H:i:s');
+    $solog->date = now()->format('Y-m-d');
+    $solog->status = 'SO Updated';
+    $solog->created_by = Auth::id();
+    $solog->so_id = $so->id;
+    $solog->role = Auth::user()->selectedRole;
+    $solog->save();
     return redirect()->route('dailyleads.index')->with('success', 'Sales Order updated successfully.');
 }
 public function cancel($id)
