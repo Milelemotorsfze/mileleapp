@@ -123,15 +123,16 @@ class SalesOrderController extends Controller
                 }
                     }
                     }
-                    $saleperson = User::find($calls->sales_person);
-                    $empProfile = EmployeeProfile::where('user_id', $calls->sales_person)->first();
+                    $saleperson = User::find($quotation->created_by);
+                    $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first();
                     return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails', 'empProfile', 'saleperson')); 
             }  
             public function storesalesorder(Request $request, $quotationId)
             {
+                $qoutation = Quotation::find($quotationId);
                 $so = New So();
                 $so->quotation_id = $quotationId;
-                $so->sales_person_id = Auth::id();
+                $so->sales_person_id = $qoutation->created_by;
                 $so->so_number = $request->input('so_number');
                 $so->so_date = $request->input('so_date');
                 $so->notes = $request->input('notes');
@@ -140,7 +141,6 @@ class SalesOrderController extends Controller
                 $so->paidinso = $request->input('payment_so');
                 $so->paidinperforma = $request->input('advance_payment_performa');
                 $so->save();
-                $qoutation = Quotation::find($quotationId);
                 $calls = Calls::find($qoutation->calls_id);
                 $calls->status = "Closed";
                 $calls->save();
@@ -148,7 +148,7 @@ class SalesOrderController extends Controller
                 $closed->date = $request->input('so_date');
                 $closed->sales_notes = $request->input('notes');
                 $closed->call_id = $calls->id;
-                $closed->created_by = Auth::id();
+                $closed->created_by = $qoutation->created_by;
                 $closed->dealvalues = $request->input('total_payment');
                 $closed->currency = $qoutation->currency;
                 $closed->so_id = $so->id;
@@ -286,8 +286,8 @@ class SalesOrderController extends Controller
                     }
                         }
                         } 
-                        $saleperson = User::find($calls->sales_person);
-                        $empProfile = EmployeeProfile::where('user_id', $calls->sales_person)->first(); 
+                        $saleperson = User::find($quotation->created_by);
+                        $empProfile = EmployeeProfile::where('user_id', $quotation->created_by)->first(); 
                         return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems', 'empProfile', 'saleperson'));  
         }
         public function storesalesorderupdate(Request $request, $quotationId)
