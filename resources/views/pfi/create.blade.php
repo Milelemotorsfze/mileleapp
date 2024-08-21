@@ -169,7 +169,7 @@
                                                         </select>
                                                     
                                                     </div>
-                                                    <div class="col-lg-1 col-md-6">
+                                                    <div class="col-lg-2 col-md-6">
                                                         <label class="form-label"> LOI Code</label>
                                                         <select class="form-control text-dark widthinput loi-items mb-2" required multiple
                                                         name="PfiItem[1][loi_item][0]" index="1" item="0" id="loi-item-1-item-0" 
@@ -179,9 +179,8 @@
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
                                                         <label class="form-label ">PFI QTY</label>
-                                                        <input type="number" min="0" max="" 
-                                                        oninput=calculateTotalAmount(1) placeholder="0" required name="PfiItem[1][pfi_quantity][0]"
-                                                            class="form-control mb-2 widthinput pfi-quantities" value="0" placeholder="0"
+                                                        <input type="number" min="1" oninput=calculateTotalAmount(1) required name="PfiItem[1][pfi_quantity][0]"
+                                                            class="form-control mb-2 widthinput pfi-quantities" min="1" placeholder="0"
                                                             index="1" item="0" id="pfi-quantity-1-item-0">
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
@@ -202,11 +201,11 @@
                                                         placeholder="Total Amount" id="total-amount-1-item-0" index="1" item="0">
                                                         <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1-item-0">
                                                     </div>
-                                                    <div class="col-lg-2 col-md-6 col-sm-12" style="margin-top: 30px;">
+                                                    <div class="col-lg-1 col-md-6 col-sm-12" style="margin-top: 30px;">
                                                         <a class="btn btn-primary btn-sm add-more" index="1" item="0"
-                                                        title="Add Child PFI Items"> <i class="fas fa-plus"> Add More </i> 
+                                                        title="Add Child PFI Items"> <i class="fas fa-plus"> </i> 
                                                             </a>
-                                                        <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-1" data-index="1"> 
+                                                        <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-1" index="1"> 
                                                             <i class="fas fa-trash-alt"></i> </a>
                                                     </div>
                                                 </div>
@@ -448,6 +447,23 @@
         //     }
         // });
 
+        ///// start new code ////
+      
+        $(document.body).on('select2:select', "#client_id", function (e) {
+            $('#client_id-error').remove();
+
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    getLOIItemCode(i,j);
+                }
+            }
+
+        });
 
         $(document.body).on('select2:select', ".models", function (e) {
             let index = $(this).attr('index');
@@ -483,7 +499,8 @@
            
         });
         $(document.body).on('select2:unselect', ".sfx", function (e) {
-
+            let index = $(this).attr('index');
+            let childIndex = $(this).attr('item');
             $('#master-model-id-'+index+'-item-'+childIndex).val("");
            
         });
@@ -515,15 +532,15 @@
                             </div>
                             @enderror
                             </div>
-                            <div class="col-lg-1 col-md-6">
+                            <div class="col-lg-2 col-md-6">
                                 <select class="form-control text-dark widthinput loi-items mb-2" required index="${index}" multiple
                                     name="PfiItem[${index}][loi_item][${item}]" item="${item}" id="loi-item-${index}-item-${item}">
                                     <option value="" ></option>
                                 </select>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" min="0" max="" placeholder="0" required oninput=calculateTotalAmount(${index}) placeholder="0"  
-                                name="PfiItem[${index}][pfi_quantity][${item}]" class="form-control mb-2 widthinput pfi-quantities" value="0"
+                                <input type="number" min="1" placeholder="0" required oninput=calculateTotalAmount(${index}) 
+                                name="PfiItem[${index}][pfi_quantity][${item}]" class="form-control mb-2 widthinput pfi-quantities" 
                                 index="${index}" item="${item}" id="pfi-quantity-${index}-item-${item}">
                             </div>
                             <div class="col-lg-1 col-md-6">
@@ -604,16 +621,16 @@
                             </div>
                             @enderror
                             </div>
-                            <div class="col-lg-1 col-md-6">
+                            <div class="col-lg-2 col-md-6">
                                 <select class="form-control text-dark widthinput loi-items mb-2" required index="${index}" multiple
                                     name="PfiItem[${index}][loi_item][0]" item="0" id="loi-item-${index}-item-0">
                                     <option value="" ></option>
                                 </select>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" min="0" max="" placeholder="PFI Qty" placeholder="0"  required
-                                name="PfiItem[${index}][pfi_quantity][0]" class="form-control mb-2 widthinput pfi-quantities" value=""
-                                index="${index}" item="0" id="pfi-quantity-${index}-item-0" placeholder="0">
+                                <input type="number" min="1" placeholder="0" required
+                                name="PfiItem[${index}][pfi_quantity][0]" class="form-control mb-2 widthinput pfi-quantities" 
+                                index="${index}" item="0" id="pfi-quantity-${index}-item-0">
                             </div>
                             <div class="col-lg-1 col-md-6">
                                 <input type="number" readonly class="form-control mb-2 widthinput remaining-quantities" placeholder="0"
@@ -629,10 +646,10 @@
                                     id="total-amount-${index}-item-0" item="0" placeholder="Total Price">
                                 <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-${index}-item-0">
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="col-lg-1 col-md-6 col-sm-12">
                                 <a class="btn btn-primary btn-sm add-more" 
                                  index="${index}" item="0"
-                                title="Add Child PFI Items">  <i class="fas fa-plus"> Add More </i> 
+                                title="Add Child PFI Items">  <i class="fas fa-plus"> </i> 
                                 </a>
                                 <a class="btn btn-sm btn-danger removePFIButton" index="${index}" > 
                                 <i class="fas fa-trash-alt"></i> </a>
@@ -694,7 +711,7 @@
                     $(this).attr('id', 'row-'+index);
                     $(this).find('#parentItem').attr('class', 'row pr-0 mr-0 pfi-child-item-div-'+index);
                     $(this).find('.chilItems').attr('class', 'row chilItems child-item-'+index);
-                    $(this).find('.removeButton').attr('index', index);
+                    $(this).find('.removePFIButton').attr('index', index);
                     
                     // child Rows ReIndex
                   
@@ -740,7 +757,8 @@
                 $(this).find('.total-amounts').attr('item',i);
                 $(this).find('.total-amounts').attr('id','total-amount-'+index+'-item-'+i);
                 $(this).find('.removePFIItemButton').attr('id','remove-button-'+index+'-item-'+i);
-                $(this).find('.removePFIItemButton').attr('item',i);
+                $(this).find('.removePFIItemButton').attr('item',+i);
+                $(this).find('.removePFIItemButton').attr('index',+index);
 
                 $(this).find('.models').attr('index', index);
                 $(this).find('.sfx').attr('index', index);
@@ -759,7 +777,11 @@
                     placeholder: 'Select SFX',
                     maximumSelectionLength:1,
                 });
-
+                $('#loi-item-'+index+'-item-'+i).select2
+                ({
+                    placeholder: 'Select Code',
+                    maximumSelectionLength:1,
+                });
 
             });
         }
@@ -769,15 +791,7 @@
          
             let model = $('#model-'+index+'-item-'+childIndex).val();
             let url = '{{ route('demand.get-sfx') }}';
-            var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-            var selectedModelIds = [];
-            for(let i=0; i<=rowCount; i++)
-            {
-                var eachSelectedModelId = $('#master-model-id-'+index+'-item-'+i).val();
-                if(eachSelectedModelId) {
-                    selectedModelIds.push(eachSelectedModelId);
-                }
-            }
+            
             $.ajax({
                 type: "GET",
                 url: url,
@@ -785,7 +799,6 @@
                 data: {
                     model: model[0],
                     module: 'PFI',
-                    selectedModelIds:selectedModelIds
                 },
                 success:function (data) {              
                     $('#sfx-'+index+'-item-'+childIndex).empty();
@@ -800,12 +813,28 @@
             });           
        }
        function getLOIItemCode(index,childIndex) {
-            $('.overlay').show();
+          
             let customer = $('#client_id').val();
             let model = $('#model-'+index+'-item-'+childIndex).val();
             let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
             let url = '{{ route('loi-item-code') }}';
+            var selectedLOIItemIds = [];
 
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
+                    if(eachSelectedLOIItemId) {
+                        selectedLOIItemIds.push(eachSelectedLOIItemId);
+                    }
+                }
+            }
+
+            if(customer.length > 0 && model.length > 0  && sfx.length > 0) {
+                $('.overlay').show();
                 $.ajax({
                 type: "GET",
                 url: url,
@@ -813,10 +842,11 @@
                 data: {
                     model: model[0],
                     sfx:sfx[0],
-                    client_id:customer[0]
+                    client_id:customer[0],
+                    selectedLOIItemIds:selectedLOIItemIds
                 },
                 success:function (data) {
-                    console.log(data);
+                    // console.log(data);
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
                     $('#loi-item-'+index+'-item-'+childIndex).html('<option value=""> Select Code </option>');                      
@@ -828,6 +858,8 @@
                     $('.overlay').hide();
                 }
             });
+        }
+
             
        }
        function getModels(index,item,type) {
@@ -851,11 +883,11 @@
                     {
                         model: parentModel[0],
                         sfx:parentSfx[0],
-                        selectedModelIds:selectedModelIds
+                        // selectedModelIds:selectedModelIds
                     },
                 dataType : 'json',
                 success: function(data) {
-                    console.log(data);
+                    // console.log(data);
                     var size = data.length;
                   
                         let modelDropdownData   = [];
