@@ -2148,7 +2148,7 @@ class WorkOrderController extends Controller
             try {
                 $authId = Auth::id();
                 $woApprovals = WOApprovals::where('id', $request->id)->first();
-    
+                $workOrder = WorkOrder::where('id',$woApprovals->work_order_id)->first(); 
                 if ($woApprovals && $woApprovals->action_at == '' && $woApprovals->status == 'pending') {
                     $woApprovals->action_at = Carbon::now();
                     $woApprovals->user_id = $authId;
@@ -2172,6 +2172,8 @@ class WorkOrderController extends Controller
                     }
     
                     DB::commit();
+                    // Send email notification
+                    $this->sendCOOApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments,$woApprovals->user->name);                   
                     return response()->json('success');
                 } else if ($woApprovals && $woApprovals->action_at != '') {
                     DB::commit();
@@ -2185,5 +2187,53 @@ class WorkOrderController extends Controller
                 return view('hrm.notaccess',compact('errorMsg'));
             }
         }
+    }
+    private function sendCOOApprovalEmail($workOrder, $status, $comments, $userName)
+    {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+
+        // Prepare email subject
+        $subject = "WO COO Office Approval '{$status}' " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
+        // Retrieve and validate email addresses from .env
+        $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+
+        // Retrieve the CreatedBy user's email and validate it
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
+
+        // Check if any email is invalid and handle the error
+        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'financeEmail' => env('FINANCE_TEAM_EMAIL'),
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
+
+        // Send email using a Blade template
+        Mail::send('work_order.emails.coo_approval', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'approvalHistoryLink' => $approvalHistoryLink,
+            'comments' => $comments,
+            'userName' => $userName,
+            'status' => $status
+        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
+            $message->from($template['from'], $template['from_name'])
+                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
+                    ->subject($subject);
+        });
     }
 }
