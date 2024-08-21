@@ -27,7 +27,7 @@ class VehicleNetsuiteCostController extends Controller
             $data = VehicleNetsuiteCost::select( [
                     'vehicle_netsuite_cost.cost',
                     'vehicles.vin',
-                    DB::raw("DATE_FORMAT(CONVERT_TZ(updated_at, '+00:00', @@session.time_zone), '%d %b %Y') as updated_at"),
+                    DB::raw("DATE_FORMAT(vehicle_netsuite_cost.updated_at, '%d-%b-%Y') as last_update"),
                     'vehicle_netsuite_cost.netsuite_link',
                 ])
                 ->leftJoin('vehicles', 'vehicle_netsuite_cost.vehicles_id', '=', 'vehicles.id');

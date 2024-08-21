@@ -2798,6 +2798,13 @@ $variant->save();
                         'purchasing_order.po_number',
                         'users.name',
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
+                        DB::raw("
+            COALESCE(
+                (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+                (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                ''
+            ) as price
+        ")
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')

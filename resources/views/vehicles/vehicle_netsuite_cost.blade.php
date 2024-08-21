@@ -100,8 +100,8 @@
                 <tr>
                   <th>Vehicle VIN</th>
                   <th>Vehicle Cost</th>
-                  <th>Netsuite Link</th>
                   <th>Last Update</th>
+                  <th>Netsuite Link</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,6 +120,7 @@
             columns: [
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'cost', name: 'vehicle_netsuite_cost.cost' },
+                { data: 'last_update', name: 'vehicle_netsuite_cost.updated_at' },
                 { 
                     data: 'netsuite_link', 
                     name: 'vehicle_netsuite_cost.netsuite_link',
@@ -127,7 +128,6 @@
                         return '<button class="btn btn-primary" onclick="window.open(\'' + data + '\', \'_blank\')">Open Link</button>';
                     }
                 },
-                { data: 'updated_at', name: 'vehicle_netsuite_cost.updated_at' },
             ]
         });
 });
