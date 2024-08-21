@@ -875,7 +875,7 @@ class WorkOrderController extends Controller
         try { 
             $canCreateFinanceApproval = false;
             $canCreateCOOApproval = false;
-            if((isset($request->deposit_received_as) && $request->deposit_received_as != '') || $request->deposit_received_as != $workOrder->deposit_received_as) {
+            if(isset($request->deposit_received_as) && $request->deposit_received_as != '' && ($request->deposit_received_as != $workOrder->deposit_received_as)) {
                 $canCreateFinanceApproval = true;
             }
             $authId = Auth::id();            
