@@ -360,12 +360,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>Estimated Arrival</th>
@@ -413,12 +408,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -467,12 +457,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -522,12 +507,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -578,12 +558,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -634,12 +609,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -692,12 +662,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -749,12 +714,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-vehicles');
-      @endphp
-      @if ($hasPermission)
                   <th>Cost Price</th>
-                  @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -843,6 +803,23 @@
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
@@ -922,6 +899,23 @@
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
               { data: 'po_number', name: 'purchasing_order.po_number' },
               { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -999,6 +993,23 @@
         { data: 'location', name: 'warehouse.name' },
         { data: 'territory', name: 'vehicles.territory' },
         { data: 'fd', name: 'countries.name' },
+        {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
         { data: 'po_number', name: 'purchasing_order.po_number' },
         { data: 'po_date', name: 'purchasing_order.po_date' },
         { data: 'grn_number', name: 'grn.grn_number' },
@@ -1109,6 +1120,23 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1197,6 +1225,23 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1276,6 +1321,23 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1366,6 +1428,23 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1469,6 +1548,23 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
+                {
+                    data: 'price', 
+                    name: 'price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
