@@ -35,6 +35,7 @@ use Carbon\Carbon;
 use Validator;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Mail;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -591,6 +592,41 @@ class WorkOrderController extends Controller
                 ]);
             }
             (new UserActivityController)->createActivity('Create '.$request->type.' work order');
+            // Prepare the from details
+            $template['from'] = 'no-reply@milele.com';
+            $template['from_name'] = 'Milele Matrix';
+
+            // Handle cases where customer_name is null
+            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+
+            // Prepare email data
+            $subject = "New Work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+
+            // Define a quick access link (adjust the route as needed)
+            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+
+            // Retrieve and validate email addresses from .env
+            $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+
+            // Check if any email is invalid and handle the error
+            if (!$financeEmail || !$managementEmail || !$operationsEmail) {
+                \Log::error('Invalid email addresses provided:', [
+                    'financeEmail' => env('FINANCE_TEAM_EMAIL'),
+                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                    'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                ]);
+                throw new \Exception('One or more email addresses are invalid.');
+            }
+
+            // Send email using a Blade template
+            Mail::send('work_order.emails.new_wo', ['workOrder' => $workOrder, 'accessLink' => $accessLink], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
+                $message->from($template['from'], $template['from_name'])
+                        ->to([$financeEmail, $managementEmail, $operationsEmail])
+                        ->subject($subject);
+            });
+
             // Commit the transaction
             DB::commit(); 
             

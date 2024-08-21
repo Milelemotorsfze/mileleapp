@@ -98,7 +98,9 @@ class WorkOrder extends Model
     protected $appends = [
         'finance_approval_status',
         'coo_approval_status',
-        'total_number_of_boe'
+        'total_number_of_boe',
+        'vehicle_count',
+        'type_name',
     ];
     public function getFinanceApprovalStatusAttribute() {
         $status = '';
@@ -131,6 +133,30 @@ class WorkOrder extends Model
         ->distinct()
         ->count('boe_number');
         return $uniqueBoeCount;
+    }
+    public function getVehicleCountAttribute() {
+        // Count the vehicles related to this work order and not deleted
+        $vehicleCount = WOVehicles::where('work_order_id', $this->id)
+            ->whereNull('deleted_at')
+            ->count(); // This will return the number of records
+    
+        return $vehicleCount;
+    }
+    public function getTypeNameAttribute() {
+        $typeName = '';
+        if($this->type == 'export_exw') {
+            $typeName = 'Export EXW';
+        }
+        else if($this->type == 'export_cnf') {
+            $typeName = 'Export CNF';
+        }
+        else if($this->type == 'local_sale') {
+            $typeName = 'Local Sale';
+        }
+        else if($this->type == 'lto') {
+            $typeName = 'LTO';
+        }
+        return $typeName;
     }
     public function CreatedBy()
     {
