@@ -457,13 +457,61 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+
                 for(let j=0; j<=childIndex;j++) 
                 {
                     getLOIItemCode(i,j);
+                    // call unit price,remaining qty, total quantity
                 }
             }
 
         });
+        $(document.body).on('select2:unselect', "#client_id", function (e) {
+            
+            let data =  e.params.data.id;
+           // chcek any item selcted 
+           var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    let model = $('#model-'+i+'-item-'+j).val();
+                    let sfx = $('#sfx-'+i+'-item-'+j).val();
+                    let loiCode = $('#loi-item-'+i+'-item-'+j).val();
+                    if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
+                        var confirm = alertify.confirm('While changing customer entire pfi items data will be reset to empty!',function (e) {
+                            if (e) {
+                                resetData();
+                            }
+                        }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                            $("#client_id").val(data).trigger('change');
+                            });                           
+                    }                                                  
+                }
+            
+            }
+
+        });
+        function resetData(){
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                    $("#sfx-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                    $("#loi-item-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                    $("#pfi-quantity-"+i+"-item-"+j).val("");
+                    $("#remining-quantity-"+i+"-item-"+j).val("");
+                    $("#unit-price-"+i+"-item-"+j).val("");
+                    $("#total-amount-"+i+"-item-"+j).val("");
+                }
+            }
+        }
 
         $(document.body).on('select2:select', ".models", function (e) {
             let index = $(this).attr('index');
@@ -504,6 +552,21 @@
             $('#master-model-id-'+index+'-item-'+childIndex).val("");
            
         });
+        $(document.body).on('select2:select', ".loi-items", function (e) {
+            let index = $(this).attr('index');
+            let childIndex = $(this).attr('item');
+            $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
+            var value = e.params.data.id;
+            alert(value);
+            hideLOIItemCode(index,childIndex,value);
+        });
+        $(document.body).on('select2:unselect', ".loi-items", function (e) {
+            let index = $(this).attr('index');
+            let childIndex = $(this).attr('item');
+            var value = e.params.data;
+            appendLOIItemCode(index,childIndex,value);
+        });
+
         $(document.body).on('click', ".add-more", function (e) {
             let index = $(this).attr('index');
             let item =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
@@ -922,5 +985,50 @@
             });
            
        }
+       function hideLOIItemCode(index,childIndex,value) {
+            
+        var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=rowIndex;j++) 
+                {
+                    // console.log("i"+i);
+                    //     console.log("j"+j);
+                    var currentId = 'loi-item-'+i+'-item-'+j;
+                    var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+    
+                    if(selectedId != currentId ) {
+                        // console.log(i);
+                        // console.log(j);
+                        // console.log("detach code");
+                        var currentId = 'loi-item-'+i+'-item-'+j;
+                        $('#' + currentId + ' option[value=' + value + ']').detach(); 
+                    }
+                }
+            }
+
+       }
+       function appendLOIItemCode(index,childIndex,value) {
+        let selectedmodel = $('#model-'+index+'-item-'+childIndex).val();
+        let selectedsfx = $('#sfx-'+index+'-item-'+childIndex).val();
+        var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
+                {           
+                   let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                    for(let j=0; j<=rowIndex;j++) 
+                    {
+                        var currentId = 'loi-item-'+i+'-item-'+j;                     
+                        let currentmodel = $('#model-'+i+'-item-'+j).val();
+                        let currentsfx = $('#sfx-'+i+'-item-'+j).val();
+                        if(selectedId != currentId && selectedmodel[0] == currentmodel[0] && selectedsfx[0] == currentsfx[0]) {
+                            $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: value.id, text : value.text}));    
+                        }
+                    }
+                }    
+           }
     </script>
 @endpush
+
