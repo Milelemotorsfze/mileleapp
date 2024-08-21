@@ -8,6 +8,14 @@
             <div class="card-header">
                 <h4 class="card-title">
                     PFI Lists
+                    @can('PFI-create')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('pfi.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                    @endif
+                @endcan
                 </h4>
                 @if (Session::has('success'))
                     <div class="alert alert-success" id="success-alert">

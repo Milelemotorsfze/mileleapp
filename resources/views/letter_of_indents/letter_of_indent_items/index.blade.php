@@ -28,10 +28,14 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
                     @endphp
                     @if ($hasPermission)
-
                         <a  class="btn btn-sm btn-primary float-end" href="{{ route('letter-of-indent-items.index', ['export' => 'EXCEL'] ) }}" ><i class="fa fa-download" aria-hidden="true"></i> Export</a>
                     @endif
                 @endcan
+               
+                       <a  class="btn btn-sm btn-info float-end" style="margin-right:5px;" title="LOI List View"
+                        href="{{ route('letter-of-indents.index') }}" > <i class="fa fa-th-large" ></i> 
+                       </a>
+               
                 <div class="card-body">
                     @if (count($errors) > 0)
                         <div class="alert alert-danger">
@@ -108,28 +112,28 @@
             ajax: "{{ route('letter-of-indent-items.index') }}",
         columns: [
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
-            {'data' : 'l_o_i.id', 'name' : 'LOI.id'},
-            {'data' : 'loi_date', 'name' : 'loi_date' },
-            {'data' : 'loi_approval_date', 'name' : 'LOI.loi_approval_date' },
-            {'data' : 'l_o_i.dealers', 'name' : 'LOI.dealers' },
-            {'data' : 'l_o_i.client.name', 'name' : 'LOI.client.name'},
-            {'data' : 'l_o_i.client.customertype', 'name': 'LOI.client.customertype' },  
-            {'data' : 'l_o_i.category', 'name': 'LOI.category' },        
-            {'data' : 'l_o_i.client.country.name', 'name': 'LOI.client.country.name' },        
-            {'data' : 'code', 'name': 'code' },        
-            {'data' : 'master_model.model', 'name': 'masterModel.model' },        
-            {'data' : 'master_model.sfx', 'name': 'masterModel.sfx' },  
-            {'data' : 'master_model.steering', 'name': 'masterModel.steering' },          
-            {'data' : 'master_model.model_line.model_line', 'name': 'masterModel.modelLine.model_line' },        
-            {'data' : 'quantity', 'name': 'quantity' },      
-            {'data' : 'utilized_quantity', 'name': 'utilized_quantity' },  
-            {'data' : 'remaining_quantity', 'name': 'remaining_quantity' }, 
-            {'data' : 'sales_person_id', 'name': 'LOI.salesPerson.name' },     
-            {'data' : 'is_expired', 'name': 'is_expired' },   
-            {'data' : 'status', 'name': 'LOI.status' },        
-            {'data' : 'so_number', 'name': 'LOI.soNumbers.so_number' },
-            {'data' : 'l_o_i.review', 'name': 'LOI.review' },
-            {'data' : 'l_o_i.comments', 'name': 'LOI.comments' },
+            {'data' : 'l_o_i.uuid', 'name' : 'LOI.uuid', orderable: false},
+            {'data' : 'loi_date', 'name' : 'loi_date', orderable: false },
+            {'data' : 'loi_approval_date', 'name' : 'LOI.loi_approval_date', orderable: false },
+            {'data' : 'l_o_i.dealers', 'name' : 'LOI.dealers' , orderable: false},
+            {'data' : 'l_o_i.client.name', 'name' : 'LOI.client.name', orderable: false},
+            {'data' : 'l_o_i.client.customertype', 'name': 'LOI.client.customertype', orderable: false },  
+            {'data' : 'l_o_i.category', 'name': 'LOI.category', orderable: false },        
+            {'data' : 'l_o_i.client.country.name', 'name': 'LOI.client.country.name', orderable: false },        
+            {'data' : 'code', 'name': 'code', orderable: false },        
+            {'data' : 'master_model.model', 'name': 'masterModel.model', orderable: false },        
+            {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },  
+            {'data' : 'master_model.steering', 'name': 'masterModel.steering', orderable: false },          
+            {'data' : 'master_model.model_line.model_line', 'name': 'masterModel.modelLine.model_line', orderable: false },        
+            {'data' : 'quantity', 'name': 'quantity', orderable: false },      
+            {'data' : 'utilized_quantity', 'name': 'utilized_quantity', orderable: false },  
+            {'data' : 'remaining_quantity', 'name': 'remaining_quantity', orderable: false }, 
+            {'data' : 'sales_person_id', 'name': 'LOI.salesPerson.name', orderable: false },     
+            {'data' : 'is_expired', 'name': 'is_expired', orderable: false },   
+            {'data' : 'status', 'name': 'LOI.status', orderable: false },        
+            {'data' : 'so_number', 'name': 'LOI.soNumbers.so_number', orderable: false },
+            {'data' : 'l_o_i.review', 'name': 'LOI.review', orderable: false },
+            {'data' : 'l_o_i.comments', 'name': 'LOI.comments', orderable: false },
                
         ]
         });

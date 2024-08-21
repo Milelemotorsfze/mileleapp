@@ -491,6 +491,8 @@ Route::get('/d', function () {
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update/{id}', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
+    Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
+    Route::get('pfi-item/get-master-models', [PFIController::class,'getChildMasterModels'])->name('pfi-item.master-models');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
 

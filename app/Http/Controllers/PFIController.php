@@ -11,6 +11,7 @@ use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
 use App\Models\PfiItem;
 use App\Models\Supplier;
+use App\Models\Clients;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -49,61 +50,53 @@ class PFIController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
         (new UserActivityController)->createActivity('Open PFI Create Page');
 
-        $letterOfIndent = LetterOfIndent::findOrFail($request->id);
-        // $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
-        //                                 ->whereNull('pfi_id')
-        //                                 ->where('is_pfi_created', true)
-        //                                 ->get();
-        // $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
-        //                                 ->whereNull('pfi_id')
-        //                                 ->where('is_pfi_created', false)
-        //                                 ->get();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
+        $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx')
+                                      ->groupBy('model')->get();
+         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->get();
 
             // new pfi creation
 
-          $LOIItems = $letterOfIndent->letterOfIndentItems;
+        //   $LOIItems = $letterOfIndent->letterOfIndentItems;
 
-          $totalLOIQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
-                                ->where('letter_of_indent_id', $request->id)
-                                ->sum('quantity');
+        //   $totalLOIQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
+        //                         ->where('letter_of_indent_id', $request->id)
+        //                         ->sum('quantity');
 
-            foreach($LOIItems as $LOIItem) {
-                $model_line = 'HIACE';
-                // chcek if case insensitive check is possible
-                $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx');
-                if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
-                    $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
-                        $query->where('model_line', 'LIKE', '%'. $model_line .'%');
-                    });
-                }else{
-                    $masterModels =  $masterModels->where('master_model_line_id', $LOIItem->masterModel->master_model_line_id);
-                }
-                $LOIItem->masterModels =  $masterModels->groupBy('model')->get();
+        //     foreach($LOIItems as $LOIItem) {
+        //         $model_line = 'HIACE';
+        //         // chcek if case insensitive check is possible
+        //         $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx');
+        //         if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
+        //             $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
+        //                 $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+        //             });
+        //         }else{
+        //             $masterModels =  $masterModels->where('master_model_line_id', $LOIItem->masterModel->master_model_line_id);
+        //         }
+        //         $LOIItem->masterModels =  $masterModels->groupBy('model')->get();
                 
-                $totalpfiQuantityUsed = PfiItem::select('loi_item_id','pfi_quantity')->where('loi_item_id', $LOIItem->id)
-                                                    ->sum('pfi_quantity');
+        //         $totalpfiQuantityUsed = PfiItem::select('loi_item_id','pfi_quantity')->where('loi_item_id', $LOIItem->id)
+        //                                             ->sum('pfi_quantity');
 
-                $alreadyusedQuantity = $LOIItem->utilized_quantity + $totalpfiQuantityUsed;
+        //         $alreadyusedQuantity = $LOIItem->utilized_quantity + $totalpfiQuantityUsed;
            
-                $LOIItem->remaining_quantity = $LOIItem->quantity - $alreadyusedQuantity;
+        //         $LOIItem->remaining_quantity = $LOIItem->quantity - $alreadyusedQuantity;
                
-            }
+        //     }
             
-
             // return $LOIItems;
-
             
-            return view('pfi.new_create', compact('LOIItems','letterOfIndent','suppliers','totalLOIQuantity'));
+            return view('pfi.create', compact('suppliers','masterModels','customers'));
         // return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
 
@@ -112,7 +105,14 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-        // return $request->all();
+        // info($request->PfiItem);
+        // info("items");
+        // foreach($request->PfiItem as $pfiItem) {
+        //         info($pfiItem['model'][0]);
+        // }
+           
+        // }
+        return $request->all();
 
         (new UserActivityController)->createActivity('New PFI Created');
 
@@ -396,13 +396,7 @@ class PFIController extends Controller
 
             $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
 
-            // change the status to previous while deleting PO
-            // if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
-            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-            // }else{
-            //     $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-            // }
-            // $letterOfIndent->save();
+          
         }
         $pfi->delete();
         (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');
@@ -448,5 +442,65 @@ class PFIController extends Controller
         $pfi->released_date = $request->released_date;
         $pfi->save();
         return redirect()->back()->with('success', 'Payment released amount Successfully.');
+    }
+    public function getLOIItemCode(Request $request) {
+
+       $data = [];
+       $data['codes'] = LetterOfIndentItem::with('masterModel','LOI')
+                ->whereHas('masterModel', function($query)use($request) {
+                    $query->where('model', $request->model)
+                    ->where('sfx', $request->sfx);
+                })
+                ->whereHas('LOI', function($query)use($request) {
+                        $query->select('client_id','status','id','is_expired')->where('client_id', $request->client_id)
+                        ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
+                        ->where('is_expired', false);
+                })
+                ->get();
+       $masterModel = MasterModel::where('model', $request->model)
+                        ->where('sfx', $request->sfx)
+                        ->orderBy('model_year','DESC')
+                        ->first();
+       $data['master_model_id'] = $masterModel->id;
+       return response($data);
+    }
+
+    public function getChildMasterModels(Request $request) {
+        info("inside function");
+        info($request->all());
+
+        $parentModel = MasterModel::where('model', $request->model)
+                          ->where('sfx', $request->sfx)->first();
+
+            // if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
+            //     $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
+            //         $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+            //     });
+            // }   
+            if($parentModel) {
+                $data = MasterModel::where('steering', $parentModel->steering)
+                            ->where('master_model_line_id', $parentModel->master_model_line_id);
+              
+            }
+            if($request->selectedModelIds) {
+                $restrictedModelIds = [];
+                foreach($request->selectedModelIds as $selectedModelId){
+                    $masterModel = MasterModel::find($selectedModelId);
+                    $possibleModels = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx', $masterModel->sfx)
+                                            ->get();
+                    foreach($possibleModels as $possibleModel) {
+                        $restrictedModelIds[] = $possibleModel->id;
+                    }                  
+                }
+                if($restrictedModelIds) {
+                    $data = $data->whereNotIn('id', $restrictedModelIds);
+                }
+             
+            }
+            $data = $data->groupBy('model')->orderBy('id','DESC')->get();
+           
+        return response($data);
+       
     }
 }

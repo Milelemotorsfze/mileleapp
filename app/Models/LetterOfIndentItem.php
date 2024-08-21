@@ -10,10 +10,8 @@ class LetterOfIndentItem extends Model
 {
     use HasFactory, SoftDeletes;
    
-//    public $timestamps = false;
     protected $appends = [
         'steering',
-        // 'balance_quantity',
         'inventory_quantity',
         'loi_description',
     ];
@@ -21,10 +19,6 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(LetterOfIndent::class,'letter_of_indent_id');
     }
-//    public function Variant()
-//    {
-//        return $this->belongsTo(Varaint::class,'variant_name','name');
-//    }
     public function masterModel()
     {
         return $this->belongsTo(MasterModel::class,'master_model_id','id');
@@ -53,12 +47,11 @@ class LetterOfIndentItem extends Model
 
         return $loiDescription;
     }
-    // public function getBalanceQuantityAttribute()
-    // {
-    //    $totalQuantity = $this->quantity;
-    //    $approvedQuantity = $this->approved_quantity;
-    //    $balanceQuantity = $totalQuantity - $approvedQuantity;
 
+
+    //    return $balanceQuantity;
+    // }
+  
     //    return $balanceQuantity;
     // }
     public function getInventoryQuantityAttribute()
