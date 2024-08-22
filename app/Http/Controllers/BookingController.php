@@ -269,9 +269,6 @@ public function store(Request $request)
             ->whereNull('vehicles.so_id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '>=', now());
-            if ($hasEditSOPermission) {
-                $data = $data->where('booking_requests.created_by', Auth::id());
-            }
             if (!empty($searchValue)) {
                 $data->where(function ($query) use ($searchValue) {
                     $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
