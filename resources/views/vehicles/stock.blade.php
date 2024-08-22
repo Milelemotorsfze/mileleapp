@@ -627,7 +627,9 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Min Price</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -680,7 +682,9 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Min Price</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -732,7 +736,9 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Min Price</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
