@@ -280,7 +280,7 @@
   </div>
 </div>
     <ul class="nav nav-pills nav-fill">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
           <span class="badge badge-danger row-badge1 badge-notification"></span>
         </a>
@@ -289,12 +289,12 @@
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection
         <span class="badge badge-danger row-badge2 badge-notification"></span>
         </a>
-      </li>
+      </li> -->
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Available Stock
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab3">Incoming / Available Stock
         <span class="badge badge-danger row-badge3 badge-notification"></span>
         </a>
-      </li>
+      <!-- </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked
         <span class="badge badge-danger row-badge4 badge-notification"></span>
@@ -304,7 +304,7 @@
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold
         <span class="badge badge-danger row-badge5 badge-notification"></span>
         </a>
-      </li>
+      </li> -->
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered
         <span class="badge badge-danger row-badge6 badge-notification"></span>
@@ -327,8 +327,15 @@
       @endif
     </ul>      
   </div>
+  @php
+    $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('dp-vehicles-only');
+@endphp
+
+<script>
+    var hasPricePermission = @json($hasPricePermission);
+</script>
   <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <!-- <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -360,7 +367,9 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>Estimated Arrival</th>
@@ -408,7 +417,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -424,8 +433,8 @@
             </table>
           </div> 
         </div>  
-      </div> 
-      <div class="tab-pane fade show" id="tab3">
+      </div>  -->
+      <div class="tab-pane fade show active" id="tab3">
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -439,6 +448,7 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
+            <th>Status</th>
             <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
@@ -457,7 +467,9 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -466,6 +478,12 @@
                   <th>Inspection Remarks</th>
                   <th>Aging</th>
                   <th>GRN Report</th>
+                  <th>Reservation Start</th>
+                  <th>Reservation End</th>
+                  <th>Reservation Sales Person</th>
+                  <th>SO Date</th>
+                  <th>So Number</th>
+                  <th>Sales Person</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -475,7 +493,7 @@
           </div> 
         </div>  
       </div> 
-      <div class="tab-pane fade show" id="tab4">
+      <!-- <div class="tab-pane fade show" id="tab4">
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -507,7 +525,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -525,8 +543,8 @@
             </table>
           </div> 
         </div>  
-      </div> 
-      <div class="tab-pane fade show" id="tab5">
+      </div>  -->
+      <!-- <div class="tab-pane fade show" id="tab5">
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -558,7 +576,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -576,7 +594,7 @@
             </table>
           </div> 
         </div>  
-      </div> 
+      </div>  -->
       <div class="tab-pane fade show" id="tab6">
         <div class="card-body">
         @php
@@ -609,7 +627,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -662,7 +680,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -714,7 +732,7 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  <th>Cost Price</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -753,201 +771,203 @@
   </div>
   <script>
         $(document).ready(function () {
-          var table1 = $('#dtBasicExample1').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
+//            var columns1 = [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
                         
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},        
-        { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-                {
-                    data: 'price', 
-                    name: 'price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},        
+//         { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//             ];
+//         if (hasPricePermission) {
+//                     columns1.push({
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
 
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-                },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'estimation_date', name: 'vehicles.estimation_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            buttons: [
-        'excelHtml5' // Add the export to Excel button
-    ]
-        });
-        table1.on('draw', function () {
-            var rowCount = table1.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge1').text(rowCount).show();
-            } else {
-                $('.row-badge1').hide();
-            }
-        });
-        var table2 = $('#dtBasicExample2').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+// });
+//             }
+//             columns1.push(
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             );
+//             var table1 = $('#dtBasicExample1').DataTable({
+//             processing: true,
+//             serverSide: true,
+//             columns: columns1,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//             buttons: [
+//         'excelHtml5' // Add the export to Excel button
+//     ]
+//         });
+//         table1.on('draw', function () {
+//             var rowCount = table1.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge1').text(rowCount).show();
+//             } else {
+//                 $('.row-badge1').hide();
+//             }
+//         });
+//         var table2 = $('#dtBasicExample2').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
                         
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-                {
-                    data: 'price', 
-                    name: 'price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
 
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-                },
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-              { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table2.on('draw', function () {
-            var rowCount = table2.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge2').text(rowCount).show();
-            } else {
-                $('.row-badge2').hide();
-            }
-        });
-        var table3 = $('#dtBasicExample3').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
-    columns: [
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//               { data: 'po_number', name: 'purchasing_order.po_number' },
+//               { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table2.on('draw', function () {
+//             var rowCount = table2.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge2').text(rowCount).show();
+//             } else {
+//                 $('.row-badge2').hide();
+//             }
+//         });
+    var columns3 = [
+        { data: 'id', name: 'vehicles.id' },
         { data: 'brand_name', name: 'brands.brand_name' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'model_detail', name: 'varaints.model_detail' },
@@ -993,9 +1013,11 @@
         { data: 'location', name: 'warehouse.name' },
         { data: 'territory', name: 'vehicles.territory' },
         { data: 'fd', name: 'countries.name' },
-        {
-                    data: 'price', 
-                    name: 'price', 
+    ];
+    if (hasPricePermission) {
+        columns3.push({
+            data: 'price', 
+            name: 'vehicles.price', 
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -1009,7 +1031,9 @@
                         }
                         return ''; // Return an empty string if there's no price
                     }
-                },
+        });
+    }
+    columns3.push(
         { data: 'po_number', name: 'purchasing_order.po_number' },
         { data: 'po_date', name: 'purchasing_order.po_date' },
         { data: 'grn_number', name: 'grn.grn_number' },
@@ -1040,6 +1064,12 @@
                 }
             }
         },
+        { data: 'reservation_start_date', name: 'reservation_start_date' },
+                { data: 'reservation_end_date', name: 'reservation_end_date' },
+                { data: 'booking_person_name', name: 'booking_person.name' },
+        { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'sales_person_name', name: 'sales_person.name' },
         {
                 data: null,
                 name: 'chat',
@@ -1049,8 +1079,36 @@
                 orderable: false,
                 searchable: false
             },
-    ],
+        );
+            var table3 = $('#dtBasicExample3').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+    columns: columns3,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    columnDefs: [
+        {
+            targets: 0,
+            render: function (data, type, row) {
+              console.log(row);
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                    return 'Incoming';
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                    return 'Pending Inspection';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
+                    return 'Available Stock';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                    return 'Booked';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                    return 'Sold';
+                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                    return 'Delivered';
+                } else {
+                    return '';
+                }
+            }
+        }
+    ],
 });
 
 table3.on('draw', function () {
@@ -1070,116 +1128,208 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
         openBookingModal(data.id);
     @endif
 });
-        var table4 = $('#dtBasicExample4').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                    }
-                },
-                {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
+//         var table4 = $('#dtBasicExample4').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                     }
+//                 },
+//                 {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
                         
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-                { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-                {
-                    data: 'price', 
-                    name: 'price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//                 { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price',  
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
 
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-                },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'reservation_start_date', name: 'reservation_start_date' },
-                { data: 'reservation_end_date', name: 'reservation_end_date' },
-                { data: 'name', name: 'users.name' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table4.on('draw', function () {
-            var rowCount = table4.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge4').text(rowCount).show();
-            } else {
-                $('.row-badge4').hide();
-            }
-        });
-        $('#dtBasicExample4 tbody').on('click', 'tr', function () {
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
-    @endphp
-    @if ($hasPermission)
-        var data = table4.row(this).data();
-        openBookingModal(data.id);
-    @endif
-});
-        var table5 = $('#dtBasicExample5').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
-            columns: [
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'inspection_date', name: 'inspection_date' },
+//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
+//                 { data: 'reservation_start_date', name: 'reservation_start_date' },
+//                 { data: 'reservation_end_date', name: 'reservation_end_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table4.on('draw', function () {
+//             var rowCount = table4.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge4').text(rowCount).show();
+//             } else {
+//                 $('.row-badge4').hide();
+//             }
+//         });
+//         $('#dtBasicExample4 tbody').on('click', 'tr', function () {
+//     @php
+//     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+//     @endphp
+//     @if ($hasPermission)
+//         var data = table4.row(this).data();
+//         openBookingModal(data.id);
+//     @endif
+// });
+//         var table5 = $('#dtBasicExample5').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
+                        
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
+
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
+
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'inspection_date', name: 'inspection_date' },
+//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table5.on('draw', function () {
+//             var rowCount = table5.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge5').text(rowCount).show();
+//             } else {
+//                 $('.row-badge5').hide();
+//             }
+//         });
+var columns6 = [
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -1191,25 +1341,25 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 }
             },
             {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+            data: 'variant_detail',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -1225,9 +1375,11 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
-                {
+            ];
+                if (hasPricePermission) {
+                    columns6.push({
                     data: 'price', 
-                    name: 'price', 
+                    name: 'vehicles.price', 
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -1241,103 +1393,9 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                         }
                         return ''; // Return an empty string if there's no price
                     }
-                },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table5.on('draw', function () {
-            var rowCount = table5.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge5').text(rowCount).show();
-            } else {
-                $('.row-badge5').hide();
+                });
             }
-        });
-        var table6 = $('#dtBasicExample6').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-                {
-                    data: 'price', 
-                    name: 'price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-                },
+                columns6.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1367,7 +1425,12 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 orderable: false,
                 searchable: false
             },
-          ],
+        );
+        var table6 = $('#dtBasicExample6').DataTable({
+          processing: true,
+            serverSide: true,
+            ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
+            columns: columns6,
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table6.on('draw', function () {
@@ -1379,11 +1442,8 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
             }
         });
         var now = new Date();
-        var table7 = $('#dtBasicExample7').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
-            columns: [
+        
+        var columns7 = [
               { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -1428,9 +1488,11 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
-                {
+    ];
+                if (hasPricePermission) {
+                    columns7.push({
                     data: 'price', 
-                    name: 'price', 
+                    name: 'vehicles.price', 
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -1444,7 +1506,9 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                         }
                         return ''; // Return an empty string if there's no price
                     }
-                },
+        });
+    }
+                columns7.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1463,7 +1527,13 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 orderable: false,
                 searchable: false
             },
-            ],
+);
+        var table7 = $('#dtBasicExample7').DataTable({
+          processing: true,
+            serverSide: true,
+            ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
+            columns: columns7,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
             targets: 0,
@@ -1487,7 +1557,6 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
             }
         }
     ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table7.on('draw', function () {
             var rowCount = table7.page.info().recordsDisplay;
@@ -1497,11 +1566,8 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 $('.row-badge7').hide();
             }
         });
-        var table8 = $('#dtBasicExample8').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
-            columns: [
+       
+        var columns9 = [
               { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -1548,9 +1614,12 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
-                {
+            ];
+
+if (hasPricePermission) {
+    columns9.push({
                     data: 'price', 
-                    name: 'price', 
+                    name: 'vehicles.price', 
                     render: function(data, type, row) {
                         if (data) {
                             // Convert the string to a float, then format it with commas
@@ -1564,7 +1633,9 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                         }
                         return ''; // Return an empty string if there's no price
                     }
-                },
+        });
+    }
+                columns9.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1583,7 +1654,14 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
                 orderable: false,
                 searchable: false
             }, 
-            ],
+        );
+            
+    var table8 = $('#dtBasicExample8').DataTable({
+          processing: true,
+            serverSide: true,
+            ajax: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
+            columns: columns9,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
             targets: 0,
@@ -1607,7 +1685,6 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
             }
         }
     ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table8.on('draw', function () {
             var rowCount = table8.page.info().recordsDisplay;
