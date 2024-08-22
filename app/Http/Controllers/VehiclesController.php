@@ -2898,7 +2898,7 @@ $variant->save();
                         'vehicles.engine',
                         'inspection.id as inspectionid',
                         'vehicles.territory',
-                        'vehicles.price as p',
+                        'vehicles.price as price',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
