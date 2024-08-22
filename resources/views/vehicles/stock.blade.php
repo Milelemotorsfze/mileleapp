@@ -1020,23 +1020,23 @@
         { data: 'fd', name: 'countries.name' },
     ];
     if (hasPricePermission) {
-        columns3.push({
-            data: 'price', 
-            name: 'vehicles.price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
+        // columns3.push({
+        //     data: 'price', 
+        //     name: 'vehicles.price', 
+        //             render: function(data, type, row) {
+        //                 if (data) {
+        //                     // Convert the string to a float, then format it with commas
+        //                     var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+        //                         minimumFractionDigits: 0,
+        //                         maximumFractionDigits: 0
+        //                     });
 
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-        });
+        //                     // Return the price wrapped in a span with button-like styling
+        //                     return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+        //                 }
+        //                 return ''; // Return an empty string if there's no price
+        //             }
+        // });
     }
     columns3.push(
         { data: 'po_number', name: 'purchasing_order.po_number' },
@@ -1070,11 +1070,11 @@
             }
         },
         { data: 'reservation_start_date', name: 'reservation_start_date' },
-                { data: 'reservation_end_date', name: 'reservation_end_date' },
-                { data: 'booking_person_name', name: 'booking_person.name' },
+        { data: 'reservation_end_date', name: 'reservation_end_date' },
+        { data: 'booking_person_name', name: 'booking_person.name' },
         { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'sales_person_name', name: 'sales_person.name' },
+        { data: 'so_number', name: 'so.so_number' },
+        { data: 'sales_person_name', name: 'sales_person.name' },
         {
                 data: null,
                 name: 'chat',
