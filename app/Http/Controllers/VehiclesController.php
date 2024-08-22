@@ -2887,7 +2887,7 @@ $variant->save();
                 else if($status === "Available Stock")
                 {
                     $data = Vehicles::select( [
-                        'vehicles.id as vid',
+                        'vehicles.id as id',
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
