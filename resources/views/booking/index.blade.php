@@ -112,6 +112,22 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabel">File Viewer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="fileViewer" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="editModalws" tabindex="-1" role="dialog" aria-labelledby="editModalwsLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -172,7 +188,7 @@
                   <th>Booking Request ID</th>
                   <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>Date</th>
                   <th>VIN</th>
                   <th>Brand</th>
@@ -209,7 +225,7 @@
                 <tr>
                 <th>Booking ID</th>
                 <th>Sales Person</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -247,7 +263,7 @@
                 <th>Booking ID</th>
                 <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -285,7 +301,7 @@
                 <th>Booking ID</th>
                 <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -317,7 +333,7 @@
                 <th>Booking Request ID</th>
                 <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>Date</th>
                   <th>VIN</th>
                   <th>Brand</th>
@@ -359,13 +375,19 @@
                 { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking_requests.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
@@ -420,13 +442,19 @@
                 { data: 'id', name: 'booking.id' },
                 { data: 'name', name: 'users.name' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -485,13 +513,19 @@
                 { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -546,13 +580,19 @@
                 { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -595,13 +635,19 @@
                 { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
@@ -771,6 +817,16 @@ function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
+    function openModalfile(filePath) {
+    const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
+    console.log('File URL:', fileUrl); // Log the URL to the console
+    $('#fileViewer').attr('src', fileUrl);
+    $('#fileModal').modal('show');
+}
+$('#fileModal').on('hidden.bs.modal', function () {
+    $('#fileViewer').attr('src', '');
+});
     </script>
 @else
     @php
