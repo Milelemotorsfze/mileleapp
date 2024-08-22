@@ -202,8 +202,8 @@
                                                         <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1-item-0">
                                                     </div>
                                                     <div class="col-lg-1 col-md-6 col-sm-12" style="margin-top: 30px;">
-                                                        <a class="btn btn-primary btn-sm add-more" index="1" item="0"
-                                                        title="Add Child PFI Items"> <i class="fas fa-plus"> </i> 
+                                                        <a class="btn btn-primary btn-sm add-more disabled" id="add-more-1" index="1" item="0"
+                                                        title="Add Child PFI Items" > <i class="fas fa-plus"> </i> 
                                                             </a>
                                                         <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-1" index="1"> 
                                                             <i class="fas fa-trash-alt"></i> </a>
@@ -450,12 +450,14 @@
         ///// start new code ////
       
         $(document.body).on('select2:select', "#client_id", function (e) {
+          
             $('#client_id-error').remove();
-
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-
             for(let i=1; i<=parentIndex;i++) 
             {
+                let type = 'all';
+                getModels(i,0,type);
+                enableOrDisableAddMoreButton(i);
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
 
                 for(let j=0; j<=childIndex;j++) 
@@ -483,10 +485,11 @@
                     if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
                         var confirm = alertify.confirm('While changing customer entire pfi items data will be reset to empty!',function (e) {
                             if (e) {
-                                resetData();
+                                resetData();                               
                             }
                         }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
                             $("#client_id").val(data).trigger('change');
+                            
                             });                           
                     }                                                  
                 }
@@ -499,12 +502,21 @@
 
             for(let i=1; i<=parentIndex;i++) 
             {
+                enableOrDisableAddMoreButton(i);
+              
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=0; j<=childIndex;j++) 
                 {
-                    $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                    $("#sfx-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                    $("#loi-item-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                    if(j == 0) {
+                        $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                        $("#sfx-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                        $("#loi-item-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
+                    }else{
+                        $("#model-"+i+"-item-"+j).empty();
+                        $("#sfx-"+i+"-item-"+j).empty();
+                        $("#loi-item-"+i+"-item-"+j).empty();
+                    }
+                    
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remining-quantity-"+i+"-item-"+j).val("");
                     $("#unit-price-"+i+"-item-"+j).val("");
@@ -518,10 +530,22 @@
             let childIndex = $(this).attr('item');
             $('#model-'+index+'-item-'+childIndex +'-error').remove();
             getSfx(index, childIndex);
+
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
            let index = $(this).attr('index');
            let childIndex = $(this).attr('item');
+         
+           // if unselected model is in the parent row append model in every parent line items
+           if(childIndex == 0) {
+                var model = e.params.data.id;
+                let sfx =  $('#sfx-'+index+'-item-0').val();
+                if(sfx.length > 0) {
+                    appendParentModel(index,model,sfx[0]);
+                }
+            
+           }
+         
            $('#sfx-'+index+'-item-'+childIndex).empty();
            $('#loi-item-'+index+'-item-'+childIndex).empty();
            $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
@@ -529,6 +553,8 @@
            $('#unit-price-'+index+'-item-'+childIndex).val("");
            $('#total-amount-'+index+'-item-'+childIndex).val("");
            $('#master-model-id-'+index+'-item-'+childIndex).val("");
+           enableOrDisableAddMoreButton(index);
+
         //    var model = e.params.data.id;
           
         //    appendSFX(index,model,sfx[0]);
@@ -540,31 +566,42 @@
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
             $('#sfx-'+index+'-item-'+childIndex +'-error').remove();
+                // if selected sfx is in the parent row hide corresponding model in every parent line items
+            if(childIndex == 0) {
+                hideParentModel(index);
+            }
             getLOIItemCode(index, childIndex);
-
-            // var value = e.params.data.text;
+            enableOrDisableAddMoreButton(index);
             // hideSFX(index, value);
            
         });
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
+            let model = $('#model-'+index+'-item-0').val();
+            var value = e.params.data.id;
             $('#master-model-id-'+index+'-item-'+childIndex).val("");
-           
+               // if unselected sfx is in the parent row append corresponding model in every parent line items
+            if(childIndex == 0) {
+                appendParentModel(index,model[0],value);
+            }
+            
+            enableOrDisableAddMoreButton(index);
+
         });
         $(document.body).on('select2:select', ".loi-items", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
             $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
             var value = e.params.data.id;
-            alert(value);
             hideLOIItemCode(index,childIndex,value);
         });
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
-            var value = e.params.data;
-            appendLOIItemCode(index,childIndex,value);
+            var id = e.params.data.id;
+            var text = e.params.data.text;
+            appendLOIItemCode(index,childIndex,id,text);
         });
 
         $(document.body).on('click', ".add-more", function (e) {
@@ -631,8 +668,9 @@
                     let parentSfx = $('#sfx-'+index+'-item-0').val();
                     // populate child models if parent have value
                     if(parentSfx[0]) {
-                        let type = 'add-new';
-                        getModels(index,item,type); 
+                        // let type = 'add-new';
+                        getChildModels(index,item);
+                        // getModels(index,item,type); 
 
                     }else{
                        $('#model-'+index+'-item-'+item).select2({
@@ -710,8 +748,8 @@
                                 <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-${index}-item-0">
                             </div>
                             <div class="col-lg-1 col-md-6 col-sm-12">
-                                <a class="btn btn-primary btn-sm add-more" 
-                                 index="${index}" item="0"
+                                <a class="btn btn-primary btn-sm add-more disabled" 
+                                 index="${index}" item="0" id="add-more-${index}"
                                 title="Add Child PFI Items">  <i class="fas fa-plus"> </i> 
                                 </a>
                                 <a class="btn btn-sm btn-danger removePFIButton" index="${index}" > 
@@ -724,7 +762,9 @@
                     </div>
                     `;
                         $('#pfi-items').append(newRow);
-
+                        let type = 'add-new';
+                        getModels(index,0,type);
+                        
                         $('#model-'+index+'-item-0').select2({
                             placeholder: 'Select Model',
                             maximumSelectionLength: 1
@@ -741,8 +781,19 @@
         });
         $(document.body).on('click', ".removePFIItemButton", function (e) {
             var index = $(this).attr('index');
-            var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+            // var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
             var childIndex = $(this).attr('item');
+
+            // var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
+            // var model = $('#model-'+index+'-item-'+childIndex).val();
+            var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
+            var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
+
+            
+            if(loiItemId[0]) {
+                console.log("item code selected");
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
+            }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
@@ -754,17 +805,12 @@
             if(rowCount > 1) {
 
                 var indexNumber = $(this).attr('index');
-                // populate value later
-                // var modelLine = $('#model-line-'+indexNumber).val()
-                // var model = $('#model-'+indexNumber).val();
-                // var sfx = $('#sfx-'+indexNumber).val();
-               
-                // if(model[0]) {
-                //     appendModel(indexNumber,model[0]);
-                // }
-                // if(sfx[0]) {
-                //     appendSFX(indexNumber,model[0],sfx[0]);
-                // }
+                var sfx = $('#sfx-'+indexNumber+'-item-0').val();
+                var model = $('#model-'+indexNumber+'-item-0').val();
+                
+                if(sfx[0]) {
+                    appendParentModel(indexNumber,model[0],sfx[0]);                 
+                }
 
                 $(this).closest('#row-'+indexNumber).remove();
 
@@ -775,7 +821,8 @@
                     $(this).find('#parentItem').attr('class', 'row pr-0 mr-0 pfi-child-item-div-'+index);
                     $(this).find('.chilItems').attr('class', 'row chilItems child-item-'+index);
                     $(this).find('.removePFIButton').attr('index', index);
-                    
+                    $(this).find('.add-more').attr('index', index);
+                    $(this).find('.add-more').attr('id', 'add-more-'+index);
                     // child Rows ReIndex
                   
                     var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
@@ -829,7 +876,7 @@
                 $(this).find('.pfi-quantities').attr('index', index);
                 $(this).find('.remaining-quantities').attr('index', index);
                 $(this).find('.unit_prices').attr('index', index);
-                $(this).find('.add-more').attr('index', index);
+              
                 $('#model-'+index+'-item-'+i).select2
                 ({
                     placeholder: 'Select Model',
@@ -912,7 +959,7 @@
                     // console.log(data);
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
-                    $('#loi-item-'+index+'-item-'+childIndex).html('<option value=""> Select Code </option>');                      
+                    // $('#loi-item-'+index+'-item-'+childIndex).html('<option value=""> Select Code </option>');                      
                     jQuery.each(codes, function(key,value){
                         $('#loi-item-'+index+'-item-'+childIndex).append('<option value="'+ value.id +'">'+ value.code +'</option>');
                     });
@@ -926,33 +973,91 @@
             
        }
        function getModels(index,item,type) {
-            $('.overlay').show();
+           
+            let customer = $('#client_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
-            var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             var selectedModelIds = [];
-            for(let i=0; i<=rowCount; i++)
-            {
-                var eachSelectedModelId = $('#master-model-id-'+index+'-item-'+i).val();
+          
+                for(let i=1; i<=parentIndex; i++)
+                {
+                    var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
 
-                if(eachSelectedModelId) {
-                    selectedModelIds.push(eachSelectedModelId);
+                    if(eachSelectedModelId) {
+                        selectedModelIds.push(eachSelectedModelId);
+                    }
                 }
-            }
-            $.ajax({
-                url:"{{route('pfi-item.master-models')}}",
-                type: "GET",
-                data:
-                    {
-                        model: parentModel[0],
-                        sfx:parentSfx[0],
-                        // selectedModelIds:selectedModelIds
-                    },
-                dataType : 'json',
-                success: function(data) {
-                    // console.log(data);
-                    var size = data.length;
-                  
+          
+            if(customer.length > 0) {
+                $('.overlay').show();
+                $.ajax({
+                    url:"{{route('pfi-item.master-models')}}",
+                    type: "GET",
+                    data:
+                        {
+                            model: parentModel[0],
+                            sfx:parentSfx[0],
+                            customer:customer[0],
+                            selectedModelIds:selectedModelIds,
+                            type: type
+                        },
+                    dataType : 'json',
+                    success: function(data) {
+                    
+                        var size = data.length;
+                    
+                            let modelDropdownData   = [];
+                            $.each(data,function(key,value)
+                            {
+                                modelDropdownData.push
+                                ({
+                                    id: value.model,
+                                    text: value.model
+                                });
+                            });
+                            if(type == 'add-new') {
+                                $('#model-'+index+'-item-'+item).html("");
+                                $('#model-'+index+'-item-'+item).select2({
+                                    placeholder: 'Select Model',
+                                    data: modelDropdownData,
+                                    maximumSelectionLength: 1,
+                                });
+                            }else{
+                                for(let i=1; i<=parentIndex; i++)
+                                {
+                                    $('#model-'+i+'-item-0').html("");
+                                    $('#model-'+i+'-item-0').select2({
+                                        placeholder: 'Select Model',
+                                        data: modelDropdownData,
+                                        maximumSelectionLength: 1,
+                                    });
+                                }
+                            }
+                        $('.overlay').hide();
+                    }
+                });
+            }          
+       }
+       function getChildModels(index,item) {
+            let customer = $('#client_id').val();
+            let parentModel = $('#model-'+index+'-item-0').val();
+            let parentSfx = $('#sfx-'+index+'-item-0').val();
+            if(customer.length > 0) {
+                $('.overlay').show();
+                $.ajax({
+                    url:"{{route('pfi-item.master-models')}}",
+                    type: "GET",
+                    data:
+                        {
+                            model: parentModel[0],
+                            sfx:parentSfx[0],
+                            customer:customer[0]
+                        },
+                    dataType : 'json',
+                    success: function(data) {
+                        var size = data.length;
+                    
                         let modelDropdownData   = [];
                         $.each(data,function(key,value)
                         {
@@ -962,28 +1067,17 @@
                                 text: value.model
                             });
                         });
-                        if(type == 'add-new') {
-                            $('#model-'+index+'-item-'+item).html("");
-                            $('#model-'+index+'-item-'+item).select2({
-                                placeholder: 'Select Model',
-                                data: modelDropdownData,
-                                maximumSelectionLength: 1,
-                            });
-                        }else{
-                            for(let i=1; i<=rowCount; i++)
-                            {
-                                $('#model-'+index+'-item-'+i).html("");
-                                $('#model-'+index+'-item-'+i).select2({
-                                    placeholder: 'Select Model',
-                                    data: modelDropdownData,
-                                    maximumSelectionLength: 1,
-                                });
-                            }
-                        }
-                    $('.overlay').hide();
-                }
-            });
-           
+                        
+                        $('#model-'+index+'-item-'+item).html("");
+                        $('#model-'+index+'-item-'+item).select2({
+                            placeholder: 'Select Model',
+                            data: modelDropdownData,
+                            maximumSelectionLength: 1,
+                        });
+                        $('.overlay').hide();
+                    }
+                });
+            } 
        }
        function hideLOIItemCode(index,childIndex,value) {
             
@@ -993,15 +1087,10 @@
                 let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=0; j<=rowIndex;j++) 
                 {
-                    // console.log("i"+i);
-                    //     console.log("j"+j);
                     var currentId = 'loi-item-'+i+'-item-'+j;
                     var selectedId = 'loi-item-'+index+'-item-'+childIndex;
     
                     if(selectedId != currentId ) {
-                        // console.log(i);
-                        // console.log(j);
-                        // console.log("detach code");
                         var currentId = 'loi-item-'+i+'-item-'+j;
                         $('#' + currentId + ' option[value=' + value + ']').detach(); 
                     }
@@ -1009,26 +1098,74 @@
             }
 
        }
-       function appendLOIItemCode(index,childIndex,value) {
+       function appendLOIItemCode(index,childIndex,id,text)
+        {
+            console.log(id);
+            console.log(text);
         let selectedmodel = $('#model-'+index+'-item-'+childIndex).val();
         let selectedsfx = $('#sfx-'+index+'-item-'+childIndex).val();
         var selectedId = 'loi-item-'+index+'-item-'+childIndex;
 
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-                for(let i=1; i<=parentIndex;i++) 
-                {           
-                   let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                    for(let j=0; j<=rowIndex;j++) 
-                    {
-                        var currentId = 'loi-item-'+i+'-item-'+j;                     
-                        let currentmodel = $('#model-'+i+'-item-'+j).val();
-                        let currentsfx = $('#sfx-'+i+'-item-'+j).val();
-                        if(selectedId != currentId && selectedmodel[0] == currentmodel[0] && selectedsfx[0] == currentsfx[0]) {
-                            $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: value.id, text : value.text}));    
-                        }
+            for(let i=1; i<=parentIndex;i++) 
+            {           
+                let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=rowIndex;j++) 
+                {
+                    var currentId = 'loi-item-'+i+'-item-'+j;                     
+                    let currentmodel = $('#model-'+i+'-item-'+j).val();
+                    let currentsfx = $('#sfx-'+i+'-item-'+j).val();
+                    if(selectedId != currentId && selectedmodel[0] == currentmodel[0] && selectedsfx[0] == currentsfx[0]) {
+                        $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
                     }
-                }    
-           }
+                }
+            }    
+        }
+
+        function hideParentModel(index) {
+            var selectedId = 'model-'+index+'-item-0';
+            let model = $('#model-'+index+'-item-0').val(); 
+            console.log(model[0]);
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
+                { 
+                    var currentId = 'model-'+i+'-item-0';
+                    let currentModel = $('#' + currentId).val(); 
+                    if(selectedId != currentId ) {                  
+                        $('#' + currentId + ' option[value=' + model[0] + ']').detach(); 
+                        if(currentModel[0] == model[0]) {
+                            $('#sfx-'+i+'-item-0').empty();
+                        }
+                      
+                    }
+                  
+                }
+        }
+        function appendParentModel(index,model,sfx) {
+            var selectedId = 'model-'+index+'-item-0';
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
+                { 
+                    var currentId = 'model-'+i+'-item-0';                     
+                    let currentmodel = $('#model-'+i+'-item-0').val();
+                    let currentsfx = $('#sfx-'+i+'-item-0').val();
+                    if(selectedId != currentId && model != currentmodel[0] && sfx != currentsfx[0]) {
+                        $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}));    
+                    }
+                }
+        }
+        function enableOrDisableAddMoreButton(index) {
+            // check any customer is selected or not
+            let customer = $('#client_id').val();
+            let sfx = $('#sfx-'+index+'-item-0').val();
+            if(customer.length > 0 && sfx.length > 0) {
+                // check sfx is there the model also will be there
+                $('#add-more-'+index).removeClass('disabled');
+            }else if(customer.length <= 0 || sfx.length <= 0){
+                $('#add-more-'+index).addClass('disabled');
+            }
+       }
+       
     </script>
 @endpush
 

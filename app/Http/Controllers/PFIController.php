@@ -446,7 +446,7 @@ class PFIController extends Controller
     public function getLOIItemCode(Request $request) {
 
        $data = [];
-       $data['codes'] = LetterOfIndentItem::with('masterModel','LOI')
+       $loiItems = LetterOfIndentItem::with('masterModel','LOI')
                 ->whereHas('masterModel', function($query)use($request) {
                     $query->where('model', $request->model)
                     ->where('sfx', $request->sfx);
@@ -455,32 +455,46 @@ class PFIController extends Controller
                         $query->select('client_id','status','id','is_expired')->where('client_id', $request->client_id)
                         ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
                         ->where('is_expired', false);
-                })
-                ->get();
+                });
+
+            if($request->selectedLOIItemIds) {
+                
+                $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);
+             
+            }
+
        $masterModel = MasterModel::where('model', $request->model)
                         ->where('sfx', $request->sfx)
                         ->orderBy('model_year','DESC')
                         ->first();
+        $data['codes'] = $loiItems->get();
        $data['master_model_id'] = $masterModel->id;
        return response($data);
     }
 
-    public function getChildMasterModels(Request $request) {
+    public function getMasterModels(Request $request) {
         info("inside function");
         info($request->all());
 
-        $parentModel = MasterModel::where('model', $request->model)
-                          ->where('sfx', $request->sfx)->first();
-
+      
             // if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
             //     $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
             //         $query->where('model_line', 'LIKE', '%'. $model_line .'%');
             //     });
-            // }   
-            if($parentModel) {
-                $data = MasterModel::where('steering', $parentModel->steering)
-                            ->where('master_model_line_id', $parentModel->master_model_line_id);
-              
+            // }  
+            $data = MasterModel::with('loiItems.LOI')
+            ->whereHas('loiItems.LOI', function($query)use($request){
+                $query->select('client_id','status','id','is_expired')
+                ->where('client_id', $request->customer)
+                ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
+                ->where('is_expired', false);
+            }); 
+            if($request->model && $request->sfx) {
+                $parentModel = MasterModel::where('model', $request->model)
+                                    ->where('sfx', $request->sfx)->first();
+
+               $data = $data->where('steering', $parentModel->steering)
+                            ->where('master_model_line_id', $parentModel->master_model_line_id);             
             }
             if($request->selectedModelIds) {
                 $restrictedModelIds = [];
@@ -498,6 +512,7 @@ class PFIController extends Controller
                 }
              
             }
+           
             $data = $data->groupBy('model')->orderBy('id','DESC')->get();
            
         return response($data);
