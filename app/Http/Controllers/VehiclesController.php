@@ -2938,11 +2938,7 @@ $variant->save();
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                     ->whereNull('vehicles.gdn_id')
-                    ->where('vehicles.status', 'Approved')
-                    ->where(function($query) {
-                        $query->whereDate('vehicles.reservation_end_date', '<', now())
-                              ->orWhereNull('vehicles.reservation_end_date');
-                         });
+                    ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "Booked")
