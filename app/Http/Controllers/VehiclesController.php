@@ -2887,7 +2887,7 @@ $variant->save();
                 else if($status === "Available Stock")
                 {
                     $data = Vehicles::select( [
-                        'vehicles.id',
+                        'vehicles.id as vid',
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
@@ -2898,7 +2898,7 @@ $variant->save();
                         'vehicles.engine',
                         'inspection.id as inspectionid',
                         'vehicles.territory',
-                        'vehicles.price',
+                        'vehicles.price as p',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
@@ -2918,17 +2918,10 @@ $variant->save();
                         'so.so_number',
                         'purchasing_order.po_number',
                         'grn.grn_number',
-                        'sales_person.name as sales_person_name',
-                        'booking_person.name as booking_person_name',
+                        'sp.name as spn',
+                        'bp.name as bpn',
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
@@ -2936,8 +2929,8 @@ $variant->save();
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users as sales_person', 'so.sales_person_id', '=', 'sales_person.id') // Join for sales person
-                    ->leftJoin('users as booking_person', 'vehicles.booking_person_id', '=', 'booking_person.id') // Join for booking person
+                    ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
+                    ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
                     ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                     ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
