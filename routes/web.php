@@ -627,7 +627,7 @@ Route::get('/d', function () {
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
     Route::get('vehicles/filter', [VehiclesController::class, 'index'])->name('vehicles.filter');
-    Route::get('vehicles/statuswise', [VehiclesController::class, 'statuswise'])->name('vehicles.statuswise');
+    Route::match(['get', 'post'], 'vehicles/statuswise', [VehiclesController::class, 'statuswise'])->name('vehicles.statuswise');
     Route::get('vehicles/currentstatus', [VehiclesController::class, 'currentstatus'])->name('vehicles.currentstatus');
     Route::post('vehicles/statussreach', [VehiclesController::class, 'statussreach'])->name('vehicles.statussearch');
     // Route::get('/search-data', [VehiclesController::class, 'searchData'])->name('vehicles.search-data');
