@@ -190,6 +190,7 @@ public function store(Request $request)
                 'booking_requests.calls_id',
                 'users.name',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking_requests.days',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -208,6 +209,7 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
@@ -241,6 +243,7 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
                 'vehicles.vin',
                 'users.name',
@@ -261,6 +264,7 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
@@ -297,6 +301,7 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
                'users.name',
                 'vehicles.vin',
@@ -317,6 +322,7 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
@@ -353,6 +359,7 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
                 'users.name',
                 'vehicles.vin',
@@ -373,6 +380,7 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
@@ -408,6 +416,7 @@ public function store(Request $request)
                 'booking_requests.id',
                 'booking_requests.calls_id',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking_requests.days',
                 'users.name',
                 'booking_requests.reason',
@@ -428,6 +437,7 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
