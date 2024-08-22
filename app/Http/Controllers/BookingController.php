@@ -188,6 +188,7 @@ public function store(Request $request)
         $data = BookingRequest::select([
                 'booking_requests.id',
                 'booking_requests.calls_id',
+                'users.name',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
                 'booking_requests.days',
                 'booking_requests.bookingnotes',
@@ -242,6 +243,7 @@ public function store(Request $request)
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'users.name',
                 'brands.brand_name',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -261,7 +263,7 @@ public function store(Request $request)
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->whereNull('vehicles.so_id')
             ->where('booking_requests.status', $status)
@@ -296,6 +298,7 @@ public function store(Request $request)
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
+               'users.name',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -316,7 +319,7 @@ public function store(Request $request)
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '>=', now())
@@ -351,6 +354,7 @@ public function store(Request $request)
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
+                'users.name',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -371,7 +375,7 @@ public function store(Request $request)
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '<', now());
@@ -405,6 +409,7 @@ public function store(Request $request)
                 'booking_requests.calls_id',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
                 'booking_requests.days',
+                'users.name',
                 'booking_requests.reason',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
