@@ -991,7 +991,6 @@
                 if (!data) {
                     return '';
                 }
-                
                 var words = data.split(' ');
                 var firstFiveWords = words.slice(0, 5).join(' ') + '...';
                 var fullText = data;
@@ -1107,8 +1106,6 @@
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
-                    return 'Delivered';
                 } else {
                     return '';
                 }
