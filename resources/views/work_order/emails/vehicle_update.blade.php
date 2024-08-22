@@ -20,7 +20,8 @@
             <strong>Batch:</strong> {{ $workOrder->batch }}<br>
         @elseif(($workOrder->type == 'export_exw' || $workOrder->type == 'export_cnf') && $workOrder->is_batch == 0) 
             <strong>Batch:</strong> Single Work Order<br>
-        @endif   
+        @endif 
+        <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>  
     </p>
     <p>
         <a href="{{ $accessLink }}">Click here to view the work order</a><br>
@@ -34,7 +35,7 @@
                         <thead>
                             <tr>
                             <th colspan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">
-                                {{ count($newComment->new_vehicles) }} vehicles added as new
+                                {{ count($newComment->new_vehicles) }} vehicles added as new by {{$authUserName}} at {{$currentDateTime}}
                             </th>
                             </tr>
                         </thead>
@@ -47,7 +48,7 @@
                         <thead>
                             <tr>
                                 <th colspan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">
-                                {{ count($newComment->removed_vehicles) }} vehicles removed
+                                {{ count($newComment->removed_vehicles) }} vehicles removed by {{$authUserName}} at {{$currentDateTime}}
                                 </th>
                             </tr>
                         </thead>
@@ -60,7 +61,7 @@
                         <thead>
                             <tr>
                                 <th colspan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px;border-bottom:1px solid #e9e9ef; background-color:#e6f1ff!important;">
-                                {{ count($newComment->updated_vehicles) }} vehicles data updated
+                                {{ count($newComment->updated_vehicles) }} vehicles data updated by {{$authUserName}} at {{$currentDateTime}}
                                 </th>
                             </tr>
                         </thead>

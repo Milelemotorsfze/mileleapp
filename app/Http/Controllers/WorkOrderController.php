@@ -668,12 +668,18 @@ class WorkOrderController extends Controller
             ]);
             throw new \Exception('One or more email addresses are invalid.');
         }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
 
+        // Get the current date and time in d M Y, h:i:s A format
+        $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
         Mail::send('work_order.emails.vehicle_update', [
             'workOrder' => $workOrder,
             'accessLink' => $accessLink,
             'newComment' => $newComment,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
         ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
             $message->from($template['from'], $template['from_name'])
                     ->to([$financeEmail, $managementEmail, $operationsEmail])
