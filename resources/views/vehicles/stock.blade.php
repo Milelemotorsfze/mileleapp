@@ -478,7 +478,6 @@
                   <th>Inspection Remarks</th>
                   <th>Aging</th>
                   <th>GRN Report</th>
-                  <th>Reservation Start</th>
                   <th>Reservation End</th>
                   <th>Reservation Sales Person</th>
                   <th>SO Date</th>
@@ -1069,7 +1068,6 @@
                 }
             }
         },
-        { data: 'reservation_start_date', name: 'vehicles.reservation_start_date' },
         { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
         { data: 'bpn', name: 'bp.name' },
         { data: 'so_date', name: 'so.so_date' },
