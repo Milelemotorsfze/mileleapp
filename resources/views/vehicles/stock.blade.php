@@ -483,6 +483,9 @@
                   <th>SO Date</th>
                   <th>So Number</th>
                   <th>Sales Person</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -639,6 +642,9 @@
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>PDI Report</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -693,6 +699,9 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -747,6 +756,9 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -1073,6 +1085,9 @@
         { data: 'so_date', name: 'so.so_date' },
         { data: 'so_number', name: 'so.so_number' },
         { data: 'spn', name: 'sp.name' },
+        { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
         {
                 data: null,
                 name: 'chat',
@@ -1086,7 +1101,17 @@
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
-    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+    ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
     columns: columns3,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
     columnDefs: [
@@ -1416,6 +1441,9 @@ var columns6 = [
                 }
             }
         },
+        { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
             {
                 data: null,
                 name: 'chat',
@@ -1429,8 +1457,18 @@ var columns6 = [
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
             serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
             columns: columns6,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table6.on('draw', function () {
@@ -1518,6 +1556,9 @@ var columns6 = [
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
+                { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
                 {
                 data: null,
                 name: 'chat',
@@ -1531,8 +1572,18 @@ var columns6 = [
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
             serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
             columns: columns7,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
@@ -1644,6 +1695,9 @@ if (hasPricePermission) {
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' },
+                { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
                 {
                 data: null,
                 name: 'chat',
@@ -1658,8 +1712,18 @@ if (hasPricePermission) {
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
             serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
             columns: columns9,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {

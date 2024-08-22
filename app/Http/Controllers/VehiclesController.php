@@ -2919,6 +2919,9 @@ $variant->save();
                         'purchasing_order.po_number',
                         'grn.grn_number',
                         'sp.name as spn',
+                        'documents.import_type',
+                        'documents.owership',
+                        'documents.document_with',
                         'bp.name as bpn',
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
@@ -2937,6 +2940,7 @@ $variant->save();
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
@@ -3098,6 +3102,9 @@ $variant->save();
                         'int_color.name as interior_color',
                         'ex_color.name as exterior_color',
                         'purchasing_order.po_number',
+                        'documents.import_type',
+                        'documents.owership',
+                        'documents.document_with',
                         'grn.grn_number',
                         'gdn.gdn_number',
                         'users.name',
@@ -3125,6 +3132,7 @@ $variant->save();
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->whereNotNull('vehicles.inspection_date')
                     ->whereNotNull('vehicles.gdn_id')
                     ->whereNotNull('vehicles.grn_id')
@@ -3165,6 +3173,9 @@ $variant->save();
                         'int_color.name as interior_color',
                         'ex_color.name as exterior_color',
                         'purchasing_order.po_number',
+                        'documents.import_type',
+                        'documents.owership',
+                        'documents.document_with',
                         'grn.grn_number',
                         'gdn.gdn_number',
                         'users.name',
@@ -3192,6 +3203,7 @@ $variant->save();
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
@@ -3223,6 +3235,9 @@ $variant->save();
                         'varaints.steering',
                         'varaints.my',
                         'varaints.fuel_type',
+                        'documents.import_type',
+                        'documents.owership',
+                        'documents.document_with',
                         'varaints.gearbox',
                         'so.so_number',
                         'master_model_lines.model_line',
@@ -3256,6 +3271,7 @@ $variant->save();
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->where('vehicles.status', 'Approved')
                     ->where('purchasing_order.is_demand_planning_po', '=', '1');
                     $data = $data->groupBy('vehicles.id');  
