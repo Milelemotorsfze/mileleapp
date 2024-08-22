@@ -14,7 +14,7 @@
         @if(($workOrder->type == 'export_exw' || $workOrder->type == 'export_cnf') && $workOrder->is_batch == 1 && !empty($workOrder->batch)) 
         <strong>Batch:</strong>  {{ $workOrder->batch }}<br>
         @elseif(($workOrder->type == 'export_exw' || $workOrder->type == 'export_cnf') && $workOrder->is_batch == 0) 
-        <strong>Batch:</strong>  Single Batch<br>
+        <strong>Batch:</strong>  Single Work Order<br>
         @endif
         <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>
     </p>

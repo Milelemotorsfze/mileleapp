@@ -2095,9 +2095,14 @@ class WorkOrderController extends Controller
 
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-
+        $statusName = '';
+        if($status == 'approved') {
+            $statusName = 'Approved';
+        } else if($status == 'rejected') {
+            $statusName = 'Rejected';
+        }
         // Prepare email subject
-        $subject = "WO Finance Approval '{$status}' " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+        $subject = "WO Finance ".$statusName." " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
@@ -2196,9 +2201,14 @@ class WorkOrderController extends Controller
 
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-
+        $statusName = '';
+        if($status == 'approved') {
+            $statusName = 'Approved';
+        } else if($status == 'rejected') {
+            $statusName = 'Rejected';
+        }
         // Prepare email subject
-        $subject = "WO COO Office Approval '{$status}' " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+        $subject = "WO COO Office ".$statusName." " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
