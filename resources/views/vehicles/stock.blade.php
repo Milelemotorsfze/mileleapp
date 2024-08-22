@@ -1093,14 +1093,13 @@
         {
             targets: 0,
             render: function (data, type, row) {
-              console.log(row);
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1126,7 +1125,7 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
     @endphp
     @if ($hasPermission)
         var data = table3.row(this).data();
-        openBookingModal(data.id);
+        openBookingModal(data.vid);
     @endif
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
@@ -1539,14 +1538,13 @@ var columns6 = [
         {
             targets: 0,
             render: function (data, type, row) {
-              console.log(row);
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1667,14 +1665,13 @@ if (hasPricePermission) {
         {
             targets: 0,
             render: function (data, type, row) {
-              console.log(row);
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1852,7 +1849,6 @@ function openModal(id) {
                 var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
               }
               var variantItemsBody = $('<tbody></tbody>');
-              console.log(response.variantItems);
               response.variantItems.forEach(function(variantItem) {
                   var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
                   var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
@@ -1878,7 +1874,6 @@ function openModal(id) {
                 var modifiedVariantHeader = $('<thead><tr><th>Modified Attributes</th><th>Modified Option</th></tr></thead>');
                 var modifiedVariantBody = $('<tbody></tbody>');
                 response.modifiedVariants.forEach(function(modifiedVariant) {
-                  console.log(modifiedVariant);
                     var modifiedVariantName = modifiedVariant.modified_variant_items ? modifiedVariant.modified_variant_items.name : 'N/A';
                     var addonName = modifiedVariant.addon ? modifiedVariant.addon.name : 'N/A';
                     modifiedVariantBody.append('<tr><td>' + modifiedVariantName + '</td><td>' + addonName + '</td></tr>');
@@ -1908,7 +1903,6 @@ function fetchVehicleData(vehicleId) {
             } else {
                 alert('No post found');
             }
-            console.log(response);
         },
         error: function(xhr) {
             if (xhr.status === 404) {
@@ -1939,7 +1933,6 @@ function displayGallery(imageUrls) {
 </script>
 <script>
   function openBookingModal(vehicleId) {
-    console.log(vehicleId);
     $('#vehicle_id').val(vehicleId);
     $('#bookingModal').modal('show');
 }
@@ -1961,8 +1954,17 @@ function displayGallery(imageUrls) {
             location.reload();
         },
         error: function(xhr) {
-            alert('An error occurred while saving the booking.');
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
         }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
     });
 });
 </script>
@@ -1975,7 +1977,6 @@ function openChatModal(vehicleId) {
 }
 
 function loadMessages(vehicleId) {
-  console.log("pouch");
     $.get(`/stockmessages/${vehicleId}`, function(data) {
         $('#messages').empty();
         data.forEach(function(message) {
