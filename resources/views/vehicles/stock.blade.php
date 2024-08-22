@@ -1125,7 +1125,7 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
     @endphp
     @if ($hasPermission)
         var data = table3.row(this).data();
-        openBookingModal(data.vid);
+        openBookingModal(data.id);
     @endif
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
