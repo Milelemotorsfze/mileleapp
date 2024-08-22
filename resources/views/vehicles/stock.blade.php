@@ -1069,12 +1069,12 @@
                 }
             }
         },
-        { data: 'reservation_start_date', name: 'reservation_start_date' },
-        { data: 'reservation_end_date', name: 'reservation_end_date' },
-        { data: 'booking_person_name', name: 'booking_person.name' },
+        { data: 'reservation_start_date', name: 'vehicles.reservation_start_date' },
+        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
+        { data: 'bpn', name: 'bp.name' },
         { data: 'so_date', name: 'so.so_date' },
         { data: 'so_number', name: 'so.so_number' },
-        { data: 'sales_person_name', name: 'sales_person.name' },
+        { data: 'spn', name: 'sp.name' },
         {
                 data: null,
                 name: 'chat',
