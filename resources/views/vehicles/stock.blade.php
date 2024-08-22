@@ -1014,10 +1014,21 @@
                 `;
             }
         },
-        { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+        {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '/GRN?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-        { data: 'engine', name: 'vehicles.engine' },
         { data: 'my', name: 'varaints.my' },
         { data: 'steering', name: 'varaints.steering' },
         { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -1385,10 +1396,21 @@ var columns6 = [
                 `;
             }
         },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+        {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -1511,10 +1533,21 @@ var columns6 = [
                         `;
                     }
                 },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -1649,10 +1682,21 @@ var columns6 = [
                         `;
                     }
                 },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
