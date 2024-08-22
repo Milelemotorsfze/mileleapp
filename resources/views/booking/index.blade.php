@@ -170,6 +170,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Booking Request ID</th>
+                  <th>Sales Person</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>Date</th>
@@ -207,6 +208,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
+                <th>Sales Person</th>
                   <th>Lead ID</th>
                   <th>VIN</th>
                   <th>Brand</th>
@@ -243,6 +245,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>VIN</th>
@@ -280,6 +283,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>VIN</th>
@@ -311,6 +315,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking Request ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>Date</th>
@@ -351,6 +356,7 @@
             ajax: "{{ route('booking.index', ['status' => 'New']) }}",
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
             data: 'calls_id',
@@ -366,7 +372,26 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
@@ -393,6 +418,7 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved Without SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 {
             data: 'calls_id',
             name: 'booking.calls_id',
@@ -406,7 +432,26 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -437,6 +482,7 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved With SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
             data: 'calls_id',
@@ -451,7 +497,26 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -478,6 +543,7 @@
             ajax: "{{ route('booking.index', ['status' => 'Expire']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
             data: 'calls_id',
@@ -492,7 +558,26 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -507,6 +592,7 @@
             ajax: "{{ route('booking.index', ['status' => 'Rejected']) }}",
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
             data: 'calls_id',
@@ -522,7 +608,26 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
@@ -662,6 +767,10 @@ $(document).ready(function () {
         return `${day} - ${month} - ${year}`;
     }
 });
+function showFullText(button) {
+        var fullText = button.getAttribute('data-fulltext');
+        alert(fullText);
+    }
     </script>
 @else
     @php
