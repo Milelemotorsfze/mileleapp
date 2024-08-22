@@ -328,7 +328,7 @@
     </ul>      
   </div>
   @php
-    $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('dp-vehicles-only');
+    $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
 @endphp
 
 <script>
