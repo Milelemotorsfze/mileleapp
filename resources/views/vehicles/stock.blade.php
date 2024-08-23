@@ -61,6 +61,106 @@
       border-radius: 50%;
       padding: 0.3rem 0.6rem;
     }
+    .comments-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fixed-height {
+    height: 280px; /* Adjust the height as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.message-card, .message-reply {
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.message-card .card-body, .message-reply {
+    padding: 1rem;
+}
+
+.message-reply {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+
+.reply-input {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.avatar-small {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    margin-left: 5px;
+}
+
+.send-icon {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    border: none;
+    background: none;
+    font-size: 0.1rem;
+    color: #28a745;
+    cursor: pointer;
+}
+
+.send-icongt {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    border: none;
+    background: none;
+    font-size: 0.01rem;
+    color: #28a745;
+    cursor: pointer;
+}
+.message-input-wrapper, .reply-input-wrapper {
+    position: relative;
+}
+
+.message-input-wrapper textarea, .reply-input-wrapper textarea {
+    padding-right: 40px;
+    width: 100%;
+    box-sizing: border-box;
+}
   </style>
 @section('content')
 @if(session('success'))
@@ -73,6 +173,72 @@
      Stock Info
     </h4>
     <br>
+    <!-- Chat Modal -->
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="chatModalLabel">Comments Box</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <div class="comments-header">
+            <h6>Comments & Remarks</h6>
+          </div>
+          <div id="messages" class="fixed-height"></div>
+          <div class="message-input-wrapper mb-3">
+            <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
+            <button id="send-message" class="btn btn-success send-icon">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="bookingForm" method="POST" action="{{ route('booking.savedirectly') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="booking_start_date">Booking Start Date</label>
+                        <input type="date" class="form-control" id="booking_start_date" name="booking_start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking_end_date">Booking End Date</label>
+                        <input type="date" class="form-control" id="booking_end_date" name="booking_end_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">Sales Person</label>
+                        <select class="form-control" id="salesperson" name="salesperson" required>
+                        @foreach($salesperson as $salesperson)
+                                <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
+                            @endforeach
+                           
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -114,7 +280,7 @@
   </div>
 </div>
     <ul class="nav nav-pills nav-fill">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
           <span class="badge badge-danger row-badge1 badge-notification"></span>
         </a>
@@ -123,12 +289,12 @@
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection
         <span class="badge badge-danger row-badge2 badge-notification"></span>
         </a>
-      </li>
+      </li> -->
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Available Stock
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab3">Incoming / Available Stock
         <span class="badge badge-danger row-badge3 badge-notification"></span>
         </a>
-      </li>
+      <!-- </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked
         <span class="badge badge-danger row-badge4 badge-notification"></span>
@@ -138,14 +304,14 @@
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold
         <span class="badge badge-danger row-badge5 badge-notification"></span>
         </a>
-      </li>
+      </li> -->
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered
         <span class="badge badge-danger row-badge6 badge-notification"></span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Full Stock
+        <a class="nav-link" data-bs-toggle="pill" href="#tab7">All Vehicles
           <span class="badge badge-danger row-badge7 badge-notification"></span>
         </a>
       </li>
@@ -161,17 +327,29 @@
       @endif
     </ul>      
   </div>
+  @php
+    $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
+@endphp
+
+<script>
+    var hasPricePermission = @json($hasPricePermission);
+</script>
   <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <!-- <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample1')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Brand</th>
+                  <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -188,13 +366,17 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>Estimated Arrival</th>
                   <th>SO</th>
                   <th>SO Date</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -205,9 +387,14 @@
       </div>  
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample2')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -229,7 +416,8 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -237,6 +425,7 @@
                   <th>SO</th>
                   <th>SO Date</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,16 +433,22 @@
             </table>
           </div> 
         </div>  
-      </div> 
-      <div class="tab-pane fade show" id="tab3">
+      </div>  -->
+      <div class="tab-pane fade show active" id="tab3">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
+            <th>Status</th>
             <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
@@ -271,14 +466,27 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
                   <th>GRN Date</th>
                   <th>Inspection Date</th>
                   <th>Inspection Remarks</th>
+                  <th>Aging</th>
                   <th>GRN Report</th>
+                  <th>Reservation End</th>
+                  <th>Reservation Sales Person</th>
+                  <th>SO Date</th>
+                  <th>So Number</th>
+                  <th>Sales Person</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -287,11 +495,16 @@
           </div> 
         </div>  
       </div> 
-      <div class="tab-pane fade show" id="tab4">
+      <!-- <div class="tab-pane fade show" id="tab4">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample4')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -313,7 +526,8 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -323,6 +537,7 @@
                   <th>Reservation Start</th>
                   <th>Reservation End</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -330,12 +545,17 @@
             </table>
           </div> 
         </div>  
-      </div> 
-      <div class="tab-pane fade show" id="tab5">
+      </div>  -->
+      <!-- <div class="tab-pane fade show" id="tab5">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample5')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -357,7 +577,8 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  <th>Min Price</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -367,6 +588,7 @@
                   <th>SO Date</th>
                   <th>So Number</th>
                   <th>Sales Person</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -374,12 +596,17 @@
             </table>
           </div> 
         </div>  
-      </div> 
+      </div>  -->
       <div class="tab-pane fade show" id="tab6">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -401,7 +628,10 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -412,6 +642,10 @@
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>PDI Report</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -422,9 +656,14 @@
       </div>
       <div class="tab-pane fade show" id="tab7">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample7')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -447,7 +686,10 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -457,6 +699,10 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -467,9 +713,14 @@
       </div>
       <div class="tab-pane fade show" id="tab8">
         <div class="card-body">
+        @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
+      @endphp
+      @if ($hasPermission)
         <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample8')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
+@endif
           <div class="table-responsive">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -492,7 +743,10 @@
                   <th>Production Year</th>
                   <th>Location</th>
                   <th>Territory</th>
-                  <th>Final Destination</th>
+                  <th>Preferred Destination</th>
+                  @if ($hasPricePermission)
+                    <th>Price</th>
+                @endif
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -502,6 +756,10 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Import Type</th>
+                  <th>Owership</th>
+                  <th>Document With</th>
+                  <th>Comments</th>
                 </tr>
               </thead>
               <tbody>
@@ -530,149 +788,203 @@
   </div>
   <script>
         $(document).ready(function () {
-          var table1 = $('#dtBasicExample1').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
+//            var columns1 = [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
                         
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},        
-        { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'estimation_date', name: 'vehicles.estimation_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' }
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            buttons: [
-        'excelHtml5' // Add the export to Excel button
-    ]
-        });
-        table1.on('draw', function () {
-            var rowCount = table1.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge1').text(rowCount).show();
-            } else {
-                $('.row-badge1').hide();
-            }
-        });
-        var table2 = $('#dtBasicExample2').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},        
+//         { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//             ];
+//         if (hasPricePermission) {
+//                     columns1.push({
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
+
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+// });
+//             }
+//             columns1.push(
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             );
+//             var table1 = $('#dtBasicExample1').DataTable({
+//             processing: true,
+//             serverSide: true,
+//             columns: columns1,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//             buttons: [
+//         'excelHtml5' // Add the export to Excel button
+//     ]
+//         });
+//         table1.on('draw', function () {
+//             var rowCount = table1.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge1').text(rowCount).show();
+//             } else {
+//                 $('.row-badge1').hide();
+//             }
+//         });
+//         var table2 = $('#dtBasicExample2').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
                         
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
 
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-              { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table2.on('draw', function () {
-            var rowCount = table2.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge2').text(rowCount).show();
-            } else {
-                $('.row-badge2').hide();
-            }
-        });
-        var table3 = $('#dtBasicExample3').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
-    columns: [
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
+
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//               { data: 'po_number', name: 'purchasing_order.po_number' },
+//               { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table2.on('draw', function () {
+//             var rowCount = table2.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge2').text(rowCount).show();
+//             } else {
+//                 $('.row-badge2').hide();
+//             }
+//         });
+    var columns3 = [
+        { data: 'id', name: 'vehicles.id' },
         { data: 'brand_name', name: 'brands.brand_name' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'model_detail', name: 'varaints.model_detail' },
@@ -684,6 +996,389 @@
             }
         },
         {
+            data: 'variant_detail',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
+        {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '/GRN?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
+        { data: 'my', name: 'varaints.my' },
+        { data: 'steering', name: 'varaints.steering' },
+        { data: 'fuel_type', name: 'varaints.fuel_type' },
+        { data: 'gearbox', name: 'varaints.gearbox' },
+        { data: 'exterior_color', name: 'ex_color.name' },
+        { data: 'interior_color', name: 'int_color.name' },
+        { data: 'upholestry', name: 'varaints.upholestry' },
+        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+        { data: 'location', name: 'warehouse.name' },
+        { data: 'territory', name: 'vehicles.territory' },
+        { data: 'fd', name: 'countries.name' },
+    ];
+    if (hasPricePermission) {
+        columns3.push({
+            data: 'price', 
+            name: 'vehicles.price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        });
+    }
+    columns3.push(
+        { data: 'po_number', name: 'purchasing_order.po_number' },
+        { data: 'po_date', name: 'purchasing_order.po_date' },
+        { data: 'grn_number', name: 'grn.grn_number' },
+        { data: 'date', name: 'grn.date' },
+        { data: 'inspection_date', name: 'inspection_date' },
+        { data: 'grn_remark', name: 'vehicles.grn_remark' },
+        { 
+            data: null,
+            render: function(data, type, row) {
+                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
+                var currentDate = new Date();
+                var timeDiff = currentDate - grnDate;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
+
+                return daysDiff + ' days';
+            },
+            searchable: false, // Disable searching for this column
+            orderable: false // Disable ordering from the server-side for this column
+        },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
+        { data: 'bpn', name: 'bp.name' },
+        { data: 'so_date', name: 'so.so_date' },
+        { data: 'so_number', name: 'so.so_number' },
+        { data: 'spn', name: 'sp.name' },
+        { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
+        {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
+        );
+            var table3 = $('#dtBasicExample3').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
+    columns: columns3,
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    columnDefs: [
+        {
+            targets: 0,
+            render: function (data, type, row) {
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                    return 'Incoming';
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                    return 'Pending Inspection';
+                } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
+                    return 'Available Stock';
+                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
+                    return 'Booked';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                    return 'Sold';
+                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                    return 'Delivered';
+                } else {
+                    return '';
+                }
+            }
+        }
+    ],
+});
+
+table3.on('draw', function () {
+    var rowCount = table3.page.info().recordsDisplay;
+    if (rowCount > 0) {
+        $('.row-badge3').text(rowCount).show();
+    } else {
+        $('.row-badge3').hide();
+    }
+});
+$('#dtBasicExample3 tbody').on('click', 'tr', function () {
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+    @endphp
+    @if ($hasPermission)
+        var data = table3.row(this).data();
+        openBookingModal(data.id);
+    @endif
+});
+//         var table4 = $('#dtBasicExample4').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                     }
+//                 },
+//                 {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
+                        
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
+
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//                 { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price',  
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
+
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'inspection_date', name: 'inspection_date' },
+//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
+//                 { data: 'reservation_start_date', name: 'reservation_start_date' },
+//                 { data: 'reservation_end_date', name: 'reservation_end_date' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table4.on('draw', function () {
+//             var rowCount = table4.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge4').text(rowCount).show();
+//             } else {
+//                 $('.row-badge4').hide();
+//             }
+//         });
+//         $('#dtBasicExample4 tbody').on('click', 'tr', function () {
+//     @php
+//     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+//     @endphp
+//     @if ($hasPermission)
+//         var data = table4.row(this).data();
+//         openBookingModal(data.id);
+//     @endif
+// });
+//         var table5 = $('#dtBasicExample5').DataTable({
+//           processing: true,
+//             serverSide: true,
+//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
+//             columns: [
+//               { data: 'brand_name', name: 'brands.brand_name' },
+//                 { data: 'model_line', name: 'master_model_lines.model_line' },
+//                 { data: 'model_detail', name: 'varaints.model_detail' },
+//                 { 
+//                 data: 'variant', 
+//                 name: 'varaints.name',
+//                 render: function(data, type, row) {
+//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+//                 }
+//             },
+//             {
+//                     data: 'variant_detail', // Updated to use the alias
+//                     name: 'varaints.detail',
+//                     render: function(data, type, row) {
+//                         if (!data) {
+//                             return ''; // Return an empty string if data is undefined or null
+//                         }
+                        
+//                         var words = data.split(' ');
+//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+//                         var fullText = data;
+
+//                         return `
+//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+//                                 ${firstFiveWords}
+//                             </div>
+//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+//                         `;
+//                     }
+//                 },
+//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+//         }},
+//                 { data: 'engine', name: 'vehicles.engine' },
+//                 { data: 'my', name: 'varaints.my' },
+//                 { data: 'steering', name: 'varaints.steering' },
+//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
+//                 { data: 'gearbox', name: 'varaints.gearbox' },
+//                 { data: 'exterior_color', name: 'ex_color.name' },
+//                 { data: 'interior_color', name: 'int_color.name' },
+//                 { data: 'upholestry', name: 'varaints.upholestry' },
+//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+//                 { data: 'location', name: 'warehouse.name' },
+//                 { data: 'territory', name: 'vehicles.territory' },
+//                 { data: 'fd', name: 'countries.name' },
+//                 {
+//                     data: 'price', 
+//                     name: 'vehicles.price', 
+//                     render: function(data, type, row) {
+//                         if (data) {
+//                             // Convert the string to a float, then format it with commas
+//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+//                                 minimumFractionDigits: 0,
+//                                 maximumFractionDigits: 0
+//                             });
+
+//                             // Return the price wrapped in a span with button-like styling
+//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+//                         }
+//                         return ''; // Return an empty string if there's no price
+//                     }
+//                 },
+//                 { data: 'po_number', name: 'purchasing_order.po_number' },
+//                 { data: 'po_date', name: 'purchasing_order.po_date' },
+//                 { data: 'grn_number', name: 'grn.grn_number' },
+//                 { data: 'date', name: 'grn.date' },
+//                 { data: 'inspection_date', name: 'inspection_date' },
+//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
+//                 { data: 'so_date', name: 'so.so_date' },
+//                 { data: 'so_number', name: 'so.so_number' },
+//                 { data: 'name', name: 'users.name' },
+//                 {
+//                 data: null,
+//                 name: 'chat',
+//                 render: function(data, type, row) {
+//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+//                 },
+//                 orderable: false,
+//                 searchable: false
+//             },
+//             ],
+//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//         });
+//         table5.on('draw', function () {
+//             var rowCount = table5.page.info().recordsDisplay;
+//             if (rowCount > 0) {
+//                 $('.row-badge5').text(rowCount).show();
+//             } else {
+//                 $('.row-badge5').hide();
+//             }
+//         });
+var columns6 = [
+              { data: 'brand_name', name: 'brands.brand_name' },
+                { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
+            {
             data: 'variant_detail',
             name: 'varaints.detail',
             render: function(data, type, row) {
@@ -703,89 +1398,21 @@
                 `;
             }
         },
-        { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-        { data: 'engine', name: 'vehicles.engine' },
-        { data: 'my', name: 'varaints.my' },
-        { data: 'steering', name: 'varaints.steering' },
-        { data: 'fuel_type', name: 'varaints.fuel_type' },
-        { data: 'gearbox', name: 'varaints.gearbox' },
-        { data: 'exterior_color', name: 'ex_color.name' },
-        { data: 'interior_color', name: 'int_color.name' },
-        { data: 'upholestry', name: 'varaints.upholestry' },
-        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-        { data: 'location', name: 'warehouse.name' },
-        { data: 'territory', name: 'vehicles.territory' },
-        { data: 'fd', name: 'purchasing_order.fd' },
-        { data: 'po_number', name: 'purchasing_order.po_number' },
-        { data: 'po_date', name: 'purchasing_order.po_date' },
-        { data: 'grn_number', name: 'grn.grn_number' },
-        { data: 'date', name: 'grn.date' },
-        { data: 'inspection_date', name: 'inspection_date' },
-        { data: 'grn_remark', name: 'vehicles.grn_remark' },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                if (row.inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
+        {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
         }
-    ],
-    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-});
-
-table3.on('draw', function () {
-    var rowCount = table3.page.info().recordsDisplay;
-    if (rowCount > 0) {
-        $('.row-badge3').text(rowCount).show();
-    } else {
-        $('.row-badge3').hide();
     }
-});
-        var table4 = $('#dtBasicExample4').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                    }
-                },
-                {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-                { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -796,147 +1423,28 @@ table3.on('draw', function () {
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'reservation_start_date', name: 'reservation_start_date' },
-                { data: 'reservation_end_date', name: 'reservation_end_date' },
-                { data: 'name', name: 'users.name' },
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table4.on('draw', function () {
-            var rowCount = table4.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge4').text(rowCount).show();
-            } else {
-                $('.row-badge4').hide();
+                { data: 'fd', name: 'countries.name' },
+            ];
+                if (hasPricePermission) {
+                    columns6.push({
+                    data: 'price', 
+                    name: 'vehicles.price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+                });
             }
-        });
-        var table5 = $('#dtBasicExample5').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' }
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        });
-        table5.on('draw', function () {
-            var rowCount = table5.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge5').text(rowCount).show();
-            } else {
-                $('.row-badge5').hide();
-            }
-        });
-        var table6 = $('#dtBasicExample6').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
-            columns: [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
+                columns6.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -956,8 +1464,35 @@ table3.on('draw', function () {
                     return 'Not Available';
                 }
             }
+        },
+        { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
+            {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
+        );
+        var table6 = $('#dtBasicExample6').DataTable({
+          processing: true,
+            serverSide: true,
+            columns: columns6,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-            ],
+    },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table6.on('draw', function () {
@@ -969,11 +1504,8 @@ table3.on('draw', function () {
             }
         });
         var now = new Date();
-        var table7 = $('#dtBasicExample7').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
-            columns: [
+        
+        var columns7 = [
               { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -1003,10 +1535,21 @@ table3.on('draw', function () {
                         `;
                     }
                 },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -1017,7 +1560,28 @@ table3.on('draw', function () {
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
+                { data: 'fd', name: 'countries.name' },
+    ];
+                if (hasPricePermission) {
+                    columns7.push({
+                    data: 'price', 
+                    name: 'vehicles.price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        });
+    }
+                columns7.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1027,19 +1591,46 @@ table3.on('draw', function () {
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
-            ],
+                { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            },
+);
+        var table7 = $('#dtBasicExample7').DataTable({
+          processing: true,
+            serverSide: true,
+            columns: columns7,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
             targets: 0,
             render: function (data, type, row) {
-              console.log(row);
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1051,7 +1642,6 @@ table3.on('draw', function () {
             }
         }
     ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table7.on('draw', function () {
             var rowCount = table7.page.info().recordsDisplay;
@@ -1061,11 +1651,8 @@ table3.on('draw', function () {
                 $('.row-badge7').hide();
             }
         });
-        var table8 = $('#dtBasicExample8').DataTable({
-          processing: true,
-            serverSide: true,
-            ajax: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
-            columns: [
+       
+        var columns9 = [
               { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -1097,10 +1684,21 @@ table3.on('draw', function () {
                         `;
                     }
                 },
-            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+                {
+    data: 'vin',
+    name: 'vehicles.vin',
+    render: function(data, type, row) {
+        if (data) {
+            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
+            return '<a href="' + url + '" target="_blank">' + data + '</a>';
+        } else {
+            return data;
+        }
+    }
+},
+        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
-                { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -1111,7 +1709,29 @@ table3.on('draw', function () {
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'purchasing_order.fd' },
+                { data: 'fd', name: 'countries.name' },
+            ];
+
+if (hasPricePermission) {
+    columns9.push({
+                    data: 'price', 
+                    name: 'vehicles.price', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        });
+    }
+                columns9.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -1120,20 +1740,48 @@ table3.on('draw', function () {
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' }, 
-            ],
+                { data: 'gdndate', name: 'gdn.date' },
+                { data: 'import_type', name: 'documents.import_type' },
+        { data: 'owership', name: 'documents.owership' },
+        { data: 'document_with', name: 'documents.document_with' },
+                {
+                data: null,
+                name: 'chat',
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
+                },
+                orderable: false,
+                searchable: false
+            }, 
+        );
+            
+    var table8 = $('#dtBasicExample8').DataTable({
+          processing: true,
+            serverSide: true,
+            columns: columns9,
+            ajax: {
+        url: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
+        type: "POST",
+        data: function(d) {
+            // Add any additional parameters to be sent along with the POST request here
+            // d.extra_param = "extra_value";
+        },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    },
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
             targets: 0,
             render: function (data, type, row) {
-              console.log(row);
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
+                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1145,7 +1793,6 @@ table3.on('draw', function () {
             }
         }
     ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table8.on('draw', function () {
             var rowCount = table8.page.info().recordsDisplay;
@@ -1312,7 +1959,6 @@ function openModal(id) {
                 var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
               }
               var variantItemsBody = $('<tbody></tbody>');
-              console.log(response.variantItems);
               response.variantItems.forEach(function(variantItem) {
                   var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
                   var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
@@ -1338,7 +1984,6 @@ function openModal(id) {
                 var modifiedVariantHeader = $('<thead><tr><th>Modified Attributes</th><th>Modified Option</th></tr></thead>');
                 var modifiedVariantBody = $('<tbody></tbody>');
                 response.modifiedVariants.forEach(function(modifiedVariant) {
-                  console.log(modifiedVariant);
                     var modifiedVariantName = modifiedVariant.modified_variant_items ? modifiedVariant.modified_variant_items.name : 'N/A';
                     var addonName = modifiedVariant.addon ? modifiedVariant.addon.name : 'N/A';
                     modifiedVariantBody.append('<tr><td>' + modifiedVariantName + '</td><td>' + addonName + '</td></tr>');
@@ -1368,7 +2013,6 @@ function fetchVehicleData(vehicleId) {
             } else {
                 alert('No post found');
             }
-            console.log(response);
         },
         error: function(xhr) {
             if (xhr.status === 404) {
@@ -1383,7 +2027,6 @@ function fetchVehicleData(vehicleId) {
 function showNoImagePopup() {
     $('#noImageModal').modal('show');
 }
-
 function displayGallery(imageUrls) {
     var carouselImages = document.getElementById("carouselImages");
     carouselImages.innerHTML = "";
@@ -1399,9 +2042,195 @@ function displayGallery(imageUrls) {
 }
 </script>
 <script>
+  function openBookingModal(vehicleId) {
+    $('#vehicle_id').val(vehicleId);
+    $('#bookingModal').modal('show');
+}
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
+    $('#bookingForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#bookingModal').modal('hide');
+            alert('Booking saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+</script>
+<script>
+let currentVehicleId = null;
+function openChatModal(vehicleId) {
+    currentVehicleId = vehicleId;  // Store the vehicleId in a global variable
+    $('#chatModal').modal('show');
+    loadMessages(vehicleId);
+}
+
+function loadMessages(vehicleId) {
+    $.get(`/stockmessages/${vehicleId}`, function(data) {
+        $('#messages').empty();
+        data.forEach(function(message) {
+            displayMessage(message);
+        });
+        scrollToBottom();
+    });
+}
+
+function scrollToBottom() {
+    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const messageDate = new Date(date);
+    const diff = Math.floor((now - messageDate) / 1000);
+    if (diff < 60) return `${diff} seconds ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    return `${Math.floor(diff / 86400)} days ago`;
+}
+
+function getInitials(name) {
+    return name.charAt(0).toUpperCase();
+}
+
+function getAvatarColor(name) {
+    const colors = ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'];
+    const charCode = name.charCodeAt(0);
+    return colors[charCode % colors.length];
+}
+
+function displayMessage(message) {
+    const replies = message.replies || [];
+    const messageTime = formatTimeAgo(message.created_at);
+    const userInitial = getInitials(message.user.name);
+    const userColor = getAvatarColor(message.user.name);
+    const messageHtml = `
+        <div class="card message-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div class="user-info">
+                        <div class="avatar" style="background-color: ${userColor};">${userInitial}</div>
+                        <strong class="user-name">${message.user.name}</strong>
+                    </div>
+                    <small class="text-muted">${messageTime}</small>
+                </div>
+                <p class="mt-2">${message.message}</p>
+                <div id="replies-${message.id}">
+                    ${replies.map(reply => `
+                        <div class="message-reply">
+                            <div class="d-flex justify-content-between">
+                                <div class="user-info">
+                                    <div class="avatar avatar-small" style="background-color: ${getAvatarColor(reply.user.name)};">${getInitials(reply.user.name)}</div>
+                                    <strong class="user-name">${reply.user.name}</strong>
+                                </div>
+                                <small class="text-muted">${formatTimeAgo(reply.created_at)}</small>
+                            </div>
+                            <p class="mt-1">${reply.reply}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <a href="javascript:void(0)" class="reply-link" data-message-id="${message.id}">Reply</a>
+                <div class="reply-input-wrapper input-group mt-2" style="display:none;" id="reply-input-${message.id}">
+                    <textarea class="form-control reply-message" placeholder="Reply..." rows="1"></textarea>
+                    <button class="btn btn-success btn-sm send-reply" data-message-id="${message.id}">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    $('#messages').append(messageHtml);
+}
+let csrfToken = $('meta[name="csrf-token"]').attr('content');
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': csrfToken
+    }
+});
+function sendMessage() {
+    const message = $('#message').val();
+    if (message.trim() !== '') {
+        $.post('/stockmessages', { vehicle_id: currentVehicleId, message: message }, function(data) {
+            displayMessage(data);
+            $('#message').val('');
+            scrollToBottom();
+        });
+    }
+}
+
+function sendReply(messageId) {
+    const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
+    if (reply.trim() !== '') {
+        $.post('/stockreplies', { message_id: messageId, reply: reply }, function(data) {
+            const replyHtml = `
+                <div class="message-reply">
+                    <div class="d-flex justify-content-between">
+                        <div class="user-info">
+                            <div class="avatar avatar-small" style="background-color: ${getAvatarColor(data.user.name)};">${getInitials(data.user.name)}</div>
+                            <strong class="user-name">${data.user.name}</strong>
+                        </div>
+                        <small class="text-muted">${formatTimeAgo(data.created_at)}</small>
+                    </div>
+                    <p class="mt-1">${data.reply}</p>
+                </div>
+            `;
+            $(`#replies-${messageId}`).append(replyHtml);
+            $(`#reply-input-${messageId}`).find('.reply-message').val('');
+            $(`#reply-input-${messageId}`).hide();
+        });
+    }
+}
+
+$(document).ready(function() {
+    $('#send-message').on('click', function() {
+        sendMessage();
+    });
+
+    $('#message').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            sendMessage();
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.reply-link', function() {
+        const messageId = $(this).data('message-id');
+        $(`#reply-input-${messageId}`).toggle();
+    });
+
+    $(document).on('keypress', '.reply-message', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            const messageId = $(this).closest('.reply-input-wrapper').attr('id').split('-')[2];
+            sendReply(messageId);
+            e.preventDefault();
+        }
+    });
+
+    $(document).on('click', '.send-reply', function() {
+        const messageId = $(this).data('message-id');
+        sendReply(messageId);
+    });
+});
 </script>
 @endsection

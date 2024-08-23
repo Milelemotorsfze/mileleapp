@@ -127,9 +127,9 @@
                                     </a>
                                 </li>
                                 @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
-                                        @endphp
-                                        @if ($hasPermission)
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo','list-export-exw-wo','view-current-user-export-exw-wo-list','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                @endphp
+                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
@@ -137,13 +137,14 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
+
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','list-export-exw-wo']);
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Create Work Order</span>
+                                                <span data-key="t-utility"> Export EXW</span>
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
@@ -151,67 +152,70 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{route('work-order-create.create','export_exw')}}" class="dropdown-item" data-key="t-login">Export EXW</a>
+                                                <a href="{{route('work-order-create.create','export_exw')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Export CNF</a>
+                                                <a href="{{ route('work-order.index','export_exw') }}" class="dropdown-item" data-key="t-login">List</a>
                                                 @endif
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Local Sale</a>
-                                                @endif
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-lto-wo']);
-                                                @endphp
-                                                <!-- @if ($hasPermission)
-                                                <a href="{{route('work-order-create.create','lto')}}" class="dropdown-item" data-key="t-login">LTO</a>
-                                                @endif -->
                                             </div>
                                         </div>
                                         @endif
 
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo','list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Work Order Info</span>
+                                                <span data-key="t-utility"> Export CNF</span>
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('work-order.index','export_exw') }}" class="dropdown-item" data-key="t-login">Export EXW</a>
+                                                <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-cnf-wo']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('work-order.index','export_cnf') }}" class="dropdown-item" data-key="t-login">Export CNF</a>
-                                                @endif
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-local-sale-wo']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('work-order.index','local_sale') }}" class="dropdown-item" data-key="t-login">Local Sale</a>
-                                                @endif
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-lto-wo']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <!-- <a href="{{ route('work-order.index','lto') }}" class="dropdown-item" data-key="t-login">LTO</a> -->
+                                                <a href="{{ route('work-order.index','export_cnf') }}" class="dropdown-item" data-key="t-login">List</a>
                                                 @endif
                                             </div>
                                         </div>
                                         @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo','list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Local Sale</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Create</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('work-order.index','local_sale') }}" class="dropdown-item" data-key="t-login">List</a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
+
                                     </div>
                                 </li>
                                 @endif
@@ -850,7 +854,6 @@
                                 </div>
                             </li>
                             @endif
-                          
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -904,36 +907,6 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('sale_person_status.index') }}" id="topnav-more" role="button">
                                         <i data-feather="user"></i>
                                         <span data-key="t-extra-pages">Sales Persons</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="" id="topnav-more" role="button">
-                                        <i data-feather="upload-cloud"></i>
-                                        <span data-key="t-extra-pages">Posting Records</span>
-                                        <div class="arrow-down"></div>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                        @php
-                                        $posting_platforms = DB::table('posting_platforms')->get();
-                                        @endphp
-                                        @foreach ($posting_platforms as $posting_platform)
-                                            @php
-                                            $lead_source = DB::table('lead_source')->where('id', $posting_platform->lead_source_id)->first();
-                                            @endphp
-                                            @if($lead_source)
-                                            <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('postingrecords', ['id' => $posting_platform->lead_source_id]) }}" id="topnav-utility" role="button">
-                                                    <span data-key="t-utility">{{$lead_source->source_name}}</span>
-                                                </a>
-                                            </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="shopping-bag"></i>
-                                        <span data-key="t-extra-pages">Purchashing & Payments</span>
                                     </a>
                                 </li>
                                 @endif
@@ -1335,6 +1308,16 @@
                                         </div>
                                         @endif
                                         @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-bank-accounts');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vehiclenetsuitecost.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Netsuite Vehicle Price</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('shipping-master');
                                         @endphp
                                         @if ($hasPermission)
@@ -1483,7 +1466,7 @@
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">Stock Report</span>
                                         <div class="arrow-down"></div>
@@ -1620,6 +1603,25 @@
                                 ->count();
                             @endphp
                             <span class="badge badge-danger row-badge2 badge-notificationing">{{$notificationcount}}</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('department-notification');
+                        @endphp
+                        @if ($hasPermission)
+                        <a class="dropdown-item" href="{{ route('departmentnotifications.index') }}">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                            @php
+$userDepartmentId = auth()->user()->empProfile->department_id;
+
+$departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('departments', function($query) use ($userDepartmentId) {
+    $query->where('master_departments_id', $userDepartmentId);
+})->whereDoesntHave('viewedLogs', function($query) {
+    $query->where('users_id', auth()->id());
+})->count();
+@endphp
+                            <span class="badge badge-danger row-badge2 badge-notificationing">{{$departmentnotificationscount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif

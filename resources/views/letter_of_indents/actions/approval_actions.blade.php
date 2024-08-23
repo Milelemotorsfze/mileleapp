@@ -10,6 +10,16 @@
                             class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>              
                 @endif
             @endcan
+        @elseif($type == 'WAITING_FOR_APPROVAL')
+            @can('loi-status-update')
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-status-update');
+                @endphp
+                @if ($hasPermission)
+                    <button type="button" data-bs-toggle="modal"  data-bs-target="#update-loi-status-{{ $letterOfIndent->id }}"
+                    class="btn btn-warning btn-sm " title="Reverse Update of Status to New">Status Update</button>              
+                @endif
+             @endcan
         @endif
         @if($type == 'WAITING_FOR_APPROVAL')
             @can('loi-supplier-approve')
@@ -100,7 +110,7 @@
                                     </div>
                                     <div class="row mt-2">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
-                                            <dt class="form-label font-size-13 text-muted">Reason :</dt>
+                                            <dt class="form-label font-size-13 text-muted">Remark :</dt>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
                                             <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
@@ -189,13 +199,21 @@
                                 <span id="loi-approval-date-error" class="text-danger"> </span>
                             </div>
                         </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
+                                <dt class="form-label font-size-13 text-muted">Remark :</dt>
+                            </div>
+                            <div class="col-lg-8 col-md-12 col-sm-12">
+                                <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
+                            </div>
+                        </div>
                         <input type="hidden" value="{{ $letterOfIndent->id }}" id="id" name="id">
                         <input type="hidden" value="APPROVE" id="status-approve" name="status">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary " id="status-change-button-approve">Submit</button>
+                    <button type="submit" class="btn btn-primary" >Submit</button>
                 </div>
                 </form>
                 
@@ -203,5 +221,84 @@
         </div>
     </div>
     
-       
+    <!-- To Update status as New -->
+    <div class="modal fade" id="update-loi-status-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Status </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('letter-of-indents.status-update', $letterOfIndent->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-3">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-12 col-sm-12">
+                                <dt class="form-label font-size-13 text-muted mt-2">Status :</dt>
+                            </div>
+                            <div class="col-lg-10 col-md-12 col-sm-12">
+                                <select class="form-control" name="status">
+                                    <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_NEW }}">{{ \App\Models\LetterOfIndent::LOI_STATUS_NEW }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>               
+            </div>
+        </div>
+    </div>
+     <script>
+         $('.btn-request-supplier-approval').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+           
+            var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table = $('.new-LOI-table').DataTable();
+                            table.ajax.reload();
+                            alertify.success('Approval Request Send Successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
+        // $('#loi-approve-form').submit(function (event) {
+        //     event.preventDefault();
+        //     var formData = $(this).serialize();
+        //     console.log("clicekd");
+        //     console.log(formData);
+        //     $.ajax({
+        //         url: $(this).attr('action'),
+        //         type: 'POST',
+        //         dataType:"json"
+        //         data: formData,
+        //           _token: '{{ csrf_token() }}'\
+        
+        //         success: function (response)
+        //          {
+        //             console.log(response);
+        //             var table1 = $('.waiting-for-approval-table').DataTable();
+        //             table1.ajax.reload();
+        //             alertify.success('Supplier Approved successfully.');
+
+        //             },
+        //             error: function (error) {
+        //         console.error(error);
+        //     }
+        //      });
+        // });
   </script> 

@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -111,7 +112,12 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
 use App\Http\Controllers\BankAccountsController;
 use App\Http\Controllers\LOIExpiryConditionController;
+use App\Http\Controllers\LOIItemController;
 use App\Http\Controllers\BanksController;
+use App\Http\Controllers\DepartmentNotificationsController;
+use App\Http\Controllers\AccessController;
+use App\Http\Controllers\VehicleNetsuiteCostController;
+use App\Http\Controllers\StockMessageController;
 
 /*
 /*
@@ -433,6 +439,7 @@ Route::get('/d', function () {
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
+        Route::post('work-order/wo-unique-check', 'uniqueWO')->name('work-order.uniqueWO');
         Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
         Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
         Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
@@ -440,6 +447,13 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
+
+    Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
+    // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
+
+    Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
+    // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
+
     // Demand & Planning Module
 
     // suppliers
@@ -463,11 +477,18 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
         ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
+    ->name('update-loi-comment');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
+    Route::resource('letter-of-indent-items', LOIItemController::class);
+    Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
+                ->name('letter-of-indents.status-update'); 
+    Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
+    ->name('letter-of-indents.loi-expiry-status-update'); 
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
@@ -613,7 +634,7 @@ Route::get('/d', function () {
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
     Route::get('vehicles/filter', [VehiclesController::class, 'index'])->name('vehicles.filter');
-    Route::get('vehicles/statuswise', [VehiclesController::class, 'statuswise'])->name('vehicles.statuswise');
+    Route::match(['get', 'post'], 'vehicles/statuswise', [VehiclesController::class, 'statuswise'])->name('vehicles.statuswise');
     Route::get('vehicles/currentstatus', [VehiclesController::class, 'currentstatus'])->name('vehicles.currentstatus');
     Route::post('vehicles/statussreach', [VehiclesController::class, 'statussreach'])->name('vehicles.statussearch');
     // Route::get('/search-data', [VehiclesController::class, 'searchData'])->name('vehicles.search-data');
@@ -827,7 +848,6 @@ Route::get('/d', function () {
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
-    });
     Route::get('candidate/documents/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_documents.send_form');
     Route::post('candidate/store_docs', [CandidatePersonalInfoController::class, 'storeDocs'])->name('candidate.storeDocs');
     Route::get('candidate/success_docs', [CandidatePersonalInfoController::class, 'successDocs'])->name('candidate.successDocs');
@@ -937,6 +957,28 @@ Route::get('/d', function () {
     Route::get('/get-swift-details/{id}', [PurchasingOrderController::class, 'getSwiftDetails'])->name('getSwiftDetails');
     Route::post('/vehicles/hold/{id}', [VehiclesController::class, 'hold'])->name('vehicles.hold');
     Route::post('/transition/paymentconfirm', [PurchasingOrderController::class, 'paymentconfirm'])->name('transition.paymentconfirm');
+    Route::get('/getdata', [PurchasingOrderController::class, 'getdata'])->name('purchased.getdata');
 
+    //Netsuite GDN
+    Route::get('netsuitegdn/addingnetsuitegdn', [ApprovalsController::class, 'addingnetsuitegdn'])->name('netsuitegdn.addingnetsuitegdn');
+    Route::post('netsuitegdn/submit', [ApprovalsController::class, 'submitGdn'])->name('netsuitegdn.submit');
+    Route::post('netsuitegdn/add', [ApprovalsController::class, 'addGdn'])->name('netsuitegdn.add');
+    Route::resource('departmentnotifications', DepartmentNotificationsController::class);
+    Route::post('/save-dn-numbers', [PurchasingOrderController::class, 'saveDnNumbers'])->name('save.dnNumbers');
+    Route::get('/getVehiclesdn/{purchaseOrderId}', [PurchasingOrderController::class, 'getVehiclesdn']);
+    Route::post('/saleorderstoreupdate/{QuotationId}', [SalesOrderController::class, 'storesalesorderupdate'])->name('salesorder.storesalesorderupdate');
+    Route::get('/not-access', [AccessController::class, 'notAccessPage'])->name('not_access_page');
 
+    Route::resource('vehiclenetsuitecost', VehicleNetsuiteCostController::class);
+    Route::post('/booking/savedirectly', [BookingController::class, 'storedirect'])->name('booking.savedirectly');
+    Route::get('/salesorder/cancel/{id}', [SalesOrderController::class, 'cancel'])->name('salesorder.cancel');
+
+    //Stock Messages
+    Route::get('/stockmessages/{vehicleId}', [StockMessageController::class, 'stockgetMessages'])->name('stockmessages.get');
+    Route::post('/stockmessages', [StockMessageController::class, 'stocksendMessage'])->name('stockmessages.send');
+    Route::post('/stockreplies', [StockMessageController::class, 'stocksendReply'])->name('stockreplies.send');
+    Route::get('/vehicle-details-dp', [StockMessageController::class, 'getVehicleDetailsdp'])->name('vehicle.detailsdp');
+    Route::get('/vehicle-details-dpbelgium', [StockMessageController::class, 'getVehicleDetailsdpbelgium'])->name('vehicle.detailsdpbelgium');
+    Route::post('/vehiclenetsuitecost/upload', [VehicleNetSuiteCostController::class, 'upload'])->name('vehiclenetsuitecost.upload');
+});
 

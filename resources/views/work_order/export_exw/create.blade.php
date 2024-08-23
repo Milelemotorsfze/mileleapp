@@ -2,6 +2,11 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.custom-checkbox {
+		width: 30px;   /* Set the width */
+		height: 30px;  /* Set the height */
+		border: 1px solid #ced4da!important; /* Set the border color */
+	}
 	#overlay {
 		position: fixed;
 		display: none;
@@ -127,16 +132,41 @@
     .select2-container {
         width: 100% !important;
     }
+	/* Style for the table headers */
+.my-datatable th {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the table cells */
+.my-datatable td {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the entire table */
+.my-datatable {
+    border-collapse: collapse; /* Ensure borders do not double */
+    width: 100%; /* Make the table take up the full width */
+}
 </style>
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo','edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
 @endphp
 @if ($hasPermission)
+
 <div class="card-header">
 	<h4 class="card-title"> @if(isset($workOrder)) Edit @else Create @endif @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -149,12 +179,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
+	<div>
+	@if(isset($previous) && $previous != '')
+	<a class="btn btn-sm btn-info" href="{{ route('work-order.edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	@endif
+	@if(isset($next) && $next != '')
+	<a  class="btn btn-sm btn-info" href="{{ route('work-order.edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	@endif
 	@include('work_order.export_exw.approvals')
-	<div class="row">
-		<div class="col-xxl-12 col-lg-12 col-md-12">
-			<button style="float:right;" class="btn btn-sm btn-success" id="submit-from-top">Submit</button>
-		</div>
-	</div>
+	<a class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
+	
+	<a class="btn btn-sm btn-success float-end" id="submit-from-top">Submit</a>
+	@if(isset($workOrder))
+	<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+    <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+    @endif
+	</div> 
 	</br>
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
@@ -182,18 +222,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
-							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()"
-							@if(isset($workOrder) && $workOrder->so_number != '') readonly @endif>
+							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()">
+							<!-- @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif -->						
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
-						<div class="dropdown-option-div">
-							
+					<div class="col-xxl-1 col-lg-2 col-md-2">
+						<label for="is_batch" class="col-form-label text-md-end">Is Batch ?</label></br>
+						<input type="checkbox" id="is_batch" name="is_batch" value="yes" class="custom-checkbox @error('is_batch') is-invalid @enderror" 
+							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()">				
+					</div>
+					<div class="col-xxl-2 col-lg-4 col-md-4 select-button-main-div">
+						<div id="batchDropdownSection" class="dropdown-option-div" style="display: @if(isset($workOrder) && $workOrder->is_batch == 1) block @else none @endif;">							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus>
+							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
 								<option value="">Choose Batch</option>
-								@for ($i = 1; $i <= 10; $i++)
+								@for ($i = 1; $i <= 50; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
 								@endfor
 							</select>
@@ -205,25 +249,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
 							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
-					<div class="col-xxl-5 col-lg-11 col-md-11">
+					<div class="col-xxl-4 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
                         <input hidden id="customer_type" name="customer_type" value="existing">
                         <input hidden id="customer_reference_id" name="customer_reference_id" value="">
                         <input hidden id="customer_reference_type" name="customer_reference_type" value="">
                         <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
                             @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}"
+                            <option value="{{$customer->customer_name ?? ''}}" data-id="{{$customer->unique_id ?? ''}}"
 							>{{$customer->customer_name ?? ''}}</option>
                             @endforeach
                         </select> 
 						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
 							class="form-control widthinput @error('customer_name') is-invalid @enderror" onkeyup="sanitizeInput(this)">
 					</div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="Other">
                         <a title="Create New Customer" onclick="checkValue()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
                     </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown">
+                    <div class="col-xxl-2 col-lg-1 col-md-1" id="switchToDropdown">
                         <a title="Choose Customer Name" onclick="switchToDropdown()" style="margin-top:38px; width:100%;"
                             class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
                     </div>
@@ -355,7 +399,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
-							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
+							<label for="airline" class="col-form-label text-md-end">{{ __('Choose Airline') }}</label>
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
 									<option value="{{$airline->name}}" 
@@ -444,70 +488,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					@endif
 				</div>
-				<hr>
-				<div class="row">
-					<div class="col-xxl-2 col-lg-2 col-md-2">
-						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
-						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" 
-							class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="sanitizeAmount(this)">
-							<div class="input-group-append">
-								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
-									<option value="AED" {{ isset($workOrder) && $workOrder->currency == 'AED' ? 'selected' : '' }}>AED</option>
-									<option value="USD" {{ isset($workOrder) && $workOrder->currency == 'USD' ? 'selected' : '' }}>USD</option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-xxl-2 col-lg-2 col-md-2">
-						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
-						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
-							autofocus onkeyup="sanitizeQuantity(this)">
-					</div>
-					<div class="col-xxl-2 col-lg-2 col-md-2">
-						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
-						<fieldset style="margin-top:5px;" class="radio-div-container">
-							<div class="row some-class">
-								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" 
-									{{ isset($workOrder) && $workOrder->deposit_received_as == 'total_deposit' ? 'checked' : '' }} />
-									<label for="total_deposit">Total Deposit</label>
-								</div>
-								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit"
-									{{ isset($workOrder) && $workOrder->deposit_received_as == 'custom_deposit' ? 'checked' : '' }} />
-									<label for="custom_deposit">Custom Deposit</label>
-								</div>
-							</div>
-						</fieldset>
-					</div>
-					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
-						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
-						<div class="input-group">
-							<input type="text" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
-							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
-							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="amount_received_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
-							</div>
-						</div>
-					</div>
-					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
-						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
-						<div class="input-group">
-							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
-							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
-							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="balance_amount_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
-							</div>
-						</div>
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
-						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
-						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
-						</select>
-					</div>
-				</div>
 			</div>
 		</div>
 		<div class="card">
@@ -522,7 +502,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
 							@foreach($vins as $vin)
-							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}}</option>
+							<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
 							@endforeach
 						</select>
 					</div>
@@ -575,24 +555,103 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
+					<center>SO Details</center>
+				</h4>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
+						<div class="input-group">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="{{ isset($workOrder) ? $workOrder->so_total_amount : '' }}" 
+							class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="sanitizeAmount(this)">
+							<div class="input-group-append">
+								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
+									<option value="AED" {{ isset($workOrder) && $workOrder->currency == 'AED' ? 'selected' : '' }}>AED</option>
+									<option value="USD" {{ isset($workOrder) && $workOrder->currency == 'USD' ? 'selected' : '' }}>USD</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
+						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
+							placeholder="Enter SO Vehicle Quantity" value="{{ isset($workOrder) ? $workOrder->so_vehicle_quantity : '' }}" autocomplete="so_vehicle_quantity" 
+							autofocus onkeyup="sanitizeQuantity(this)">
+					</div>
+					<div class="col-xxl-3 col-lg-2 col-md-2">
+						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+							<div class="row some-class">
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" 
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'total_deposit' ? 'checked' : '' }} />
+									<label for="total_deposit">Total Deposit</label>
+								</div>
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit"
+									{{ isset($workOrder) && $workOrder->deposit_received_as == 'custom_deposit' ? 'checked' : '' }} />
+									<label for="custom_deposit">Custom Deposit</label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
+						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
+						<div class="input-group">
+							<input type="text" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" 
+							value="{{ isset($workOrder) ? $workOrder->amount_received : '' }}" onkeyup="sanitizeAmount(this)">
+							<div class="input-group-append">
+								<span class="input-group-text widthinput" id="amount_received_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-2 col-lg-3 col-md-3" id="balance-amount-div">
+						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
+						<div class="input-group">
+							<input type="text" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" 
+							value="{{ isset($workOrder) ? $workOrder->balance_amount : '' }}" readonly>
+							<div class="input-group-append">
+								<span class="input-group-text widthinput" id="balance_amount_currency">{{ isset($workOrder) ? $workOrder->currency : 'AED' }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
+						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Against Vehicle :</label>
+						<select name="deposit_aganist_vehicle[]" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
 					<center>Questions</center>
 				</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<label for="delivery_location" class="col-form-label text-md-end"> Delivery Location :</label>
 						<input id="delivery_location" type="text" class="form-control widthinput @error('delivery_location') is-invalid @enderror" name="delivery_location"
 							placeholder="Enter Delivery Location" value="{{ isset($workOrder) ? $workOrder->delivery_location : '' }}" autocomplete="delivery_location" 
 							autofocus  onkeyup="sanitizeInput(this)">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
-						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person :</label>
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="delivery_contact_person" class="col-form-label text-md-end"> Delivery Contact Person Name :</label>
 						<input id="delivery_contact_person" type="text" class="form-control widthinput @error('delivery_contact_person') is-invalid @enderror" name="delivery_contact_person"
-							placeholder="Enter Delivery Contact Person" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
+							placeholder="Enter Delivery Contact Person Name" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person : '' }}" 
 							autocomplete="delivery_contact_person" autofocus onkeyup="sanitizeInput(this)">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="delivery_contact_person_number" class="col-form-label text-md-end"> Delivery Contact Person Number :</label>
+						<input id="delivery_contact_person_number" type="tel" class="widthinput contact form-control @error('delivery_contact_person_number[full]')
+							is-invalid @enderror" name="delivery_contact_person_number[main]" placeholder="Enter Customer Representative Contact Number"
+							value="" autocomplete="delivery_contact_person_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+							<input type="hidden" id="delivery_contact_person_number_full" name="delivery_contact_person_number[full]" value="{{ isset($workOrder) ? $workOrder->delivery_contact_person_number : '' }}">
+					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<label for="delivery_date" class="col-form-label text-md-end"> Delivery Date  :</label>
 						<input id="delivery_date" type="date" class="form-control widthinput @error('delivery_date') is-invalid @enderror" name="delivery_date"
 							placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
@@ -607,6 +666,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<i class="fa fa-plus" aria-hidden="true"></i> Add BOE</a>
 					</div>
 				</div>
+				@if(isset($type) && ($type == 'export_cnf'))
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<label for="preferred_shipping_line_of_customer" class="col-form-label text-md-end"> Prefered Shipping Line for Customer :</label>
+						<input id="preferred_shipping_line_of_customer" type="text" class="form-control widthinput @error('preferred_shipping_line_of_customer') is-invalid @enderror" name="preferred_shipping_line_of_customer"
+							placeholder="Enter Prefered Shipping Line for Customer" value="{{ isset($workOrder) ? $workOrder->preferred_shipping_line_of_customer : '' }}" 
+							autocomplete="preferred_shipping_line_of_customer" autofocus onkeyup="sanitizeInput(this)">
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="bill_of_loading_details" class="col-form-label text-md-end">{{ __("Bill of Loading Details" ) }}</label>
+						<textarea rows="5" id="bill_of_loading_details" type="text" class="form-control @error('bill_of_loading_details') is-invalid @enderror"
+							name="bill_of_loading_details" placeholder="Enter Bill of Loading Details" value="{{ isset($workOrder) ? $workOrder->bill_of_loading_details : '' }}"  autocomplete="bill_of_loading_details"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->bill_of_loading_details : '' }}</textarea>
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="shipper" class="col-form-label text-md-end">{{ __("Shipper" ) }}</label>
+						<textarea rows="5" id="shipper" type="text" class="form-control @error('shipper') is-invalid @enderror"
+							name="shipper" placeholder="Enter Shipper" value="{{ isset($workOrder) ? $workOrder->shipper : '' }}"  autocomplete="shipper"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->shipper : '' }}</textarea>
+					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+						<label for="consignee" class="col-form-label text-md-end">{{ __("Consignee" ) }}</label>
+						<textarea rows="5" id="consignee" type="text" class="form-control @error('consignee') is-invalid @enderror"
+							name="consignee" placeholder="Enter Consignee" value="{{ isset($workOrder) ? $workOrder->consignee : '' }}"  autocomplete="consignee"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->consignee : '' }}</textarea>
+					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6">
+						<label for="notify_party" class="col-form-label text-md-end">{{ __("Notify Party" ) }}</label>
+						<textarea rows="3" id="notify_party" type="text" class="form-control @error('notify_party') is-invalid @enderror"
+							name="notify_party" placeholder="Enter Notify Party" value="{{ isset($workOrder) ? $workOrder->notify_party : '' }}"  autocomplete="notify_party"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->notify_party : '' }}</textarea>
+					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6">
+						<label for="special_or_transit_clause_or_request" class="col-form-label text-md-end">{{ __("Special/In Transit/Other Requests" ) }}</label>
+						<textarea rows="3" id="special_or_transit_clause_or_request" type="text" class="form-control @error('special_or_transit_clause_or_request') is-invalid @enderror"
+							name="special_or_transit_clause_or_request" placeholder="Enter Special/In Transit/Other Requests" value="{{ isset($workOrder) ? $workOrder->special_or_transit_clause_or_request : '' }}"  autocomplete="special_or_transit_clause_or_request"
+							autofocus onkeyup="sanitizeInput(this)">{{ isset($workOrder) ? $workOrder->special_or_transit_clause_or_request : '' }}</textarea>
+					</div>
+				</div>
+				@endif
 			</div>
 		</div>
 		<div class="card">
@@ -900,7 +999,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<a class="nav-link form-label active" data-bs-toggle="pill" href="#wo_data_history"> WO Data History</a>
 					</li>   
 					<li class="nav-item">
-						<a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicle Data History</a>
+						<a class="nav-link form-label" data-bs-toggle="pill" href="#wo_vehicle_data_history"> WO Vehicles & Addons Data History</a>
 					</li>                          
 				</ul>
 			</div>
@@ -916,7 +1015,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="tab-pane fade" id="wo_vehicle_data_history">
 					<div class="card-header text-center">
-						<center style="font-size:12px;">WO Vehicle Data History</center>
+						<center style="font-size:12px;">WO Vehicles & Addons Data History</center>
 					</div>
 					<div class="card-body">
 						@include('work_order.export_exw.vehicle_data_history')
@@ -941,13 +1040,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
+@php
+$allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
 <script type="text/javascript">
 	
 	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
     // $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
-	var vins = {!! json_encode($vins) !!}
+	var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 	var customerCount =  $("#customerCount").val();
 	var type = $("#type").val();
 	var addedVins = [];
@@ -958,7 +1060,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var selectedCustomerEmail = '';
 	var selectedCustomerContact = '';
 	var selectedCustomerAddress = '';
+	let isBatchChecked = false; // Initialize the variable to store the checked state
 	var onChangeSelectedVins = [];
+	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
         var workOrder = {!! json_encode($workOrder) !!};
     @else
@@ -967,13 +1071,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
 	var input = document.querySelector("#customer_company_number");
-	var iti = window.intlTelInput(input, { 
+	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
 		separateDialCode: true,
-		preferredCountries: ["ae"],
+		preferredCountries:["ae"],
 		hiddenInput: "full",
 		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 	});
 	var customer_representative_contact = window.intlTelInput(document.querySelector("#customer_representative_contact"), {
+		separateDialCode: true,
+		preferredCountries:["ae"],
+		hiddenInput: "full",
+		utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+	});
+	var delivery_contact_person_number = window.intlTelInput(document.querySelector("#delivery_contact_person_number"), {
 		separateDialCode: true,
 		preferredCountries:["ae"],
 		hiddenInput: "full",
@@ -996,6 +1106,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		});	
 	}
 	$(document).ready(function () { 
+		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
 			  document.getElementById('submit').click();
@@ -1018,6 +1129,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#balance-amount-div").show();
 				$("#deposit-aganist-vehicle-div").hide();
 				selectedDepositReceivedValue = 'total_deposit';
+				setDepositBalance();
 			}
 			else if(workOrder != null && workOrder.deposit_received_as == 'custom_deposit') {
 				$("#amount-received-div").show();
@@ -1025,6 +1137,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#deposit-aganist-vehicle-div").show();
 				selectedDepositReceivedValue = 'custom_deposit';
 				setDepositAganistVehicleDropdownOptions();
+				setDepositBalance();
 			}
 
 			if(workOrder != null && (workOrder.signed_pfi != null || workOrder.signed_contract != null || workOrder.payment_receipts != null || workOrder.noc != null ||
@@ -1046,23 +1159,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			if(workOrder !== null) {
 				$('#customer_address').val(workOrder.customer_address);
 				$('#customer_email').val(workOrder.customer_email);
-
-				// Check if workOrder.customer_company_number is not null or undefined
-				var fullPhoneNumber = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
-
-				iti.setNumber(fullPhoneNumber);
-				sanitizeNumberInput(input);
-
+				var customer_company_numberFull = workOrder.customer_company_number ? workOrder.customer_company_number.replace(/\s+/g, '') : '';
+				iti.setNumber(customer_company_numberFull);
 				var customer_representative_contactFull = workOrder.customer_representative_contact ? workOrder.customer_representative_contact.replace(/\s+/g, '') : '';
 				customer_representative_contact.setNumber(customer_representative_contactFull);
-				sanitizeNumberInput(input);
-
+				var delivery_contact_person_numberFull = workOrder.delivery_contact_person_number ? workOrder.delivery_contact_person_number.replace(/\s+/g, '') : '';
+				delivery_contact_person_number.setNumber(delivery_contact_person_numberFull);
 				var freight_agent_contact_numberFull = workOrder.freight_agent_contact_number ? workOrder.freight_agent_contact_number.replace(/\s+/g, '') : '';
-				freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
-				sanitizeNumberInput(input);
-
-				$('#customer_representative_contact').val(workOrder.customer_representative_contact);
-				$('#freight_agent_contact_number').val(workOrder.freight_agent_contact_number);
+				if (freight_agent_contact_number && typeof freight_agent_contact_number.setNumber === 'function') {
+					freight_agent_contact_number.setNumber(freight_agent_contact_numberFull);
+				} 
 				if(workOrder.transport_type == 'air') {
 					airRelation();
 				}
@@ -1073,7 +1179,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					roadRelation();
 					var transporting_driver_contact_numberFull = workOrder.transporting_driver_contact_number ? workOrder.transporting_driver_contact_number.replace(/\s+/g, '') : '';
 					transporting_driver_contact_number.setNumber(transporting_driver_contact_numberFull);
-					sanitizeNumberInput(input);				
+					sanitizeNumberInput(input);			
 				}
 			}
 			
@@ -1155,6 +1261,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					});
 					$select.trigger('change.select2');
 				});
+				if (authUserPermission === 'true') {
+					var table = document.getElementById('myTable');
+					if (table) {
+						var inputs = table.querySelectorAll('input');
+						inputs.forEach(function(input) {
+						input.readOnly = true;
+						});
+						var selects = table.querySelectorAll('select');
+						selects.forEach(function(input) {
+						input.disabled = true;
+						});
+					}
+					var deleteVehicleLine = document.querySelectorAll('.remove-row');
+					deleteVehicleLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var deleteAddonLine = document.querySelectorAll('.remove-addon-row');
+					deleteAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+					var createAddonLine = document.querySelectorAll('.create-addon-row');
+					createAddonLine.forEach(function(button) {
+						button.readOnly = true;
+					});
+				}
 			}
 			else {
 				$("#boe-div").hide();
@@ -1179,13 +1310,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// INTEL INPUT START
 			
 			// Function to set customer relations
-			function setCustomerRelations(selectedCustomerName) {
+			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
-				$('#customer_company_number').val('');            
-				if (selectedCustomerName != null && selectedCustomerName.length > 0) {
+				$('#customer_company_number').val('');         
+				if (selectedCustomerUniqueId != null) {
 					for (var i = 0; i < customerCount; i++) {
-						if (customers[i].customer_name == selectedCustomerName[0]) { 
+						if (customers[i].unique_id == selectedCustomerUniqueId) { 
 							if (customers[i].customer_address != null) {
 								$('#customer_address').val(customers[i]?.customer_address);
 							}
@@ -1194,7 +1325,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							}
 							if (customers[i].customer_company_number != null) { 
 								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-
 								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
 								// Call sanitizeNumberInput on the current input
@@ -1275,8 +1405,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// CUSTOMER NAME ONCHANGE START
 			 // Handle customer name change
 			 $('#customer_name').on('change', function() { 
-				var selectedCustomerName = $(this).val(); 
-				setCustomerRelations(selectedCustomerName);
+				// var selectedCustomerName = $(this).val(); 
+				var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
+				setCustomerRelations(selectedCustomerUniqueId);
 			});
 		// CUSTOMER NAME ONCHANGE END
 
@@ -1293,6 +1424,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$("#deposit-aganist-vehicle-div").show();
 					setDepositAganistVehicleDropdownOptions();
 				}
+				setDepositBalance();
 			});
 		// DEPOSIT RECEIVED AS ONCHANGE END
 
@@ -1306,8 +1438,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					addAddon();
 				}
 			});
-			$("body").on("click", ".add-vehicle-btn", function () {
-				if (validateVINSelection() && validateAddonSelection()) {
+			$("body").on("click", ".add-vehicle-btn", function () { 
+				if (validateVINSelection() && validateAddonSelection()) { 
 					addVIN();
 				}
 			});
@@ -1558,6 +1690,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
 		}
 	});
+	// Function to set the minimum date to today's date
+	document.addEventListener("DOMContentLoaded", function() {
+		var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+		document.getElementById("delivery_date").setAttribute("min", today);
+	});
 	// ADD CUSTOM VALIDATION RULES START
         // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
@@ -1579,10 +1716,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 		}, "No leading or trailing spaces allowed");
 
-        // Add custom validation rule for numeric input only (excluding spaces)
-        $.validator.addMethod("numericOnly", function(value, element) {
-            return this.optional(element) || /^[0-9+]+$/.test(value);
-        }, "Please enter a valid number");
+		// Add custom validation rule for numeric input only (excluding spaces)
+		$.validator.addMethod("numericOnly", function(value, element) {
+			// Remove spaces before validation
+			value = value.replace(/\s+/g, '');
+			return this.optional(element) || /^[0-9+]+$/.test(value);
+		}, "Please enter a valid number");
 
         // Add custom validation rule for address field (no multiple consecutive spaces)
         $.validator.addMethod("validAddress", function(value, element) {
@@ -1603,7 +1742,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
+		// Custom method to check if the SO number is unique
+		$.validator.addMethod("uniqueWO", function(element) {
+			var result = false;
+			var WoId = $("#wo_id").val(); 
+			var wo_number = $("#wo_number").val(); 
+			$.ajax({
+				type: "POST",
+				async: false,
+				url: "{{route('work-order.uniqueWO')}}", // script to validate in server side
+				data: {_token: '{{csrf_token()}}', wo_number: wo_number, id: WoId},
+				success: function(data) {
+					result = (data == true) ? true : false;
+				}
+			});
+			return result; 
+		}, "This WO Number is already taken! Try another.");
+		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
+		$.validator.addMethod("greaterThanExisting", function(value, element) {
+			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
+			var numericPart = parseInt(value.split('-')[1], 10);
 
+			// Check if the extracted number is greater than 6500
+			return this.optional(element) || numericPart > 6500;
+		}, "SO Number must be greater than SO-006500");
 		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
 		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
 			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
@@ -1646,23 +1808,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					noSpaces: true,
 					SONumberFormat: true,
 					notSO000000: true,
-					uniqueSO: true,
+					// uniqueWO: true,
+					// uniqueSO: true,
+					// greaterThanExisting: true, 
+				},
+				wo_number: {
+					uniqueWO: function() {
+						return $("#wo_number").val() !== ''; // Apply the uniqueWO validation only if wo_number is not empty
+					}
 				},
                 batch: {
                     required: true,
+					// uniqueWO: true,
                 },
-                // customer_reference_id: {
-
-                // },
-                // customer_reference_type: {
-
-                // },
                 new_customer_name: {
                     noSpaces: true,
                 },
-                // existing_customer_name: {
-
-                // }
                 customer_email: {
                     noSpaces: true,
                     customEmail: true,
@@ -1689,6 +1850,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     minlength: 5,
                     maxlength: 20,
                 },
+				"delivery_contact_person_number[main]": {
+                    numericOnly: true,
+                    minlength: 5,
+                    maxlength: 20,
+                },				
                 freight_agent_name: {
                     noSpaces: true,
                 },
@@ -1703,6 +1869,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
                 port_of_loading: {
                     required: true,
+					noSpaces: true,
                 },
                 port_of_discharge: {
                     required: true,
@@ -1712,10 +1879,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     required: true,
                     noSpaces: true,
                 },
-                // transport_type: {
-                // },
                 brn_file: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 brn: {
@@ -1724,10 +1889,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 container_number: {
                     noSpaces: true,
                 },
-                // airline_reference_id: {
-                // }
-                // airline: {
-                // },
                 airway_bill: {
                     noSpaces: true,
                 },
@@ -1754,8 +1915,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 transportation_company_details: {
                     noSpaces: true,
                 },
-                // currency: {
-                // },
                 so_total_amount: {
 					noSpaces: true,
 					number: true,
@@ -1767,11 +1926,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 },
 				"deposit_aganist_vehicle[]": {
 					customDepositVehicleRequired: true
-				},
-                // amount_received: {
-                // },
-                // balance_amount: {
-                // },				
+				},				
                 delivery_location: {
                     noSpaces: true,
                 },
@@ -1781,93 +1936,66 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 delivery_date: {
                     date: true,
                 },
+				preferred_shipping_line_of_customer: {
+                    noSpaces: true,
+                },
+				bill_of_loading_details: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				shipper: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				consignee: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				notify_party: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
+				special_or_transit_clause_or_request: {
+					noSpaces: true,
+                    validAddress: true,
+                    maxlength: 255
+                },
                 signed_pfi: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 signed_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 payment_receipts: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 noc: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_trade_license: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_passport: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 enduser_contract: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
                 vehicle_handover_person_id: {
-                    extension: "jpg|jpeg|png|gif|tiff|psd|pdf|eps|ai|indd|raw|docx|rtf|doc",
+                    extension: "jpg|jpeg|png|pdf",
                     maxsize : 1073741824,
                 },
-                // DYNAMIC FIELDS
-                // vin: {
-                // 	// required: true,
-                // },
-                // brand: {
-                // 	// required: true,
-                // },
-                // variant: {
-                // 	// required: true,
-                // },
-                // engine: {
-                // 	// required: true,
-                // },
-                // model_description: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // model_year: {
-                // 	// required: true,
-                // },
-                // steering: {
-                // 	// required: true,
-                // },
-                // exterior_colour: {
-                // 	// required: true,
-                // },
-                // interior_colour: {
-                // 	// required: true,
-                // },
-                // warehouse: {
-                // 	// required: true,
-                // },
-                // territory: {
-                // 	// required: true,
-                // },
-                // preferred_destination: {
-                // 	// required: true,
-                // },
-                // import_document_type: {
-                // 	// required: true,
-                // },
-                // ownership_name: {
-                // 	// required: true,
-                // },
-                // modification_or_jobs_to_perform_per_vin: {
-                // 	// required: true,
-                // },
-                // certification_per_vin: {
-                // 	// required: true,
-                // },
-                // special_request_or_remarks: {
-                // 	// required: true,
-                // },
             },
             messages: {
                 brn_file:{
@@ -1938,10 +2066,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							const parentId = comment.getAttribute('data-parent-id');
 							const dateTime = comment.getAttribute('data-date-time');
 							const textElement = comment.querySelector('.comment-text');
-							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img`);
+							
+							const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img, .file-preview[data-comment-id="${commentId}"] embed`);
+							
 							const files = Array.from(fileElements).map(file => ({
 								src: file.src,
-								name: file.alt
+								name: file.alt || file.getAttribute('src').split('/').pop() // Use file name for images and PDFs
 							}));
 
 							if (textElement) {
@@ -1963,6 +2093,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				if (typeof customer_representative_contact !== 'undefined') {
 					$('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
 				}
+				if (typeof delivery_contact_person_number !== 'undefined') {
+					$('#delivery_contact_person_number_full').val(delivery_contact_person_number.getNumber());
+				}				
 				if (typeof freight_agent_contact_number !== 'undefined') {
 					$('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
 				}
@@ -1970,6 +2103,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					$('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
 				}
 
+				const elementsByClass = document.getElementsByClassName('transport_type');
+
+				if (elementsByClass.length > 0) {
+					Array.from(elementsByClass).forEach(function(element) {
+						element.disabled = false;
+					});
+				}
+
+				const deposit_received_asClass = document.getElementsByClassName('deposit_received_as');
+
+				if (deposit_received_asClass.length > 0) {
+					Array.from(deposit_received_asClass).forEach(function(element) {
+						element.disabled = false;
+					});
+				}
+
+				
+				$('#airline').prop('disabled', false).trigger('change');
+				$('#currency').prop('disabled', false).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', false).trigger('change');	
+				$('#vin_multiple').prop('disabled', false).trigger('change');	
+				$('#brn_file').prop('disabled', false).trigger('change');
+				$('#signed_pfi').prop('disabled', false).trigger('change');	
+				$('#signed_contract').prop('disabled', false).trigger('change');	
+				$('#payment_receipts').prop('disabled', false).trigger('change');	
+				$('#noc').prop('disabled', false).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', false).trigger('change');	
+				$('#enduser_passport').prop('disabled', false).trigger('change');	
+				$('#enduser_contract').prop('disabled', false).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
+				var table = document.getElementById('myTable');
+				if (table) {
+					var selects = table.querySelectorAll('select');
+					selects.forEach(function(input) {
+					input.disabled = false;
+					});
+				}
+				$('.dynamicselect2').prop('disabled', false);
 				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));
@@ -2017,7 +2188,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		if (parts.length > 2) {
 			value = parts[0] + '.' + parts.slice(1).join('');
 		}
-
 		input.value = value;
 		setDepositBalance();
 	}
@@ -2025,8 +2195,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	function setDepositBalance() {
 		var totalAmount = $('#so_total_amount').val();
 		var amountReceived = $('#amount_received').val();
-		var balanceAmount = '';
-		if(totalAmount != '' && amountReceived != '') {
+		var balanceAmount = ''; 
+		if(totalAmount != '' && amountReceived != '' && selectedDepositReceivedValue != '') { 
 			balanceAmount = Number(totalAmount) - Number(amountReceived);
 		}
 		document.getElementById('balance_amount').value = balanceAmount;
@@ -2134,8 +2304,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							</div>
 						</div>
 						<div class="col-xxl-9 col-lg-9 col-md-9">
-							<label class="col-form-label text-md-end">Addon Description :</label>
-							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Description"></textarea>
+							<label class="col-form-label text-md-end">Addon Custom Details :</label>
+							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Custom Details"></textarea>
 						</div>
 						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer_addon">
 							<a class="btn_round_big remove_node_btn_frm_field_addon" title="Remove Row" style="margin-top:50%;">
@@ -2206,7 +2376,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							}
 						});
 					});
-
+					if (authUserPermission === 'true') {
+						$('.dynamicselect2').prop('disabled', true);
+						$('.remove_node_btn_frm_field').prop('disabled', true);
+						$('.add_new_frm_field_btn').prop('disabled', true);
+					}
 					disableSelectedOptions();
 				} else {
 					alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
@@ -2300,12 +2474,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-		function addVIN() {
-			var selectedVIN = $("#vin_multiple").val();
-			if (selectedVIN != '' && selectedVIN.length > 0) {
-				for (var j = 0; j < selectedVIN.length; j++) {
-					for (var i = 0; i < vins.length; i++) {
-						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
+		function addVIN() { 
+			var selectedVIN = $("#vin_multiple").val(); 
+			if (selectedVIN != '' && selectedVIN.length > 0) { 
+				for (var j = 0; j < selectedVIN.length; j++) { 
+					for (var i = 0; i < vins.length; i++) { 
+						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) { 
 							var data = { 
 								id: '',
 								vehicle_id : vins[i]?.id ?? '',
@@ -2357,7 +2531,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$(this).remove();
 			});
 		}
-		function drawTableRow(data) {
+		function drawTableRow(data) { 
 			// Get the table body element by ID
 			var tableBody = document.querySelector('#myTable tbody');
 
@@ -2394,7 +2568,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var ownershipCell = createEditableCell(data.ownership_name, 'Enter Ownership','vehicle['+data.vehicle_id+'][ownership_name]');
 			var CertificationPerVINCell = createEditableSelect2Cell(data.vin,data.vehicle_id,data.certification_per_vin);
 			if(type == 'export_cnf') {
-				var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+				var shipmentCell = createEditableSelect2ShipmentCell(data.vin,data.vehicle_id,data.shipment);
+				// var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
 			}
 
 			// Append cells to the first row
@@ -2522,12 +2697,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var currentRow = thirdRow; // Start with the thirdRow
 			if (data.addons && data.addons.length > 0) {
 				for (var j = 0; j < data.addons.length; j++) {
+
+					var DateToBeformat = new Date(data.addons[j].created_at);
+
+					var optionsDate = { day: '2-digit', month: 'short', year: 'numeric' };
+					var optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+					// Format date and time separately
+					var formattedDate = DateToBeformat.toLocaleDateString('en-GB', optionsDate);
+					var formattedTime = DateToBeformat.toLocaleTimeString('en-GB', optionsTime);
+
+					// Combine the formatted date and time
+					var addonDate = formattedDate + ', ' + formattedTime;
+
+
 					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
 					var addonValue = data.addons[j].addon_code;
 					var addonQuantity = data.addons[j].addon_quantity;
 					var addonDescription = data.addons[j].addon_description;
 					if(addonValue != null) {
-						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 						addonIndex++; // Increment addonIndex after calling drawTableAddon
 					}
 				}
@@ -2536,11 +2725,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			// Gather data from all dynamically added addon input fields
 			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
+				var addonDate = '';
 				var addonValue = $(`#addons_${addonId}`).val();
 				var addonQuantity = $(`#addon_quantity_${addonId}`).val();
 				var addonDescription = $(`#addon_description_${addonId}`).val();
 				if(addonValue != null) { 
-					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonValue,addonQuantity,addonDescription);
+					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
 					addonIndex++; // Increment addonIndex after calling drawTableAddon
 				}
 			});
@@ -2548,7 +2738,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			allVehicleRows.push(lastRow);
 			$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
 		}
-		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId, addonValue, addonQuantity, addonDescription) { 
+		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId,addonDate, addonValue, addonQuantity, addonDescription) { 
 			var removeAddonCell = createAddonRemoveButton();
 			
 			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
@@ -2560,6 +2750,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
 
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = addonDate; 
+
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
@@ -2567,7 +2762,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
-			addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
+			addonQuantityCell.innerHTML = '<input class="child_addon_id_'+data.vehicle_id+'" type="hidden" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][id]" value="'+(addonId ?? '')+'">'
 				+ '<input type="hidden" class="child_addon_'+data.vehicle_id+'" name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'" id="addons_' + data.vehicle_id + '_' + addonIndex + '">'
 				+ '<div class="input-group">'
 				+ '<div class="input-group-append">'
@@ -2578,16 +2773,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonDescriptionCell = document.createElement('td');
 			if(type == 'export_cnf') {
-				addonDescriptionCell.colSpan = 15;
-			}
-			else {
 				addonDescriptionCell.colSpan = 14;
 			}
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Description">';
+			else {
+				addonDescriptionCell.colSpan = 13;
+			}
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
@@ -2642,16 +2838,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			allVehicleRows.each(function(index) {
 				var row = $(this);			
 				// Update hidden input field for addon_code
-				row.find('.child_addon_'+className).attr('name', 'vehicle['+className+'][addons]['+index+'][addon_code]').attr('id', 'addons_'+className+'_'+index);
+				row.find('.child_addon_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]').attr('id', 'addons_' + className + '_' + index);
 
 				// Update quantity input field within the specific div structure
-				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id','addon_quantity_' + className + '_' + index);
+				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id', 'addon_quantity_' + className + '_' + index);
 
 				// Update description input field within the <td> element
 				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + className + '_' + index);
 				
 				// Update hidden input field for addon ID
-				row.find('input[type="hidden"][name^="vehicle[' + className + '][addons]"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
+				row.find('.child_addon_id_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
 
 				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {
@@ -2689,6 +2885,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
+			// Addon Row Label
+			var serviceBreakdownDateLabelCell = document.createElement('td');
+			serviceBreakdownDateLabelCell.colSpan = 1;
+			serviceBreakdownDateLabelCell.textContent = '';
+
 			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
@@ -2707,16 +2908,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			var addonDescriptionCell = document.createElement('td');
 			if(type == 'export_cnf') {
-				addonDescriptionCell.colSpan = 14;
+				addonDescriptionCell.colSpan = 13;
 			}
 			else {
-				addonDescriptionCell.colSpan = 15;
+				addonDescriptionCell.colSpan = 14;
 			}
-			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Description">';
+			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 			
 			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(serviceBreakdownDateLabelCell);
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
@@ -2911,16 +3113,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				{ value: 'qisj_inspection', text: 'QISJ Inspection' },
 				{ value: 'eaa_inspection', text: 'EAA Inspection' }
 			];
-
-			// Ensure certification_per_vin is an array
-			certification_per_vin = Array.isArray(certification_per_vin) ? certification_per_vin : [];
-
 			options.forEach(function(optionData) {
 				var option = document.createElement('option');
 				option.value = optionData.value;
 				option.textContent = optionData.text;
-				
-				if (certification_per_vin.includes(optionData.value)) {
+
+				if (certification_per_vin==optionData.value) {
 					option.selected = true;
 				}
 				
@@ -2932,12 +3130,68 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			$(selectElement).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
-				placeholder: "Choose "
+				placeholder: "Choose ",
+				initSelection: function(element, callback) {
+					var selectedValues = certification_per_vin.map(function(value) {
+						return options.find(option => option.value === value);
+					});
+					callback(selectedValues);
+				}
 			});
+
+			// Set the selected values for select2
+			$(selectElement).val(certification_per_vin).trigger('change');
 
 			return cell;
 		}
+		function createEditableSelect2ShipmentCell(vin, vehicle_id, shipment) {
+			// var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
+			var cell = document.createElement('td');
+			var selectElement = document.createElement('select');
+			selectElement.id = 'shipment_' + vin;
+			selectElement.name = 'vehicle[' + vehicle_id + '][shipment]';
+			selectElement.className = 'form-control widthinput';
+			selectElement.multiple = true;
+			selectElement.style.width = '100%';
+			  
+			var options = [
+				{ value: '20 Ft', text: '20 Ft' },
+				{ value: '40 Ft 2 Car Loading', text: '40 Ft 2 Car Loading' },
+				{ value: '40 Ft 3 Car Loading', text: '40 Ft 3 Car Loading' },
+				{ value: '40 Ft 4 Car Loading', text: '40 Ft 4 Car Loading' },
+				{ value: 'RORO', text: 'RORO' },
+			];
+			options.forEach(function(optionData) {
+				var option = document.createElement('option');
+				option.value = optionData.value;
+				option.textContent = optionData.text;
 
+				if (shipment==optionData.value) {
+					option.selected = true;
+				}
+				
+				selectElement.appendChild(option);
+			});
+
+			cell.appendChild(selectElement);
+
+			$(selectElement).select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder: "Choose ",
+				initSelection: function(element, callback) {
+					var selectedValues = shipment.map(function(value) {
+						return options.find(option => option.value === value);
+					});
+					callback(selectedValues);
+				}
+			});
+
+			// Set the selected values for select2
+			$(selectElement).val(shipment).trigger('change');
+
+			return cell;
+		}
 
 	// ADD AND REMOVE VEHICLE TO WO END
 
@@ -3016,37 +3270,68 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('#customer_company_number').val('');
 			}
         }
-
-       
-		
 	// CUSTOMER DETAILS SECTION END
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-        var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
-
-        if (SONumber === '') { // Check if the input is empty
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
-
-        // Step 1: Split the string to get the part after "SO-"
-        let parts = SONumber.split("SO-");
-        if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
-
-        // Step 2: Remove leading zeros from the part after "SO-"
-        let numberPart = parts[1].replace(/^0+/, '');
-        if (numberPart === '') { // Check if the number part is empty after removing leading zeros
-            document.getElementById('wo_number').value = ''; // Clear the WO Number field
-            return; // Exit the function
-        }
-
-        var WONumber = "WO-" + numberPart; // Construct the WO Number
-        document.getElementById('wo_number').value = WONumber; // Set the WO Number field
+    var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+    var selectedBatch = '';
+    
+    if (type == 'export_exw' || type == 'export_cnf') {
+        selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
     }
+    
+    if (SONumber === '') { // Check if SO Number is empty
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    // Step 1: Split the string to get the part after "SO-"
+    let parts = SONumber.split("SO-");
+    if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    // Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
+    let numberPart = parts[1];
+    if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
+        document.getElementById('wo_number').value = ''; // Clear the WO Number field
+        return; // Exit the function
+    }
+    
+    let WONumber = '';
+    
+    // Check if the sale type is 'local_sale'
+    if (type === 'local_sale') {
+        // Construct the WO Number without batch information
+        WONumber = "WO-" + numberPart + "-LS";
+    } else {
+        if (isBatchChecked) {
+            // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
+            let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+            if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
+                document.getElementById('wo_number').value = ''; // Clear the WO Number field
+                return; // Exit the function
+            }
+
+            // Format batch number as B01, B02, ..., B09, B10, etc.
+            let formattedBatchNumber = batchNumber.padStart(2, '0');
+
+            // Construct the WO Number with batch information
+            WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
+        } else {
+            // Construct the WO Number with "-SB" when the batch is not checked
+            WONumber = "WO-" + numberPart + "-SW";
+        }
+    }
+    
+    // Set the WO Number field
+    document.getElementById('wo_number').value = WONumber;
+}
+
+
+
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
 	// SET DEPOSIT BALANCE START
@@ -3134,6 +3419,144 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			}
 		}
 	});
+	function toggleBatchDropdown() {
+		const isBatchCheckbox = document.getElementById('is_batch');
+		
+		// Ensure the checkbox element exists before accessing its properties
+		if (isBatchCheckbox) {
+			isBatchChecked = isBatchCheckbox.checked; // Update the value of isBatchChecked
+			
+			const batchDropdown = document.getElementById('batchDropdownSection');
+			
+			if (isBatchChecked) {
+				batchDropdown.style.display = 'block';
+			} else {
+				batchDropdown.style.display = 'none';
+			}
+		}
+		setWo();
+	}
+
+	// Run the function on page load if the checkbox exists
+	document.addEventListener('DOMContentLoaded', function () {
+		const isBatchCheckbox = document.getElementById('is_batch');
+		
+		if (isBatchCheckbox) {
+			toggleBatchDropdown(); // Call to set the initial state
+			
+			// Update the value of isBatchChecked on page load
+			isBatchChecked = isBatchCheckbox.checked;
+		}
+		setWo();
+	});
 </script>
+@php
+$hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-and-edit-amount']);
+@endphp
+
+@if ($hasAmountPermission)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of input field IDs and classes to disable
+            const fieldsToDisable = [
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'deposit_received_as',
+                'amount_received',
+                'balance_amount',
+            ];
+
+            // Disable each field by ID or class
+            fieldsToDisable.forEach(function(field) {
+                const elementsById = document.getElementById(field);
+                const elementsByClass = document.getElementsByClassName(field);
+
+                if (elementsById) {
+                    elementsById.readOnly = true;
+                }
+
+                if (elementsByClass.length > 0) {
+                    Array.from(elementsByClass).forEach(function(element) {
+                        element.disabled = true;
+                    });
+                }
+				$('#currency').prop('disabled', true).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');				
+            });
+			var deleteButtons = document.querySelectorAll('.delete-button');
+			deleteButtons.forEach(function(button) {
+				button.disabled = true;
+			});
+        });
+    </script>
+@endif
+
+
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-order-input-except-general-info']);
+@endphp
+
+@if ($hasPermission)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // List of input field IDs and classes to disable
+            const fieldsToDisable = [
+                'transport_type', // Class name for radio buttons
+                'brn',
+                'container_number',
+                'airline_reference_id',
+                'airway_bill',
+                'shipping_line',
+                'forward_import_code',
+                'trailer_number_plate',
+                'transportation_company',
+                'transporting_driver_contact_number',
+                'airway_details',
+                'transportation_company_details',
+                'so_total_amount',
+                'so_vehicle_quantity',
+                'deposit_received_as',
+                'amount_received',
+                'balance_amount',
+                'delivery_location',
+                'delivery_contact_person',
+                'delivery_date',
+            ];
+
+            // Disable each field by ID or class
+            fieldsToDisable.forEach(function(field) {
+                const elementsById = document.getElementById(field);
+                const elementsByClass = document.getElementsByClassName(field);
+
+                if (elementsById) {
+                    elementsById.readOnly = true;
+                }
+
+                if (elementsByClass.length > 0) {
+                    Array.from(elementsByClass).forEach(function(element) {
+                        element.disabled = true;
+                    });
+                }
+				$('#airline').prop('disabled', true).trigger('change');
+				$('#currency').prop('disabled', true).trigger('change');
+				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');	
+				$('#vin_multiple').prop('disabled', true).trigger('change');
+				$('#brn_file').prop('disabled', true).trigger('change');	
+				$('#signed_pfi').prop('disabled', true).trigger('change');	
+				$('#signed_contract').prop('disabled', true).trigger('change');	
+				$('#payment_receipts').prop('disabled', true).trigger('change');	
+				$('#noc').prop('disabled', true).trigger('change');	
+				$('#enduser_trade_license').prop('disabled', true).trigger('change');	
+				$('#enduser_passport').prop('disabled', true).trigger('change');	
+				$('#enduser_contract').prop('disabled', true).trigger('change');	
+				$('#vehicle_handover_person_id').prop('disabled', true).trigger('change');				
+            });
+			var deleteButtons = document.querySelectorAll('.delete-button');
+			deleteButtons.forEach(function(button) {
+				button.disabled = true;
+			});
+        });
+    </script>
+@endif
 
 @endsection

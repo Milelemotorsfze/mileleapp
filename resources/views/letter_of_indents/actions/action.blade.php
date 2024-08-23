@@ -23,13 +23,16 @@
             @endif
         @endcan
     @endif
- 
+
 
     @can('LOI-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
         @endphp
         @if ($hasPermission)
+        <button type="button" class="btn btn-secondary primary btn-sm mt-1" title="Update Comment" data-bs-toggle="modal" data-bs-target="#update-loi-comment-{{$letterOfIndent->id}}">
+            <i class="fa fa-comment"></i>
+        </button>
         <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" title="View LOI Item Deatails & Update Utilized Quantity" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
             <i class="fa fa-list"></i>
         </button>
@@ -38,20 +41,7 @@
         </button>
         @endif
     @endcan
-    <!-- To Create LOI -->
-        @can('PFI-create')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
-            @endphp
-            @if ($hasPermission)
-                @if($letterOfIndent->is_expired == false && $type !== 'NEW')
-                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                        <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
-                    </a>
-                @endif
-            @endif
-        @endcan
-
+       
 
     <!-- To View LOI Items -->
     <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -126,7 +116,7 @@
                                                     <dt class="d-lg-none d-xl-none d-xxl-none">Utilized Quantity</dt>
                                                     <input type="hidden" name="letter_of_indent_item_ids[]" value="{{ $LOIItem->id}}" >
                                                     <input type="number" min="0" placeholder="Utilized Quantity" 
-                                                    @if($type !== 'SUPPLIER_RESPONSE')  readonly @endif 
+                                                    @if($type == 'NEW')  readonly @endif 
                                                     required max="{{$LOIItem->quantity}}" name="utilized_quantity[]" value="{{ $LOIItem->utilized_quantity }}" class="form-control" >
                                             
                                                 </div>
@@ -142,7 +132,7 @@
 
                     </div>
                     <div class="modal-footer">
-                       @if($type == 'SUPPLIER_RESPONSE' && $letterOfIndent->is_expired == false)
+                       @if($type !== 'NEW' && $letterOfIndent->is_expired == false)
                             <button type="submit" class="btn btn-info" 
                            data-url="{{route('utilization-quantity-update', $letterOfIndent->id) }}">Update</button> 
                         @endif 
@@ -153,6 +143,7 @@
               
             </div> 
     </div>
+    <!-- To view LOI Document -->
     <div class="modal fade" id="view-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -187,6 +178,33 @@
             </div>
         </div>
     </div>
+     <!-- to update Comment -->
+    <div class="modal fade" id="update-loi-comment-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Comment</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('update-loi-comment', ['id' => $letterOfIndent->id])}}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12 m-1">
+                                <label class="form-label fw-bold">Comment</label>
+                                <textarea rows="5" cols="20" class="form-control" name="comments" placeholder="Comment Here.."> {{ $letterOfIndent->comments }} </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-info">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <script>
          $('.loi-button-delete').on('click',function(){
             let id = $(this).attr('data-id');
@@ -203,12 +221,38 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
-                            location.reload();
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
                             alertify.success('LOI Deleted successfully.');
                         }
                     });
                 }
             }).set({title:"Delete Item"})
+        });
+        $('.loi-expiry-status-update').on('click',function(){
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to make this LOI Expired?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
+                            var table2 = $('.waiting-for-approval-table').DataTable();
+                            table2.ajax.reload();
+                            var table3 = $('.supplier-response-table').DataTable();
+                            table3.ajax.reload();
+                            alertify.success('Expiry Status updated as "Expired" successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Update Expired Status"})
         });
         
     </script>

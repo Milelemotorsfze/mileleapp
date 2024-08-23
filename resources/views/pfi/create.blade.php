@@ -101,14 +101,6 @@
                                             {{ $letterOfIndent->dealers }}
                                         </div>
                                     </div>
-{{--                                    <div class="row">--}}
-{{--                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">--}}
-{{--                                            Destination :--}}
-{{--                                        </div>--}}
-{{--                                        <div class="col-sm-6">--}}
-{{--                                            {{ $letterOfIndent->destination }}--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
                                 </div>
                             </div>
                         </div>
@@ -143,18 +135,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-{{--                                            <div class="col-lg-4 col-md-6">--}}
-{{--                                                <div class="mb-3">--}}
-{{--                                                    <label for="choices-single-default" class="form-label">Released Date</label>--}}
-{{--                                                    <input type="date" class="form-control" name="pfi_date">--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
-{{--                                            <div class="col-lg-4 col-md-6">--}}
-{{--                                                <div class="mb-3">--}}
-{{--                                                    <label for="choices-single-default" class="form-label">Released Amount</label>--}}
-{{--                                                    <input type="number" min="0" class="form-control" name="released_amount" placeholder="Released Amount">--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
+
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Amount</label>
@@ -544,8 +525,7 @@
                        }
                     }
                 });
-            },
-        );
+            });
 
         $("#form-create").validate({
            ignore: [],
@@ -599,18 +579,12 @@
                         action: 'CREATE'
                     },
                     success: function(data) {
-                        var approvedItems = data.approvedItemUnitPrices;
-                        var pendingItems = data.pendingItemUnitPrices;
-                        console.log(approvedItems);
-                        console.log("pending");
-                        console.log(pendingItems);
+                        console.log(data);
 
-                        jQuery.each(approvedItems, function(key,value){
+                        jQuery.each(data, function(key,value){
                             $('#unit-price-'+key).val(value);
                         });
-                        jQuery.each(pendingItems, function(key,value){
-                            $('#unit-price-'+key).val(value);
-                        });
+                        
 
                         calculatePfiAmount();
                     }

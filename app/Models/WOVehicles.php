@@ -37,7 +37,6 @@ class WOVehicles extends Model
         'updated_by',
         'deleted_by',
         'deposit_received',
-        'comment_id',
         'deleted_comment_id',
     ];
     protected $appends = [
@@ -88,5 +87,13 @@ class WOVehicles extends Model
     public function workOrder()
     {
         return $this->hasOne(WorkOrder::class,'id','work_order_id');
+    }
+    public function commentVehicle()
+    {
+        return $this->hasMany(WOVehicleRecordHistory::class, 'comment_id', 'comment_id');
+    }
+    public function commentUpdatedVehicle()
+    {
+        return $this->hasMany(WOVehicleRecordHistory::class, 'w_o_vehicle_id', 'id');
     }
 }

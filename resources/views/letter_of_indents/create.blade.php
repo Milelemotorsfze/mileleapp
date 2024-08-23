@@ -34,7 +34,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Add New LOI</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
             </div>
             <div class="card-body">
@@ -176,6 +176,7 @@
                                     <option value="milele_cars" >Milele Cars</option>
                                     <option value="individual">Individual</option>
                                     <option value="business">Business</option>
+                                    <option value="general">General</option>
 
                                 </select>
                             </div>

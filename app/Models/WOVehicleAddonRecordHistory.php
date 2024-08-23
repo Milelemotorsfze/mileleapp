@@ -9,7 +9,7 @@ class WOVehicleAddonRecordHistory extends Model
 {
     use HasFactory;
     protected $table = "w_o_vehicle_addon_record_histories";
-    protected $fillable = ['type','w_o_vehicle_addon_id','user_id','field_name', 'old_value', 'new_value','changed_at','comment_id'];
+    protected $fillable = ['type','w_o_vehicle_addon_id','user_id','field_name', 'old_value', 'new_value','changed_at','cvm_id'];
     public $timestamps = false;
 
     protected $casts = [
@@ -21,7 +21,7 @@ class WOVehicleAddonRecordHistory extends Model
     public function getFieldAttribute() {
         $fieldMapping = [
             'addon_code' => 'Addon Code',
-            'addon_description' => 'Addon Description',
+            'addon_description' => 'Addon Custom Details',
             'addon_quantity' => 'Addon Quantity',
         ];
     
@@ -30,5 +30,13 @@ class WOVehicleAddonRecordHistory extends Model
     public function user()
     {
         return $this->hasOne(User::class,'id','user_id');
+    }
+    // Define the inverse relationship to WOApprovalAddonDataHistory
+    public function approvalAddonDataHistories()
+    {
+        return $this->hasMany(WOApprovalAddonDataHistory::class, 'wo_addon_history_id');
+    }
+    public function addon() {
+        return $this->belongsTo(WOVehicleAddons::class,'w_o_vehicle_addon_id','id');
     }
 }

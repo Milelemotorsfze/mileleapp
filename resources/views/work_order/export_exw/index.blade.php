@@ -44,7 +44,7 @@
 @section('content')
 <div class="card-header">
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
 	@endphp
 	@if ($hasPermission)
 	<h4 class="card-title">
@@ -84,7 +84,7 @@
 	@endif
 </div>
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','list-export-cnf-wo','list-export-local-sale-wo','list-lto-wo']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
 @endphp
 @if ($hasPermission)
 <div class="tab-pane fade show" id="telephonic_interview">
@@ -95,6 +95,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
 							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Approval Status</center>
+							</th>
+							<th rowspan="2" class="light">Sales Person</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
                             <th rowspan="2" class="light">Date</th>
@@ -119,26 +123,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <th rowspan="2" class="light">Transport Type</th>
                                 <th rowspan="2" class="light">BRN File</th>
 
-                                <th rowspan="2" class="dark">Airline</th>
-                                <th rowspan="2" class="dark">Airway Bill</th>
-                                <th rowspan="2" class="dark">Airway Details</th>
+                                <th rowspan="2" class="light">Airline/Shipping Line/Trailer No.</th>
+                                <th rowspan="2" class="light">AWB/Container No./Transportation Company</th>
+                                <th rowspan="2" class="light">Airway Info/Fwd Import Code/Driver Contact No.</th>
 
-                                <th rowspan="2" class="light">BRN</th>
-                                <th rowspan="2" class="light">Container Number</th>                               
-                                <th rowspan="2" class="light">Shipping Line</th>
-                                <th rowspan="2" class="light">Forward Import Code</th>
-
-                                <th rowspan="2" class="dark">Trailer Number Plate</th>
-                                <th colspan="3" class="light">
-                                    <center>Transportation</center>
-                                </th>
+                                <th rowspan="2" class="light">BRN/Transportation Com. Info</th>
                             @endif
                             <th colspan="5" class="dark">
 								<center>SO</center>
 							</th>
-                            <th colspan="3" class="light">
+                            <th colspan="4" class="light">
 								<center>Delivery</center>
 							</th>
+							@if(isset($type) && ($type == 'export_cnf'))
+							 	<th rowspan="2" class="light">Prefered Shipping Line</th>
+								<th rowspan="2" class="light">Bill of Loading</th>
+								<th rowspan="2" class="light">Shipper</th>
+								<th rowspan="2" class="light">Consignee</th>
+								<th rowspan="2" class="light">Notify Party</th>
+								<th rowspan="2" class="light">Special/In Transit/Other Requests</th>
+							@endif
                             <th rowspan="2" class="dark">Signed PFI</th>
                             <th rowspan="2" class="dark">Signed Contract</th>
                             <th rowspan="2" class="dark">Payment Receipts</th>
@@ -147,19 +151,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <center>End User</center>
                             </th>
                             <th rowspan="2" class="dark">Handover Person ID</th>
-                            <th rowspan="2" class="light">Created By</th>
                             <th rowspan="2" class="light">Created At</th>
                             <th rowspan="2" class="dark">Last Updated By</th>
                             <th rowspan="2" class="dark">Last Updated At</th>
-                            <th rowspan="2" class="light">Sales Support Data Confirmation By</th>
-                            <th rowspan="2" class="light">Sales Support Data Confirmation At</th>
-                            <th rowspan="2" class="dark">Finance Approval By</th>
-                            <th rowspan="2" class="dark">Finance Approval At</th>
-                            <th rowspan="2" class="light">COO Office Approval By</th>
-                            <th rowspan="2" class="light">COO Office Approval At</th>
 							<th rowspan="2" class="dark">Total Number Of BOE</th>
 						</tr>
 						<tr>
+							<td class="dark">Finance</td>
+							<td class="dark">COO Office</td>
 							<td class="dark">Name</td>
                             <td class="dark">Email</td>
 							<td class="dark">Contact</td>
@@ -173,11 +172,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td class="dark">Email</td>
 							<td class="dark">Contact</td>
                             @endif
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                            <td class="light">Driver Contact</td>
-                            <td class="light">Name</td>
-							<td class="light">Details</td>
-                            @endif
                             <td class="dark">Vehicle Qty</td>
 							<td class="dark">Currency</td>
                             <td class="dark">Amount</td>
@@ -185,7 +179,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td class="dark">Balance</td>
 
                             <td class="light">Location</td>
-                            <td class="light">Contact Person</td>
+                            <td class="light">Contact Person Name</td>
+							<td class="light">Contact Person No.</td>
                             <td class="light">Date</td>
                             <td class="light">Trade License</td>
                             <td class="light">Passport</td>
@@ -203,28 +198,60 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</button>
 									<ul class="dropdown-menu dropdown-menu-start">
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','export-cnf-wo-details','local-sale-wo-details']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
                                         @endphp
                                         @if ($hasPermission)
                                         <li>
-                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('work-order.show',$data->id ?? '')}}">
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i> View Details
                                             </a>
                                         </li>
                                         @endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
+                                        @endphp
+                                        @if ($hasPermission)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$data->id ?? '')}}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
+										@endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <li>
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Finance Approval History" class="btn btn-sm btn-info" href="{{route('fetchFinanceApprovalHistory',$data->id)}}">
+                                            <i class="fa fa-history" aria-hidden="true"></i> 
+											Fin. Approval Log
+                                            </a>
+                                        </li>
+										@endif
+
+										@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <li>
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="COO Office Approval History" class="btn btn-sm btn-info" href="{{route('fetchCooApprovalHistory',$data->id)}}">
+                                            <i class="fa fa-history" aria-hidden="true"></i> COO Approval Log
+                                            </a>
+                                        </li>
+										@endif
 									</ul>
 								</div>                         
                             </td>
 							<td>{{ ++$i }}</td>
-                            <td>{{$data->so_number ?? ''}}</td>
+							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
+							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
+							<td>{{$data->CreatedBy->name ?? ''}}</td>
+							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))							
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))															
 							    <td>{{$data->batch ?? ''}}</td>	
                             @endif						
 							<td>{{$data->customer_name ?? ''}}</td>
@@ -245,30 +272,51 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>{{$data->final_destination ?? ''}}</td>
                                 <td>{{$data->transport_type ?? ''}}</td>
                                 <td>
-									@if($data->brn_file)
-										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
-											<button class="btn btn-primary mb-1 btn-style">View</button>
-										</a>
-										<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
-											<button class="btn btn-info btn-style">Download</button>
-										</a>
+									@if($data->transport_type == 'air' || $data->transport_type == 'sea')
+										@if($data->brn_file)
+											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
+												<button class="btn btn-primary mb-1 btn-style">View</button>
+											</a>
+											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
+												<button class="btn btn-info btn-style">Download</button>
+											</a>
+										@endif
 									@endif
 								</td>
-                                <td>{{$data->airline ?? ''}}</td>
-                                <td>{{$data->airway_bill ?? ''}}</td>
-                                <td>{{$data->airway_details ?? ''}}</td>
-
-                                <td>{{$data->brn ?? ''}}</td>
-                                <td>{{$data->container_number ?? ''}}</td>
-                                
-                                <td>{{$data->shipping_line ?? ''}}</td>
-                                <td>{{$data->forward_import_code ?? ''}}</td>
-                                <td>{{$data->trailer_number_plate ?? ''}}</td>
-                                <td>{{$data->transporting_driver_contact_number ?? ''}}</td>
-
-                                <td>{{$data->transportation_company ?? ''}}</td>
-                               
-                                <td>{{$data->transportation_company_details ?? ''}}</td>
+                                <td>
+									@if($data->transport_type == 'air')
+										{{$data->airline ?? ''}}
+									@elseif($data->transport_type == 'sea')
+										{{$data->shipping_line ?? ''}}
+									@elseif($data->transport_type == 'road')
+										{{$data->trailer_number_plate ?? ''}}
+									@endif									
+								</td>
+                                <td>
+									@if($data->transport_type == 'air')
+										{{$data->airway_bill ?? ''}}
+									@elseif($data->transport_type == 'sea')
+										{{$data->container_number ?? ''}}
+									@elseif($data->transport_type == 'road')
+										{{$data->transportation_company ?? ''}}
+									@endif
+								</td>
+                                <td>
+									@if($data->transport_type == 'air')
+										{{$data->airway_details ?? ''}}
+									@elseif($data->transport_type == 'sea')
+										{{$data->forward_import_code ?? ''}}
+									@elseif($data->transport_type == 'road')
+										{{$data->transporting_driver_contact_number ?? ''}}
+									@endif
+								</td>
+                                <td>
+									@if($data->transport_type == 'sea')
+										{{$data->brn ?? ''}}
+									@elseif($data->transport_type == 'road')
+										{{$data->transportation_company_details ?? ''}}
+									@endif
+								</td>
                             @endif
                             <td>{{$data->so_vehicle_quantity ?? ''}}</td>
 							<td>
@@ -281,7 +329,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
 							<td>{{$data->delivery_location ?? ''}}</td>
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
+							<td>{{$data->delivery_contact_person_number ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
+							@if(isset($type) && ($type == 'export_cnf'))
+								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
+								<td>{{$data->bill_of_loading_details ?? ''}}</td>
+								<td>{{$data->shipper ?? ''}}</td>
+								<td>{{$data->consignee ?? ''}}</td>
+								<td>{{$data->notify_party ?? ''}}</td>
+								<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
+							@endif
                             <td>
 								@if($data->signed_pfi)
 									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
@@ -362,22 +419,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</a>
 								@endif
 							</td>
-
-							<td>{{$data->CreatedBy->name ?? ''}}</td>
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
                             <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-
-                            <td>{{$data->salesSupportDataConfirmationBy->name ?? ''}}</td>
-                            <td>@if($data->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($data->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                            
-							<td>{{$data->financeApprovalBy->name ?? ''}}</td>
-                            <td>@if($data->finance_approved_at != ''){{\Carbon\Carbon::parse($data->finance_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-                            
-							<td>{{$data->COOApprovalBy->name ?? ''}}</td>
-                            <td>@if($data->coe_office_approved_at != ''){{\Carbon\Carbon::parse($data->coe_office_approved_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
-							<td></td>
+							<td>@if($data->total_number_of_boe != 0){{$data->total_number_of_boe ?? ''}}@endif</td>
 						</tr>
 						@endforeach
 					</tbody>

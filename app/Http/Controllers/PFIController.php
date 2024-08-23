@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\LetterOfIndent;
+use App\Models\MasterModel;
 use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
+use App\Models\PfiItem;
 use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -52,14 +54,14 @@ class PFIController extends Controller
         (new UserActivityController)->createActivity('Open PFI Create Page');
 
         $letterOfIndent = LetterOfIndent::findOrFail($request->id);
-        $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
-                                        ->whereNull('pfi_id')
-                                        ->where('is_pfi_created', true)
-                                        ->get();
-        $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
-                                        ->whereNull('pfi_id')
-                                        ->where('is_pfi_created', false)
-                                        ->get();
+        // $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
+        //                                 ->whereNull('pfi_id')
+        //                                 ->where('is_pfi_created', true)
+        //                                 ->get();
+        // $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
+        //                                 ->whereNull('pfi_id')
+        //                                 ->where('is_pfi_created', false)
+        //                                 ->get();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -67,7 +69,42 @@ class PFIController extends Controller
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
-        return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
+            // new pfi creation
+
+          $LOIItems = $letterOfIndent->letterOfIndentItems;
+
+          $totalLOIQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
+                                ->where('letter_of_indent_id', $request->id)
+                                ->sum('quantity');
+
+            foreach($LOIItems as $LOIItem) {
+                $model_line = 'HIACE';
+                // chcek if case insensitive check is possible
+                $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx');
+                if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
+                    $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
+                        $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+                    });
+                }else{
+                    $masterModels =  $masterModels->where('master_model_line_id', $LOIItem->masterModel->master_model_line_id);
+                }
+                $LOIItem->masterModels =  $masterModels->groupBy('model')->get();
+                
+                $totalpfiQuantityUsed = PfiItem::select('loi_item_id','pfi_quantity')->where('loi_item_id', $LOIItem->id)
+                                                    ->sum('pfi_quantity');
+
+                $alreadyusedQuantity = $LOIItem->utilized_quantity + $totalpfiQuantityUsed;
+           
+                $LOIItem->remaining_quantity = $LOIItem->quantity - $alreadyusedQuantity;
+               
+            }
+            
+
+            // return $LOIItems;
+
+            
+            return view('pfi.new_create', compact('LOIItems','letterOfIndent','suppliers','totalLOIQuantity'));
+        // return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
 
     /**
@@ -75,13 +112,14 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-//         dd($request->all());
+        // return $request->all();
+
         (new UserActivityController)->createActivity('New PFI Created');
 
         $request->validate([
             'pfi_reference_number' => 'required',
-//            'pfi_date' => 'required',
-            'amount'  => 'required',
+            // 'pfi_date' => 'required',
+            // 'amount'  => 'required',
             'file' => 'required|mimes:pdf'
         ]);
 
@@ -102,7 +140,7 @@ class PFIController extends Controller
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
-        $destination = 'PFI_document_withsign';
+        // $destination = 'PFI_document_withsign';
 
         if ($request->has('file'))
         {
@@ -115,58 +153,62 @@ class PFIController extends Controller
 
         $pfi->save();
 
-        $currentlyApprovedItems = $request->selectedIds;
-        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
-        $pfiApprovedQuantity = ApprovedLetterOfIndentItem::whereIn('id', $currentlyApprovedItems)->sum('quantity');
+        if($request->pfi_quantities) {
+            foreach($request->pfi_quantities as $key => $pfiQuantity) {
+                if($pfiQuantity > 0) {
+                    $model = $request->models[$key];
+                    $sfx = $request->sfx[$key];
+                    $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
+                    $pfiItem = new PfiItem();
+                    $pfiItem->pfi_id = $pfi->id;
+                    $pfiItem->loi_item_id = $request->loi_item_ids[$key];
+                    $pfiItem->master_model_id = $masterModel->id ?? '';
+                    $pfiItem->pfi_quantity = $pfiQuantity;
+                    $pfiItem->unit_price = $request->unit_price[$key];
+                    $pfiItem->created_by = Auth::id();
+                    $pfiItem->save();
 
-        // status change in LOI table by checking quantity of pfi created untill now
-        if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
-        }else{
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
-        }
-        $letterOfIndent->save();
-        // update pfiId FOR EACH ADDED ITEM
-        foreach ($currentlyApprovedItems as $key => $currentlyApprovedItem)
-        {
-            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem);
-            $approvedLoiItem->is_pfi_created = true;
-            $approvedLoiItem->pfi_id = $pfi->id;
-            $approvedLoiItem->unit_price = $request->unit_price[$key];
-            $approvedLoiItem->save();
-        }
-        try {
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
-
-            for ($i=1; $i <= $pageCount; $i++)
-            {
-                $pdf->AddPage();
-                $tplIdx = $pdf->importPage($i);
-                $pdf->useTemplate($tplIdx);
-                if($i == $pageCount) {
-                    $pdf->Image('milele_seal.png', 80, 230, 50,35);
                 }
             }
-
-            $signedFileName = 'signed_'.time().'.'.$extension;
-            $directory = public_path('PFI_Document_with_sign');
-            \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-            $pdf->Output($directory.'/'.$signedFileName,'F');
-            $pfi->pfi_document_with_sign = $signedFileName;
-        }catch (\Exception $e) {
-
-            return redirect()->back()->with('error', $e->getMessage());
         }
-        $pfi->save();
-
+        
+        // document sealing
+        // if($request->has('file')) {
+        //     try {
+            
+        //         $pdf = new Fpdi();
+        //         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+    
+        //         for ($i=1; $i <= $pageCount; $i++)
+        //         {
+        //             $pdf->AddPage();
+        //             $tplIdx = $pdf->importPage($i);
+        //             $pdf->useTemplate($tplIdx);
+        //             if($i == $pageCount) {
+        //                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
+        //             }
+        //         }
+    
+        //         $signedFileName = 'signed_'.time().'.'.$extension;
+        //         $directory = public_path('PFI_Document_with_sign');
+        //         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        //         $pdf->Output($directory.'/'.$signedFileName,'F');
+        //         $pfi->pfi_document_with_sign = $signedFileName;
+        //     }catch (\Exception $e) {
+    
+        //         return redirect()->back()->with('error', $e->getMessage());
+        //     }
+            // $pfi->save();
+        // }
+       
         DB::commit();
 
         return redirect()->route('pfi.index')->with('message', 'PFI created Successfully');
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
 //         return $request->all();
-        $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)
+        $pfi = PFI::select('id','pfi_reference_number','created_at')
+                ->where('pfi_reference_number', $request->pfi_reference_number)
                 ->whereYear('created_at', Carbon::now()->year)->first();
         if($pfi) {
             return response(true);
@@ -188,38 +230,57 @@ class PFIController extends Controller
     public function edit(string $id)
     {
         $pfi = PFI::find($id);
-
         (new UserActivityController)->createActivity('Open PFI Edit Page');
 
         $letterOfIndent = LetterOfIndent::findOrFail($pfi->letter_of_indent_id);
-        $approvedPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $id)
-            ->where('is_pfi_created', true)
-            ->get();
-        $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
-            ->whereNull('pfi_id')
-            ->where('is_pfi_created', false)
-            ->get();
+        $pfiItems = PfiItem::where('pfi_id', $id)->get();
+        // return $pfiItems;
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
+        $totalLOIQuantity = LetterOfIndentItem::select('letter_of_indent_id','quantity')
+            ->where('letter_of_indent_id', $pfi->letter_of_indent_id)
+            ->sum('quantity');
+            $LOIItems = $letterOfIndent->letterOfIndentItems;
 
-        foreach ($pendingPfiItems as $pendingPfiItem) {
-            $loiItem = LetterOfIndentItem::find($pendingPfiItem->letter_of_indent_item_id);
-
-            if($pfi->supplier->is_MMC == true) {
-                $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
-            }else if($pfi->supplier->is_AMS == true) {
-                $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+        foreach($LOIItems as $LOIItem) {
+            $model_line = 'HIACE';
+            // chcek if case insensitive check is possible
+            $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx');
+            if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
+                $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
+                    $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+                });
             }else{
-                $price = 0;
+                $masterModels =  $masterModels->where('master_model_line_id', $LOIItem->masterModel->master_model_line_id);
             }
-           $pendingPfiItem->unit_price = $price;
-        }
+            $LOIItem->masterModels =  $masterModels->groupBy('model')->get();
+            // corresponding PFI Item
 
-        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
+            $pfiItem = PfiItem::where('pfi_id', $id)->where('loi_item_id', $LOIItem->id)->first();
+            
+            $totalpfiQuantityUsed = PfiItem::select('loi_item_id','pfi_quantity')->where('loi_item_id', $LOIItem->id)
+                                                 ->whereNot('pfi_id', $pfi->id)
+                                                ->sum('pfi_quantity');
+
+            $alreadyusedQuantity = $LOIItem->utilized_quantity + $totalpfiQuantityUsed;
+            $LOIItem->remaining_quantity = $LOIItem->quantity - $alreadyusedQuantity;
+           
+            if($pfiItem) {
+                $LOIItem->pfi_quantity =  $pfiItem->pfi_quantity;
+                $LOIItem->unit_price = $pfiItem->unit_price;
+                $LOIItem->total_amount = $pfiItem->unit_price * $pfiItem->pfi_quantity;
+            }else{
+                $LOIItem->pfi_quantity = 0;
+                $LOIItem->unit_price =  0;   
+                $LOIItem->total_amount = 0;
+            }
+           
+        }
+        return view('pfi.edit_new', compact('pfi','LOIItems','letterOfIndent','suppliers','totalLOIQuantity'));
     }
 
     /**
@@ -257,69 +318,58 @@ class PFIController extends Controller
             if (File::exists(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign))) {
                 File::delete(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign));
             }
-            if (File::exists(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign))) {
-                File::delete(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign));
-            }
+            // if (File::exists(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign))) {
+            //     File::delete(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign));
+            // }
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
 
-            $pdf = new Fpdi();
-            $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+            // $pdf = new Fpdi();
+            // $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
 
-            for ($i=1; $i <= $pageCount; $i++)
-            {
-                $pdf->AddPage();
-                $tplIdx = $pdf->importPage($i);
-                $pdf->useTemplate($tplIdx);
-                if($i == $pageCount) {
-                    $pdf->Image('milele_seal.png', 80, 230, 50,35);
-                }
-            }
+            // for ($i=1; $i <= $pageCount; $i++)
+            // {
+            //     $pdf->AddPage();
+            //     $tplIdx = $pdf->importPage($i);
+            //     $pdf->useTemplate($tplIdx);
+            //     if($i == $pageCount) {
+            //         $pdf->Image('milele_seal.png', 80, 230, 50,35);
+            //     }
+            // }
 
-            $signedFileName = 'signed_'.time().'.'.$extension;
-            $directory = public_path('PFI_Document_with_sign');
-            \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-            $pdf->Output($directory.'/'.$signedFileName,'F');
-            $pfi->pfi_document_with_sign = $signedFileName;
+            // $signedFileName = 'signed_'.time().'.'.$extension;
+            // $directory = public_path('PFI_Document_with_sign');
+            // \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+            // $pdf->Output($directory.'/'.$signedFileName,'F');
+            // $pfi->pfi_document_with_sign = $signedFileName;
         }
 
         $pfi->save();
 
-        $currentlyApprovedItems = $request->selectedIds;
+        // delele all pfi item under this pfi
+        $pfi->pfiItems()->delete();
+        
+        // update pfi items
+        if($request->pfi_quantities) {
+            foreach($request->pfi_quantities as $key => $pfiQuantity) {
+                if($pfiQuantity > 0) {
+                    $model = $request->models[$key];
+                    $sfx = $request->sfx[$key];
+                    $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
+                    $pfiItem = new PfiItem();
+                    $pfiItem->pfi_id = $pfi->id;
+                    $pfiItem->loi_item_id = $request->loi_item_ids[$key];
+                    $pfiItem->master_model_id = $masterModel->id ?? '';
+                    $pfiItem->pfi_quantity = $pfiQuantity;
+                    $pfiItem->unit_price = $request->unit_price[$key];
+                    $pfiItem->created_by = Auth::id();
+                    $pfiItem->save();
 
-        $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
-
-        $pfiApprovedQuantity = ApprovedLetterOfIndentItem::whereIn('id', $currentlyApprovedItems)->sum('quantity');
-
-        // status change in LOI table by checking quantity of pfi created untill now
-        if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
-        }else{
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
-        }
-        $letterOfIndent->save();
-
-        // make all existing items as new items
-        $existingPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $id)
-            ->where('is_pfi_created', true)
-            ->get();
-        foreach ($existingPfiItems as $pfiItem) {
-            $pfiItem->pfi_id = null;
-            $pfiItem->is_pfi_created = false;
-            $pfiItem->unit_price = 0;
-            $pfiItem->save();
-        }
-        // update pfiId FOR EACH ADDED ITEM
-        foreach ($currentlyApprovedItems as $key => $currentlyApprovedItem)
-        {
-            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem);
-            $approvedLoiItem->pfi_id = $pfi->id;
-            $approvedLoiItem->is_pfi_created = true;
-            $approvedLoiItem->unit_price = $request->unit_price[$key];
-            $approvedLoiItem->save();
+                }
+            }
         }
 
         DB::commit();
@@ -363,22 +413,10 @@ class PFIController extends Controller
 
     }
     public function getUnitPrice(Request $request) {
-
         $supplier = Supplier::find($request->supplier_id);
-
-        $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
-            ->whereNull('pfi_id')
-            ->where('is_pfi_created', false)
-            ->get();
-        $approvedItemUnitPrices = [];
-        $pendingPfiItemUnitPrices = [];
-        if($request->action == 'EDIT') {
-            $approvedPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $request->pfi_id)
-                ->where('is_pfi_created', true)
-                ->get();
-            foreach ($approvedPfiItems as $approvedPfiItem) {
-
-                $loiItem = LetterOfIndentItem::find($approvedPfiItem->letter_of_indent_item_id);
+            $data = [];
+            foreach ($request->loi_item_ids as $item) {
+                $loiItem = LetterOfIndentItem::find($item);
 
                 if($supplier->is_MMC == true) {
                     $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
@@ -387,28 +425,9 @@ class PFIController extends Controller
                 }else{
                     $price = 0;
                 }
-                $approvedItemUnitPrices[$approvedPfiItem->id] = $price;
+                $data[] = $price;
             }
-        }
-
-        if($pendingPfiItems->count() > 0) {
-            foreach ($pendingPfiItems as $pendingPfiItem) {
-
-                $loiItem = LetterOfIndentItem::find($pendingPfiItem->letter_of_indent_item_id);
-
-                if($supplier->is_MMC == true) {
-                    $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
-                }else if($supplier->is_AMS == true) {
-                    $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
-                }else{
-                    $price = 0;
-                }
-                $pendingPfiItemUnitPrices[$pendingPfiItem->id] = $price;
-            }
-        }
-
-        $data['approvedItemUnitPrices'] = $approvedItemUnitPrices;
-        $data['pendingItemUnitPrices'] = $pendingPfiItemUnitPrices;
+        
         return $data;
 
     }

@@ -34,7 +34,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Edit LOI</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -175,6 +175,7 @@
                                         {{ $letterOfIndent->client->customertype == 'Company' || $letterOfIndent->client->customertype == 'Government' ? 'disabled' : '' }}>Individual</option>
                                     <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
                                         {{ $letterOfIndent->client->customertype == 'Individual' ? 'disabled' : '' }}>Business</option>
+                                        <option value="general" {{ in_array('general',$LOITemplates) ? 'selected' : '' }}>General</option>
                                 </select>
                             </div>
                         </div>

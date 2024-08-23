@@ -65,10 +65,17 @@
         previewFiles(this.files, 'file-previews');
     });
     function previewFiles(files, previewContainerId, commentId) {
+        const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf'];
         const previewContainer = document.getElementById(previewContainerId);
         previewContainer.innerHTML = ''; // Clear previous previews
 
         for (const file of files) {
+            // Check if the file type is allowed
+            if (!allowedFileTypes.includes(file.type)) {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                continue;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.createElement('div');
@@ -80,17 +87,37 @@
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     `;
-                } else {
-                    preview.innerHTML = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
+                } else if (file.type === 'application/pdf') {
+                    preview.innerHTML = `
+                        <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    `;
                 }
 
                 previewContainer.appendChild(preview);
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    function viewPDF(src) {
+        const newWindow = window.open();
+        newWindow.document.write(`<embed src="${src}" type="application/pdf" style="width: 100%; height: 100%;">`);
+    }
+
+    function downloadFile(src, filename) {
+        const link = document.createElement('a');
+        link.href = src;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     function viewImage(src) {
         const newWindow = window.open();
@@ -111,6 +138,10 @@
 
         if (commentText.trim() === '' && commentFiles.length === 0) return;
 
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
+        submitButton.prop('disabled', true);
+
         const currentDateTime = new Date();
         const formattedDateTime = formatDateTime(currentDateTime);
 
@@ -124,7 +155,17 @@
                                 <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                 <div class="hover-options">
                                     <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                                    <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                                    <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        `);
+                    } else if (file.type === 'application/pdf') {
+                        resolve(`
+                            <div class="file-preview m-1" data-comment-id="${commentIdCounter}">
+                                <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                <div class="hover-options">
+                                    <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                                    <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         `);
@@ -189,6 +230,13 @@
             }
 
             commentIdCounter++;
+
+            // Re-enable the submit button after operation is complete
+            submitButton.prop('disabled', false);
+        }).catch(error => {
+            console.error('Error processing files:', error);
+            // Re-enable the submit button in case of an error
+            submitButton.prop('disabled', false);
         });
     }
     function showReplyForm(commentId) {

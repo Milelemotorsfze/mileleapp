@@ -20,7 +20,7 @@
 <body>
 <div class="card-header">
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','export-cnf-wo-details','local-sale-wo-details','create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details','create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
     @endphp
     @if ($hasPermission)
     <h4 class="card-title">
@@ -53,7 +53,7 @@
     @endif
 </div>
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','export-cnf-wo-details','local-sale-wo-details','create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details','create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
 @endphp
 @if ($hasPermission)
 <div class="tab-pane fade show" id="telephonic_interview">

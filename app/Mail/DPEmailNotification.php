@@ -12,30 +12,42 @@ use Illuminate\Queue\SerializesModels;
 class DPEmailNotification extends Mailable
 {
     use Queueable, SerializesModels;
-    public $ponumber;
-    public $orderCurrency;
-    public $priceChanges;
-    public $totalAmountOfChanges;
-    public $totalVehiclesChanged;
 
-    public function __construct($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged)
+    public $ponumber;
+    public $pl_number;
+    public $transaction_amount;
+    public $totalcost;
+    public $transactionCount;
+    public $orderUrl;
+    public $currency;
+
+    public function __construct($ponumber, $pl_number, $transaction_amount, $totalcost, $transactionCount, $orderUrl, $currency)
     {
         $this->ponumber = $ponumber;
-        $this->orderCurrency = $orderCurrency;
-        $this->priceChanges = $priceChanges;
-        $this->totalAmountOfChanges = $totalAmountOfChanges;
-        $this->totalVehiclesChanged = $totalVehiclesChanged;
+        $this->pl_number = $pl_number;
+        $this->transaction_amount = $this->formatAmount($transaction_amount, $currency);
+        $this->totalcost = $this->formatAmount($totalcost, $currency);
+        $this->transactionCount = $transactionCount;
+        $this->orderUrl = $orderUrl;
+        $this->currency = $currency;
+    }
+
+    private function formatAmount($amount, $currency)
+    {
+        return $currency . ' ' . number_format($amount, 2, '.', ',');
     }
 
     public function build()
     {
-        return $this->view('emails.price_change_notification')
+        return $this->subject('Purchase Order Payment Initiation')
+                    ->view('emails.dp_initiation_notification')
                     ->with([
                         'ponumber' => $this->ponumber,
-                        'orderCurrency' => $this->orderCurrency,
-                        'priceChanges' => $this->priceChanges,
-                        'totalAmountOfChanges' => $this->totalAmountOfChanges,
-                        'totalVehiclesChanged' => $this->totalVehiclesChanged,
+                        'pl_number' => $this->pl_number,
+                        'transaction_amount' => $this->transaction_amount,
+                        'totalcost' => $this->totalcost,
+                        'transactionCount' => $this->transactionCount,
+                        'orderUrl' => $this->orderUrl,
                     ]);
     }
 }

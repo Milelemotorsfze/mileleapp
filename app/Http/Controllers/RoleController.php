@@ -76,6 +76,14 @@ class RoleController extends Controller
         ]);
 
         $role = Role::find($id);
+        // Check for duplicate role name
+        $existingRole = Role::where('name', $request->input('name'))
+                            ->where('id', '!=', $id)
+                            ->first();
+
+        if ($existingRole) {
+            return redirect()->back()->withErrors(['name' => 'The role name has already been taken.']);
+        }
         $role->name = $request->input('name');
         $role->save();
 
