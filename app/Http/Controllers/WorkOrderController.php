@@ -628,7 +628,12 @@ class WorkOrderController extends Controller
                         ->to([$financeEmail, $managementEmail, $operationsEmail])
                         ->subject($subject);
             });
-
+            $checkRecords = $workOrder->dataHistories()
+                ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                ->exists();
+            if ($checkRecords) {
+                $this->sendSOAmountUpdateEmail($workOrder,null);
+            }
             // Commit the transaction
             DB::commit(); 
             
@@ -641,6 +646,50 @@ class WorkOrderController extends Controller
             Log::error('Error creating Work Order: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+    private function sendSOAmountUpdateEmail($workOrder,$comment) {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+        // Construct the email subject
+        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        // Retrieve and validate email addresses from .env
+        $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+
+        // Check if any email is invalid and handle the error
+        if (!$financeEmail || !$managementEmail || !$operationsEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'financeEmail' => env('FINANCE_TEAM_EMAIL'),
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
+
+        // Get the current date and time in d M Y, h:i:s A format
+        $currentDateTime = now()->format('d M Y, h:i:s A');
+        // Send email using a Blade template
+        Mail::send('work_order.emails.amount_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
+            $message->from($template['from'], $template['from_name'])
+                    ->to([$financeEmail, $managementEmail, $operationsEmail])
+                    ->subject($subject);
+        });
     }
     private function sendVehicleUpdateEmail($workOrder,$newComment) {
         // Prepare the from details
@@ -1253,7 +1302,6 @@ class WorkOrderController extends Controller
                     $createVehComMap['vehicle_id'] = $vehicle->id;
                     $createVehComMap['wo_id'] = $workOrder->id;
                     $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
-                    $canDeleteComment = false;
                     $canDeleteCreatedVehComMap = true;
 
                     $vehicleData['updated_by'] = Auth::id();
@@ -1394,9 +1442,7 @@ class WorkOrderController extends Controller
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $woVehicleAddon->id;
                             $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
-                            $canDeleteCreatedVehComMap = false;
                             $canDeleteCreateVehComAddMap = true;
-                            $canDeleteComment = false;
                             $processedAddonIds[] = $woVehicleAddon->id; // Append ID to array
                             // Filter out non-null, non-array values, and exclude specified fields
                             $nonNullVehicleData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
@@ -1422,6 +1468,9 @@ class WorkOrderController extends Controller
                                 if($deleteCreateVehComAddMap) {
                                     $deleteCreateVehComAddMap->delete();
                                 }
+                            }
+                            else {
+                                $canDeleteCreatedVehComMap = false;
                             }
                         }
                     }
@@ -1450,14 +1499,15 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                        $canDeleteComment = true;
+                    }
+                    else {
+                        $canDeleteComment = false;
                     }
                     // ADDON END..............................
                 } else {
                     $vehicleData['work_order_id'] = $workOrder->id;
                     $vehicleData['created_by'] = Auth::id();
                     $vehicleData['comment_id'] = $CommentId;
-                    $canDeleteComment = false;
                     $woVehicles = WOVehicles::create($vehicleData);
                     $canCreateCOOApproval = true;
                     $createVehComMap = [];
@@ -1466,7 +1516,6 @@ class WorkOrderController extends Controller
                     $createVehComMap['vehicle_id'] = $woVehicles->id;
                     $createVehComMap['wo_id'] = $workOrder->id;
                     $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
-                    $canDeleteComment = false;
                     $canDeleteCreatedVehComMap = true;
 
                     // Push the newly created vehicle's ID into the array
@@ -1514,7 +1563,6 @@ class WorkOrderController extends Controller
                                     $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                                     $createCommVehAddon['addon_id'] = $WOVehicleAddons->id;
                                     $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
-                                    $canDeleteCreatedVehComMap = false;
                                     $canDeleteCreateVehComAddMap = true;
                                     // Filter out non-null, non-array values, and exclude specified fields
                                     $excludeVehicleAddonFields = [
@@ -1545,6 +1593,8 @@ class WorkOrderController extends Controller
                                         if($deleteCreateVehComAddMap) {
                                             $deleteCreateVehComAddMap->delete();
                                         }
+                                    }else {
+                                        $canDeleteCreatedVehComMap = false; 
                                     }
                                 }
                             }
@@ -1557,7 +1607,9 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                        $canDeleteComment = true;
+                    }
+                    else {
+                        $canDeleteComment = false;
                     }
                 }
             }
@@ -1732,7 +1784,6 @@ class WorkOrderController extends Controller
                                     $canCreateFinanceApproval = true;
                                 }
                                 else {
-                                    // dd('9');
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
@@ -1835,6 +1886,14 @@ class WorkOrderController extends Controller
                 $deleteComment = WOComments::where('id', $CommentId)->first();
                 if($deleteComment) {
                     $deleteComment->delete();
+                }
+            }
+            else {
+                $checkRecords = $newComment->wo_histories()
+                    ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                    ->exists();
+                if ($checkRecords) {
+                    $this->sendSOAmountUpdateEmail($workOrder,$newComment);
                 }
             }
             if($canCreateFinanceApproval == true) {
