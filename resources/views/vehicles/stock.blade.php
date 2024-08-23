@@ -1,6 +1,53 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+   .btn-outline-primary {
+    margin-bottom: 5px;
+    width: 100%;
+}
+.dataTables_processing {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    margin-left: -50px;
+    margin-top: -30px;
+    background: url('https://logosbynick.com/wp-content/uploads/2021/01/animated-gif.gif') no-repeat center center;
+    background-size: contain;
+    z-index: 1100; /* Higher than the z-index of the <thead> */
+    display: none;
+}
+#dtBasicExample3_processing {
+    display: block;
+}
+#toggleButtonsRow th {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 4px;
+    text-align: center;
+}
+
+.d-flex.mb-2 {
+    margin-bottom: 10px;
+}
+
+#dtBasicExample3_wrapper .btn-danger,
+#dtBasicExample3_wrapper .btn-success {
+    margin-right: 10px;
+}
+#dtBasicExample6_wrapper .btn-danger,
+#dtBasicExample6_wrapper .btn-success {
+    margin-right: 10px;
+}
+#dtBasicExample7_wrapper .btn-danger,
+#dtBasicExample7_wrapper .btn-success {
+    margin-right: 10px;
+}
+#dtBasicExample8_wrapper .btn-danger,
+#dtBasicExample8_wrapper .btn-success {
+    margin-right: 10px;
+}
   .text-container {
         display: inline-block; /* Inline block to handle overflow */
         max-width: 300px; /* Adjust this width as needed */
@@ -444,9 +491,12 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <tr id="toggleButtonsRow3">
+                <!-- Toggle buttons will be added here dynamically -->
+            </tr>
             <tr>
             <th>Status</th>
             <th>Brand</th>
@@ -607,9 +657,12 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <tr id="toggleButtonsRow6">
+                <!-- Toggle buttons will be added here dynamically -->
+            </tr>
             <tr>
             <th>Brand</th>
                   <th>Model Line</th>
@@ -664,9 +717,12 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <tr id="toggleButtonsRow7">
+                <!-- Toggle buttons will be added here dynamically -->
+            </tr>
             <tr>
                   <th>Status</th>
                   <th>Brand</th>
@@ -721,9 +777,12 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <tr id="toggleButtonsRow8">
+                <!-- Toggle buttons will be added here dynamically -->
+            </tr>
             <tr>
                   <th>Status</th>
                   <th>Brand</th>
@@ -1100,14 +1159,38 @@
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
         {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
+    data: null,
+    name: 'chat',
+    render: function(data, type, row) {
+        const messageCount = row.message_count || 0; // message_count is now available
+        const badgeHtml = messageCount > 0 ? `
+            <span style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: #cb3365;
+                color: #fff;
+                padding: 0.25em 0.5em;
+                font-size: 75%;
+                border-radius: 0.25rem;
+                transform: translate(50%, -50%);
+            ">
+                ${messageCount}
+            </span>` : '';
+        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
+
+        return `
+            <div style="position: relative; display: inline-block;">
+                ${badgeHtml}
+                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
+                    Comments
+                </button>
+            </div>
+        `;
+    },
+    orderable: false,
+    searchable: false
+},
         );
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
@@ -1125,6 +1208,7 @@
     },
     columns: columns3,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    pageLength: -1,
     columnDefs: [
         {
             targets: 0,
@@ -1147,14 +1231,65 @@
             }
         }
     ],
-});
+    colReorder: true
+    });
+// Create the Hide All and Unhide All buttons
+var hideAllButton = $('<button>')
+        .text('Hide All')
+        .addClass('btn btn-sm btn-danger')
+        .on('click', function () {
+            table3.columns().every(function () {
+                this.visible(false); // Hide all columns
+            });
+            $('#toggleButtonsRow3').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
+        });
 
+    var unhideAllButton = $('<button>')
+        .text('Unhide All')
+        .addClass('btn btn-sm btn-success')
+        .on('click', function () {
+            table3.columns().every(function () {
+                this.visible(true); // Unhide all columns
+            });
+            $('#toggleButtonsRow3').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
+        });
+
+    // Add the buttons above the table
+    $('#dtBasicExample3_wrapper').prepend(
+        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
+    );
+
+    // Create toggle buttons for each column
+    table3.columns().every(function (index) {
+        var column = this;
+        var columnTitle = $(column.header()).text();
+
+        // Create a button element
+        var toggleButton = $('<button>')
+            .text(columnTitle)
+            .addClass('btn btn-sm btn-outline-primary')
+            .on('click', function () {
+                column.visible(!column.visible()); // Toggle column visibility
+                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
+            });
+
+        // Add the button above the column header
+        $('#toggleButtonsRow3').append($('<th>').append(toggleButton));
+    });
 table3.on('draw', function () {
     var rowCount = table3.page.info().recordsDisplay;
     if (rowCount > 0) {
         $('.row-badge3').text(rowCount).show();
     } else {
         $('.row-badge3').hide();
+    }
+});
+$('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
+    if (processing) {
+        // Optionally, customize the indicator here, or just use the default one
+        $('#dtBasicExample3_processing').show();
+    } else {
+        $('#dtBasicExample3_processing').hide();
     }
 });
 $('#dtBasicExample3 tbody').on('click', 'tr', function () {
@@ -1494,7 +1629,52 @@ var columns6 = [
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
+            colReorder: true
+    });
+// Create the Hide All and Unhide All buttons
+var hideAllButton = $('<button>')
+        .text('Hide All')
+        .addClass('btn btn-sm btn-danger')
+        .on('click', function () {
+            table6.columns().every(function () {
+                this.visible(false); // Hide all columns
+            });
+            $('#toggleButtonsRow6').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
         });
+
+    var unhideAllButton = $('<button>')
+        .text('Unhide All')
+        .addClass('btn btn-sm btn-success')
+        .on('click', function () {
+            table6.columns().every(function () {
+                this.visible(true); // Unhide all columns
+            });
+            $('#toggleButtonsRow6').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
+        });
+
+    // Add the buttons above the table
+    $('#dtBasicExample6_wrapper').prepend(
+        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
+    );
+
+    // Create toggle buttons for each column
+    table6.columns().every(function (index) {
+        var column = this;
+        var columnTitle = $(column.header()).text();
+
+        // Create a button element
+        var toggleButton = $('<button>')
+            .text(columnTitle)
+            .addClass('btn btn-sm btn-outline-primary')
+            .on('click', function () {
+                column.visible(!column.visible()); // Toggle column visibility
+                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
+            });
+
+        // Add the button above the column header
+        $('#toggleButtonsRow6').append($('<th>').append(toggleButton));
+    });
         table6.on('draw', function () {
             var rowCount = table6.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -1642,7 +1822,52 @@ var columns6 = [
             }
         }
     ],
+    pageLength: -1,
+            colReorder: true
+    });
+// Create the Hide All and Unhide All buttons
+var hideAllButton = $('<button>')
+        .text('Hide All')
+        .addClass('btn btn-sm btn-danger')
+        .on('click', function () {
+            table7.columns().every(function () {
+                this.visible(false); // Hide all columns
+            });
+            $('#toggleButtonsRow7').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
         });
+
+    var unhideAllButton = $('<button>')
+        .text('Unhide All')
+        .addClass('btn btn-sm btn-success')
+        .on('click', function () {
+            table7.columns().every(function () {
+                this.visible(true); // Unhide all columns
+            });
+            $('#toggleButtonsRow7').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
+        });
+
+    // Add the buttons above the table
+    $('#dtBasicExample7_wrapper').prepend(
+        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
+    );
+
+    // Create toggle buttons for each column
+    table7.columns().every(function (index) {
+        var column = this;
+        var columnTitle = $(column.header()).text();
+
+        // Create a button element
+        var toggleButton = $('<button>')
+            .text(columnTitle)
+            .addClass('btn btn-sm btn-outline-primary')
+            .on('click', function () {
+                column.visible(!column.visible()); // Toggle column visibility
+                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
+            });
+
+        // Add the button above the column header
+        $('#toggleButtonsRow7').append($('<th>').append(toggleButton));
+    });
         table7.on('draw', function () {
             var rowCount = table7.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -1793,7 +2018,52 @@ if (hasPricePermission) {
             }
         }
     ],
+    pageLength: -1,
+    colReorder: true
+    });
+// Create the Hide All and Unhide All buttons
+var hideAllButton = $('<button>')
+        .text('Hide All')
+        .addClass('btn btn-sm btn-danger')
+        .on('click', function () {
+            table8.columns().every(function () {
+                this.visible(false); // Hide all columns
+            });
+            $('#toggleButtonsRow8').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
         });
+
+    var unhideAllButton = $('<button>')
+        .text('Unhide All')
+        .addClass('btn btn-sm btn-success')
+        .on('click', function () {
+            table8.columns().every(function () {
+                this.visible(true); // Unhide all columns
+            });
+            $('#toggleButtonsRow8').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
+        });
+
+    // Add the buttons above the table
+    $('#dtBasicExample8_wrapper').prepend(
+        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
+    );
+
+    // Create toggle buttons for each column
+    table8.columns().every(function (index) {
+        var column = this;
+        var columnTitle = $(column.header()).text();
+
+        // Create a button element
+        var toggleButton = $('<button>')
+            .text(columnTitle)
+            .addClass('btn btn-sm btn-outline-primary')
+            .on('click', function () {
+                column.visible(!column.visible()); // Toggle column visibility
+                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
+            });
+
+        // Add the button above the column header
+        $('#toggleButtonsRow8').append($('<th>').append(toggleButton));
+    });
         table8.on('draw', function () {
             var rowCount = table8.page.info().recordsDisplay;
             if (rowCount > 0) {

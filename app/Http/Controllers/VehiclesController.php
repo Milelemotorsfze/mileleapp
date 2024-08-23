@@ -2925,6 +2925,7 @@ $variant->save();
                         'bp.name as bpn',
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
