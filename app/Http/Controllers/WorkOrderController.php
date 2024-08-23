@@ -693,6 +693,47 @@ class WorkOrderController extends Controller
                     ->subject($subject);
         });
     }
+    private function sendDataUpdateEmail($workOrder,$comment) {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+        // Construct the email subject
+        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        // Retrieve and validate email addresses from .env
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        // Check if any email is invalid and handle the error
+        if (!$managementEmail || !$operationsEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
+
+        // Get the current date and time in d M Y, h:i:s A format
+        $currentDateTime = now()->format('d M Y, h:i:s A');
+        // Send email using a Blade template
+        Mail::send('work_order.emails.data_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+        ], function ($message) use ($subject, $managementEmail, $operationsEmail, $template) {
+            $message->from($template['from'], $template['from_name'])
+                    ->to([$managementEmail, $operationsEmail])
+                    ->subject($subject);
+        });
+    }
     private function sendVehicleUpdateEmail($workOrder,$newComment) {
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
@@ -1896,6 +1937,21 @@ class WorkOrderController extends Controller
                     ->exists();
                 if ($checkRecords) {
                     $this->sendSOAmountUpdateEmail($workOrder,$newComment);
+                }
+                $checkmainRecords = $newComment->wo_histories()
+                    ->whereIn('field_name', ['airline','airway_bill','airway_details','batch','brn','brn_file','container_number',
+                        'customer_address','customer_company_number','customer_company_number.full','customer_email','customer_name',
+                        'customer_representative_contact','customer_representative_contact.full','customer_representative_email',
+                        'customer_representative_name','delivery_contact_person','delivery_contact_person_number','delivery_date',
+                        'delivery_location','enduser_contract','enduser_passport','enduser_trade_license','existing_customer_name',
+                        'final_destination','forward_import_code','freight_agent_contact_number','freight_agent_contact_number.full',
+                        'freight_agent_email','freight_agent_name','is_batch','noc','payment_receipts','port_of_discharge','port_of_loading',
+                        'shipment','shipping_line','signed_contract','signed_pfi','so_number','trailer_number_plate','transport_type',
+                        'transportation_company','transportation_company_details','transporting_driver_contact_number','transporting_driver_contact_number.full',
+                        'vehicle_handover_person_id','wo_number','preferred_shipping_line_of_customer','bill_of_loading_details',
+                        'shipper','consignee','notify_party','special_or_transit_clause_or_request',])->exists();
+                if ($checkmainRecords) {
+                    $this->sendDataUpdateEmail($workOrder,$newComment);
                 }
             }
             if($canCreateFinanceApproval == true) {
