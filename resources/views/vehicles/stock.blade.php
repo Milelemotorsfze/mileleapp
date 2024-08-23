@@ -1,6 +1,41 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    /* Ensure the select2 rendered text stays inside the dropdown */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 28px; /* Adjust this line height to match your dropdown height */
+        padding-left: 8px; /* Add some padding for better alignment */
+    }
+
+    /* Ensure the dropdown itself doesn't overflow or look weird */
+    .select2-container--default .select2-selection--single {
+        height: auto; /* Ensure auto height for the dropdown */
+        min-height: 38px; /* Ensure minimum height to match other inputs */
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #cbdada; /* Adjust this color as needed */
+        color: #212529;
+    }
+    /* Fix the alignment of the arrow inside the dropdown */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%; /* Make the arrow container full height */
+        top: 0; /* Align to the top */
+        right: 8px; /* Adjust right padding if needed */
+    }
+
+    /* Prevent overlapping or overflow issues with the dropdown box */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        margin-right: 30px; /* Adjust to prevent text from overlapping with the arrow */
+    }
+
+    /* Add some margin at the bottom of the select box */
+    .select2-container {
+        margin-bottom: 15px; /* Adjust as needed */
+    }
   .text-container {
         display: inline-block; /* Inline block to handle overflow */
         max-width: 300px; /* Adjust this width as needed */
@@ -444,9 +479,9 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+          <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
             <tr>
             <th>Status</th>
             <th>Brand</th>
@@ -607,9 +642,9 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
             <tr>
             <th>Brand</th>
                   <th>Model Line</th>
@@ -664,9 +699,9 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
             <tr>
                   <th>Status</th>
                   <th>Brand</th>
@@ -721,9 +756,9 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-          <div class="table-responsive">
+<div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
             <tr>
                   <th>Status</th>
                   <th>Brand</th>
@@ -1109,7 +1144,16 @@
                 searchable: false
             },
         );
-            var table3 = $('#dtBasicExample3').DataTable({
+        $('#dtBasicExample3 thead').append('<tr class="filter-row"></tr>');
+$('#dtBasicExample3 thead th').each(function(index) {
+    if (index === 0 || index === 5|| index === 15) {
+        $('.filter-row').append('<th></th>');  // Append an empty cell for the first column
+    } else {
+        var title = $(this).text();
+        $('.filter-row').append('<th><select class="form-control filter-dropdown select2"><option value="">Select ' + title + '</option></select></th>');
+    }
+});
+var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
@@ -1125,6 +1169,7 @@
     },
     columns: columns3,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    pageLength: -1,
     columnDefs: [
         {
             targets: 0,
@@ -1135,7 +1180,7 @@
                     return 'Pending Inspection';
                 } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
+                } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
@@ -1147,8 +1192,37 @@
             }
         }
     ],
-});
+    initComplete: function() {
+        this.api().columns().every(function(index) {
+            // Skip the columns where we do not need filters
+            if (index === 0 || index === 5 || index === 15) {
+                return;
+            }
+            var column = this;
+            var select = $('<select class="select2"><option value="">Select</option></select>')
+                .appendTo($(column.header()).empty())
+                .on('change', function() {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+                });
 
+            // For date columns, we'll ensure dropdown contains formatted dates
+            column.data().unique().sort().each(function(d, j) {
+                if (d !== null && d !== '') {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                }
+            });
+            // Apply select2 to the dropdowns
+            $('.select2').select2({
+                width: '100%'  // Adjust width as necessary
+            });
+            // Add the ability to unselect and then re-select the "Select" option
+            select.on('select2:unselecting', function(e) {
+                $(this).val('').trigger('change');  // Reset the select to the "Select" option
+            });
+        });
+    }
+});
 table3.on('draw', function () {
     var rowCount = table3.page.info().recordsDisplay;
     if (rowCount > 0) {
@@ -1166,6 +1240,8 @@ $('#dtBasicExample3 tbody').on('click', 'tr', function () {
         openBookingModal(data.id);
     @endif
 });
+
+
 //         var table4 = $('#dtBasicExample4').DataTable({
 //           processing: true,
 //             serverSide: true,
@@ -1494,6 +1570,7 @@ var columns6 = [
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
         });
         table6.on('draw', function () {
             var rowCount = table6.page.info().recordsDisplay;
@@ -1620,6 +1697,7 @@ var columns6 = [
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
             columnDefs: [
         {
             targets: 0,
@@ -1771,6 +1849,7 @@ if (hasPricePermission) {
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
             columnDefs: [
         {
             targets: 0,
