@@ -663,13 +663,15 @@ class WorkOrderController extends Controller
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-
+        // Retrieve the CreatedBy user's email and validate it
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         // Check if any email is invalid and handle the error
-        if (!$financeEmail || !$managementEmail || !$operationsEmail) {
+        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
             \Log::error('Invalid email addresses provided:', [
                 'financeEmail' => env('FINANCE_TEAM_EMAIL'),
                 'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
+                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
             ]);
             throw new \Exception('One or more email addresses are invalid.');
         }
@@ -685,9 +687,9 @@ class WorkOrderController extends Controller
             'authUserName' => $authUserName, // Pass the authenticated user's name
             'currentDateTime' => $currentDateTime, // Pass the current date and time
             'comment' => $comment,
-        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
+        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$financeEmail, $managementEmail, $operationsEmail])
+                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
                     ->subject($subject);
         });
     }
