@@ -179,7 +179,7 @@
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
                                                         <label class="form-label ">PFI QTY</label>
-                                                        <input type="number" min="1" oninput=calculateTotalAmount(1) required name="PfiItem[1][pfi_quantity][0]"
+                                                        <input type="number" min="1" oninput=calculateTotalAmount(1,0) required name="PfiItem[1][pfi_quantity][0]"
                                                             class="form-control mb-2 widthinput pfi-quantities" min="1" placeholder="0"
                                                             index="1" item="0" id="pfi-quantity-1-item-0">
                                                     </div>
@@ -191,7 +191,7 @@
                                                     </div>
                                                     <div class="col-lg-2 col-md-6">
                                                         <label class="form-label ">Unit Price</label>
-                                                        <input type="number" min="0"  required placeholder="0" name="PfiItem[1][unit_price][0]" oninput=calculateTotalAmount(1) 
+                                                        <input type="number" min="0"  required placeholder="0" name="PfiItem[1][unit_price][0]" oninput=calculateTotalAmount(1,0) 
                                                             class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
                                                             index="1" item="0" id="unit-price-1-item-0">
                                                     </div>
@@ -374,39 +374,30 @@
                 $('#delivery-location').val('');
                 $('#currency').val('USD');
             }
-
-            if(supplier) {
-                $.ajax({
-                    type:"GET",
-                    url: "{{ route('loi-item.unit-price') }}",
-                    data: {
-                        supplier_id:supplier[0],
-                        letter_of_indent_id:loi_id,
-                        loi_item_ids:loiItems,
-                        action: 'CREATE'
-                    },
-                    success: function(data) {
-                        jQuery.each(data, function(key,value){
-                            $('#unit-price-'+key).val(value);
-                            calculateTotalAmount(key);
-                        });
-
-                    }
-                });
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    getLOIItemDetails(i,j);                 
+                }
             }
         });
 
         $(document.body).on('select2:unselect', "#supplier-id", function (e) {
             $('.unit-prices').val(0);
+            $('.remaining-quantities').val(0);
         });
      
         function calculatePfiAmount() {
             var sum = 0;
             $('.unit-prices').each(function() {
-                var id = $(this).attr('index');
-                var quantity = $('#pfi-quantity-'+id).val();
+                var index = $(this).attr('index');
+                var childIndex = $(this).attr('item');
+                var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
                 var eachItemTotal = parseFloat(quantity) * parseFloat(this.value);
-                $('#total-amount-'+id).val(eachItemTotal);
+                $('#total-amount-'+index+'-item-'+childIndex).val(eachItemTotal);
                 sum = sum + eachItemTotal;
             });
 
@@ -414,11 +405,11 @@
            
         }
         
-        function calculateTotalAmount(id) {
-            var quantity = $('#pfi-quantity-'+id).val();
-            var unitPrice = $('#unit-price-'+id).val();
+        function calculateTotalAmount(index,childIndex) {
+            var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
+            var unitPrice = $('#unit-price-'+index+'-item-'+childIndex).val();
             var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
-            $('#total-amount-'+id).val(eachItemTotal);
+            $('#total-amount-'+index+'-item-'+childIndex).val(eachItemTotal);
 
             calculatePfiAmount();
         }
@@ -462,6 +453,7 @@
 
                 for(let j=0; j<=childIndex;j++) 
                 {
+                    
                     getLOIItemCode(i,j);
                     // call unit price,remaining qty, total quantity
                 }
@@ -535,33 +527,53 @@
         $(document.body).on('select2:unselect', ".models", function (e) {
            let index = $(this).attr('index');
            let childIndex = $(this).attr('item');
-         
+           var model = e.params.data.id;
+           let sfx =  $('#sfx-'+index+'-item-0').val();
            // if unselected model is in the parent row append model in every parent line items
-           if(childIndex == 0) {
-                var model = e.params.data.id;
-                let sfx =  $('#sfx-'+index+'-item-0').val();
+           if(childIndex == 0) {              
                 if(sfx.length > 0) {
                     appendParentModel(index,model,sfx[0]);
                 }
-            
+                let childIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    if(j !=0){
+                       $('#model-'+index+'-item-'+j).empty();
+                    }
+                    $('#sfx-'+index+'-item-'+j).empty();
+                    resetRowData(index,j); 
+                }
+                enableOrDisableAddMoreButton(index);
+           }else{
+               
+                 var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
+                 var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
+                appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText,model,sfx[0]);
+                $('#sfx-'+index+'-item-'+childIndex).empty();
+                resetRowData(index,childIndex); 
            }
-         
-           $('#sfx-'+index+'-item-'+childIndex).empty();
+        //    var confirm = alertify.confirm('By changing model child items data will be reset!',function (e) {
+        //         if (e) {
+        //             resetData();                               
+        //         }
+        //     }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+        //         $("#model-"+index+'-item-0').val(model).trigger('change');
+                
+        //         });  
+       
+           // call append LOI Item code if same model am
+           
+       });
+
+       function resetRowData(index,childIndex,input) {
+            
            $('#loi-item-'+index+'-item-'+childIndex).empty();
            $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
            $('#pfi-quantity-'+index+'-item-'+childIndex).val("");
            $('#unit-price-'+index+'-item-'+childIndex).val("");
            $('#total-amount-'+index+'-item-'+childIndex).val("");
            $('#master-model-id-'+index+'-item-'+childIndex).val("");
-           enableOrDisableAddMoreButton(index);
-
-        //    var model = e.params.data.id;
-          
-        //    appendSFX(index,model,sfx[0]);
-        //    appendModel(index,model);
-        //    enableDealer();
-      
-       });
+       }
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
@@ -583,11 +595,24 @@
             $('#master-model-id-'+index+'-item-'+childIndex).val("");
                // if unselected sfx is in the parent row append corresponding model in every parent line items
             if(childIndex == 0) {
+                let childIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    if(j !=0){
+                       $('#sfx-'+index+'-item-'+j).empty();
+                    }
+                    resetRowData(index,j); 
+                }
                 appendParentModel(index,model[0],value);
+                enableOrDisableAddMoreButton(index);
+            }else{
+                var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
+                var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
+                appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText,model,value);
+                resetRowData(index,childIndex);
             }
-            
-            enableOrDisableAddMoreButton(index);
-
+           
+         
         });
         $(document.body).on('select2:select', ".loi-items", function (e) {
             let index = $(this).attr('index');
@@ -595,13 +620,21 @@
             $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
             var value = e.params.data.id;
             hideLOIItemCode(index,childIndex,value);
+            getLOIItemDetails(index,childIndex);
         });
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
             var id = e.params.data.id;
             var text = e.params.data.text;
-            appendLOIItemCode(index,childIndex,id,text);
+            let model = $('#model-'+index+'-item-'+childIndex).val();
+            let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
+
+            appendLOIItemCode(index,childIndex,id,text,model[0],sfx[0]);
+            $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
+            $('#unit-price-'+index+'-item-'+childIndex).val("");
+            $('#total-amount-'+index+'-item-'+childIndex).val("");
+
         });
 
         $(document.body).on('click', ".add-more", function (e) {
@@ -639,7 +672,7 @@
                                 </select>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" min="1" placeholder="0" required oninput=calculateTotalAmount(${index}) 
+                                <input type="number" min="1" placeholder="0" required oninput=calculateTotalAmount(${index},${item}) 
                                 name="PfiItem[${index}][pfi_quantity][${item}]" class="form-control mb-2 widthinput pfi-quantities" 
                                 index="${index}" item="${item}" id="pfi-quantity-${index}-item-${item}">
                             </div>
@@ -729,7 +762,7 @@
                                 </select>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" min="1" placeholder="0" required
+                                <input type="number" min="1" placeholder="0" required oninput=calculateTotalAmount(${index},0) 
                                 name="PfiItem[${index}][pfi_quantity][0]" class="form-control mb-2 widthinput pfi-quantities" 
                                 index="${index}" item="0" id="pfi-quantity-${index}-item-0">
                             </div>
@@ -784,15 +817,14 @@
             // var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
             var childIndex = $(this).attr('item');
 
-            // var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
-            // var model = $('#model-'+index+'-item-'+childIndex).val();
+            var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
+            var model = $('#model-'+index+'-item-'+childIndex).val();
             var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
-
-            
+           
             if(loiItemId[0]) {
                 console.log("item code selected");
-                appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText.model[0],sfx[0]);
             }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
@@ -856,6 +888,7 @@
                 $(this).find('.pfi-quantities').attr('name', 'PfiItem['+ index +'][pfi_quantity]['+ i +']');
                 $(this).find('.pfi-quantities').attr('item',i);
                 $(this).find('.pfi-quantities').attr('id','pfi-quantity-'+index+'-item-'+i);
+                $(this).find('.pfi-quantities').attr('oninput','calculateTotalAmount('+index+','+i+')');
 
                 $(this).find('.remaining-quantities').attr('item',i);
                 $(this).find('.remaining-quantities').attr('id','remaining-quantity-'+index+'-item-'+i);
@@ -968,9 +1001,35 @@
                     $('.overlay').hide();
                 }
             });
-        }
+        }           
+       }
+       function getLOIItemDetails(index,childIndex) {
+           
+            let loiItem = $('#loi-item-'+index+'-item-'+childIndex).val();
+            let vendor = $('#supplier-id').val();
+            if(vendor && loiItem.length > 0) {
+                console.log(vendor);
+                $('.overlay').show();
 
-            
+                let url = '{{ route('loi-item-details') }}';
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        loi_item_id: loiItem[0],   
+                        supplier_id: vendor[0]            
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
+                        $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        calculateTotalAmount(index,childIndex)
+                        $('.overlay').hide();
+                    }
+                });
+            }
+                
        }
        function getModels(index,item,type) {
            
@@ -1098,24 +1157,21 @@
             }
 
        }
-       function appendLOIItemCode(index,childIndex,id,text)
+       function appendLOIItemCode(index,childIndex,id,text,selectedmodel,selectedsfx)
         {
-            console.log(id);
-            console.log(text);
-        let selectedmodel = $('#model-'+index+'-item-'+childIndex).val();
-        let selectedsfx = $('#sfx-'+index+'-item-'+childIndex).val();
-        var selectedId = 'loi-item-'+index+'-item-'+childIndex;
-
+            var selectedId = 'loi-item-'+index+'-item-'+childIndex;
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {           
                 let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=0; j<=rowIndex;j++) 
-                {
+                {             
                     var currentId = 'loi-item-'+i+'-item-'+j;                     
                     let currentmodel = $('#model-'+i+'-item-'+j).val();
                     let currentsfx = $('#sfx-'+i+'-item-'+j).val();
-                    if(selectedId != currentId && selectedmodel[0] == currentmodel[0] && selectedsfx[0] == currentsfx[0]) {
+                 
+                    if(selectedId != currentId && selectedmodel == currentmodel[0] && selectedsfx == currentsfx[0]) {
+                        console.log(currentId);
                         $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
                     }
                 }

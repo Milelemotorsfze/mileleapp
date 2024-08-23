@@ -107,12 +107,15 @@ class PFIController extends Controller
     {
         // info($request->PfiItem);
         // info("items");
-        // foreach($request->PfiItem as $pfiItem) {
-        //         info($pfiItem['model'][0]);
+        // foreach($request->PfiItem as $pfiItems) {
+        //     foreach($pfiItems['model'] as $keyValue => $value) {
+        //         dd($pfiItems['model'][$keyValue]);
+
+        //     }
         // }
            
         // }
-        return $request->all();
+        // return $request->all();
 
         (new UserActivityController)->createActivity('New PFI Created');
 
@@ -129,7 +132,7 @@ class PFIController extends Controller
         $pfi->pfi_reference_number = $request->pfi_reference_number;
 //        $pfi->pfi_date = $request->pfi_date;
         $pfi->amount = $request->amount;
-        $pfi->letter_of_indent_id = $request->letter_of_indent_id;
+        // $pfi->letter_of_indent_id = $request->letter_of_indent_id;
         $pfi->created_by = Auth::id();
         $pfi->comment = $request->comment;
         $pfi->status = PFI::PFI_STATUS_NEW;
@@ -153,25 +156,34 @@ class PFIController extends Controller
 
         $pfi->save();
 
-        if($request->pfi_quantities) {
-            foreach($request->pfi_quantities as $key => $pfiQuantity) {
-                if($pfiQuantity > 0) {
-                    $model = $request->models[$key];
-                    $sfx = $request->sfx[$key];
-                    $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
-                    $pfiItem = new PfiItem();
-                    $pfiItem->pfi_id = $pfi->id;
-                    $pfiItem->loi_item_id = $request->loi_item_ids[$key];
-                    $pfiItem->master_model_id = $masterModel->id ?? '';
-                    $pfiItem->pfi_quantity = $pfiQuantity;
-                    $pfiItem->unit_price = $request->unit_price[$key];
-                    $pfiItem->created_by = Auth::id();
-                    $pfiItem->save();
+        foreach($request->PfiItem as $key => $pfiItem) {
+            foreach($pfiItem['model'] as $keyValue => $model) {
+                info($key);
+               
+                // dd($pfiItem['loi_item'][$keyValue]);
+                $model = $pfiItem['model'][$keyValue];               
+                $sfx = $pfiItem['sfx'][$keyValue];
+                info($model);
+                info($sfx);
+                $loiItemId = $pfiItem['loi_item'][$keyValue];
+                $pfiQuantity = $pfiItem['pfi_quantity'][$keyValue];
+                $unitPrice = $pfiItem['unit_price'][$keyValue];
 
-                }
+                $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
+                info($masterModel);
+                $pfiItemRow = new PfiItem();
+                $pfiItemRow->pfi_id = $pfi->id;
+                $pfiItemRow->loi_item_id = $loiItemId;
+                $pfiItemRow->master_model_id = $masterModel->id ?? '';
+                $pfiItemRow->pfi_quantity = $pfiQuantity;
+                $pfiItemRow->unit_price = $unitPrice;
+                $pfiItemRow->created_by = Auth::id();
+                $pfiItemRow->save();
+
             }
+
         }
-        
+               
         // document sealing
         // if($request->has('file')) {
         //     try {
@@ -408,9 +420,8 @@ class PFIController extends Controller
     }
     public function getUnitPrice(Request $request) {
         $supplier = Supplier::find($request->supplier_id);
-            $data = [];
-            foreach ($request->loi_item_ids as $item) {
-                $loiItem = LetterOfIndentItem::find($item);
+            // foreach ($request->loi_item_ids as $item) {
+                $loiItem = LetterOfIndentItem::find($loiItem->id);
 
                 if($supplier->is_MMC == true) {
                     $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
@@ -419,8 +430,8 @@ class PFIController extends Controller
                 }else{
                     $price = 0;
                 }
-                $data[] = $price;
-            }
+                $data['unit_price'] = $price;
+            // }
         
         return $data;
 
@@ -473,9 +484,6 @@ class PFIController extends Controller
     }
 
     public function getMasterModels(Request $request) {
-        info("inside function");
-        info($request->all());
-
       
             // if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
             //     $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
@@ -517,5 +525,23 @@ class PFIController extends Controller
            
         return response($data);
        
+    }
+    public function getLOIItemDetails(Request $request) {
+        info($request->all());
+        $supplier = Supplier::find($request->supplier_id);
+        $loiItem = LetterOfIndentItem::find($request->loi_item_id);
+
+            if($supplier->is_MMC == true) {
+                $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
+            }else if($supplier->is_AMS == true) {
+                $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+            }else{
+                $price = 0;
+            }
+            $data['unit_price'] = $price;
+      
+        $remianingQty = $loiItem->quantity - $loiItem->utilized_quantity;
+        $data['remaining_quantity'] = $remianingQty;
+        return response($data);
     }
 }
