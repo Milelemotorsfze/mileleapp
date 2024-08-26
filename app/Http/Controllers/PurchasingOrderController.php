@@ -1653,7 +1653,6 @@ public function checkcreatevins(Request $request)
             }
             info($changes);
             if (!empty($changes)) {
-                // $vehicle->status = 'New Changes'; // Set the vehicle status
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -4423,6 +4422,12 @@ public function requestAdditionalPayment(Request $request)
                 }
             }
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Payment Initiation Saved";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+        $purchasingordereventsLog->description = "Payment Inititaion Save By the PO Creator";
+        $purchasingordereventsLog->save();
         return response()->json(['message' => 'Payment details saved successfully'], 200);
     } catch (Exception $e) { // Catch any exception
         return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
@@ -4542,6 +4547,12 @@ public function submitPaymentDetails(Request $request)
                 }
             }
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Payment Initation";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+        $purchasingordereventsLog->description = "Payment Inititaion Request to the Procurement Manager";
+        $purchasingordereventsLog->save();
         return response()->json(['message' => 'Payment details saved successfully'], 200);
     } catch (Exception $e) { // Catch any exception
         return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
@@ -4612,6 +4623,12 @@ public function submitPaymentDetails(Request $request)
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Payment Inititaion Request to the Procurement Manager";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);  
 }
     public function getVendorAndBalance($purchaseOrderId)
@@ -4696,6 +4713,12 @@ public function submitPaymentDetails(Request $request)
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Procurement Manager Forward Payment Inititaion Request to the Finance Department";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
     public function submitPayment(Request $request)
@@ -4792,6 +4815,12 @@ public function submitPaymentDetails(Request $request)
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Finance Manager Forward Payment Inititaion Request to the CEO office For Payment Released";
+                $purchasingordereventsLog->save();
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4873,6 +4902,12 @@ public function submitPaymentDetails(Request $request)
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Released";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "CEO office Released Confirmed";
+                $purchasingordereventsLog->save();
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)
@@ -4922,6 +4957,12 @@ public function submitPaymentDetails(Request $request)
         $vehicleTransaction->status = 'Rejected';
         $vehicleTransaction->save();
     }
+    $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Requested Rejected";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "The Payment Request is Rejected";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Transition rejected successfully.']);
     }
     public function rejectTransitionlinitiate(Request $request)
@@ -4950,6 +4991,12 @@ public function submitPaymentDetails(Request $request)
         $vehicleTransaction->status = 'Rejected';
         $vehicleTransaction->save();
     }
+    $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initiation Rejected";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "The Payment Initation is being rejected";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Transition rejected successfully.']);
     }
     public function uploadSwiftFile(Request $request)
@@ -5011,6 +5058,12 @@ public function submitPaymentDetails(Request $request)
         } else {
             return response()->json(['success' => false, 'message' => 'Invalid transition ID or file'], 422);
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Confirmed";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Finance Department Update the Swift Copy";
+                $purchasingordereventsLog->save();
     } catch (\Exception $e) {
         Log::error('Payment submission failed', ['error' => $e->getMessage()]);
         return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);

@@ -980,5 +980,7 @@ Route::get('/d', function () {
     Route::get('/vehicle-details-dp', [StockMessageController::class, 'getVehicleDetailsdp'])->name('vehicle.detailsdp');
     Route::get('/vehicle-details-dpbelgium', [StockMessageController::class, 'getVehicleDetailsdpbelgium'])->name('vehicle.detailsdpbelgium');
     Route::post('/vehiclenetsuitecost/upload', [VehicleNetSuiteCostController::class, 'upload'])->name('vehiclenetsuitecost.upload');
+    Route::get('/all-variant-prices', [VehiclesController::class, 'allvariantprice'])->name('variantprices.allvariantprice');
+    Route::post('/all-variant-prices-update', [VehiclesController::class, 'allvariantpriceupdate'])->name('variantprices.allvariantpriceupdate');
 });
 
