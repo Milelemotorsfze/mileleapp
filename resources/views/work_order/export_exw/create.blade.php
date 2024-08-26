@@ -3483,10 +3483,6 @@ $hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-a
 				$('#currency').prop('disabled', true).trigger('change');
 				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');				
             });
-			var deleteButtons = document.querySelectorAll('.delete-button');
-			deleteButtons.forEach(function(button) {
-				button.disabled = true;
-			});
         });
     </script>
 @endif
