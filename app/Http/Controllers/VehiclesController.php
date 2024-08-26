@@ -3532,5 +3532,95 @@ public function hold(Request $request, $id)
     $vehicle->save();
     return response()->json(['success' => true]);
 }
-
+public function allvariantprice(Request $request)
+    {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Open All Variant Price";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        if ($request->ajax()) {
+            $data = Vehicles::select( [
+                    'brands.brand_name',
+                    'vehicles.gp',
+                    'vehicles.varaints_id',
+                    'vehicles.int_colour',
+                    'vehicles.ex_colour',
+                    'vehicles.price',
+                    'varaints.name',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                ])
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->wherenotnull('vehicles.int_colour')
+                ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
+                return DataTables::of($data)
+        ->editColumn('price', function($data) {
+            return number_format($data->price, 0, '.', ',');
+        })
+        ->toJson();
+            }
+        return view('variant-prices.allindex');
     }
+    public function allvariantpriceupdate(Request $request)
+{
+// Validate the incoming request
+$request->validate([
+    'varaints_id' => 'required|integer|exists:varaints,id',
+    'field' => 'required|string|in:price,gp',
+    'value' => 'required|string'
+]);
+
+// Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
+$query = Vehicles::where('varaints_id', $request->varaints_id);
+
+if (!empty($request->int_colour)) {
+    $query->where('int_colour', $request->int_colour);
+}
+
+if (!empty($request->ex_colour)) {
+    $query->where('ex_colour', $request->ex_colour);
+}
+
+$vehicle = $query->first();
+
+if (!$vehicle) {
+    return response()->json(['error' => 'Vehicle not found'], 404);
+}
+$oldValue = $vehicle->{$request->field};
+$field = $request->field;
+$value = $request->value;
+
+if ($field == 'price') {
+    $value = str_replace(',', '', $value);
+}
+$vehicle->$field = $value;
+$vehicle->save();
+$currentDateTime = Carbon::now();
+$vehicleslog = new Vehicleslog();
+$vehicleslog->time = $currentDateTime->toTimeString();
+$vehicleslog->date = $currentDateTime->toDateString();
+$vehicleslog->status = 'Update Vehicles Selling Price / GP';
+$vehicleslog->vehicles_id = $vehicle->id;
+$vehicleslog->field = $field;
+$vehicleslog->old_value = $oldValue;
+$vehicleslog->new_value = $value;
+$vehicleslog->category = "Sales";
+$vehicleslog->created_by = auth()->user()->id;
+$vehicleslog->role = Auth::user()->selectedRole;
+$vehicleslog->save();
+return response()->json(['success' => 'Vehicle updated successfully']);
+    }
+}
