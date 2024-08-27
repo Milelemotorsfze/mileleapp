@@ -347,7 +347,7 @@
                 const viewMoreUrl = 'javascript:void(0);'; // Prevent default link behavior
 
                 newVehiclesHtml += `
-                    <tr style="border-top:2px solid #d3d3df;">
+                    <tr style="border-top:2px solid #d3d3df; background-color : #f6fafe!important;">
                         <td style="padding-left:5px; font-size:12px!important;">
                             <a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
                             ${item.vehicle.deleted_at == null ? `<a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
@@ -455,7 +455,7 @@
                 <table class="my-datatable" style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${removed_vehicles.length} vehicles removed</th></tr>
-                        <tr style="border-top:2px solid #d3d3df;">
+                        <tr style="border-top:2px solid #d3d3df;background-color : #f6fafe!important;">
                             <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">VIN</th>
