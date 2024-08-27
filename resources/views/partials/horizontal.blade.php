@@ -1308,7 +1308,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-bank-accounts');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
