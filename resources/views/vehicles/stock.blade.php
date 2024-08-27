@@ -286,6 +286,39 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="custominspectionModal" tabindex="-1" role="dialog" aria-labelledby="custominspectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="custominspectionForm" method="POST" action="{{ route('vehicles.savecustominspection') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_idinspection">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="custominspectionModalLabel">Custom Inspection Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="booking_start_date">Custom Inspection Number</label>
+                        <input type="number" class="form-control" id="custom_inspection_number" name="custom_inspection_number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="custom_inspection_status">Custom Inspection Status</label>
+                        <select class="form-control" id="custom_inspection_status" name="custom_inspection_status" required>
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="start">Start</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -537,9 +570,12 @@
                   <th>SO Date</th>
                   <th>So Number</th>
                   <th>Sales Person</th>
+                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
+                  <th>Custom Inspection Number</th>
+                  <th>Custom Inspection Status</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -704,6 +740,8 @@
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
+                  <th>Custom Inspection Number</th>
+                  <th>Custom Inspection Status</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -766,6 +804,8 @@
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
+                  <th>Custom Inspection Number</th>
+                  <th>Custom Inspection Status</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -828,6 +868,8 @@
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
+                  <th>Custom Inspection Number</th>
+                  <th>Custom Inspection Status</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -1170,7 +1212,7 @@
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                if (row.inspectionid) {
+                if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
                 } else {
                     return 'Not Available';
@@ -1182,9 +1224,22 @@
         { data: 'so_date', name: 'so.so_date' },
         { data: 'so_number', name: 'so.so_number' },
         { data: 'spn', name: 'sp.name' },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.id) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
         { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
+        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
+        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
         {
     data: null,
     name: 'chat',
@@ -1322,10 +1377,15 @@ $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
 $('#dtBasicExample3 tbody').on('click', 'tr', function () {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
     @endphp
     @if ($hasPermission)
         var data = table3.row(this).data();
         openBookingModal(data.id);
+    @endif
+    @if ($hascustominspectionPermission)
+        var datainspection = table3.row(this).data();
+        opencustominspectionModal(datainspection.id);
     @endif
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
@@ -1647,6 +1707,8 @@ var columns6 = [
         { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
+        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
+        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
             {
                 data: null,
                 name: 'chat',
@@ -1727,6 +1789,15 @@ var hideAllButton = $('<button>')
                 $('.row-badge6').hide();
             }
         });
+        $('#dtBasicExample6 tbody').on('click', 'tr', function () {
+    @php
+    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+    @endphp
+    @if ($hascustominspectionPermission)
+        var datainspection = table6.row(this).data();
+        opencustominspectionModal(datainspection.id);
+    @endif
+});
         var now = new Date();
         
         var columns7 = [
@@ -1835,6 +1906,8 @@ var hideAllButton = $('<button>')
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
+        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
+        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
                 {
                 data: null,
                 name: 'chat',
@@ -1937,7 +2010,15 @@ var hideAllButton = $('<button>')
                 $('.row-badge7').hide();
             }
         });
-       
+        $('#dtBasicExample7 tbody').on('click', 'tr', function () {
+    @php
+    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+    @endphp
+    @if ($hascustominspectionPermission)
+        var datainspection = table7.row(this).data();
+        opencustominspectionModal(datainspection.id);
+    @endif
+});
         var columns9 = [
               { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
@@ -2047,6 +2128,8 @@ if (hasPricePermission) {
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
+        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
+        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
                 {
                 data: null,
                 name: 'chat',
@@ -2394,6 +2477,10 @@ function displayGallery(imageUrls) {
     $('#vehicle_id').val(vehicleId);
     $('#bookingModal').modal('show');
 }
+function opencustominspectionModal(vehicleIdInspection) {
+    $('#vehicle_idinspection').val(vehicleIdInspection);
+    $('#custominspectionModal').modal('show');
+}
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
@@ -2409,6 +2496,33 @@ function displayGallery(imageUrls) {
         success: function(response) {
             $('#bookingModal').modal('hide');
             alert('Booking saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#custominspectionForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#custominspectionModal').modal('hide');
+            alert('Custom Inspection Update Successfully.');
             location.reload();
         },
         error: function(xhr) {

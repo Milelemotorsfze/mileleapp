@@ -2776,6 +2776,8 @@ $variant->save();
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.estimation_date',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.vin',
                         'vehicles.gp',
                         'vehicles.price',
@@ -2834,6 +2836,8 @@ $variant->save();
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.estimation_date',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.vin',
                         'vehicles.gp',
                         'vehicles.territory',
@@ -2898,10 +2902,13 @@ $variant->save();
                         'vehicles.vin',
                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                         'vehicles.engine',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.gp',
                         'inspection.id as inspectionid',
                         'vehicles.territory',
                         'vehicles.price as price',
+                        'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
@@ -2954,6 +2961,10 @@ $variant->save();
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
                     ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
@@ -2971,6 +2982,8 @@ $variant->save();
                         'vehicles.estimation_date',
                         'vehicles.vin',
                         'vehicles.price',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.grn_remark',
@@ -3037,6 +3050,8 @@ $variant->save();
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                          'vehicles.vin',
                          'vehicles.territory',
+                         'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                          'vehicles.price',
                          'vehicles.gp',
                          'vehicles.engine',
@@ -3101,6 +3116,8 @@ $variant->save();
                         'vehicles.vin',
                         'vehicles.price',
                         'vehicles.territory',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.engine',
                         'vehicles.gp',
                         'brands.brand_name',
@@ -3169,6 +3186,8 @@ $variant->save();
                         'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.inspection_date',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.so_id',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
@@ -3240,6 +3259,8 @@ $variant->save();
                         'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.inspection_date',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
                         'vehicles.so_id',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
@@ -3648,5 +3669,18 @@ $vehicleslog->created_by = auth()->user()->id;
 $vehicleslog->role = Auth::user()->selectedRole;
 $vehicleslog->save();
 return response()->json(['success' => 'Vehicle updated successfully']);
+    }
+    public function custominspectionupdate(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'custom_inspection_number' => 'required|numeric',
+            'custom_inspection_status' => 'required|in:pending,done,start',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->custom_inspection_number = $request->input('custom_inspection_number');
+        $vehicle->custom_inspection_status = $request->input('custom_inspection_status');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }
 }
