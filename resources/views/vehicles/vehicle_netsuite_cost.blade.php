@@ -50,7 +50,7 @@
   </style>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
   @endphp
   @if ($hasPermission)
   <div class="card-header">
