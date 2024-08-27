@@ -119,7 +119,9 @@
             ajax: "{{ route('vehiclenetsuitecost.index') }}",
             columns: [
                 { data: 'vin', name: 'vehicles.vin' },
-                { data: 'cost', name: 'vehicle_netsuite_cost.cost' },
+                { data: 'cost', name: 'vehicle_netsuite_cost.cost', render: function(data, type, row) {
+            return data ? parseInt(data).toLocaleString() : '';
+        }},
                 { data: 'last_update', name: 'vehicle_netsuite_cost.updated_at' },
                 { 
                     data: 'netsuite_link', 

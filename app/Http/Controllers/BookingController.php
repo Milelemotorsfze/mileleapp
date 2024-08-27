@@ -663,6 +663,6 @@ public function approval(Request $request)
         $vehicle->booking_person_id = $validatedData['salesperson'];
         $vehicle->save();
     }
-    return redirect()->route('vehicles.statuswise', ['status' => 'Incoming']);
+    return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }
     }

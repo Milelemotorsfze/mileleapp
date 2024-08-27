@@ -91,9 +91,7 @@ class VehicleNetsuiteCostController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,csv'
         ]);
-        // Process the uploaded file using the import class
         Excel::import(new VehicleNetSuiteCostImport, $request->file('file'));
-        // Redirect back with a success message
         return redirect()->route('vehiclenetsuitecost.index')->with('success', 'Vehicle costs updated successfully!');
     }
 }
