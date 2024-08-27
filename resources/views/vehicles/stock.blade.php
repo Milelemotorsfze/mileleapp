@@ -376,10 +376,12 @@
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
+    $hasManagementPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-link-stock-report');
 @endphp
 
 <script>
     var hasPricePermission = @json($hasPricePermission);
+    var hasManagementPermission = @json($hasManagementPermission);
 </script>
   <div class="tab-content">
       <!-- <div class="tab-pane fade show active" id="tab1"> 
@@ -518,6 +520,8 @@
                   <th>Territory</th>
                   <th>Preferred Destination</th>
                   @if ($hasPricePermission)
+                  <th>Vehicle Cost</th>
+                     <th>GP</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -683,6 +687,8 @@
                   <th>Territory</th>
                   <th>Preferred Destination</th>
                   @if ($hasPricePermission)
+                  <th>Vehicle Cost</th>
+                  <th>GP</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -744,6 +750,8 @@
                   <th>Territory</th>
                   <th>Preferred Destination</th>
                   @if ($hasPricePermission)
+                  <th>Vehicle Cost</th>
+                  <th>GP</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -804,7 +812,9 @@
                   <th>Territory</th>
                   <th>Preferred Destination</th>
                   @if ($hasPricePermission)
-                    <th>Price</th>
+                  <th>Vehicle Cost</th>
+                  <th>GP</th>
+                  <th>Price</th>
                 @endif
                   <th>PO</th>
                   <th>PO Date</th>
@@ -1101,7 +1111,24 @@
         { data: 'fd', name: 'countries.name' },
     ];
     if (hasPricePermission) {
-        columns3.push({
+        columns3.push(
+            {
+    data: 'costprice',
+    name: 'costprice',
+    searchable: false,
+    render: function(data, type, row) {
+        if (data) {
+            if (row.netsuite_link && hasManagementPermission) {
+                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
+            } else {
+                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
+            }
+        }
+        return ''; // Return an empty string if there's no price
+    }
+},
+            { data: 'gp', name: 'vehicles.gp' },
+            {
             data: 'price', 
             name: 'vehicles.price', 
                     render: function(data, type, row) {
@@ -1561,7 +1588,24 @@ var columns6 = [
                 { data: 'fd', name: 'countries.name' },
             ];
                 if (hasPricePermission) {
-                    columns6.push({
+                    columns6.push(
+                        {
+    data: 'costprice',
+    name: 'costprice',
+    searchable: false,
+    render: function(data, type, row) {
+        if (data) {
+            if (row.netsuite_link && hasManagementPermission) {
+                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
+            } else {
+                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
+            }
+        }
+        return ''; // Return an empty string if there's no price
+    }
+},
+                    { data: 'gp', name: 'vehicles.gp' },
+                    {
                     data: 'price', 
                     name: 'vehicles.price', 
                     render: function(data, type, row) {
@@ -1743,7 +1787,24 @@ var hideAllButton = $('<button>')
                 { data: 'fd', name: 'countries.name' },
     ];
                 if (hasPricePermission) {
-                    columns7.push({
+                    columns7.push(
+                        {
+    data: 'costprice',
+    name: 'costprice',
+    searchable: false,
+    render: function(data, type, row) {
+        if (data) {
+            if (row.netsuite_link && hasManagementPermission) {
+                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
+            } else {
+                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
+            }
+        }
+        return ''; // Return an empty string if there's no price
+    }
+},
+                    { data: 'gp', name: 'vehicles.gp' },
+                    {
                     data: 'price', 
                     name: 'vehicles.price', 
                     render: function(data, type, row) {
@@ -1938,7 +1999,24 @@ var hideAllButton = $('<button>')
             ];
 
 if (hasPricePermission) {
-    columns9.push({
+    columns9.push(
+        {
+    data: 'costprice',
+    name: 'costprice',
+    searchable: false,
+    render: function(data, type, row) {
+        if (data) {
+            if (row.netsuite_link && hasManagementPermission) {
+                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
+            } else {
+                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
+            }
+        }
+        return ''; // Return an empty string if there's no price
+    }
+},
+        { data: 'gp', name: 'vehicles.gp' },
+        {
                     data: 'price', 
                     name: 'vehicles.price', 
                     render: function(data, type, row) {

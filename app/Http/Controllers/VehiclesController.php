@@ -2777,6 +2777,7 @@ $variant->save();
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.gp',
                         'vehicles.price',
                         'vehicles.territory',
                         'vehicles.engine',
@@ -2834,6 +2835,7 @@ $variant->save();
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.engine',
                         'vehicles.price',
@@ -2859,12 +2861,12 @@ $variant->save();
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice
+")
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
@@ -2896,6 +2898,7 @@ $variant->save();
                         'vehicles.vin',
                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                         'vehicles.engine',
+                        'vehicles.gp',
                         'inspection.id as inspectionid',
                         'vehicles.territory',
                         'vehicles.price as price',
@@ -2926,6 +2929,15 @@ $variant->save();
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                        DB::raw("
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
@@ -2959,6 +2971,7 @@ $variant->save();
                         'vehicles.estimation_date',
                         'vehicles.vin',
                         'vehicles.price',
+                        'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.grn_remark',
                         'vehicles.engine',
@@ -2985,12 +2998,13 @@ $variant->save();
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
@@ -3024,6 +3038,7 @@ $variant->save();
                          'vehicles.vin',
                          'vehicles.territory',
                          'vehicles.price',
+                         'vehicles.gp',
                          'vehicles.engine',
                          'vehicles.grn_remark',
                          'brands.brand_name',
@@ -3048,12 +3063,14 @@ $variant->save();
                          DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                          DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                          DB::raw("
-                         COALESCE(
-                             (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                             (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                             ''
-                         ) as costprice
-                     ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
@@ -3085,6 +3102,7 @@ $variant->save();
                         'vehicles.price',
                         'vehicles.territory',
                         'vehicles.engine',
+                        'vehicles.gp',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.id as variant_id',
@@ -3113,12 +3131,14 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                         DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
@@ -3146,6 +3166,7 @@ $variant->save();
                         'vehicles.id',
                         'vehicles.grn_id',
                         'vehicles.gdn_id',
+                        'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.inspection_date',
                         'vehicles.so_id',
@@ -3184,12 +3205,14 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                         DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
@@ -3214,6 +3237,7 @@ $variant->save();
                         'vehicles.id',
                         'vehicles.grn_id',
                         'vehicles.gdn_id',
+                        'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.inspection_date',
                         'vehicles.so_id',
@@ -3252,12 +3276,14 @@ $variant->save();
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
                         DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')

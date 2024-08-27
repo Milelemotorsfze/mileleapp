@@ -1413,7 +1413,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variantprices.allvariantprice')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Variant Price </span>
                                             </a>
                                         </div>

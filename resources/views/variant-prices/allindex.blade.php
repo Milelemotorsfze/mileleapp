@@ -78,6 +78,21 @@
     <br>
 </div>
 <div class="card-body">
+<div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="variantviewLabel">View Variants</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <div class="table-responsive" style="height: 74vh;">
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
         <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
@@ -114,7 +129,13 @@
             columns: [
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'name', name: 'varaints.name' },
+                { 
+            data: 'name', 
+            name: 'varaints.name',
+            render: function(data, type, row) {
+                return '<a href="#" onclick="openModal(' + row.varaints_id + ')" style="text-decoration: underline;">' + data + '</a>';
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 {
@@ -234,5 +255,143 @@ $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
     saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''));
 });
     });
+    function openModal(id) {
+    $.ajax({
+        url: '/variants_details/' + id,
+        type: 'GET',
+        success: function(response) {
+            $('#variantview .modal-body').empty();
+            var modalBody = $('#variantview .modal-body');
+            var variantDetailsTable = $('<table class="table table-bordered"></table>');
+            var variantDetailsBody = $('<tbody></tbody>');
+            if (response.modifiedVariants) {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th><th>Modified Option</th></tr>');
+            if(response.variants.name != response.basevaraint.name)
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.basevaraint.name + '</td><td>' + response.variants.name + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
+            }
+            if(response.basevaraint.steering != response.variants.steering)
+            {
+            variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td>' + response.variants.steering + '</td></tr>');
+            }
+            else {
+              variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td></td></tr>');
+            }
+            if(response.basevaraint.engine != response.variants.engine)
+            {
+            variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td>' + response.variants.engine + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td></td></tr>');
+            }
+            if(response.basevaraint.my != response.variants.my)
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td>' + response.variants.my + '</td></tr>');
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td></td></tr>');
+            }
+            if(response.basevaraint.fuel_type != response.variants.fuel_type)
+            {
+            variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td>' + response.variants.fuel_type + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td></td></tr>');
+            }
+            if(response.basevaraint.gearbox != response.variants.gearbox)
+            {
+            variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td>' + response.variants.gearbox + '</td></tr>');
+            }
+            else 
+            {
+              variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td></td></tr>');
+            }
+            if(response.basevaraint.drive_train != response.variants.drive_train)
+            {
+            variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td>' + response.variants.drive_train + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td></td></tr>');
+            }
+            if(response.basevaraint.upholestry != response.variants.upholestry)
+            {
+            variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td>' + response.variants.upholestry + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>'); 
+            }
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th></tr>');
+            variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td></tr>');
+            }
+            variantDetailsTable.append(variantDetailsBody);
+            modalBody.append('<h5>Variant Details:</h5>');
+            modalBody.append(variantDetailsTable);
+              modalBody.append('<h5>Attributes Items:</h5>');
+              var variantItemsTable = $('<table class="table table-bordered"></table>');
+              if (response.modifiedVariants) {
+              var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th><th>Modified Option</th></tr></thead>');
+              }
+              else{
+                var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
+              }
+              var variantItemsBody = $('<tbody></tbody>');
+              response.variantItems.forEach(function(variantItem) {
+                  var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
+                  var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
+                  var modificationOption = '';
+                  if (response.modifiedVariants) {
+                      response.modifiedVariants.forEach(function(modifiedVariant) {
+                          if (modifiedVariant.modified_variant_items && modifiedVariant.modified_variant_items.name === specificationName) {
+                              modificationOption = modifiedVariant.addon ? modifiedVariant.addon.name : '';
+                          }
+                      });
+                      variantItemsBody.append('<tr><td>' + specificationName + '</td><td>' + optionName + '</td><td>' + modificationOption + '</td></tr>');
+                  }
+                  else{
+                    variantItemsBody.append('<tr><td>' + specificationName + '</td><td>' + optionName + '</td></tr>');
+                  }
+              });
+              variantItemsTable.append(variantItemsHeader);
+              variantItemsTable.append(variantItemsBody);
+              modalBody.append(variantItemsTable);
+            if (response.modifiedVariants) {
+                modalBody.append('<h5>Modified Attributes Items:</h5>');
+                var modifiedVariantTable = $('<table class="table table-bordered"></table>');
+                var modifiedVariantHeader = $('<thead><tr><th>Modified Attributes</th><th>Modified Option</th></tr></thead>');
+                var modifiedVariantBody = $('<tbody></tbody>');
+                response.modifiedVariants.forEach(function(modifiedVariant) {
+                    var modifiedVariantName = modifiedVariant.modified_variant_items ? modifiedVariant.modified_variant_items.name : 'N/A';
+                    var addonName = modifiedVariant.addon ? modifiedVariant.addon.name : 'N/A';
+                    modifiedVariantBody.append('<tr><td>' + modifiedVariantName + '</td><td>' + addonName + '</td></tr>');
+                });
+                modifiedVariantTable.append(modifiedVariantHeader);
+                modifiedVariantTable.append(modifiedVariantBody);
+                modalBody.append(modifiedVariantTable);
+            }
+            $('#variantview').modal('show');
+        },
+        error: function(xhr, status, error) {
+        }
+    });
+}
 </script>
 @endsection

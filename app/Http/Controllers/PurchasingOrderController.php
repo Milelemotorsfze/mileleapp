@@ -1211,7 +1211,7 @@ public function getBrandsAndModelLines(Request $request)
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
-    $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
+    $vehicleslog = Vehicleslog::whereNull('category')->whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
     $vendorstatus = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)
                                ->select('current_balance', 'currency')
