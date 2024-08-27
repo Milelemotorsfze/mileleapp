@@ -60,7 +60,7 @@
                                 <td>{{ $pfi->delivery_location }}</td>
                                 <td>{{ $pfi->currency }}</td>
                                 <td>{{ $pfi->letterOfIndent->client->name ?? ''}}</td>
-                                <td>{{ $pfi->letterOfIndent->client->country->name ?? ''  }}</td>
+                                <td>{{ $pfi->letterOfIndent->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
                                 <td>{{ $pfi->released_amount }}</td>
                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->released_date)->format('d M y') }}</td>

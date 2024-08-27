@@ -12,6 +12,7 @@ use App\Models\PFI;
 use App\Models\PfiItem;
 use App\Models\Supplier;
 use App\Models\Clients;
+use App\Models\Country;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -62,7 +63,7 @@ class PFIController extends Controller
             ->get();
         $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx')
                                       ->groupBy('model')->get();
-         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->get();
+         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
 
             // new pfi creation
 
@@ -120,10 +121,10 @@ class PFIController extends Controller
         (new UserActivityController)->createActivity('New PFI Created');
 
         $request->validate([
-            'pfi_reference_number' => 'required',
+            // 'pfi_reference_number' => 'required',
             // 'pfi_date' => 'required',
             // 'amount'  => 'required',
-            'file' => 'required|mimes:pdf'
+            // 'file' => 'required|mimes:pdf'
         ]);
 
         DB::beginTransaction();
@@ -132,7 +133,6 @@ class PFIController extends Controller
         $pfi->pfi_reference_number = $request->pfi_reference_number;
 //        $pfi->pfi_date = $request->pfi_date;
         $pfi->amount = $request->amount;
-        // $pfi->letter_of_indent_id = $request->letter_of_indent_id;
         $pfi->created_by = Auth::id();
         $pfi->comment = $request->comment;
         $pfi->status = PFI::PFI_STATUS_NEW;
@@ -155,34 +155,38 @@ class PFIController extends Controller
         }
 
         $pfi->save();
-
+        $pfiItemRowParentId = [];
         foreach($request->PfiItem as $key => $pfiItem) {
+            $parentId = NULL;
             foreach($pfiItem['model'] as $keyValue => $model) {
-                info($key);
-               
-                // dd($pfiItem['loi_item'][$keyValue]);
                 $model = $pfiItem['model'][$keyValue];               
                 $sfx = $pfiItem['sfx'][$keyValue];
-                info($model);
-                info($sfx);
                 $loiItemId = $pfiItem['loi_item'][$keyValue];
                 $pfiQuantity = $pfiItem['pfi_quantity'][$keyValue];
                 $unitPrice = $pfiItem['unit_price'][$keyValue];
 
                 $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
-                info($masterModel);
                 $pfiItemRow = new PfiItem();
                 $pfiItemRow->pfi_id = $pfi->id;
-                $pfiItemRow->loi_item_id = $loiItemId;
+                if($loiItemId != 'NULL') {
+                    $pfiItemRow->loi_item_id = $loiItemId;
+                }
                 $pfiItemRow->master_model_id = $masterModel->id ?? '';
                 $pfiItemRow->pfi_quantity = $pfiQuantity;
                 $pfiItemRow->unit_price = $unitPrice;
                 $pfiItemRow->created_by = Auth::id();
                 $pfiItemRow->save();
-
+                if($keyValue == 0) {
+                    $pfiItemRow->is_parent = true;
+                    $parentId = $pfiItemRow->id;
+                }else{
+                    $pfiItemRowParentId[] = $parentId;
+                    $pfiItemRow->parent_pfi_item_id = $parentId;
+                }
+                $pfiItemRow->save();
             }
-
         }
+
                
         // document sealing
         // if($request->has('file')) {
@@ -455,9 +459,9 @@ class PFIController extends Controller
         return redirect()->back()->with('success', 'Payment released amount Successfully.');
     }
     public function getLOIItemCode(Request $request) {
-
        $data = [];
        $loiItems = LetterOfIndentItem::with('masterModel','LOI')
+                // ->whereColumn('utilized_quantity', '>', 'quantity')
                 ->whereHas('masterModel', function($query)use($request) {
                     $query->where('model', $request->model)
                     ->where('sfx', $request->sfx);
@@ -478,32 +482,63 @@ class PFIController extends Controller
                         ->where('sfx', $request->sfx)
                         ->orderBy('model_year','DESC')
                         ->first();
+        $data['is_loi_available'] = 'YES';
+         $LOINotAvailableBrands = ['HINO','SUZUKI'];
+
+        if($masterModel) {
+           if( in_array($masterModel->modelLine->brand->brand_name, $LOINotAvailableBrands) ){
+            $data['is_loi_available'] = 'NO';
+           }
+        }                
         $data['codes'] = $loiItems->get();
+        info($data['codes']);
        $data['master_model_id'] = $masterModel->id;
        return response($data);
     }
+  
 
-    public function getMasterModels(Request $request) {
+    public function getChildModels(Request $request) {
       
-            // if(str_contains($LOIItem->masterModel->modelLine->model_line, $model_line)){
-            //     $masterModels = $masterModels->whereHas('modelLine', function($query)use($model_line){
-            //         $query->where('model_line', 'LIKE', '%'. $model_line .'%');
-            //     });
-            // }  
-            $data = MasterModel::with('loiItems.LOI')
-            ->whereHas('loiItems.LOI', function($query)use($request){
-                $query->select('client_id','status','id','is_expired')
-                ->where('client_id', $request->customer)
-                ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
-                ->where('is_expired', false);
-            }); 
+           
+             $data = MasterModel::orderBy('id','DESC');
+            //  info($request->all());
+
+             if($request->is_child == 'Yes') {
+                // info("child row add");
+                $data = $data->with('loiItems.LOI')
+                ->whereHas('loiItems.LOI', function($query)use($request){
+                    $query->select('client_id','status','id','is_expired')
+                    ->where('client_id', $request->customer)
+                    ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
+                    ->where('is_expired', false);
+                }); 
+
+                // info($data->pluck('id'));
+             }
+
             if($request->model && $request->sfx) {
+               
                 $parentModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)->first();
+                                    info($parentModel);
 
-               $data = $data->where('steering', $parentModel->steering)
-                            ->where('master_model_line_id', $parentModel->master_model_line_id);             
+               $data = $data->where('steering', $parentModel->steering);
+            //    info("after steering chcek");
+            //    info($data->pluck('id'));
+                $model_line = 'HIACE';
+                if(str_contains($parentModel->modelLine->model_line, $model_line)){
+                    // info("Hiace");
+                    // info($parentModel->modelLine->model_line);
+                    $data = $data->whereHas('modelLine', function($query)use($model_line){
+                        $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+                    });
+                }else{
+                    // info("Not Hiace");
+                    $data = $data->where('master_model_line_id', $parentModel->master_model_line_id); 
+                }  
+                       
             }
+            
             if($request->selectedModelIds) {
                 $restrictedModelIds = [];
                 foreach($request->selectedModelIds as $selectedModelId){
@@ -515,22 +550,24 @@ class PFIController extends Controller
                         $restrictedModelIds[] = $possibleModel->id;
                     }                  
                 }
+                // info($restrictedModelIds);
                 if($restrictedModelIds) {
                     $data = $data->whereNotIn('id', $restrictedModelIds);
                 }
-             
+            //  info($data->pluck('id'));
             }
            
-            $data = $data->groupBy('model')->orderBy('id','DESC')->get();
-           
+            $data = $data->groupBy('model')->get();
+            // info($data);
         return response($data);
        
     }
     public function getLOIItemDetails(Request $request) {
         info($request->all());
+        $data = [];
         $supplier = Supplier::find($request->supplier_id);
         $loiItem = LetterOfIndentItem::find($request->loi_item_id);
-
+        if($supplier && $loiItem) {
             if($supplier->is_MMC == true) {
                 $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
             }else if($supplier->is_AMS == true) {
@@ -539,9 +576,25 @@ class PFIController extends Controller
                 $price = 0;
             }
             $data['unit_price'] = $price;
-      
-        $remianingQty = $loiItem->quantity - $loiItem->utilized_quantity;
-        $data['remaining_quantity'] = $remianingQty;
+        }
+          
+        if($loiItem) {
+            $remianingQty = $loiItem->quantity - $loiItem->utilized_quantity;
+            $data['remaining_quantity'] = $remianingQty;
+        }
+       
         return response($data);
+    }
+
+    public function getCustomerCountries(Request $request) {
+        info($request->all());
+
+        $countries = Country::with('clients')
+            ->whereHas('clients', function($query) use($request){
+            $query->select('id','country_id')->where('id', $request->client_id);
+            })->get();
+
+            return response($countries);
+
     }
 }
