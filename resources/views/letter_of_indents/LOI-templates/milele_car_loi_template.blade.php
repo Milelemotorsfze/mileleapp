@@ -127,7 +127,7 @@
                                         <span style="margin-right: 50px;padding-right: 20px;color:#D3D3D3;"> TO </span>
                                         <!-- <span  style="list-style: none;" > -->
                                         <span style="font-size:12px;font-weight:600px" >{{ strtoupper($letterOfIndent->client->name ?? '') }}</span>
-                                       <span class="county-name">{{ strtoupper($letterOfIndent->client->country->name ?? '') }} </span>
+                                       <span class="county-name">{{ strtoupper($letterOfIndent->country->name ?? '') }} </span>
                                     </span>
                                     </td>
                                 </tr>

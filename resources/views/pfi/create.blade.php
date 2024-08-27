@@ -100,6 +100,14 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="choices-single-default" class="form-label">Country</label>
+                                                    <select class="form-control widthinput" name="country_id" id="country_id" multiple >
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
                                         
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
@@ -180,7 +188,7 @@
                                                     <div class="col-lg-1 col-md-6">
                                                         <label class="form-label ">PFI QTY</label>
                                                         <input type="number" min="1" oninput=calculateTotalAmount(1,0) required name="PfiItem[1][pfi_quantity][0]"
-                                                            class="form-control mb-2 widthinput pfi-quantities" min="1" placeholder="0"
+                                                            class="form-control mb-2 widthinput pfi-quantities" placeholder="0"
                                                             index="1" item="0" id="pfi-quantity-1-item-0">
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
@@ -199,7 +207,7 @@
                                                         <label class="form-label">Total Price</label>
                                                         <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts"
                                                         placeholder="Total Amount" id="total-amount-1-item-0" index="1" item="0">
-                                                        <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1-item-0">
+                                                        <input type="hidden" class="master-model-ids" id="master-model-id-1-item-0">
                                                     </div>
                                                     <div class="col-lg-1 col-md-6 col-sm-12" style="margin-top: 30px;">
                                                         <a class="btn btn-primary btn-sm add-more disabled" id="add-more-1" index="1" item="0"
@@ -263,6 +271,10 @@
             placeholder: "Select Customer",
             maximumSelectionLength: 1
         });
+        $('#country_id').select2({
+            placeholder: "Select Country",
+            maximumSelectionLength: 1
+        });
         $('#model-1-item-0').select2({
             placeholder : 'Select Model',
             maximumSelectionLength: 1
@@ -279,19 +291,22 @@
         $("#form-create").validate({
             ignore: [],
             rules: {
-                pfi_reference_number: {
-                required: true,
-                },
-                pfi_date: {
-                    required: true,
-                },
-                amount: {
-                    required: true,
-                },
+                // pfi_reference_number: {
+                // required: true,
+                // },
+                // pfi_date: {
+                //     required: true,
+                // },
+                // amount: {
+                //     required: true,
+                // },
                 supplier_id:{
                     required:true
                 },
                 client_id:{
+                    required:true
+                },
+                country_id:{
                     required:true
                 },
                 "models[]": {
@@ -301,20 +316,20 @@
                     required: true
                 },
                 
-                file: {
-                    required:true,
-                    extension: "pdf|png|jpg|jpeg|svg",
-                    maxsize:5242880 
-                },
+                // file: {
+                //     required:true,
+                //     extension: "pdf|png|jpg|jpeg|svg",
+                //     maxsize:5242880 
+                // },
                
             },
                 
-            messages: {
-                file: {
-                    extension: "Please upload file format (pdf)"
-                },
+            // messages: {
+            //     file: {
+            //         extension: "Please upload file format (pdf)"
+            //     },
                 
-            },
+            // },
             
         });
 
@@ -364,7 +379,7 @@
              $('.loi_item_ids').map(function(){
                 loiItems.push($(this).val());
                 });
-            let supplier = $(this).val();
+            // let supplier = $(this).val();
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
 
             if(MMC == 1) {
@@ -446,6 +461,7 @@
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {
+                resetData();
                 let type = 'all';
                 getModels(i,0,type);
                 enableOrDisableAddMoreButton(i);
@@ -458,7 +474,7 @@
                     // call unit price,remaining qty, total quantity
                 }
             }
-
+            getCustomerCountries()
         });
         $(document.body).on('select2:unselect', "#client_id", function (e) {
             
@@ -510,9 +526,10 @@
                     }
                     
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
-                    $("#remining-quantity-"+i+"-item-"+j).val("");
+                    $("#remaining-quantity-"+i+"-item-"+j).val("");
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
+                    $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
                 }
             }
         }
@@ -573,6 +590,8 @@
            $('#unit-price-'+index+'-item-'+childIndex).val("");
            $('#total-amount-'+index+'-item-'+childIndex).val("");
            $('#master-model-id-'+index+'-item-'+childIndex).val("");
+           $('#pfi-quantity-'+index+'-item-'+childIndex).valid();
+           $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
        }
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('index');
@@ -634,6 +653,9 @@
             $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
             $('#unit-price-'+index+'-item-'+childIndex).val("");
             $('#total-amount-'+index+'-item-'+childIndex).val("");
+            $('#pfi-quantity-'+index+'-item-'+childIndex).val("");
+            $('#pfi-quantity-'+index+'-item-'+childIndex).valid();
+            $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
 
         });
 
@@ -688,7 +710,7 @@
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts" index="${index}"
                                     id="total-amount-${index}-item-${item}" item="${item}" placeholder="Total Price">
-                                <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-${index}-item-${item}">
+                                <input type="hidden" class="master-model-ids" id="master-model-id-${index}-item-${item}">
                             </div>
                             <div class="col-lg-1 col-md-6 col-sm-12">
                                 <a class="btn btn-sm btn-danger removePFIItemButton" id="remove-btn-${index}-item-${item}" item="${item}" index="${index}" > 
@@ -778,7 +800,7 @@
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts" index="${index}"
                                     id="total-amount-${index}-item-0" item="0" placeholder="Total Price">
-                                <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-${index}-item-0">
+                                <input type="hidden" class="master-model-ids" id="master-model-id-${index}-item-0">
                             </div>
                             <div class="col-lg-1 col-md-6 col-sm-12">
                                 <a class="btn btn-primary btn-sm add-more disabled" 
@@ -934,6 +956,20 @@
          
             let model = $('#model-'+index+'-item-'+childIndex).val();
             let url = '{{ route('demand.get-sfx') }}';
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+            selectedModelIds = [];
+            
+            if(childIndex == 0) {
+                for(let i=1; i<=parentIndex; i++)
+                {
+                    var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
+
+                    if(eachSelectedModelId) {
+                        selectedModelIds.push(eachSelectedModelId);
+                    }
+                }                 
+            }
+            console.log(selectedModelIds);
             
             $.ajax({
                 type: "GET",
@@ -942,6 +978,7 @@
                 data: {
                     model: model[0],
                     module: 'PFI',
+                    selectedModelIds:selectedModelIds
                 },
                 success:function (data) {              
                     $('#sfx-'+index+'-item-'+childIndex).empty();
@@ -976,7 +1013,7 @@
                 }
             }
 
-            if(customer.length > 0 && model.length > 0  && sfx.length > 0) {
+            if(model.length > 0  && sfx.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                 type: "GET",
@@ -989,25 +1026,31 @@
                     selectedLOIItemIds:selectedLOIItemIds
                 },
                 success:function (data) {
-                    // console.log(data);
+                    console.log(data);
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
-                    // $('#loi-item-'+index+'-item-'+childIndex).html('<option value=""> Select Code </option>');                      
-                    jQuery.each(codes, function(key,value){
-                        $('#loi-item-'+index+'-item-'+childIndex).append('<option value="'+ value.id +'">'+ value.code +'</option>');
-                    });
+                    if(data.is_loi_available == 'NO') {
+                        let id = 'loi-item-'+index+'-item-'+childIndex;
+                        $('#'+id).append('<option value="NULL">NO LOI</option>');
+                        $('#'+id ).val("NULL").trigger('change');
+                           
+                    }else{
+                        jQuery.each(codes, function(key,value){
+                            $('#loi-item-'+index+'-item-'+childIndex).append('<option value="'+ value.id +'">'+ value.code +'</option>');
+                         });
+                    }
                     $('#master-model-id-'+index+'-item-'+childIndex).val(data.master_model_id);
-                   
                     $('.overlay').hide();
                 }
             });
         }           
        }
        function getLOIItemDetails(index,childIndex) {
-           
+           console.log("reached");
             let loiItem = $('#loi-item-'+index+'-item-'+childIndex).val();
             let vendor = $('#supplier-id').val();
-            if(vendor && loiItem.length > 0) {
+            console.log(vendor);
+            if(loiItem.length > 0) {
                 console.log(vendor);
                 $('.overlay').show();
 
@@ -1023,6 +1066,7 @@
                     success:function (data) {
                         console.log(data);
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
+                        $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
                         $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
                         calculateTotalAmount(index,childIndex)
                         $('.overlay').hide();
@@ -1033,7 +1077,7 @@
        }
        function getModels(index,item,type) {
            
-            let customer = $('#client_id').val();
+            // let customer = $('#client_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -1047,8 +1091,8 @@
                         selectedModelIds.push(eachSelectedModelId);
                     }
                 }
-          
-            if(customer.length > 0) {
+                console.log(selectedModelIds);
+            // if(customer.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     url:"{{route('pfi-item.master-models')}}",
@@ -1057,9 +1101,8 @@
                         {
                             model: parentModel[0],
                             sfx:parentSfx[0],
-                            customer:customer[0],
                             selectedModelIds:selectedModelIds,
-                            type: type
+                            is_child:'No'
                         },
                     dataType : 'json',
                     success: function(data) {
@@ -1096,13 +1139,13 @@
                         $('.overlay').hide();
                     }
                 });
-            }          
+            // }          
        }
        function getChildModels(index,item) {
             let customer = $('#client_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
-            if(customer.length > 0) {
+            if(customer.length > 0 && parentModel.length > 0 && parentSfx.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     url:"{{route('pfi-item.master-models')}}",
@@ -1111,7 +1154,9 @@
                         {
                             model: parentModel[0],
                             sfx:parentSfx[0],
+                            is_child:'Yes',
                             customer:customer[0]
+                            // is_parent_model: 'YES'
                         },
                     dataType : 'json',
                     success: function(data) {
@@ -1181,17 +1226,19 @@
         function hideParentModel(index) {
             var selectedId = 'model-'+index+'-item-0';
             let model = $('#model-'+index+'-item-0').val(); 
+            let sfx = $('#sfx-'+index+'-item-0').val(); 
             console.log(model[0]);
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
                 for(let i=1; i<=parentIndex;i++) 
                 { 
                     var currentId = 'model-'+i+'-item-0';
-                    let currentModel = $('#' + currentId).val(); 
-                    if(selectedId != currentId ) {                  
+                    let currentModel = $('#' + currentId).val();
+                    let currentsfx = $('#sfx-'+i+'-item-0').val(); 
+                    if(selectedId != currentId && model == currentModel[0] && sfx == currentsfx[0]) {                  
                         $('#' + currentId + ' option[value=' + model[0] + ']').detach(); 
-                        if(currentModel[0] == model[0]) {
+                        // if(currentModel[0] == model[0]) {
                             $('#sfx-'+i+'-item-0').empty();
-                        }
+                        // }
                       
                     }
                   
@@ -1220,6 +1267,29 @@
             }else if(customer.length <= 0 || sfx.length <= 0){
                 $('#add-more-'+index).addClass('disabled');
             }
+       }
+       function getCustomerCountries() {
+        let url = '{{ route('pfi-item.customer-countries')}}';
+        let customer = $('#client_id').val();
+        if(customer.length > 0) {
+            $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        client_id: customer[0],   
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        jQuery.each(data, function(key,value){
+                            $('#country_id').append('<option value="'+ value.id +'">'+ value.name+'</option>');
+                         });
+                        
+                    }
+                });
+        }
+
+
        }
        
     </script>

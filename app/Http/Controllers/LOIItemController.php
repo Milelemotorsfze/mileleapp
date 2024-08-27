@@ -20,12 +20,12 @@ class LOIItemController extends Controller
         $data = LetterOfIndentItem::orderBy('updated_at','DESC')->with([
                 'LOI' => function ($query) {
                     $query->select('id','uuid','client_id','date','category','loi_approval_date',
-                    'is_expired','dealers','status','sales_person_id','review','comments');
+                    'is_expired','dealers','status','sales_person_id','review','comments','country_id');
                 },
                 'LOI.client'  => function ($query) {
                     $query->select('id','name','customertype','country_id');
                 },
-                'LOI.client.country'  => function ($query) {
+                'LOI.country'  => function ($query) {
                     $query->select('id','name');
                 },
                 'masterModel' => function($query){
@@ -61,7 +61,7 @@ class LOIItemController extends Controller
                             'Category' => $data->LOI->category,
                             'Customer Name' => $data->LOI->client->name ?? '',
                             'Customer Type' => $data->LOI->client->customertype ?? '',
-                            'Country' => $data->LOI->client->country->name ?? '',
+                            'Country' => $data->LOI->country->name ?? '',
                             'Item Code' => $data->code,
                             'Model' => $data->masterModel->model,
                             'SFX' => $data->masterModel->sfx,

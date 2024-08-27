@@ -8,6 +8,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiTemplate;
 use App\Models\LoiSoNumber;
+use App\Models\ClientCountry;
 
 use Illuminate\Http\Request;
 
@@ -381,7 +382,24 @@ class MigrationDataCheckController extends Controller
     //     }
     //     return 1;
     
-      
+      $LOIS = LetterOfIndent::all();
+      info($LOIS->count());
+      foreach($LOIS as $LOI) {
+        $loiClient = Clients::findOrFail($LOI->client_id);
+        $LOI->country_id = $loiClient->country_id ?? '';
+        $LOI->save();
+      }
+      return 1;
+    }
+    public function migratecustomerCountries() {
+        $clients = Clients::where('is_demand_planning_customer', true)->get();
+      info($clients->count());
+      foreach($clients as $client) {
+        $clientCountry = new ClientCountry();
+        $clientCountry->client_id = $client->id;
+        $clientCountry->country_id = $client->country_id;
+        $clientCountry->save();
+      }
     }
     // add master model line id of respective variants
     public function chcekuniqueSonumberinLOI(){

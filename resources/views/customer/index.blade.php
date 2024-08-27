@@ -67,7 +67,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->customertype }}</td>
-                                <td>{{ $customer->country->name ?? '' }}</td>
+                                <td>{{ $customer->country }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M Y') }}</td>

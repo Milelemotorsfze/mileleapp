@@ -119,7 +119,7 @@
             {'data' : 'l_o_i.client.name', 'name' : 'LOI.client.name', orderable: false},
             {'data' : 'l_o_i.client.customertype', 'name': 'LOI.client.customertype', orderable: false },  
             {'data' : 'l_o_i.category', 'name': 'LOI.category', orderable: false },        
-            {'data' : 'l_o_i.client.country.name', 'name': 'LOI.client.country.name', orderable: false },        
+            {'data' : 'l_o_i.country.name', 'name': 'LOI.country.name', orderable: false },        
             {'data' : 'code', 'name': 'code', orderable: false },        
             {'data' : 'master_model.model', 'name': 'masterModel.model', orderable: false },        
             {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },  

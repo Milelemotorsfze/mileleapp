@@ -117,7 +117,7 @@
                                             @endforeach
                                          </td>
                                          <td>{{ $letterOfIndent->salesPerson->name ?? ''}} </td>
-                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->country->name ?? '' }}</td>
                                         <td>
                                              {{ $letterOfIndent->status }}
                                          
@@ -334,7 +334,7 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->salesPerson->name ?? ''}} </td>
-                                        <td>{{ $letterOfIndent->client->country->name ?? '' }}</td>
+                                        <td>{{ $letterOfIndent->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->total_loi_quantity }}</td>
                                         <td> 
                                              {{ $letterOfIndent->status }}
@@ -458,7 +458,7 @@
                                                                             <dt class="form-label font-size-13 text-muted">Country :</dt>
                                                                         </div>
                                                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                            <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
+                                                                            <dl>{{ $letterOfIndent->country->name ?? '' }} </dl>
                                                                         </div>
                                                                     </div>
                                                                     <div class="row">
@@ -544,7 +544,7 @@
                                                                     <dt class="form-label font-size-13 text-muted">Country :</dt>
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                    <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
+                                                                    <dl>{{ $letterOfIndent->country->name ?? '' }} </dl>
                                                                 </div>
                                                             </div>
                                                             <div class="row">
