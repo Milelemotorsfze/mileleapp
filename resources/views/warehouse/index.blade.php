@@ -932,51 +932,88 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
         <script>
 $(document).ready(function() {
+  // Conversion rates from other currencies to AED
+  var conversionRates = {
+    'AED': 1,
+    'USD': 3.67,
+    'EUR': 4.1,
+    'JPY': 0.034,
+    'CAD': 2.85,
+    // Add other currencies and their conversion rates here
+  };
+
+  // Custom sorting function for currency
+  $.fn.dataTable.ext.type.order['currency-pre'] = function(data) {
+    if (data === 'N/A') {
+      return 0;
+    }
+
+    var matches = data.match(/([\D]+)?\s?([\d,\.]+)/);
+    if (matches && matches[2]) {
+      var currency = matches[1] ? matches[1].trim() : 'AED'; // Default to 'AED' if currency is missing
+      var number = parseFloat(matches[2].replace(/,/g, ''));
+      var conversionRate = conversionRates[currency] || 1; // Default to 1 if currency not found
+      return number * conversionRate;
+    }
+    return 0;
+  };
+
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
-  pageLength: 10,
-  order: [[1, 'desc']],
-        columnDefs: [
-            {
-                targets: 1,
-                type: 'date',
-            }
-        ],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (columnName === "statuss") {
-        return;
+    pageLength: 10,
+    order: [[1, 'desc']], // Date column descending
+    columnDefs: [
+      {
+        targets: 1,
+        type: 'date',
+        orderSequence: ['desc', 'asc'] // Date column only descending
+      },
+      {
+        targets: 4, // Ensure the correct column index for the total cost
+        type: 'currency',
+        orderSequence: ['asc', 'desc'] // Total cost ascending
       }
+      // You can specify other columns if needed
+    ],
+    initComplete: function() {
+      this.api().columns().every(function() {
+        var column = this;
+        var columnName = $(column.header()).attr('id');
+        if (columnName === "statuss") {
+          return;
+        }
 
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%'
+        var selectWrapper = $('<div class="select-wrapper"></div>');
+        var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+          .appendTo(selectWrapper)
+          .select2({
+            width: '100%'
+          });
+        select.on('change', function() {
+          var selectedValues = $(this).val();
+          column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
         });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
+        selectWrapper.appendTo($(column.header()));
+        $(column.header()).addClass('nowrap-td');
 
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
+        column.data().unique().sort(function(a, b) {
+          var aValue = $.fn.dataTable.ext.type.order['currency-pre'](a);
+          var bValue = $.fn.dataTable.ext.type.order['currency-pre'](b);
+          return aValue - bValue;
+        }).each(function(d) {
+          select.append('<option value="' + d + '">' + d + '</option>');
+        });
       });
-    });
-  }
-});
+    }
+  });
+
   $('.dataTables_filter input').on('keyup', function() {
     dataTable.search(this.value).draw();
   });
 
   // Apply custom CSS class after Select2 dropdown is opened
-  $(document).on('select2:open', function(e) {
+  $(document).on('select2:open', function() {
     $('.select2-dropdown').addClass('select2-orange-highlight');
   });
 });

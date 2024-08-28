@@ -23,7 +23,7 @@
             @endif
         @endcan
     @endif
- 
+
 
     @can('LOI-list')
         @php
@@ -41,20 +41,7 @@
         </button>
         @endif
     @endcan
-    <!-- To Create LOI -->
-        @can('PFI-create')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
-            @endphp
-            @if ($hasPermission)
-                @if($letterOfIndent->is_expired == false && $type !== 'NEW')
-                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                        <button type="button"  class="btn btn-soft-blue btn-sm mt-1">Add PFI</button>
-                    </a>
-                @endif
-            @endif
-        @endcan
-
+       
 
     <!-- To View LOI Items -->
     <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -217,6 +204,7 @@
             </div>
         </div>
     </div>
+    
     <script>
          $('.loi-button-delete').on('click',function(){
             let id = $(this).attr('data-id');
@@ -233,12 +221,38 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
-                            location.reload();
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
                             alertify.success('LOI Deleted successfully.');
                         }
                     });
                 }
             }).set({title:"Delete Item"})
+        });
+        $('.loi-expiry-status-update').on('click',function(){
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to make this LOI Expired?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
+                            var table2 = $('.waiting-for-approval-table').DataTable();
+                            table2.ajax.reload();
+                            var table3 = $('.supplier-response-table').DataTable();
+                            table3.ajax.reload();
+                            alertify.success('Expiry Status updated as "Expired" successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Update Expired Status"})
         });
         
     </script>

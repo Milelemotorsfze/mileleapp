@@ -3,17 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movement;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Vehicles;
 use App\Models\Warehouse;
 use App\Models\Varaint;
 use App\Models\MasterModelLines;
 use App\Models\Vehicleslog;
+use App\Mail\GRNEmailNotification;
 use App\Models\Brand;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MovementsReference;
 use App\Models\Grn;
 use App\Models\So;
 use App\Models\Gdn;
+use App\Models\DepartmentNotifications;
 use App\Models\VinChange;
 use Carbon\CarbonTimeZone;
 use Carbon\Carbon;
@@ -242,15 +245,56 @@ class MovementController extends Controller
                             $vehicleslog->new_value = "Vehicle Recived GRN Done";
                             $vehicleslog->created_by = auth()->user()->id;
                             $vehicleslog->save();
+                            $vehicleCount = count($grnVins);
+                            $grnDate = Carbon::parse($grn->date)->format('d M Y');
+                            $groupedVehicles = Vehicles::whereIn('vin', $grnVins)->with([
+                                'variant.master_model_lines.brand',
+                                'variant.brand',
+                                'interior',
+                                'exterior'
+                            ])->get()->groupBy('purchasing_order_id');
+                            foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
+                                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                                if($purchasingOrder->is_demand_planning_po == 1)
+                                {
+                                $recipients = ['team.dp@milele.com'];
+                                }
+                                else
+                                {
+                                $recipients = ['abdul@milele.com'];   
+                                }
+                                $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                                $vehicleDetails = $vehicles->map(function ($vehicle) use ($grnDate, $grnNumber) {
+                                    return [
+                                        'vin' => $vehicle->vin,
+                                        'grn' => $grnNumber,
+                                        'grn_date' => $grnDate,
+                                        'brand' => $vehicle->variant->brand->brand_name ?? '',
+                                        'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
+                                        'variant' => $vehicle->variant->name ?? '',
+                                        'int_colour' => $vehicle->interior->name ?? '',
+                                        'ext_colour' => $vehicle->exterior->name ?? '',
+                                    ];
+                                });
+                                Mail::to($recipients)->send(new GRNEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $orderUrl, $vehicleCount, $grnDate, $vehicleDetails));
+                                $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                                "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                                "Stage: " . "Goods Received Note\n" .
+                                "Number of Units: " . $vehicleCount . "\n" .
+                                "GRN Date: " . $grnDate . " Vehicles\n" .
+                                "Order URL: " . $orderUrl;
+                          $notification = New DepartmentNotifications();
+                          $notification->module = 'Logistics';
+                          $notification->type = 'Information';
+                          $notification->detail = $detailText;
+                          $notification->save();
+                            }
         }
         if (!empty($gdnVins)) {
             $gdn = new Gdn();
             $gdn->date = $date;
             $gdn->save();
-            $gdnNumber = $gdn->id;
-            $gdn->gdn_number = $gdnNumber;
-            $gdn->save();
-            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
+            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdn->id]);
             $vehicleId = Vehicles::whereIn('vin', $gdnVins)->pluck('id');
             $vehicleslog = new Vehicleslog();
                             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -309,13 +353,7 @@ class MovementController extends Controller
         }
     }
 }    
-        $data = Movement::get();
-        $vehicles = Vehicles::whereNotNull('vin')
-        ->where('status', '!=', 'cancel')
-        ->pluck('vin', 'varaints_id'); 
-        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
-        $movementreference = MovementsReference::get(); 
-        return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
+return redirect()->back()->with('success', 'Transition has been successfully Saved!');
     }    
     /**
      * Display the specified resource.
@@ -503,7 +541,6 @@ public function grnfilepost(Request $request)
             ->where('status', '=', 'Approved')
             ->pluck('id');
         }
-        info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);

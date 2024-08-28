@@ -14,13 +14,15 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
                     @endphp
                     @if ($hasPermission)
-                        <a  class="btn btn-sm btn-info float-end" href="{{ route('master-models.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-                    @endif
+                        <a  class="btn btn-sm btn-info float-end"  href="{{ route('master-models.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                        <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" href="{{ route('master-models.index', ['export' => 'EXCEL'] ) }}" >
+                        <i class="fa fa-download" aria-hidden="true"></i> Export</a>
+                        @endif
                 @endcan
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger mt-3 mb-0">
                         <strong>Whoops!</strong> There were some problems with your input.<br>
                         <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                         <ul>
@@ -31,7 +33,7 @@
                     </div>
                 @endif
                 @if (Session::has('success'))
-                    <div class="alert alert-success" id="success-alert">
+                    <div class="alert alert-success mt-3 mb-0" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('success') }}
                     </div>

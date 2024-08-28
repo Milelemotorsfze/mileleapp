@@ -28,11 +28,17 @@ use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
 use App\Models\AddonTypes;
 use App\Models\Varaint;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Addon;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
         $brands = Brand::all();
         $callDetails = Calls::where('id', $callId)->first();
+        $currentUser = Auth::user();
+        $hasPermission = $currentUser->hasPermissionForSelectedRole('all-quotation-access');
+        if ($callDetails->sales_person !== $currentUser->id && !$hasPermission) {
+        return redirect()->route('not_access_page');
+         }
         $assessoriesDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','P');
         })->get();
@@ -477,6 +483,12 @@ class ProformaInvoiceController extends Controller {
     }
     public function proforma_invoice_edit($callId) {
         $quotation = Quotation::where('calls_id', $callId)->first();
+        $salespersoncalls = Calls::where('id', $callId)->first();
+        $currentUser = Auth::user();
+        $hasPermission = $currentUser->hasPermissionForSelectedRole('all-quotation-access');
+        if ($salespersoncalls->sales_person !== $currentUser->id && !$hasPermission) {
+        return redirect()->route('not_access_page');
+         }
         $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
         $quotationitems = QuotationItem::with('varaint')->with('addon')->with('quotationVins')->with('shippingdocuments')->with('shippingcertification')->with('otherlogisticscharges')->where('quotation_id', $quotation->id)->get();
         foreach ($quotationitems as $quotationitem) {

@@ -16,7 +16,7 @@ class LetterOfIndent extends Model
     public const LOI_CATEGORY_END_USER_CHANGED = "End User Changed";
     public const LOI_CATEGORY_QUANTITY_INFLATE = "Quantity Inflate";
     public const LOI_SUBMISION_STATUS_NEW = "New";
-    public const LOI_STATUS_WAITING_FOR_APPROVAL = "Waiting For approval";
+    public const LOI_STATUS_WAITING_FOR_APPROVAL = "Waiting for approval";
     public const LOI_STATUS_SUPPLIER_APPROVED = "Approved by Supplier";
     public const LOI_STATUS_SUPPLIER_REJECTED = "Rejected by Supplier";
     public const LOI_STATUS_PARTIAL_APPROVED = "Partialy Utilized LOI";
@@ -27,6 +27,7 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
     public const LOI_STATUS_EXPIRED = "Expired";
 
+    // delete total loi qty when po section live.
     protected $appends = [
         'total_loi_quantity',
     ];
@@ -47,6 +48,10 @@ class LetterOfIndent extends Model
     public function client()
     {
         return $this->belongsTo(Clients::class,'client_id','id');
+    }
+    public function country()
+    {
+        return $this->belongsTo(Country::class,'country_id','id');
     }
     public function supplier()
     {

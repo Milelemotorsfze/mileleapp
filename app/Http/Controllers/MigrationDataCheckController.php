@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\MasterModel;
+use App\Models\Clients;
+use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
+use App\Models\LoiTemplate;
+use App\Models\LoiSoNumber;
+use App\Models\ClientCountry;
 
 use Illuminate\Http\Request;
 
@@ -269,24 +275,166 @@ class MigrationDataCheckController extends Controller
         }
         return $qtyExceededLOI;
     }
+    public function customerNameUniquecheck() {
+        $clients = Clients::where('is_demand_planning_customer',true)
+            ->whereNotIn('id',['498','734','534','1497','556','1211','559','1577','693','750','825','826','919','1162','945','969'])
+            ->get();
+        foreach ($clients as $client) {
+            $clientCount =  Clients::where('name', $client->name)
+            ->where('is_demand_planning_customer',true)
+           
+            ->count();
+          $duplicateClients =  Clients::where('name', $client->name)->get();
+            if($clientCount > 1) {
+               return $duplicateClients; 
+            } 
+        }
+        return "All cutomers are unique name";
+    }
+    public function masterModelUnique(){
+        $masterModels = MasterModel::get();
+        foreach($masterModels as $masterModel) {
+         $duplicateCount = MasterModel::where('model', $masterModel->model)
+         ->where('sfx', $masterModel->sfx)
+         ->where('steering', $masterModel->steering)->where('model_year', $masterModel->model_year)
+         ->count();
+ 
+         if($duplicateCount > 1) {
+             return $duplicateCount; 
+          } 
+        }
+        
+        return "Master models are unique";
+    }
+    public function updateUtilizationQtyForMigratedData() {
+            // make attribute sum calculation according to which qty u need
+            $lois = LetterOfIndent::all();
+            foreach($lois as $loi) {
+                $loi->utilized_quantity =  $loi->total_loi_quantity;
+                $loi->save();
+            }
+
+            return 1;
+    }
+    // Customer Id,LOI Date,Dealer,LOI Category,Status,is Expired.
+    public function checkEnumLOI() {
+            
+    //    $loi = LetterOfIndent::whereNull('is_expired')->first();
+    //    if($loi) {
+    //     return $loi;
+    //    }
+    //    return 1;
+    //   $loi = LetterOfIndent::whereNotIn('category',['Management Request','End User Changed','Quantity Inflate','Original','Special'])->get();
+    // $customer = Clients::where('is_demand_planning_customer', true)
+    //         ->whereNotIn('customertype', ['Individual','Company','Government'])->get();
+    // $loi = LetterOfIndent::whereNotIn('dealers',['Trans Cars','Milele Motors'])->get();
+    if($loi) {
+        return $loi;
+      }
+      return 1;
+    }
     public function index()
     {
-        $duplicates = [];
-        $LOIs = DB::table('migration_letter_of_indents')->whereNotIn('loi_number', $duplicates)->get();
-        foreach ($LOIs as $LOI) {
-        $loiIds = DB::table('migration_loi_items')->where('loi_number', $LOI->loi_number)->pluck('master_model_id')->toArray();
-        
-        info($loiIds);
-            if (count($loiIds) !== count(array_unique($loiIds))) {
-                $duplicates[] = $LOI->loi_number;
-            }
-        }
-        return $duplicates;
-       
+        // $loiItemCodes = DB::table('loi_item_codes')->get();
+        // foreach($loiItemCodes as $loiItemCode) {
+        //     DB::table('letter_of_indent_items')
+        //         ->where('id', $loiItemCode->loi_item_id)
+        //         ->update([
+        //             'code' => $loiItemCode->code,
+        //         ]);
+        // }
+
+        // $lois = LetterOfIndent::all();
+        // foreach($lois as $loi) {
+        //     $loi->utilized_quantity =  $loi->total_loi_quantity;
+        //     $loi->save();
+        // }
+
+        // return 1;
+
+       // loi templates options update for migration data
+
+    //    $lois = LetterOfIndent::all();
+    //    foreach($lois as $loi) {
+    //         if($loi->client->customertype == 'Individual'){
+    //             $loiTemplate = new LoiTemplate();
+    //             $loiTemplate->template_type = 'individual';
+    //             $loiTemplate->letter_of_indent_id = $loi->id;
+    //             $loiTemplate->save();
+    //         }else {
+    //             $loiTemplate = new LoiTemplate();
+    //             $loiTemplate->template_type = 'business';
+    //             $loiTemplate->letter_of_indent_id = $loi->id;
+    //             $loiTemplate->save();
+    //         }
+
+    //         if($loi->dealers == 'Milele Motors') {
+    //             $loiTemplate = new LoiTemplate();
+    //             $loiTemplate->template_type = 'milele_cars';
+    //             $loiTemplate->letter_of_indent_id = $loi->id;
+    //             $loiTemplate->save();
+    //         }else if($loi->dealers == 'Trans Cars') {
+    //             $loiTemplate = new LoiTemplate();
+    //             $loiTemplate->template_type = 'trans_cars';
+    //             $loiTemplate->letter_of_indent_id = $loi->id;
+    //             $loiTemplate->save();
+    //         }
+    //     }
+    //     return 1;
+    
+    //   $LOIS = LetterOfIndent::all();
+    //   info($LOIS->count());
+    //   foreach($LOIS as $LOI) {
+    //     $loiClient = Clients::findOrFail($LOI->client_id);
+    //     $LOI->country_id = $loiClient->country_id ?? '';
+    //     $LOI->save();
+    //   }
+      
+    // $clients = Clients::where('is_demand_planning_customer', true)->get();
+    // info($clients->count());
+    // foreach($clients as $client) {
+    //   $clientCountry = new ClientCountry();
+    //   $clientCountry->client_id = $client->id;
+    //   $clientCountry->country_id = $client->country_id;
+    //   $clientCountry->save();
+    // }
+      return 1;
+    }
+    public function migratecustomerCountries() {
+        $clients = Clients::where('is_demand_planning_customer', true)->get();
+      info($clients->count());
+      foreach($clients as $client) {
+        $clientCountry = new ClientCountry();
+        $clientCountry->client_id = $client->id;
+        $clientCountry->country_id = $client->country_id;
+        $clientCountry->save();
+      }
     }
     // add master model line id of respective variants
-    public function addModelLineId(){
-
+    public function chcekuniqueSonumberinLOI(){
+        $loiSoNummbers = LoiSoNumber::all();
+        foreach($loiSoNummbers as $loiSoNummber) {
+            $duplicateCount = LoiSoNumber::where('letter_of_indent_id', $loiSoNummber->letter_of_indent_id)
+            ->where('so_number', $loiSoNummber->so_number)
+            ->count();
+    
+            if($duplicateCount > 1) {
+                return $duplicateCount; 
+             } 
+           }
+           
+           return "all LOI have unique so number are unique";
+    
+    }
+    public function LOIItemCodeCheck(){
+        $loiItemCodes = DB::table('loi_item_codes')->get();
+        foreach($loiItemCodes as $loiItemCode) {
+            DB::table('letter_of_indent_items')
+                ->where('id', $loiItemCode->loi_item_id)
+                ->update([
+                    'code' => $loiItemCode->code,
+                ]);
+        }
     }
 
     /**

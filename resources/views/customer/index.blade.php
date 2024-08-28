@@ -20,11 +20,13 @@
                         @if ($hasPermission)
                             <a  class="btn btn-sm btn-info float-end" title="Create New Customer" href="{{ route('dm-customers.create') }}" >
                                 <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                            <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" href="{{ route('dm-customers.index', ['export' => 'EXCEL'] ) }}" >
+                            <i class="fa fa-download" aria-hidden="true"></i> Export</a>
                         @endif
                     @endcan
                 </h4>
                 @if (count($errors) > 0)
-                    <div class="alert alert-danger">
+                    <div class="alert alert-danger mt-3 mb-0">
                         <strong>Whoops!</strong> There were some problems with your input.<br>
                         <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                         <ul>
@@ -35,7 +37,7 @@
                     </div>
                 @endif
                 @if (Session::has('success'))
-                    <div class="alert alert-success" id="success-alert">
+                    <div class="alert alert-success mt-3 mb-0" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('success') }}
                     </div>
@@ -65,7 +67,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->customertype }}</td>
-                                <td>{{ $customer->country->name ?? '' }}</td>
+                                <td>{{ $customer->country }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M Y') }}</td>
@@ -83,7 +85,7 @@
                                             <i class="fa fa-edit" aria-hidden="true"></i>
                                         </a>
                                         @endif
-                                    @endcan
+                                    @endcan 
                                     @can('delete-customer')
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');

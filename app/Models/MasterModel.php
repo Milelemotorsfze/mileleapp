@@ -20,6 +20,10 @@ class MasterModel extends Model
     {
         return $this->hasMany(SupplierInventory::class);
     }
+    public function loiItems()
+    {
+        return $this->hasMany(LetterOfIndentItem::class);
+    }
     public function createdBy()
     {
         return $this->belongsTo(User::class,'created_by','id');

@@ -11,20 +11,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class MasterModelController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Builder $builder)
+    public function index(Builder $builder, Request $request)
     {
         (new UserActivityController)->createActivity('Open the listing page of Master Models.');
 
-        $masterModel = MasterModel::orderBy('id','DESC')->get();
+        $masterModel = MasterModel::orderBy('id','DESC');
+
+        if($request->export == 'EXCEL') {
+            $data = $masterModel->get();
+            return (new FastExcel($data))->download('models.csv', function ($data) {
+                return [
+                    'Steering' => $data->steering,
+                    'Model' => $data->model,
+                    'SFX' => $data->sfx,
+                    'Model Year' => $data->model_year,
+                    'Model Line' => $data->modelLine->model_line,
+                    'Trans Car LOI Description' => $data->transcar_loi_description,
+                    'Milele LOI Description' => $data->milele_loi_description,
+                    'Amount(UAE)' => $data->amount_uae,
+                    'Amount(Belgium)' => $data->amount_belgium,
+                    'Variant' => $data->variant->name ?? '',
+                    'Created At' => Carbon::parse($data->created_at)->format('d-m-Y'),
+                    'Created By' => $data->createdBy->name ?? '',
+                ];
+            });
+        }
 
         if (request()->ajax()) {
             return DataTables::of($masterModel)
+                ->addIndexColumn()
                 ->editColumn('created_at', function($query) {
                     return Carbon::parse($query->created_at)->format('d M Y');
                 })
@@ -53,11 +75,12 @@ class MasterModelController extends Controller
                     return  number_format($query->amount_belgium);
                 })
                 ->rawColumns(['action'])
+                 
                 ->toJson();
         }
 
         $html = $builder->columns([
-            ['data' => 'id', 'name' => 'id','title' => 'S.No'],
+            ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex','title' => 'S.No', 'orderable' =>  false, 'searchable' => false],
             ['data' => 'steering', 'name' => 'steering','title' => 'Steering'],
             ['data' => 'model', 'name' => 'model','title' => 'Model'],
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],

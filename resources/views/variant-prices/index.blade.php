@@ -9,6 +9,10 @@
         <h4 class="card-title">
             Price List
         </h4>
+        <a class="btn btn-sm btn-success float-end" href="{{ route('variantprices.allvariantprice') }}" text-align: right>
+        <i class="fa fa-info" aria-hidden="true"></i> Full Price List
+      </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     </div>
     @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price');
