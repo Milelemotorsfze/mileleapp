@@ -555,6 +555,7 @@
           
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
+            var country = $('#country').val();
             var date = $('#date').val();
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
@@ -576,7 +577,7 @@
                     }
                 }
                
-            if(customer.length > 0 && customer_type.length > 0  && date.length > 0) {
+            if(country.length > 0 && customer_type.length > 0  && date.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     type: "GET",
@@ -585,6 +586,7 @@
                     data: {
                         loi_date:date,
                         customer_id: customer[0],
+                        country_id: country[0],
                         customer_type: customer_type[0],
                         total_quantities:total_quantities,
                         selectedModelLineIds:selectedModelLineIds
@@ -637,7 +639,7 @@
                 url: url,
                 dataType: "json",
                 data: {
-                    country: country,
+                    country: country[0],
                     customer_type: customer_type
                 },
                 success:function (data) {
