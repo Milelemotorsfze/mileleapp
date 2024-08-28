@@ -100,7 +100,7 @@
                                 <label for="choices-single-default" class="form-label">Customer</label>
                                 <select class="form-control widthinput" multiple name="client_id" id="customer" >
                                     @foreach($possibleCustomers as $customer)
-                                        <option value="{{ $letterOfIndent->client_id }}"
+                                        <option value="{{ $customer->id }}"
                                             {{ $letterOfIndent->client_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
                                     @endforeach
                                 </select>
