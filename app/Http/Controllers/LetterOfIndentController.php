@@ -166,7 +166,8 @@ class LetterOfIndentController extends Controller
                 ->addColumn('approval_button', function($query, Request $request) {
                     $type = $request->tab;
                    
-                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status')->find($query->id);
+                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status',
+                    'country_id')->find($query->id);
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
                 ->addColumn('action', function($query,Request $request) {
