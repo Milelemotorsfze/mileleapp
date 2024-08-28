@@ -95,7 +95,7 @@
   </div>
 <div class="table-responsive" style="height: 74vh;">
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
-        <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+        <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
                 <tr>
                     <th>Brand</th>
                     <th>Model Line</th>

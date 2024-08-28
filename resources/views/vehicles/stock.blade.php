@@ -528,7 +528,7 @@
 @endif
 <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow3">
                 <!-- Toggle buttons will be added here dynamically -->
             </tr>
@@ -699,7 +699,7 @@
 @endif
 <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow6">
                 <!-- Toggle buttons will be added here dynamically -->
             </tr>
@@ -764,7 +764,7 @@
 @endif
 <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow7">
                 <!-- Toggle buttons will be added here dynamically -->
             </tr>
@@ -832,7 +832,7 @@
 @endif
 <div class="table-responsive" style="height: 74vh;">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow8">
                 <!-- Toggle buttons will be added here dynamically -->
             </tr>
