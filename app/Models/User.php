@@ -599,4 +599,9 @@ class User extends Authenticatable
         return $this->hasOneThrough(MasterDepartment::class, EmpProfile::class, 'user_id', 'id', 'id', 'department_id');
 
     }
+    public function department()
+    {
+        return $this->hasOneThrough(MasterDepartment::class, EmpProfile::class, 'user_id', 'id', 'id', 'department_id');
+
+    }
 }
