@@ -803,6 +803,8 @@
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>GRN Report</th>
+                  <th>Reservation End</th>
+                  <th>Reservation Sales Person</th>
                   <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
@@ -1381,19 +1383,34 @@ $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
         $('#dtBasicExample3_processing').hide();
     }
 });
-$('#dtBasicExample3 tbody').on('click', 'tr', function () {
+$('#dtBasicExample3 tbody').off('click', 'tr');
+// Add specific click event listeners for relevant columns
+$('#dtBasicExample3 tbody').on('click', 'td', function () {
+    var table = $('#dtBasicExample3').DataTable();
+    var cellIndex = table.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table.column(cellIndex).header().innerText; // Get the header text of the clicked column
+
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table.row(this).data();
+            opencustominspectionModal(datainspection.id);
+        @endif
+    }
+    else if(columnHeader === 'Reservation End')
+    {
+    // Check for other columns (like "direct-booking") as per existing logic
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
     @endphp
     @if ($hasPermission)
-        var data = table3.row(this).data();
+        var data = table.row(this).data();
         openBookingModal(data.id);
     @endif
-    @if ($hascustominspectionPermission)
-        var datainspection = table3.row(this).data();
-        opencustominspectionModal(datainspection.id);
-    @endif
+    }
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
 //           processing: true,
@@ -1808,14 +1825,23 @@ var hideAllButton = $('<button>')
                 $('.row-badge6').hide();
             }
         });
-        $('#dtBasicExample6 tbody').on('click', 'tr', function () {
-    @php
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
-    @endphp
-    @if ($hascustominspectionPermission)
-        var datainspection = table6.row(this).data();
-        opencustominspectionModal(datainspection.id);
-    @endif
+        $('#dtBasicExample6 tbody').off('click', 'tr');
+// Add specific click event listeners for relevant columns
+$('#dtBasicExample6 tbody').on('click', 'td', function () {
+    var table6 = $('#dtBasicExample6').DataTable();
+    var cellIndex = table6.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table6.column(cellIndex).header().innerText; // Get the header text of the clicked column
+
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table6.row(this).data();
+            opencustominspectionModal(datainspection.id);
+        @endif
+    }
 });
         var now = new Date();
         
@@ -1919,7 +1945,7 @@ var hideAllButton = $('<button>')
                 { data: 'date', name: 'grn.date' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
+                { data: 'spn', name: 'sp.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
                 { 
@@ -1933,6 +1959,8 @@ var hideAllButton = $('<button>')
                 }
             }
         },
+        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
+        { data: 'bpn', name: 'bp.name' },
         { 
             data: 'id', 
             name: 'id',
@@ -2052,14 +2080,33 @@ var hideAllButton = $('<button>')
                 $('.row-badge7').hide();
             }
         });
-        $('#dtBasicExample7 tbody').on('click', 'tr', function () {
+        $('#dtBasicExample7 tbody').off('click', 'tr');
+// Add specific click event listeners for relevant columns
+$('#dtBasicExample7 tbody').on('click', 'td', function () {
+    var table7 = $('#dtBasicExample7').DataTable();
+    var cellIndex = table7.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table7.column(cellIndex).header().innerText; // Get the header text of the clicked column
+
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table7.row(this).data();
+            opencustominspectionModal(datainspection.id);
+        @endif
+    }
+else if(columnHeader === 'Reservation End')
+{
     @php
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
-    @if ($hascustominspectionPermission)
-        var datainspection = table7.row(this).data();
-        opencustominspectionModal(datainspection.id);
+    @if ($hasPermission)
+        var data = table7.row(this).data();
+        openBookingModal(data.id);
     @endif
+}
 });
         var columns9 = [
               { data: 'id', name: 'vehicles.id' },
@@ -2272,7 +2319,25 @@ var hideAllButton = $('<button>')
     $('#dtBasicExample8_wrapper').prepend(
         $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
     );
+    $('#dtBasicExample8 tbody').off('click', 'tr');
+// Add specific click event listeners for relevant columns
+$('#dtBasicExample8 tbody').on('click', 'td', function () {
+    var table9 = $('#dtBasicExample8').DataTable();
+    var cellIndex = table9.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table9.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table9.row(this).data();
+            opencustominspectionModal(datainspection.id);
+        @endif
+    }
+
+});
     // Create toggle buttons for each column
     table8.columns().every(function (index) {
         var column = this;

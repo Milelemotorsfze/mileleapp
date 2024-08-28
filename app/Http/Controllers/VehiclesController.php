@@ -3091,6 +3091,7 @@ $variant->save();
 
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
@@ -3116,6 +3117,7 @@ $variant->save();
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
+                         DB::raw("DATE_FORMAT(vehicles.reservation_end_date, '%d-%b-%Y') as reservation_end_date"),
                         'vehicles.vin',
                         'vehicles.price',
                         'vehicles.territory',
@@ -3233,7 +3235,8 @@ $variant->save();
                         'documents.document_with',
                         'grn.grn_number',
                         'gdn.gdn_number',
-                        'users.name',
+                        'bp.name as bpn',
+                        'sp.name as spn',
                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
                         DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
@@ -3253,7 +3256,8 @@ $variant->save();
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
                     ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
+                    ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
                     ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
                     ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
