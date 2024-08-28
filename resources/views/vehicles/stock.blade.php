@@ -803,6 +803,8 @@
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>GRN Report</th>
+                  <th>Reservation End</th>
+                  <th>Reservation Sales Person</th>
                   <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
@@ -1398,7 +1400,8 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-
+    else if(columnHeader === 'Reservation End')
+    {
     // Check for other columns (like "direct-booking") as per existing logic
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
@@ -1407,6 +1410,7 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         var data = table.row(this).data();
         openBookingModal(data.id);
     @endif
+    }
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
 //           processing: true,
@@ -1941,7 +1945,7 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
                 { data: 'date', name: 'grn.date' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
+                { data: 'spn', name: 'sp.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
                 { 
@@ -1955,6 +1959,8 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
                 }
             }
         },
+        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
+        { data: 'bpn', name: 'bp.name' },
         { 
             data: 'id', 
             name: 'id',
@@ -2091,7 +2097,8 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-    // Check for other columns (like "direct-booking") as per existing logic
+else if(columnHeader === 'Reservation End')
+{
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
@@ -2099,7 +2106,7 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
         var data = table7.row(this).data();
         openBookingModal(data.id);
     @endif
-
+}
 });
         var columns9 = [
               { data: 'id', name: 'vehicles.id' },
