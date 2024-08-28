@@ -65,8 +65,8 @@
 
             <div class="card-body">
             <div class="tab-pane fade show active table-responsive">
-                    <table class="table table-bordered LOI-Items-table" style = "width:100%;">
-                        <thead>
+                    <table class="table table-bordered table-striped table-editable table-edits table table-condensed LOI-Items-table" style="width:100%;">
+                        <thead class="bg-soft-secondary">
                             <tr>
                                 <th>S.No</th>
                                 <th>LOI Number</th>

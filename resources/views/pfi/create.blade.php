@@ -31,8 +31,10 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Create New PFI</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-
+               
+                <a  class="btn btn-sm btn-info float-end mr-2" href="{{ route('pfi.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" title="Model-SFX Detail View of LOI Items" href="{{ route('letter-of-indent-items.index') }}" >
+                <i class="fa fa-table" ></i> LOI List </a>
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -445,7 +447,6 @@
                 quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
                 
             });
-            console.log(quantitySum);
             if(quantitySum <= 0) {
                 $('.overlay').hide();
                 e.preventDefault();
@@ -855,7 +856,6 @@
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
            
             if(loiItemId[0]) {
-                console.log("item code selected");
                 appendLOIItemCode(index,childIndex,loiItemId,loiItemText.model[0],sfx[0]);
             }
               
@@ -979,7 +979,6 @@
                     }
                 }                 
             }
-            console.log(selectedModelIds);
             
             $.ajax({
                 type: "GET",
@@ -1036,7 +1035,6 @@
                     selectedLOIItemIds:selectedLOIItemIds
                 },
                 success:function (data) {
-                    console.log(data);
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
                     if(data.is_loi_available == 'NO') {
@@ -1056,12 +1054,9 @@
         }           
        }
        function getLOIItemDetails(index,childIndex) {
-           console.log("reached");
             let loiItem = $('#loi-item-'+index+'-item-'+childIndex).val();
             let vendor = $('#supplier-id').val();
-            console.log(vendor);
             if(loiItem.length > 0) {
-                console.log(vendor);
                 $('.overlay').show();
 
                 let url = '{{ route('loi-item-details') }}';
@@ -1074,7 +1069,6 @@
                         supplier_id: vendor[0]            
                     },
                     success:function (data) {
-                        console.log(data);
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
                         $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
                         $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
@@ -1101,7 +1095,6 @@
                         selectedModelIds.push(eachSelectedModelId);
                     }
                 }
-                console.log(selectedModelIds);
             // if(customer.length > 0) {
                 $('.overlay').show();
                 $.ajax({
@@ -1236,7 +1229,6 @@
                     let currentsfx = $('#sfx-'+i+'-item-'+j).val();
                  
                     if(selectedId != currentId && selectedmodel == currentmodel[0] && selectedsfx == currentsfx[0]) {
-                        console.log(currentId);
                         $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
                     }
                 }
@@ -1280,7 +1272,6 @@
             var selectedId = 'sfx-'+index+'-item-0';
             let model = $('#model-'+index+'-item-0').val(); 
             let sfx = $('#sfx-'+index+'-item-0').val(); 
-            console.log(model[0]);
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
                 for(let i=1; i<=parentIndex;i++) 
                 { 
@@ -1333,7 +1324,6 @@
                         client_id: customer[0],   
                     },
                     success:function (data) {
-                        console.log(data);
                         $('#country_id').empty();
                         jQuery.each(data, function(key,value){
                             $('#country_id').append('<option value="'+ value.id +'">'+ value.name+'</option>');

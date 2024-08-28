@@ -77,8 +77,8 @@
             <div class="tab-content">
                 <div class="card-body">
                 <div class="tab-pane fade show active table-responsive" id="new-LOI">
-                        <table class="table table-bordered new-LOI-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered  table-striped table-editable table-edits table table-condensed new-LOI-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>S.No</th>
                                     <th>LOI Number</th>
@@ -108,8 +108,8 @@
                         </table>                      
                     </div>
                     <div class="tab-pane fade table-responsive" id="waiting-for-approval-LOI">
-                        <table class="table table-bordered waiting-for-approval-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered  table-striped table-editable table-edits table table-condensed waiting-for-approval-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
                                 <th>S.No</th>
                                     <th>LOI Number</th>
@@ -140,8 +140,8 @@
                         </table>                      
                     </div>
                     <div class="tab-pane fade table-responsive" id="supplier-response-LOI">
-                        <table class="table table-bordered supplier-response-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered table-striped table-editable table-edits table table-condensed supplier-response-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
                                 <th>S.No</th>
                                     <th>LOI Number</th>
