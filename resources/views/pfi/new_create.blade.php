@@ -52,98 +52,7 @@
                         {{ Session::get('success') }}
                     </div>
                 @endif
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">LOI Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
-                                    <div class="row ">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            LOI Number :
-                                        </div>
-                                        <div class="col-sm-6 ">
-                                            {{ $letterOfIndent->uuid }}
-                                        </div>
-                                    </div>
-                                    <div class="row ">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            Customer :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->client->name ?? '' }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
-                                            So Number :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                {{ $LoiSoNumber->so_number }}
-                                                @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            Total LOI Quantity :
-                                        </div>
-                                        <div class="col-sm-6">
-                                            {{ $totalLOIQuantity }}
-                                        </div>    
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            LOI Category :
-                                        </div>
-                                        <div class="col-sm-6">
-                                            {{ $letterOfIndent->category }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            Total Utilized Quantity :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->utilized_quantity }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="row ">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            LOI Date :
-                                        </div>
-                                        <div class="col-sm-6 ">
-                                            {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            Dealers :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->dealers }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                             Country :
-                                        </div>
-                                        <div class="col-sm-6">
-                                            {{ $letterOfIndent->client->country->name ?? '' }}
-                                        </div>
-                                       
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">PFI Details</h4>
@@ -151,7 +60,6 @@
                         <div class="card-body">
                             <form action="{{ route('pfi.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" name="letter_of_indent_id" value="{{ $letterOfIndent->id }}">
                                 <div class="row">
                                     <div class="col-xxl-8 col-lg-6 col-md-12">
                                         <div class="row">
@@ -180,6 +88,12 @@
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Amount</label>
                                                     <input type="number" class="form-control widthinput pfi-amount" value="" readonly name="amount" min="0" placeholder="PFI Amount">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="choices-single-default" class="form-label">PFI Document</label>
+                                                    <input type="file" id="file" class="form-control widthinput" name="file" accept="application/pdf">
                                                 </div>
                                             </div>
                                             <div class="col-lg-4 col-md-6">
@@ -250,69 +164,59 @@
                                             </div>
                                         </div>
                                     </div>
-                                        @foreach($LOIItems as $key => $LOIItem)
-                                            @if($LOIItem->remaining_quantity > 0)
-                                                <input type="hidden" name="loi_item_ids[]" class="loi_item_ids" value="{{$LOIItem->id}}" >
+                                                <input type="hidden" name="loi_item_ids[]" class="loi_item_ids" value="" >
                                                 <div class="d-flex">
                                                     <div class="col-lg-12">
                                                         <div class="row">
                                                             <div class="col-lg-2 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none text-center">Model</label>
-                                                                <select class="form-select widthinput text-dark models mb-2" index="{{ $key }}"  id="model-{{ $key }}" multiple
+                                                                <select class="form-select widthinput text-dark models mb-2" index="1"  id="model-1" multiple
                                                                         name="models[]">
                                                                     <option value="" >Select Model</option>
-                                                                        @foreach($LOIItem->masterModels as $model)
-                                                                            <option value="{{ $model->model }}"
-                                                                            {{ $LOIItem->masterModel->model == $model->model ? 'selected' : '' }}>{{ $model->model }}</option>
+                                                                        @foreach($masterModels as $model)
+                                                                            <option value="{{ $model->model }}" >{{ $model->model }}</option>
                                                                         @endforeach
                                                                     </select>  
                                                             </div>
                                                             <div class="col-lg-1 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                <select class="form-control text-dark widthinput sfx mb-2" index="{{ $key }}" multiple name="sfx[]" id="sfx-{{ $key }}"  >
-                                                                    <option value="{{ $LOIItem->masterModel->sfx }}" selected>{{ $LOIItem->masterModel->sfx ?? ''}}</option>
+                                                                <select class="form-control text-dark widthinput sfx mb-2" index="1" multiple name="sfx[]" id="sfx-1"  >
+                                                                    <option value="" ></option>
                                                                 </select>
                                                             
                                                             </div>
                                                             <div class="col-lg-2 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Line</label>
-                                                                <input type="text" readonly value="{{ $LOIItem->masterModel->modelLine->model_line ?? '' }}"
-                                                                    id="model-line-{{ $key }}" class="form-control widthinput mb-2">
+                                                                <input type="text" readonly value=""
+                                                                    id="model-line-1" class="form-control widthinput mb-2">
                                                             </div>
                                                             <div class="col-lg-1 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">PFI Quantity</label>
-                                                                <input type="number" min="0" max="{{ $LOIItem->remaining_quantity }}" 
-                                                                id="pfi-quantity-{{ $key }}" oninput=calculateTotalAmount({{$key}}) placeholder="0"  name="pfi_quantities[]"
+                                                                <input type="number" min="0" max="" 
+                                                                id="pfi-quantity-1" oninput=calculateTotalAmount(1) placeholder="0"  name="pfi_quantities[]"
                                                                     class="form-control mb-2 widthinput pfi-quantities" value="0">
                                                             </div>
                                                             <div class="col-lg-1 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Reamining Quantity</label>
-                                                                <input type="text" value="{{ $LOIItem->remaining_quantity }}" id="remaining-quantity-{{ $key }}"
+                                                                <input type="text" value="" id="remaining-quantity-1"
                                                                     readonly class="form-control mb-2 widthinput">
                                                             </div>
                                                             <div class="col-lg-2 col-md-6">
                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>
                                                                 <input type="number" min="0"  required placeholder="0"
-                                                                    index="{{ $key }}" name="unit_price[]" oninput=calculateTotalAmount({{$key}}) class="form-control widthinput mb-2 unit-prices"
-                                                                    id="unit-price-{{ $key}}">
+                                                                    index="1" name="unit_price[]" oninput=calculateTotalAmount(1) class="form-control widthinput mb-2 unit-prices"
+                                                                    id="unit-price-1">
                                                             </div>
                                                             <div class="col-lg-2 col-md-6">
                                                                 <label class="form-label  d-lg-none d-xl-none d-xxl-none">Total Price</label>
                                                                 <input type="number" min="0" readonly class="form-control mb-2 widthinput"
-                                                                    id="total-amount-{{ $key }}">
+                                                                    id="total-amount-1">
                                                             </div>
-                                                            <!-- <div class="col-lg-1 col-md-6">
-                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none"></label>
-                                                                <button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi({{ $LOIItem->id }})"  >
-                                                                    Remove
-                                                                </button>
-                                                            </div> -->
+                                                         
                                                         </div>
                                                     
                                                     </div>
                                                 </div>
-                                            @endif
-                                        @endforeach
                                  </div>
                                
                                     </div>

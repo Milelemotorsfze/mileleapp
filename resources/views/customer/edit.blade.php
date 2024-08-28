@@ -54,10 +54,10 @@
                         <div class="col-lg-3 col-md-3 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Country</label>
-                                <select class="form-control" name="country_id" id="country" autofocus>
+                                <select class="form-control" name="country_id[]" multiple id="country" autofocus>
                                     <option ></option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country->id}}" {{ $customer->country_id == $country->id ? 'selected' : '' }}> {{ $country->name }} </option>
+                                        <option value="{{$country->id}}" {{ in_array($country->id, $customerCountries) ? 'selected' : '' }}> {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>

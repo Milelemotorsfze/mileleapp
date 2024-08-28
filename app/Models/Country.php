@@ -15,5 +15,9 @@ class Country extends Model
     public function ports()
     {
         return $this->hasMany(MasterShippingPorts::class, 'country_id');
+    } 
+    public function clientCountries()
+    {
+        return $this->hasMany(ClientCountry::class,'country_id');
     }     
 }

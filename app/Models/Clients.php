@@ -27,6 +27,10 @@ class Clients extends Model
     {
         return $this->belongsTo(User::class,'created_by','id');
     }
+    public function clientCountries()
+    {
+        return $this->hasMany(ClientCountry::class,'client_id','id');
+    }
     public function getIsDeletableAttribute() {
 
         $isExistLOI = LetterOfIndent::where('client_id', $this->id)->count();
