@@ -2905,7 +2905,7 @@ $variant->save();
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
                         'vehicles.gp',
-                        'inspection.id as inspectionid',
+                        'inspection_grn.id as grn_inspectionid',
                         'vehicles.territory',
                         'vehicles.price as price',
                         'inspection_pdi.id as pdi_inspectionid',
@@ -2959,7 +2959,10 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->leftJoin('inspection as inspection_pdi', function($join) {
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
@@ -3118,6 +3121,8 @@ $variant->save();
                         'vehicles.territory',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
+                        'inspection_grn.id as grn_inspectionid',
+                        'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.engine',
                         'vehicles.gp',
                         'brands.brand_name',
@@ -3169,8 +3174,15 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
                     ->whereNotNull('vehicles.inspection_date')
                     ->whereNotNull('vehicles.gdn_id')
                     ->whereNotNull('vehicles.grn_id')
@@ -3194,6 +3206,8 @@ $variant->save();
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                          DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.vin as vin',
+                        'inspection_grn.id as grn_inspectionid',
+                        'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.engine',
                         'vehicles.price',
                         'countries.name as fd',
@@ -3245,8 +3259,15 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
                     ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
@@ -3267,6 +3288,8 @@ $variant->save();
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
                         'vehicles.vin as vin',
+                        'inspection_grn.id as grn_inspectionid',
+                        'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.engine',
                         'vehicles.price',
                         'countries.name as fd',
@@ -3318,7 +3341,14 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->where('vehicles.status', 'Approved')
                     ->where('purchasing_order.is_demand_planning_po', '=', '1');
