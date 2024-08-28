@@ -1745,15 +1745,39 @@ var columns6 = [
         { data: 'document_with', name: 'documents.document_with' },
         { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
         { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-            {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
+        {
+    data: null,
+    name: 'chat',
+    render: function(data, type, row) {
+        const messageCount = row.message_count || 0; // message_count is now available
+        const badgeHtml = messageCount > 0 ? `
+            <span style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: #cb3365;
+                color: #fff;
+                padding: 0.25em 0.5em;
+                font-size: 75%;
+                border-radius: 0.25rem;
+                transform: translate(50%, -50%);
+            ">
+                ${messageCount}
+            </span>` : '';
+        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
+
+        return `
+            <div style="position: relative; display: inline-block;">
+                ${badgeHtml}
+                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
+                    Comments
+                </button>
+            </div>
+        `;
+    },
+    orderable: false,
+    searchable: false
+},
         );
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
@@ -1978,15 +2002,39 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
         { data: 'document_with', name: 'documents.document_with' },
         { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
         { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
+        {
+    data: null,
+    name: 'chat',
+    render: function(data, type, row) {
+        const messageCount = row.message_count || 0; // message_count is now available
+        const badgeHtml = messageCount > 0 ? `
+            <span style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: #cb3365;
+                color: #fff;
+                padding: 0.25em 0.5em;
+                font-size: 75%;
+                border-radius: 0.25rem;
+                transform: translate(50%, -50%);
+            ">
+                ${messageCount}
+            </span>` : '';
+        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
+
+        return `
+            <div style="position: relative; display: inline-block;">
+                ${badgeHtml}
+                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
+                    Comments
+                </button>
+            </div>
+        `;
+    },
+    orderable: false,
+    searchable: false
+},
 );
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
@@ -2242,15 +2290,39 @@ if (hasPricePermission) {
         { data: 'document_with', name: 'documents.document_with' },
         { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
         { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            }, 
+        {
+    data: null,
+    name: 'chat',
+    render: function(data, type, row) {
+        const messageCount = row.message_count || 0; // message_count is now available
+        const badgeHtml = messageCount > 0 ? `
+            <span style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: #cb3365;
+                color: #fff;
+                padding: 0.25em 0.5em;
+                font-size: 75%;
+                border-radius: 0.25rem;
+                transform: translate(50%, -50%);
+            ">
+                ${messageCount}
+            </span>` : '';
+        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
+
+        return `
+            <div style="position: relative; display: inline-block;">
+                ${badgeHtml}
+                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
+                    Comments
+                </button>
+            </div>
+        `;
+    },
+    orderable: false,
+    searchable: false
+},
         );
             
     var table8 = $('#dtBasicExample8').DataTable({
