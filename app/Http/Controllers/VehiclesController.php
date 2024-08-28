@@ -3565,7 +3565,7 @@ private function fetchPost($variant, $exteriorColor)
     $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
     $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
     $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
-
+    $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
     $data = [
         'inspection' => $inspection,
         'PdiInspectionData' => $PdiInspectionData,
@@ -3577,7 +3577,7 @@ private function fetchPost($variant, $exteriorColor)
         'Incidentpicturelink' => $Incidentpicturelink,
         'incident' => $incident,
         'remarks' => $inspection->remarks,
-        'created_by' => Auth::user()->name,
+        'created_by' => $createdby,
     ];
 
     $pdf = PDF::loadView('Reports.pdi', $data);
