@@ -383,7 +383,7 @@ class LetterOfIndentController extends Controller
     {
         (new UserActivityController)->createActivity('Generated LOI Document.');
         
-        $letterOfIndent = LetterOfIndent::select('id','date','signature','client_id','year_code')->where('id',$request->id)->first();
+        $letterOfIndent = LetterOfIndent::select('id','date','signature','client_id','year_code','country_id')->where('id',$request->id)->first();
         $fileName = $letterOfIndent->client->name .'-'.$letterOfIndent->year_code.'.pdf';
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
       
