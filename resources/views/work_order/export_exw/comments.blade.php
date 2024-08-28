@@ -1,3 +1,8 @@
+<script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script>
+
+<!-- Include At.js -->
+<script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script>
+<link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet">
 <style>
     .comment {
         margin-bottom: 20px;
@@ -52,10 +57,19 @@
     .reply-button {
         margin-left:10px;
     }
+    .mention-container {
+        position: relative;
+    }
+    #styled-comment {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: transparent; /* Make it invisible to show only the textarea */
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
 </style>
-<!-- <head>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head> -->
 <div class="row">
     <div class="row" id="comments-section">
         
@@ -130,6 +144,56 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+        // Initialize mentions for the main comment textarea
+        initializeMentions('#new-comment');
+
+        function initializeMentions(selector) {
+            $(selector).atwho({
+                at: "@",
+                data: [], // Empty initially, will be populated via AJAX
+                limit: 10,
+                callbacks: {
+                    remoteFilter: function(query, renderCallback) {
+                        if (query.length === 0) {
+                            renderCallback([]);
+                            return;
+                        }
+                        $.ajax({
+                            url: '/users-search', // Make sure this matches your route
+                            type: 'GET',
+                            data: { query: query },
+                            success: function(response) {
+                                console.log(response); // Check if users array is correct
+                                if (response.users && response.users.length > 0) {
+                                    renderCallback(response.users.map(user => ({
+                                        id: user.id,
+                                        name: user.name || 'Unknown User' // Fallback if name is null
+                                    })));
+                                } else {
+                                    renderCallback([]);
+                                }
+                            },
+                            error: function() {
+                                console.error('Error fetching user data.');
+                                renderCallback([]); // Handle error gracefully
+                            }
+                        });
+                    },
+                    beforeInsert: function(value, $li) {
+                        // Wrap the mention in a custom token or placeholder that will later be styled
+                        const mentionText = value.replace('@', '');
+                        return `@[${mentionText}]`; // Use a special syntax to recognize mentions later
+                    }
+                }
+            });
+        }
+
+        // Set up event listeners for reply forms
+        $('#comments-section').on('click', '.reply-button', function() {
+            const commentId = $(this).closest('.comment').data('comment-id');
+            initializeMentions(`#reply-input-${commentId}`);
+        });
+        
 
         const workOrderId = workOrder.id; // Ensure this value is correctly set
         $.ajax({
@@ -147,7 +211,12 @@
             }
         });
     });
-
+    function updateStyledComment() {
+        let text = $('#new-comment').val();
+        // Replace the special mention syntax with a styled span
+        text = text.replace(/@\[(\w+)\]/g, '<span class="mention" style="color: blue;">@$1</span>');
+        $('#styled-comment').html(text);
+    }
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
         console.log(new_vehicles);
@@ -886,15 +955,34 @@
             return;
         }
 
+        // Extract mentioned user IDs using a regular expression
+        const mentionedUserIds = [];
+        const mentionPattern = /@(\w+)/g;
+        let match;
+        while ((match = mentionPattern.exec(commentText)) !== null) {
+            mentionedUserIds.push(match[1]); // Push the user ID or username
+        }
+
         // Disable the submit button to prevent multiple submissions
         const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
         submitButton.prop('disabled', true);
+
+        // Check file sizes before appending them to FormData
+        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
+        for (const file of filesInput) {
+            if (file.size > maxFileSize) {
+                alert(`The file ${file.name} exceeds the 2MB size limit.`);
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                return;
+            }
+        }
 
         // Create a FormData object to hold the comment data
         const formData = new FormData();
         formData.append('text', commentText.trim() === '' ? '' : commentText); // Store text as null if empty
         formData.append('parent_id', parentId ? parentId : '');
         formData.append('work_order_id', workOrder.id);
+        formData.append('mentions', JSON.stringify(mentionedUserIds)); // Add mentions as a JSON array
 
         // Append files to the FormData object
         for (const file of filesInput) {
@@ -924,6 +1012,12 @@
             },
             error: function(error) {
                 console.error('Error adding comment:', error);
+
+                // Check if the error is related to file size
+                if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors['files.0']) {
+                    alert(error.responseJSON.errors['files.0'][0]); // Display the error message
+                }
+
                 // Re-enable the submit button in case of an error
                 submitButton.prop('disabled', false);
             }

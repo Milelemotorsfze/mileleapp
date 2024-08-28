@@ -285,4 +285,18 @@ namespace App\Http\Controllers;
                 return back()->with('error', 'An error occurred while saving the user: ' . $e->getMessage());
             }
         }
+        public function searchUsers(Request $request)
+        {
+            $query = $request->input('query');
+            $users = User::where('name', 'LIKE', "%{$query}%")->get(['id', 'name']);
+
+            return response()->json([
+                'users' => $users->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name ?? 'Unknown User',
+                    ];
+                }),
+            ]);
+        }
     }
