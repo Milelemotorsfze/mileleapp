@@ -197,9 +197,10 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-        // info($request->all());
-        $customer = Clients::find($request->customer_id);
-        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $customer->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
+        info($request->all());
+        // $customer = Clients::find($request->country_id);
+        $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
+        info($LoiCountryCriteria);
         $data = [];
 
         // get the loi count for this customer for thid=s year;
@@ -254,15 +255,15 @@ class LoiCountryCriteriasController extends Controller
 
         if($request->selectedModelLineIds) {
                 $LOIRestrictedCountries = MasterModelLines::with('restricredOrAllowedModelLines')
-                        ->whereHas('restricredOrAllowedModelLines', function($query) use($customer) {
+                        ->whereHas('restricredOrAllowedModelLines', function($query) use($request) {
                             $query->where('is_restricted', true)
-                            ->where('country_id', $customer->country_id);
+                            ->where('country_id', $request->country_id);
                         })->pluck('model_line')->toArray();
 
             $LOIAllowedCountries = MasterModelLines::with('restricredOrAllowedModelLines')
-                        ->whereHas('restricredOrAllowedModelLines', function($query) use($customer) {
+                        ->whereHas('restricredOrAllowedModelLines', function($query) use($request) {
                             $query->where('is_allowed', true)
-                            ->where('country_id', $customer->country_id);
+                            ->where('country_id', $request->country_id);
                         })->pluck('model_line')->toArray();
 
             // info($LOIRestrictedCountries);

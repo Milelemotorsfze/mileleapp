@@ -382,13 +382,14 @@ class MigrationDataCheckController extends Controller
     //     }
     //     return 1;
     
-    //   $LOIS = LetterOfIndent::all();
-    //   info($LOIS->count());
-    //   foreach($LOIS as $LOI) {
-    //     $loiClient = Clients::findOrFail($LOI->client_id);
-    //     $LOI->country_id = $loiClient->country_id ?? '';
-    //     $LOI->save();
-    //   }
+      $LOIS = LetterOfIndent::all();
+      info($LOIS->count());
+      foreach($LOIS as $LOI) {
+        $loiClient = Clients::findOrFail($LOI->client_id);
+        $LOI->country_id = $loiClient->country_id ?? '';
+        $LOI->save();
+      }
+      
     $clients = Clients::where('is_demand_planning_customer', true)->get();
     info($clients->count());
     foreach($clients as $client) {

@@ -521,6 +521,7 @@
             // console.log('reached');
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
+            var country = $('#country').val();
             var customer_type = $('#customer-type').val();
             var date = $('#date').val();
             let total_quantities = 0;
@@ -554,6 +555,7 @@
                     data: {
                         loi_date:date,
                         customer_id: customer[0],
+                        country_id:country[0],
                         customer_type: customer_type,
                         total_quantities:total_quantities,
                         selectedModelLineIds:selectedModelLineIds
