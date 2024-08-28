@@ -589,8 +589,14 @@ class User extends Authenticatable
     public function joiningReport() {
         return $this->hasMany(JoiningReport::class,'employee_id','id');
     }
+
     public function mentionedInComments(): BelongsToMany
     {
         return $this->belongsToMany(WOComments::class, 'comment_user', 'user_id', 'comment_id');
+
+    public function department()
+    {
+        return $this->hasOneThrough(MasterDepartment::class, EmpProfile::class, 'user_id', 'id', 'id', 'department_id');
+
     }
 }

@@ -60,8 +60,8 @@
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
-                            <option value="LHD" {{ $masterModel->steering == "LHS" ? 'selected' : " "}} >LHS</option>
-                            <option value="RHD"  {{ $masterModel->steering == "RHS" ? 'selected' : " "}} >RHS</option>
+                            <option value="LHD" {{ $masterModel->steering == "LHD" ? 'selected' : " "}} >LHD</option>
+                            <option value="RHD"  {{ $masterModel->steering == "RHD" ? 'selected' : " "}} >RHD</option>
                         </select>
                     </div>
                 </div>

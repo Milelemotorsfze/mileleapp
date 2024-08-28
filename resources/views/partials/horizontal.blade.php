@@ -1,4 +1,8 @@
 <style>
+    .dropdown-menu-scrollable {
+        max-height: 90vh; /* Adjust this value as needed */
+        overflow-y: auto;
+    }
     .badge-notification {
       top: -20;
       right: 0;
@@ -905,36 +909,6 @@
                                         <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="" id="topnav-more" role="button">
-                                        <i data-feather="upload-cloud"></i>
-                                        <span data-key="t-extra-pages">Posting Records</span>
-                                        <div class="arrow-down"></div>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                        @php
-                                        $posting_platforms = DB::table('posting_platforms')->get();
-                                        @endphp
-                                        @foreach ($posting_platforms as $posting_platform)
-                                            @php
-                                            $lead_source = DB::table('lead_source')->where('id', $posting_platform->lead_source_id)->first();
-                                            @endphp
-                                            @if($lead_source)
-                                            <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('postingrecords', ['id' => $posting_platform->lead_source_id]) }}" id="topnav-utility" role="button">
-                                                    <span data-key="t-utility">{{$lead_source->source_name}}</span>
-                                                </a>
-                                            </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="shopping-bag"></i>
-                                        <span data-key="t-extra-pages">Purchashing & Payments</span>
-                                    </a>
-                                </li>
                                 @endif
                                 @endcan
                                 @can('View-daily-movemnets')
@@ -1334,6 +1308,16 @@
                                         </div>
                                         @endif
                                         @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vehiclenetsuitecost.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Netsuite Vehicle Price</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('shipping-master');
                                         @endphp
                                         @if ($hasPermission)
@@ -1429,7 +1413,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variantprices.allvariantprice')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Variant Price </span>
                                             </a>
                                         </div>
@@ -1482,7 +1466,7 @@
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">Stock Report</span>
                                         <div class="arrow-down"></div>
@@ -1548,23 +1532,23 @@
 
                 <!-- Second div with role name -->
                 <div class="nav-item rolename-button" id="rolename-dropdown-button">
-                    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
-                        @php
-                        $selectedrole = Auth::user()->selectedRole;
-                        $selected = DB::table('roles')->where('id', $selectedrole)->first();
-                        $roleselected = $selected ? $selected->name : null;
-                        @endphp
-                        {{ $roleselected }}
-                    </button>
-                    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end">
-                        @foreach ($assignedRoles as $role)
-                        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
-                            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        @endforeach
-                    </div>
-                </div>
+    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
+        @php
+        $selectedrole = Auth::user()->selectedRole;
+        $selected = DB::table('roles')->where('id', $selectedrole)->first();
+        $roleselected = $selected ? $selected->name : null;
+        @endphp
+        {{ $roleselected }}
+    </button>
+    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable">
+        @foreach ($assignedRoles as $role)
+        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
+            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
+        </a>
+        <div class="dropdown-divider"></div>
+        @endforeach
+    </div>
+</div>
 
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
@@ -1619,6 +1603,25 @@
                                 ->count();
                             @endphp
                             <span class="badge badge-danger row-badge2 badge-notificationing">{{$notificationcount}}</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('department-notification');
+                        @endphp
+                        @if ($hasPermission)
+                        <a class="dropdown-item" href="{{ route('departmentnotifications.index') }}">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                            @php
+$userDepartmentId = auth()->user()->empProfile->department_id;
+
+$departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('departments', function($query) use ($userDepartmentId) {
+    $query->where('master_departments_id', $userDepartmentId);
+})->whereDoesntHave('viewedLogs', function($query) {
+    $query->where('users_id', auth()->id());
+})->count();
+@endphp
+                            <span class="badge badge-danger row-badge2 badge-notificationing">{{$departmentnotificationscount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif

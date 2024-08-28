@@ -42,6 +42,10 @@ class MasterDepartment extends Model
         }
         return $approvalByEmailName;
     }
+    public function notifications()
+    {
+        return $this->belongsToMany(DepartmentNotifications::class, 'dnaccess', 'master_departments_id', 'department_notifications_id');
+    }
     public function division() {
         return $this->hasOne(MasterDivisionWithHead::class,'id','division_id');
     }

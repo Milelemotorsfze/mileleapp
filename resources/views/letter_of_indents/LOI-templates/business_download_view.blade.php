@@ -40,7 +40,7 @@
         <h3 class="center" style="text-decoration: underline;color: black;font-size: 16px;">Letter of Intent for Automotive Purchase</h3>
         <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
         <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
-        <p>  <span style="font-weight: bold;margin-right:50px;">Address: </span> {{  strtoupper($letterOfIndent->client->country->name) ?? ''}} </p>
+        <p>  <span style="font-weight: bold;margin-right:50px;">Address: </span> {{  strtoupper($letterOfIndent->country->name) ?? ''}} </p>
         <p>Dear Sir/Madam,</p>
 
         <p>I am writing on behalf of {{ strtoupper($letterOfIndent->client->name ?? '') }}  to formally convey our intent to procure automobile(s) from Milele Motors.
@@ -87,7 +87,6 @@
     </div>
 </div>
     @if($letterOfIndent->LOIDocuments->count() > 0)
-        <div class="page_break"></div>
         <div class="row">
             @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
             <img src="{{ public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  class="mt-2">

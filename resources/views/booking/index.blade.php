@@ -112,6 +112,22 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabel">File Viewer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="fileViewer" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="editModalws" tabindex="-1" role="dialog" aria-labelledby="editModalwsLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -170,8 +186,9 @@
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Booking Request ID</th>
+                  <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>Date</th>
                   <th>VIN</th>
                   <th>Brand</th>
@@ -207,7 +224,8 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
-                  <th>Lead ID</th>
+                <th>Sales Person</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -243,8 +261,9 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -280,8 +299,9 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -311,8 +331,9 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Booking Request ID</th>
+                <th>Sales Person</th>
                   <th>SO Number</th>
-                  <th>Lead ID</th>
+                  <th>Qoutation File</th>
                   <th>Date</th>
                   <th>VIN</th>
                   <th>Brand</th>
@@ -351,22 +372,48 @@
             ajax: "{{ route('booking.index', ['status' => 'New']) }}",
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking_requests.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
@@ -393,20 +440,46 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved Without SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -437,21 +510,47 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved With SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -478,21 +577,47 @@
             ajax: "{{ route('booking.index', ['status' => 'Expire']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
@@ -507,22 +632,48 @@
             ajax: "{{ route('booking.index', ['status' => 'Rejected']) }}",
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
+                { data: 'name', name: 'users.name' },
                 { data: 'so_number', name: 'so.so_number' },
                 {
-            data: 'calls_id',
-            name: 'booking.calls_id',
-            render: function (data, type, row) {
-                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
-                return '<a href="' + dynamicUrl + '">' + data + '</a>';
-            }
-        },
+    data: 'file_path',
+    name: 'file_path',
+    searchable: false,
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'variant_details', name: 'varaints.detail' },
+                {
+            data: 'variant_details',
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return '';
+                }
+                
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var fullText = data;
+
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
@@ -661,6 +812,20 @@ $(document).ready(function () {
         const year = date.getFullYear();
         return `${day} - ${month} - ${year}`;
     }
+});
+function showFullText(button) {
+        var fullText = button.getAttribute('data-fulltext');
+        alert(fullText);
+    }
+    function openModalfile(filePath) {
+    const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
+    console.log('File URL:', fileUrl); // Log the URL to the console
+    $('#fileViewer').attr('src', fileUrl);
+    $('#fileModal').modal('show');
+}
+$('#fileModal').on('hidden.bs.modal', function () {
+    $('#fileViewer').attr('src', '');
 });
     </script>
 @else

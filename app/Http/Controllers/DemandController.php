@@ -116,6 +116,8 @@ class DemandController extends Controller
 
         $data = MasterModel::where('model', $request->model);
         if($request->selectedModelIds) {
+            info("inside check");
+            info($request->selectedModelIds);
             $restrictedModelIds = [];
             foreach($request->selectedModelIds as $selectedModelId){
                 $masterModel = MasterModel::find($selectedModelId);

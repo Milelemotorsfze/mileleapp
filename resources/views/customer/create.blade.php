@@ -52,7 +52,7 @@
                         <div class="col-lg-3 col-md-3 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Country</label>
-                                <select class="form-control" name="country_id" id="country" autofocus>
+                                <select class="form-control" name="country_id[]" id="country" multiple autofocus>
                                     <option ></option>
                                     @foreach($countries as $country)
                                         <option value="{{$country->id}}" @if( old('country_id') == $country->id) selected="selected" @endif  > {{ $country->name }} </option>
@@ -193,7 +193,7 @@
                 type: {
                     required: true,
                 },
-                country_id: {
+                "country_id[]": {
                     required: true,
                 },
                 passport_file:{

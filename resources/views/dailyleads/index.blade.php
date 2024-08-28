@@ -1012,6 +1012,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Sales Notes</th>
                   <th>So Number</th>
                   <th>SO Update</th>
+                  <th>SO Cancel</th>
                   <!-- <th>Booking Vehicles</th> -->
                 </tr>
               </thead>
@@ -2885,7 +2886,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
-                { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
+                { data: 'cdealvalues', name: 'cdealvalues', searchable: false},
                 {
     data: 'csalesnotes',
     name: 'csalesnotes',
@@ -2905,8 +2906,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             return `<span class="remarks-text">${data}</span>`;
         }
     }
-},
-                { data: 'so_number', name: 'so_number', searchable: false},
+              },
+              { data: 'so_number', name: 'so.so_number', searchable: true },
               {
               data: 'id',
               name: 'id',
@@ -2919,6 +2920,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
               </a>`;
               }
               },
+              {
+            data: 'id',  // Use the ID of the sales order
+            name: 'cancel',
+            searchable: false,
+            orderable: false,
+            render: function (data, type, row) {
+                return `
+                <button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">
+                    Cancel SO
+                </button>`;
+            }
+        },
             ]
         });
         dataTable7 =   $('#dtBasicExample7').DataTable({
@@ -3360,6 +3373,14 @@ setInterval(updateRemainingTime, 1000);
         }
     }
   </script>
+   <script>
+        // Global definition of the cancelSO function
+        function cancelSO(id) {
+            if (confirm('Are you sure you want to cancel this Sales Order?')) {
+                window.location.href = `{{ url('salesorder/cancel') }}/${id}`;
+            }
+        }
+    </script>
 @else
     @php
         redirect()->route('home')->send();

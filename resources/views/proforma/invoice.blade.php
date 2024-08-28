@@ -100,6 +100,7 @@
     border: 1px solid #FFFF00;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    vertical-align: middle;
 }
 .circle-buttonr::before {
     content: 'X';
