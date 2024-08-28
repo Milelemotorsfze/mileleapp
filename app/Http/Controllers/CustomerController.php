@@ -35,7 +35,7 @@ class CustomerController extends Controller
            $clientCustomers  = Country::with('clientCountries')
             ->whereHas('clientCountries', function($query) use($customer) {
                 $query->where('client_id', $customer->id);
-            })->pluck('name')->torray();
+            })->pluck('name')->toArray();
             $customer->country = implode(",", $clientCustomers);
         }
 
