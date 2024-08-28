@@ -353,13 +353,7 @@ class MovementController extends Controller
         }
     }
 }    
-        $data = Movement::get();
-        $vehicles = Vehicles::whereNotNull('vin')
-        ->where('status', '!=', 'cancel')
-        ->pluck('vin', 'varaints_id'); 
-        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
-        $movementreference = MovementsReference::get(); 
-        return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
+return redirect()->back()->with('success', 'Transition has been successfully Saved!');
     }    
     /**
      * Display the specified resource.
