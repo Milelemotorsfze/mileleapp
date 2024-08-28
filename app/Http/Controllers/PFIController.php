@@ -166,6 +166,19 @@ class PFIController extends Controller
                 $unitPrice = $pfiItem['unit_price'][$keyValue];
 
                 $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
+                $latestRow = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+                    $length = 6;
+                    $offset = 2;
+                    $prefix = "P ";
+                    if($latestRow){
+                        $latestUUID =  $latestRow->code;
+                        $latestUUIDNumber = substr($latestUUID, $offset, $length);
+
+                        $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+                        $code =  $prefix.$newCode;
+                    }else{
+                        $code = $prefix.'001';
+                    }
                 $pfiItemRow = new PfiItem();
                 $pfiItemRow->pfi_id = $pfi->id;
                 if($loiItemId != 'NULL') {
