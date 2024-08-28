@@ -212,8 +212,7 @@ class LetterOfIndentController extends Controller
             'dealers' => 'required'
           
         ]);
-        // return $request->all();
-
+       
         $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
@@ -561,6 +560,7 @@ class LetterOfIndentController extends Controller
             'date' => 'required',
             'dealers' => 'required'
         ]);
+        // return $request->all();
 
         $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
