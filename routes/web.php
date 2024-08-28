@@ -176,6 +176,7 @@ Route::get('/d', function () {
     Route::post('/update-history-info', [ProfileController::class, 'updatehistoryInfo'])->name('profile.updatehistoryInfo');
     // User
     Route::resource('users', UserController::class);
+    Route::get('/users-search', [UserController::class, 'searchUsers']);
     Route::get('users/updateStatus/{id}', [UserController::class, 'updateStatus'])->name('users.updateStatus');
     Route::get('users/makeActive/{id}', [UserController::class, 'makeActive'])->name('users.makeActive');
     Route::get('users/restore/{id}', [UserController::class, 'restore'])->name('users.restore');

@@ -21,6 +21,7 @@ use App\Models\HRM\Employee\Leave;
 use App\Models\HRM\Employee\OverTime;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -588,8 +589,14 @@ class User extends Authenticatable
     public function joiningReport() {
         return $this->hasMany(JoiningReport::class,'employee_id','id');
     }
+
+    public function mentionedInComments(): BelongsToMany
+    {
+        return $this->belongsToMany(WOComments::class, 'comment_user', 'user_id', 'comment_id');
+
     public function department()
     {
         return $this->hasOneThrough(MasterDepartment::class, EmpProfile::class, 'user_id', 'id', 'id', 'department_id');
+
     }
 }

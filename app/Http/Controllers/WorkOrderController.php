@@ -570,8 +570,52 @@ class WorkOrderController extends Controller
                             ]);
                         }
                     }
+
+                    // Handle mentioned users
+                    if (isset($comment['mentioned_users'])) {
+                        WOComments::find($newCommentId)->mentionedUsers()->attach($comment['mentioned_users']);
+                    }
+
+                    // Extract mentioned users from the text
+                    preg_match_all('/@\[([^\]]+)\]/', $comment['text'] ?? '', $matches);
+                    $mentionedUserNames = $matches[1];
+
+                    if (!empty($mentionedUserNames)) {
+                        $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+
+                        foreach ($mentionedUsers as $user) {
+                            // Queue email notifications for efficiency
+                            dispatch(function () use ($workOrder, $newCommentId, $user) {
+                                $template = [
+                                    'from' => 'no-reply@milele.com',
+                                    'from_name' => 'Milele Matrix'
+                                ];
+                                $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                                $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                                $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                                $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
+                            
+                                // Retrieve the comment object from the database
+                                $comment = WOComments::find($newCommentId);
+                            
+                                Mail::send('work_order.emails.mentioned_in_comment', [
+                                    'workOrder' => $workOrder,
+                                    'accessLink' => $accessLink,
+                                    'accessLinkWithComment' => $accessLinkWithComment,
+                                    'comment' => $comment, // This ensures $comment is an object
+                                    'user' => $user // Pass the user object to the view
+                                ], function ($message) use ($subject, $template, $user) {
+                                    $message->from($template['from'], $template['from_name'])
+                                            ->to($user->email)
+                                            ->subject($subject);
+                                });
+                            })->onQueue('emails');
+                            
+                        }
+                    }
                 }
             }
+
             if(isset($request->deposit_received_as) && $request->deposit_received_as != '') {
                 $canCreateFinanceApproval = true;
             }
@@ -2050,9 +2094,12 @@ class WorkOrderController extends Controller
     {
         // Validate the request data, making 'text' nullable
         $request->validate([
-            'text' => 'nullable|string|max:255', // 'text' is now nullable
+            'text' => 'nullable|string|max:255',
             'parent_id' => 'nullable|integer|exists:w_o_comments,id',
-            'work_order_id' => 'required|integer|exists:work_orders,id'
+            'work_order_id' => 'required|integer|exists:work_orders,id',
+            'mentioned_users' => 'array',
+            'mentioned_users.*' => 'exists:users,id',
+            'files.*' => 'file|mimes:jpg,png,pdf|max:2048', // File validation
         ]);
     
         // Check if text is null and there are no files
@@ -2069,24 +2116,54 @@ class WorkOrderController extends Controller
             'parent_id' => $request->input('parent_id'),
             'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
         ]);
-        $files = [];
+        $workOrder = WorkOrder::find($comment->work_order_id);
         if ($request->hasFile('files')) {
+            $files = [];
             foreach ($request->file('files') as $file) {
-                $fileData = base64_encode(file_get_contents($file->getRealPath()));
                 $files[] = [
                     'file_name' => $file->getClientOriginalName(),
-                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . $fileData
+                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath())),
                 ];
             }
-        }
-    
-        // Assuming you have a relation set up for files on the comment model
-        if (!empty($files)) {
             $comment->files()->createMany($files);
         }
-    
-        // Respond with the comment and files data
-        return response()->json($comment->load('files','user'), 201);
+
+        if ($request->has('mentioned_users')) {
+            $comment->mentionedUsers()->attach($request->input('mentioned_users'));
+        }
+
+        // Extract mentioned users from the text
+        preg_match_all('/@\[([^\]]+)\]/', $text, $matches);
+        $mentionedUserNames = $matches[1];
+
+        if (!empty($mentionedUserNames)) {
+            $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+        
+            foreach ($mentionedUsers as $user) {
+                // Queue email notifications for efficiency
+                dispatch(function () use ($workOrder, $comment, $user) {
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                    $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                    $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                    $accessLinkWithComment = $accessLink . '#comment-' . $comment->id;
+                    Mail::send('work_order.emails.mentioned_in_comment', [
+                        'workOrder' => $workOrder,
+                        'accessLink' => $accessLink,
+                        'accessLinkWithComment' => $accessLinkWithComment,
+                        'comment' => $comment,
+                        'user' => $user // Pass the user variable to the view
+                    ], function ($message) use ($subject, $template, $user) {
+                        $message->from($template['from'], $template['from_name'])
+                                ->to($user->email)
+                                ->subject($subject);
+                    });
+                })->onQueue('emails');
+            }
+        }
+
+        return response()->json($comment->load('files', 'mentionedUsers', 'user'), 201);
     }
     // public function getComments($workOrderId)
     // {

@@ -1,4 +1,8 @@
-<style>
+<script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script>
+
+<!-- Include At.js -->
+<script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script>
+<link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"><style>
     .file-preview {
         position: relative;
         display: flex;
@@ -138,10 +142,26 @@
 
         if (commentText.trim() === '' && commentFiles.length === 0) return;
 
+        // Extract mentioned user IDs using a regular expression
+        const mentionedUserIds = [];
+        const mentionPattern = /@(\w+)/g;
+        let match;
+        while ((match = mentionPattern.exec(commentText)) !== null) {
+            mentionedUserIds.push(match[1]); // Push the user ID or username
+        }
         // Disable the submit button to prevent multiple submissions
         const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
         submitButton.prop('disabled', true);
 
+         // Check file sizes before appending them to FormData
+        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
+        for (const file of commentFiles) { // Changed from filesInput to commentFiles
+            if (file.size > maxFileSize) {
+                alert(`The file ${file.name} exceeds the 2MB size limit.`);
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                return;
+            }
+        }
         const currentDateTime = new Date();
         const formattedDateTime = formatDateTime(currentDateTime);
 
