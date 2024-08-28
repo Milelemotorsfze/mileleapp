@@ -36,6 +36,21 @@
                 </ul>
             </div>
         @endif
+        @if(session('success'))
+    <div class="alert alert-success" id="success-message">
+        {{ session('success') }}
+    </div>
+
+    <script>
+        // Set a timeout to remove the success message after 5 seconds
+        setTimeout(function() {
+            var successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                successMessage.style.display = 'none';
+            }
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
+@endif
         <form action="{{ route('movement.store') }}" method="POST" id="purchasing-order">
         @csrf
         <div class="row">
