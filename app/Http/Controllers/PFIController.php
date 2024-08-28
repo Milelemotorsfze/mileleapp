@@ -139,6 +139,7 @@ class PFIController extends Controller
         $pfi->delivery_location = $request->delivery_location;
         $pfi->currency = $request->currency;
         $pfi->supplier_id = $request->supplier_id;
+        $pfi->country_id = $request->country_id;
 //        $pfi->released_amount = $request->released_amount;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
@@ -422,24 +423,22 @@ class PFIController extends Controller
         return response(true);
 
     }
-    public function getUnitPrice(Request $request) {
-        $supplier = Supplier::find($request->supplier_id);
-            // foreach ($request->loi_item_ids as $item) {
-                $loiItem = LetterOfIndentItem::find($loiItem->id);
+    // public function getUnitPrice(Request $request) {
+    //     $supplier = Supplier::find($request->supplier_id);
+    //             $loiItem = LetterOfIndentItem::find($loiItem->id);
 
-                if($supplier->is_MMC == true) {
-                    $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
-                }else if($supplier->is_AMS == true) {
-                    $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
-                }else{
-                    $price = 0;
-                }
-                $data['unit_price'] = $price;
-            // }
+    //             if($supplier->is_MMC == true) {
+    //                 $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
+    //             }else if($supplier->is_AMS == true) {
+    //                 $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+    //             }else{
+    //                 $price = 0;
+    //             }
+    //             $data['unit_price'] = $price;
         
-        return $data;
+    //     return $data;
 
-    }
+    // }
     public function paymentStatusUpdate(Request $request, $id) {
 
         (new UserActivityController)->createActivity('PFI payment status updated.');
@@ -491,7 +490,7 @@ class PFIController extends Controller
            }
         }                
         $data['codes'] = $loiItems->get();
-        info($data['codes']);
+        // info($data['codes']);
        $data['master_model_id'] = $masterModel->id;
        return response($data);
     }
@@ -563,7 +562,7 @@ class PFIController extends Controller
        
     }
     public function getLOIItemDetails(Request $request) {
-        info($request->all());
+        // info($request->all());
         $data = [];
         $supplier = Supplier::find($request->supplier_id);
         $loiItem = LetterOfIndentItem::find($request->loi_item_id);
@@ -587,14 +586,13 @@ class PFIController extends Controller
     }
 
     public function getCustomerCountries(Request $request) {
-        info($request->all());
 
-        $countries = Country::with('clients')
-            ->whereHas('clients', function($query) use($request){
-            $query->select('id','country_id')->where('id', $request->client_id);
+        $countries = Country::with('clientCountries')
+            ->whereHas('clientCountries', function($query) use($request){
+            $query->where('client_id', $request->client_id);
             })->get();
 
-            return response($countries);
+        return response($countries);
 
     }
 }

@@ -118,7 +118,7 @@
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Document</label>
-                                                    <input type="file" id="file" class="form-control widthinput" name="file" accept="application/pdf">
+                                                    <input type="file" id="file" class="form-control widthinput" name="file">
                                                 </div>
                                             </div>
                                           
@@ -260,6 +260,13 @@
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
                 }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile.appendChild(image);
+                }
         });
 
           let loi_id = '{{ request()->id }}';
@@ -291,15 +298,15 @@
         $("#form-create").validate({
             ignore: [],
             rules: {
-                // pfi_reference_number: {
-                // required: true,
-                // },
-                // pfi_date: {
-                //     required: true,
-                // },
-                // amount: {
-                //     required: true,
-                // },
+                pfi_reference_number: {
+                required: true,
+                },
+                pfi_date: {
+                    required: true,
+                },
+                amount: {
+                    required: true,
+                },
                 supplier_id:{
                     required:true
                 },
@@ -316,20 +323,20 @@
                     required: true
                 },
                 
-                // file: {
-                //     required:true,
-                //     extension: "pdf|png|jpg|jpeg|svg",
-                //     maxsize:5242880 
-                // },
+                file: {
+                    required:true,
+                    extension: "pdf|png|jpg|jpeg|svg",
+                    maxsize:5242880 
+                },
                
             },
                 
-            // messages: {
-            //     file: {
-            //         extension: "Please upload file format (pdf)"
-            //     },
+            messages: {
+                file: {
+                    extension: "Please upload file format (pdf,png,jpg,jpeg,svg)"
+                },
                 
-            // },
+            },
             
         });
 
@@ -429,29 +436,29 @@
             calculatePfiAmount();
         }
 
-        // $('form').on('submit', function(e){
-        //     $('.overlay').show();
+        $('form').on('submit', function(e){
+            $('.overlay').show();
             
-        //     let quantitySum = 0;
-        //     $('.pfi-quantities').each(function() {
-        //         var quantity = $(this).val();
-        //         quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
+            let quantitySum = 0;
+            $('.pfi-quantities').each(function() {
+                var quantity = $(this).val();
+                quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
                 
-        //     });
-        //     console.log(quantitySum);
-        //     if(quantitySum <= 0) {
-        //         $('.overlay').hide();
-        //         e.preventDefault();
-        //         alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
-        //     }else {
-        //         if($("#form-create").valid()) {
-        //             $('#form-create').submit();
-        //         }else{
-        //             $('.overlay').hide();
-        //             e.preventDefault();
-        //         }
-        //     }
-        // });
+            });
+            console.log(quantitySum);
+            if(quantitySum <= 0) {
+                $('.overlay').hide();
+                e.preventDefault();
+                alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
+            }else {
+                if($("#form-create").valid()) {
+                    $('#form-create').submit();
+                }else{
+                    $('.overlay').hide();
+                    e.preventDefault();
+                }
+            }
+        });
 
         ///// start new code ////
       
@@ -479,6 +486,7 @@
         $(document.body).on('select2:unselect', "#client_id", function (e) {
             
             let data =  e.params.data.id;
+            $('#country_id').empty();
            // chcek any item selcted 
            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
 
@@ -590,7 +598,7 @@
            $('#unit-price-'+index+'-item-'+childIndex).val("");
            $('#total-amount-'+index+'-item-'+childIndex).val("");
            $('#master-model-id-'+index+'-item-'+childIndex).val("");
-           $('#pfi-quantity-'+index+'-item-'+childIndex).valid();
+           $('#pfi-quantity-'+index+'-item-'+childIndex).removeClass('is-invalid');
            $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
        }
         $(document.body).on('select2:select', ".sfx", function (e) {
@@ -600,6 +608,9 @@
                 // if selected sfx is in the parent row hide corresponding model in every parent line items
             if(childIndex == 0) {
                 hideParentModel(index);
+                hideParentSFX(index);
+                let type = 'all';
+                getChildModels(index,0,type);
             }
             getLOIItemCode(index, childIndex);
             enableOrDisableAddMoreButton(index);
@@ -614,6 +625,7 @@
             $('#master-model-id-'+index+'-item-'+childIndex).val("");
                // if unselected sfx is in the parent row append corresponding model in every parent line items
             if(childIndex == 0) {
+                appendParentSFX(index,value);
                 let childIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=0; j<=childIndex;j++) 
                 {
@@ -627,7 +639,7 @@
             }else{
                 var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
                 var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
-                appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText,model,value);
+                appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText,model[0],value);
                 resetRowData(index,childIndex);
             }
            
@@ -654,9 +666,8 @@
             $('#unit-price-'+index+'-item-'+childIndex).val("");
             $('#total-amount-'+index+'-item-'+childIndex).val("");
             $('#pfi-quantity-'+index+'-item-'+childIndex).val("");
-            $('#pfi-quantity-'+index+'-item-'+childIndex).valid();
             $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
-
+            $('#pfi-quantity-'+index+'-item-'+childIndex).removeClass('is-invalid');
         });
 
         $(document.body).on('click', ".add-more", function (e) {
@@ -723,9 +734,8 @@
                     let parentSfx = $('#sfx-'+index+'-item-0').val();
                     // populate child models if parent have value
                     if(parentSfx[0]) {
-                        // let type = 'add-new';
-                        getChildModels(index,item);
-                        // getModels(index,item,type); 
+                        let type = 'add-new';
+                        getChildModels(index,item,type);
 
                     }else{
                        $('#model-'+index+'-item-'+item).select2({
@@ -1141,7 +1151,7 @@
                 });
             // }          
        }
-       function getChildModels(index,item) {
+       function getChildModels(index,item,type) {
             let customer = $('#client_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
@@ -1156,12 +1166,10 @@
                             sfx:parentSfx[0],
                             is_child:'Yes',
                             customer:customer[0]
-                            // is_parent_model: 'YES'
                         },
                     dataType : 'json',
                     success: function(data) {
-                        var size = data.length;
-                    
+                        let rowIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                         let modelDropdownData   = [];
                         $.each(data,function(key,value)
                         {
@@ -1171,13 +1179,25 @@
                                 text: value.model
                             });
                         });
-                        
-                        $('#model-'+index+'-item-'+item).html("");
-                        $('#model-'+index+'-item-'+item).select2({
-                            placeholder: 'Select Model',
-                            data: modelDropdownData,
-                            maximumSelectionLength: 1,
-                        });
+                        if(type == 'add-new') {
+                            $('#model-'+index+'-item-'+item).html("");
+                            $('#model-'+index+'-item-'+item).select2({
+                                placeholder: 'Select Model',
+                                data: modelDropdownData,
+                                maximumSelectionLength: 1,
+                            });
+                        } else{
+                                for(let i=1; i<=rowIndex; i++)
+                                {
+                                    $('#model-'+index+'-item-'+i).html("");
+                                    $('#model-'+index+'-item-'+i).select2({
+                                        placeholder: 'Select Model',
+                                        data: modelDropdownData,
+                                        maximumSelectionLength: 1,
+                                    });
+                                }
+                            }
+                       
                         $('.overlay').hide();
                     }
                 });
@@ -1227,14 +1247,13 @@
             var selectedId = 'model-'+index+'-item-0';
             let model = $('#model-'+index+'-item-0').val(); 
             let sfx = $('#sfx-'+index+'-item-0').val(); 
-            console.log(model[0]);
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
                 for(let i=1; i<=parentIndex;i++) 
                 { 
                     var currentId = 'model-'+i+'-item-0';
                     let currentModel = $('#' + currentId).val();
                     let currentsfx = $('#sfx-'+i+'-item-0').val(); 
-                    if(selectedId != currentId && model == currentModel[0] && sfx == currentsfx[0]) {                  
+                    if(selectedId != currentId && model[0] == currentModel[0] && sfx[0] == currentsfx[0]) {                  
                         $('#' + currentId + ' option[value=' + model[0] + ']').detach(); 
                         // if(currentModel[0] == model[0]) {
                             $('#sfx-'+i+'-item-0').empty();
@@ -1256,6 +1275,40 @@
                         $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}));    
                     }
                 }
+        }
+        function hideParentSFX(index) {
+            var selectedId = 'sfx-'+index+'-item-0';
+            let model = $('#model-'+index+'-item-0').val(); 
+            let sfx = $('#sfx-'+index+'-item-0').val(); 
+            console.log(model[0]);
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
+                { 
+                    var currentId = 'sfx-'+i+'-item-0';
+                    let currentModel = $('#model-'+i+'-item-0').val(); 
+                    if(selectedId != currentId && model[0] == currentModel[0] ) {                  
+                        $('#' + currentId + ' option[value=' + sfx[0] + ']').detach(); 
+                        // if(currentModel[0] == model[0]) {
+                            // $('#sfx-'+i+'-item-0').empty();
+                        // }
+                      
+                    }
+                }
+                  
+        }
+        function appendParentSFX(index,value) {
+            var selectedId = 'sfx-'+index+'-item-0';
+            let model = $('#model-'+index+'-item-0').val(); 
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
+                { 
+                    var currentId = 'sfx-'+i+'-item-0';
+                    let currentModel = $('#model-'+i+'-item-0').val(); 
+                    if(selectedId != currentId && model[0] == currentModel[0] ) {                  
+                        $('#sfx-'+i+'-item-0').append($('<option>', {value: value, text : value})); 
+                      
+                    }
+                }                
         }
         function enableOrDisableAddMoreButton(index) {
             // check any customer is selected or not
@@ -1281,6 +1334,7 @@
                     },
                     success:function (data) {
                         console.log(data);
+                        $('#country_id').empty();
                         jQuery.each(data, function(key,value){
                             $('#country_id').append('<option value="'+ value.id +'">'+ value.name+'</option>');
                          });
