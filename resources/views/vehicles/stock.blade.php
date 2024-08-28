@@ -736,6 +736,7 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>GRN Report</th>
                   <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
@@ -801,6 +802,8 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>GRN Report</th>
+                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
@@ -865,6 +868,8 @@
                   <th>Sales Person</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>GRN Report</th>
+                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
@@ -1212,7 +1217,8 @@
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                if (row.pdi_inspectionid) {
+                console.log(row);
+                if (row.grn_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
                 } else {
                     return 'Not Available';
@@ -1228,7 +1234,8 @@
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                if (row.id) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
                     return 'Not Available';
@@ -1697,7 +1704,19 @@ var columns6 = [
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                if (row.id) {
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
                     return 'Not Available';
@@ -1903,6 +1922,29 @@ var hideAllButton = $('<button>')
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' }, 
+                { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
@@ -2125,6 +2167,29 @@ if (hasPricePermission) {
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 { data: 'gdndate', name: 'gdn.date' },
+                { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
