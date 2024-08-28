@@ -1553,7 +1553,7 @@
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
                     <button class="btn username-toggle header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
-                        <img class="rounded-circle header-profile-user" src="{{ asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;">
+                    <img class="rounded-circle header-profile-user" src="{{ auth()->user()->empProfile && auth()->user()->empProfile->image_path ? asset(auth()->user()->empProfile->image_path) : asset('images/users/avatar-1.jpg.jpg') }}" alt="Header Avatar" style="float: left;padding: 0px!important;">
                         <span class="d-none d-xl-inline-block fw-medium user-textname-div" style="line-height: 35px;">
                             @php
                             $userName = auth()->user()->name;

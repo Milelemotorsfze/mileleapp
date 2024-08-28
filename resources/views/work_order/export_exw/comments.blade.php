@@ -814,7 +814,15 @@
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
                 <div class="row">
                     <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-                        <img class="rounded-circle header-profile-user" src="{{ env('BASE_URL') }}/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+                        <img class="rounded-circle header-profile-user" 
+                            src="${
+                                !commentData.user ? 
+                                    '{{ env('BASE_URL') }}/images/users/3-robot.jpg' : 
+                                    commentData.user.emp_profile && commentData.user.emp_profile.image_path ? 
+                                        '{{ env('BASE_URL') }}/' + commentData.user.emp_profile.image_path : 
+                                        '{{ env('BASE_URL') }}/images/users/OIP.jpg' 
+                            }" 
+                            alt="Header Avatar" style="float: left;padding: 0px!important;">
                     </div>
                     <div class="col-xxl-11 col-lg-11 col-md-11">
                         <div class="comment-text" style="font-size:12px;">
