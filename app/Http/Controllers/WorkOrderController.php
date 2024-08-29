@@ -163,8 +163,10 @@ class WorkOrderController extends Controller
             'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
         ]);
 
-        // Build the query with conditional adjustments
-        $datas = WorkOrder::where('type', $type)
+      // Build the query with conditional adjustments
+        $datas = WorkOrder::when($type !== 'all', function ($query) use ($type) {
+                return $query->where('type', $type);
+            })
             ->when($hasLimitedAccess, function ($query) use ($authId) {
                 return $query->where('created_by', $authId);
             })

@@ -139,7 +139,18 @@
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
 
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','list-export-exw-wo']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('work-order.index','all')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> List All</span>
+                                            </a>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','list-export-exw-wo','view-current-user-export-exw-wo-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
@@ -181,7 +192,7 @@
                                                 <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo','list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('work-order.index','export_cnf') }}" class="dropdown-item" data-key="t-login">List</a>
@@ -207,7 +218,7 @@
                                                 <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('work-order.index','local_sale') }}" class="dropdown-item" data-key="t-login">List</a>
