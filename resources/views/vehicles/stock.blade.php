@@ -253,6 +253,7 @@
                 <input type="hidden" name="vehicle_id" id="vehicle_id">
                 <div class="modal-header">
                     <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
+                    <button type="button" style="margin-left: 10px;" class="btn btn-danger" id="cancelBookingButton">Cancel Booking</button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -267,6 +268,7 @@
                     <div class="form-group">
                         <label for="user_id">Sales Person</label>
                         <select class="form-control" id="salesperson" name="salesperson" required>
+                        <option value="" disabled selected>Select the Sales Person</option>
                         @foreach($salesperson as $salesperson)
                                 <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
                             @endforeach
@@ -2896,5 +2898,30 @@ $(document).ready(function() {
         sendReply(messageId);
     });
 });
+</script>
+<script>
+    document.getElementById('cancelBookingButton').addEventListener('click', function() {
+        var vehicleId = document.getElementById('vehicle_id').value;
+        
+        if(confirm('Are you sure you want to cancel this booking?')) {
+            // Send AJAX request to cancel booking
+            fetch('{{ route('booking.canceling') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ vehicle_id: vehicleId })
+            }).then(response => response.json())
+              .then(data => {
+                  if(data.success) {
+                      alert('Booking canceled successfully.');
+                      $('#bookingModal').modal('hide');
+                  } else {
+                      alert('Failed to cancel the booking.');
+                  }
+              }).catch(error => console.error('Error:', error));
+        }
+    });
 </script>
 @endsection
