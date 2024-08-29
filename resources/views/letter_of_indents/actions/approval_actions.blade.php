@@ -95,7 +95,7 @@
                                             <dt class="form-label font-size-13 text-muted">Country :</dt>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
+                                            <dl>{{ $letterOfIndent->country->name ?? '' }} </dl>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -186,7 +186,7 @@
                                 <dt class="form-label font-size-13 text-muted">Country :</dt>
                             </div>
                             <div class="col-lg-8 col-md-12 col-sm-12">
-                                <dl>{{ $letterOfIndent->client->country->name ?? '' }} </dl>
+                                <dl>{{ $letterOfIndent->country->name ?? '' }} </dl>
                             </div>
                         </div>
                         <div class="row">

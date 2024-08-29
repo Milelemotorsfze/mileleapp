@@ -570,8 +570,52 @@ class WorkOrderController extends Controller
                             ]);
                         }
                     }
+
+                    // Handle mentioned users
+                    if (isset($comment['mentioned_users'])) {
+                        WOComments::find($newCommentId)->mentionedUsers()->attach($comment['mentioned_users']);
+                    }
+
+                    // Extract mentioned users from the text
+                    preg_match_all('/@\[([^\]]+)\]/', $comment['text'] ?? '', $matches);
+                    $mentionedUserNames = $matches[1];
+
+                    if (!empty($mentionedUserNames)) {
+                        $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+
+                        foreach ($mentionedUsers as $user) {
+                            // Queue email notifications for efficiency
+                            dispatch(function () use ($workOrder, $newCommentId, $user) {
+                                $template = [
+                                    'from' => 'no-reply@milele.com',
+                                    'from_name' => 'Milele Matrix'
+                                ];
+                                $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                                $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                                $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                                $accessLinkWithComment = $accessLink . '#comment-' . $newCommentId;
+                            
+                                // Retrieve the comment object from the database
+                                $comment = WOComments::find($newCommentId);
+                            
+                                Mail::send('work_order.emails.mentioned_in_comment', [
+                                    'workOrder' => $workOrder,
+                                    'accessLink' => $accessLink,
+                                    'accessLinkWithComment' => $accessLinkWithComment,
+                                    'comment' => $comment, // This ensures $comment is an object
+                                    'user' => $user // Pass the user object to the view
+                                ], function ($message) use ($subject, $template, $user) {
+                                    $message->from($template['from'], $template['from_name'])
+                                            ->to($user->email)
+                                            ->subject($subject);
+                                });
+                            })->onQueue('emails');
+                            
+                        }
+                    }
                 }
             }
+
             if(isset($request->deposit_received_as) && $request->deposit_received_as != '') {
                 $canCreateFinanceApproval = true;
             }
@@ -628,7 +672,12 @@ class WorkOrderController extends Controller
                         ->to([$financeEmail, $managementEmail, $operationsEmail])
                         ->subject($subject);
             });
-
+            $checkRecords = $workOrder->dataHistories()
+                ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                ->exists();
+            if ($checkRecords) {
+                $this->sendSOAmountUpdateEmail($workOrder,null);
+            }
             // Commit the transaction
             DB::commit(); 
             
@@ -641,6 +690,93 @@ class WorkOrderController extends Controller
             Log::error('Error creating Work Order: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+    private function sendSOAmountUpdateEmail($workOrder,$comment) {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+        // Construct the email subject
+        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        // Retrieve and validate email addresses from .env
+        $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        // Retrieve the CreatedBy user's email and validate it
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
+        // Check if any email is invalid and handle the error
+        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'financeEmail' => env('FINANCE_TEAM_EMAIL'),
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
+                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
+
+        // Get the current date and time in d M Y, h:i:s A format
+        $currentDateTime = now()->format('d M Y, h:i:s A');
+        // Send email using a Blade template
+        Mail::send('work_order.emails.amount_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
+            $message->from($template['from'], $template['from_name'])
+                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
+                    ->subject($subject);
+        });
+    }
+    private function sendDataUpdateEmail($workOrder,$comment) {
+        // Prepare the from details
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+
+        // Handle cases where customer_name is null
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+        // Construct the email subject
+        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+
+        // Define a quick access link (adjust the route as needed)
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        // Retrieve and validate email addresses from .env
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        // Check if any email is invalid and handle the error
+        if (!$managementEmail || !$operationsEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
+
+        // Get the current date and time in d M Y, h:i:s A format
+        $currentDateTime = now()->format('d M Y, h:i:s A');
+        // Send email using a Blade template
+        Mail::send('work_order.emails.data_update', [
+            'workOrder' => $workOrder,
+            'accessLink' => $accessLink,
+            'authUserName' => $authUserName, // Pass the authenticated user's name
+            'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'comment' => $comment,
+        ], function ($message) use ($subject, $managementEmail, $operationsEmail, $template) {
+            $message->from($template['from'], $template['from_name'])
+                    ->to([$managementEmail, $operationsEmail])
+                    ->subject($subject);
+        });
     }
     private function sendVehicleUpdateEmail($workOrder,$newComment) {
         // Prepare the from details
@@ -1253,7 +1389,6 @@ class WorkOrderController extends Controller
                     $createVehComMap['vehicle_id'] = $vehicle->id;
                     $createVehComMap['wo_id'] = $workOrder->id;
                     $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
-                    $canDeleteComment = false;
                     $canDeleteCreatedVehComMap = true;
 
                     $vehicleData['updated_by'] = Auth::id();
@@ -1394,9 +1529,7 @@ class WorkOrderController extends Controller
                             $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                             $createCommVehAddon['addon_id'] = $woVehicleAddon->id;
                             $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
-                            $canDeleteCreatedVehComMap = false;
                             $canDeleteCreateVehComAddMap = true;
-                            $canDeleteComment = false;
                             $processedAddonIds[] = $woVehicleAddon->id; // Append ID to array
                             // Filter out non-null, non-array values, and exclude specified fields
                             $nonNullVehicleData = array_filter($addonData, function ($value, $key) use ($excludeVehicleAddonFields) {
@@ -1422,6 +1555,9 @@ class WorkOrderController extends Controller
                                 if($deleteCreateVehComAddMap) {
                                     $deleteCreateVehComAddMap->delete();
                                 }
+                            }
+                            else {
+                                $canDeleteCreatedVehComMap = false;
                             }
                         }
                     }
@@ -1450,14 +1586,15 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                        $canDeleteComment = true;
+                    }
+                    else {
+                        $canDeleteComment = false;
                     }
                     // ADDON END..............................
                 } else {
                     $vehicleData['work_order_id'] = $workOrder->id;
                     $vehicleData['created_by'] = Auth::id();
                     $vehicleData['comment_id'] = $CommentId;
-                    $canDeleteComment = false;
                     $woVehicles = WOVehicles::create($vehicleData);
                     $canCreateCOOApproval = true;
                     $createVehComMap = [];
@@ -1466,7 +1603,6 @@ class WorkOrderController extends Controller
                     $createVehComMap['vehicle_id'] = $woVehicles->id;
                     $createVehComMap['wo_id'] = $workOrder->id;
                     $CreatedVehComMap = CommentVehicleMapping::create($createVehComMap);
-                    $canDeleteComment = false;
                     $canDeleteCreatedVehComMap = true;
 
                     // Push the newly created vehicle's ID into the array
@@ -1514,7 +1650,6 @@ class WorkOrderController extends Controller
                                     $createCommVehAddon['comment_vehicle_mapping_id'] = $CreatedVehComMap->id;
                                     $createCommVehAddon['addon_id'] = $WOVehicleAddons->id;
                                     $createdCommVehAddonMapp = CommentVehicleAddonMapping::create($createCommVehAddon);
-                                    $canDeleteCreatedVehComMap = false;
                                     $canDeleteCreateVehComAddMap = true;
                                     // Filter out non-null, non-array values, and exclude specified fields
                                     $excludeVehicleAddonFields = [
@@ -1545,6 +1680,8 @@ class WorkOrderController extends Controller
                                         if($deleteCreateVehComAddMap) {
                                             $deleteCreateVehComAddMap->delete();
                                         }
+                                    }else {
+                                        $canDeleteCreatedVehComMap = false; 
                                     }
                                 }
                             }
@@ -1557,7 +1694,9 @@ class WorkOrderController extends Controller
                         if($deleteCommVehMap) {
                             $deleteCommVehMap->delete();
                         }
-                        $canDeleteComment = true;
+                    }
+                    else {
+                        $canDeleteComment = false;
                     }
                 }
             }
@@ -1732,7 +1871,6 @@ class WorkOrderController extends Controller
                                     $canCreateFinanceApproval = true;
                                 }
                                 else {
-                                    // dd('9');
                                     // Create history record
                                     WOVehicleRecordHistory::create([
                                         'w_o_vehicle_id' => $woVehicle->id,
@@ -1837,6 +1975,29 @@ class WorkOrderController extends Controller
                     $deleteComment->delete();
                 }
             }
+            else {
+                $checkRecords = $newComment->wo_histories()
+                    ->whereIn('field_name', ['amount_received', 'balance_amount', 'currency', 'deposit_received_as', 'so_total_amount', 'so_vehicle_quantity'])
+                    ->exists();
+                if ($checkRecords) {
+                    $this->sendSOAmountUpdateEmail($workOrder,$newComment);
+                }
+                $checkmainRecords = $newComment->wo_histories()
+                    ->whereIn('field_name', ['airline','airway_bill','airway_details','batch','brn','brn_file','container_number',
+                        'customer_address','customer_company_number','customer_company_number.full','customer_email','customer_name',
+                        'customer_representative_contact','customer_representative_contact.full','customer_representative_email',
+                        'customer_representative_name','delivery_contact_person','delivery_contact_person_number','delivery_date',
+                        'delivery_location','enduser_contract','enduser_passport','enduser_trade_license','existing_customer_name',
+                        'final_destination','forward_import_code','freight_agent_contact_number','freight_agent_contact_number.full',
+                        'freight_agent_email','freight_agent_name','is_batch','noc','payment_receipts','port_of_discharge','port_of_loading',
+                        'shipment','shipping_line','signed_contract','signed_pfi','so_number','trailer_number_plate','transport_type',
+                        'transportation_company','transportation_company_details','transporting_driver_contact_number','transporting_driver_contact_number.full',
+                        'vehicle_handover_person_id','wo_number','preferred_shipping_line_of_customer','bill_of_loading_details',
+                        'shipper','consignee','notify_party','special_or_transit_clause_or_request',])->exists();
+                if ($checkmainRecords) {
+                    $this->sendDataUpdateEmail($workOrder,$newComment);
+                }
+            }
             if($canCreateFinanceApproval == true) {
                 $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
                 if($financePendingApproval == null) { 
@@ -1933,9 +2094,12 @@ class WorkOrderController extends Controller
     {
         // Validate the request data, making 'text' nullable
         $request->validate([
-            'text' => 'nullable|string|max:255', // 'text' is now nullable
+            'text' => 'nullable|string|max:255',
             'parent_id' => 'nullable|integer|exists:w_o_comments,id',
-            'work_order_id' => 'required|integer|exists:work_orders,id'
+            'work_order_id' => 'required|integer|exists:work_orders,id',
+            'mentioned_users' => 'array',
+            'mentioned_users.*' => 'exists:users,id',
+            'files.*' => 'file|mimes:jpg,png,pdf|max:2048', // File validation
         ]);
     
         // Check if text is null and there are no files
@@ -1952,24 +2116,54 @@ class WorkOrderController extends Controller
             'parent_id' => $request->input('parent_id'),
             'user_id' => auth()->id(), // Assuming you're using Laravel's authentication
         ]);
-        $files = [];
+        $workOrder = WorkOrder::find($comment->work_order_id);
         if ($request->hasFile('files')) {
+            $files = [];
             foreach ($request->file('files') as $file) {
-                $fileData = base64_encode(file_get_contents($file->getRealPath()));
                 $files[] = [
                     'file_name' => $file->getClientOriginalName(),
-                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . $fileData
+                    'file_data' => 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath())),
                 ];
             }
-        }
-    
-        // Assuming you have a relation set up for files on the comment model
-        if (!empty($files)) {
             $comment->files()->createMany($files);
         }
-    
-        // Respond with the comment and files data
-        return response()->json($comment->load('files','user'), 201);
+
+        if ($request->has('mentioned_users')) {
+            $comment->mentionedUsers()->attach($request->input('mentioned_users'));
+        }
+
+        // Extract mentioned users from the text
+        preg_match_all('/@\[([^\]]+)\]/', $text, $matches);
+        $mentionedUserNames = $matches[1];
+
+        if (!empty($mentionedUserNames)) {
+            $mentionedUsers = User::whereIn('name', $mentionedUserNames)->get();
+        
+            foreach ($mentionedUsers as $user) {
+                // Queue email notifications for efficiency
+                dispatch(function () use ($workOrder, $comment, $user) {
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+                    $subject = "You were mentioned in a comment - " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+                    $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                    $accessLinkWithComment = $accessLink . '#comment-' . $comment->id;
+                    Mail::send('work_order.emails.mentioned_in_comment', [
+                        'workOrder' => $workOrder,
+                        'accessLink' => $accessLink,
+                        'accessLinkWithComment' => $accessLinkWithComment,
+                        'comment' => $comment,
+                        'user' => $user // Pass the user variable to the view
+                    ], function ($message) use ($subject, $template, $user) {
+                        $message->from($template['from'], $template['from_name'])
+                                ->to($user->email)
+                                ->subject($subject);
+                    });
+                })->onQueue('emails');
+            }
+        }
+
+        return response()->json($comment->load('files', 'mentionedUsers', 'user'), 201);
     }
     // public function getComments($workOrderId)
     // {

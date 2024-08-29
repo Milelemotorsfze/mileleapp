@@ -14,7 +14,7 @@
             </ul>
         </div>
     @endif
-    {!! Form::model($user, ['method' => 'PATCH', 'route' => ['users.update', $user->id]]) !!}
+    {!! Form::model($user, ['method' => 'PATCH', 'route' => ['users.update', $user->id], 'enctype' => 'multipart/form-data']) !!}
     <div class="row mb-3">
         <div class="col-md-4">
             <label for="name" class="form-label">Name</label>
@@ -63,6 +63,15 @@
                 <input class="form-check-input" type="checkbox" id="sales_rap" name="sales_rap" value="yes" {{ old('sales_rap', $user->sales_rap) == 'Yes' ? 'checked' : '' }}>
                 <label class="form-check-label" for="sales_rap">Sales RAP</label>
             </div>
+        </div>
+        <div class="col-md-4">
+            <label for="user_image" class="form-label">User Image</label>
+            @if(!is_null($user->empProfile->image_path))
+                <div class="mb-3">
+                    <img src="{{ asset($user->empProfile->image_path) }}" alt="User Image" class="img-thumbnail" width="150">
+                </div>
+            @endif
+            <input type="file" name="user_image" id="user_image" class="form-control" accept=".jpg, .jpeg, .png">
         </div>
         <div class="col-md-4">
             <label for="roles" class="form-label">Roles</label>

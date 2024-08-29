@@ -51,7 +51,7 @@ class LetterOfIndentController extends Controller
                 'client' => function ($query) {
                     $query->select('id', 'name','customertype','country_id');
                 },
-                'client.country'  => function ($query) {
+                'country'  => function ($query) {
                     $query->select('id', 'name');
                 },
                 'createdBy' => function ($query) {
@@ -166,7 +166,8 @@ class LetterOfIndentController extends Controller
                 ->addColumn('approval_button', function($query, Request $request) {
                     $type = $request->tab;
                    
-                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status')->find($query->id);
+                    $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status',
+                    'country_id')->find($query->id);
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
                 ->addColumn('action', function($query,Request $request) {
@@ -193,11 +194,10 @@ class LetterOfIndentController extends Controller
         
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
-        $customers = Clients::whereNotNull('country_id')->get();
         $models = MasterModel::where('is_milele', true)->groupBy('model')->orderBy('id','ASC')->get();
         $salesPersons = User::where('status','active')->get();
 
-        return view('letter_of_indents.create',compact('countries','customers','models','salesPersons'));
+        return view('letter_of_indents.create',compact('countries','models','salesPersons'));
     }
 
     /**
@@ -212,8 +212,7 @@ class LetterOfIndentController extends Controller
             'dealers' => 'required'
           
         ]);
-        // return $request->all();
-
+       
         $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
@@ -234,6 +233,7 @@ class LetterOfIndentController extends Controller
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
+            $LOI->country_id = $request->country;
             $LOI->sales_person_id = $request->sales_person_id;
            
             $customer = Clients::find($request->client_id);
@@ -370,7 +370,10 @@ class LetterOfIndentController extends Controller
     }
     public function getCustomers(Request $request)
     {
-        $customers = Clients::where('country_id', $request->country)
+        $customers = Clients::with('clientCountries')
+            ->whereHas('clientCountries', function($query) use($request){
+                $query->where('country_id', $request->country);
+            })
             ->where('customertype', $request->customer_type)
             ->get();
 
@@ -380,7 +383,7 @@ class LetterOfIndentController extends Controller
     {
         (new UserActivityController)->createActivity('Generated LOI Document.');
         
-        $letterOfIndent = LetterOfIndent::select('id','date','signature','client_id','year_code')->where('id',$request->id)->first();
+        $letterOfIndent = LetterOfIndent::select('id','date','signature','client_id','year_code','country_id')->where('id',$request->id)->first();
         $fileName = $letterOfIndent->client->name .'-'.$letterOfIndent->year_code.'.pdf';
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
       
@@ -510,8 +513,12 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($id);
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
-        $customers = Clients::whereNotNull('country_id')->get();
-        $possibleCustomers = Clients::where('country_id', $letterOfIndent->client->country_id)->get();
+        $possibleCustomers = Clients::with('clientCountries')
+                        ->whereHas('clientCountries', function($query) use($letterOfIndent){
+                            $query->where('country_id', $letterOfIndent->country_id);
+                        })
+                    ->where('customertype', $letterOfIndent->client->customertype)
+                    ->get();
         $salesPersons = User::where('status','active')->get();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
@@ -536,7 +543,7 @@ class LetterOfIndentController extends Controller
         }
         $LOITemplates = LoiTemplate::where('letter_of_indent_id', $id)->pluck('template_type')->toArray();
 
-        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
+        return view('letter_of_indents.edit', compact('countries','letterOfIndent','models',
                                 'letterOfIndentItems','salesPersons','possibleCustomers','LOITemplates'));
     }
 
@@ -553,6 +560,7 @@ class LetterOfIndentController extends Controller
             'date' => 'required',
             'dealers' => 'required'
         ]);
+        // return $request->all();
 
         $LOI = LetterOfIndent::where('client_id', $request->client_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
@@ -589,6 +597,7 @@ class LetterOfIndentController extends Controller
                 $LOI->uuid = $uuid;
 
                 $LOI->client_id = $request->client_id;
+                $LOI->country_id = $request->country;
                 $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
                 $LOI->category = $request->category;
                 $LOI->dealers = $request->dealers;

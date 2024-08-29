@@ -120,7 +120,7 @@
                     <!-- <span  style="list-style: none;" > -->
                         <span style="font-weight:600px;font-size:12px;" >{{ strtoupper($letterOfIndent->client->name ?? '') }}</span>
                        <span class="country-name">
-                        {{ strtoupper($letterOfIndent->client->country->name ?? '') }} </span>
+                        {{ strtoupper($letterOfIndent->country->name ?? '') }} </span>
                     <!-- </span> -->
                 </td>
             </tr>

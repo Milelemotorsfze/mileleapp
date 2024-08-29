@@ -72,7 +72,7 @@
                                             Country :
                                         </div>
                                         <div class="col-sm-6">
-                                            {{ $letterOfIndent->client->country->name ?? '' }}
+                                            {{ $letterOfIndent->country->name ?? '' }}
                                         </div>
                                     </div>
 

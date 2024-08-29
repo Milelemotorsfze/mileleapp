@@ -61,6 +61,7 @@ namespace App\Http\Controllers;
                 'department' => 'required',
                 'designation' => 'required',
                 'lauguages' => 'required',
+                'user_image' => 'nullable|image|mimes:jpg,jpeg,png|max:100',
             ]);
             $user = new User();
             $user->name = $request->input('name');
@@ -75,6 +76,13 @@ namespace App\Http\Controllers;
             $empProfile->company_number = $request->input('phone');
             $empProfile->department_id = $request->input('department');
             $empProfile->designation_id = $request->input('designation');
+            if ($request->hasFile('user_image')) {
+                $image = $request->file('user_image');
+                $imageName = time().'.'.$image->getClientOriginalExtension();
+                $image->move(public_path('images/users'), $imageName);           
+                // Save the image path to the user's record
+                $empProfile->image_path = 'images/users/'.$imageName;
+            }
             $empProfile->save();
             $empJob = new EmpJob();
             $empProfileId = $empProfile->id;
@@ -144,6 +152,7 @@ namespace App\Http\Controllers;
         'roles' => 'required',
         'department' => 'required',
         'designation' => 'required',
+        'user_image' => 'nullable|image|mimes:jpg,jpeg,png|max:100',
     ]);
     $user = User::find($id);
     $user->name = $request->input('name');
@@ -157,6 +166,13 @@ namespace App\Http\Controllers;
     $empProfile->company_number = $request->input('phone');
     $empProfile->department_id = $request->input('department');
     $empProfile->designation_id = $request->input('designation');
+    if ($request->hasFile('user_image')) {
+        $image = $request->file('user_image');
+        $imageName = time().'.'.$image->getClientOriginalExtension();
+        $image->move(public_path('images/users'), $imageName);
+        // Save the image path to the user's record
+        $empProfile->image_path = 'images/users/'.$imageName;
+    }
     $empProfile->save();
     SalesPersonStatus::updateOrCreate(
         ['sale_person_id' => $user->id],
@@ -284,5 +300,19 @@ namespace App\Http\Controllers;
                 // Handle the exception
                 return back()->with('error', 'An error occurred while saving the user: ' . $e->getMessage());
             }
+        }
+        public function searchUsers(Request $request)
+        {
+            $query = $request->input('query');
+            $users = User::where('name', 'LIKE', "%{$query}%")->get(['id', 'name']);
+
+            return response()->json([
+                'users' => $users->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name ?? 'Unknown User',
+                    ];
+                }),
+            ]);
         }
     }
