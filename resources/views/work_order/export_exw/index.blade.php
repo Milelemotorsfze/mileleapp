@@ -48,16 +48,28 @@
 	@endphp
 	@if ($hasPermission)
 	<h4 class="card-title">
-    @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order Info
+    @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @elseif(isset($type) && $type == 'all') All @endif Work Order Info
 	</h4>
 	@endif
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
-	<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
-	</a>
+		@if(isset($type) && $type == 'all')
+		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','local_sale')}}">
+		<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
+		</a>
+		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_cnf')}}">
+		<i class="fa fa-plus" aria-hidden="true"></i> New Export CNF Work Order 
+		</a>
+		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_exw')}}">
+		<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
+		</a>
+		@elseif(isset($type) && $type != 'all')
+			<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
+			<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
+			</a>
+		@endif
 	@endif
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
@@ -95,6 +107,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
 							<th rowspan="2" class="light">Sl No</th>
+							@if(isset($type) && ($type == 'all'))	
+							<th rowspan="2" class="light">Type</th>
+							@endif
 							<th rowspan="2" class="light">Sales Support Data Confirmation</th>
 							<th colspan="2" class="dark">
 								<center>Approval Status</center>
@@ -103,7 +118,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
                             <th rowspan="2" class="light">Date</th>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf' || $type == 'all'))
                                 <th rowspan="2" class="light">Batch</th>
                             @endif
 							<th colspan="4" class="dark">
@@ -112,12 +127,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<th colspan="3" class="light">
 								<center>Customer Representative</center>
 							</th>
-                            @if(isset($type) && $type == 'export_exw')
+                            @if(isset($type) && ($type == 'export_exw'|| $type == 'all'))
 							<th colspan="3" class="dark">
 								<center>Freight Agent</center>
 							</th>
                             @endif
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf' || $type == 'all'))
                                 <th rowspan="2" class="light">Port Of Loading</th>
                                 <th rowspan="2" class="light">Port Of Discharge</th>
                                 <th rowspan="2" class="light">Final Destination</th>
@@ -136,7 +151,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th colspan="4" class="light">
 								<center>Delivery</center>
 							</th>
-							@if(isset($type) && ($type == 'export_cnf'))
+							@if(isset($type) && ($type == 'export_cnf' || $type == 'all'))
 							 	<th rowspan="2" class="light">Prefered Shipping Line</th>
 								<th rowspan="2" class="light">Bill of Loading</th>
 								<th rowspan="2" class="light">Shipper</th>
@@ -170,7 +185,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td class="light">Name</td>
                             <td class="light">Email</td>
 							<td class="light">Contact</td>
-                            @if(isset($type) && $type == 'export_exw')
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'all'))
 							<td class="dark">Name</td>
                             <td class="dark">Email</td>
 							<td class="dark">Contact</td>
@@ -249,6 +264,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								</div>                         
                             </td>
 							<td>{{ ++$i }}</td>
+							@if(isset($type) && ($type == 'all'|| $type == 'all'))	
+							<td>{{ $data->type_name ?? '' }}</td>
+							@endif
 							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ $data->sales_support_data_confirmation ?? ''}}</label></td>
 							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
 							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
@@ -256,7 +274,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))															
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))															
 							    <td>{{$data->batch ?? ''}}</td>	
                             @endif						
 							<td>{{$data->customer_name ?? ''}}</td>
@@ -266,12 +284,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->customer_representative_name ?? ''}}</td>
 							<td>{{$data->customer_representative_email ?? ''}}</td>
 							<td>{{$data->customer_representative_contact ?? ''}}</td>	
-                            @if(isset($type) && $type == 'export_exw')													
+                            @if(isset($type) && $type == 'export_exw'|| $type == 'all')													
                                 <td>{{$data->freight_agent_name ?? ''}}</td>
                                 <td>{{$data->freight_agent_email ?? ''}}</td>
                                 <td>{{$data->freight_agent_contact_number ?? ''}}</td>
                             @endif
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
                                 <td>{{$data->port_of_loading ?? ''}}</td>
                                 <td>{{$data->port_of_discharge ?? ''}}</td>
                                 <td>{{$data->final_destination ?? ''}}</td>
@@ -336,7 +354,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
 							<td>{{$data->delivery_contact_person_number ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
-							@if(isset($type) && ($type == 'export_cnf'))
+							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
 								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
 								<td>{{$data->bill_of_loading_details ?? ''}}</td>
 								<td>{{$data->shipper ?? ''}}</td>
@@ -449,7 +467,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 <script type="text/javascript">
     $(document).ready(function() {
         // Initialize DataTable with default 100 entries
-        $('.my-datatable').DataTable({
+        var table = $('.my-datatable').DataTable({
             "pageLength": 100, // Set the default number of entries to display
             "lengthMenu": [10, 25, 50, 100, 200], // Options for number of entries per page
             "order": [], // Disable initial sorting if you don't want any column sorted on load
@@ -457,6 +475,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                 "targets": 'no-sort', // Apply 'no-sort' class to columns you want unsorted by default
                 "orderable": false,
             }],
+            "initComplete": function(settings, json) {
+                // Loop through each column
+                this.api().columns().every(function() {
+                    var column = this;
+                    var allEmpty = true;
+
+                    // Check if all cells in the column are empty in the current page
+                    column.data().each(function(data, index) {
+                        if (data && $.trim(data) !== '') {
+                            allEmpty = false;
+                            return false; // Break out of the loop
+                        }
+                    });
+
+                    // Hide the column if all cells are empty
+                    if (allEmpty) {
+                        column.visible(false);
+                    }
+                });
+            }
         });
     });
     // Setup AJAX with CSRF token
