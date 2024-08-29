@@ -989,5 +989,6 @@ Route::get('/d', function () {
     Route::post('/all-variant-prices-update', [VehiclesController::class, 'allvariantpriceupdate'])->name('variantprices.allvariantpriceupdate');
     Route::post('/custom-inspection-update', [VehiclesController::class, 'custominspectionupdate'])->name('vehicles.savecustominspection');
     Route::post('/booking/canceling', [BookingController::class, 'canceling'])->name('booking.canceling');
+    Route::post('/get-reservation', [VehiclesController::class, 'getReservation'])->name('get.reservation');
 });
 
