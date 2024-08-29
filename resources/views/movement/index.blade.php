@@ -121,9 +121,9 @@
       <div class="tab-content">
     <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
-            <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-                <thead class="bg-soft-secondary">
+        <div class="table-responsive" style="height: 74vh;">
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
                 <th>Creation Date</th>
                 <th>Movement Date</th>
