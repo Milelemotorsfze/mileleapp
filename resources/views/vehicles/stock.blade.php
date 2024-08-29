@@ -2677,8 +2677,32 @@ function displayGallery(imageUrls) {
 }
 </script>
 <script>
-  function openBookingModal(vehicleId) {
+ function openBookingModal(vehicleId) {
+    // Set the vehicle ID in the hidden input field
     $('#vehicle_id').val(vehicleId);
+
+    // Now, retrieve the value of vehicle_id from the hidden input field
+    var vehicleIdValue = $('#vehicle_id').val();
+
+    $.ajax({
+        url: '{{ route('get.reservation') }}',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            vehicle_id: vehicleIdValue
+        },
+        success: function(response) {
+            if (response && Object.keys(response).length > 0) {
+                $('#cancelBookingButton').show();
+            } else {
+                $('#cancelBookingButton').hide();
+            }
+        },
+        error: function(xhr) {
+            console.log('An error occurred while fetching the reservation data.');
+        }
+    });
+
     $('#bookingModal').modal('show');
 }
 function opencustominspectionModal(vehicleIdInspection) {

@@ -3720,4 +3720,14 @@ return response()->json(['success' => 'Vehicle updated successfully']);
         $vehicle->save();
         return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }
+    public function getReservation(Request $request)
+{
+    $vehicle_id = $request->input('vehicle_id');
+    $reservation = DB::table('vehicles')
+        ->where('id', $vehicle_id)
+        ->whereDate('reservation_end_date', '>=', Carbon::today())
+        ->first();
+        info($reservation);
+    return response()->json($reservation);
+}
 }
