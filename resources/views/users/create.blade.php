@@ -70,7 +70,7 @@
         <div class="col-md-4">
             <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="sales_rap" name="sales_rap" value="yes" {{ old('sales_rap') ? 'checked' : '' }}>
-                <label class="form-check-label" for="sales_rap">Sales RAP</label>
+                <label class="form-check-label" for="sales_rap">Sales REP</label>
             </div>
         </div>
         <div class="col-md-4">
