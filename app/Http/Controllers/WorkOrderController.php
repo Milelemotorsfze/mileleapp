@@ -1089,6 +1089,10 @@ class WorkOrderController extends Controller
      */
     public function update(Request $request, WorkOrder $workOrder)
     { 
+        // Check if the sales support data has been confirmed
+        if (!is_null($workOrder->sales_support_data_confirmation_at)) {
+            return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
+        }
         DB::beginTransaction();
         try { 
             $canCreateFinanceApproval = false;
@@ -2487,5 +2491,105 @@ class WorkOrderController extends Controller
                     ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
                     ->subject($subject);
         });
+    }
+    public function salesApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->sales_support_data_confirmation_at == '' && $wo->sales_support_data_confirmation_by == '') {
+                    $wo->sales_support_data_confirmation_at = Carbon::now();
+                    $wo->sales_support_data_confirmation_by = $authId;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_at',
+                        'old_value' => NULL,
+                        'new_value' => Carbon::now()->format('d M Y, H:i:s'),
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_by',
+                        'old_value' => NULL,
+                        'new_value' => Auth::user()->name,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->sales_support_data_confirmation_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
+    }
+    public function revertSalesApproval(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $wo = WorkOrder::where('id',$request->id)->first();
+                if($wo && $wo->sales_support_data_confirmation_at != '' && $wo->sales_support_data_confirmation_by != '') {
+                    $wo->sales_support_data_confirmation_at = NULL;
+                    $wo->sales_support_data_confirmation_by = NULL;
+                    $wo->update();
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_at',
+                        'old_value' => $wo->sales_support_data_confirmation_at,
+                        'new_value' => NULL,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    WORecordHistory::create([
+                        'work_order_id' => $wo->id,
+                        'user_id' => $authId,
+                        'field_name' => 'sales_support_data_confirmation_by',
+                        'old_value' => $wo->sales_support_data_confirmation_by,
+                        'new_value' => NULL,
+                        'type' => 'Set',
+                        'changed_at' => Carbon::now()
+                    ]);
+                    DB::commit();
+                    return response()->json('success');
+                }
+                else if($wo && $wo->sales_support_data_confirmation_at == '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
+            }
+        }
     }
 }

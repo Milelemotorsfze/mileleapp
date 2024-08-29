@@ -96,12 +96,22 @@ class WorkOrder extends Model
         'deleted_by',
     ];
     protected $appends = [
+        'sales_support_data_confirmation',
         'finance_approval_status',
         'coo_approval_status',
         'total_number_of_boe',
         'vehicle_count',
         'type_name',
     ];
+    public function getSalesSupportDataConfirmationAttribute() {
+        $status = '';
+        if($this->sales_support_data_confirmation_at == NULL) {
+            $status = 'Not Confirmed';
+        } else if($this->sales_support_data_confirmation_at != NULL) {
+            $status = 'Confirmed';
+        }
+        return $status;
+    }
     public function getFinanceApprovalStatusAttribute() {
         $status = '';
         $data = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();

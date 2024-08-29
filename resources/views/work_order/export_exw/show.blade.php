@@ -101,19 +101,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title form-label">@if(isset($workOrder) && $workOrder->type == 'export_exw') Export EXW @elseif(isset($workOrder) && $workOrder->type == 'export_cnf') Export CNF @elseif(isset($workOrder) && $workOrder->type == 'local_sale') Local Sale @endif Work Order Details</h4>
-	@if($previous != '')
-	<a class="btn btn-sm btn-info" href="{{ route('work-order.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
-	@endif
-	@if($next != '')
-	<a  class="btn btn-sm btn-info" href="{{ route('work-order.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-	@endif
-    @include('work_order.export_exw.approvals')
-    <a style="margin-right:0px;margin-left:0px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$workOrder->id ?? '')}}">
-        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-    </a>
-	<a  class="btn btn-sm btn-info" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-	<label style="font-size: 119%;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
-    <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+    <div class="col-12 d-flex flex-wrap float-end">        
+        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">Sales Support Data {{ $workOrder->sales_support_data_confirmation ?? ''}}</label>
+        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+    </div>
+    <div class="col-12 d-flex flex-wrap align-items-center">
+        @if($previous != '')
+        <a class="btn btn-sm btn-info me-2" href="{{ route('work-order.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+        @endif
+        @if($next != '')
+        <a class="btn btn-sm btn-info me-2" href="{{ route('work-order.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+        @endif
+        @include('work_order.export_exw.approvals')
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
+        $isDisabled = isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '';
+        @endphp
+        @if ($hasPermission)
+        <a title="Edit" class="btn btn-sm btn-info me-2 {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $workOrder->id ?? '') }}">
+            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+        </a>
+        @endif
+        <a class="btn btn-sm btn-info me-2" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </div>
     @if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -628,7 +639,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Updated By</label>
+                                                            <label for="choices-single-default" class="form-label"> Data Confirmed By</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{$workOrder->salesSupportDataConfirmationBy->name ?? 'NA'}} @else 'NA' @endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Data Confirmed At </label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label"> Last Updated By</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->UpdatedBy->name ?? 'NA'}}</span>
@@ -638,7 +669,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Updated At </label>
+                                                            <label for="choices-single-default" class="form-label"> Last Updated At </label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
