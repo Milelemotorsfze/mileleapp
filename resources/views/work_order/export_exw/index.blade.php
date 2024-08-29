@@ -95,6 +95,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
 							<th rowspan="2" class="light">Sl No</th>
+							<th rowspan="2" class="light">Sales Support Data Confirmation</th>
 							<th colspan="2" class="dark">
 								<center>Approval Status</center>
 							</th>
@@ -154,6 +155,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="light">Created At</th>
                             <th rowspan="2" class="dark">Last Updated By</th>
                             <th rowspan="2" class="dark">Last Updated At</th>
+							<th rowspan="2" class="dark">Sales Support Data Confirmation By</th>
+                            <th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 							<th rowspan="2" class="dark">Total Number Of BOE</th>
 						</tr>
 						<tr>
@@ -210,10 +213,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 
 										@php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-                                        @endphp
+                                        $isDisabled = $data->sales_support_data_confirmation_at != '';
+										@endphp
                                         @if ($hasPermission)
                                         <li>
-                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('work-order.edit',$data->id ?? '')}}">
+                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $data->id ?? '') }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
@@ -245,6 +249,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								</div>                         
                             </td>
 							<td>{{ ++$i }}</td>
+							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ $data->sales_support_data_confirmation ?? ''}}</label></td>
 							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
 							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
 							<td>{{$data->CreatedBy->name ?? ''}}</td>
@@ -422,6 +427,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
                             <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+							<td>@if($data->sales_support_data_confirmation_at != ''){{$data->salesSupportDataConfirmationBy->name ?? ''}}@endif</td>
+                            <td>@if($data->sales_support_data_confirmation_at != '') {{\Carbon\Carbon::parse($data->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 							<td>@if($data->total_number_of_boe != 0){{$data->total_number_of_boe ?? ''}}@endif</td>
 						</tr>
 						@endforeach

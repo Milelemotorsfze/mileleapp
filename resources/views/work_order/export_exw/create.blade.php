@@ -191,22 +191,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
-	<div>
-	@if(isset($previous) && $previous != '')
-	<a class="btn btn-sm btn-info" href="{{ route('work-order.edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
-	@endif
-	@if(isset($next) && $next != '')
-	<a  class="btn btn-sm btn-info" href="{{ route('work-order.edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-	@endif
-	@include('work_order.export_exw.approvals')
-	<a class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
-	
-	<a class="btn btn-sm btn-success float-end" id="submit-from-top">Submit</a>
-	@if(isset($workOrder))
-	<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
-    <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
-    @endif
+	<div class="col-12 d-flex flex-wrap float-end">
+		@if(isset($workOrder))
+			<label style="font-size: 119%; margin-right:3px;" class="badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">Sales Support Data {{ $workOrder->sales_support_data_confirmation ?? ''}}</label>
+			<label style="font-size: 119%; margin-right:3px;" class="badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+			<label style="font-size: 119%; margin-right:3px;" class="badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+		@endif
 	</div> 
+	<div class="col-12 d-flex flex-wrap align-items-center">
+		@if(isset($previous) && $previous != '')
+		<a class="btn btn-sm btn-info me-2" href="{{ route('work-order.edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+		@endif
+		@if(isset($next) && $next != '')
+		<a  class="btn btn-sm btn-info me-2" href="{{ route('work-order.edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+		@endif
+		@include('work_order.export_exw.approvals')
+		<a class="btn btn-sm btn-info me-2" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
+		@php
+		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
+		@endphp
+		@if ($hasPermission && isset($workOrder))
+			<a title="View Details" class="btn btn-sm btn-info me-2" href="{{route('work-order.show',$workOrder->id ?? '')}}">
+			<i class="fa fa-eye" aria-hidden="true"></i> View Details
+			</a>
+		@endif		
+		<a class="btn btn-sm btn-success float-end" id="submit-from-top">Submit</a>
+	</div> 	
 	</br>
 		<form id="WOForm" name="WOForm" action="{{ isset($workOrder) ? route('work-order.update', $workOrder->id) : route('work-order.store') }}" enctype="multipart/form-data" method="POST">
     @csrf
@@ -1700,6 +1710,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			elements.forEach(function(element) {
 				element.disabled = true;
 			});
+			// Also disable the submit button with ID "submit-from-top"
+			var submitFromTopButton = document.getElementById('submit-from-top');
+			if (submitFromTopButton) {
+				submitFromTopButton.disabled = true;
+				submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+			}
 		}
 		// Initialize mentions for the main comment textarea
         initializeMentions('#new-comment');
@@ -2225,6 +2241,19 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						throw new Error(data.message);
 					}
 				}).catch(error => {
+					alert(error.message);
+					// // Check if the error message matches the specific text
+					// if (error.message === "Can't edit the work order because the sales support confirmed the data.") {
+					// 	// Disable the #submit and #submit-from-top buttons
+					// 	document.querySelectorAll('#WOForm #submit').forEach(function(element) {
+					// 		element.disabled = true;
+					// 	});
+					// 	const submitFromTopButton = document.getElementById('submit-from-top');
+					// 	if (submitFromTopButton) {
+					// 		submitFromTopButton.disabled = true;
+					// 		submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+					// 	}
+					// }
 					console.error('Form submission error:', error);
 				}).finally(() => {
 					// Hide the overlay

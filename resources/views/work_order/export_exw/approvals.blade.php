@@ -1,10 +1,18 @@
 
+@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
+	<a title="Revert Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
+		<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
+	</a>
+@elseif(isset($workOrder) && $workOrder->sales_support_data_confirmation_at == '')
+	<a title="Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
+	<i class="fas fa-hourglass-start"></i> Sales Support Data Confirmation</a>
+@endif
 @if(isset($workOrder) && isset($workOrder->financePendingApproval))
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-finance-approval']);
 	@endphp
 	@if ($hasPermission)
-		<a title="Finance Approval" class="btn btn-sm btn-info" 
+		<a title="Finance Approval" class="me-2 btn btn-sm btn-info" 
 		data-bs-toggle="modal" data-bs-target="#financeApprovalModal">
 			<i class="fas fa-hourglass-start" title="Finance Approval"></i> Fin. Approval
 		</a>
@@ -42,7 +50,7 @@
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
 	@endphp
 	@if ($hasPermission)
-		<a class="btn btn-sm btn-info" 
+		<a class="me-2 btn btn-sm btn-info" 
 			href="{{route('fetchFinanceApprovalHistory',$workOrder->id)}}">
 			<i class="fas fa-eye"></i> Fin. Approval Log
 		</a>
@@ -54,7 +62,7 @@
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-coo-office-approval']);
 	@endphp
 	@if ($hasPermission)
-		<a title="COO Office Approval" class="btn btn-sm btn-info" 
+		<a title="COO Office Approval" class="me-2 btn btn-sm btn-info" 
 		data-bs-toggle="modal" data-bs-target="#cooApprovalModal">
 			<i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Approval
 		</a>
@@ -116,7 +124,7 @@
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
 	@endphp
 	@if ($hasPermission)
-		<a class="btn btn-sm btn-info"
+		<a class="me-2 btn btn-sm btn-info"
 			href="{{route('fetchCooApprovalHistory',$workOrder->id)}}">
 			<i class="fas fa-eye"></i> COO Approval Log
 		</a>
@@ -126,6 +134,60 @@
 <script type="text/javascript">
 
     $(document).ready(function () { 
+		$('.btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to confirm this work order ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Confirm, It was Confirmed already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
+		$('.revert-btn-sales-approval').click(function (e) { 
+			var id = $(this).attr('data-id');
+			let url = '{{ route('work-order.revert-sales-approval') }}';
+			var confirm = alertify.confirm('Are you sure you want to revert this work order confirmation ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {						
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't Revert, It was reverted already..")
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		})
 		$('.btn-finance-approval').click(function (e) { 
 			var id = $(this).attr('data-id');
 			var status = $(this).attr('data-status');
