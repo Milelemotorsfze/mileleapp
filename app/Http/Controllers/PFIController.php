@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Facades\File;
+use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
 
 class PFIController extends Controller
@@ -72,10 +73,11 @@ class PFIController extends Controller
                     ->rawColumns(['action'])
                     ->toJson();
                 }
+
             
             return view('pfi.index');
     }
-    public function PFIItemList() {
+    public function PFIItemList(Request $request) {
         (new UserActivityController)->createActivity('Open PFI Item List Section');
 
         $data = PfiItem::orderBy('updated_at','DESC')->with([
@@ -105,9 +107,35 @@ class PFIController extends Controller
             },
             'pfi.country'  => function ($query) {
                 $query->select('id','name');
-            }
-            ]);
+            }]);
             // return $data->get();
+            if($request->export == 'EXCEL') {
+                (new UserActivityController)->createActivity('Downloaded PFI Item List');
+
+                $data = $data->get();
+              return (new FastExcel($data))->download('PFI-ITEMS.csv', function ($data) {
+                    return [
+                        'LOI Number' => $data->letterOfIndentItem->LOI->uuid ?? '',
+                        'LOI Item Code' => $data->letterOfIndentItem->code ?? '',
+                        'PFI Date' => Carbon::parse($data->pfi->created_at)->format('d-m-Y'),
+                        'PFI Number' => $data->pfi->pfi_reference_number,
+                        'Customer Name' => $data->pfi->customer->name ?? '',
+                        'Country' => $data->pfi->country->name ?? '',
+                        'Vendor' => $data->pfi->supplier->supplier ?? '',
+                        'Currency' => $data->pfi->currency ?? '',
+                        'Steering' => $data->masterModel->steering,
+                        'Brand' => $data->masterModel->modelLine->brand->brand_name ?? '',
+                        'Model Line' => $data->masterModel->modelLine->model_line,
+                        'Model' => $data->masterModel->model,
+                        'SFX' => $data->masterModel->sfx,
+                        'PFI Quantity' => $data->pfi_quantity,
+                        'Unit Price' => $data->unit_price,
+                        'PFI Amount' => $data->pfi->amount,
+                        'Comment' => $data->pfi->comment ?? '',
+                       
+                    ];
+                });
+            }
 
             if (request()->ajax()) {
                 return DataTables::of($data)

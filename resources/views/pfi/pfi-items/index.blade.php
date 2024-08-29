@@ -10,14 +10,14 @@
                 <h4 class="card-title">
                     PFI Items Lists
                 </h4>
-                <!-- @can('PFI-create')
+                 @can('export-pfi-items')
                     @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('export-pfi-items');
                     @endphp
                     @if ($hasPermission)
                         <a  class="btn btn-sm btn-primary float-end" href="{{ route('pfi-item.list', ['export' => 'EXCEL'] ) }}" ><i class="fa fa-download" aria-hidden="true"></i> Export</a>
                     @endif
-                @endcan -->
+                @endcan 
                
                        <a  class="btn btn-sm btn-info float-end" style="margin-right:5px;" title="LOI List View"
                         href="{{ route('pfi.index') }}" > <i class="fa fa-th-large" ></i> 
@@ -63,12 +63,12 @@
                                 <th>Customer Name </th>
                                 <th>Country</th>  
                                 <th>Vendor</th>  
-                                <th>Currency</th>                               
+                                <th>Currency</th> 
+                                <th>Steering</th>                              
+                                <th>Brand</th>
+                                <th>Model Line</th>                           
                                 <th>Model</th>
                                 <th>SFX</th>
-                                <th>Steering</th>
-                                <th>Brand</th>
-                                <th>Model Line</th>
                                 <th>PFI Quantity</th>
                                 <th>Unit Price</th>
                                 <th>Amount</th>
@@ -101,12 +101,12 @@
             {'data' : 'pfi.customer.name', 'name' : 'pfi.customer.name', orderable: false },
             {'data' : 'pfi.country.name', 'name' : 'pfi.country.name', orderable: false },
             {'data' : 'pfi.supplier.supplier', 'name' : 'pfi.supplier.supplier', orderable: false },
-            {'data' : 'pfi.currency', 'name' : 'pfi.currency', orderable: false },          
+            {'data' : 'pfi.currency', 'name' : 'pfi.currency', orderable: false },         
+            {'data' : 'master_model.steering', 'name': 'masterModel.steering', orderable: false }, 
             {'data' : 'master_model.model_line.brand.brand_name', 'name': 'masterModel.modelLine.brand.brand_name', orderable: false },        
             {'data' : 'master_model.model_line.model_line', 'name': 'masterModel.modelLine.model_line', orderable: false },
             {'data' : 'master_model.model', 'name': 'masterModel.model', orderable: false },      
-            {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },      
-            {'data' : 'master_model.steering', 'name': 'masterModel.steering', orderable: false },
+            {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },              
             {'data' : 'pfi_quantity', 'name': 'pfi_quantity', orderable: false },   
             {'data' : 'unit_price', 'name': 'unit_price', orderable: false },        
             {'data' : 'amount', 'name': 'pfi.amount', orderable: false },   
