@@ -40,7 +40,6 @@ class MovementController extends Controller
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
     $warehouses = Warehouse::select('id', 'name')->get();
- 
     if ($request->ajax()) {
         $movementsQuery = Movement::query();
         foreach ($request->input('columns') as $column) {
@@ -75,10 +74,24 @@ class MovementController extends Controller
                     $query->where('po_number', 'like', '%' . $searchValue . '%');
                 });
             }
+            elseif ($columnName === 'remarks' && $searchValue !== null) {
+                $movementsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+            } elseif ($columnName === 'custom_inspection_number' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('vehicle', function ($query) use ($searchValue) {
+                    $query->where('custom_inspection_number', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'created_at' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('Movementrefernce', function ($query) use ($searchValue) {
+                    $query->where('created_at', 'like', '%' . $searchValue . '%');
+                });
+            }
         }
         return DataTables::of($movementsQuery)
             ->addColumn('date', function ($movement) {
                 return date('d-M-Y', strtotime($movement->Movementrefernce->date));
+            })
+            ->addColumn('created_at', function ($movement) {
+                return date('d-M-Y', strtotime($movement->Movementrefernce->created_at));
             })
             ->addColumn('model_detail', function ($movement) {
                 return $movement->vehicle->variant->model_detail ?? '';
@@ -94,6 +107,12 @@ class MovementController extends Controller
             })
             ->addColumn('po_number', function ($movement) {
                 return $movement->vehicle->purchasingOrder->po_number ?? '';
+            })
+            ->addColumn('custom_inspection_number', function ($movement) {
+                return $movement->vehicle->custom_inspection_number ?? '';
+            })
+            ->addColumn('remarks', function ($movement) {
+                return $movement->remarks ?? '';
             })
             ->toJson();
     }

@@ -125,13 +125,16 @@
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
             <tr>
-                <th>Date</th>
+                <th>Creation Date</th>
+                <th>Movement Date</th>
                 <th>VIN</th>
-                <th>Model Detail</th>
-                <th>From Name</th>
-                <th>To Name</th>
+                <th>TRIM</th>
+                <th>From</th>
+                <th>To</th>
                 <th>SO Number</th>
                 <th>PO Number</th>
+                <th>Inspection No</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -203,13 +206,16 @@
 
             // Define column-specific filters
             "columns": [
+                { data: 'created_at', name: 'created_at' },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vin' },
                 { data: 'model_detail', name: 'model_detail' },
                 { data: 'from_name', name: 'from_name' },
                 { data: 'to_name', name: 'to_name' },
                 { data: 'so_number', name: 'so_number' },
-                { data: 'po_number', name: 'po_number' }
+                { data: 'po_number', name: 'po_number' },
+                { data: 'custom_inspection_number', name: 'custom_inspection_number' },
+                { data: 'remarks', name: 'remarks' }
             ]
         });
 
