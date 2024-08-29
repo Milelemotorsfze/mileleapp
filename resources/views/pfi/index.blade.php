@@ -13,10 +13,13 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
                     @endphp
                     @if ($hasPermission)
-                        <a  class="btn btn-sm btn-info float-end" href="{{ route('pfi.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                        <a  class="btn btn-sm btn-info float-end mr-3" href="{{ route('pfi.create') }}" >
+                            <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
-                </h4>
+                <a  class="btn btn-sm btn-primary float-end" href="{{ route('pfi-item.list') }}" title="PFI Item Lists" >
+                    
+                <i class="fa fa-table" aria-hidden="true"></i>  View PFI Items</a>
                 @if (Session::has('success'))
                     <div class="alert alert-success" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>

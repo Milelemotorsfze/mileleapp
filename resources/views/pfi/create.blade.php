@@ -484,10 +484,10 @@
             }
             getCustomerCountries()
         });
-        $(document.body).on('select2:unselect', "#client_id", function (e) {
+        $(document.body).on('select2:unselect', "#country_id", function (e) {
             
             let data =  e.params.data.id;
-            $('#country_id').empty();
+            let isDataAvailable = false;
            // chcek any item selcted 
            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
 
@@ -500,17 +500,69 @@
                     let sfx = $('#sfx-'+i+'-item-'+j).val();
                     let loiCode = $('#loi-item-'+i+'-item-'+j).val();
                     if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
-                        var confirm = alertify.confirm('While changing customer entire pfi items data will be reset to empty!',function (e) {
-                            if (e) {
-                                resetData();                               
-                            }
+                     isDataAvailable = true;
+                        return false;
+                                                 
+                    }                                                
+                }
+            
+            }
+            console.log(isDataAvailable);
+            if(isDataAvailable == true) {
+                var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
+                        if (e) {
+                            resetData();  
+                                                
+                        }
+                        }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                            $("#country_id").val(data).trigger('change');
+                            
+                            }); 
+            }else{
+                resetData(); 
+            }
+
+                   
+
+        });
+        $(document.body).on('select2:unselect', "#client_id", function (e) {
+            
+            let data =  e.params.data.id;
+            let isData = false;
+            return false;
+           // chcek any item selcted 
+           var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    let model = $('#model-'+i+'-item-'+j).val();
+                    let sfx = $('#sfx-'+i+'-item-'+j).val();
+                    let loiCode = $('#loi-item-'+i+'-item-'+j).val();
+                    if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
+                        console.log("yes");
+                        isData = true;
+                        return false;
+                                               
+                    }                                             
+                }
+            
+            }
+            console.log(isData)
+            if(isData == true) {
+                var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
+                        if (e) {
+                            resetData();  
+                                                
+                        }
                         }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
                             $("#client_id").val(data).trigger('change');
                             
-                            });                           
-                    }                                                  
-                }
-            
+                            }); 
+            }else{
+                resetData(); 
             }
 
         });
@@ -539,6 +591,8 @@
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
+                    $('#country_id').empty();          
+                    
                 }
             }
         }
@@ -1004,6 +1058,7 @@
        function getLOIItemCode(index,childIndex) {
           
             let customer = $('#client_id').val();
+            let country = $('#country_id').val();
             let model = $('#model-'+index+'-item-'+childIndex).val();
             let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
             let url = '{{ route('loi-item-code') }}';
@@ -1032,6 +1087,7 @@
                     model: model[0],
                     sfx:sfx[0],
                     client_id:customer[0],
+                    country_id:country[0],
                     selectedLOIItemIds:selectedLOIItemIds
                 },
                 success:function (data) {
@@ -1146,6 +1202,7 @@
        }
        function getChildModels(index,item,type) {
             let customer = $('#client_id').val();
+            let country = $('#country_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
             if(customer.length > 0 && parentModel.length > 0 && parentSfx.length > 0) {
@@ -1158,7 +1215,8 @@
                             model: parentModel[0],
                             sfx:parentSfx[0],
                             is_child:'Yes',
-                            customer:customer[0]
+                            customer:customer[0],
+                            country_id:country[0],
                         },
                     dataType : 'json',
                     success: function(data) {

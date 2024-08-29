@@ -76,7 +76,56 @@ class PFIController extends Controller
             return view('pfi.index');
     }
     public function PFIItemList() {
-        
+        (new UserActivityController)->createActivity('Open PFI Item List Section');
+
+        $data = PfiItem::orderBy('updated_at','DESC')->with([
+            'pfi' => function ($query) {
+                $query->select('id','supplier_id','country_id','client_id','pfi_reference_number','currency','amount','comment');
+            },
+            'letterOfIndentItem' => function ($query) {
+                $query->select('id','code','master_model_id','letter_of_indent_id');
+            },
+            'letterOfIndentItem.LOI' => function ($query) {
+                $query->select('id','uuid');
+            },
+            'masterModel'  => function ($query) {
+                $query->select('id','model','sfx','steering','master_model_line_id');
+            },
+            'masterModel.modelLine'  => function ($query) {
+                $query->select('id','model_line','brand_id');
+            },
+            'masterModel.modelLine.brand'  => function ($query) {
+                $query->select('id','brand_name');
+            },
+            'pfi.customer'  => function ($query) {
+                $query->select('id','name');
+            },
+            'pfi.supplier'  => function ($query) {
+                $query->select('id','supplier');
+            },
+            'pfi.country'  => function ($query) {
+                $query->select('id','name');
+            }
+            ]);
+            // return $data->get();
+
+            if (request()->ajax()) {
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->editColumn('unit_price', function($query) {
+                        return number_format($query->unit_price);
+                    })
+                    ->editColumn('amount', function($query) {
+                        return number_format($query->pfi->amount);
+                    })
+                    ->addColumn('pfi_date', function($query) {
+                        return Carbon::parse($query->pfi->created_at)->format('d M Y');
+                    })
+                    ->rawColumns(['pfi_date'])
+                    ->toJson();
+                }
+            
+            return view('pfi.pfi-items.index');
     }
 
     /**
@@ -173,17 +222,19 @@ class PFIController extends Controller
                     if($latestRow){
                         $latestUUID =  $latestRow->code;
                         $latestUUIDNumber = substr($latestUUID, $offset, $length);
-
+                        
                         $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
                         $code =  $prefix.$newCode;
                     }else{
                         $code = $prefix.'001';
                     }
+                    // dd($code);
                 $pfiItemRow = new PfiItem();
                 $pfiItemRow->pfi_id = $pfi->id;
                 if($loiItemId != 'NULL') {
                     $pfiItemRow->loi_item_id = $loiItemId;
                 }
+                $pfiItemRow->code = $code;
                 $pfiItemRow->master_model_id = $masterModel->id ?? '';
                 $pfiItemRow->pfi_quantity = $pfiQuantity;
                 $pfiItemRow->unit_price = $unitPrice;
@@ -469,7 +520,9 @@ class PFIController extends Controller
                     ->where('sfx', $request->sfx);
                 })
                 ->whereHas('LOI', function($query)use($request) {
-                        $query->select('client_id','status','id','is_expired')->where('client_id', $request->client_id)
+                        $query->select('client_id','status','id','is_expired','country_id')
+                        ->where('client_id', $request->client_id)
+                        ->where('country_id', $request->country_id)
                         ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
                         ->where('is_expired', false);
                 });
@@ -508,13 +561,16 @@ class PFIController extends Controller
                 // info("child row add");
                 $data = $data->with('loiItems.LOI')
                 ->whereHas('loiItems.LOI', function($query)use($request){
-                    $query->select('client_id','status','id','is_expired')
+                    $query->select('client_id','status','id','is_expired','country_id')
                     ->where('client_id', $request->customer)
+                    ->where('country_id', $request->country_id)
                     ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
                     ->where('is_expired', false);
                 }); 
 
                 // info($data->pluck('id'));
+             }else{
+                // get this customer model & sfx with toyota 
              }
 
             if($request->model && $request->sfx) {

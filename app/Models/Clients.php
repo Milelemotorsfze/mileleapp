@@ -45,7 +45,14 @@ class Clients extends Model
                     $isExistClientLeads = ClientLeads::where('clients_id', $this->id)->count();
                     if($isExistClientLeads <= 0) {
 
-                        return true;
+                        $isExistClientCountries = ClientCountry::where('client_id', $this->id)->count();
+                        if($isExistClientCountries <= 0) {
+                            $isExistPFI = PFI::where('client_id', $this->id)->count();
+                            if($isExistPFI <= 0) {
+                                return true;
+                            }
+                        }
+                        
                     }
                 }             
             }
