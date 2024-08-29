@@ -17,7 +17,7 @@
             </ul>
         </div>
     @endif
-    {!! Form::open(array('route' => 'users.store', 'method' => 'POST')) !!}
+    {!! Form::open(array('route' => 'users.store', 'method' => 'POST', 'enctype' => 'multipart/form-data')) !!}
     <div class="row mb-3">
         <div class="col-md-4">
             <label for="name" class="form-label">Full Name</label>
@@ -73,7 +73,11 @@
                 <label class="form-check-label" for="sales_rap">Sales REP</label>
             </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-4">
+            <label for="user_image" class="form-label">User Image</label>
+            <input type="file" name="user_image" id="user_image" class="form-control" accept=".jpg, .jpeg, .png">
+        </div>
+        <div class="col-md-4">
             <label for="roles" class="form-label">Roles</label>
             <select name="roles[]" id="roles" class="form-select" multiple>
                 @foreach($roles as $role)

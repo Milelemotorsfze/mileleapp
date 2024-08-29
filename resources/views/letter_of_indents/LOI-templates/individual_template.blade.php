@@ -61,7 +61,7 @@
                 <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
                 <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>
                 <p style="margin-bottom: 0px;"> <span class="fw-bold">Full Name: </span> {{ strtoupper($letterOfIndent->client->name ?? '') }} </p>
-                <p> <span class="fw-bold">Address: </span>  {{  strtoupper($letterOfIndent->client->country->name) ?? ''}} </p>
+                <p> <span class="fw-bold">Address: </span>  {{  strtoupper($letterOfIndent->country->name) ?? ''}} </p>
                 <p>Dear Milele Motors,</p>
                 <p>I, ({{ ucfirst($letterOfIndent->client->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following model(s) from your company.</p>
                 <h5 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline;color: black">Requirements:</h5>

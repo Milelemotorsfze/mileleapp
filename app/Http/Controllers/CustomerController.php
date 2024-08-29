@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Country;
 use Illuminate\Support\Facades\DB;
-use App\Models\Customer;
+use App\Models\ClientCountry;
 use App\Models\MasterModelLines;
 use App\Models\UserActivities;
 use App\Models\Clients;
@@ -31,14 +31,20 @@ class CustomerController extends Controller
     {
         (new UserActivityController)->createActivity('Open Customer List Page');
         $customers = Clients::where('is_demand_planning_customer', true)->orderBy('updated_at','DESC')->get();
+        foreach($customers as $customer) {
+           $clientCustomers  = Country::with('clientCountries')
+            ->whereHas('clientCountries', function($query) use($customer) {
+                $query->where('client_id', $customer->id);
+            })->pluck('name')->toArray();
+            $customer->country = implode(",", $clientCustomers);
+        }
 
         if($request->export == 'EXCEL') {
-            $customer = Clients::all();
             return (new FastExcel($customers))->download('customers.csv', function ($customers) {
                 return [
                     'Name' => $customers->name,
                     'Customer Type' => $customers->customertype,
-                    'Country' => $customers->country->name ?? '',
+                    'Country' => $customers->country ?? '',
                     'Address' => $customers->address,
                     'Created At' => Carbon::parse($customers->created_at)->format('d-m-Y'),
                     'Created By' => $customers->createdBy->name ?? '',
@@ -75,23 +81,20 @@ class CustomerController extends Controller
         ]);
 
             $isCustomerExist = Clients::where('name', $request->name)
-                                    ->where('country_id', $request->country_id)
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
-                return redirect()->back()->with('error', 'This customer name and country is already existing!');
+                return redirect()->back()->with('error', 'This customer name is already existing!');
             }
         DB::beginTransaction();
 
             $client = new Clients();
             $client->name = $request->name;
-            $client->country_id = $request->country_id;
             $client->customertype = $request->type;
             $client->address = $request->address;
             $client->created_by = Auth::id();
             $client->is_demand_planning_customer = true;
-
-
+            
             if ($request->has('passport_file'))
             {
                 $file = $request->file('passport_file');
@@ -125,6 +128,14 @@ class CustomerController extends Controller
             }
         
             $client->save();
+            if($request->country_id) {
+                foreach($request->country_id as $countryId) {
+                    $clientCountry = new ClientCountry();
+                    $clientCountry->country_id = $countryId;
+                    $clientCountry->client_id = $client->id;
+                    $clientCountry->save();
+                }
+            }
         DB::commit();
         // $customer->save();
 
@@ -148,8 +159,10 @@ class CustomerController extends Controller
 
          $customer = Clients::find($id);
          $countries = Country::all();
+         $customerCountries = $customer->clientCountries()->pluck('country_id')->toArray();
+        //  return $customerCountries;
 
-         return view('customer.edit', compact('customer','countries'));
+         return view('customer.edit', compact('customer','countries','customerCountries'));
     }
 
     /**
@@ -165,7 +178,6 @@ class CustomerController extends Controller
             'type' => 'required',
         ]);
             $isCustomerExist = Clients::where('name', $request->name)
-                                    ->where('country_id', $request->country_id)
                                     ->whereNot('id',$id)
                                     ->where('is_demand_planning_customer', true)->first();
             
@@ -176,7 +188,6 @@ class CustomerController extends Controller
 
         $client = Clients::find($id);
         $client->name = $request->name;
-        $client->country_id = $request->country_id;
         $client->customertype = $request->type;
         $client->address = $request->address;
         $client->created_by = Auth::id();
@@ -217,6 +228,15 @@ class CustomerController extends Controller
 
         }
         $client->save();
+        $client->clientCountries()->delete();
+        if($request->country_id) {
+                foreach($request->country_id as $countryId) {
+                    $clientCountry = new ClientCountry();
+                    $clientCountry->country_id = $countryId;
+                    $clientCountry->client_id = $client->id;
+                    $clientCountry->save();
+                }
+        }
         DB::commit();
 
         return redirect()->route('dm-customers.index')->with('success','Customer Updated Successfully.');

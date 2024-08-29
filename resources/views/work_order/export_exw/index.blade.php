@@ -440,11 +440,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 @endsection
 @push('scripts')
 <script type="text/javascript">
-	$.ajaxSetup({
-	    headers: {
-	        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-	    }
-	});
+    $(document).ready(function() {
+        // Initialize DataTable with default 100 entries
+        $('.my-datatable').DataTable({
+            "pageLength": 100, // Set the default number of entries to display
+            "lengthMenu": [10, 25, 50, 100, 200], // Options for number of entries per page
+            "order": [], // Disable initial sorting if you don't want any column sorted on load
+            "columnDefs": [{
+                "targets": 'no-sort', // Apply 'no-sort' class to columns you want unsorted by default
+                "orderable": false,
+            }],
+        });
+    });
+    // Setup AJAX with CSRF token
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 </script>
 
 @endpush

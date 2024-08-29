@@ -228,7 +228,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                     <div class="row">
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                            <label for="choices-single-default" class="form-label"> Customer Company Email </label>
+                                                            <label for="choices-single-default" class="form-label"> Customer Company No. </label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span class="data-font">{{$workOrder->customer_company_number ?? 'NA'}}</span>

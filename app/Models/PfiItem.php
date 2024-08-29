@@ -18,4 +18,8 @@ class PfiItem extends Model
     {
         return $this->belongsTo(MasterModel::class);
     }
+    public function parentPfiItem()
+    {
+        return $this->belongsTo(PfiItem::class,'parent_pfi_item_id','id');
+    }
 }

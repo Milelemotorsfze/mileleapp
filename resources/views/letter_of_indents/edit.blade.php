@@ -70,7 +70,7 @@
                                 <select class="form-control widthinput" autofocus multiple name="country" id="country" >
                                     <option disabled>Select Country</option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->client->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
+                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -100,7 +100,7 @@
                                 <label for="choices-single-default" class="form-label">Customer</label>
                                 <select class="form-control widthinput" multiple name="client_id" id="customer" >
                                     @foreach($possibleCustomers as $customer)
-                                        <option value="{{ $letterOfIndent->client_id }}"
+                                        <option value="{{ $customer->id }}"
                                             {{ $letterOfIndent->client_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
                                     @endforeach
                                 </select>
@@ -521,6 +521,7 @@
             // console.log('reached');
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
+            var country = $('#country').val();
             var customer_type = $('#customer-type').val();
             var date = $('#date').val();
             let total_quantities = 0;
@@ -554,6 +555,7 @@
                     data: {
                         loi_date:date,
                         customer_id: customer[0],
+                        country_id:country[0],
                         customer_type: customer_type,
                         total_quantities:total_quantities,
                         selectedModelLineIds:selectedModelLineIds

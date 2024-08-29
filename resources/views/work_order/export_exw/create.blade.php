@@ -157,6 +157,18 @@
     border-collapse: collapse; /* Ensure borders do not double */
     width: 100%; /* Make the table take up the full width */
 }
+	.mention-container {
+        position: relative;
+    }
+    #styled-comment {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: transparent; /* Make it invisible to show only the textarea */
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
 </style>
 @include('layouts.formstyle')
 @section('content')
@@ -1689,6 +1701,55 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				element.disabled = true;
 			});
 		}
+		// Initialize mentions for the main comment textarea
+        initializeMentions('#new-comment');
+
+        function initializeMentions(selector) {
+            $(selector).atwho({
+                at: "@",
+                data: [], // Empty initially, will be populated via AJAX
+                limit: 10,
+                callbacks: {
+                    remoteFilter: function(query, renderCallback) {
+                        if (query.length === 0) {
+                            renderCallback([]);
+                            return;
+                        }
+                        $.ajax({
+                            url: '/users-search', // Make sure this matches your route
+                            type: 'GET',
+                            data: { query: query },
+                            success: function(response) {
+                                console.log(response); // Check if users array is correct
+                                if (response.users && response.users.length > 0) {
+                                    renderCallback(response.users.map(user => ({
+                                        id: user.id,
+                                        name: user.name || 'Unknown User' // Fallback if name is null
+                                    })));
+                                } else {
+                                    renderCallback([]);
+                                }
+                            },
+                            error: function() {
+                                console.error('Error fetching user data.');
+                                renderCallback([]); // Handle error gracefully
+                            }
+                        });
+                    },
+                    beforeInsert: function(value, $li) {
+                        // Wrap the mention in a custom token or placeholder that will later be styled
+                        const mentionText = value.replace('@', '');
+                        return `@[${mentionText}]`; // Use a special syntax to recognize mentions later
+                    }
+                }
+            });
+        }
+
+        // Set up event listeners for reply forms
+        $('#comments-section').on('click', '.reply-button', function() {
+            const commentId = $(this).closest('.comment').data('comment-id');
+            initializeMentions(`#reply-input-${commentId}`);
+        });
 	});
 	// Function to set the minimum date to today's date
 	document.addEventListener("DOMContentLoaded", function() {
@@ -3449,6 +3510,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}
 		setWo();
 	});
+	function updateStyledComment() {
+        let text = $('#new-comment').val();
+        // Replace the special mention syntax with a styled span
+        text = text.replace(/@\[(\w+)\]/g, '<span class="mention" style="color: blue;">@$1</span>');
+        $('#styled-comment').html(text);
+    }
 </script>
 @php
 $hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-and-edit-amount']);
@@ -3483,10 +3550,6 @@ $hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-a
 				$('#currency').prop('disabled', true).trigger('change');
 				$('#deposit_aganist_vehicle').prop('disabled', true).trigger('change');				
             });
-			var deleteButtons = document.querySelectorAll('.delete-button');
-			deleteButtons.forEach(function(button) {
-				button.disabled = true;
-			});
         });
     </script>
 @endif
