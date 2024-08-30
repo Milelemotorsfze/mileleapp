@@ -245,7 +245,7 @@
     </div>
   </div>
 </div>
-    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="bookingForm" method="POST" action="{{ route('booking.savedirectly') }}">
@@ -283,6 +283,32 @@
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="enhancementModal" tabindex="-1" role="dialog" aria-labelledby="enhancementModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="bookingForm" method="POST" action="{{ route('enhancement.save') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="enhancementModalLabel">Enhancement Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="booking_start_date">Update Variant</label>
+                        <select class="form-control" id="variantSelect" name="variant_id" required>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Enhancement</button>
                 </div>
             </form>
         </div>
@@ -2157,6 +2183,16 @@ else if(columnHeader === 'Reservation End')
         openBookingModal(data.id);
     @endif
 }
+else if(columnHeader === 'Variant Detail')
+{
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('adding-enhancement');
+    @endphp
+    @if ($hasPermission)
+        var data = table7.row(this).data();
+        openenhancementModal(data.id);
+    @endif
+}
 });
         var columns9 = [
               { data: 'id', name: 'vehicles.id' },
@@ -2704,6 +2740,33 @@ function displayGallery(imageUrls) {
     });
 
     $('#bookingModal').modal('show');
+}
+function openenhancementModal(vehicleId) {
+    // Send an AJAX request to get the variant and related information
+    $.ajax({
+        url: "{{ route('enhancement.getVariants') }}",  // Route to the controller method
+        method: "GET",
+        data: { vehicle_id: vehicleId },
+        success: function(response) {
+            // Handle the response from the server
+            if(response.success) {
+                // Populate the modal with the data returned from the server
+                // Example: Assuming response.data contains the list of variants
+                let variantOptions = '';
+                response.data.forEach(function(variant) {
+                    variantOptions += `<option value="${variant.id}">${variant.name}</option>`;
+                });
+                $('#variantSelect').html(variantOptions);
+                
+                // Set the vehicle ID in the hidden input field
+                $('#vehicle_id').val(vehicleId);
+                $('#enhancementModal').modal('show');
+            }
+        },
+        error: function() {
+            alert('Error fetching data. Please try again.');
+        }
+    });
 }
 function opencustominspectionModal(vehicleIdInspection) {
     $('#vehicle_idinspection').val(vehicleIdInspection);

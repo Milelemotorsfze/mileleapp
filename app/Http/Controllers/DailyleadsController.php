@@ -161,7 +161,6 @@ class DailyleadsController extends Controller
                             ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.location', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhere('so.so_number', 'LIKE', "%$searchValue%")
                             ->orWhereExists(function ($subquery) use ($searchValue) {
                                 $subquery->select(DB::raw(1))
                                     ->from('calls_requirement')
