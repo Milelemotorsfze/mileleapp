@@ -81,6 +81,20 @@
                                         </a>
                                     @endif
                                 </td>
+                            @elseif($dataHistory->field === 'Sales Person')
+                                <td>
+                                    {{ $dataHistory->old_value ? \App\Models\User::find($dataHistory->old_value)->name ?? 'Unknown User' : '' }}
+                                </td>
+                                <td>
+                                    {{ $dataHistory->new_value ? \App\Models\User::find($dataHistory->new_value)->name ?? 'Unknown User' : '' }}
+                                </td>
+                            @elseif($dataHistory->field === 'Is Batch')
+                                <td>
+                                    {{ $dataHistory->old_value == 1 ? 'Yes' : ($dataHistory->old_value == 0 ? 'No' : '') }}
+                                </td>
+                                <td>
+                                    {{ $dataHistory->new_value == 1 ? 'Yes' : ($dataHistory->new_value == 0 ? 'No' : '') }}
+                                </td>
                             @else
                             <td>{{ $dataHistory->old_value }}</td>
                             <td>{{ $dataHistory->new_value }}</td>

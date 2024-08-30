@@ -234,18 +234,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<input type="hidden" name="customerCount" id="customerCount" value={{$customerCount ?? ''}}>
 					<input type="hidden" name="wo_id" id="wo_id" value={{ isset($workOrder) ? $workOrder->id : '' }}>
 					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
-					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<!-- <span class="error">* </span> -->
+					@php
+					$hasAllSalesPermission = Auth::user()->hasPermissionForSelectedRole(['create-wo-for-all-sales-person']);
+					@endphp
+					<div class="col-xxl-{{ $hasAllSalesPermission ? '2' : '3' }} col-lg-6 col-md-6">
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
 						<input type="text" class="form-control widthinput" readonly 
-						value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
+							value="{{ isset($workOrder) && $workOrder->date ? \Carbon\Carbon::parse($workOrder->date)->format('d M Y') : \Carbon\Carbon::now()->format('d M Y') }}">
 					</div>
-					<div class="col-xxl-3 col-lg-6 col-md-6">
+					<div class="col-xxl-{{ $hasAllSalesPermission ? '2' : '3' }} col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
 							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()">
-							<!-- @if(isset($workOrder) && $workOrder->so_number != '') readonly @endif -->						
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-1 col-lg-2 col-md-2">
@@ -266,11 +267,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					</div>
 					@endif
-					<div class="col-xxl-3 col-lg-6 col-md-6">
+					<div class="col-xxl-{{ $hasAllSalesPermission ? '2' : '3' }} col-lg-6 col-md-6">
 						<label for="wo_number" class="col-form-label text-md-end">{{ __('WO Number') }}</label>
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
 							placeholder="Enter WO" value="{{ isset($workOrder) ? $workOrder->wo_number : 'WO-' }}" autocomplete="wo_number" autofocus readonly>
 					</div>
+
+					@if($hasAllSalesPermission)
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="sales-person-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="sales_person_id" class="col-form-label text-md-end">{{ __('Choose Sales Person') }}</label>
+							<select name="sales_person_id" id="sales_person_id" multiple="true" class="form-control widthinput" autofocus>
+								@foreach($salesPersons as $salesPerson)
+									<option value="{{ $salesPerson->id }}"{{ isset($workOrder) && $workOrder->sales_person_id == $salesPerson->id ? 'selected' : '' }}>{{ $salesPerson->name }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					@else
+						<input type="hidden" name="sales_person_id" value="{{ Auth::id() }}">
+					@endif
+
 					<div class="col-xxl-4 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
                         <input hidden id="customer_type" name="customer_type" value="existing">
@@ -1134,6 +1152,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			  document.getElementById('submit').click();
 		});
 		// SELECT 2 START
+			$('#sales_person_id').select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder:"Choose Sales Person",
+			});
 			$('#customer_name').select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
@@ -1898,6 +1921,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                     required: true,
 					// uniqueWO: true,
                 },
+				sales_person_id: {
+					required: true,
+				},
                 new_customer_name: {
                     noSpaces: true,
                 },

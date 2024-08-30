@@ -31,7 +31,7 @@
             <strong>Batch:</strong> {{ $workOrder->is_batch ? $workOrder->batch : 'Single Work Order' }}<br>
         @endif 
 
-        <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>  
+        <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? '' }}<br>  
     </p>
 
     <p>
@@ -67,6 +67,10 @@
                                             <button class="btn btn-info btn-style">Download</button>
                                         </a>
                                     @endif
+                                @elseif($item->field_name === 'Sales Person')
+                                    {{ $item->old_value ? \App\Models\User::find($item->old_value)->name ?? 'Unknown User' : '' }}
+                                @elseif($item->field_name === 'Is Batch')
+                                    {{ $item->old_value == 1 ? 'Yes' : ($item->old_value == 0 ? 'No' : '') }}                 
                                 @else
                                     {{ $item->old_value }}
                                 @endif
@@ -81,6 +85,10 @@
                                             <button class="btn btn-info btn-style">Download</button>
                                         </a>
                                     @endif
+                                @elseif($item->field_name === 'Sales Person')
+                                    {{ $item->new_value ? \App\Models\User::find($item->new_value)->name ?? 'Unknown User' : '' }}
+                                @elseif($item->field_name === 'Is Batch')
+                                    {{ $item->new_value == 1 ? 'Yes' : ($item->new_value == 0 ? 'No' : '') }}               
                                 @else
                                     {{ $item->new_value }}
                                 @endif

@@ -21,7 +21,7 @@
         @elseif(($workOrder->type == 'export_exw' || $workOrder->type == 'export_cnf') && $workOrder->is_batch == 0) 
             <strong>Batch:</strong> Single Work Order<br>
         @endif
-        <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>
+        <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? '' }}<br>
         <strong>Approval Status:</strong> 
         <label class="badge @if($status == 'pending') badge-soft-info @elseif($status == 'approved') badge-soft-success @elseif($status == 'rejected') badge-soft-danger @endif">
             {{ ucfirst($status) }}

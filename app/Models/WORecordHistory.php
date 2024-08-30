@@ -66,6 +66,7 @@ class WORecordHistory extends Model
             'payment_receipts' => 'Payment Receipts',
             'port_of_discharge' => 'Port Of Discharge',
             'port_of_loading' => 'Port Of Loading',
+            'sales_person_id' => 'Sales Person',
             'sales_support_data_confirmation_at' => 'Sales Support Data Confirmation At',
             'sales_support_data_confirmation_by' => 'Sales Support Data Confirmation By',
             'shipment' => 'Shipment',
