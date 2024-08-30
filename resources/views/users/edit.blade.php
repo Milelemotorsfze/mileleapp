@@ -58,10 +58,16 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="sales_rap" name="sales_rap" value="yes" {{ old('sales_rap', $user->sales_rap) == 'Yes' ? 'checked' : '' }}>
                 <label class="form-check-label" for="sales_rap">Sales REP</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="is_sales_rep" name="is_sales_rep" value="yes" {{ old('is_sales_rep', $user->is_sales_rep) == 'Yes' ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_sales_rep">Is Sales Rep.</label>
             </div>
         </div>
         <div class="col-md-4">
