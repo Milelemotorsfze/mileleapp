@@ -98,6 +98,7 @@
                             ->first();
                     @endphp
                     <td>
+                    @if($movementref->created_by == auth()->id())
                         @if ($latestMovement && $latestMovement->id == $movements->id)
                         <form action="{{ route('movement.revised', ['id' => $movements->id]) }}" method="POST" style="display:inline;">
     @csrf
@@ -105,6 +106,7 @@
         Revise
     </button>
 </form>
+                        @endif
                         @endif
                     </td>
                         </tr>
