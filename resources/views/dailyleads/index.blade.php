@@ -921,6 +921,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
                   <th>Qoutation Date</th>
+                  <th>Sales Person</th>
                   <th>Deal Values</th>
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
@@ -1007,6 +1008,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th> -->
+                  <th>Sales Person</th>
                   <th>Sales Date</th>
                   <th>Sales Values</th>
                   <th>Sales Notes</th>
@@ -1015,7 +1017,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>SO Cancel</th>
                   <!-- <th>Booking Vehicles</th> -->
                 </tr>
-              </thead>
+                             </thead>
             </table>
           </div>
         </div>
@@ -2354,6 +2356,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
+        { data: 'salespersonname', name: 'users.name' },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2836,42 +2839,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-//                 { data: 'ndate', name: 'ndate', searchable: false},
-//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-//                 {
-//     data: 'nsalesnotes',
-//     name: 'nsalesnotes',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         const maxLength = 20;
-//         const uniqueId = 'nsalesnotes_' + row.id;
-
-//         if (data && data.length > maxLength) {
-//             const truncatedText = data.substring(0, maxLength);
-//             return `
-//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-//             `;
-//         } else {
-//             return `<span class="remarks-text">${data}</span>`;
-//         }
-//     }
-// },
-// {
-//     data: 'nfile_path',
-//     name: 'nfile_path',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         if (data) {
-//             return `
-//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-//             `;
-//         } else {
-//             return '';
-//         }
-//     }
-// },
+{ data: 'salespersonname', name: 'users.name', searchable: true },
 {
             data: 'cdate',
             name: 'cdate',
@@ -3099,42 +3067,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-//                 { data: 'ndate', name: 'ndate', searchable: false},
-//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-//                 {
-//     data: 'nsalesnotes',
-//     name: 'nsalesnotes',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         const maxLength = 20;
-//         const uniqueId = 'nsalesnotes_' + row.id;
-
-//         if (data && data.length > maxLength) {
-//             const truncatedText = data.substring(0, maxLength);
-//             return `
-//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-//             `;
-//         } else {
-//             return `<span class="remarks-text">${data}</span>`;
-//         }
-//     }
-// },
-// {
-//     data: 'nfile_path',
-//     name: 'nfile_path',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         if (data) {
-//             return `
-//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-//             `;
-//         } else {
-//             return '';
-//         }
-//     }
-// },
 {
             data: 'rdate',
             name: 'rdate',
