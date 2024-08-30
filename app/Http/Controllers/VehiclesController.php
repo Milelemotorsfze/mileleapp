@@ -3730,4 +3730,23 @@ return response()->json(['success' => 'Vehicle updated successfully']);
         info($reservation);
     return response()->json($reservation);
 }
-}
+public function saveenhancement(Request $request)
+    {
+
+    }
+    public function getVariants(Request $request)
+    {
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::find($vehicleId);
+    if ($vehicle) {
+        $variantId = $vehicle->varaints_id;
+        $varaiant = Varaint::find($variantId);
+        $masterModelLinesId = $varaiant->master_model_lines_id;
+        $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
+                            ->where('category', 'Modified')
+                            ->get();
+        return response()->json(['success' => true, 'data' => $variants]);
+    }
+    return response()->json(['success' => false, 'message' => 'Vehicle not found']);
+    }
+    }
