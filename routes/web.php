@@ -990,5 +990,6 @@ Route::get('/d', function () {
     Route::post('/custom-inspection-update', [VehiclesController::class, 'custominspectionupdate'])->name('vehicles.savecustominspection');
     Route::post('/booking/canceling', [BookingController::class, 'canceling'])->name('booking.canceling');
     Route::post('/get-reservation', [VehiclesController::class, 'getReservation'])->name('get.reservation');
+    Route::post('/movement/revised/{id}', [MovementController::class, 'revise'])->name('movement.revised');
 });
 

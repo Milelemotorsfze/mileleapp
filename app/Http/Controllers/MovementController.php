@@ -653,4 +653,28 @@ public function grnfilepost(Request $request)
             }
          return response()->json($vehicleDetails);
     }
+    public function revise(Request $request, $id)
+{
+    $movementlast = Movement::findOrFail($id);
+    $vehicle = Vehicles::where('vin', $movementlast->vin)->first(); 
+    $revisedmovement = new Movement();
+    $revisedmovement->from = $movementlast->to;
+    $revisedmovement->to = $movementlast->from;
+    $revisedmovement->vin = $movementlast->vin;
+    $revisedmovement->reference_id = $movementlast->reference_id;
+    $revisedmovement->remarks = 'Revised Movement';
+    $revisedmovement->save();
+    if ($movementlast->from === 1) {
+        if ($vehicle) {
+            $vehicle->grn_id = null;
+            $vehicle->save();
+        }
+    } else if ($movementlast->to === 2) {
+        if ($vehicle) {
+            $vehicle->gdn_id = null;
+            $vehicle->save();
+        }
+    }
+    return redirect()->route('movement.index')->with('success', 'Movement has been revised successfully.');
+}
     }

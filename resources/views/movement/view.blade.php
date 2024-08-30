@@ -43,6 +43,7 @@
                     <th>To</th>
                     <th>SO</th>
                     <th>PO</th>
+                    <th>Revised</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -89,6 +90,23 @@
                         $po_number = $purchasing_orders ? $purchasing_orders->po_number : '';
                         @endphp
                         <td>PO - {{ $po_number }}</td>
+                        @php
+                        // Check if there is a more recent movement entry for the same VIN
+                        $latestMovement = DB::table('movements')
+                            ->where('vin', $movements->vin)
+                            ->orderBy('created_at', 'desc')
+                            ->first();
+                    @endphp
+                    <td>
+                        @if ($latestMovement && $latestMovement->id == $movements->id)
+                        <form action="{{ route('movement.revised', ['id' => $movements->id]) }}" method="POST" style="display:inline;">
+    @csrf
+    <button type="submit" class="btn btn-sm btn-danger">
+        Revise
+    </button>
+</form>
+                        @endif
+                    </td>
                         </tr>
                         @endforeach
                         </tbody>
