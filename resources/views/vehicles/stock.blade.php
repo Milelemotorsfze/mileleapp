@@ -291,9 +291,9 @@
     <div class="modal fade" id="enhancementModal" tabindex="-1" role="dialog" aria-labelledby="enhancementModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="bookingForm" method="POST" action="{{ route('enhancement.save') }}">
+            <form id="enhancementForm" method="POST" action="{{ route('enhancement.save') }}">
                 @csrf
-                <input type="hidden" name="vehicle_id" id="vehicle_id">
+                <input type="text" name="vehicle_id" id="vehicle_idenchacment">
                 <div class="modal-header">
                     <h5 class="modal-title" id="enhancementModalLabel">Enhancement Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -2759,7 +2759,7 @@ function openenhancementModal(vehicleId) {
                 $('#variantSelect').html(variantOptions);
                 
                 // Set the vehicle ID in the hidden input field
-                $('#vehicle_id').val(vehicleId);
+                $('#vehicle_idenchacment').val(vehicleId);
                 $('#enhancementModal').modal('show');
             }
         },
@@ -2787,6 +2787,33 @@ function opencustominspectionModal(vehicleIdInspection) {
         success: function(response) {
             $('#bookingModal').modal('hide');
             alert('Booking saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#enhancementForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#enhancementModal').modal('hide');
+            alert('Enhancement saved successfully.');
             location.reload();
         },
         error: function(xhr) {
