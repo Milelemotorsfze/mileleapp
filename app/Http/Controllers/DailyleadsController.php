@@ -128,11 +128,11 @@ class DailyleadsController extends Controller
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
                 if($hasPermission)
                 {
-                    $data->whereIn('status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
                 }
                 else
                 {
-                    $data->whereIn('status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
                 }
             }
             else
@@ -140,12 +140,12 @@ class DailyleadsController extends Controller
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
                 if($hasPermission)
                 {
-                    $data->where('status', $status)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->orderBy('created_at', 'desc');
                 
                 }
                 else
                 {
-                    $data->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
                 }
             }
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
@@ -161,6 +161,7 @@ class DailyleadsController extends Controller
                             ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.location', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhere('so.so_number', 'LIKE', "%$searchValue%")
                             ->orWhereExists(function ($subquery) use ($searchValue) {
                                 $subquery->select(DB::raw(1))
                                     ->from('calls_requirement')
@@ -206,9 +207,11 @@ class DailyleadsController extends Controller
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status')
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status'),
+                    'users.name as salespersonname',
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -264,6 +267,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(lead_closed.sales_notes, '') as csalesnotes"),
                     DB::raw("IFNULL(lead_closed.so_id, '') as so_id"),
                     DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as cdealvalues"),
+                    'users.name as salespersonname',
                 );
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
                 $data->leftJoin('so', function ($join) {
@@ -271,6 +275,7 @@ class DailyleadsController extends Controller
                          ->whereNotNull('lead_closed.so_id');
                 });
                 $data->addSelect('so.so_number');
+                $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
