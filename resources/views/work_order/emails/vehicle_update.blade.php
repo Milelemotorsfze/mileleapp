@@ -21,7 +21,7 @@
         @elseif(($workOrder->type == 'export_exw' || $workOrder->type == 'export_cnf') && $workOrder->is_batch == 0) 
             <strong>Batch:</strong> Single Work Order<br>
         @endif 
-        <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>  
+        <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? '' }}<br>  
     </p>
     <p>
         <a href="{{ $accessLink }}">Click here to view the work order</a><br>

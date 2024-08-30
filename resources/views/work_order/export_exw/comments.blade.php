@@ -325,7 +325,16 @@
                         : '<td></td>';
                 }
                 // Check for specific values and update the display text accordingly
-                if (item.old_value === 'total_deposit') {
+                if (item.field === 'Sales Person') {
+                    const oldSalesPersonName = item.old_value ? getUserById(item.old_value) : 'Unknown User';
+                    const newSalesPersonName = item.new_value ? getUserById(item.new_value) : 'Unknown User';
+                    oldValueHtml = `<td>${oldSalesPersonName}</td>`;
+                    newValueHtml = `<td>${newSalesPersonName}</td>`;
+                } else if (item.field === 'Is Batch') {
+                    oldValueHtml = `<td>${item.old_value == 1 ? 'Yes' : (item.old_value == 0 ? 'No' : '')}</td>`;
+                    newValueHtml = `<td>${item.new_value == 1 ? 'Yes' : (item.new_value == 0 ? 'No' : '')}</td>`;
+                }
+                else if (item.old_value === 'total_deposit') {
                     oldValueHtml = '<td>Total Deposit</td>';
                 } else if (item.old_value === 'custom_deposit') {
                     oldValueHtml = '<td>Custom Deposit</td>';

@@ -156,28 +156,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 			<div class="card">
 				<div class="card-header" style="background-color:#e8f3fd;">
 					<div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label> : <span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
 							</div>
 						</div>
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 								<center><label for="choices-single-default" class="form-label"> <strong> WO Number</strong></label> : <span class="data-font">{{ $workOrder->wo_number ?? '' }}</span></center>
 							</div>
 						</div>
-						<div class="col-lg-3 col-md-3 col-sm-6 col-12">
+						<div class="col-lg-2 col-md-2 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 								<center><label for="choices-single-default" class="form-label"> <strong> SO Number </strong></label> : <span class="data-font">{{ $workOrder->so_number ?? '' }}</span></center>
 							</div>
 						</div>
                         @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                            <div class="col-lg-2 col-md-2 col-sm-6 col-12">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                                     <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">{{ $workOrder->batch ?? '' }}</span></center>
                                 </div>
                             </div>
                         @endif
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-12">
+							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+								<center><label for="choices-single-default" class="form-label"> <strong> Sales Person </strong></label> : <span class="data-font">{{ $workOrder->salesPerson->name ?? '' }}</span></center>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="card-body">

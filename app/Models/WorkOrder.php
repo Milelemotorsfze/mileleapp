@@ -17,6 +17,7 @@ class WorkOrder extends Model
         'is_batch',
         'batch',
         'wo_number',
+        'sales_person_id',
 
         'customer_reference_id',
         'customer_reference_type',
@@ -171,6 +172,10 @@ class WorkOrder extends Model
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
+    }
+    public function salesPerson()
+    {
+        return $this->hasOne(User::class,'id','sales_person_id');
     }
     public function UpdatedBy()
     {

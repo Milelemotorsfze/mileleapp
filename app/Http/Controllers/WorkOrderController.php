@@ -143,7 +143,16 @@ class WorkOrderController extends Controller
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin')
             ->values(); // Reset the keys to ensure it's a proper array 
-        return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges'))->with([
+        $salesPersons = [];
+        $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
+            'create-wo-for-all-sales-person'
+        ]);
+        if ($hasAllSalesAccess) {
+            $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+                $q = $q->where('type','employee');
+            })->get();
+        }
+        return view('work_order.export_exw.create', compact('type', 'customers', 'customerCount', 'airlines', 'vins', 'users', 'addons', 'charges','salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }
@@ -1081,7 +1090,16 @@ class WorkOrderController extends Controller
             ->get();
         // Merge collections
         $addons = $accessories->merge($spareParts)->merge($kit);
-        return view('work_order.export_exw.create',compact('previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges'))->with([
+        $salesPersons = [];
+        $hasAllSalesAccess = Auth::user()->hasPermissionForSelectedRole([
+            'create-wo-for-all-sales-person'
+        ]);
+        if ($hasAllSalesAccess) {
+            $salesPersons = User::orderBy('name','ASC')->where('status','active')->where('is_sales_rep','Yes')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+                $q = $q->where('type','employee');
+            })->get();
+        }
+        return view('work_order.export_exw.create',compact('previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges','salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }

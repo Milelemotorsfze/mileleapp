@@ -31,7 +31,7 @@
             <strong>Batch:</strong> {{ $workOrder->is_batch ? $workOrder->batch : 'Single Work Order' }}<br>
         @endif 
 
-        <strong>Sales Person:</strong> {{ $workOrder->CreatedBy->name ?? '' }}<br>  
+        <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? '' }}<br>  
     </p>
 
     <p>

@@ -167,6 +167,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <center>End User</center>
                             </th>
                             <th rowspan="2" class="dark">Handover Person ID</th>
+							<th rowspan="2" class="light">Created By</th>
                             <th rowspan="2" class="light">Created At</th>
                             <th rowspan="2" class="dark">Last Updated By</th>
                             <th rowspan="2" class="dark">Last Updated At</th>
@@ -270,7 +271,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ $data->sales_support_data_confirmation ?? ''}}</label></td>
 							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
 							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
-							<td>{{$data->CreatedBy->name ?? ''}}</td>
+							<td>{{$data->salesPerson->name ?? ''}}</td>
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
@@ -442,6 +443,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</a>
 								@endif
 							</td>
+							<td>{{$data->CreatedBy->name ?? ''}}</td>
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
                             <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
