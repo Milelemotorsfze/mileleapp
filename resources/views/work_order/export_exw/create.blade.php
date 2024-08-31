@@ -286,7 +286,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					</div>
 					@else
+						@if(isset($workOrder))
+						<input type="hidden" name="sales_person_id" value="{{ $workOrder->sales_person_id ?? '' }}">
+						@else if(!isset($workOrder))
 						<input type="hidden" name="sales_person_id" value="{{ Auth::id() }}">
+						@endif
 					@endif
 
 					<div class="col-xxl-4 col-lg-11 col-md-11">
