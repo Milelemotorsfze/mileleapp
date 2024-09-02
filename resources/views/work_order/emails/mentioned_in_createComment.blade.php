@@ -5,7 +5,9 @@
 </head>
 <body>
     <!-- <p>Dear {{ $user->name }},</p> -->
-    <p>You were mentioned in a comment on work order {{ $workOrder->wo_number }}:</p>
+    <p>You were mentioned in a comment by {{ $comment->user->name }} on work order {{ $workOrder->wo_number }} at @if($comment->created_at != '')
+								{{\Carbon\Carbon::parse($comment->created_at)->format('d M Y,  h:i:s A')}}
+								@endif</p>
     <p>{{ $comment['text'] }}</p>
     <br>
     <p>

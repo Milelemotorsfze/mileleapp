@@ -168,7 +168,7 @@
         const baseUrl = '{{env('BASE_URL')}}';
 
         // Get the authenticated user's image path dynamically or fall back to 'OIP.jpg' if not available
-        const userProfileImage = "{{ Auth::user()->emp_profile && Auth::user()->emp_profile->image_path ? Auth::user()->emp_profile->image_path : 'images/users/OIP.jpg' }}";
+        const userProfileImage = "{{ Auth::user()->empProfile && Auth::user()->empProfile->image_path ? Auth::user()->empProfile->image_path : 'images/users/OIP.jpg' }}";
 
         const filePreviewsHtml = Array.from(commentFiles).map(file => {
             const reader = new FileReader();
