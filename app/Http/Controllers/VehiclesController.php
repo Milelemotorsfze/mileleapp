@@ -3732,7 +3732,15 @@ return response()->json(['success' => 'Vehicle updated successfully']);
 }
 public function saveenhancement(Request $request)
     {
-
+        $vehicleId = $request->input('vehicle_id');
+        $variantId = $request->input('variant_id');
+        info($vehicleId);
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            $vehicle->varaints_id = $variantId;
+            $vehicle->save();
+        }
+        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }
     public function getVariants(Request $request)
     {

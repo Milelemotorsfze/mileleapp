@@ -208,6 +208,7 @@
       </div>
     </div>
   </div>
+  <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
   <script type="text/javascript">
 $(document).ready(function () {
   $('.select2').select2();
