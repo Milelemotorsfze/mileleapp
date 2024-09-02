@@ -17,7 +17,7 @@
                             <i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
-                <a  class="btn btn-sm btn-primary float-end" href="{{ route('pfi-item.list') }}" title="PFI Item Lists" >
+                <a  class="btn btn-sm btn-primary float-end"  style="margin-right:5px;" href="{{ route('pfi-item.list') }}" title="PFI Item Lists" >
                     
                 <i class="fa fa-table" aria-hidden="true"></i>  View PFI Items</a>
                 @if (Session::has('success'))

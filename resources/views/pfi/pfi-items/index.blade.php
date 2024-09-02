@@ -15,7 +15,8 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('export-pfi-items');
                     @endphp
                     @if ($hasPermission)
-                        <a  class="btn btn-sm btn-primary float-end" href="{{ route('pfi-item.list', ['export' => 'EXCEL'] ) }}" ><i class="fa fa-download" aria-hidden="true"></i> Export</a>
+                        <a  class="btn btn-sm btn-primary float-end" href="{{ route('pfi-item.list', ['export' => 'EXCEL'] ) }}" >
+                            <i class="fa fa-download" aria-hidden="true"></i> Export</a>
                     @endif
                 @endcan 
                

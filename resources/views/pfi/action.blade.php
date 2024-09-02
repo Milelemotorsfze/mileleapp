@@ -79,7 +79,7 @@
                             <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Released Amount</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST">
+                        <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST" id="released-amount">
                             @csrf
                             <div class="modal-body">
                                 <div class="col-lg-12">
@@ -260,7 +260,8 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success:function (data) {
-                        location.reload();
+                        var table = $('.PFI-Items-table').DataTable();
+                        table.ajax.reload();
                         alertify.success('PFI Deleted successfully.');
                     }
                 });
