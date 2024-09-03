@@ -100,6 +100,7 @@ class WorkOrder extends Model
         'sales_support_data_confirmation',
         'finance_approval_status',
         'coo_approval_status',
+        'docs_status',
         'total_number_of_boe',
         'vehicle_count',
         'type_name',
@@ -135,6 +136,21 @@ class WorkOrder extends Model
         }else if($data && $data->status == 'rejected') {
             $status = 'Rejected';
         }
+        return $status;
+    }
+    public function getDocsStatusAttribute() {
+        $status = 'Not Initiated';
+        
+        // Fetch the most recent record for the current work order
+        $data = WoDocsStatus::where('wo_id', $this->id)
+            ->orderBy('doc_status_changed_at', 'DESC')
+            ->first();
+        
+        // If data exists, update the status to the latest one
+        if ($data) {
+            $status = $data->is_docs_ready;
+        }
+    
         return $status;
     }
     public function getTotalNumberOfBOEAttribute() {

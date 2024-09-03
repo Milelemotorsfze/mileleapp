@@ -103,8 +103,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	<h4 class="card-title form-label">@if(isset($workOrder) && $workOrder->type == 'export_exw') Export EXW @elseif(isset($workOrder) && $workOrder->type == 'export_cnf') Export CNF @elseif(isset($workOrder) && $workOrder->type == 'local_sale') Local Sale @endif Work Order Details</h4>
     <div class="col-12 d-flex flex-wrap float-end">        
         <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">Sales Support Data {{ $workOrder->sales_support_data_confirmation ?? ''}}</label>
-        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
         <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">Fin. {{ $workOrder->finance_approval_status ?? ''}}</label>
+        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO {{ $workOrder->coo_approval_status ?? ''}}</label>
+        @if(isset($workOrder))
+            @if($workOrder->sales_support_data_confirmation_at != '' && 
+                $workOrder->finance_approval_status == 'Approved' && 
+                $workOrder->coo_approval_status == 'Approved') 
+
+                @php
+                    // Determine the badge class based on docs_status
+                    $badgeClass = '';
+                    if ($workOrder->docs_status == 'In Progress') {
+                        $badgeClass = 'badge-soft-info';
+                    } elseif ($workOrder->docs_status == 'Ready') {
+                        $badgeClass = 'badge-soft-success';
+                    } elseif ($workOrder->docs_status == 'Not Initiated') {
+                        $badgeClass = 'badge-soft-danger';
+                    }
+
+                    // Determine the label text based on docs_status
+                    $labelText = '';
+                    if ($workOrder->docs_status == 'In Progress' || $workOrder->docs_status == 'Not Initiated') {
+                        $labelText = 'Documentation';
+                    } elseif ($workOrder->docs_status == 'Ready') {
+                        $labelText = 'Documents';
+                    }
+                @endphp
+
+                <label style="font-size: 119%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
+                    {{ $labelText }} {{ $workOrder->docs_status ?? '' }}
+                </label>
+            @endif
+        @endif
     </div>
     <div class="col-12 d-flex flex-wrap align-items-center">
         @if($previous != '')
