@@ -236,6 +236,7 @@
 @endsection
 @push('scripts')
     <script>
+        
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {

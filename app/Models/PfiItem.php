@@ -10,16 +10,17 @@ class PfiItem extends Model
 {
     use HasFactory, softDeletes;
 
+    public function pfi()
+    {
+        return $this->belongsTo(PFI::class,'pfi_id','id');
+    }
     public function letterOfIndentItem()
     {
         return $this->belongsTo(LetterOfIndentItem::class,'loi_item_id','id');
     }
     public function masterModel()
     {
-        return $this->belongsTo(MasterModel::class);
+        return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
-    public function parentPfiItem()
-    {
-        return $this->belongsTo(PfiItem::class,'parent_pfi_item_id','id');
-    }
+    
 }

@@ -79,7 +79,7 @@
                             <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Released Amount</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST">
+                        <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST" id="released-amount">
                             @csrf
                             <div class="modal-body">
                                 <div class="col-lg-12">
@@ -104,7 +104,7 @@
 
             <!--  PFI PAYMENT UPDATE MODAL -->
 
-            <div class="modal fade " id="update-pfi-payment-status-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <!-- <div class="modal fade " id="update-pfi-payment-status-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog ">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -136,7 +136,7 @@
                         </form>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!--  PFI PAYMENT DOCS MODAL -->
 
         <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -149,7 +149,7 @@
                     <div class="modal-body">
                         <div class="col-lg-12">
                             <div class="row p-2">
-                                <embed src="{{ url('PFI_Document_without_sign/'.$pfi->pfi_document_without_sign) }}" height="400" >
+                                <embed src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" height="400" >
                             </div>
                         </div>
                     </div>
@@ -169,13 +169,13 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        @if($pfi->pfiItems->count() > 0)
+                        @if($parentPfiItems->count() > 0)
                             <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
                                 <div class="d-flex">
                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                         <div class="row">
                                         <div class="col-lg-2 col-md-12 col-sm-12">
-                                                <dt>PFI Item Code</dt>
+                                                <dt>LOI Item Code</dt>
                                             </div>
                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                 <dt>Model</dt>
@@ -196,15 +196,16 @@
                                     </div>
                                 </div>
                             </div>
-                            @foreach($pfi->pfiItems as $value => $pfiItem)
+                            @foreach($parentPfiItems as $value => $pfiItem)
+                            {{ $pfiItem->test}}
                                 <div class="row">
                                     <div class="d-flex">
                                         <div class="col-lg-12 col-md-12 col-sm-12">
                                             <hr>
                                             <div class="row mt-3">
                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                    <dt class="d-lg-none d-xl-none d-xxl-none">PFI Item Code</dt>
-                                                    <dl> {{ $pfiItem->code ?? ''}} </dl>
+                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Item Code</dt>
+                                                    <dl> {{ $pfiItem->letterOfIndentItem->code ?? ''}} </dl>
                                                 </div>
                                               
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
@@ -226,7 +227,7 @@
                                                 </div>
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                     <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Total Price ({{ $pfi->currency }})</dt>
-                                                    <dl>{{ $pfiItem->unit_price * $pfiItem->quantity }}  </dl>
+                                                    <dl>{{ $pfiItem->unit_price * $pfiItem->pfi_quantity }}  </dl>
                                                 </div>
                                             </div>
                                         </div>
@@ -242,7 +243,6 @@
             </div>
         </div>
                                       
-                     
                    
 <script>
     $('.pfi-button-delete').on('click',function(){
@@ -260,7 +260,8 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success:function (data) {
-                        location.reload();
+                        var table1 = $('#PFI-table').DataTable();
+                        table1.ajax.reload();
                         alertify.success('PFI Deleted successfully.');
                     }
                 });

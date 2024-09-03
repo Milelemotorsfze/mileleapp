@@ -15,7 +15,7 @@ class LOIItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Builder $builder,Request $request)
+    public function index(Request $request)
     {
         $data = LetterOfIndentItem::orderBy('updated_at','DESC')->with([
                 'LOI' => function ($query) {
@@ -42,6 +42,8 @@ class LOIItemController extends Controller
                 }]);
 
                 if($request->export == 'EXCEL') {
+                    (new UserActivityController)->createActivity('Downloaded LOI Item List');
+
                     $data = $data->get();
                   return (new FastExcel($data))->download('LOI-ITEMS.csv', function ($data) {
                     $soNumbers = LoiSoNumber::where('letter_of_indent_id', $data->LOI->id)
