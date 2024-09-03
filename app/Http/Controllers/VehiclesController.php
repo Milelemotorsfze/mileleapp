@@ -3799,5 +3799,53 @@ public function saveenhancement(Request $request)
             'extColorOptions' => $extColorSelect,
             'vin' => $vin,
         ]);
-    }    
+    } 
+    public function saveenhancementcolor(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $int_color = $request->input('int_color_dropdown');
+        $ext_color = $request->input('ext_color_dropdown');
+        info($int_color);
+        $vehicle = Vehicles::find($vehicleId);
+        $oldValueint = $vehicle->int_colour;
+        $oldValueex = $vehicle->ex_colour;
+        if ($vehicle) {
+            $vehicle->int_colour = $int_color;
+            $vehicle->ex_colour = $ext_color;
+            $vehicle->save();
+        }
+        if($oldValueint != $int_color)
+        {
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Interior Colours';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Interior Colour";
+        $vehicleslog->old_value = $oldValueint;
+        $vehicleslog->new_value = $int_color;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        }
+        if($oldValueex != $ext_color)
+        {
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Exterior Colours';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Exterior Colour";
+        $vehicleslog->old_value = $oldValueex;
+        $vehicleslog->new_value = $ext_color;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        }
+        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
+    }   
     }

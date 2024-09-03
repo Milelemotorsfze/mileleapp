@@ -328,14 +328,14 @@
                 <input type="hidden" name="vehicle_id" id="vehicle_colour">
                     <div class="form-group">
                         <label for="int_color_dropdown">Interior Color</label>
-                        <select id="int_color_dropdown" class="form-control">
+                        <select name = "int_color_dropdown" id="int_color_dropdown" class="form-control">
                             <!-- Options will be populated by AJAX -->
                         </select>
                     </div>
 </br>
                     <div class="form-group">
                         <label for="ext_color_dropdown">Exterior Color</label>
-                        <select id="ext_color_dropdown" class="form-control">
+                        <select name = "ext_color_dropdown" id="ext_color_dropdown" class="form-control">
                             <!-- Options will be populated by AJAX -->
                         </select>
                     </div>
@@ -2890,7 +2890,7 @@ $('#enhancementForm').on('submit', function(e) {
 }
     });
 });
-$('#enhancementForm').on('submit', function(e) {
+$('#editColorForm').on('submit', function(e) {
     e.preventDefault();
     var formData = $(this).serialize();
 
@@ -2899,8 +2899,8 @@ $('#enhancementForm').on('submit', function(e) {
         url: $(this).attr('action'),
         data: formData,
         success: function(response) {
-            $('#enhancementModal').modal('hide');
-            alert('Enhancement saved successfully.');
+            $('#colorModal').modal('hide');
+            alert('Enhancement Colour saved successfully.');
             location.reload();
         },
         error: function(xhr) {
