@@ -3765,7 +3765,6 @@ public function saveenhancement(Request $request)
         $varaiant = Varaint::find($variantId);
         $masterModelLinesId = $varaiant->master_model_lines_id;
         $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
-                            ->where('category', 'Modified')
                             ->get();
                             return response()->json([
                                 'success' => true,
