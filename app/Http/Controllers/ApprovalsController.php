@@ -1056,7 +1056,6 @@ class ApprovalsController extends Controller
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
           "PFI Number: " . $purchasingOrder->pl_number . "\n" .
           "Stage: " . "QC Inspection Done\n" .
-          "Number of Units: " . $transactionCount . " Vehicles\n" .
           "Old Variant: " . $oldVariantName . " Vehicles\n" .
           "New Variant: " . $newVariantName . " Vehicles\n" .
           "Order URL: " . $orderUrl;
@@ -1115,6 +1114,8 @@ class ApprovalsController extends Controller
     }
     public function approvalsrotein(Request $request)
     {
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
         $useractivities =  New UserActivities();
         $useractivities->activity = "Approved the routain inspection";
         $useractivities->users_id = Auth::id();
