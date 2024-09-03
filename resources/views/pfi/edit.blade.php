@@ -129,24 +129,24 @@
                                                 </div>
                                             </div>
                                           
-                                            @if($pfi->supplier->is_MMC == true)
-                                                <div class="col-lg-4 col-md-6 mmc-items-div" >
-                                                    <div class="mb-3">
-                                                        <label for="choices-single-default" class="form-label">Delivery Location</label>
-                                                        <input type="text" id="delivery-location" class="form-control" name="delivery_location"
-                                                         placeholder="Delivery Location">
+                                                <!-- <span class="" hidden> -->
+                                                    <div class="col-lg-4 col-md-6 mmc-items-div" hidden>
+                                                        <div class="mb-3">
+                                                            <label for="choices-single-default" class="form-label">Delivery Location</label>
+                                                            <input type="text" id="delivery-location" class="form-control" name="delivery_location"
+                                                            placeholder="Delivery Location">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-lg-4 col-md-6 mmc-items-div">
-                                                    <div class="mb-3">
-                                                        <label for="choices-single-default" class="form-label">Currency</label>
-                                                        <select class="form-control" name="currency" id="currency" >
-                                                            <option value="USD" {{ $pfi->currency == 'USD' ? 'selected' : ''}}>USD</option>
-                                                            <option value="EUR" {{ $pfi->currency == 'EUR' ? 'selected' : ''}}>EUR</option>
-                                                        </select>
+                                                    <div class="col-lg-4 col-md-6 mmc-items-div" hidden>
+                                                        <div class="mb-3">
+                                                            <label for="choices-single-default" class="form-label">Currency</label>
+                                                            <select class="form-control" name="currency" id="currency" >
+                                                                <option value="USD" {{ $pfi->currency == 'USD' ? 'selected' : ''}}>USD</option>
+                                                                <option value="EUR" {{ $pfi->currency == 'EUR' ? 'selected' : ''}}>EUR</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            @endif
+                                                <!-- </span> -->
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">Comment</label>
@@ -168,121 +168,129 @@
                                         <h4 class="card-title">Add PFI Item Details</h4>
                                     </div>
                                     <div class="card-body">
-                                    <div class="row">
-                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                        <label class="form-label">Model</label>
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
-                                        <label class="form-label">SFX</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                        <label class="form-label">LOI Code</label>
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
-                                        <label class="form-label">PFI QTY</label>
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12">
-                                        <label class="form-label">Unused QTY</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                        <label class="form-label">Unit Price</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                        <label class="form-label">Total Price</label>
-                                    </div>
-                                </div>
+                                        <div class="row">
+                                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <label class="form-label">Model</label>
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
+                                                <label class="form-label">SFX</label>
+                                            </div>
+                                            <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                                <label class="form-label">LOI Code</label>
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
+                                                <label class="form-label">PFI QTY</label>
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12">
+                                                <label class="form-label">Unused QTY</label>
+                                            </div>
+                                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <label class="form-label">Unit Price</label>
+                                            </div>
+                                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <label class="form-label">Total Price</label>
+                                            </div>
+                                        </div>
                                         <div id="pfi-items" >
-                                        @foreach($parentPfiItems as $key => $pfi_item) 
-                                            <div class="row pfi-items-parent-div" id="row-{{$key+1}}">
-                                                <div class="row pfi-child-item-div-{{$key+1}}" id="parentItem" index="{{$key+1}}" >
-                                                    <div class="row chilItems child-item-{{$key+1}}" id="row-{{$key+1}}-item-0">
-                                                        <div class="col-lg-2 col-md-6">
-                                                            <select class="form-select widthinput text-dark models mb-2 border-bold"  required
-                                                            index="{{$key+1}}" item="0" id="model-{{$key+1}}-item-0" multiple name="PfiItem[{{$key+1}}][model][0]">
-                                                                <option value="" >Select Model</option>
-                                                                    @foreach($masterModels as $model)
-                                                                        <option value="{{ $model->model }}" {{ $pfi_item->masterModel->model == $model->model ? 'selected' : '' }}>{{ $model->model }}</option>
-                                                                    @endforeach
-                                                                </select>  
-                                                        </div>
-                                                        <div class="col-lg-1 col-md-6">
-                                                            <select class="form-control text-dark widthinput sfx mb-2" required
-                                                                multiple name="PfiItem[{{$key+1}}][sfx][0]" index="{{$key+1}}" item="0" id="sfx-{{$key+1}}-item-0">
-                                                                @foreach($pfi_item->sfxLists as $sfx)
-                                                                    <option value="{{ $sfx}}" {{$sfx == $pfi_item->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        
-                                                        </div>
-                                                        <div class="col-lg-2 col-md-6">
-                                                            <select class="form-control text-dark widthinput loi-items mb-2" required multiple
-                                                            name="PfiItem[{{$key+1}}][loi_item][0]" index="{{$key+1}}" item="0" id="loi-item-{{$key+1}}-item-0" 
-                                                            placeholder="LOI Code" >
-                                                            <option value="{{ $pfi_item->letterOfIndentItem->id }}" selected>{{ $pfi_item->letterOfIndentItem->code ?? ''}}</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-lg-1 col-md-6">
-                                                            <input type="number" min="1" oninput=calculateTotalAmount({{$key+1}},0) required name="PfiItem[{{$key+1}}][pfi_quantity][0]"
-                                                                class="form-control mb-2 widthinput pfi-quantities" placeholder="0"
-                                                                index="{{$key+1}}" item="0" id="pfi-quantity-{{$key+1}}-item-0" value="{{$pfi_item->pfi_quantity }}">
-                                                        </div>
-                                                        <div class="col-lg-1 col-md-6">
-                                                            <input type="number" readonly class="form-control mb-2 widthinput remaining-quantities" placeholder="0"
-                                                                index="{{$key+1}}" item="0" id="remaining-quantity-{{$key+1}}-item-0" 
-                                                                value="{{$pfi_item->remainingQuantity }}">
-                                                        </div>
-                                                        <div class="col-lg-2 col-md-6">
-                                                            <input type="number" min="0"  required placeholder="0" name="PfiItem[{{$key+1}}][unit_price][0]" oninput=calculateTotalAmount({{$key+1}},0) 
-                                                                class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
-                                                                index="{{$key+1}}" item="0" id="unit-price-{{$key+1}}-item-0" value="{{$pfi_item->unit_price }}">
-                                                        </div>
-                                                        <div class="col-lg-2 col-md-6">
-                                                            <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts" 
-                                                            placeholder="Total Amount" id="total-amount-{{$key+1}}-item-0" index="{{$key+1}}" item="0"
-                                                            value="{{ $pfi_item->totalAmount }}">
-                                                            <input type="hidden" class="master-model-ids" id="master-model-id-{{$key+1}}-item-0" value="{{ $pfi_item->master_model_id }}">
-                                                        </div>
-                                                        <div class="col-lg-1 col-md-6 col-sm-12" >
-                                                            <a class="btn btn-primary btn-sm add-more" id="add-more-{{$key+1}}" index="{{$key+1}}" item="0"
-                                                            title="Add Child PFI Items" > <i class="fas fa-plus"> </i> 
-                                                                </a>
-                                                            <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-{{$key+1}}" index="{{$key+1}}"> 
-                                                                <i class="fas fa-trash-alt"></i> </a>
-                                                        </div>
-                                                    </div>
-                                                    @foreach($pfi_item->childPfiItems as $child_Key => $childPfiItem)
-                                                        <div class="row chilItems child-item-{{$key+1}}" id="row-{{$key+1}}-item-{{$child_Key+1}}">
-                                                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                                                <select class="form-select widthinput text-dark models" multiple name="PfiItem[{{$key+1}}][model][{{$child_Key+1}}]"
-                                                                    index="{{$key+1}}" item="{{$child_Key+1}}" id="model-{{$key+1}}-item-{{$child_Key+1}}" required autofocus>
-                                                                    @foreach($childPfiItem->masterModels as $childModel)
-                                                                        <option value="{{ $childModel->model }}" {{ $childPfiItem->masterModel->model == $childModel->model ? 'selected' : '' }} >{{ $childModel->model }}</option>
+                                            @foreach($parentPfiItems as $key => $pfi_item) 
+                                                <div class="row pfi-items-parent-div" id="row-{{$key+1}}">
+                                                    <div class="row pfi-child-item-div-{{$key+1}}" id="parentItem" index="{{$key+1}}" >
+                                                        <div class="row chilItems child-item-{{$key+1}}" id="row-{{$key+1}}-item-0">
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <select class="form-select widthinput text-dark models mb-2 border-bold"  required
+                                                                index="{{$key+1}}" item="0" id="model-{{$key+1}}-item-0" multiple name="PfiItem[{{$key+1}}][model][0]">
+                                                                    <option value="" >Select Model</option>
+                                                                        @foreach($masterModels as $model)
+                                                                            <option value="{{ $model->model }}" {{ $pfi_item->masterModel->model == $model->model ? 'selected' : '' }}>{{ $model->model }}</option>
+                                                                        @endforeach
+                                                                    </select>  
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6">
+                                                                <select class="form-control text-dark widthinput sfx mb-2" required multiple 
+                                                                name="PfiItem[{{$key+1}}][sfx][0]" index="{{$key+1}}" item="0" id="sfx-{{$key+1}}-item-0">
+                                                                    @foreach($pfi_item->sfxLists as $sfx)
+                                                                        <option value="{{ $sfx}}" {{$sfx == $pfi_item->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
                                                                     @endforeach
                                                                 </select>
-                                                                @error('model')
-                                                                <span>
-                                                                    <strong >{{ $message }}</strong>
-                                                                    </span>
-                                                                @enderror
+                                                            
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <select class="form-control text-dark widthinput loi-items mb-2" required multiple
+                                                                name="PfiItem[{{$key+1}}][loi_item][0]" index="{{$key+1}}" item="0" id="loi-item-{{$key+1}}-item-0" 
+                                                                placeholder="LOI Code" >
+                                                                    @if($pfi_item->is_loi_available == 'YES')
+                                                                        @foreach($pfi_item->LOIItemCodes as $LOIItemCode)
+                                                                            <option value="{{ $LOIItemCode->id }}" {{$LOIItemCode->id == $pfi_item->letterOfIndentItem->id ? 'selected' : ''}} >
+                                                                        {{ $LOIItemCode->code }}</option>
+                                                                        @endforeach
+                                                                    @else
+                                                                
+                                                                        <option value="NULL" selected>NO LOI</option> 
+                                                                        
+                                                                    @endif
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6">
+                                                                <input type="number" min="1" oninput=calculateTotalAmount({{$key+1}},0) required name="PfiItem[{{$key+1}}][pfi_quantity][0]"
+                                                                    class="form-control mb-2 widthinput pfi-quantities" placeholder="0"
+                                                                    index="{{$key+1}}" item="0" id="pfi-quantity-{{$key+1}}-item-0" value="{{$pfi_item->pfi_quantity }}">
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6">
+                                                                <input type="number" readonly class="form-control mb-2 widthinput remaining-quantities" placeholder="0"
+                                                                    index="{{$key+1}}" item="0" id="remaining-quantity-{{$key+1}}-item-0" 
+                                                                    value="{{$pfi_item->remainingQuantity }}">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <input type="number" min="0"  required placeholder="0" name="PfiItem[{{$key+1}}][unit_price][0]" oninput=calculateTotalAmount({{$key+1}},0) 
+                                                                    class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
+                                                                    index="{{$key+1}}" item="0" id="unit-price-{{$key+1}}-item-0" value="{{$pfi_item->unit_price }}">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts" 
+                                                                placeholder="Total Amount" id="total-amount-{{$key+1}}-item-0" index="{{$key+1}}" item="0"
+                                                                value="{{ $pfi_item->totalAmount }}">
+                                                                <input type="hidden" class="master-model-ids" id="master-model-id-{{$key+1}}-item-0" value="{{ $pfi_item->master_model_id }}">
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6 col-sm-12" >
+                                                                <a class="btn btn-primary btn-sm add-more" id="add-more-{{$key+1}}" index="{{$key+1}}" item="0"
+                                                                title="Add Child PFI Items" > <i class="fas fa-plus"> </i> 
+                                                                    </a>
+                                                                <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-{{$key+1}}" index="{{$key+1}}"> 
+                                                                    <i class="fas fa-trash-alt"></i> </a>
+                                                            </div>
+                                                        </div>
+                                                        @foreach($pfi_item->childPfiItems as $child_Key => $childPfiItem)
+                                                            <div class="row chilItems child-item-{{$key+1}}" id="row-{{$key+1}}-item-{{$child_Key+1}}">
+                                                                <div class="col-lg-2 col-md-6 col-sm-12">
+                                                                    <select class="form-select widthinput text-dark models" multiple name="PfiItem[{{$key+1}}][model][{{$child_Key+1}}]"
+                                                                        index="{{$key+1}}" item="{{$child_Key+1}}" id="model-{{$key+1}}-item-{{$child_Key+1}}" required autofocus>
+                                                                        @foreach($childPfiItem->masterModels as $childModel)
+                                                                            <option value="{{ $childModel->model }}" {{ $childPfiItem->masterModel->model == $childModel->model ? 'selected' : '' }} >{{ $childModel->model }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                
                                                                 </div>
                                                                 <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
-                                                                    <select class="form-select widthinput text-dark sfx" required multiple name="PfiItem[{{$key+1}}][sfx][{{$child_Key+1}}]" 
-                                                                    index="{{$key+1}}" item="{{$child_Key+1}}" id="sfx-{{$key+1}}-item-{{$child_Key+1}}" >
-                                                                   
+                                                                    <select class="form-select widthinput text-dark sfx"  multiple name="PfiItem[{{$key+1}}][sfx][{{$child_Key+1}}]" 
+                                                                    index="{{$key+1}}" item="{{$child_Key+1}}" required id="sfx-{{$key+1}}-item-{{$child_Key+1}}" >
+                                                                    
                                                                     @foreach($childPfiItem->sfxLists as $sfx)
-                                                                        <option value="{{ $sfx}}" {{$sfx == $childPfiItem->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
+                                                                        <option value="{{ $sfx}}" {{ $childPfiItem->masterModel->sfx == $sfx ? 'selected' : ''}} >{{ $sfx }}</option>
                                                                     @endforeach
-                                                                </select>
-                                                                @error('sfx')
-                                                                <div role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </div>
-                                                                @enderror
+                                                                    </select>
+                                                                    
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
                                                                     <select class="form-control text-dark widthinput loi-items mb-2" required index="{{$key+1}}" multiple
                                                                         name="PfiItem[{{$key+1}}][loi_item][{{$child_Key+1}}]" item="{{$child_Key+1}}" id="loi-item-{{$key+1}}-item-{{$child_Key+1}}">
-                                                                        <option value="{{ $childPfiItem->letterOfIndentItem->id }}" selected>{{ $childPfiItem->letterOfIndentItem->code ?? ''}}</option>
+                                                                        @if($childPfiItem->is_loi_available == 'YES')
+                                                                            @foreach($childPfiItem->LOIItemCodes as $LOIItemCode)
+                                                                                <option value="{{ $LOIItemCode->id }}" {{$LOIItemCode->id == $childPfiItem->letterOfIndentItem->id ? 'selected' : ''}}>
+                                                                                {{ $LOIItemCode->code }}</option>
+                                                                            @endforeach
+                                                                         @else
+                                                                            <option value="NULL" selected>NO LOI</option> 
+                                                                        @endif
                                                                        
                                                                     </select>
                                                                 </div>
@@ -297,7 +305,7 @@
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
                                                                     <input type="number" min="0"  required placeholder="0" index="{{$key+1}}" name="PfiItem[{{$key+1}}][unit_price][{{$child_Key+1}}]" 
-                                                                    oninput=calculateTotalAmount({{$key+1}}) class="form-control widthinput mb-2 unit-prices"  value="{{ $childPfiItem->unit_price}}"
+                                                                    oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}})  class="form-control widthinput mb-2 unit-prices"  value="{{ $childPfiItem->unit_price}}"
                                                                         id="unit-price-{{$key+1}}-item-{{$child_Key+1}}" item="{{$child_Key+1}}" placeholder="Unit price">
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
@@ -311,21 +319,20 @@
                                                                     <i class="fas fa-trash-alt"></i> </a>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
-                                    </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="btn btn-info btn-sm add-pfi-btn float-end" >
-                                            <i class="fas fa-plus"></i> Add LOI Item
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="btn btn-info btn-sm add-pfi-btn float-end" >
+                                                    <i class="fas fa-plus"></i> Add LOI Item
+                                                </div>
+                                                
+                                            </div>
                                         </div>
-                                        
                                     </div>
-                                </div>
-                            </div>
                                 </div>
 
                                 <div class="col-12 text-center">
@@ -398,9 +405,7 @@
                 pfi_reference_number: {
                 required: true,
                 },
-                pfi_date: {
-                    required: true,
-                },
+               
                 amount: {
                     required: true,
                 },
@@ -473,6 +478,24 @@
                 }
             });
             });
+            $( document ).ready(function() {
+                hideorShowMMCDiv();
+                let type = 'Edit';
+            
+            });
+
+            function hideorShowMMCDiv() {
+                let MMC = $('#supplier-id').find('option:selected').attr("data-is-MMC");
+                console.log(MMC);
+            if(MMC == 1) {
+                console.log(MMC);
+                $('.mmc-items-div').attr('hidden', false);
+            }else{
+                $('.mmc-items-div').attr('hidden', true);
+                $('#delivery-location').val('');
+                $('#currency').val('USD');
+            }
+            }
 
         // get the unit price while supplier select
 
@@ -483,20 +506,12 @@
                 loiItems.push($(this).val());
                 });
             // let supplier = $(this).val();
-            let MMC = $(this).find('option:selected').attr("data-is-MMC");
-
-            if(MMC == 1) {
-                $('.mmc-items-div').attr('hidden', false);
-            }else{
-                $('.mmc-items-div').attr('hidden', true);
-                $('#delivery-location').val('');
-                $('#currency').val('USD');
-            }
+            hideorShowMMCDiv();
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                console.log(childIndex);
+               
                 for(let j=0; j<=childIndex;j++) 
                 {
                     getLOIItemDetails(i,j);                 
@@ -533,33 +548,33 @@
             calculatePfiAmount();
         }
 
-        $('form').on('submit', function(e){
-            $('.overlay').show();
+        // $('form').on('submit', function(e){
+        //     $('.overlay').show();
             
-            let quantitySum = 0;
-            $('.pfi-quantities').each(function() {
-                var quantity = $(this).val();
-                quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
+        //     // let quantitySum = 0;
+        //     // $('.pfi-quantities').each(function() {
+        //     //     var quantity = $(this).val();
+        //     //     quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
                 
-            });
-            if(quantitySum <= 0) {
-                $('.overlay').hide();
-                e.preventDefault();
-                alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
-            }else {
-                if($("#form-create").valid()) {
-                    $('#form-create').submit();
-                }else{
-                    $('.overlay').hide();
-                    e.preventDefault();
-                }
-            }
-        });
+        //     // });
+        //     // if(quantitySum <= 0) {
+        //     //     $('.overlay').hide();
+        //     //     e.preventDefault();
+        //     //     alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
+        //     // }else {
+        //         if($("#form-update").valid()) {
+        //             $('#form-update').submit();
+        //         }else{
+        //             $('.overlay').hide();
+        //             e.preventDefault();
+        //         }
+        //     // }
+        // });
 
         ///// start new code ////
       
         $(document.body).on('select2:select', "#client_id", function (e) {
-          
+           // pass any type to include selected Ids in the query
             $('#client_id-error').remove();
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
@@ -806,6 +821,7 @@
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
+           
             var id = e.params.data.id;
             var text = e.params.data.text;
             let model = $('#model-'+index+'-item-'+childIndex).val();
@@ -818,6 +834,7 @@
             $('#pfi-quantity-'+index+'-item-'+childIndex).val("");
             $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
             $('#pfi-quantity-'+index+'-item-'+childIndex).removeClass('is-invalid');
+
         });
 
         $(document.body).on('click', ".add-more", function (e) {
@@ -865,7 +882,7 @@
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0"  required placeholder="0" name="PfiItem[${index}][unit_price][${item}]" 
-                                oninput=calculateTotalAmount(${index}) class="form-control widthinput mb-2 unit-prices"
+                               oninput=calculateTotalAmount(${index},${item}) class="form-control widthinput mb-2 unit-prices"
                                     id="unit-price-${index}-item-${item}" item="${item}"  index="${index}" placeholder="Unit price">
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -954,7 +971,7 @@
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0"  required placeholder="0" name="PfiItem[${index}][unit_price][0]" 
-                                class="form-control widthinput mb-2 unit-prices"  index="${index}" 
+                                class="form-control widthinput mb-2 unit-prices"  index="${index}" oninput=calculateTotalAmount(${index},0) 
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -998,14 +1015,16 @@
             var index = $(this).attr('index');
             // var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
             var childIndex = $(this).attr('item');
-
+            console.log(index);
+            console.log(childIndex);
             var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
+            console.log(sfx[0]);
             var model = $('#model-'+index+'-item-'+childIndex).val();
             var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
            
             if(loiItemId[0]) {
-                appendLOIItemCode(index,childIndex,loiItemId,loiItemText.model[0],sfx[0]);
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText,model[0],sfx[0]);
             }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
@@ -1077,6 +1096,7 @@
                 $(this).find('.unit-prices').attr('name', 'PfiItem['+ index +'][unit_price]['+ i +']');
                 $(this).find('.unit-prices').attr('item',i);
                 $(this).find('.unit-prices').attr('id','unit-price-'+index+'-item-'+i);
+                $(this).find('.unit-prices').attr('oninput','calculateTotalAmount('+index+','+i+')');
 
                 $(this).find('.total-amounts').attr('item',i);
                 $(this).find('.total-amounts').attr('id','total-amount-'+index+'-item-'+i);
@@ -1158,20 +1178,19 @@
             let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
             let url = '{{ route('loi-item-code') }}';
             var selectedLOIItemIds = [];
-
-            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-            for(let i=1; i<=parentIndex;i++) 
-            {
-                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                for(let j=0; j<=childIndex;j++) 
+                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                for(let i=1; i<=parentIndex;i++) 
                 {
-                    var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
-                    if(eachSelectedLOIItemId) {
-                        selectedLOIItemIds.push(eachSelectedLOIItemId);
+                    let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                    for(let j=0; j<=childIndex;j++) 
+                    {
+                        var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
+                        if(eachSelectedLOIItemId) {
+                            selectedLOIItemIds.push(eachSelectedLOIItemId);
+                        }
                     }
                 }
-            }
-
+            
             if(model.length > 0  && sfx.length > 0) {
                 $('.overlay').show();
                 $.ajax({
@@ -1194,7 +1213,7 @@
                         $('#'+id ).val("NULL").trigger('change');
                            
                     }else{
-                        jQuery.each(codes, function(key,value){
+                        jQuery.each(codes, function(key,value){                          
                             $('#loi-item-'+index+'-item-'+childIndex).append('<option value="'+ value.id +'">'+ value.code +'</option>');
                          });
                     }

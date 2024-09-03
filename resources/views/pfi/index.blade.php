@@ -21,7 +21,7 @@
                     
                 <i class="fa fa-table" aria-hidden="true"></i>  View PFI Items</a>
                 @if (Session::has('success'))
-                    <div class="alert alert-success" id="success-alert">
+                    <div class="alert alert-success mt-3" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                         {{ Session::get('success') }}
                     </div>

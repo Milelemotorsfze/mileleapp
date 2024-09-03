@@ -272,7 +272,6 @@
                 }
         });
 
-          let loi_id = '{{ request()->id }}';
         $('#supplier-id').select2({
             placeholder: "Select Vendor",
             maximumSelectionLength: 1
@@ -303,9 +302,6 @@
             rules: {
                 pfi_reference_number: {
                 required: true,
-                },
-                pfi_date: {
-                    required: true,
                 },
                 amount: {
                     required: true,
@@ -439,28 +435,28 @@
             calculatePfiAmount();
         }
 
-        $('form').on('submit', function(e){
-            $('.overlay').show();
+        // $('form').on('submit', function(e){
+        //     $('.overlay').show();
             
-            let quantitySum = 0;
-            $('.pfi-quantities').each(function() {
-                var quantity = $(this).val();
-                quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
+        //     let quantitySum = 0;
+        //     $('.pfi-quantities').each(function() {
+        //         var quantity = $(this).val();
+        //         quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
                 
-            });
-            if(quantitySum <= 0) {
-                $('.overlay').hide();
-                e.preventDefault();
-                alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
-            }else {
-                if($("#form-create").valid()) {
-                    $('#form-create').submit();
-                }else{
-                    $('.overlay').hide();
-                    e.preventDefault();
-                }
-            }
-        });
+        //     });
+        //     if(quantitySum <= 0) {
+        //         $('.overlay').hide();
+        //         e.preventDefault();
+        //         alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
+        //     }else {
+        //         if($("#form-create").valid()) {
+        //             $('#form-create').submit();
+        //         }else{
+        //             $('.overlay').hide();
+        //             e.preventDefault();
+        //         }
+        //     }
+        // });
 
         ///// start new code ////
       
@@ -771,7 +767,7 @@
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0"  required placeholder="0" index="${index}" name="PfiItem[${index}][unit_price][${item}]" 
-                                oninput=calculateTotalAmount(${index}) class="form-control widthinput mb-2 unit-prices"
+                                oninput=calculateTotalAmount(${index},${item}) class="form-control widthinput mb-2 unit-prices"
                                     id="unit-price-${index}-item-${item}" item="${item}" placeholder="Unit price">
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -860,7 +856,7 @@
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0"  required placeholder="0" index="${index}" name="PfiItem[${index}][unit_price][0]" 
-                                class="form-control widthinput mb-2 unit-prices"
+                                class="form-control widthinput mb-2 unit-prices"  oninput=calculateTotalAmount(${index},0)
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -911,7 +907,7 @@
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
            
             if(loiItemId[0]) {
-                appendLOIItemCode(index,childIndex,loiItemId,loiItemText.model[0],sfx[0]);
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText,model[0],sfx[0]);
             }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
@@ -983,6 +979,7 @@
                 $(this).find('.unit-prices').attr('name', 'PfiItem['+ index +'][unit_price]['+ i +']');
                 $(this).find('.unit-prices').attr('item',i);
                 $(this).find('.unit-prices').attr('id','unit-price-'+index+'-item-'+i);
+                $(this).find('.unit-prices').attr('oninput','calculateTotalAmount('+index+','+i+')');
 
                 $(this).find('.total-amounts').attr('item',i);
                 $(this).find('.total-amounts').attr('id','total-amount-'+index+'-item-'+i);

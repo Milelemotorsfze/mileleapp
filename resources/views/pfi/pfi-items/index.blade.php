@@ -57,7 +57,6 @@
                         <thead class="bg-soft-secondary">
                             <tr>
                                 <th>S.No</th>
-                                <th>LOI Number</th>
                                 <th>LOI Item Code</th> 
                                 <th>PFI Date</th>                                                                              
                                 <th>PFI Number</th>
@@ -95,7 +94,6 @@
             ajax: "{{ route('pfi-item.list') }}",
         columns: [
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
-            {'data' : 'letter_of_indent_item.l_o_i.uuid', 'name' : 'letterOfIndentItem.LOI.uuid', orderable: false},
             {'data' : 'letter_of_indent_item.code', 'name' : 'letterOfIndentItem.code' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},

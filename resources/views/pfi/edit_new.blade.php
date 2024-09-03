@@ -333,6 +333,7 @@
 @endsection
 @push('scripts')
     <script>
+        
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -469,6 +470,17 @@
             });
             });
 
+            function MMCDivHideOrShow(){
+                let MMC = $('#supplier-id').find('option:selected').attr("data-is-MMC");
+
+            if(MMC == 1) {
+                $('.mmc-items-div').attr('hidden', false);
+            }else{
+                $('.mmc-items-div').attr('hidden', true);
+                $('#delivery-location').val('');
+                $('#currency').val('USD');
+            }
+            }
         // get the unit price while supplier select
 
         $(document.body).on('select2:select', "#supplier-id", function (e) {
@@ -478,15 +490,7 @@
                 loiItems.push($(this).val());
                 });
             let supplier = $(this).val();
-            let MMC = $(this).find('option:selected').attr("data-is-MMC");
-
-            if(MMC == 1) {
-                $('.mmc-items-div').attr('hidden', false);
-            }else{
-                $('.mmc-items-div').attr('hidden', true);
-                $('#delivery-location').val('');
-                $('#currency').val('USD');
-            }
+            MMCDivHideOrShow();
 
             if(supplier) {
                 $.ajax({
