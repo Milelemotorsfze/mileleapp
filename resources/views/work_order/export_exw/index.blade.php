@@ -37,9 +37,6 @@
 	.other-error {
 	color: red;
 	}
-	.table-edits input, .table-edits select {
-	height:38px!important;
-	}
 </style>
 @section('content')
 <div class="card-header">
@@ -102,7 +99,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 <div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+				<table class="my-datatable table table-striped table-editable table" style="width:100%;">
 					<thead>
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
@@ -114,6 +111,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<th colspan="2" class="dark">
 								<center>Approval Status</center>
 							</th>
+							<th rowspan="2" class="light">Documentation Status</th>
 							<th rowspan="2" class="light">Sales Person</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
@@ -261,8 +259,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                             </a>
                                         </li>
 										@endif
+										@if($data->sales_support_data_confirmation_at != '' && 
+											$data->finance_approval_status == 'Approved' && 
+											$data->coo_approval_status == 'Approved')
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
+											@endphp
+											@if ($hasPermission)
+												<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateDocStatusModal_{{$data->id}}">
+													<i class="fa fa-file" aria-hidden="true"></i> Update Doc Status
+												</a>
+											@endif
+										@endif
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
+										@endphp
+										@if ($hasPermission)
+											<li>
+												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
+													href="{{route('docStatusHistory',$data->id)}}">
+													<i class="fas fa-eye"></i> Doc Status Log
+												</a>
+											</li>
+										@endif
 									</ul>
-								</div>                         
+								</div> 
+								@include('work_order.export_exw.doc_status_update')                     
                             </td>
 							<td>{{ ++$i }}</td>
 							@if(isset($type) && ($type == 'all'|| $type == 'all'))	
@@ -271,6 +293,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ $data->sales_support_data_confirmation ?? ''}}</label></td>
 							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
 							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
+							<td>
+							@if($data->sales_support_data_confirmation_at != '' && 
+								$data->finance_approval_status == 'Approved' && 
+								$data->coo_approval_status == 'Approved') 
+
+								@php
+									// Determine the badge class based on docs_status
+									$badgeClass = '';
+									if ($data->docs_status == 'In Progress') {
+										$badgeClass = 'badge-soft-info';
+									} elseif ($data->docs_status == 'Ready') {
+										$badgeClass = 'badge-soft-success';
+									} elseif ($data->docs_status == 'Not Initiated') {
+										$badgeClass = 'badge-soft-danger';
+									}
+								@endphp
+
+								<label class="badge {{ $badgeClass }}">
+									{{ $data->docs_status ?? '' }}
+								</label>
+							@endif
+						</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>

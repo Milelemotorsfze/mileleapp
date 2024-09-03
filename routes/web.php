@@ -27,6 +27,7 @@ use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\WOApprovalsController;
+use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -448,7 +449,11 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
-
+    Route::controller(WoDocsStatusController::class)->group(function(){
+        Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
+        Route::post('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
+    });    
+    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
