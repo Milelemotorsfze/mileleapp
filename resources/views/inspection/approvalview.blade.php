@@ -175,6 +175,7 @@
                     <option value="PHEV" @if($variant_request->fuel_type == 'PHEV') selected @endif>PHEV</option>
                     <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option>
                     <option value="EV" @if($variant_request->fuel_type == 'EV') selected @endif>EV</option>
+                    <option value="PH" @if($variant_request->fuel_type == 'PH') selected @endif>PH</option>
                  </select>
                 </td>
                 <td>

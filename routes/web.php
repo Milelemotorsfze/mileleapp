@@ -993,6 +993,7 @@ Route::get('/d', function () {
     Route::post('/movement/revised/{id}', [MovementController::class, 'revise'])->name('movement.revised');
     Route::post('/enhancement', [VehiclesController::class, 'saveenhancement'])->name('enhancement.save');
     Route::get('/enhancement/getVariants', [VehiclesController::class, 'getVariants'])->name('enhancement.getVariants');
-
+    Route::get('/enhancement/getcolours', [VehiclesController::class, 'getcolours'])->name('get.color.data');
+    Route::post('/enhancementcolour', [VehiclesController::class, 'saveenhancementcolor'])->name('enhancement.savecolour');
 });
 
