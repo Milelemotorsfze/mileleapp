@@ -3736,10 +3736,24 @@ public function saveenhancement(Request $request)
         $variantId = $request->input('variant_id');
         info($vehicleId);
         $vehicle = Vehicles::find($vehicleId);
+        $oldValue = $vehicle->varaints_id;
         if ($vehicle) {
             $vehicle->varaints_id = $variantId;
             $vehicle->save();
         }
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Variant After Enhancement';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Variant";
+        $vehicleslog->old_value = $oldValue;
+        $vehicleslog->new_value = $variantId;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
         return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }
     public function getVariants(Request $request)
@@ -3753,8 +3767,37 @@ public function saveenhancement(Request $request)
         $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
                             ->where('category', 'Modified')
                             ->get();
-        return response()->json(['success' => true, 'data' => $variants]);
+                            return response()->json([
+                                'success' => true,
+                                'data' => [
+                                    'variants' => $variants,
+                                    'vin' => $vehicle->vin,  // Assuming the VIN is stored in the vehicle model
+                                ]
+                            ]);
     }
     return response()->json(['success' => false, 'message' => 'Vehicle not found']);
     }
+    public function getcolours(Request $request)
+    {
+        $vehicleId = $request->get('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        $intColorOptions = ColorCode::where('belong_to', 'int')->get();
+        $extColorOptions = ColorCode::where('belong_to', 'ex')->get();
+        $vin = $vehicle->vin;
+        $intColorSelect = '<option value="">Select Interior Color</option>';
+        foreach ($intColorOptions as $color) {
+            $selected = $vehicle->int_colour == $color->id ? 'selected' : '';
+            $intColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+        }
+        $extColorSelect = '<option value="">Select Exterior Color</option>';
+        foreach ($extColorOptions as $color) {
+            $selected = $vehicle->ex_colour == $color->id ? 'selected' : '';
+            $extColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+        }
+        return response()->json([
+            'intColorOptions' => $intColorSelect,
+            'extColorOptions' => $extColorSelect,
+            'vin' => $vin,
+        ]);
+    }    
     }

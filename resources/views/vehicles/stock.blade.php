@@ -293,9 +293,9 @@
         <div class="modal-content">
             <form id="enhancementForm" method="POST" action="{{ route('enhancement.save') }}">
                 @csrf
-                <input type="text" name="vehicle_id" id="vehicle_idenchacment">
+                <input type="hidden" name="vehicle_id" id="vehicle_idenchacment">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="enhancementModalLabel">Enhancement Details</h5>
+                    <h5 class="modal-title" id="enhancementModalLabel">Enhancement Details - <span id="vehicleVin"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -311,6 +311,38 @@
                     <button type="submit" class="btn btn-primary">Save Enhancement</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Structure -->
+<div class="modal fade" id="colorModal" tabindex="-1" role="dialog" aria-labelledby="colorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="colorModalLabel">Edit Colors - <span id="vehicleVincolor"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editColorForm" method="POST" action="{{ route('enhancement.savecolour') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_colour">
+                    <div class="form-group">
+                        <label for="int_color_dropdown">Interior Color</label>
+                        <select id="int_color_dropdown" class="form-control">
+                            <!-- Options will be populated by AJAX -->
+                        </select>
+                    </div>
+</br>
+                    <div class="form-group">
+                        <label for="ext_color_dropdown">Exterior Color</label>
+                        <select id="ext_color_dropdown" class="form-control">
+                            <!-- Options will be populated by AJAX -->
+                        </select>
+                    </div>
+</br>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -1405,40 +1437,54 @@ table3.on('draw', function () {
 });
 $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
     if (processing) {
-        // Optionally, customize the indicator here, or just use the default one
         $('#dtBasicExample3_processing').show();
     } else {
         $('#dtBasicExample3_processing').hide();
     }
 });
 $('#dtBasicExample3 tbody').off('click', 'tr');
-// Add specific click event listeners for relevant columns
 $('#dtBasicExample3 tbody').on('click', 'td', function () {
     var table = $('#dtBasicExample3').DataTable();
     var cellIndex = table.cell(this).index().column; // Get the clicked cell's column index
     var columnHeader = table.column(cellIndex).header().innerText; // Get the header text of the clicked column
-
-    // Check for "Custom Inspection Number" column click
     if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
         @if ($hascustominspectionPermission)
-            var datainspection = table.row(this).data();
+            var datainspection = table3.row(this).data();
             opencustominspectionModal(datainspection.id);
         @endif
     }
     else if(columnHeader === 'Reservation End')
     {
-    // Check for other columns (like "direct-booking") as per existing logic
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
-        var data = table.row(this).data();
+        var data = table3.row(this).data();
         openBookingModal(data.id);
     @endif
     }
+    else if(columnHeader === 'Variant Detail')
+{
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('adding-enhancement');
+    @endphp
+    @if ($hasPermission)
+        var data = table3.row(this).data();
+        openenhancementModal(data.id);
+    @endif
+}
+if (columnHeader === 'Ext Colour' || columnHeader === 'Int Colour') {
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('editing-colours');
+    @endphp
+    @if ($hasPermission)
+        var data = table3.row(this).data();
+        openeditingcolorModal(data.id);
+    @endif
+}
 });
 //         var table4 = $('#dtBasicExample4').DataTable({
 //           processing: true,
@@ -2742,23 +2788,18 @@ function displayGallery(imageUrls) {
     $('#bookingModal').modal('show');
 }
 function openenhancementModal(vehicleId) {
-    // Send an AJAX request to get the variant and related information
     $.ajax({
-        url: "{{ route('enhancement.getVariants') }}",  // Route to the controller method
+        url: "{{ route('enhancement.getVariants') }}",
         method: "GET",
         data: { vehicle_id: vehicleId },
         success: function(response) {
-            // Handle the response from the server
             if(response.success) {
-                // Populate the modal with the data returned from the server
-                // Example: Assuming response.data contains the list of variants
                 let variantOptions = '';
-                response.data.forEach(function(variant) {
+                response.data.variants.forEach(function(variant) {
                     variantOptions += `<option value="${variant.id}">${variant.name}</option>`;
                 });
                 $('#variantSelect').html(variantOptions);
-                
-                // Set the vehicle ID in the hidden input field
+                $('#vehicleVin').text(response.data.vin);
                 $('#vehicle_idenchacment').val(vehicleId);
                 $('#enhancementModal').modal('show');
             }
@@ -2768,6 +2809,25 @@ function openenhancementModal(vehicleId) {
         }
     });
 }
+function openeditingcolorModal(vehicleId) {
+        $.ajax({
+            url: '{{ route('get.color.data') }}',
+            type: 'GET',
+            data: {
+                vehicle_id: vehicleId
+            },
+            success: function(response) {
+                $('#int_color_dropdown').html(response.intColorOptions);
+                $('#ext_color_dropdown').html(response.extColorOptions);
+                $('#vehicleVincolor').text(response.vin);
+                $('#vehicle_colour').val(vehicleId);
+                $('#colorModal').modal('show');
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
 function opencustominspectionModal(vehicleIdInspection) {
     $('#vehicle_idinspection').val(vehicleIdInspection);
     $('#custominspectionModal').modal('show');
@@ -2787,6 +2847,33 @@ function opencustominspectionModal(vehicleIdInspection) {
         success: function(response) {
             $('#bookingModal').modal('hide');
             alert('Booking saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#enhancementForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#enhancementModal').modal('hide');
+            alert('Enhancement saved successfully.');
             location.reload();
         },
         error: function(xhr) {
