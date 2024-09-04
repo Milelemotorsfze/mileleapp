@@ -2828,8 +2828,26 @@ function openeditingcolorModal(vehicleId) {
             }
         });
     }
-function opencustominspectionModal(vehicleIdInspection) {
+    function opencustominspectionModal(vehicleIdInspection) {
+    // Set the vehicle_idinspection value
     $('#vehicle_idinspection').val(vehicleIdInspection);
+
+    // Make an AJAX call to get the custom inspection details
+    $.ajax({
+        url: '/get-custom-inspection-data',  // The route to get the custom inspection data
+        type: 'GET',
+        data: { vehicle_id: vehicleIdInspection },
+        success: function(response) {
+            // Populate the modal fields with the fetched data
+            $('#custom_inspection_number').val(response.custom_inspection_number);
+            $('#custom_inspection_status').val(response.custom_inspection_status);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+
+    // Show the modal
     $('#custominspectionModal').modal('show');
 }
     function showFullText(button) {

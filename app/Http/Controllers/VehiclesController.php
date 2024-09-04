@@ -3847,4 +3847,20 @@ public function saveenhancement(Request $request)
         }
         return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
     }  
+    public function getCustomInspectionData(Request $request)
+{
+    // Find the vehicle by ID and fetch its custom inspection details
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
+
+    if ($vehicle) {
+        // Return the custom inspection number and status
+        return response()->json([
+            'custom_inspection_number' => $vehicle->custom_inspection_number, // Replace with the actual column
+            'custom_inspection_status' => $vehicle->custom_inspection_status  // Replace with the actual column
+        ]);
+    } else {
+        return response()->json(['error' => 'Vehicle not found'], 404);
+    }
+}
     }
