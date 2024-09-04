@@ -317,4 +317,24 @@ namespace App\Http\Controllers;
                 }),
             ]);
         }
+        public function getUserById($id)
+        {
+            // Find the user by ID
+            $user = User::find($id);
+    
+            // Check if the user exists
+            if ($user) {
+                // Return user data as a JSON response
+                return response()->json([
+                    'status' => 'success',
+                    'user' => $user
+                ]);
+            } else {
+                // Return error response if user not found
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ], 404);
+            }
+        }
     }
