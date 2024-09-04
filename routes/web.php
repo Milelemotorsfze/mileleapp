@@ -1001,5 +1001,6 @@ Route::get('/d', function () {
     Route::get('/enhancement/getcolours', [VehiclesController::class, 'getcolours'])->name('get.color.data');
     Route::post('/enhancementcolour', [VehiclesController::class, 'saveenhancementcolor'])->name('enhancement.savecolour');
     Route::post('/vehicles/uploadVinFile', [MovementController::class, 'uploadVinFile'])->name('vehicles.uploadVinFile');
+    Route::get('/get-custom-inspection-data', [VehiclesController::class, 'getCustomInspectionData']);
 });
 
