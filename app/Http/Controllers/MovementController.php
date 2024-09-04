@@ -677,4 +677,81 @@ public function grnfilepost(Request $request)
     }
     return redirect()->route('movement.index')->with('success', 'Movement has been revised successfully.');
 }
+public function uploadVinFile(Request $request)
+{
+if ($request->hasFile('vin_file')) {
+    $file = $request->file('vin_file');
+    $vinNumbers = [];
+    if (($handle = fopen($file, 'r')) !== false) {
+        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+            $vinNumbers[] = $data[0];
+        }
+        fclose($handle);
+    }
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+    if($hasPermission)
+    {
+        $vehicles = Vehicles::whereIn('vin', $vinNumbers)
+        ->whereNotNull('vin')
+        ->where('status', '!=', 'cancel')
+        ->whereNull('grn_id')
+        ->where('status', '=', 'Approved')
+        ->pluck('id');
+    }
+    else
+    {
+    $vehicles = Vehicles::whereIn('vin', $vinNumbers)
+        ->whereNotNull('vin')
+        ->where('status', '!=', 'cancel')
+        ->whereNull('gdn_id')
+        ->where('status', '=', 'Approved')
+        ->pluck('id');
+    }
+    if ($vehicles->isEmpty()) {
+        return response()->json(['success' => false, 'message' => 'No matching VINs found']);
+    }
+        $vehicleDetails = [];
+        foreach($vehicles  as $key =>  $vehicle) {
+            $data = Vehicles::find($vehicle);
+            $vehicleDetails[$key]['vin'] = $data->vin;
+            $vehicle = Vehicles::where('vin', $data->vin)->first();
+            $variant = Varaint::find($vehicle->varaints_id)->name;
+            $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+            $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
+            $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+            $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+            $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
+            $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+            $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+            if (empty($warehouseName)) {
+             if($vehicle->latest_location){
+             $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+             }
+             else{
+                $warehouseName = 1;
+             }
+             }
+             if (empty($warehouseNames)) {
+             if($vehicle->latest_location)
+             {
+                $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first();
+             }
+            else
+            {
+                $warehouseNames = "Supplier";
+            }
+            }
+             $vehicleDetails[$key]['variant'] = $variant;
+             $vehicleDetails[$key]['modelLine'] = $modelLine;
+             $vehicleDetails[$key]['brand'] = $brand;
+             $vehicleDetails[$key]['warehouseName'] = $warehouseName;
+             $vehicleDetails[$key]['warehouseNames'] = $warehouseNames;
+             $vehicleDetails[$key]['po_number'] = $po_number;
+             $vehicleDetails[$key]['so_number'] = $so_number;
+        }
+    return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
+} else {
+    return response()->json(['success' => false, 'message' => 'No file uploaded']);
+}
+} 
     }

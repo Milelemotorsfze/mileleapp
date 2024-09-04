@@ -3846,5 +3846,5 @@ public function saveenhancement(Request $request)
         $vehicleslog->save();
         }
         return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
-    }   
+    }  
     }
