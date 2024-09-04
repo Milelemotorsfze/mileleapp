@@ -1063,4 +1063,21 @@
         link.click();
         document.body.removeChild(link);
     }
+    function getUserById(userId) {
+        let userName = 'Unknown User';
+        $.ajax({
+            url: `/getUser/${userId}`, // Your route to fetch user by ID
+            type: 'GET',
+            async: false, // Ensure the request completes before returning the result
+            success: function(response) {
+                if (response && response.user) {
+                    userName = response.user.name;
+                }
+            },
+            error: function() {
+                console.error('Error fetching user data.');
+            }
+        });
+        return userName;
+    }
 </script>
