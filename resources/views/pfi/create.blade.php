@@ -248,6 +248,7 @@
 @endsection
 @push('scripts')
     <script type="text/javascript">
+
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -498,13 +499,12 @@
                     let loiCode = $('#loi-item-'+i+'-item-'+j).val();
                     if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
                      isDataAvailable = true;
-                        return false;
+                        break;
                                                  
                     }                                                
                 }
             
             }
-            console.log(isDataAvailable);
             if(isDataAvailable == true) {
                 var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
                         if (e) {
@@ -526,7 +526,7 @@
             
             let data =  e.params.data.id;
             let isData = false;
-            return false;
+
            // chcek any item selcted 
            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
 
@@ -538,16 +538,16 @@
                     let model = $('#model-'+i+'-item-'+j).val();
                     let sfx = $('#sfx-'+i+'-item-'+j).val();
                     let loiCode = $('#loi-item-'+i+'-item-'+j).val();
-                    if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
-                        console.log("yes");
+                    if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 )
+                    {
                         isData = true;
-                        return false;
-                                               
+                         break;
+
                     }                                             
                 }
             
             }
-            console.log(isData)
+
             if(isData == true) {
                 var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
                         if (e) {
@@ -575,20 +575,19 @@
                 {
                     if(j == 0) {
                         $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                        $("#sfx-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                        $("#loi-item-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
                     }else{
                         $("#model-"+i+"-item-"+j).empty();
-                        $("#sfx-"+i+"-item-"+j).empty();
-                        $("#loi-item-"+i+"-item-"+j).empty();
                     }
+                    $("#sfx-"+i+"-item-"+j).empty();
+                    $("#loi-item-"+i+"-item-"+j).empty();
                     
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remaining-quantity-"+i+"-item-"+j).val("");
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
-                    $('#country_id').empty();          
+                    // country unselect if client id unselect
+                    $('#country_id').prop("selectedIndex", -1).trigger("change");          
                     
                 }
             }

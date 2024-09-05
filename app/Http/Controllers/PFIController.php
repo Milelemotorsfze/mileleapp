@@ -75,7 +75,6 @@ class PFIController extends Controller
                                     ->sum('pfi_quantity');
 
                             $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
-                            info($pfi_quantity);
                             $item->quantity = $pfi_quantity;
                             $item->test = "test";
                         }
@@ -164,6 +163,9 @@ class PFIController extends Controller
                         return $quantity;
                     })
                     ->addColumn('pfi_date', function($query) {
+                        return Carbon::parse($query->pfi->created_at)->format('d M Y');
+                    })
+                    ->addColumn('total_price', function($query) {
                         return Carbon::parse($query->pfi->created_at)->format('d M Y');
                     })
                     ->rawColumns(['pfi_date','pfi_quantity'])
@@ -573,14 +575,17 @@ class PFIController extends Controller
         $pfi->save();
         return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
     }
-    public function relaesedAmountUpdate(Request $request, $id) {
+    public function relaesedAmountUpdate(Request $request) {
+        info($request->all());
         (new UserActivityController)->createActivity('PFI released amount updated.');
 
-        $pfi = PFI::find($id);
+        $pfi = PFI::find($request->pfi_id);
+        info($pfi);
         $pfi->released_amount = $request->released_amount;
         $pfi->released_date = $request->released_date;
         $pfi->save();
-        return redirect()->back()->with('success', 'Payment released amount Successfully.');
+        return response($pfi);
+        // return redirect()->back()->with('success', 'Payment released amount Successfully.');
     }
     public function getLOIItemCode(Request $request) {
         info($request->all());

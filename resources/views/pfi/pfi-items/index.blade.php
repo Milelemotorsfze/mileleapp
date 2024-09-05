@@ -71,7 +71,8 @@
                                 <th>SFX</th>
                                 <th>PFI Quantity</th>
                                 <th>Unit Price</th>
-                                <th>Amount</th>
+                                <!-- <th>Total Price</th> -->
+                                <th>PFI Amount</th>
                                 <th>Comment</th>                      
                             </tr>
                         </thead>
@@ -107,7 +108,8 @@
             {'data' : 'master_model.model', 'name': 'masterModel.model', orderable: false },      
             {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },              
             {'data' : 'pfi_quantity', 'name': 'pfi_quantity', orderable: false },   
-            {'data' : 'unit_price', 'name': 'unit_price', orderable: false },        
+            {'data' : 'unit_price', 'name': 'unit_price', orderable: false }, 
+            // {'data' : 'total_price', 'name': 'total_price', orderable: false },         
             {'data' : 'amount', 'name': 'pfi.amount', orderable: false },   
             {'data' : 'pfi.comment', 'name': 'pfi.comment', orderable: false },        
         ]

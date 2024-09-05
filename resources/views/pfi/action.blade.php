@@ -79,64 +79,30 @@
                             <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Released Amount</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form action="{{ route('pfi-released-amount-update', $pfi->id) }}" method="POST" id="released-amount">
-                            @csrf
                             <div class="modal-body">
                                 <div class="col-lg-12">
                                     <div class="row p-2">
-                                        <input type="date" name="released_date" required class="form-control" >
+                                        <input type="date" name="released_date" value="{{ Illuminate\Support\Carbon::parse($pfi->released_date)->format('Y-m-d') }}"
+                                         required class="form-control" id="released_date_{{$pfi->id}}" >
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="row p-2">
-                                        <input type="number" min="0" required name="released_amount" class="form-control" >
+                                        <input type="number" min="0" value="{{ $pfi->released_amount }}" required name="released_amount" 
+                                        class="form-control" id="released_amount_{{$pfi->id}}" >
                                     </div>
                                 </div>
                             </div>
+                            <input type="hidden"  value="{{ $pfi->id }}" name="pfi_id" id="pfi_id">
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-info">Update</button>
+                                <button type="button" class="btn btn-info released-detail-update" data-id="{{$pfi->id}}">Update</button>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
-                        </form>
                     </div>
                 </div>
             </div>
 
-            <!--  PFI PAYMENT UPDATE MODAL -->
-
-            <!-- <div class="modal fade " id="update-pfi-payment-status-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog ">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Payment Status</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('pfi-payment-status-update', $pfi->id) }}" method="POST">
-                            @csrf
-                            <div class="modal-body">
-                                <div class="col-lg-12">
-                                    <div class="row p-2">
-                                        <select name="payment_status" class="form-select">
-                                            <option value="UNPAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_UNPAID == $pfi->payment_status ? 'selected' : '' }} >UNPAID </option>
-                                            <option value="PARTIALY PAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_PARTIALY_PAID == $pfi->payment_status ? 'selected' : '' }}>
-                                                PARTIALY PAID
-                                            </option>
-                                            <option value="PAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_PAID == $pfi->payment_status ? 'selected' : '' }} >
-                                                PAID
-                                            </option>
-                                            <option value="CANCELLED" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_CANCELLED == $pfi->payment_status ? 'selected' : '' }}>CANCELLED </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-info">Update</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> -->
+           
             <!--  PFI PAYMENT DOCS MODAL -->
 
         <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -197,7 +163,6 @@
                                 </div>
                             </div>
                             @foreach($parentPfiItems as $value => $pfiItem)
-                            {{ $pfiItem->test}}
                                 <div class="row">
                                     <div class="d-flex">
                                         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -245,10 +210,12 @@
                                       
                    
 <script>
+    
     $('.pfi-button-delete').on('click',function(){
         let id = $(this).attr('data-id');
         let url =  $(this).attr('data-url');
         var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+          
             if (e) {
                 $.ajax({
                     type: "POST",
@@ -267,6 +234,39 @@
                 });
             }
         }).set({title:"Delete Item"})
+    });
+
+    $('.released-detail-update').on('click',function(){
+        let pfi_id = $(this).attr('data-id');
+
+        let url =  "{{ route('pfi-released-amount-update') }}";
+        let released_amount = $('#released_amount_'+pfi_id).val();
+        let released_date = $('#released_date_'+pfi_id).val();
+
+        var confirm = alertify.confirm('Are you sure you want to Update Released amount and data for this item ?',function (e) {
+            $('#update-released-amount-'+pfi_id).modal('hide');
+            
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        released_amount: released_amount,
+                        released_date: released_date,
+                        pfi_id: pfi_id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        var table1 = $('#PFI-table').DataTable();
+                        table1.ajax.reload();
+
+                        alertify.success('PFI Updated successfully.');
+                    }
+                });
+            }
+        }).set({title:"Update Item"})
     });
 
 </script>

@@ -186,21 +186,20 @@
                     <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Comment</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('update-loi-comment', ['id' => $letterOfIndent->id])}}" method="POST">
-                    @csrf
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-lg-12 m-1">
                                 <label class="form-label fw-bold">Comment</label>
-                                <textarea rows="5" cols="20" class="form-control" name="comments" placeholder="Comment Here.."> {{ $letterOfIndent->comments }} </textarea>
+                                <textarea rows="5" cols="20" class="form-control" required name="comments" id="comment-{{ $letterOfIndent->id }}"
+                                placeholder="Comment Here..">{{ $letterOfIndent->comments }}</textarea>
+                                <span id="comment-error-{{ $letterOfIndent->id }}" class="text-danger"> </span>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-info">Update</button>
+                        <button type="button" class="btn btn-info" onclick="updateComment({{ $letterOfIndent->id }})">Update</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
-                </form>
             </div>
         </div>
     </div>
@@ -254,6 +253,49 @@
                 }
             }).set({title:"Update Expired Status"})
         });
+
+       function updateComment(id){
+            let url =  "{{ route('update-loi-comment')}}";
+            let comment = $('#comment-'+id).val();
+            if(comment.length > 0) {
+                document.getElementById("comment-error-"+id).textContent="";
+	            document.getElementById("comment-"+id).classList.remove("is-invalid");
+	            document.getElementById("comment-error-"+id).classList.remove("paragraph-class");
+
+                var confirm = alertify.confirm('Are you sure ? Do you want to Update Comment of this item ?',function (e) {
+                if (e) {
+                    $('#update-loi-comment-'+id).modal('hide');
+                        
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            comments:comment,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table1 = $('.new-LOI-table').DataTable();
+                            table1.ajax.reload();
+                            var table2 = $('.waiting-for-approval-table').DataTable();
+                            table2.ajax.reload();
+                            var table3 = $('.supplier-response-table').DataTable();
+                            table3.ajax.reload();
+                            alertify.success('LOI Comment updated successfully.');
+
+                        }
+                    });
+                }
+                }).set({title:"Delete Item"})
+            }else{
+                let msg = "This filed is required";
+                document.getElementById("comment-error-"+id).textContent=msg;
+                document.getElementById("comment-"+id).classList.add("is-invalid");
+                document.getElementById("comment-error-"+id).classList.add("paragraph-class");
+            }
+            
+        }
         
     </script>
 
