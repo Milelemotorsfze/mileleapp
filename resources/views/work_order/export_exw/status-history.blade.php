@@ -49,7 +49,7 @@
 <div class="card">
     <div class="card-header">
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
         @endphp
         @if ($hasPermission)
             <h4 class="card-title">
@@ -64,7 +64,7 @@
                 <i class="fa fa-eye" aria-hidden="true"></i> Work Order Details
                 </a>
             @endif	
-            @include('work_order.export_exw.doc_approval')
+            @include('work_order.export_exw.update_status')
         @endif
         @if (count($errors) > 0)
         <div class="alert alert-danger">
@@ -112,15 +112,15 @@
                         @if(count($data) > 0)
                             <div hidden>{{$i=0;}}</div>
                             @foreach($data as $one)
-                                <tr data-id="{{ $one->id }}">
-                                    <td>{{ ++$i }}</td>
-                                    <td>
-                                        <label class="badge @if($one->is_docs_ready == 'In Progress') badge-soft-info @elseif($one->is_docs_ready == 'Ready') badge-soft-success @elseif($one->is_docs_ready == 'Not Initiated') badge-soft-danger @endif">{{ $one->is_docs_ready ?? ''}}</label>
-                                    </td>
-                                    <td>{{ $one->documentation_comment ?? '' }}</td>
-                                    <td>{{ $one->user->name ?? '' }}</td>
-                                    <td>@if($one->doc_status_changed_at != ''){{ $one->doc_status_changed_at->format('d M Y,  h:i:s A') ?? '' }}@endif</td>                                 
-                                </tr>
+                            <tr data-id="{{ $one->id }}">
+                                <td>{{ ++$i }}</td>
+                                <td>
+                                    <label class="badge @if($one->status == 'On Hold') badge-soft-info @elseif($one->status == 'Active') badge-soft-success @endif">{{ strtoupper($one->status) ?? ''}}</label>
+                                </td>
+                                <td>{{ $one->comment ?? '' }}</td>
+                                <td>{{ $one->user->name ?? '' }}</td>
+                                <td>{{ $one->status_changed_at ? $one->status_changed_at->format('d M Y,  h:i:s A') : '' }}</td>                                 
+                            </tr>
                             @endforeach
                         @else
                             <tr>

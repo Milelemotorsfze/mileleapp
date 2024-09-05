@@ -17,6 +17,7 @@ use App\Models\WOApprovalDataHistory;
 use App\Models\WOApprovalDepositAganistVehicle;
 use App\Models\WOApprovalAddonDataHistory;
 use App\Models\WOApprovalVehicleDataHistory;
+use App\Models\WoStatus;
 use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
@@ -288,7 +289,12 @@ class WorkOrderController extends Controller
                 $input['is_batch'] = 1;
             }
             $workOrder = WorkOrder::create($input);
-        
+            $createwostatus['wo_id'] = $workOrder->id;
+            $createwostatus['status_changed_by'] = $authId;
+            $createwostatus['status'] = 'Active';
+            $createwostatus['comment'] = 'The system generated the status when this work order was created.';
+            $createwostatus['status_changed_at'] = Carbon::now();
+            $WoStatusCreate = WoStatus::create($createwostatus);
             if(isset($request->is_batch)) {
                 WORecordHistory::create([
                     'work_order_id' => $workOrder->id,
