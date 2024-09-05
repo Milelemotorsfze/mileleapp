@@ -953,6 +953,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         </div>
                                                     </div>
                                                 @endif
+                                                @if(isset($workOrder->latestStatus))
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Status Remarks</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">{{ $workOrder->latestStatus->comment ?? 'NA' }}</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Status Updated By</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">{{ $workOrder->latestStatus->user->name ?? 'NA' }}</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Status Updated At</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">
+                                                                        @if(!empty($workOrder->latestStatus->status_changed_at))
+                                                                            {{ \Carbon\Carbon::parse($workOrder->latestStatus->status_changed_at)->format('d M Y, h:i:s A') }}
+                                                                        @else
+                                                                            NA
+                                                                        @endif
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>  
                                         </div>
                                     </div>
