@@ -468,9 +468,11 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 resetData();
+
                 let type = 'all';
                 getModels(i,0,type);
                 enableOrDisableAddMoreButton(i);
+
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
 
                 for(let j=0; j<=childIndex;j++) 
@@ -586,6 +588,7 @@
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
+                    $('#master-model-id-'+i+'-item-'+j).val("");
                     // country unselect if client id unselect
                     $('#country_id').prop("selectedIndex", -1).trigger("change");          
                     
@@ -1148,6 +1151,7 @@
                         selectedModelIds.push(eachSelectedModelId);
                     }
                 }
+                console.log(selectedModelIds);
             // if(customer.length > 0) {
                 $('.overlay').show();
                 $.ajax({
