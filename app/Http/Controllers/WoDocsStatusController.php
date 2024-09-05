@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\WoDocsStatus;
+use App\Models\WorkOrder;
 
 class WoDocsStatusController extends Controller
 {
@@ -18,27 +19,25 @@ class WoDocsStatusController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        // Create or update the wo_docs_status record
-        $woDocStatus = WoDocsStatus::updateOrCreate(
-            ['wo_id' => $validatedData['workOrderId']], // Find record by work order ID
-            [
-                'is_docs_ready' => $validatedData['status'],
-                'documentation_comment' => $validatedData['comment'],
-                'doc_status_changed_by' => Auth::id(), // Set the ID of the authenticated user
-                'doc_status_changed_at' => now(), // Set the current timestamp
-            ]
-        );
+        // Always create a new wo_docs_status record
+        $woDocStatus = WoDocsStatus::create([
+            'wo_id' => $validatedData['workOrderId'], // Associate with work order ID
+            'is_docs_ready' => $validatedData['status'], // Set the document status
+            'documentation_comment' => $validatedData['comment'], // Optional comment
+            'doc_status_changed_by' => Auth::id(), // Set the ID of the authenticated user
+            'doc_status_changed_at' => now(), // Set the current timestamp
+        ]);
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $woDocStatus]);
     }
     public function docStatusHistory($id)
     {
-        $data = WoDocsStatus::where('work_order_id', $id)->where('type', 'coo')->orderBy('id','DESC')->get();
+        $data = WoDocsStatus::where('wo_id', $id)->orderBy('doc_status_changed_at','DESC')->get();
         $workOrder = WorkOrder::where('id',$id)->first();
         $type = $workOrder->type;
         $previous = WorkOrder::where('type',$type)->where('id', '<', $workOrder->id)->max('id');
         $next = WorkOrder::where('type',$type)->where('id', '>', $workOrder->id)->min('id');
-        return view('work_order.export_exw.doc-status-history', compact('data','type','id','previous','next'));
+        return view('work_order.export_exw.doc-status-history', compact('data','type','id','previous','next','workOrder'));
     }
 }
