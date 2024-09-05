@@ -551,8 +551,6 @@ class PFIController extends Controller
     public function destroy(string $id)
     {
         $pfi = PFI::find($id);
-        // $approvedItemsForPFIs = ApprovedLetterOfIndentItem::where('pfi_id', $id)->get();
-
         DB::beginTransaction();
         // make pfi creation reverse when it is deleting
        

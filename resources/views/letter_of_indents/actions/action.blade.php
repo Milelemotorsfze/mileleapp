@@ -1,14 +1,46 @@
 
-
+<div class="dropdown">
+    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+    <i class="fa fa-bars" aria-hidden="true"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-start"> 
+    @can('LOI-list')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+        @endphp
+        @if ($hasPermission)       
+        <li>   
+            <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+             title="View LOI Item Deatails & Update Utilized Quantity" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
+                <i class="fa fa-list"></i> View LOI Items & Update Utilized Qty
+            </button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+            data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                <i class="fa fa-file-pdf"></i> View Customer Doc
+            </button>
+        </li>
+        <li>
+            <button type="button" class="btn btn-secondary primary btn-sm mt-1" title="Update Comment" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+             data-bs-toggle="modal" data-bs-target="#update-loi-comment-{{$letterOfIndent->id}}">
+                <i class="fa fa-comment"></i> Update Comment
+            </button>
+        </li>
+        @endif
+    @endcan
     @if($type !== 'SUPPLIER_RESPONSE')
         @can('LOI-edit')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');
-            @endphp
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');
+        @endphp
             @if ($hasPermission)
-                <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
-                    <button type="button" class="btn btn-soft-green btn-sm mt-1" title="Edit LOI"><i class="fa fa-edit"></i></button>
+            <li>
+                <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}" class="btn btn-info btn-sm mt-1"
+                title="Edit LOI" style="width:100%; margin-top:2px; margin-bottom:2px;" >
+                 <i class="fa fa-edit"></i> Edit
                 </a>
+            </li>
             @endif
         @endcan
         @can('LOI-delete')
@@ -16,32 +48,21 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
             @endphp
             @if ($hasPermission)
-                <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI"
+            <li>
+                <button type="button" class="btn btn-danger btn-sm loi-button-delete mt-1" title="Delete LOI" style="width:100%; margin-top:2px; margin-bottom:2px;" 
                         data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
-                    <i class="fa fa-trash"></i>
+                    <i class="fa fa-trash"></i> Delete
                 </button>
+                <li>
             @endif
         @endcan
     @endif
-
-
-    @can('LOI-list')
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
-        @endphp
-        @if ($hasPermission)
-        <button type="button" class="btn btn-secondary primary btn-sm mt-1" title="Update Comment" data-bs-toggle="modal" data-bs-target="#update-loi-comment-{{$letterOfIndent->id}}">
-            <i class="fa fa-comment"></i>
-        </button>
-        <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" title="View LOI Item Deatails & Update Utilized Quantity" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
-            <i class="fa fa-list"></i>
-        </button>
-        <button type="button" class="btn btn-dark-blue btn-sm mt-1" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
-            <i class="fa fa-file-pdf"></i>
-        </button>
-        @endif
-    @endcan
+  
        
+    </ul>
+</div>
+    
+  
 
     <!-- To View LOI Items -->
     <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

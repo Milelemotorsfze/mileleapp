@@ -1,42 +1,59 @@
     
-    @if($letterOfIndent->is_expired == false)
-        @if($type == 'NEW')
-            @can('LOI-approve')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                @endphp
-                @if ($hasPermission)
-                    <button type="button" data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indent.request-supplier-approval') }}"
-                            class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>              
+    <div class="dropdown">
+        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Status Update">
+        <i class="fa fa-list" aria-hidden="true"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-start"> 
+            @if($letterOfIndent->is_expired == false)
+                @if($type == 'NEW')
+                    @can('LOI-approve')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
+                        @endphp
+                        @if ($hasPermission)
+                        <li>
+                            <button type="button" data-id="{{ $letterOfIndent->id }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                            data-url="{{ route('letter-of-indent.request-supplier-approval') }}"
+                                    class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>              
+                        </li>
+                        @endif
+                    @endcan
+                @elseif($type == 'WAITING_FOR_APPROVAL')
+                    @can('loi-status-update')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-status-update');
+                        @endphp
+                        @if ($hasPermission)
+                        <li>
+                            <button type="button" data-bs-toggle="modal" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                             data-bs-target="#update-loi-status-{{ $letterOfIndent->id }}"
+                            class="btn btn-info btn-sm " title="Reverse Update of Status to New">Status Update</button>  
+                        </li>            
+                        @endif
+                    @endcan
+                    @can('loi-supplier-approve')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                        @endphp
+                        @if ($hasPermission)
+                        <li>
+                            <button type="button" class="btn btn-primary modal-button btn-sm mt-1"
+                            style="width:100%; margin-top:2px; margin-bottom:2px;" data-bs-toggle="modal"
+                                    data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-danger modal-button btn-sm mt-1"
+                            style="width:100%; margin-top:2px; margin-bottom:2px;" data-bs-toggle="modal"
+                                    data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button> 
+                        </li>               
+                        @endif
+                    @endcan
                 @endif
-            @endcan
-        @elseif($type == 'WAITING_FOR_APPROVAL')
-            @can('loi-status-update')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-status-update');
-                @endphp
-                @if ($hasPermission)
-                    <button type="button" data-bs-toggle="modal"  data-bs-target="#update-loi-status-{{ $letterOfIndent->id }}"
-                    class="btn btn-warning btn-sm " title="Reverse Update of Status to New">Status Update</button>              
-                @endif
-             @endcan
-        @endif
-        @if($type == 'WAITING_FOR_APPROVAL')
-            @can('loi-supplier-approve')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
-                @endphp
-                @if ($hasPermission)
-                    <button type="button" class="btn btn-primary modal-button btn-sm mt-1" data-bs-toggle="modal"
-                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
-
-                    <button type="button" class="btn btn-danger modal-button btn-sm mt-1" data-bs-toggle="modal"
-                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>                
-                @endif
-            @endcan
-        @endif
-       
-    @endif
+        
+            @endif
+        </ul>
+    </div>
+   
     <!-- To Reject LOI -->
 
     <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}" data-bs-backdrop="static"
