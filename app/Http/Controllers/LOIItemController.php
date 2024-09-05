@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\LetterOfIndent;
+use App\Models\PFI;
+use App\Models\PfiItem;
 use App\Models\LetterOfIndentItem;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
@@ -39,6 +41,9 @@ class LOIItemController extends Controller
                 },
                 'LOI.soNumbers' => function($query){
                     $query->select('id','so_number');
+                },
+                'pfiItems.pfi' => function($query){
+                    $query->select('id','pfi_reference_number');
                 }]);
 
                 if($request->export == 'EXCEL') {
@@ -54,7 +59,24 @@ class LOIItemController extends Controller
                             $is_expired = 'Expired';
                         }else{
                             $is_expired = 'Not Expired';
-                        }   
+                        }  
+                        // pfi number 
+                        $loi_item_id = $data->id;
+                        $pfiNumbers = [];
+                        $pfiIds = PFI::with('pfiItems')
+                        ->whereHas('pfiItems', function($q)use($loi_item_id){
+                            $q->where('loi_item_id', $loi_item_id);
+                        })
+                        ->get();
+                        if($pfiIds->count() > 0) {}
+                        foreach($pfiIds as $pfi) {
+                            $pfiItem= PfiItem::where('loi_item_id', $loi_item_id)
+                                    ->where('pfi_id', $pfi->id)->first();
+                                    $pfiNumbers[] = $pfi->pfi_reference_number. ' - ('. $pfiItem->pfi_quantity .')';
+                        }
+
+                        $pfiNumbers = implode("<br>", $pfiNumbers); 
+                        
                         return [
                             'LOI Number' => $data->LOI->uuid,
                             'LOI Date' => $data->LOI->date,
@@ -69,6 +91,7 @@ class LOIItemController extends Controller
                             'SFX' => $data->masterModel->sfx,
                             'Steering' => $data->masterModel->steering,
                             'Model Line' => $data->masterModel->modelLine->model_line,
+                            'PFI Number - (QTY)' => $pfiNumbers,
                             'Quantity' => $data->quantity,
                             'Utilized Quantity' => $data->utilized_quantity,
                             'Remaining Quantity' => $data->quantity - $data->utilized_quantity,
@@ -102,6 +125,22 @@ class LOIItemController extends Controller
 
                    return implode(",", $soNumbers);
                 })
+                ->addColumn('pfi_number', function($query) {
+                    $loi_item_id = $query->id;
+                    $pfiNumbers = [];
+                    $pfiIds = PFI::with('pfiItems')
+                    ->whereHas('pfiItems', function($q)use($loi_item_id){
+                        $q->where('loi_item_id', $loi_item_id);
+                    })
+                    ->get();
+                    foreach($pfiIds as $pfi) {
+                        $pfiItem= PfiItem::where('loi_item_id', $loi_item_id)
+                                ->where('pfi_id', $pfi->id)->first();
+                                $pfiNumbers[] = $pfi->pfi_reference_number. ' - ('. $pfiItem->pfi_quantity .')';
+                    }
+
+                   return implode("<br>", $pfiNumbers);
+                })
                 ->addColumn('sales_person_id', function($query) {                    
                     if($query->LOI->sales_person_id){
                         return $query->LOI->salesPerson->name ?? '';
@@ -130,7 +169,8 @@ class LOIItemController extends Controller
                         return $query->LOI->status;
                      }                                       
                  })
-                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number','status','loi_approval_date'])
+                ->rawColumns(['loi_date','remaining_quantity','is_expired','sales_person_id','so_number','status',
+                             'loi_approval_date','pfi_number'])
                 ->toJson();
             }
         

@@ -68,6 +68,7 @@
                                 <th>SFX</th>
                                 <th>Steering</th>
                                 <th>Model Line</th>
+                                <th>PFI Number - (QTY)</th>
                                 <th>Quantity</th>
                                 <th>Utilized Quantity</th>
                                 <th>Remaining Quantity</th>
@@ -110,7 +111,8 @@
             {'data' : 'master_model.model', 'name': 'masterModel.model', orderable: false },        
             {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },  
             {'data' : 'master_model.steering', 'name': 'masterModel.steering', orderable: false },          
-            {'data' : 'master_model.model_line.model_line', 'name': 'masterModel.modelLine.model_line', orderable: false },        
+            {'data' : 'master_model.model_line.model_line', 'name': 'masterModel.modelLine.model_line', orderable: false },
+            {'data' : 'pfi_number', 'name': 'pfiItems.pfi.pfi_reference_number', orderable: false },        
             {'data' : 'quantity', 'name': 'quantity', orderable: false },      
             {'data' : 'utilized_quantity', 'name': 'utilized_quantity', orderable: false },  
             {'data' : 'remaining_quantity', 'name': 'remaining_quantity', orderable: false }, 

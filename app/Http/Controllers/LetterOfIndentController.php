@@ -748,7 +748,6 @@ class LetterOfIndentController extends Controller
 
     }
     public function supplierApproval(Request $request) {
-
         (new UserActivityController)->createActivity('Supplier Approved successfully.');
     
         $LOI = LetterOfIndent::find($request->id);
@@ -772,16 +771,18 @@ class LetterOfIndentController extends Controller
 
         DB::commit();
 
-        // return response()->json($msg);
-        return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
+        return response()->json($msg);
+        // return redirect()->back()->with('success', 'Supplier'. $msg .' Successfully.');
     }
     public function updateComment(Request $request) {
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');
+        info($request->all());
         $LOI = LetterOfIndent::find($request->id);
         $LOI->comments = $request->comments;
         $LOI->save();
 
-        return redirect()->back()->with('success', 'LOI Comment updated successfully.');
+        return response(true);
+        // return redirect()->back()->with('success', 'LOI Comment updated successfully.');
     }
     /**
      * Remove the specified resource from storage.

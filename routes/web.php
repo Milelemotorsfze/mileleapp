@@ -490,7 +490,7 @@ Route::get('/d', function () {
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
-    Route::post('pfi-released-amount/update/{id}', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
+    Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
     Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
     Route::get('pfi-item/get-master-models', [PFIController::class,'getChildModels'])->name('pfi-item.master-models');

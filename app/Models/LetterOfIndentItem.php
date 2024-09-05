@@ -23,6 +23,10 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
+    public function pfiItems()
+    {
+        return $this->hasMany(PfiItem::class,'loi_item_id','id');
+    }
     public function getSteeringAttribute()
     {
        $mastermodel = MasterModel::where('model',$this->model)
