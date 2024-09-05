@@ -107,6 +107,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							@if(isset($type) && ($type == 'all'))	
 							<th rowspan="2" class="light">Type</th>
 							@endif
+							<th rowspan="2" class="light">Status</th>
 							<th rowspan="2" class="light">Sales Support Data Confirmation</th>
 							<th colspan="2" class="dark">
 								<center>Approval Status</center>
@@ -282,17 +283,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 												</a>
 											</li>
 										@endif
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
+										@endphp
+										@if ($hasPermission)
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateStatusModal_{{$data->id}}">
+												<i class="fa fa-file" aria-hidden="true"></i> Update Status
+											</a>
+										@endif
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
+										@endphp
+										@if ($hasPermission)
+											<li>
+												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
+													href="{{route('woStatusHistory',$data->id)}}">
+													<i class="fas fa-eye"></i> Status Log
+												</a>
+											</li>
+										@endif
 									</ul>
 								</div> 
-								@include('work_order.export_exw.doc_status_update')                     
+								@include('work_order.export_exw.doc_status_update')   
+								@include('work_order.export_exw.status_update')                   
                             </td>
 							<td>{{ ++$i }}</td>
 							@if(isset($type) && ($type == 'all'|| $type == 'all'))	
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
-							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ $data->sales_support_data_confirmation ?? ''}}</label></td>
-							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->finance_approval_status ?? ''}}</label></td>
-							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ $data->coo_approval_status ?? ''}}</label></td>
+							<td><label class="badge @if($data->status == 'On Hold') badge-soft-info @elseif($data->status == 'Active') badge-soft-success @endif">{{ strtoupper($data->status) ?? ''}}</label></td>
+							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ strtoupper($data->sales_support_data_confirmation) ?? ''}}</label></td>
+							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->finance_approval_status) ?? ''}}</label></td>
+							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->coo_approval_status) ?? ''}}</label></td>
 							<td>
 							@if($data->sales_support_data_confirmation_at != '' && 
 								$data->finance_approval_status == 'Approved' && 

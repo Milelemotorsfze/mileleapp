@@ -1,4 +1,17 @@
-
+<!-- wo status -->
+@include('work_order.export_exw.update_status')
+@if(isset($workOrder))
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
+	@endphp
+	@if ($hasPermission)
+		<a class="me-2 btn btn-sm btn-info"
+			href="{{route('woStatusHistory',$workOrder->id)}}">
+			<i class="fas fa-eye"></i> Status Log
+		</a>
+	@endif
+@endif
+<!-- wo status -->
 @if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
 	<a title="Revert Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
 		<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
@@ -147,7 +160,6 @@
 		@endif
 	@endif
 @endif
-
 <script type="text/javascript">
 
     $(document).ready(function () { 

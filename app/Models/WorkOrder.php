@@ -97,6 +97,7 @@ class WorkOrder extends Model
         'deleted_by',
     ];
     protected $appends = [
+        'status',
         'sales_support_data_confirmation',
         'finance_approval_status',
         'coo_approval_status',
@@ -105,6 +106,21 @@ class WorkOrder extends Model
         'vehicle_count',
         'type_name',
     ];
+    public function getStatusAttribute() {
+        $status = '';
+        
+        // Fetch the most recent record for the current work order
+        $data = WoStatus::where('wo_id', $this->id)
+            ->orderBy('status_changed_at', 'DESC')
+            ->first();
+        
+        // If data exists, update the status to the latest one
+        if ($data) {
+            $status = $data->status;
+        }
+    
+        return $status;
+    }
     public function getSalesSupportDataConfirmationAttribute() {
         $status = '';
         if($this->sales_support_data_confirmation_at == NULL) {
@@ -257,5 +273,10 @@ class WorkOrder extends Model
     {
         return $this->hasOne(WoDocsStatus::class, 'wo_id') // Explicitly define the foreign key here
             ->latestOfMany('doc_status_changed_at');  // Sort by the date field
+    }
+    public function latestStatus()
+    {
+        return $this->hasOne(WoStatus::class, 'wo_id') // Explicitly define the foreign key here
+            ->latestOfMany('status_changed_at');  // Sort by the date field
     }
 }
