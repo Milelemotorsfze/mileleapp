@@ -165,6 +165,9 @@ class PFIController extends Controller
                     ->addColumn('pfi_date', function($query) {
                         return Carbon::parse($query->pfi->created_at)->format('d M Y');
                     })
+                    ->addColumn('total_price', function($query) {
+                        return Carbon::parse($query->pfi->created_at)->format('d M Y');
+                    })
                     ->rawColumns(['pfi_date','pfi_quantity'])
                     ->toJson();
                 }
