@@ -452,7 +452,7 @@ Route::get('/d', function () {
     });
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
-        Route::post('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
+        Route::get('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
     });    
     
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');

@@ -667,7 +667,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Created At </label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->created_at != ''){{\Carbon\Carbon::parse($workOrder->created_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                            <span class="data-font">@if($workOrder->created_at != ''){{\Carbon\Carbon::parse($workOrder->created_at)->format('d M Y,  h:i:s A') ?? 'NA'}}@endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -687,7 +687,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Data Confirmed At </label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? 'NA'}}@endif</span>
+                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{\Carbon\Carbon::parse($workOrder->sales_support_data_confirmation_at)->format('d M Y,  h:i:s A') ?? 'NA'}}@endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -707,7 +707,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Last Updated At </label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y, H:i:s') ?? 'NA'}} @else NA @endif</span>
+                                                            <span class="data-font">@if($workOrder->updated_at != '' && $workOrder->updated_at != $workOrder->created_at){{\Carbon\Carbon::parse($workOrder->updated_at)->format('d M Y,  h:i:s A') ?? 'NA'}} @else NA @endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -912,6 +912,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         </div>
                                                     </div>
                                                 </div>
+                                                @if(isset($workOrder->latestDocsStatus))
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Docs Status Remarks</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">{{$workOrder->latestDocsStatus->documentation_comment ?? 'NA'}}</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Docs Status Updated By</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">{{$workOrder->latestDocsStatus->user->name ?? 'NA'}}</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label">Docs Status Updated At</label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">
+                                                                    <span class="data-font">
+                                                                        @if($workOrder->latestDocsStatus->doc_status_changed_at != ''){{\Carbon\Carbon::parse($workOrder->latestDocsStatus->doc_status_changed_at)->format('d M Y,  h:i:s A')}}@endif
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>  
                                         </div>
                                     </div>
@@ -997,7 +1037,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>
-                                                                <td colspan="2">@if($addon->created_at != ''){{\Carbon\Carbon::parse($addon->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                                                                <td colspan="2">@if($addon->created_at != ''){{\Carbon\Carbon::parse($addon->created_at)->format('d M Y,  h:i:s A') ?? ''}}@endif</td>
                                                                 <td colspan="4">{{$addon->addon_code ?? ''}}</td>
                                                                 <td colspan="1">{{$addon->addon_quantity ?? ''}}</td>
                                                                 <td colspan="12">{{$addon->addon_description ?? ''}}</td>

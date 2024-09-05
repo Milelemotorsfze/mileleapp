@@ -253,4 +253,9 @@ class WorkOrder extends Model
             ->whereIn('status', ['approved', 'rejected'])
             ->latestOfMany('action_at');
     }
+    public function latestDocsStatus()
+    {
+        return $this->hasOne(WoDocsStatus::class, 'wo_id') // Explicitly define the foreign key here
+            ->latestOfMany('doc_status_changed_at');  // Sort by the date field
+    }
 }

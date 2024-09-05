@@ -16,4 +16,11 @@ class WoDocsStatus extends Model
         'doc_status_changed_by',
         'doc_status_changed_at',
     ];
+    protected $casts = [
+        'doc_status_changed_at' => 'datetime',
+    ];
+    public function user()
+    {
+        return $this->hasOne(User::class,'id','doc_status_changed_by');
+    }
 }
