@@ -612,8 +612,10 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
+                  @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
+                  @endif
+                  @if ($hasPricePermission)
                      <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -782,8 +784,10 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
+                  @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
+                @endif
+                  @if ($hasPricePermission)
                   <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -848,8 +852,10 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
+                  @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
+                @endif
+                  @if ($hasPricePermission)
                   <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -916,8 +922,10 @@
                   <th>Location</th>
                   <th>Territory</th>
                   <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
+                  @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
+                @endif
+                  @if ($hasPricePermission)
                   <th>GP</th>
                   <th>Price</th>
                 @endif
@@ -1220,6 +1228,7 @@
         { data: 'fd', name: 'countries.name' },
     ];
     if (hasPricePermission) {
+        if (hasManagementPermission) {
         columns3.push(
             {
     data: 'costprice',
@@ -1235,7 +1244,10 @@
         }
         return ''; // Return an empty string if there's no price
     }
-},
+});
+    }
+
+    columns3.push(
             { data: 'gp', name: 'vehicles.gp' },
             {
             data: 'price', 
@@ -1382,8 +1394,42 @@
             }
         }
     ],
-    colReorder: true
+    colReorder: true,
+    initComplete: function () {
+    var api = this.api();
+
+    // For each column in the table, create a dropdown filter
+    api.columns().every(function (index) {
+        var column = this;
+        var columnHeader = $(column.header()).text();  // Get the column header text
+
+        // List of column headers you want to exclude from filtering
+        var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'SO Date', 'Reservation End', 'GRN Report', 'Aging', 'Inspection Date', 'GRN Date', 'PO Date'];
+
+        // Skip columns where you don't want filters (either by header name or index)
+        if (excludeFilters.includes(columnHeader)) {
+            return; // Skip this column
+        }
+
+        // Create a select element
+        var select = $('<select><option value="">Filter by ' + columnHeader + '</option></select>')
+            .appendTo($(column.header()).empty())  // Append to the header cell
+            .on('change', function () {
+                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                column
+                    .search(val ? '^' + val + '$' : '', true, false)  // Use regex for exact match
+                    .draw();
+            });
+
+        // Populate the select element with unique values from the column
+        column.data().unique().sort().each(function (d, j) {
+            if (d) {
+                select.append('<option value="' + d + '">' + d + '</option>');
+            }
+        });
     });
+}
+});
 // Create the Hide All and Unhide All buttons
 var hideAllButton = $('<button>')
         .text('Hide All')
@@ -1746,6 +1792,7 @@ var columns6 = [
                 { data: 'fd', name: 'countries.name' },
             ];
                 if (hasPricePermission) {
+                    if (hasManagementPermission) {
                     columns6.push(
                         {
     data: 'costprice',
@@ -1761,7 +1808,10 @@ var columns6 = [
         }
         return ''; // Return an empty string if there's no price
     }
-},
+});
+    }
+
+    columns3.push(
                     { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
@@ -2001,6 +2051,7 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
                 { data: 'fd', name: 'countries.name' },
     ];
                 if (hasPricePermission) {
+                    if (hasManagementPermission) {
                     columns7.push(
                         {
     data: 'costprice',
@@ -2016,7 +2067,10 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
         }
         return ''; // Return an empty string if there's no price
     }
-},
+});
+    }
+
+    columns3.push(
                     { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
@@ -2301,6 +2355,7 @@ else if(columnHeader === 'Variant Detail')
             ];
 
 if (hasPricePermission) {
+    if (hasManagementPermission) {
     columns9.push(
         {
     data: 'costprice',
@@ -2316,7 +2371,10 @@ if (hasPricePermission) {
         }
         return ''; // Return an empty string if there's no price
     }
-},
+});
+    }
+
+    columns3.push(
         { data: 'gp', name: 'vehicles.gp' },
         {
                     data: 'price', 
