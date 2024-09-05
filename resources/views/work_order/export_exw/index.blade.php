@@ -333,7 +333,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								@endphp
 
 								<label class="badge {{ $badgeClass }}">
-									{{ $data->docs_status ?? '' }}
+									{{ strtoupper($data->docs_status) ?? '' }}
 								</label>
 							@endif
 						</td>
