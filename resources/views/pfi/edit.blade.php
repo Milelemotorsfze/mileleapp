@@ -696,6 +696,7 @@
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
+                    $('#master-model-id-'+i+'-item-'+j).val("");
                     // country unselect if client id unselect
                     $('#country_id').prop("selectedIndex", -1).trigger("change");     
                     
