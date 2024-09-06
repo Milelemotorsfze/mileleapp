@@ -2820,7 +2820,21 @@ else if(columnHeader === 'Variant Detail')
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+                {
+    data: 'ppmmyyy',
+    name: 'vehicles.ppmmyyy',
+    render: function(data, type, row) {
+        if (data) {
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: 'long'
+            });
+            return formattedDate;  // Example: "January 2024"
+        }
+        return ''; // If no date, return empty
+    }
+},
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
@@ -2868,14 +2882,70 @@ if (hasPricePermission) {
     }
                 columns9.push(
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
+                {
+    data: 'po_date',
+    name: 'purchasing_order.po_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
+                {
+    data: 'date',
+    name: 'grn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+                {
+    data: 'so_date',
+    name: 'so.so_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
+                {
+    data: 'gdndate',
+    name: 'gdn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
                 { 
             data: 'id', 
             name: 'id',
@@ -2978,7 +3048,82 @@ if (hasPricePermission) {
         }
     ],
     pageLength: -1,
-    colReorder: true
+    colReorder: true,
+    initComplete: function () {
+    var api = this.api();
+    // For each column in the table, create a dropdown filter
+    api.columns().every(function (index) {
+        var column = this;
+        var columnHeader = $(column.header()).text();  // Get the column header text
+        var headerWidth = $(column.header()).outerWidth(); // Get the actual width of the header
+        // List of column headers you want to exclude from filtering
+        var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'GRN Report', 'Aging', 'Vehicle Cost'];
+        // Skip columns where you don't want filters (either by header name or index)
+        if (excludeFilters.includes(columnHeader)) {
+            return; // Skip this column
+        }
+        // Create a select element
+        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+            .appendTo($(column.header()).empty())  // Append to the header cell
+            .on('change', function () {
+                // Get the selected values
+                var selectedValues = $(this).val();
+                
+                if (selectedValues && selectedValues.length > 0) {
+                    // Join selected values as a string that looks for exact matches
+                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
+                    column
+                        .search(exactSearch, true, false)  // Exact match using regex search
+                        .draw();
+                } else {
+                    column
+                        .search('', true, false)  // Clear search if no values selected
+                        .draw();
+                }
+            });
+
+        // Populate the select element with unique values from the column
+        column.data().unique().sort().each(function (d, j) {
+            if (d) {
+                // If this is the 'po_date' column, format the date
+                if (columnHeader === 'PO Date' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'GDN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                } 
+                else if (columnHeader === 'Production Year') { 
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        year: 'numeric',
+                        month: 'long'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                }
+                else if (columnHeader === 'Price') {
+                    var formattedPrice = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedPrice + '</option>');
+                }
+                else {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                }
+            }
+        });
+        select.select2({
+            placeholder: columnHeader, // Placeholder for the column
+            allowClear: true,  // Option to clear selections
+            dropdownAutoWidth: true,  // Dynamically adjust dropdown width based on content
+            width: headerWidth + 'px'  // Set the width of the select2 dropdown equal to the header width
+        });
+
+        // Also, set the width of the <select> element to match the header
+        select.css('width', headerWidth + 'px');
+    });
+}
     });
 // Create the Hide All and Unhide All buttons
 var hideAllButton = $('<button>')

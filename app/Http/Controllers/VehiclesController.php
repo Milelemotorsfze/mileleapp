@@ -3291,8 +3291,8 @@ $variant->save();
                         'vehicles.so_id',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                        DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
+                        'purchasing_order.po_date',
+                        'vehicles.ppmmyyy',
                         'vehicles.vin as vin',
                         'inspection_grn.id as grn_inspectionid',
                         'inspection_pdi.id as pdi_inspectionid',
@@ -3323,9 +3323,9 @@ $variant->save();
                         'gdn.gdn_number',
                         'users.name',
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
+                       'so.so_date',
+                        'grn.date',
+                        'gdn.date as gdndate',
                         DB::raw("
     COALESCE(
         (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
