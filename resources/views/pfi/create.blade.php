@@ -1171,7 +1171,12 @@
                     success:function (data) {
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
                         $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
-                        $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        if(childIndex == 0) {
+                            $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        }else{
+                            let unitPrice = $('#unit-price-'+index+'-item-0').val();
+                            $('#unit-price-'+index+'-item-'+childIndex).val(unitPrice);
+                        }
                         calculateTotalAmount(index,childIndex)
                         $('.overlay').hide();
                     }
