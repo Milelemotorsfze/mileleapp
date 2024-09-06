@@ -71,6 +71,12 @@ class PFIController extends Controller
                     ->editColumn('created_at', function($query) {
                         return Carbon::parse($query->created_at)->format('d M Y');
                     })
+                    ->editColumn('created_at', function($query) {
+                        if($query->updated_at) {
+                            return Carbon::parse($query->created_at)->format('d M Y');
+                        }
+                        return "";
+                    })
                     ->editColumn('updated_by', function($query) {                  
                         if($query->updated_by){
                             return $query->updatedBy->name ?? '';
@@ -137,7 +143,6 @@ class PFIController extends Controller
             'pfi.country'  => function ($query) {
                 $query->select('id','name');
             }]);
-            // return $data->get();
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
 
@@ -243,6 +248,7 @@ class PFIController extends Controller
 
         $request->validate([
             'pfi_reference_number' => 'required',
+            'pfi_date' => 'required',
             'amount'  => 'required',
             'country_id'  => 'required',
             'client_id'  => 'required',
@@ -264,7 +270,6 @@ class PFIController extends Controller
         $pfi->supplier_id = $request->supplier_id;
         $pfi->country_id = $request->country_id;
         $pfi->client_id = $request->client_id;
-//        $pfi->released_amount = $request->released_amount;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
@@ -304,7 +309,6 @@ class PFIController extends Controller
                     }else{
                         $code = $prefix.'001';
                     }
-                    // dd($code);
                 $pfiItemRow = new PfiItem();
                 $pfiItemRow->pfi_id = $pfi->id;
                 if($loiItemId != 'NULL') {
@@ -362,7 +366,6 @@ class PFIController extends Controller
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
-//         return $request->all();
         $pfi = PFI::select('id','pfi_reference_number','created_at')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
                 ->whereYear('created_at', Carbon::now()->year)->first();
@@ -453,13 +456,11 @@ class PFIController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // return $request->all();
-//        dd($request->all());
         (new UserActivityController)->createActivity('Updated PFI Details');
 
         $request->validate([
             'pfi_reference_number' => 'required',
-            // 'pfi_date' => 'required',
+            'pfi_date' => 'required',
             'amount'  => 'required',
             'country_id'  => 'required',
             'client_id'  => 'required',
@@ -501,7 +502,6 @@ class PFIController extends Controller
         $pfi->save();
         $pfiItemRowParentId = [];
         $alreadyAddedRows =  PfiItem::where('pfi_id', $pfi->id)->pluck('id')->toArray();
-        // $pfi->pfiItems()->delete();
         $updatedRows = [];
         foreach($request->PfiItem as $key => $pfiItem) {
             $parentId = NULL;
@@ -538,7 +538,6 @@ class PFIController extends Controller
                         }else{
                             $code = $prefix.'001';
                         }
-                        // dd($code);
                             $pfiItemRow = new PfiItem();
                             $pfiItemRow->code = $code;
                     }

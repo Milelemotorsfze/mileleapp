@@ -148,7 +148,8 @@
                                                 <div class="mb-3">
                                                 <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Date</label>
-                                                    <input type="date" value="{{ Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('Y-m-d') }}" class="form-control widthinput" name="released_date">
+                                                    <input type="date" value="{{ Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('Y-m-d') }}"
+                                                     class="form-control widthinput" name="pfi_date">
                                                 </div>
                                             </div>
                                           
