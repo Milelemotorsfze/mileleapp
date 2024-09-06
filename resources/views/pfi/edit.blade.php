@@ -334,8 +334,8 @@
                                                                         index="{{$key+1}}" item="{{$child_Key+1}}" id="remaining-quantity-{{$key+1}}-item-{{$child_Key+1}}"  value="{{ $childPfiItem->remainingQuantity}}">
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
-                                                                    <input type="number" min="0"  required placeholder="0" index="{{$key+1}}" name="PfiItem[{{$key+1}}][unit_price][{{$child_Key+1}}]" 
-                                                                    oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}})  class="form-control widthinput mb-2 unit-prices"  value="{{ $childPfiItem->unit_price}}"
+                                                                    <input type="number" min="0"  placeholder="0" index="{{$key+1}}" name="PfiItem[{{$key+1}}][unit_price][{{$child_Key+1}}]" 
+                                                                    oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}})  class="form-control widthinput mb-2 unit-prices" readonly value="{{ $childPfiItem->unit_price}}"
                                                                         id="unit-price-{{$key+1}}-item-{{$child_Key+1}}" item="{{$child_Key+1}}" placeholder="Unit price">
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
@@ -547,6 +547,7 @@
                     getLOIItemDetails(i,j);                 
                 }
             }
+
         });
 
         $(document.body).on('select2:unselect', "#supplier-id", function (e) {
@@ -922,7 +923,7 @@
                                     index="${index}" item="${item}" id="remaining-quantity-${index}-item-${item}">
                             </div>
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  placeholder="0" name="PfiItem[${index}][unit_price][${item}]" value="${unitPrice}"
+                                <input type="number" min="0" readonly placeholder="0" name="PfiItem[${index}][unit_price][${item}]" value="${unitPrice}"
                                oninput=calculateTotalAmount(${index},${item}) class="form-control widthinput mb-2 unit-prices"
                                     id="unit-price-${index}-item-${item}" item="${item}"  index="${index}" placeholder="Unit price">
                             </div>
@@ -1280,7 +1281,12 @@
                     success:function (data) {
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
                         $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
-                        $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        if(childIndex == 0) {
+                            $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        }else{
+                            let unitPrice = $('#unit-price-'+index+'-item-0').val();
+                            $('#unit-price-'+index+'-item-'+childIndex).val(unitPrice);
+                        }
                         calculateTotalAmount(index,childIndex)
                         $('.overlay').hide();
                     }

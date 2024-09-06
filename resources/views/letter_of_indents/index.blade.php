@@ -81,6 +81,7 @@
                             <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>Action</th>
+                                    <th>Send Supplier Approval</th>
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
@@ -100,7 +101,6 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Send Supplier Approval</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -189,6 +189,7 @@
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}",
         columns: [
             {data: 'action', name: 'action', orderable: false, searchable: false},
+            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },      
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
@@ -208,7 +209,6 @@
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },        
-            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },      
         ]
         
         });
