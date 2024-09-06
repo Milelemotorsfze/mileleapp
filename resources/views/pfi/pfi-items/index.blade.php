@@ -58,6 +58,7 @@
                             <tr>
                                 <th>S.No</th>
                                 <th>LOI Item Code</th> 
+                                <th>LOI Status</th> 
                                 <th>PFI Date</th>                                                                              
                                 <th>PFI Number</th>
                                 <th>Customer Name </th>
@@ -71,7 +72,7 @@
                                 <th>SFX</th>
                                 <th>PFI Quantity</th>
                                 <th>Unit Price</th>
-                                <!-- <th>Total Price</th> -->
+                                <th>Total Price</th>
                                 <th>PFI Amount</th>
                                 <th>Comment</th>                      
                             </tr>
@@ -94,9 +95,10 @@
             searching:true,
             ajax: "{{ route('pfi-item.list') }}",
         columns: [
-            { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
-            {'data' : 'letter_of_indent_item.code', 'name' : 'letterOfIndentItem.code' , orderable: false},
-            {'data' : 'pfi_date', 'name' : 'pfi_date', orderable: false},
+            {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
+            {'data' : 'loi_item_code', 'name' : 'letterOfIndentItem.code' , orderable: false},
+            {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
+            {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},
             {'data' : 'pfi.customer.name', 'name' : 'pfi.customer.name', orderable: false },
             {'data' : 'pfi.country.name', 'name' : 'pfi.country.name', orderable: false },
@@ -109,7 +111,7 @@
             {'data' : 'master_model.sfx', 'name': 'masterModel.sfx', orderable: false },              
             {'data' : 'pfi_quantity', 'name': 'pfi_quantity', orderable: false },   
             {'data' : 'unit_price', 'name': 'unit_price', orderable: false }, 
-            // {'data' : 'total_price', 'name': 'total_price', orderable: false },         
+            {'data' : 'total_price', 'name': 'total_price', orderable: false },         
             {'data' : 'amount', 'name': 'pfi.amount', orderable: false },   
             {'data' : 'pfi.comment', 'name': 'pfi.comment', orderable: false },        
         ]

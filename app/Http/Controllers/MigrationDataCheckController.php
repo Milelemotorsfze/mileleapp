@@ -172,7 +172,6 @@ class MigrationDataCheckController extends Controller
        $datas =  DB::table('migration_po_items')->get();
 
        foreach($datas as $data) {
-        info($data->variant_id);
        $model = DB::table('migration_master_models')
                     ->find($data->master_model_id);
 
@@ -194,7 +193,6 @@ class MigrationDataCheckController extends Controller
         foreach ($LOIs as $LOI) {
         $loiIds = DB::table('migration_loi_items')->where('loi_number', $LOI->loi_number)->pluck('master_model_id')->toArray();
         
-        info($loiIds);
             if (count($loiIds) !== count(array_unique($loiIds))) {
                 $duplicates[] = $LOI->loi_number;
             }
@@ -235,9 +233,7 @@ class MigrationDataCheckController extends Controller
                                 ->where('sfx', $masterModel->sfx)
                                 // ->whereIn('model_line_id', $data->model_line_id)
                                 ->pluck('id')->toArray();
-                                info($masterModel->model);
-                                info($masterModel->sfx);
-                                info($sameModelIds);
+                               
                                 
             // get the count of same model lines 
             $modelCountPO = DB::table('migration_po_items')
@@ -253,9 +249,7 @@ class MigrationDataCheckController extends Controller
                                         ->where('vendor', $data->vendor)
                                         ->count();  
                                         info("total count in po");
-                                info($modelCountPO);
-                                info("total count in inventory");
-                                info($modelCountInventory);                       
+                                                    
 
           if($modelCountInventory < $modelCountPO)  {
             $incorrectModelSfx[] = $masterModel->model."-".$masterModel->sfx;

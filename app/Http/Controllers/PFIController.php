@@ -46,6 +46,9 @@ class PFIController extends Controller
             'createdBy' => function ($query) {
                 $query->select('id', 'name');
             },
+            'updatedBy' => function($query){
+                    $query->select('id', 'name');
+                },
             ]);
 
             if (request()->ajax()) {
@@ -68,6 +71,22 @@ class PFIController extends Controller
                     ->editColumn('created_at', function($query) {
                         return Carbon::parse($query->created_at)->format('d M Y');
                     })
+                    ->editColumn('updated_by', function($query) {                  
+                        if($query->updated_by){
+                            return $query->updatedBy->name ?? '';
+                        }
+                    })                    ->editColumn('updated_at', function($query) {
+                        if($query->updated_at) {
+                        return Carbon::parse($query->updated_at)->format('d M Y');
+                        }
+                        return "";
+                    })
+                    ->editColumn('pfi_date', function($query) {
+                        if($query->pfi_date) {
+                            return Carbon::parse($query->pfi_date)->format('d M Y');
+                        }
+                        return " ";
+                    })
                     ->addColumn('action', function(PFI $pfi) {
                         $parentPfiItems =  PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
                         foreach($parentPfiItems as $item) {
@@ -76,7 +95,6 @@ class PFIController extends Controller
 
                             $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
                             $item->quantity = $pfi_quantity;
-                            $item->test = "test";
                         }
                         return view('pfi.action',compact('pfi','parentPfiItems'));
                     })
@@ -92,10 +110,14 @@ class PFIController extends Controller
 
         $data = PfiItem::where('is_parent', true)->orderBy('updated_at','DESC')->with([
             'pfi' => function ($query) {
-                $query->select('id','supplier_id','country_id','client_id','pfi_reference_number','currency','amount','comment');
+                $query->select('id','supplier_id','country_id','client_id','pfi_reference_number',
+                'currency','amount','comment','pfi_date');
             },
             'letterOfIndentItem' => function ($query) {
                 $query->select('id','code','master_model_id','letter_of_indent_id');
+            },
+            'letterOfIndentItem.LOI' => function ($query) {
+                $query->select('id','status');
             },
             'masterModel'  => function ($query) {
                 $query->select('id','model','sfx','steering','master_model_line_id');
@@ -127,7 +149,8 @@ class PFIController extends Controller
 
                     return [
                         'LOI Item Code' => $data->letterOfIndentItem->code ?? '',
-                        'PFI Date' => Carbon::parse($data->pfi->created_at)->format('d-m-Y'),
+                        'LOI Status' => $data->letterOfIndentItem->LOI->status ?? '',
+                        'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),
                         'PFI Number' => $data->pfi->pfi_reference_number,
                         'Customer Name' => $data->pfi->customer->name ?? '',
                         'Country' => $data->pfi->country->name ?? '',
@@ -140,6 +163,7 @@ class PFIController extends Controller
                         'SFX' => $data->masterModel->sfx,
                         'PFI Quantity' => $pfiQuantity,
                         'Unit Price' => $data->unit_price,
+                        'Total Price' => $data->unit_price * $pfiQuantity,
                         'PFI Amount' => $data->pfi->amount,
                         'Comment' => $data->pfi->comment ?? '',
                        
@@ -163,12 +187,26 @@ class PFIController extends Controller
                         return $quantity;
                     })
                     ->addColumn('pfi_date', function($query) {
-                        return Carbon::parse($query->pfi->created_at)->format('d M Y');
+                        if($query->pfi->pfi_date) {
+                            return Carbon::parse($query->pfi->pfi_date)->format('d M Y');
+                        }
+                        return "";
+                       
+                    })
+                    ->addColumn('loi_item_code', function($query) {
+                        return $query->letterOfIndentItem->code ?? '';
+                    })
+                    ->addColumn('loi_status', function($query) {
+                        return $query->letterOfIndentItem->LOI->status ?? '';
                     })
                     ->addColumn('total_price', function($query) {
-                        return Carbon::parse($query->pfi->created_at)->format('d M Y');
+                        $pfiQuantity = PfiItem::where('parent_pfi_item_id', $query->id)
+                        ->sum('pfi_quantity');
+                        $quantity = $pfiQuantity + $query->pfi_quantity;
+                        $total = $quantity * $query->unit_price;
+                        return number_format($total);
                     })
-                    ->rawColumns(['pfi_date','pfi_quantity'])
+                    ->rawColumns(['pfi_date','pfi_quantity','loi_item_code'])
                     ->toJson();
                 }
             
@@ -200,17 +238,6 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-        // info($request->PfiItem);
-        // info("items");
-        // foreach($request->PfiItem as $pfiItems) {
-        //     foreach($pfiItems['model'] as $keyValue => $value) {
-        //         dd($pfiItems['model'][$keyValue]);
-
-        //     }
-        // }
-           
-        // }
-        // return $request->all();
 
         (new UserActivityController)->createActivity('New PFI Created');
 
@@ -227,7 +254,7 @@ class PFIController extends Controller
         $pfi = new PFI();
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
-//        $pfi->pfi_date = $request->pfi_date;
+        $pfi->pfi_date = $request->pfi_date;
         $pfi->amount = $request->amount;
         $pfi->created_by = Auth::id();
         $pfi->comment = $request->comment;
@@ -386,7 +413,6 @@ class PFIController extends Controller
         $parentPfiItem->totalAmount = $parentPfiItem->pfi_quantity * $parentPfiItem->unit_price;
         $parentPfiItem->childPfiItems = PfiItem::where('pfi_id', $pfi->id)->where('is_parent', false)
                                         ->where('parent_pfi_item_id', $parentPfiItem->id)->orderBy('id','DESC')->get();
-                                        info( $parentPfiItem->childPfiItems);
 
         $request['page'] = 'Edit';  
         $request['client_id']  = $pfi->customer->id;
@@ -445,8 +471,9 @@ class PFIController extends Controller
         $pfi = PFI::findOrFail($id);
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
+        $pfi->pfi_date = $request->pfi_date;
         $pfi->amount = $request->amount;
-        $pfi->created_by = Auth::id();
+        $pfi->updated_by = Auth::id();
         $pfi->comment = $request->comment;
         $pfi->status = PFI::PFI_STATUS_NEW;
         $pfi->delivery_location = $request->delivery_location;
@@ -555,7 +582,10 @@ class PFIController extends Controller
         // make pfi creation reverse when it is deleting
        
         $pfi->pfiItems()->delete();
+        $pfi->deleted_by = Auth::id();
+        $pfi->save();
         $pfi->delete();
+
         (new UserActivityController)->createActivity('Deleted PFI Sucessfully.');
 
         DB::commit();
@@ -574,19 +604,15 @@ class PFIController extends Controller
         return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
     }
     public function relaesedAmountUpdate(Request $request) {
-        info($request->all());
         (new UserActivityController)->createActivity('PFI released amount updated.');
 
         $pfi = PFI::find($request->pfi_id);
-        info($pfi);
         $pfi->released_amount = $request->released_amount;
         $pfi->released_date = $request->released_date;
         $pfi->save();
         return response($pfi);
-        // return redirect()->back()->with('success', 'Payment released amount Successfully.');
     }
     public function getLOIItemCode(Request $request) {
-        info($request->all());
        $data = [];
        $loiItems = LetterOfIndentItem::with('masterModel','LOI')
                 // ->whereColumn('utilized_quantity', '>', 'quantity')
@@ -638,7 +664,6 @@ class PFIController extends Controller
              $data = MasterModel::orderBy('id','DESC');
              
              if($request->is_child == 'Yes') {
-                // info("child row add");
                 $data = $data->with('loiItems.LOI')
                 ->whereHas('loiItems.LOI', function($query)use($request){
                     $query->select('client_id','status','id','is_expired','country_id')
@@ -648,27 +673,20 @@ class PFIController extends Controller
                     ->where('is_expired', false);
                 }); 
 
-                // info($data->pluck('id'));
              }
 
             if($request->model && $request->sfx) {
                
                 $parentModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)->first();
-                                    info($parentModel);
 
                $data = $data->where('steering', $parentModel->steering);
-            //    info("after steering chcek");
-            //    info($data->pluck('id'));
                 $model_line = 'HIACE';
                 if(str_contains($parentModel->modelLine->model_line, $model_line)){
-                    // info("Hiace");
-                    // info($parentModel->modelLine->model_line);
                     $data = $data->whereHas('modelLine', function($query)use($model_line){
                         $query->where('model_line', 'LIKE', '%'. $model_line .'%');
                     });
                 }else{
-                    // info("Not Hiace");
                     $data = $data->where('master_model_line_id', $parentModel->master_model_line_id); 
                 }  
                        
@@ -685,15 +703,12 @@ class PFIController extends Controller
                         $restrictedModelIds[] = $possibleModel->id;
                     }                  
                 }
-                // info($restrictedModelIds);
                 if($restrictedModelIds) {
                     $data = $data->whereNotIn('id', $restrictedModelIds);
                 }
-            //  info($data->pluck('id'));
             }
            
             $data = $data->groupBy('model')->get();
-            // info($data);
             if($request->page == 'Edit') {
                return $data; 
             }
@@ -701,7 +716,6 @@ class PFIController extends Controller
        
     }
     public function getLOIItemDetails(Request $request) {
-        // info($request->all());
         $data = [];
         $supplier = Supplier::find($request->supplier_id);
         $loiItem = LetterOfIndentItem::find($request->loi_item_id);

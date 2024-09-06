@@ -197,10 +197,8 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-        info($request->all());
         // $customer = Clients::find($request->country_id);
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
-        info($LoiCountryCriteria);
         $data = [];
 
         // get the loi count for this customer for thid=s year;
@@ -266,31 +264,24 @@ class LoiCountryCriteriasController extends Controller
                             ->where('country_id', $request->country_id);
                         })->pluck('model_line')->toArray();
 
-            // info($LOIRestrictedCountries);
             $restrictedModelLinesChoosen = [];
             $notAllowedModelLinesChoosen = [];
 
             foreach($request->selectedModelLineIds as $modelLine) {
                 if($LOIRestrictedCountries) {
                     if(in_array($modelLine, $LOIRestrictedCountries)) {
-                        // info("model line is restrcied");
-                        // info($modelLine);
+                        
                         $restrictedModelLinesChoosen[] = $modelLine;
                     }
                 }
                 
                 if($LOIAllowedCountries) {
                     if(!in_array($modelLine, $LOIAllowedCountries) ) {
-                        info("model line is not allowed");
-                        info($modelLine);
                         $notAllowedModelLinesChoosen[] = $modelLine;
                     }
                 }              
             }
-            // info("allowed list");
-            // info($LOIAllowedCountries);
-            // info("model line which is not included in allwed list");
-            // info($notAllowedModelLinesChoosen);
+         
            
             if($restrictedModelLinesChoosen) {
                 $modelLines = array_unique($restrictedModelLinesChoosen);
