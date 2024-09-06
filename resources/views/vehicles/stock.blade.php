@@ -1548,14 +1548,14 @@ table.dataTable thead th select {
                 var selectedValues = $(this).val();
                 
                 if (selectedValues && selectedValues.length > 0) {
-                    // Build a regex to search for multiple values
-                    var regex = selectedValues.join('|');  // Join selected values with 'OR' operator
+                    // Join selected values as a string that looks for exact matches
+                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
                     column
-                        .search(regex, true, false)  // Use regex search to match any of the selected values
+                        .search(exactSearch, true, false)  // Exact match using regex search
                         .draw();
                 } else {
                     column
-                        .search('', true, false)
+                        .search('', true, false)  // Clear search if no values selected
                         .draw();
                 }
             });
@@ -1578,6 +1578,13 @@ table.dataTable thead th select {
                         month: 'long'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                }
+                else if (columnHeader === 'Price') {
+                    var formattedPrice = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedPrice + '</option>');
                 }
                 else {
                     select.append('<option value="' + d + '">' + d + '</option>');
