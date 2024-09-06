@@ -1137,6 +1137,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	var selectedCustomerAddress = '';
 	let isBatchChecked = false; // Initialize the variable to store the checked state
 	var onChangeSelectedVins = [];
+	// Global variable to store VINs when BOE number is null
+	var vinWithoutBoe = [];
 	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
         var workOrder = {!! json_encode($workOrder) !!};
@@ -1302,6 +1304,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						}
 						boeVins[boeNumber].push(workOrder.vehicles[i].vin);
 					}
+					else {
+						// Collect the workOrder.vehicles[i].vin in the global variable
+						vinWithoutBoe.push(workOrder.vehicles[i].vin);
+					}
 				}
 				var newBoeOption = '';
 				allVins.forEach(function(vin) { 
@@ -1339,8 +1345,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							$select.find('option[value="' + vin + '"]').prop('disabled', true);
 						}
 					});
+					// Enable VINs from the global variable (vinWithoutBoe) in all dropdowns
+					vinWithoutBoe.forEach(function(vin) {
+						$select.find('option[value="' + vin + '"]').prop('disabled', false);
+					});
 					$select.trigger('change.select2');
 				});
+				// write code here to enable the collected workOrder.vehicles[i].vin in the above for all $(".form_field_outer").find(".form_field_outer_row select").each(function() {
 				if (authUserPermission === 'true') {
 					var table = document.getElementById('myTable');
 					if (table) {
@@ -2494,7 +2505,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					var newRow = $(`
 						<div class="row form_field_outer_row" id="${index}">
 							<div class="col-xxl-11 col-lg-11 col-md-11">
-								<span class="error">* </span>
 								<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
 								<select name="boe[${index}][vin][]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
 									${options}
@@ -2517,16 +2527,16 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						placeholder: "Choose VIN Per BOE",
 					});
 
-					// Add validation rules for all dynamicselect2 elements
-					$('.dynamicselect2').each(function() {
-						$(this).rules('add', {
-							required: true,
-							allVinsSelected: true,
-							messages: {
-								required: "This field is required."
-							}
-						});
-					});
+					// // Add validation rules for all dynamicselect2 elements
+					// $('.dynamicselect2').each(function() {
+					// 	$(this).rules('add', {
+					// 		required: true,
+					// 		allVinsSelected: true,
+					// 		messages: {
+					// 			required: "This field is required."
+					// 		}
+					// 	});
+					// });
 					if (authUserPermission === 'true') {
 						$('.dynamicselect2').prop('disabled', true);
 						$('.remove_node_btn_frm_field').prop('disabled', true);
