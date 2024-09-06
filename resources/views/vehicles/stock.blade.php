@@ -1993,7 +1993,7 @@ var columns6 = [
 });
     }
 
-    columns3.push(
+    columns6.push(
                     { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
@@ -2397,7 +2397,7 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
 });
     }
 
-    columns3.push(
+    columns7.push(
                     { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
@@ -2846,7 +2846,7 @@ if (hasPricePermission) {
 });
     }
 
-    columns3.push(
+    columns9.push(
         { data: 'gp', name: 'vehicles.gp' },
         {
                     data: 'price', 
