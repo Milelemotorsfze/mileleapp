@@ -5,6 +5,43 @@
     margin-bottom: 5px;
     width: 100%;
 }
+.select2-container--default .select2-search--inline .select2-search__field {
+    font-size: 12px !important; /* Adjust the font-size as per your needs */
+    width: 100% !important;
+}
+/* Ensure the Select2 dropdown fits the column width */
+table.dataTable thead th select {
+    width: 100% !important; /* Ensures the select element fits the header width */
+    min-width: 100%; /* Ensures it takes at least 100% width */
+}
+
+/* Ensure the Select2 dropdown fits the full header width when opened */
+.select2-container {
+    width: 100% !important; /* Ensures the container takes full width */
+}
+
+/* Ensure the dropdown itself is properly styled */
+.select2-dropdown {
+    width: auto !important; /* Let the dropdown size adjust dynamically */
+    min-width: 100%; /* Ensure the dropdown is at least the width of the select element */
+    box-sizing: border-box; /* Makes sure the padding is included in width */
+}
+
+/* Ensure proper spacing between dropdown options */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #007bff;
+    border: 1px solid #0056b3;
+    padding: 0 5px;
+    margin: 3px 5px 3px 0;
+    color: black;
+    font-size: 12px;
+}
+
+/* Highlight the selected items */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #007bff;
+    color: white;
+}
 .dataTables_processing {
     position: absolute;
     top: 50%;
@@ -77,10 +114,16 @@
       position: relative;
     }
     thead th {
-      position: sticky!important;
-      top: 0;
-      background-color: rgb(194, 196, 204)!important;
-      z-index: 1;
+        white-space: nowrap; /* Prevent text from wrapping into two lines */
+    text-overflow: ellipsis; /* Show ellipsis ("...") if the text overflows */
+    overflow: hidden; /* Hide overflowed text */
+    width: auto; /* Allow the header to take up available width */
+    padding: 8px; /* Adjust padding for better alignment */
+    vertical-align: middle; /* Vertically align the text in the middle */
+    background-color: rgb(194, 196, 204)!important; /* Ensure sticky header color */
+    position: sticky!important; /* Sticky header */
+    top: 0;
+    z-index: 1;
     }
     #table-responsive {
       height: 100vh;
@@ -1222,7 +1265,21 @@
         { data: 'exterior_color', name: 'ex_color.name' },
         { data: 'interior_color', name: 'int_color.name' },
         { data: 'upholestry', name: 'varaints.upholestry' },
-        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+        {
+    data: 'ppmmyyy',
+    name: 'vehicles.ppmmyyy',
+    render: function(data, type, row) {
+        if (data) {
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: 'long'
+            });
+            return formattedDate;  // Example: "January 2024"
+        }
+        return ''; // If no date, return empty
+    }
+},
         { data: 'location', name: 'warehouse.name' },
         { data: 'territory', name: 'vehicles.territory' },
         { data: 'fd', name: 'countries.name' },
@@ -1269,10 +1326,52 @@
     }
     columns3.push(
         { data: 'po_number', name: 'purchasing_order.po_number' },
-        { data: 'po_date', name: 'purchasing_order.po_date' },
+        {
+    data: 'po_date',
+    name: 'purchasing_order.po_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
         { data: 'grn_number', name: 'grn.grn_number' },
-        { data: 'date', name: 'grn.date' },
-        { data: 'inspection_date', name: 'inspection_date' },
+        {
+    data: 'date',
+    name: 'grn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        {
+    data: 'inspection_date',
+    name: 'vehicles.inspection_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
         { data: 'grn_remark', name: 'vehicles.grn_remark' },
         { 
             data: null,
@@ -1299,9 +1398,37 @@
                 }
             }
         },
-        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
+        {
+    data: 'reservation_end_date',
+    name: 'vehicles.reservation_end_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
         { data: 'bpn', name: 'bp.name' },
-        { data: 'so_date', name: 'so.so_date' },
+        {
+    data: 'so_date',
+    name: 'so.so_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
         { data: 'so_number', name: 'so.so_number' },
         { data: 'spn', name: 'sp.name' },
         { 
@@ -1402,9 +1529,11 @@
     api.columns().every(function (index) {
         var column = this;
         var columnHeader = $(column.header()).text();  // Get the column header text
+        var headerWidth = $(column.header()).outerWidth(); // Get the actual width of the header
+
 
         // List of column headers you want to exclude from filtering
-        var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'SO Date', 'Reservation End', 'GRN Report', 'Aging', 'Inspection Date', 'GRN Date', 'PO Date'];
+        var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'GRN Report', 'Aging'];
 
         // Skip columns where you don't want filters (either by header name or index)
         if (excludeFilters.includes(columnHeader)) {
@@ -1412,21 +1541,58 @@
         }
 
         // Create a select element
-        var select = $('<select><option value="">Filter by ' + columnHeader + '</option></select>')
+        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                column
-                    .search(val ? '^' + val + '$' : '', true, false)  // Use regex for exact match
-                    .draw();
+                // Get the selected values
+                var selectedValues = $(this).val();
+                
+                if (selectedValues && selectedValues.length > 0) {
+                    // Build a regex to search for multiple values
+                    var regex = selectedValues.join('|');  // Join selected values with 'OR' operator
+                    column
+                        .search(regex, true, false)  // Use regex search to match any of the selected values
+                        .draw();
+                } else {
+                    column
+                        .search('', true, false)
+                        .draw();
+                }
             });
 
         // Populate the select element with unique values from the column
         column.data().unique().sort().each(function (d, j) {
             if (d) {
-                select.append('<option value="' + d + '">' + d + '</option>');
+                // If this is the 'po_date' column, format the date
+                if (columnHeader === 'PO Date' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                } 
+                else if (columnHeader === 'Production Year') { 
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        year: 'numeric',
+                        month: 'long'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                }
+                else {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                }
             }
         });
+        select.select2({
+            placeholder: columnHeader, // Placeholder for the column
+            allowClear: true,  // Option to clear selections
+            dropdownAutoWidth: true,  // Dynamically adjust dropdown width based on content
+            width: headerWidth + 'px'  // Set the width of the select2 dropdown equal to the header width
+        });
+
+        // Also, set the width of the <select> element to match the header
+        select.css('width', headerWidth + 'px');
     });
 }
 });

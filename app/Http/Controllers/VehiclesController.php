@@ -2895,12 +2895,12 @@ $variant->save();
                     $data = Vehicles::select( [
                         'vehicles.id as id',
                         'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
+                         'purchasing_order.po_date',
+                         'vehicles.ppmmyyy',
                          DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
-                         DB::raw("DATE_FORMAT(vehicles.reservation_end_date, '%d-%b-%Y') as reservation_end_date"),
+                        'vehicles.reservation_end_date',
                         'vehicles.vin',
-                        DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
+                        'vehicles.inspection_date',
                         'vehicles.engine',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
@@ -2933,8 +2933,8 @@ $variant->save();
                         'documents.owership',
                         'documents.document_with',
                         'bp.name as bpn',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        'so.so_date',
+                        'grn.date',
                         DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
                         DB::raw("
     COALESCE(
