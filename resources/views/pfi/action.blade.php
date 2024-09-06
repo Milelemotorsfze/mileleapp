@@ -82,12 +82,14 @@
                             <div class="modal-body">
                                 <div class="col-lg-12">
                                     <div class="row p-2">
+                                        <label class="form-label font-size-13">Released Date</label>
                                         <input type="date" name="released_date" value="{{ Illuminate\Support\Carbon::parse($pfi->released_date)->format('Y-m-d') }}"
                                          required class="form-control" id="released_date_{{$pfi->id}}" >
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="row p-2">
+                                    <label class="form-label font-size-13">Released Amount</label>
                                         <input type="number" min="0" value="{{ $pfi->released_amount }}" required name="released_amount" 
                                         class="form-control" id="released_amount_{{$pfi->id}}" >
                                     </div>

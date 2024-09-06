@@ -22,6 +22,9 @@
             margin-right: 0px;
             padding-right: 0px;
         }
+        .error{
+            color:red;
+       }
        
     </style>
     @can('pfi-edit')
@@ -33,7 +36,15 @@
                 <h4 class="card-title">Edit PFI</h4>
                
                 <a  class="btn btn-sm btn-info float-end mr-2" href="{{ route('pfi.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-                
+                @can('LOI-list')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" title="Model-SFX Detail View of LOI Items" href="{{ route('letter-of-indent-items.index') }}" >
+                        <i class="fa fa-table" ></i> LOI List </a>
+                    @endif
+                @endcan
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -72,6 +83,7 @@
                                         <div class="row">
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Number</label>
                                                     <input type="text" class="form-control widthinput" id="pfi_reference_number" autofocus placeholder="Enter PFI Number"
                                                            name="pfi_reference_number" value="{{ old('pfi_reference_number', $pfi->pfi_reference_number) }}">
@@ -80,6 +92,7 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Vendor</label>
                                                     <select class="form-control widthinput" name="supplier_id" id="supplier-id" multiple >
                                                         @foreach($suppliers as $supplier)
@@ -93,6 +106,7 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Customer</label>
                                                     <select class="form-control widthinput" name="client_id" id="client_id" multiple >
                                                         @foreach($customers as $customer)
@@ -105,6 +119,7 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Country</label>
                                                     <select class="form-control widthinput" name="country_id" id="country_id" multiple >
                                                     @foreach($customerCountries as $customerCountry)
@@ -124,8 +139,16 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Document</label>
                                                     <input type="file" id="file" class="form-control widthinput" name="file">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
+                                                <span class="error">* </span>
+                                                    <label for="choices-single-default" class="form-label">PFI Date</label>
+                                                    <input type="date" value="{{ Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('Y-m-d') }}" class="form-control widthinput" name="released_date">
                                                 </div>
                                             </div>
                                           
@@ -169,22 +192,28 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
+                                            
                                             <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <span class="error">* </span>
                                                 <label class="form-label">Model</label>
                                             </div>
                                             <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
+                                                <span class="error">* </span>
                                                 <label class="form-label">SFX</label>
                                             </div>
                                             <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                                <span class="error">* </span>
                                                 <label class="form-label">LOI Code</label>
                                             </div>
                                             <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
+                                                <span class="error">* </span>
                                                 <label class="form-label">PFI QTY</label>
                                             </div>
                                             <div class="col-lg-1 col-md-6 col-sm-12">
                                                 <label class="form-label">Unused QTY</label>
                                             </div>
                                             <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <span class="error">* </span>
                                                 <label class="form-label">Unit Price</label>
                                             </div>
                                             <div class="col-lg-2 col-md-6 col-sm-12">
@@ -405,7 +434,9 @@
                 pfi_reference_number: {
                 required: true,
                 },
-               
+                pfi_date: {
+                    required: true,
+                },
                 amount: {
                     required: true,
                 },
@@ -486,9 +517,7 @@
 
             function hideorShowMMCDiv() {
                 let MMC = $('#supplier-id').find('option:selected').attr("data-is-MMC");
-                console.log(MMC);
             if(MMC == 1) {
-                console.log(MMC);
                 $('.mmc-items-div').attr('hidden', false);
             }else{
                 $('.mmc-items-div').attr('hidden', true);
@@ -542,6 +571,13 @@
         function calculateTotalAmount(index,childIndex) {
             var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
             var unitPrice = $('#unit-price-'+index+'-item-'+childIndex).val();
+            if(childIndex == 0) {
+                let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+                for(let j=1; j<=totalIndex;j++) 
+                {
+                   $('#unit-price-'+index+'-item-'+j).val(unitPrice);              
+                }
+            }
             var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-'+childIndex).val(eachItemTotal);
 
@@ -836,9 +872,16 @@
 
         $(document.body).on('click', ".add-more", function (e) {
             let index = $(this).attr('index');
+
+            let unitPrice =  $("#unit-price-"+index+"-item-0").val();
             let item =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
+            let loiItem = $('#loi-item-'+index+'-item-0').val();
+               if(loiItem[0] == 'NULL')  {
+                var confirm = alertify.confirm('This model and sfx do not have any LOI, So you can not add child items',function (e) {
+                }).set({title:"Can't Add Child PFI Item"})
+               }else{
           
-             $(".pfi-child-item-div-"+index).append(`
+                $(".pfi-child-item-div-"+index).append(`
                      <div class="row chilItems child-item-${index}" id="row-${index}-item-${item}">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <select class="form-select widthinput text-dark models" multiple name="PfiItem[${index}][model][${item}]"
@@ -878,7 +921,7 @@
                                     index="${index}" item="${item}" id="remaining-quantity-${index}-item-${item}">
                             </div>
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  required placeholder="0" name="PfiItem[${index}][unit_price][${item}]" 
+                                <input type="number" min="0"  placeholder="0" name="PfiItem[${index}][unit_price][${item}]" value="${unitPrice}"
                                oninput=calculateTotalAmount(${index},${item}) class="form-control widthinput mb-2 unit-prices"
                                     id="unit-price-${index}-item-${item}" item="${item}"  index="${index}" placeholder="Unit price">
                             </div>
@@ -917,6 +960,7 @@
                         placeholder: 'Select Code',
                         maximumSelectionLength: 1
                     });
+                }
         });
       
         $('.add-pfi-btn').click(function() {
@@ -1012,10 +1056,7 @@
             var index = $(this).attr('index');
             // var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
             var childIndex = $(this).attr('item');
-            console.log(index);
-            console.log(childIndex);
             var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
-            console.log(sfx[0]);
             var model = $('#model-'+index+'-item-'+childIndex).val();
             var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
