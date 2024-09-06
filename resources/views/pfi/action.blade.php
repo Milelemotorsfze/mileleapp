@@ -92,6 +92,7 @@
                                     <div class="row p-2">
                                         <input type="number" min="0" value="{{ $pfi->released_amount }}" required name="released_amount" 
                                         class="form-control" id="released_amount_{{$pfi->id}}" placeholder="Enter Amount" min="1" >
+                                        <span id="released-amount-error-{{ $pfi->id }}" class="text-danger"> </span>
                                     </div>
                                 </div>
                             </div>
@@ -244,8 +245,11 @@
         let url =  "{{ route('pfi-released-amount-update') }}";
         let released_amount = $('#released_amount_'+pfi_id).val();
         let released_date = $('#released_date_'+pfi_id).val();
-
-        var confirm = alertify.confirm('Are you sure you want to Update Released amount and data for this item ?',function (e) {
+        if(released_amount.length > 0) {
+            document.getElementById("released-amount-error-"+pfi_id).textContent="";
+	        document.getElementById("released_amount_"+pfi_id).classList.remove("is-invalid");
+	        document.getElementById("released-amount-error-"+pfi_id).classList.remove("paragraph-class");
+            var confirm = alertify.confirm('Are you sure you want to Update Released amount and data for this item ?',function (e) {
             $('#update-released-amount-'+pfi_id).modal('hide');
             
             if (e) {
@@ -264,11 +268,18 @@
                         var table1 = $('#PFI-table').DataTable();
                         table1.ajax.reload();
 
-                        alertify.success('PFI Updated successfully.');
+                        alertify.success('Relaesed amount updated successfully.');
                     }
                 });
             }
         }).set({title:"Update Item"})
+        }else{
+                let msg = "This filed is required";
+                document.getElementById("released-amount-error-"+pfi_id).textContent=msg;
+                document.getElementById("released_amount_"+pfi_id).classList.add("is-invalid");
+                document.getElementById("released-amount-error-"+pfi_id).classList.add("paragraph-class");
+        }
+      
     });
 
 </script>
