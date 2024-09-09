@@ -117,13 +117,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" required>
-                    <datalist id="milelemotorsList">
-                    @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
-                    @endforeach
-                    </datalist>
-                    </div>
+    <select name="milelemotors" class="form-control" id="milelemotorsSelect" required>
+        <option value="">-- Select Source --</option>
+        @foreach ($LeadSource as $source)
+            <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
+        @endforeach
+    </select>
+</div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
