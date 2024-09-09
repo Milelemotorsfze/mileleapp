@@ -2721,6 +2721,50 @@ $normalizationMap = [
 'Speakers' => 'Speakers',
 'sunroof' => 'sunroof'
 ];
+foreach ($variants as $variant) {
+    $details = [];
+    $otherDetails = [];
+    foreach ($variant->variantItems as $item) {
+        $modelSpecification = $item->model_specification;
+        $modelSpecificationOption = $item->model_specification_option;
+        if ($modelSpecification && $modelSpecificationOption) {
+            $name = $modelSpecification->name;
+            $optionName = $modelSpecificationOption->name;
+            $normalized = null;
+            foreach ($normalizationMap as $key => $values) {
+                if (is_array($values)) {
+                    if (in_array($name, $values)) {
+                        $normalized = $key;
+                        break;
+                    }
+                } elseif ($name === $values) {
+                    $normalized = $key;
+                    break;
+                }
+            }
+    
+            if ($normalized) {
+                $name = $normalized;
+            }
+            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                if (strtolower($optionName) === 'yes') {
+                    $optionName = $name;
+                } else {
+                    continue;
+                }
+            }
+            if (in_array($name, $sequence)) {
+                $index = array_search($name, $sequence);
+                $details[$index] = $optionName;
+            } else {
+                $otherDetails[] = $optionName;
+            }
+        }
+    }
+    ksort($details);
+    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+    $variant->save();
+    }
         if ($request->ajax()) {
             $status = $request->input('status');
             if($status === "Incoming")
@@ -2872,6 +2916,7 @@ $normalizationMap = [
                         'varaints.name as variant',
                         'varaints.model_detail',
                         'varaints.id as variant_id',
+                        'varaints.detail as variant_detail',
                        'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2998,7 +3043,7 @@ $normalizationMap = [
                     ->whereDate('vehicles.reservation_end_date', '>=', now())
                     ->whereNotNull('vehicles.grn_id')
                     ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id')->get();  
+                    $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "Sold")
                 {
@@ -3065,7 +3110,7 @@ $normalizationMap = [
                     ->whereNotNull('vehicles.so_id')
                     ->whereNotNull('vehicles.grn_id')
                     ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id')->get();  
+                    $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "Delivered")
                 {
@@ -3089,7 +3134,7 @@ $normalizationMap = [
                         'varaints.name as variant',
                         'varaints.id as variant_id',
                         'varaints.model_detail',
-                        'varaints.detail',
+                        'varaints.detail as variant_detail',
                         'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -3147,7 +3192,7 @@ $normalizationMap = [
                     ->whereNotNull('vehicles.gdn_id')
                     ->whereNotNull('vehicles.grn_id')
                     ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id')->get();  
+                    $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "allstock")
                 {
@@ -3178,6 +3223,7 @@ $normalizationMap = [
                         'varaints.model_detail',
                         'varaints.detail',
                         'varaints.seat',
+                        'varaints.detail as variant_detail',
                         'varaints.upholestry',
                         'varaints.steering',
                         'varaints.my',
@@ -3232,7 +3278,7 @@ $normalizationMap = [
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id')->get();  
+                    $data = $data->groupBy('vehicles.id');  
                 }
                 else if($status === "dpvehicles")
                 {
@@ -3259,6 +3305,7 @@ $normalizationMap = [
                         'countries.name as fd',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.detail as variant_detail',
                         'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
@@ -3316,68 +3363,12 @@ $normalizationMap = [
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                     ->where('vehicles.status', 'Approved')
                     ->where('purchasing_order.is_demand_planning_po', '=', '1');
-                    $data = $data->groupBy('vehicles.id')->get();
+                    $data = $data->groupBy('vehicles.id');
                                             // Process each vehicle to generate variant_details dynamically
         }  
-        foreach ($data as $vehicle) {
-            $variant = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-                ->where('id', $vehicle->variant_id)
-                ->first();
-            // Compute variant details based on the sequence and normalization map
-            $details = [];
-            $otherDetails = [];
-            foreach ($variant->variantItems as $item) {
-                $modelSpecification = $item->model_specification;
-                $modelSpecificationOption = $item->model_specification_option;
-                if ($modelSpecification && $modelSpecificationOption) {
-                    $name = $modelSpecification->name;
-                    $optionName = $modelSpecificationOption->name;
-                    $normalized = null;
-                    
-                    // Normalize the variant name using normalization map
-                    foreach ($normalizationMap as $key => $values) {
-                        if (is_array($values)) {
-                            if (in_array($name, $values)) {
-                                $normalized = $key;
-                                break;
-                            }
-                        } elseif ($name === $values) {
-                            $normalized = $key;
-                            break;
-                        }
-                    }
-
-                    if ($normalized) {
-                        $name = $normalized;
-                    }
-                    
-                    // Handle Yes/No values
-                    if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                        if (strtolower($optionName) === 'yes') {
-                            $optionName = $name;
-                        } else {
-                            continue;
-                        }
-                    }
-                    
-                    // Sequence the details based on the predefined sequence
-                    if (in_array($name, $sequence)) {
-                        $index = array_search($name, $sequence);
-                        $details[$index] = $optionName;
-                    } else {
-                        $otherDetails[] = $optionName;
-                    }
-                }
-            }
-
-            // Sort the details based on sequence and merge with other details
-            ksort($details);
-            $variantDetails = implode(', ', array_merge($details, $otherDetails));
-            
-            // Assign the computed variant_details to the vehicle
-            $vehicle->variant_detail = $variantDetails;
-                }
-                return DataTables::of($data)->make(true);
+        if ($data) {
+            return DataTables::of($data)->toJson();
+        }
         }
         return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
