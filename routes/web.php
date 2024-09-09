@@ -29,6 +29,7 @@ use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\WOApprovalsController;
 use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
+use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -459,7 +460,10 @@ Route::get('/d', function () {
         Route::post('/update-wo-status', 'updateStatus')->name('wo.updateStatus');
         Route::get('/wo-status-history/{id}', 'woStatusHistory')->name('woStatusHistory');
     }); 
-    
+    Route::controller(WoVehicleController::class)->group(function(){
+        Route::post('/update-vehicle-modification-status', 'updateVehModiStatus')->name('wo.updateVehModiStatus');
+        Route::get('/vehicle-modification-status-log/{id}', 'vehModiStatusHistory')->name('vehModiStatusHistory');
+    }); 
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 

@@ -125,17 +125,37 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                     // Determine the label text based on docs_status
                     $labelText = '';
                     if ($workOrder->docs_status == 'In Progress' || $workOrder->docs_status == 'Not Initiated') {
-                        $labelText = 'Documentation';
+                        $labelText = 'Documentation :';
                     } elseif ($workOrder->docs_status == 'Ready') {
-                        $labelText = 'Documents';
+                        $labelText = 'Documents :';
                     }
                 @endphp
 
                 <label style="font-size: 119%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
-                    {{ $labelText }} {{ $workOrder->docs_status ?? '' }}
+                    {{ strtoupper($labelText) }} <strong>{{ strtoupper($workOrder->docs_status) ?? '' }}</strong>
                 </label>
+
+                @if($workOrder->vehicles_modification_summary == 'Completed')
+                    <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-success">
+                        MODIFICATION : <strong>COMPLETED</strong>
+                    </label>
+                @else
+                    @if($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count == 0)
+                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-info">
+                            MODIFICATION : <strong>INITIATED</strong>
+                        </label>
+                    @elseif($workOrder->vehicles_initiated_count == 0 && $workOrder->vehicles_not_initiated_count > 0)
+                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-danger">
+                            MODIFICATION : <strong>NOT INITIATED</strong>
+                        </label>
+                    @elseif($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count > 0)
+                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-warning">
+                            MODIFICATION : {{ $workOrder->vehicles_initiated_count }} INITIATED & {{ $workOrder->vehicles_not_initiated_count }} NOT INITIATED
+                        </label>
+                    @endif
+                @endif            
             @endif
-        @endif
+        @endif 
     </div>
     <div class="col-12 d-flex flex-wrap align-items-center">
         @if($previous != '')
@@ -678,7 +698,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Data Confirmed By</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{$workOrder->salesSupportDataConfirmationBy->name ?? 'NA'}} @else 'NA' @endif</span>
+                                                            <span class="data-font">@if($workOrder->sales_support_data_confirmation_at != ''){{$workOrder->salesSupportDataConfirmationBy->name ?? 'NA'}} @else NA @endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1013,8 +1033,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="table-responsive">
-                                            <table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+                                            <table class="my-datatable table table-striped table-editable table" style="width:100%;">
                                                 <tr style="border-bottom:1px solid #b3b3b3; background-color : #e8f3fd!important;">
+                                                    <th>Action</th>
                                                     <th>BOE</th>
                                                     <th>VIN</th>
                                                     <th>Brand</th>
@@ -1040,6 +1061,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                 @if(isset($workOrder->vehicles) && count($workOrder->vehicles) > 0)
                                                     @foreach($workOrder->vehicles as $vehicle)
                                                     <tr class="custom-border-top" style="background-color : #f6fafe!important;">
+                                                        <td>
+                                                            @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                                $workOrder->finance_approval_status == 'Approved' && 
+                                                                $workOrder->coo_approval_status == 'Approved' && ($vehicle->modification_or_jobs_to_perform_per_vin != '' || (isset($vehicle->addons) && count($vehicle->addons) > 0)))                                                           
+                                                                <div class="dropdown">
+                                                                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu dropdown-menu-start">                                      
+                                                                        @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                                            $workOrder->finance_approval_status == 'Approved' && 
+                                                                            $workOrder->coo_approval_status == 'Approved')
+                                                                            @php
+                                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['update-vehicle-modification-status']);
+                                                                            @endphp
+                                                                            @if ($hasPermission)
+                                                                                <a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updatevehModiStatusModal_{{$vehicle->id}}">
+                                                                                <i class="fa fa-wrench" aria-hidden="true"></i> Update Modification Status
+                                                                                </a>
+                                                                            @endif
+                                                                        @endif
+                                                                        @php
+                                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-modification-status-log']);
+                                                                        @endphp
+                                                                        @if ($hasPermission)
+                                                                            <li>
+                                                                                <a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                                                                                    href="{{route('vehModiStatusHistory',$vehicle->id)}}">
+                                                                                    <i class="fas fa-eye"></i> Modification Status Log
+                                                                                </a>
+                                                                            </li>
+                                                                        @endif										
+                                                                    </ul>
+                                                                </div> 
+                                                                @include('work_order.export_exw.veh_modi_status_update')   
+                                                            @endif 
+                                                        </td>                                                                                                         
                                                         <td>{{$vehicle->boe_number ?? 'NA'}}</td>
                                                         <td>{{$vehicle->vin ?? 'NA'}}</td>
                                                         <td>{{$vehicle->brand ?? 'NA'}}</td>
@@ -1063,36 +1121,100 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         <td>{{$vehicle->deposit_received ?? 'NA'}}</td>
                                                     </tr>
                                                     <tr>
+                                                        <th></th>
                                                         <th colspan="2">Modification/Jobs</th>
                                                         <td colspan="17">{{$vehicle->modification_or_jobs_to_perform_per_vin ?? 'NA'}}</td>
                                                     </tr>
                                                     <tr>
+                                                        <th></th>
                                                         <th colspan="2">Special Request/Remarks</th>
                                                         <td colspan="17">{{$vehicle->special_request_or_remarks ?? 'NA'}}</td>
                                                     </tr>
-                                                        @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
+                                                    @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                        $workOrder->finance_approval_status == 'Approved' && 
+                                                        $workOrder->coo_approval_status == 'Approved' && ($vehicle->modification_or_jobs_to_perform_per_vin != '' || (isset($vehicle->addons) && count($vehicle->addons) > 0)))
                                                         <tr>
-                                                            <th colspan="19">Service Breakdown</th>
+                                                            <td></td>
+                                                            <td>
+                                                                @php
+                                                                    // Determine the badge class based on modification_status
+                                                                    $badgeClass = '';
+                                                                    if ($vehicle->modification_status == 'Initiated') {
+                                                                        $badgeClass = 'badge-soft-info';
+                                                                    } elseif ($vehicle->modification_status == 'Completed') {
+                                                                        $badgeClass = 'badge-soft-success';
+                                                                    } elseif ($vehicle->modification_status == 'Not Initiated') {
+                                                                        $badgeClass = 'badge-soft-danger';
+                                                                    }
+                                                                @endphp
+
+                                                                <label style="font-size: 70%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
+                                                                    MODIFICATION : <strong>{{ strtoupper($vehicle->modification_status) ?? '' }}</strong>
+                                                                </label>
+                                                            </td>
+                                                            @if($vehicle->modification_status == 'Initiated')
+                                                                <td colspan="3">Exp. Completion : @if(!empty($vehicle->latestModificationStatus->expected_completion_datetime))
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestModificationStatus->expected_completion_datetime)->format('d M Y, h:i:s A') }}
+                                                                    @endif
+                                                                </td>   
+                                                                <td colspan="4">Current Location : {{$vehicle->latestModificationStatus->current_vehicle_location ?? ''}}</td>            
+                                                            @elseif($vehicle->modification_status == 'Completed')
+                                                                <td colspan="4">Available Location : {{$vehicle->latestModificationStatus->location->name ?? ''}}</td>
+                                                            @endif
+                                                            <td colspan="
+                                                                @if(isset($type) && $type == 'export_cnf') 
+                                                                    @if($vehicle->modification_status == 'Initiated') 
+                                                                        6
+                                                                    @elseif($vehicle->modification_status == 'Completed') 
+                                                                        9
+                                                                    @elseif($vehicle->modification_status == 'Not Initiated') 
+                                                                        13
+                                                                    @endif
+                                                                @else
+                                                                    @if($vehicle->modification_status == 'Initiated') 
+                                                                        5
+                                                                    @elseif($vehicle->modification_status == 'Completed') 
+                                                                        8
+                                                                    @elseif($vehicle->modification_status == 'Not Initiated') 
+                                                                        12
+                                                                    @endif
+                                                                @endif">Comment : {{ $vehicle->latestModificationStatus->comment ?? '' }}
+                                                            </td>
+                                                            <td colspan="5">Updated : {{$vehicle->latestModificationStatus->user->name ?? ''}} - 
+                                                                @if(!is_null($vehicle->latestModificationStatus) && !is_null($vehicle->latestModificationStatus->created_at))
+                                                                    {{ $vehicle->latestModificationStatus->created_at->format('d M Y,  h:i:s A') }}
+                                                                @else
+                                                                    Not available
+                                                                @endif
+                                                            </td>                                                            
+                                                        </tr>
+                                                    @endif
+                                                    @if(isset($vehicle->addons) && count($vehicle->addons) > 0)
+                                                        <tr>
+                                                            <th></th>
+                                                            <th colspan="@if(isset($type) && $type == 'export_cnf') 19 @else 18 @endif">Service Breakdown</th>
                                                         </tr>
                                                         <tr>
+                                                            <th></th>
                                                             <th colspan="2">Created Date & Time</th>
                                                             <th colspan="4">Addon Code</th>
                                                             <th colspan="1">Quantity</th>
-                                                            <th colspan="12">Addon Custom Details</th>
+                                                            <th colspan="@if(isset($type) && $type == 'export_cnf') 12 @else 11 @endif">Addon Custom Details</th>
                                                         </tr>
                                                             @foreach($vehicle->addons as $addon)
                                                             <tr>
+                                                                <td></td>
                                                                 <td colspan="2">@if($addon->created_at != ''){{\Carbon\Carbon::parse($addon->created_at)->format('d M Y,  h:i:s A') ?? ''}}@endif</td>
                                                                 <td colspan="4">{{$addon->addon_code ?? ''}}</td>
                                                                 <td colspan="1">{{$addon->addon_quantity ?? ''}}</td>
-                                                                <td colspan="12">{{$addon->addon_description ?? ''}}</td>
+                                                                <td colspan="@if(isset($type) && $type == 'export_cnf') 12 @else 11 @endif">{{$addon->addon_description ?? ''}}</td>
                                                             </tr>
                                                             @endforeach
                                                         @endif
                                                     @endforeach
                                                 @else
                                                 <tr>
-                                                    <td colspan="19">
+                                                    <td colspan="@if(isset($type) && $type == 'export_cnf') 20 @else 19 @endif">
                                                         <center style="font-size:12px;">No vehilces and addons available</center>
                                                     </td>
                                                 </tr>
