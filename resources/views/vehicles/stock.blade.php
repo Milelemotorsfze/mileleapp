@@ -1230,7 +1230,7 @@ table.dataTable thead th select {
         },
         {
             data: 'variant_detail',
-            name: 'varaints.detail',
+            name: 'variant_detail',
             render: function(data, type, row) {
                 if (!data) {
                     return '';
