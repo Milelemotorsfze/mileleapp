@@ -660,7 +660,7 @@ table.dataTable thead th select {
                   @endif
                   @if ($hasPricePermission)
                      <th>Minimum Commission</th>
-                     <th>GP</th>
+                     <th>GP %</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -833,7 +833,7 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP</th>
+                  <th>GP %</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -902,7 +902,7 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP</th>
+                  <th>GP %</th>
                     <th>Price</th>
                 @endif
                   <th>PO</th>
@@ -973,7 +973,7 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP</th>
+                  <th>GP %</th>
                   <th>Price</th>
                 @endif
                   <th>PO</th>
