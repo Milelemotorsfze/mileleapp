@@ -659,6 +659,7 @@ table.dataTable thead th select {
                   <th>Vehicle Cost</th>
                   @endif
                   @if ($hasPricePermission)
+                     <th>Minimum Commission</th>
                      <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -831,6 +832,7 @@ table.dataTable thead th select {
                   <th>Vehicle Cost</th>
                 @endif
                   @if ($hasPricePermission)
+                  <th>Minimum Commission</th>
                   <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -899,6 +901,7 @@ table.dataTable thead th select {
                   <th>Vehicle Cost</th>
                 @endif
                   @if ($hasPricePermission)
+                  <th>Minimum Commission</th>
                   <th>GP</th>
                     <th>Price</th>
                 @endif
@@ -969,6 +972,7 @@ table.dataTable thead th select {
                   <th>Vehicle Cost</th>
                 @endif
                   @if ($hasPricePermission)
+                  <th>Minimum Commission</th>
                   <th>GP</th>
                   <th>Price</th>
                 @endif
@@ -1305,6 +1309,23 @@ table.dataTable thead th select {
     }
 
     columns3.push(
+        {
+            data: 'minimum_commission', 
+            name: 'vehicles.minimum_commission', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedminimum_commission = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedminimum_commission + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        },
             { data: 'gp', name: 'vehicles.gp' },
             {
             data: 'price', 
@@ -1580,6 +1601,13 @@ table.dataTable thead th select {
                         maximumFractionDigits: 0
                     });
                     select.append('<option value="' + d + '">' + formattedPrice + '</option>');
+                }
+                else if (columnHeader === 'Minimum Commission') {
+                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
                 }
                 else {
                     select.append('<option value="' + d + '">' + d + '</option>');
@@ -1994,6 +2022,23 @@ var columns6 = [
     }
 
     columns6.push(
+        {
+            data: 'minimum_commission', 
+            name: 'vehicles.minimum_commission', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedminimum_commission = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedminimum_commission + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        },
                     { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
@@ -2218,6 +2263,13 @@ var columns6 = [
                     });
                     select.append('<option value="' + d + '">' + formattedPrice + '</option>');
                 }
+                else if (columnHeader === 'Minimum Commission') {
+                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
+                }
                 else {
                     select.append('<option value="' + d + '">' + d + '</option>');
                 }
@@ -2399,6 +2451,23 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
 
     columns7.push(
                     { data: 'gp', name: 'vehicles.gp' },
+                    {
+            data: 'minimum_commission', 
+            name: 'vehicles.minimum_commission', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedminimum_commission = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedminimum_commission + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        },
                     {
                     data: 'price', 
                     name: 'vehicles.price', 
@@ -2660,6 +2729,13 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
                     });
                     select.append('<option value="' + d + '">' + formattedPrice + '</option>');
                 }
+                else if (columnHeader === 'Minimum Commission') {
+                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
+                }
                 else {
                     select.append('<option value="' + d + '">' + d + '</option>');
                 }
@@ -2861,6 +2937,23 @@ if (hasPricePermission) {
     }
 
     columns9.push(
+        {
+            data: 'minimum_commission', 
+            name: 'vehicles.minimum_commission', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedminimum_commission = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedminimum_commission + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        },
         { data: 'gp', name: 'vehicles.gp' },
         {
                     data: 'price', 
@@ -3107,6 +3200,13 @@ if (hasPricePermission) {
                         maximumFractionDigits: 0
                     });
                     select.append('<option value="' + d + '">' + formattedPrice + '</option>');
+                }
+                else if (columnHeader === 'Minimum Commission') {
+                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
                 }
                 else {
                     select.append('<option value="' + d + '">' + d + '</option>');

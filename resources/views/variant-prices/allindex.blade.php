@@ -102,10 +102,12 @@
                     <th>Variant</th>
                     <th>Interior Colour</th>
                     <th>Exterior Colour</th>
+                    <th>Minimum Commission</th>
                     <th>GP</th>
                     <th>Price</th>
                 </tr>
                 <tr>
+                    <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
@@ -139,10 +141,18 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 {
+                    data: 'minimum_commission', 
+                    name: 'vehicles.minimum_commission', 
+                    render: function (data, type, row) {
+                        console.log(row);
+                        var displayValue = data === null || data == 0 ? '' : data;
+                        return `<input type="text" class="editable-minimum_commission" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
+                    }
+                },
+                {
                     data: 'gp', 
                     name: 'vehicles.gp', 
                     render: function (data, type, row) {
-                        console.log(row);
                         var displayValue = data === null || data == 0 ? '' : data;
                         return `<input type="text" class="editable-gp" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
                     }
@@ -177,6 +187,9 @@
 
         // Allow only positive numbers in Price field (no negative signs)
         $('#dtBasicExample1').on('input', 'input.editable-price', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        $('#dtBasicExample1').on('input', 'input.editable-minimum_commission', function () {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
@@ -253,6 +266,19 @@ $('#dtBasicExample1').on('blur', 'input.editable-price', function () {
 
     // Save the updated Price value, removing commas before sending
     saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'price', newValue.replace(/,/g, ''));
+});
+$('#dtBasicExample1').on('blur', 'input.editable-minimum_commission', function () {
+    var $this = $(this);
+    var newValue = $this.val().replace(/[^0-9]/g, ''); // Ensure only digits are kept
+
+    if (newValue !== '') {
+        newValue = parseInt(newValue).toLocaleString(); // Format number with commas
+    }
+
+    $this.val(newValue); // Set the formatted value
+
+    // Save the updated Price value, removing commas before sending
+    saveField($this.data('varaint-id'), $this.data('int-colour'), $this.data('ex-colour'), 'minimum_commission', newValue.replace(/,/g, ''));
 });
     });
     function openModal(id) {

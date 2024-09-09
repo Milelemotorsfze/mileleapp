@@ -2781,6 +2781,7 @@ $variant->save();
                         'vehicles.vin',
                         'vehicles.gp',
                         'vehicles.price',
+                        'vehicles.minimum_commission',
                         'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
@@ -2842,6 +2843,7 @@ $variant->save();
                         'vehicles.gp',
                         'vehicles.territory',
                         'vehicles.engine',
+                        'vehicles.minimum_commission',
                         'vehicles.price',
                         'brands.brand_name',
                         'varaints.name as variant',
@@ -2902,6 +2904,7 @@ $variant->save();
                         'vehicles.vin',
                         'vehicles.inspection_date',
                         'vehicles.engine',
+                        'vehicles.minimum_commission',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
                         'vehicles.gp',
@@ -2985,6 +2988,7 @@ $variant->save();
                         'vehicles.estimation_date',
                         'vehicles.vin',
                         'vehicles.price',
+                        'vehicles.minimum_commission',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
                         'vehicles.gp',
@@ -3057,6 +3061,7 @@ $variant->save();
                         'vehicles.custom_inspection_status',
                          'vehicles.price',
                          'vehicles.gp',
+                         'vehicles.minimum_commission',
                          'vehicles.engine',
                          'vehicles.grn_remark',
                          'brands.brand_name',
@@ -3121,6 +3126,7 @@ $variant->save();
                         'vehicles.vin',
                         'vehicles.price',
                         'vehicles.territory',
+                        'vehicles.minimum_commission',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
                         'inspection_grn.id as grn_inspectionid',
@@ -3204,6 +3210,7 @@ $variant->save();
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
                         'vehicles.so_id',
+                        'vehicles.minimum_commission',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
                         'purchasing_order.po_date',
@@ -3294,6 +3301,7 @@ $variant->save();
                         'purchasing_order.po_date',
                         'vehicles.ppmmyyy',
                         'vehicles.vin as vin',
+                        'vehicles.minimum_commission',
                         'inspection_grn.id as grn_inspectionid',
                         'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.engine',
@@ -3626,6 +3634,7 @@ public function allvariantprice(Request $request)
             $data = Vehicles::select( [
                     'brands.brand_name',
                     'vehicles.gp',
+                    'vehicles.minimum_commission',
                     'vehicles.varaints_id',
                     'vehicles.int_colour',
                     'vehicles.ex_colour',
@@ -3654,6 +3663,9 @@ public function allvariantprice(Request $request)
         ->editColumn('price', function($data) {
             return number_format($data->price, 0, '.', ',');
         })
+        ->editColumn('minimum_commission', function($data) {
+            return number_format($data->minimum_commission, 0, '.', ',');
+        })
         ->toJson();
             }
         return view('variant-prices.allindex');
@@ -3663,7 +3675,7 @@ public function allvariantprice(Request $request)
 // Validate the incoming request
 $request->validate([
     'varaints_id' => 'required|integer|exists:varaints,id',
-    'field' => 'required|string|in:price,gp',
+    'field' => 'required|string|in:price,gp,minimum_commission',
     'value' => 'required|string'
 ]);
 
@@ -3686,8 +3698,11 @@ if (!$vehicle) {
 $oldValue = $vehicle->{$request->field};
 $field = $request->field;
 $value = $request->value;
-
+info($field);
 if ($field == 'price') {
+    $value = str_replace(',', '', $value);
+}
+if ($field == 'minimum_commission') {
     $value = str_replace(',', '', $value);
 }
 $vehicle->$field = $value;
