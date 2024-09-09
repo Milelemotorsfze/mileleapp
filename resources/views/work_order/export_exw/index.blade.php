@@ -113,6 +113,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								<center>Approval Status</center>
 							</th>
 							<th rowspan="2" class="light">Documentation Status</th>
+							<th rowspan="2" class="light">Vehicle Modification Status</th>
 							<th rowspan="2" class="light">Sales Person</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
@@ -316,27 +317,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->finance_approval_status) ?? ''}}</label></td>
 							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->coo_approval_status) ?? ''}}</label></td>
 							<td>
-							@if($data->sales_support_data_confirmation_at != '' && 
-								$data->finance_approval_status == 'Approved' && 
-								$data->coo_approval_status == 'Approved') 
+								@if($data->sales_support_data_confirmation_at != '' && 
+									$data->finance_approval_status == 'Approved' && 
+									$data->coo_approval_status == 'Approved') 
 
-								@php
-									// Determine the badge class based on docs_status
-									$badgeClass = '';
-									if ($data->docs_status == 'In Progress') {
-										$badgeClass = 'badge-soft-info';
-									} elseif ($data->docs_status == 'Ready') {
-										$badgeClass = 'badge-soft-success';
-									} elseif ($data->docs_status == 'Not Initiated') {
-										$badgeClass = 'badge-soft-danger';
-									}
-								@endphp
+									@php
+										// Determine the badge class based on docs_status
+										$badgeClass = '';
+										if ($data->docs_status == 'In Progress') {
+											$badgeClass = 'badge-soft-info';
+										} elseif ($data->docs_status == 'Ready') {
+											$badgeClass = 'badge-soft-success';
+										} elseif ($data->docs_status == 'Not Initiated') {
+											$badgeClass = 'badge-soft-danger';
+										}
+									@endphp
 
-								<label class="badge {{ $badgeClass }}">
-									{{ strtoupper($data->docs_status) ?? '' }}
-								</label>
-							@endif
-						</td>
+									<label class="badge {{ $badgeClass }}">
+										{{ strtoupper($data->docs_status) ?? '' }}
+									</label>
+								@endif
+							</td>
+							<td>
+								@if($data->sales_support_data_confirmation_at != '' && 
+									$data->finance_approval_status == 'Approved' && 
+									$data->coo_approval_status == 'Approved') 
+
+									@if($data->vehicles_modification_summary == 'Completed')
+										<label class="float-end badge badge-soft-success">
+											<strong>COMPLETED</strong>
+										</label>
+									@else
+										@if($data->vehicles_initiated_count > 0 && $data->vehicles_not_initiated_count == 0)
+											<label class="float-end badge badge-soft-info">
+												<strong>INITIATED</strong>
+											</label>
+										@elseif($data->vehicles_initiated_count == 0 && $data->vehicles_not_initiated_count > 0)
+											<label class="float-end badge badge-soft-danger">
+												<strong>NOT INITIATED</strong>
+											</label>
+										@elseif($data->vehicles_initiated_count > 0 && $data->vehicles_not_initiated_count > 0)
+											<label class="float-end badge badge-soft-warning">
+												{{ $data->vehicles_initiated_count }} INITIATED & {{ $data->vehicles_not_initiated_count }} NOT INITIATED
+											</label>
+										@endif
+									@endif     
+								@endif
+							</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>

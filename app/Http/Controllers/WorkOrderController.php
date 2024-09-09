@@ -25,6 +25,7 @@ use App\Models\User;
 use App\Models\AddonDetails;
 use App\Models\Masters\MasterAirlines;
 use App\Models\Masters\MasterCharges;
+use App\Models\Masters\MasterOfficeLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -951,8 +952,8 @@ class WorkOrderController extends Controller
             })
             ->orderBy('name', 'ASC')
             ->get();
-    
-        return view('work_order.export_exw.show', compact('type', 'users', 'workOrder', 'previous', 'next'));
+        $locations = MasterOfficeLocation::select('id','name')->get();
+        return view('work_order.export_exw.show', compact('type', 'users', 'workOrder', 'previous', 'next','locations'));
     }
     
 

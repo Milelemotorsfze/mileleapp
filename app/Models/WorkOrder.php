@@ -105,6 +105,10 @@ class WorkOrder extends Model
         'total_number_of_boe',
         'vehicle_count',
         'type_name',
+        'vehicles_initiated_count',
+        'vehicles_not_initiated_count',
+        'vehicles_completed_count',
+        'vehicles_modification_summary',
     ];
     public function getStatusAttribute() {
         $status = '';
@@ -200,6 +204,47 @@ class WorkOrder extends Model
             $typeName = 'LTO';
         }
         return $typeName;
+    }
+    // Attribute to get the count of "Initiated" vehicles
+    public function getVehiclesInitiatedCountAttribute()
+    {
+        return $this->vehicles->where('modification_status', 'Initiated')->count();
+    }
+
+    // Attribute to get the count of "Not Initiated" vehicles
+    public function getVehiclesNotInitiatedCountAttribute()
+    {
+        return $this->vehicles->where('modification_status', 'Not Initiated')->count();
+    }
+
+    // Attribute to get the count of "Completed" vehicles
+    public function getVehiclesCompletedCountAttribute()
+    {
+        return $this->vehicles->where('modification_status', 'Completed')->count();
+    }
+
+    // Attribute to get the modification status summary for the work order
+    public function getVehiclesModificationSummaryAttribute()
+    {
+        $completedCount = $this->vehicles_completed_count;
+        $initiatedCount = $this->vehicles_initiated_count;
+        $notInitiatedCount = $this->vehicles_not_initiated_count;
+
+        // If all vehicles are "Completed"
+        if ($completedCount === $this->vehicles->count()) {
+            return 'Completed';
+        }
+
+        // Otherwise, return a summary of the other statuses
+        $statusSummary = [];
+        if ($initiatedCount > 0) {
+            $statusSummary[] = "$initiatedCount Initiated";
+        }
+        if ($notInitiatedCount > 0) {
+            $statusSummary[] = "$notInitiatedCount Not Initiated";
+        }
+
+        return implode(', ', $statusSummary);
     }
     public function CreatedBy()
     {
