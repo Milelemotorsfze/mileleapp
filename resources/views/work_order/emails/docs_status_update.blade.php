@@ -9,9 +9,9 @@
     </style>
 </head>
 <body>
-    <p>Dear Team,</p>
+    <p>Dear,</p>
     <p>The following work order documentation status has been changed to 
-        <label class="badge @if($status == 'Ready') badge-soft-success @elseif($status == 'Initiated') badge-soft-info @elseif($status == 'Not Initiated') @endif">
+        <label class="badge @if($status == 'Ready') badge-soft-success @elseif($status == 'Initiated') badge-soft-info @elseif($status == 'Not Initiated') badge-soft-danger @endif">
             {{ strtoupper($status) }}
         </label>:
     </p>
@@ -32,10 +32,10 @@
         @endif
         <strong>Status Changed At:</strong> @if($datetime) {{ \Carbon\Carbon::parse($datetime)->format('d M Y, h:i:s A') }} @else NA @endif<br>
     </p><br>
-    <p>
+    @if(empty($isCustomerEmail))
         <a href="{{ $accessLink }}">Click here to view the work order</a><br>
         <a href="{{ $statusLogLink }}">Click here to view the documentation Status log</a>
-    </p><br>
+    @endif
     <p>Best Regards,<br>Milele Matrix</p>
 </body>
 </html>

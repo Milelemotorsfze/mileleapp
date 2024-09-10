@@ -101,6 +101,8 @@ class WoDocsStatusController extends Controller
                 ]);
                 throw new \Exception('One or more email addresses are invalid.');
             }
+            // Determine if the email is being sent to the customer
+            $isCustomerEmail = in_array($customerEmail, $recipients);
 
             // Send email using a Blade template
             Mail::send('work_order.emails.docs_status_update', [
@@ -111,6 +113,7 @@ class WoDocsStatusController extends Controller
                 'userName' => $authUserName,
                 'status' => $statusName,
                 'datetime' => Carbon::now(),
+                'isCustomerEmail' => $isCustomerEmail,  // Pass this flag to the email template
             ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
                         ->to($recipients)
