@@ -9,7 +9,7 @@
     </style>
 </head>
 <body>
-    <p>Dear Team,</p>
+    <p>Dear,</p>
     <p>The following work order status has been changed to 
         <label class="badge @if($status == 'Active') badge-soft-success @elseif($status == 'On Hold') badge-soft-info @endif">
             {{ strtoupper($status) }}
@@ -37,8 +37,10 @@
         <strong>Status Changed At:</strong> @if($datetime) {{ \Carbon\Carbon::parse($datetime)->format('d M Y, h:i:s A') }} @else NA @endif<br>
     </p><br>
     <p>
-        <a href="{{ $accessLink }}">Click here to view the work order</a><br>
-        <a href="{{ $statusLogLink }}">Click here to view the status approval log</a>
+    @if(empty($isCustomerEmail))
+            <a href="{{ $accessLink }}">Click here to view the work order</a><br>
+            <a href="{{ $statusLogLink }}">Click here to view the status approval log</a>
+    @endif       
     </p><br>
     <p>Best Regards,<br>Milele Matrix</p>
 </body>
