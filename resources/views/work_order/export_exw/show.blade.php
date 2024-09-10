@@ -150,7 +150,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         </label>
                     @elseif($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count > 0)
                         <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-warning">
-                            MODIFICATION : {{ $workOrder->vehicles_initiated_count }} INITIATED & {{ $workOrder->vehicles_not_initiated_count }} NOT INITIATED
+                            MODIFICATION : <strong>{{ $workOrder->vehicles_initiated_count }} INITIATED & {{ $workOrder->vehicles_not_initiated_count }} NOT INITIATED</strong>
                         </label>
                     @endif
                 @endif            

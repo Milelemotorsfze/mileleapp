@@ -312,10 +312,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							@if(isset($type) && ($type == 'all'|| $type == 'all'))	
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
-							<td><label class="badge @if($data->status == 'On Hold') badge-soft-info @elseif($data->status == 'Active') badge-soft-success @endif">{{ strtoupper($data->status) ?? ''}}</label></td>
-							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">{{ strtoupper($data->sales_support_data_confirmation) ?? ''}}</label></td>
-							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->finance_approval_status) ?? ''}}</label></td>
-							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif">{{ strtoupper($data->coo_approval_status) ?? ''}}</label></td>
+							<td><label class="badge @if($data->status == 'On Hold') badge-soft-info @elseif($data->status == 'Active') badge-soft-success @endif"><strong>{{ strtoupper($data->status) ?? ''}}</strong></label></td>
+							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif"><strong>{{ strtoupper($data->sales_support_data_confirmation) ?? ''}}</strong></label></td>
+							<td><label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->finance_approval_status) ?? ''}}</strong></label></td>
+							<td><label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->coo_approval_status) ?? ''}}</strong></label></td>
 							<td>
 								@if($data->sales_support_data_confirmation_at != '' && 
 									$data->finance_approval_status == 'Approved' && 
@@ -334,7 +334,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									@endphp
 
 									<label class="badge {{ $badgeClass }}">
-										{{ strtoupper($data->docs_status) ?? '' }}
+										<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
 									</label>
 								@endif
 							</td>
@@ -358,7 +358,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 											</label>
 										@elseif($data->vehicles_initiated_count > 0 && $data->vehicles_not_initiated_count > 0)
 											<label class="float-end badge badge-soft-warning">
-												{{ $data->vehicles_initiated_count }} INITIATED & {{ $data->vehicles_not_initiated_count }} NOT INITIATED
+												<strong>{{ $data->vehicles_initiated_count }} INITIATED & {{ $data->vehicles_not_initiated_count }} NOT INITIATED</strong>
 											</label>
 										@endif
 									@endif     
