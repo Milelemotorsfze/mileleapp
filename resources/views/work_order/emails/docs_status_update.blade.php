@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Work Order Status Changed Notification</title>
+    <title>Work Order Documentation Status Changed Notification</title>
     <style>
         .badge-soft-info { background-color: #5bc0de; color: #fff; }
         .badge-soft-success { background-color: #5cb85c; color: #fff; }
@@ -10,13 +10,12 @@
 </head>
 <body>
     <p>Dear Team,</p>
-    <p>The following work order status has been changed to 
-        <label class="badge @if($status == 'Active') badge-soft-success @elseif($status == 'On Hold') badge-soft-info @endif">
+    <p>The following work order documentation status has been changed to 
+        <label class="badge @if($status == 'Ready') badge-soft-success @elseif($status == 'Initiated') badge-soft-info @elseif($status == 'Not Initiated') @endif">
             {{ strtoupper($status) }}
         </label>:
     </p>
     <p>
-        <strong>VIN:</strong> {{ $woVehicle->vin }}<br><br>
         <strong>Work Order Number:</strong> {{ $workOrder->wo_number }}<br>
         <strong>Customer Name:</strong> {{ $workOrder->customer_name ?? 'Unknown Customer' }}<br>
         <strong>Vehicle Count:</strong> {{ $workOrder->vehicle_count }} Unit<br>
@@ -27,9 +26,6 @@
             <strong>Batch:</strong> Single Work Order<br>
         @endif
         <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? 'NA' }}<br><br>
-        @if(isset($statusTracking) && isset($statusTracking->location) && !empty($statusTracking->location->name))
-            <strong>Vehicle Available Location:</strong> {{ $statusTracking->location->name ?? 'NA' }}<br>
-        @endif
         <strong>Status Changed By:</strong> {{ $userName ?? 'Unknown User' }}<br>
         @if(!empty($comments))
             <strong>Status Changed Remarks:</strong> {{ $comments }}<br>
@@ -38,7 +34,7 @@
     </p><br>
     <p>
         <a href="{{ $accessLink }}">Click here to view the work order</a><br>
-        <a href="{{ $statusLogLink }}">Click here to view the status approval log</a>
+        <a href="{{ $statusLogLink }}">Click here to view the documentation Status log</a>
     </p><br>
     <p>Best Regards,<br>Milele Matrix</p>
 </body>

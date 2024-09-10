@@ -63,15 +63,53 @@ class WoVehicleController extends Controller
 
             // Define a quick access link (adjust the route as needed)
             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-            $statusLogLink = env('BASE_URL') . '/wo-status-history/' . $woVehicle->id;
+            $statusLogLink = env('BASE_URL') . '/vehicle-modification-status-log/' . $woVehicle->id;
 
             // Retrieve and validate email addresses from .env
             $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
+            $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
+            $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+
+            // Log email addresses to debug
+            \Log::info('Email Recipients:', [
+                'managementEmail' => $managementEmail,
+                'operationsEmail' => $operationsEmail,
+                'createdByEmail' => $createdByEmail,
+                'salesPersonEmail' => $salesPersonEmail,
+                'customerEmail' => $customerEmail,
+            ]);
+
+            // Check if the salesPerson exists before trying to access properties
+            $shouldSendToSalesPerson = false;
+            if ($workOrder->salesPerson) {
+                $shouldSendToSalesPerson = $createdByEmail !== $salesPersonEmail
+                    && $workOrder->salesPerson->is_sales_rep === 'Yes'
+                    && $workOrder->salesPerson->is_management === 'No';
+            }
+
+            // Initialize recipient list
+            $recipients = [$managementEmail, $operationsEmail];
+
+            // Add createdByEmail if valid
+            if ($createdByEmail) {
+                $recipients[] = $createdByEmail;
+            }
+
+            // Add salesPersonEmail only if the condition is met
+            if ($shouldSendToSalesPerson && $salesPersonEmail) {
+                $recipients[] = $salesPersonEmail;
+            }
+
+            // Add customerEmail if valid
+            if ($customerEmail) {
+                $recipients[] = $customerEmail;
+            }
 
             // Log and handle invalid email addresses
             if (!$managementEmail || !$operationsEmail) {
-                \Log::error('Invalid email addresses provided:', [
+                \Log::error('Invalid management or operations email addresses provided:', [
                     'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                 ]);
@@ -85,14 +123,17 @@ class WoVehicleController extends Controller
                 'accessLink' => $accessLink,
                 'statusLogLink' => $statusLogLink,
                 'comments' => $validatedData['comment'],
+                'statusTracking' => $statusTracking,
                 'userName' => $authUserName,
                 'status' => $statusName,
                 'datetime' => Carbon::now(),
-            ], function ($message) use ($subject, $managementEmail, $operationsEmail, $template) {
+            ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
-                        ->to([$managementEmail, $operationsEmail])
+                        ->to($recipients)
                         ->subject($subject);
             });
+            // Log successful email sending
+            \Log::info('Email sent to recipients:', $recipients);
         }
 
         // Return a JSON response indicating success
