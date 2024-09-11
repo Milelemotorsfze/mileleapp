@@ -1498,7 +1498,12 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                    <div class="dropdown">
+                                    <!-- <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.availablevehicles')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Incoming & Available Vehicles</span>
+                                            </a>
+                                            </div> -->
+                                            <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Status Wise</span>
                                             </a>
