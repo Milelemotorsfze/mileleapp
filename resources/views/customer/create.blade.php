@@ -5,6 +5,20 @@
             height: 400px;
             margin-bottom: 10px;
         }
+        .image-row {
+             text-align: center;
+        }
+        .image-box {
+            width: 20%;
+            padding: 1%;
+            margin: .5%;
+            /* background: pink; */
+            display: inline-block;
+            font-size: 0; /* fixes bottom padding */
+        }
+        .image-box img {
+            max-width: 50%;
+        }
     </style>
     @can('create-customer')
         @php
@@ -89,6 +103,12 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Other Document</label>
+                                <input type="file" class="form-control" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
                                 <textarea class="form-control" name="address" rows="5" cols="25">{{ old('address')}}</textarea>
                             </div>
@@ -103,6 +123,16 @@
                                     </div>
                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                         <div id="file2-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="image-row">
+                                     <div class="image-box">
+                                    </div> 
+                                    
+                                </div> -->
+                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                        <div id="file3-preview">
                                         </div>
                                     </div>
                                 </div>
@@ -122,9 +152,11 @@
 
         const fileInputLicense1 = document.querySelector("#file1-upload");
         const fileInputLicense2 = document.querySelector("#file2-upload");
+        const fileInputLicense3 = document.querySelector("#file3-upload");
 
         const previewFile1 = document.querySelector("#file1-preview");
         const previewFile2 = document.querySelector("#file2-preview");
+        const previewFile3 = document.querySelector("#file3-preview");
 
         fileInputLicense1.addEventListener("change", function(event) {
             $('.preview-div').attr('hidden', false);
@@ -175,6 +207,33 @@
                     const image = new Image();
                     image.src = objectUrl;
                     previewFile2.appendChild(image);
+                }
+            }
+        });
+        fileInputLicense3.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
+            const files = event.target.files;
+            while (previewFile3.firstChild) {
+                previewFile3.removeChild(previewFile3.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile3.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    console.log(image);
+                    previewFile3.appendChild(image);
                 }
             }
         });

@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 use App\Models\ClientCountry;
+use App\Models\ClientDocument;
 use App\Models\MasterModelLines;
 use App\Models\UserActivities;
 use App\Models\Clients;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
 use Rap2hpoutre\FastExcel\FastExcel;
+use Illuminate\Support\Facades\File;
 use Storage;
 
 class CustomerController extends Controller
@@ -71,6 +73,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request->all();
         
         (new UserActivityController)->createActivity('New Customer Created');
 
@@ -126,8 +129,26 @@ class CustomerController extends Controller
                 $client->tradelicense = $fileName2;
 
             }
-        
             $client->save();
+
+            if ($request->has('other_document_file'))
+            {
+                foreach ($request->file('other_document_file') as $key => $file) {
+
+                    $extension = $file->getClientOriginalExtension();
+                    $clientfileName = $key.time().'.'.$extension;
+                    $destinationPath1 = 'customer-other-documents';
+                    if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath1)) {
+                        \Illuminate\Support\Facades\File::makeDirectory($destinationPath1, $mode = 0777, true, true);
+                    }
+                    $file->move($destinationPath1, $clientfileName);
+                    $clientDocument = new ClientDocument();
+                    $clientDocument->document = $clientfileName;
+                    $clientDocument->client_id = $client->id;
+                    $clientDocument->save();
+                }
+            }
+        
             if($request->country_id) {
                 foreach($request->country_id as $countryId) {
                     $clientCountry = new ClientCountry();
@@ -228,6 +249,35 @@ class CustomerController extends Controller
 
         }
         $client->save();
+        if ($request->has('other_document_file'))
+        {
+            foreach ($request->file('other_document_file') as $key => $file) {
+
+                $extension = $file->getClientOriginalExtension();
+                $clientfileName = $key.time().'.'.$extension;
+                $destinationPath1 = 'customer-other-documents';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath1)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath1, $mode = 0777, true, true);
+                }
+                $file->move($destinationPath1, $clientfileName);
+                $clientDocument = new ClientDocument();
+                $clientDocument->document = $clientfileName;
+                $clientDocument->client_id = $client->id;
+                $clientDocument->save();
+            }
+        }
+        if($request->deletedIds) {
+            // foreach($request->deletedIds as $clientDocumentId) {
+            //     $clientDocument = ClientDocument::find($clientDocumentId);
+            //     $filePath = '/customer-other-documents/'.$clientDocument->document;
+            //     if (File::exists($filePath)) {
+            //         File::delete($filePath);
+            //         // echo "File deleted successfully.";
+            //     }
+            // }
+            
+            ClientDocument::whereIn('id', $request->deletedIds)->delete();
+        }
         $client->clientCountries()->delete();
         if($request->country_id) {
                 foreach($request->country_id as $countryId) {

@@ -98,6 +98,12 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Other Document</label>
+                                <input type="file" class="form-control" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
                                 <textarea class="form-control" name="address" rows="5" cols="25">{{ old('address', $customer->address) }}</textarea>
                             </div>
@@ -105,30 +111,49 @@
                         <div class="col-lg-6 col-md-6" id="file-preview">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                            <div id="file1-preview">
-                                @if($customer->passport)
-                                    <h6 class="fw-bold text-center">Passport</h6>
-                                    <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
+                    <div class="card"  >
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                    <div id="file1-preview">
+                                        @if($customer->passport)
+                                            <h6 class="fw-bold text-center">Passport</h6>
+                                            <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
 
-                                @endif
+                                        @endif
 
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                    <div id="file2-preview">
+                                        @if($customer->tradelicense)
+                                            <h6 class="fw-bold text-center">Trade License</h6>
+                                            <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                            <div id="file2-preview">
-                                @if($customer->tradelicense)
-                                    <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
-                                @endif
-                            </div>
+                            @if($customer->clientDocuments->count() > 0)
+                                <h6 class="fw-bold text-center other-doc-title p-2" style="background-color:#E9EAEC">Other Documents</h6>
+                                <div class="row">
+                                    @foreach($customer->clientDocuments as $key => $customerDocument)
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center" id="remove-doc-{{$customerDocument->id}}">
+                                        <iframe src="{{ url('customer-other-documents/' . $customerDocument->document) }}" alt="File"></iframe>
+                                        <a href="#"  data-id="{{ $customerDocument->id }}"
+                                        class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                            <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+                            </select>
+                            <input type="hidden" id="remaining-customer-document-count" value="{{ $customer->clientDocuments->count() }}" >
                         </div>
                     </div>
-
                     <div class="col-12 text-center mt-3">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
+
                 </form>
             </div>
         @endif
@@ -137,7 +162,7 @@
 @push('scripts')
     <script>
 
-
+        let deletedDocumetIds = [];
         const fileInputLicense1 = document.querySelector("#file1-upload");
         const fileInputLicense2 = document.querySelector("#file2-upload");
 
@@ -227,6 +252,26 @@
                 }
             },
         });
+
+        $('.remove-doc-button').click(function () {
+                let id = $(this).attr('data-id');
+                console.log(id);
+                $('#remove-doc-'+id).remove();
+                deletedDocumetIds.push(id);
+                $('#deleted-docs').empty();
+
+                jQuery.each(deletedDocumetIds, function (key, value) {
+
+                    $('#deleted-docs').append('<option value="' + value + '" >' + value+ '</option>');
+                    $("#deleted-docs option").attr("selected", "selected");
+                });
+                let count = $('#remaining-customer-document-count').val();
+                let remainingCount = count - 1;
+                $('#remaining-customer-document-count').val(remainingCount);
+                if(remainingCount == 0) {
+                    $('.other-doc-title').attr('hidden',true);
+                }
+            });
     </script>
 @endpush
 

@@ -127,6 +127,16 @@
                                                         </div>
                                                     </div>
                                                 @endif
+                                                @if($customer->clientDocuments()->count() > 0)
+                                                    <h6 class="fw-bold text-center">Other Documents</h6>
+                                                    @foreach($customer->clientDocuments as $key => $customerDocument)
+                                                    <div class="col-lg-12">
+                                                        <div class="row p-2">
+                                                            <embed src="{{ url('customer-other-documents/' . $customerDocument->document) }}"  width="400" height="600" alt="File"></embed>
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
+                                                @endif
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
