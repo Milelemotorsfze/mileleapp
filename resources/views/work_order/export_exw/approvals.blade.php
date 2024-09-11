@@ -251,7 +251,7 @@
 		$('.btn-coe-office-approval').click(function (e) { 
 			var id = $(this).attr('data-id');
 			var status = $(this).attr('data-status');
-			var comments = $('#financeComment').val();
+			var comments = $('#cooComment').val();
 			let url = '{{ route('work-order.coe-office-approval') }}';
 			var confirm = alertify.confirm('Are you sure you want to '+status+' this work order ?',function (e) {
 				if (e) {
