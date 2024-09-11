@@ -32,8 +32,8 @@
                                 </div>
                             </div>
                             <div class="mb-3 mt-3">
-                                <label for="docComment" class="form-label">Add Comment:</label>
-                                <textarea class="form-control" id="docComment" name="docComment" rows="3"></textarea>
+                                <label for="woStatus" class="form-label">Add Comment:</label>
+                                <textarea class="form-control" id="woStatus" name="woStatus" rows="3"></textarea>
                             </div>
                         </form>
                     </div>
@@ -55,7 +55,7 @@ function submitStatus(workOrderId, woNumber) {
 			'Confirmation Required', // Title of the confirmation dialog
 			`Are you sure you want to update the status for work order ${woNumber} to ${selectedStatus}?`, // Message in the dialog
 			function() { // If the user clicks "OK"
-				const comment = document.getElementById(`docComment`).value;
+				const comment = document.getElementById(`woStatus`).value;
 
 				// Perform the AJAX request to update the status
 				$.ajax({
