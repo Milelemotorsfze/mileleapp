@@ -1684,12 +1684,12 @@ $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
         $('#dtBasicExample3_processing').hide();
     }
 });
-$('#dtBasicExample3 tbody').off('click', 'tr');
+$('#dtBasicExample3 tbody').off('click', 'td');
 $('#dtBasicExample3 tbody').on('click', 'td', function () {
     var table = $('#dtBasicExample3').DataTable();
     var cellIndex = table.cell(this).index().column; // Get the clicked cell's column index
     var columnHeader = table.column(cellIndex).header().innerText; // Get the header text of the clicked column
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -1698,12 +1698,12 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-    else if(columnHeader === 'Reservation End')
-    {
+    else if (columnHeader.includes('Reservation End')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
+    console.log("open booking");
         var data = table3.row(this).data();
         openBookingModal(data.id);
     @endif
@@ -1718,7 +1718,7 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         openenhancementModal(data.id);
     @endif
 }
-if (columnHeader === 'Ext Colour' || columnHeader === 'Int Colour') {
+if (columnHeader.includes('Ext Colour') || columnHeader.includes('Int Colour')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('editing-colours');
     @endphp
@@ -2346,7 +2346,7 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
     var columnHeader = table6.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -2812,7 +2812,7 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
     var columnHeader = table7.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -2821,7 +2821,7 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-else if(columnHeader === 'Reservation End')
+else if(columnHeader.includes('Reservation End'))
 {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
@@ -3258,7 +3258,7 @@ $('#dtBasicExample8 tbody').on('click', 'td', function () {
     var columnHeader = table9.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
