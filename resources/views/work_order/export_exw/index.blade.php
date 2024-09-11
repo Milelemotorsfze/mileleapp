@@ -279,7 +279,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 										@if ($hasPermission)
 											<li>
 												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
-													href="{{route('docStatusHistory',$data->id)}}">
+													href="{{route('woStatusHistory',$data->id)}}">
 													<i class="fas fa-eye"></i> Doc Status Log
 												</a>
 											</li>

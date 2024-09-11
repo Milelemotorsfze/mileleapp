@@ -9,13 +9,13 @@
                 <form id="StatusForm_{{$data->id}}">
                     <div class="d-flex justify-content-between">
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusActive_{{$data->id}}" value="Active" {{ $data->docs_status == 'Not Initiated' ? 'checked' : '' }}>
+                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusActive_{{$data->id}}" value="Active" {{ $data->status == 'Active' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusActive_{{$data->id}}" style="font-size: 14px;">
                                 Active
                             </label>
                         </div>
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusOnHold_{{$data->id}}" value="On Hold" {{ $data->docs_status == 'In Progress' ? 'checked' : '' }}>
+                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusOnHold_{{$data->id}}" value="On Hold" {{ $data->status == 'On Hold' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusOnHold_{{$data->id}}" style="font-size: 14px;">
                                 On Hold
                             </label>

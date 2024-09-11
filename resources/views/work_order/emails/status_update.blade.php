@@ -16,7 +16,6 @@
         </label>:
     </p>
     <p>
-        <strong>VIN:</strong> {{ $woVehicle->vin }}<br><br>
         <strong>Work Order Number:</strong> {{ $workOrder->wo_number }}<br>
         <strong>Customer Name:</strong> {{ $workOrder->customer_name ?? 'Unknown Customer' }}<br>
         <strong>Vehicle Count:</strong> {{ $workOrder->vehicle_count }} Unit<br>
@@ -27,9 +26,6 @@
             <strong>Batch:</strong> Single Work Order<br>
         @endif
         <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? 'NA' }}<br><br>
-        @if(isset($statusTracking) && isset($statusTracking->location) && !empty($statusTracking->location->name))
-            <strong>Vehicle Available Location:</strong> {{ $statusTracking->location->name ?? 'NA' }}<br>
-        @endif
         <strong>Status Changed By:</strong> {{ $userName ?? 'Unknown User' }}<br>
         @if(!empty($comments))
             <strong>Status Changed Remarks:</strong> {{ $comments }}<br>
