@@ -339,29 +339,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								@endif
 							</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && 
-									$data->finance_approval_status == 'Approved' && 
-									$data->coo_approval_status == 'Approved') 
-
-									@if($data->vehicles_modification_summary == 'Completed')
-										<label class="float-end badge badge-soft-success">
-											<strong>COMPLETED</strong>
-										</label>
-									@else
-										@if($data->vehicles_initiated_count > 0 && $data->vehicles_not_initiated_count == 0)
-											<label class="float-end badge badge-soft-info">
-												<strong>INITIATED</strong>
-											</label>
-										@elseif($data->vehicles_initiated_count == 0 && $data->vehicles_not_initiated_count > 0)
-											<label class="float-end badge badge-soft-danger">
-												<strong>NOT INITIATED</strong>
-											</label>
-										@elseif($data->vehicles_initiated_count > 0 && $data->vehicles_not_initiated_count > 0)
-											<label class="float-end badge badge-soft-warning">
-												<strong>{{ $data->vehicles_initiated_count }} INITIATED & {{ $data->vehicles_not_initiated_count }} NOT INITIATED</strong>
-											</label>
-										@endif
-									@endif     
+								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
+									<label class="float-end badge @if($data->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($data->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+										<strong>{{ $data->vehicles_modification_summary ?? ''}}</strong>
+									</label>
 								@endif
 							</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>

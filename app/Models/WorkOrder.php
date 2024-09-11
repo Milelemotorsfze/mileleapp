@@ -222,29 +222,29 @@ class WorkOrder extends Model
     {
         return $this->vehicles->where('modification_status', 'Completed')->count();
     }
-
-    // Attribute to get the modification status summary for the work order
     public function getVehiclesModificationSummaryAttribute()
     {
         $completedCount = $this->vehicles_completed_count;
         $initiatedCount = $this->vehicles_initiated_count;
         $notInitiatedCount = $this->vehicles_not_initiated_count;
-
-        // If all vehicles are "Completed"
-        if ($completedCount === $this->vehicles->count()) {
-            return 'Completed';
+    
+        if ($completedCount > 0 && $initiatedCount == 0 && $notInitiatedCount == 0) {
+            return 'COMPLETED';
+        } elseif ($completedCount > 0 && $initiatedCount > 0 && $notInitiatedCount == 0) {
+            return "{$completedCount} COMPLETED & {$initiatedCount} INITIATED";
+        } elseif ($completedCount > 0 && $initiatedCount == 0 && $notInitiatedCount > 0) {
+            return "{$completedCount} COMPLETED & {$notInitiatedCount} NOT INITIATED";
+        } elseif ($completedCount > 0 && $initiatedCount > 0 && $notInitiatedCount > 0) {
+            return "{$completedCount} COMPLETED & {$initiatedCount} INITIATED & {$notInitiatedCount} NOT INITIATED";
+        } elseif ($initiatedCount > 0 && $completedCount == 0 && $notInitiatedCount == 0) {
+            return 'INITIATED';
+        } elseif ($initiatedCount > 0 && $notInitiatedCount > 0 && $completedCount == 0) {
+            return "{$initiatedCount} INITIATED & {$notInitiatedCount} NOT INITIATED";
+        } elseif ($notInitiatedCount > 0 && $initiatedCount == 0 && $completedCount == 0) {
+            return 'NOT INITIATED';
+        } else {
+            return 'NO DATA AVAILABLE';
         }
-
-        // Otherwise, return a summary of the other statuses
-        $statusSummary = [];
-        if ($initiatedCount > 0) {
-            $statusSummary[] = "$initiatedCount Initiated";
-        }
-        if ($notInitiatedCount > 0) {
-            $statusSummary[] = "$notInitiatedCount Not Initiated";
-        }
-
-        return implode(', ', $statusSummary);
     }
     public function CreatedBy()
     {

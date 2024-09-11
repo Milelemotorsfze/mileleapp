@@ -134,26 +134,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                 <label style="font-size: 119%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
                     {{ strtoupper($labelText) }} <strong>{{ strtoupper($workOrder->docs_status) ?? '' }}</strong>
                 </label>
-
-                @if($workOrder->vehicles_modification_summary == 'Completed')
-                    <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-success">
-                        MODIFICATION : <strong>COMPLETED</strong>
-                    </label>
-                @else
-                    @if($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count == 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-info">
-                            MODIFICATION : <strong>INITIATED</strong>
-                        </label>
-                    @elseif($workOrder->vehicles_initiated_count == 0 && $workOrder->vehicles_not_initiated_count > 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-danger">
-                            MODIFICATION : <strong>NOT INITIATED</strong>
-                        </label>
-                    @elseif($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count > 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-warning">
-                            MODIFICATION : <strong>{{ $workOrder->vehicles_initiated_count }} INITIATED & {{ $workOrder->vehicles_not_initiated_count }} NOT INITIATED</strong>
-                        </label>
-                    @endif
-                @endif            
+                <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+                    MODIFICATION : <strong>{{ $workOrder->vehicles_modification_summary ?? ''}}</strong>
+                </label>        
             @endif
         @endif 
     </div>
@@ -1064,7 +1047,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         <td>
                                                             @if($workOrder->sales_support_data_confirmation_at != '' && 
                                                                 $workOrder->finance_approval_status == 'Approved' && 
-                                                                $workOrder->coo_approval_status == 'Approved' && ($vehicle->modification_or_jobs_to_perform_per_vin != '' || (isset($vehicle->addons) && count($vehicle->addons) > 0)))                                                           
+                                                                $workOrder->coo_approval_status == 'Approved')                                                           
                                                                 <div class="dropdown">
                                                                     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                                                     <i class="fa fa-bars" aria-hidden="true"></i>
@@ -1072,7 +1055,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     <ul class="dropdown-menu dropdown-menu-start">                                      
                                                                         @if($workOrder->sales_support_data_confirmation_at != '' && 
                                                                             $workOrder->finance_approval_status == 'Approved' && 
-                                                                            $workOrder->coo_approval_status == 'Approved')
+                                                                            $workOrder->coo_approval_status == 'Approved' && ($vehicle->modification_or_jobs_to_perform_per_vin != '' || (isset($vehicle->addons) && count($vehicle->addons) > 0)))
                                                                             @php
                                                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['update-vehicle-modification-status']);
                                                                             @endphp
@@ -1085,14 +1068,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                         @php
                                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-modification-status-log']);
                                                                         @endphp
-                                                                        @if ($hasPermission)
+                                                                        @if ($hasPermission && ($vehicle->modification_or_jobs_to_perform_per_vin != '' || (isset($vehicle->addons) && count($vehicle->addons) > 0)))
                                                                             <li>
                                                                                 <a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
                                                                                     href="{{route('vehModiStatusHistory',$vehicle->id)}}">
                                                                                     <i class="fas fa-eye"></i> Modification Status Log
                                                                                 </a>
                                                                             </li>
-                                                                        @endif										
+                                                                        @endif											
                                                                     </ul>
                                                                 </div> 
                                                                 @include('work_order.export_exw.veh_modi_status_update')   

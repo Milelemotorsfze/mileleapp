@@ -105,7 +105,7 @@
         // Display the confirmation dialog
         alertify.confirm(
             'Confirmation Required',
-            `Are you sure you want to update the status of vehicle ${vin} in work order ${woNumber} to ${selectedStatus}?"`,
+            `Are you sure you want to update the modification status of vehicle ${vin} in work order ${woNumber} to ${selectedStatus}?"`,
             function() { // If the user clicks "OK"
                 const comment = document.getElementById(`Comment_${woVehicleId}`).value;
                 const expectedCompletion = document.getElementById(`expectedCompletion_${woVehicleId}`).value;
