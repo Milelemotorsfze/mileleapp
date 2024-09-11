@@ -227,25 +227,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     {{ strtoupper($labelText) }} <strong>{{ strtoupper($workOrder->docs_status) ?? '' }}</strong>
                 </label>
 				
-				@if($workOrder->vehicles_modification_summary == 'Completed')
-                    <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-success">
-                        MODIFICATION : <strong>COMPLETED</strong>
-                    </label>
-                @else
-                    @if($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count == 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-info">
-                            MODIFICATION : <strong>INITIATED</strong>
-                        </label>
-                    @elseif($workOrder->vehicles_initiated_count == 0 && $workOrder->vehicles_not_initiated_count > 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-danger">
-                            MODIFICATION : <strong>NOT INITIATED</strong>
-                        </label>
-                    @elseif($workOrder->vehicles_initiated_count > 0 && $workOrder->vehicles_not_initiated_count > 0)
-                        <label style="font-size: 119%; margin-right:3px;" class="float-end badge badge-soft-warning">
-                            MODIFICATION : <strong>{{ $workOrder->vehicles_initiated_count }} INITIATED & {{ $workOrder->vehicles_not_initiated_count }} NOT INITIATED</strong>
-                        </label>
-                    @endif
-                @endif        
+				<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+                    MODIFICATION : <strong>{{ $workOrder->vehicles_modification_summary ?? ''}}</strong>
+                </label>
             @endif
         @endif
 	</div> 

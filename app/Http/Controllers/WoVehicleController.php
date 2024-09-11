@@ -119,7 +119,7 @@ class WoVehicleController extends Controller
             $isCustomerEmail = in_array($customerEmail, $recipients);
 
             // Send email using a Blade template
-            Mail::send('work_order.emails.status_update', [
+            Mail::send('work_order.emails.modification_status_update', [
                 'workOrder' => $workOrder,
                 'woVehicle' => $woVehicle,
                 'accessLink' => $accessLink,
