@@ -83,7 +83,7 @@ class CustomerController extends Controller
             'type' => 'required',
         ]);
 
-            $isCustomerExist = Clients::where('name', $request->name)
+            $isCustomerExist = Clients::select('name','is_demand_planning_customer')->where('name', $request->name)
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
@@ -198,7 +198,8 @@ class CustomerController extends Controller
             'country_id' => 'required',
             'type' => 'required',
         ]);
-            $isCustomerExist = Clients::where('name', $request->name)
+            $isCustomerExist = Clients::select('id','name','is_demand_planning_customer')
+                                    ->where('name', $request->name)
                                     ->whereNot('id',$id)
                                     ->where('is_demand_planning_customer', true)->first();
             
@@ -266,16 +267,7 @@ class CustomerController extends Controller
                 $clientDocument->save();
             }
         }
-        if($request->deletedIds) {
-            // foreach($request->deletedIds as $clientDocumentId) {
-            //     $clientDocument = ClientDocument::find($clientDocumentId);
-            //     $filePath = '/customer-other-documents/'.$clientDocument->document;
-            //     if (File::exists($filePath)) {
-            //         File::delete($filePath);
-            //         // echo "File deleted successfully.";
-            //     }
-            // }
-            
+        if($request->deletedIds) {           
             ClientDocument::whereIn('id', $request->deletedIds)->delete();
         }
         $client->clientCountries()->delete();

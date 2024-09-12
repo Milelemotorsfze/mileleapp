@@ -78,12 +78,6 @@
                             </div>
                         </div>
 
-{{--                        <div class="col-lg-3 col-md-6">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="choices-single-default" class="form-label">Company Name</label>--}}
-{{--                                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name" value="{{ old('company_name', $customer->company_name) }}">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
@@ -118,17 +112,17 @@
                                     <div id="file1-preview">
                                         @if($customer->passport)
                                             <h6 class="fw-bold text-center">Passport</h6>
-                                            <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
-
+                                            <iframe src="{{ url('storage/app/public/passports/' .$customer->passport) }}"
+                                             width="500px;" height="300px;" alt="Passport"></iframe>
                                         @endif
-
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                                     <div id="file2-preview">
                                         @if($customer->tradelicense)
                                             <h6 class="fw-bold text-center">Trade License</h6>
-                                            <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
+                                            <iframe src="{{ url('storage/app/public/tradelicenses/' .$customer->tradelicense) }}" 
+                                            width="500px;" height="300px;" alt="Trade License"></iframe>
                                         @endif
                                     </div>
                                 </div>
@@ -241,7 +235,11 @@
                 },
                 trade_license_file:{
                      extension: "png|jpeg|jpg"
-                }
+                },
+                "other_document_file[]": {
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880 
+                },
             },
             messages: {
                 trade_license_file: {
@@ -249,7 +247,10 @@
                 },
                 passport_file:{
                     extension: "Please upload Image file format (png,jpeg,jpg)"
-                }
+                },
+                other_document_file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
+                },
             },
         });
 

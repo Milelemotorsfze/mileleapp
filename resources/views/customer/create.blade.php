@@ -260,7 +260,11 @@
                 },
                 trade_license_file:{
                      extension: "png|jpeg|jpg"
-                }
+                },
+                "other_document_file[]": {
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880 
+                },
             },
             messages: {
                 trade_license_file: {
@@ -268,7 +272,10 @@
                 },
                 passport_file:{
                     extension: "Please upload Image file format (png,jpeg,jpg)"
-                }
+                },
+                other_document_file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
+                },
             },
         });
     </script>

@@ -6,6 +6,7 @@ use App\Models\ColorCode;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Clients;
+use App\Models\ClientDocument;
 use App\Models\Demand;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
@@ -280,21 +281,46 @@ class LetterOfIndentController extends Controller
 
             $LOI->save();
 
-            if ($request->has('files'))
-            {
-                foreach ($request->file('files') as $key => $file)
-                {
-                    $extension = $file->getClientOriginalExtension();
-                    $fileName = $key.time().'.'.$extension;
-                    $destinationPath = 'LOI-Documents';
-                    $file->move($destinationPath, $fileName);
-                    $LoiDocument = new LetterOfIndentDocument();
+            // if ($request->has('files'))
+            // {
+            //     foreach ($request->file('files') as $key => $file)
+            //     {
+            //         $extension = $file->getClientOriginalExtension();
+            //         $fileName = $key.time().'.'.$extension;
+            //         $destinationPath = 'LOI-Documents';
+            //         $file->move($destinationPath, $fileName);
+            //         $LoiDocument = new LetterOfIndentDocument();
 
-                    $LoiDocument->loi_document_file = $fileName;
+            //         $LoiDocument->loi_document_file = $fileName;
+            //         $LoiDocument->letter_of_indent_id = $LOI->id;
+            //         $LoiDocument->save();
+            //     }
+            // }
+            if($request->customer_other_documents_Ids) {
+                foreach($request->customer_other_documents_Ids as $customerDocumentId) {
+                    $clientDoc = ClientDocument::find($customerDocumentId);
+
+                    $LoiDocument = new LetterOfIndentDocument();
+                    $LoiDocument->loi_document_file = $clientDoc->document;
                     $LoiDocument->letter_of_indent_id = $LOI->id;
                     $LoiDocument->save();
                 }
             }
+            if($request->is_passport_added == 1) {
+                    $LoiDocument = new LetterOfIndentDocument();
+                    $LoiDocument->loi_document_file = $customer->passport;
+                    $LoiDocument->letter_of_indent_id = $LOI->id;
+                    $LoiDocument->is_passport = true;
+                    $LoiDocument->save();
+            }
+            if($request->is_trade_license_added == 1) {
+                $LoiDocument = new LetterOfIndentDocument();
+                $LoiDocument->loi_document_file = $customer->tradelicense;
+                $LoiDocument->letter_of_indent_id = $LOI->id;
+                $LoiDocument->is_trade_license = true;
+                $LoiDocument->save();
+            }
+            
             $quantities = $request->quantity;
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
@@ -495,6 +521,19 @@ class LetterOfIndentController extends Controller
     //     }
     //     return $pdf;
     // }
+
+    public function getCustomerDocuments(Request $request) {
+        // info($request->all());
+
+        $client = Clients::find($request->client_id);
+        $data = [];
+        $data['customer_documents'] = $client->clientDocuments;
+        $data['passport_file'] = $client->passport;
+        $data['trade_license_file'] =  $client->tradelicense;
+        
+        return $data;
+
+    }
     /**
      * Display the specified resource.
      */
@@ -519,6 +558,20 @@ class LetterOfIndentController extends Controller
                         })
                     ->where('customertype', $letterOfIndent->client->customertype)
                     ->get();
+        $isCustomerPassport = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                                ->where('is_passport',true)->first();
+        $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                                    ->where('is_trade_license',true)->first();
+        $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                                    ->where('is_passport', false)
+                                    ->where('is_trade_license',false)
+                                    ->get(); 
+        $customerOtherDocAddedArray = $customerOtherDocAdded->pluck('loi_document_file')->toArray();
+        $customerOtherDocNotAdded = clientDocument::where('client_id',$letterOfIndent->client_id)
+                                        ->whereNotIn('document', $customerOtherDocAddedArray)
+                                        ->get(); 
+
+
         $salesPersons = User::where('status','active')->get();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
@@ -543,8 +596,9 @@ class LetterOfIndentController extends Controller
         }
         $LOITemplates = LoiTemplate::where('letter_of_indent_id', $id)->pluck('template_type')->toArray();
 
-        return view('letter_of_indents.edit', compact('countries','letterOfIndent','models',
-                                'letterOfIndentItems','salesPersons','possibleCustomers','LOITemplates'));
+        return view('letter_of_indents.edit', compact('countries','letterOfIndent','models','letterOfIndentItems',
+        'salesPersons','possibleCustomers','LOITemplates','isCustomerPassport','isCustomerTradeLicense','customerOtherDocAdded',
+        'customerOtherDocNotAdded'));
     }
 
     /**
@@ -624,24 +678,34 @@ class LetterOfIndentController extends Controller
 
                 $LOI->save();
 
-                if ($request->has('files')) {
-                    foreach ($request->file('files') as $key => $file) {
-                        $extension = $file->getClientOriginalExtension();
-                        $fileName = $key . time() . '.' . $extension;
-                        $destinationPath = 'LOI-Documents';
-                        $file->move($destinationPath, $fileName);
-                        $LoiDocument = new LetterOfIndentDocument();
+                // if ($request->has('files')) {
+                //     foreach ($request->file('files') as $key => $file) {
+                //         $extension = $file->getClientOriginalExtension();
+                //         $fileName = $key . time() . '.' . $extension;
+                //         $destinationPath = 'LOI-Documents';
+                //         $file->move($destinationPath, $fileName);
+                //         $LoiDocument = new LetterOfIndentDocument();
 
-                        $LoiDocument->loi_document_file = $fileName;
-                        $LoiDocument->letter_of_indent_id = $LOI->id;
-                        $LoiDocument->save();
-                    }
-                }
+                //         $LoiDocument->loi_document_file = $fileName;
+                //         $LoiDocument->letter_of_indent_id = $LOI->id;
+                //         $LoiDocument->save();
+                //     }
+                // }
             
                 $LOI->LOITemplates()->delete();
                 if($request->deletedIds) {
                     LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
                     // delete the corresponding file also
+                }
+                if($request->customer_other_documents_Ids) {
+                    foreach($request->customer_other_documents_Ids as $customerDocumentId) {
+                        $clientDoc = ClientDocument::find($customerDocumentId);
+    
+                        $LoiDocument = new LetterOfIndentDocument();
+                        $LoiDocument->loi_document_file = $clientDoc->document;
+                        $LoiDocument->letter_of_indent_id = $LOI->id;
+                        $LoiDocument->save();
+                    }
                 }
 
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();

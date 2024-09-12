@@ -3,7 +3,7 @@
     <style>
         iframe {
             min-height: 300px;
-            max-height: 500px;
+            max-height: 300px;
         }
         .modal-content{
             width: 1000px;
@@ -179,13 +179,13 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-6">
+                        <!-- <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" class="form-control widthinput mb-3" multiple accept="image/*" 
                                     autofocus id="file-upload" >
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Signature</label>
@@ -193,7 +193,100 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Customer Documents -->
+                   
+                    <div class="card mb-3 mt-3">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                 Customer Documents
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                    <div class="mb-3" id="signature-preview">
+                                        @if($letterOfIndent->signature)
+                                        <label class="text-center">Signature File</label>
+                                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
+                                            <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($letterOfIndent->LOIDocuments->count() > 0)
+                                    <!-- consider the LOI selected customer passport or any doc and current passport or any doc, it may differ -->
+                                    @if($isCustomerPassport)
+                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                            <label> Passport </label>
+                                            <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
+                                            <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-passport-button"
+                                            onclick="addPassportToLOI()" >
+                                                Add to LOI </button>
+                                            <button type="button"  class="btn btn-danger btn-sm text-center mt-2 remove-passport-button"
+                                            onclick="removePassportFromLOI()">
+                                            Remove From LOI </button>   
+                                        </div>
+                                    @elseif($letterOfIndent->client->passport)
+                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                            <label> Passport </label>
+                                            <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
+                                            <button type="button" onclick="addPassportToLOI()" class="btn btn-info btn-sm text-center mt-2 add-passport-button">
+                                                Add to LOI </button>
+                                            <button type="button" hidden onclick="removePassportFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-passport-button">
+                                            Remove From LOI </button>               
+                                        </div>  
+                                    @endif
+                                    @if($isCustomerTradeLicense)  
+                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                            <label> Trade License </label>
+                                            <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"></iframe>
+                                            <button type="button" hidden onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
+                                            Add to LOI </button>    
+                                            <button type="button" onclick="removeTradeDocFromLOI()"  class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
+                                            Remove From LOI </button>
+                                        </div>
+                                    @elseif($letterOfIndent->client->tradelicense)
+                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                            <label> Trade License  </label>
+                                            <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
+                                            <button type="button" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button"
+                                            onclick="addTradeDocToLOI()">
+                                                    Add to LOI </button>    
+                                            <button type="button" hidden onclick="removeTradeDocFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
+                                            Remove From LOI </button>     
+                                        </div>    
+                                    @endif
+                                    @if($letterOfIndent->client->clientDocuments->count() > 0 )
+                                        <label class="text-center"> Other Documents </label>
 
+                                        @foreach($customerOtherDocAdded as $key => $CustomerOtherDoc)
+                                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                                <iframe src="{{ url('customer-other-documents/'.$CustomerOtherDoc->loi_document_file) }}"></iframe>
+                                                <button type="button" data-id="{{ $CustomerOtherDoc->id }}" id="remove-customer-doc-{{ $CustomerOtherDoc->id }}" 
+                                                class="btn btn-danger btn-sm text-center mt-2 remove-other-cus-doc">
+                                                Remove From LOI </button>
+                                                <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-other-cus-doc"
+                                                data-id="{{ $CustomerOtherDoc->id }}" id="add-customer-doc-{{ $CustomerOtherDoc->id }}" >
+                                                    Add to LOI </button>
+                                            </div>
+                                        @endforeach
+                                        <!--  refereing the client document table for not added Document -->
+                                        @foreach($customerOtherDocNotAdded as $docNotAdded)
+                                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                                <iframe src="{{ url('customer-other-documents/'.$docNotAdded->document) }}"></iframe>
+                                                <button type="button" onclick="addDocToLOI({{ $docNotAdded->id }})"  class="btn btn-info btn-sm text-center mt-2 "
+                                                id="add-other-doc-{{ $docNotAdded->id }}" > Add to LOI </button>
+
+                                                <button type="button" hidden onclick="removeDocToLOI({{ $docNotAdded->id }})"
+                                                 id="remove-other-doc-{{ $docNotAdded->id }}" class="btn btn-danger btn-sm text-center mt-2 ">
+                                                Remove From LOI </button>
+                                            </div>
+                                        @endforeach
+                                     @endif
+                                @endif
+                            </div>     
+                        </div>
+                    </div>
+                        <!-- Add so Numbers -->
                     <div class="card" id="soNumberDiv">
                         <div class="card-header">
                             <h4 class="card-title">
@@ -220,9 +313,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
-                                
                                 @endforeach
                             </div>
                             <div class="row">
@@ -230,32 +320,6 @@
                                     <a id="addSoNumberBtn" style="float: right;" class="btn btn-sm btn-info">
                                     <i class="fa fa-plus" aria-hidden="true"></i> Add So Numbers</a>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3" id="signature-preview">
-                                @if($letterOfIndent->signature)
-                                <label class="form-label fw-bold">Signature File</label>
-                                    <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
-                                    <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
-                                @endif
-                            </div>
-                        </div>
-                        @if($letterOfIndent->LOIDocuments->count() > 0)
-                            <label class="form-label fw-bold">Customer Document</label>
-                            @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                                <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
-                                    <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
-                                    <a href="#"  data-id="{{ $letterOfIndentDocument->id }}"
-                                    class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
-                                </div>
-                            @endforeach
-                        @endif
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div id="file-preview">
                             </div>
                         </div>
                     </div>
@@ -358,10 +422,16 @@
                     <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
                     <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
                     </select>
-                    <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
+                    <select name="customer_other_documents_Ids[]" id="added-customer-docs" hidden="hidden" multiple>
+                    </select>
+                    <input type="hidden" value="@if($isCustomerPassport) 1 @else 0 @endif" name="is_passport_added" id="add-passport-to-loi">
+                    <input type="hidden" value="@if($isCustomerTradeLicense) 1 @else 0 @endif" name="is_trade_license_added" id="add-trade-license-to-loi">
+                   
+                    <!-- <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" > -->
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
                     </div>
+
 
                 </form>
             </div>
@@ -375,26 +445,29 @@
         var previousSelected = $('#customer-type').val();
         let formValid = true;
         let deletedDocumetIds = [];
-        const fileInputLicense = document.querySelector("#file-upload");
-        const previewFile = document.querySelector("#file-preview");
-        fileInputLicense.addEventListener("change", function(event) {
-            const files = event.target.files;
-            while (previewFile.firstChild) {
-                previewFile.removeChild(previewFile.firstChild);
-            }
-            for (let i = 0; i < files.length; i++)
-            {
-                const file = files[i];
+        let AddedDocumetIds = [];
+        let totalDocumentCount = '{{ $letterOfIndent->LOIDocuments->count() }}';
+       
+        // const fileInputLicense = document.querySelector("#file-upload");
+        // const previewFile = document.querySelector("#file-preview");
+        // fileInputLicense.addEventListener("change", function(event) {
+        //     const files = event.target.files;
+        //     while (previewFile.firstChild) {
+        //         previewFile.removeChild(previewFile.firstChild);
+        //     }
+        //     for (let i = 0; i < files.length; i++)
+        //     {
+        //         const file = files[i];
                 
-                 if (file.type.match("image/*"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFile.appendChild(image);
-                }
-            }
-        });
+        //          if (file.type.match("image/*"))
+        //         {
+        //             const objectUrl = URL.createObjectURL(file);
+        //             const image = new Image();
+        //             image.src = objectUrl;
+        //             previewFile.appendChild(image);
+        //         }
+        //     }
+        // });
 
         const signatureFileInput = document.querySelector("#signature");
         const signaturePreviewFile = document.querySelector("#signature-preview");
@@ -592,29 +665,110 @@
                             $('#validation-error').attr('hidden', true);
                         }
 
-
-                       
                         $('.overlay').hide();
                     }
                 });
             }
         }
 
-            $('.remove-doc-button').click(function () {
+        // Cutsomer document making dynamic section
+
+            $('.remove-other-cus-doc').click(function () {
                 let id = $(this).attr('data-id');
                 $('#remove-doc-'+id).remove();
                 deletedDocumetIds.push(id);
                 $('#deleted-docs').empty();
 
                 jQuery.each(deletedDocumetIds, function (key, value) {
-
                     $('#deleted-docs').append('<option value="' + value + '" >' + value+ '</option>');
                     $("#deleted-docs option").attr("selected", "selected");
                 });
-                let count = $('#remaining-document-count').val();
-                let remainingCount = count - 1;
-                $('#remaining-document-count').val(remainingCount);
+                $(this).attr('hidden',true);
+                $('#add-customer-doc-'+id).attr('hidden', false);
+                let type = "subtract";
+                updateDocumentCount(type);
             });
+            // to undo already added customer doc delete
+            $('.add-other-cus-doc').click(function () {
+                let id = $(this).attr('data-id');
+                deletedDocumetIds = jQuery.grep(deletedDocumetIds, function(value) {
+                return value != id;
+                });
+                $("#deleted-docs option[value='"+id+"']").remove();
+                $(this).attr('hidden',true);
+                $('#remove-customer-doc-'+id).attr('hidden', false);
+                let type = "add";
+                updateDocumentCount(type); 
+                
+            });
+           
+            function addDocToLOI(id) {
+                $('#remove-doc-'+id).remove();
+                AddedDocumetIds.push(id);
+                $('#added-customer-docs').empty();
+
+                jQuery.each(AddedDocumetIds, function (key, value) {
+                    $('#added-customer-docs').append('<option value="' + value + '" >' + value+ '</option>');
+                    $("#added-customer-docs option").attr("selected", "selected");
+                });
+               
+                $('#add-other-doc-'+id).attr('hidden',true);
+                $('#remove-other-doc-'+id).attr('hidden', false);
+                let type = "add";
+                updateDocumentCount(type); 
+            }
+            function removeDocToLOI(id) {
+                AddedDocumetIds = jQuery.grep(AddedDocumetIds, function(value) {
+                return value != id;
+                });
+                $("#deleted-docs option[value='"+id+"']").remove();
+                $('#add-other-doc-'+id).attr('hidden',false);
+                $('#remove-other-doc-'+id).attr('hidden', true);
+                let type = "subtract";
+                updateDocumentCount(type);
+            }
+            function updateDocumentCount(type) {
+                console.log(totalDocumentCount);
+
+                if(type == 'add') {
+                    console.log('add');
+                    totalDocumentCount = parseInt(totalDocumentCount) + 1;
+                }else{
+                    console.log('subtract')
+                    if(totalDocumentCount > 0) {
+                        totalDocumentCount = parseInt(totalDocumentCount) - 1;                   
+                    }
+                 
+                }
+                console.log("totalDocumentCount");
+                console.log(totalDocumentCount);
+               
+            }
+            function addPassportToLOI() {
+                $('#add-passport-to-loi').val(1);
+                $('.add-passport-button').attr('hidden', true);
+                $('.remove-passport-button').attr('hidden', false);
+            }
+            function removePassportFromLOI() {
+                $('#add-passport-to-loi').val(0);
+                $('.add-passport-button').attr('hidden', false);
+                $('.remove-passport-button').attr('hidden', true);
+            }
+            function addTradeDocToLOI() {
+                $('#add-trade-license-to-loi').val(1);
+                $('.add-trade-license-button').attr('hidden', true);
+                $('.remove-trade-license-button').attr('hidden', false);
+            }
+            function removeTradeDocFromLOI() {
+                $('#add-trade-license-to-loi').val(0);
+                $('.add-trade-license-button').attr('hidden', false);
+                $('.remove-trade-license-button').attr('hidden', true);
+            }
+
+
+
+
+            ////////////////////////////////////
             var LOICount = '{{ $letterOfIndentItems->count() }}';
 
             for(var i=1;i<=LOICount;i++) {
@@ -661,23 +815,23 @@
                 });
             }
 
-        jQuery.validator.addMethod('fileCheck', function(value, element) {
-            let remainingCount = $('#remaining-document-count').val();
-            console.log(remainingCount);
-            if(remainingCount != 0) {
-                return true;
-            }else{
-                return false;
-            }
-        },'This field is required');
+        // jQuery.validator.addMethod('fileCheck', function(value, element) {
+        //     let remainingCount = $('#remaining-document-count').val();
+        //     console.log(remainingCount);
+        //     if(remainingCount != 0) {
+        //         return true;
+        //     }else{
+        //         return false;
+        //     }
+        // },'This field is required');
 
-        $('#file-upload').change(function () {
-            if($('#file-upload')[0].files.length !== 0) {
-                let newRemainingCount = + $('#remaining-document-count').val() + + 1;
+        // $('#file-upload').change(function () {
+        //     if($('#file-upload')[0].files.length !== 0) {
+        //         let newRemainingCount = + $('#remaining-document-count').val() + + 1;
             
-                $('#remaining-document-count').val(newRemainingCount);
-            }
-        });
+        //         $('#remaining-document-count').val(newRemainingCount);
+        //     }
+        // });
 
         $("#form-update").validate({
             ignore: [],
@@ -712,11 +866,11 @@
                 "template_type[]":{
                     required:true
                 },
-                "files[]": {
-                    fileCheck:true,
-                    extension: "png|jpeg|jpg",
-                    maxsize:5242880  
-                },
+                // "files[]": {
+                //     fileCheck:true,
+                //     extension: "png|jpeg|jpg",
+                //     maxsize:5242880  
+                // },
                 loi_signature: {
                     required:function(element) {
                         let currentDealer = '{{ $letterOfIndent->dealers }}';
@@ -727,9 +881,9 @@
                 }
             },
                 messages: {
-                    "files[]": {
-                        extension: "Please upload file  format (png,jpeg,jpg)"
-                    },
+                    // "files[]": {
+                    //     extension: "Please upload file  format (png,jpeg,jpg)"
+                    // },
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
