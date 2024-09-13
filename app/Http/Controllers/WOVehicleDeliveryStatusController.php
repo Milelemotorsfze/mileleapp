@@ -29,99 +29,88 @@ class WOVehicleDeliveryStatusController extends Controller
 
         // Always create a new status_tracking record
         $statusTracking = WOVehicleDeliveryStatus::create([
-            'w_o_vehicle_id' => $validatedData['woVehicleId'], // Associate with the work order vehicle ID
-            'user_id' => Auth::id(), // Set the ID of the authenticated user
-            'status' => $validatedData['status'], // Set the status
-            'comment' => $validatedData['comment'], // Optional comment
-            'doc_delivery_date' => $validatedData['doc_delivery_date'] ?? null, // Optional, set to null if not provided
-            'delivery_at' => $validatedData['delivery_at'] ?? null, // Optional, set to null if not provided
-            'gdn_number' => $validatedData['gdn_number'] ?? null, // Optional, set to null if not provided
-            'location' => $validatedData['location'] ?? null, // Optional, set to null if not provided
+            'w_o_vehicle_id' => $validatedData['woVehicleId'],
+            'user_id' => Auth::id(),
+            'status' => $validatedData['status'],
+            'comment' => $validatedData['comment'],
+            'doc_delivery_date' => $validatedData['doc_delivery_date'] ?? null,
+            'delivery_at' => $validatedData['delivery_at'] ?? null,
+            'gdn_number' => $validatedData['gdn_number'] ?? null,
+            'location' => $validatedData['location'] ?? null,
         ]);
 
-        // Fetch the work order vehicle
+        // Fetch the work order vehicle and related data
         $woVehicle = WOVehicles::findOrFail($validatedData['woVehicleId']);
-        $workOrder = $woVehicle->workOrder; // Assuming a relationship exists from `WoVehicle` to `WorkOrder`
+        $workOrder = $woVehicle->workOrder;
 
-        // Only send an email if the status is "Completed"
-        // if ($validatedData['status'] === 'Completed') {
-        //     // Prepare email template details
-        //     $template = [
-        //         'from' => 'no-reply@milele.com',
-        //         'from_name' => 'Milele Matrix',
-        //     ];
+        // Define recipient emails based on status
+        $recipients = [];
+        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
+        $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
+        $customerEmail = filter_var($workOrder->customer_email ?? null, FILTER_VALIDATE_EMAIL); // Assume work order has customer email
 
-        //     // Handle cases where customer_name is null
-        //     $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-        //     $statusName = $validatedData['status'];
+        // Basic recipient list (management, operations, and created by user)
+        $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
 
-        //     // Prepare email subject
-        //     $subject = "Work Order Vehicle delivery Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
+        // Add sales person to the recipient list if the condition is met
+        if ($workOrder->salesPerson && $salesPersonEmail && $createdByEmail !== $salesPersonEmail) {
+            $recipients[] = $salesPersonEmail;
+        }
 
-        //     // Retrieve the authenticated user's name
-        //     $authUserName = auth()->user()->name;
+        // Add customer email for "Ready" status
+        if ($validatedData['status'] === 'Ready' && $customerEmail) {
+            $recipients[] = $customerEmail;
+        }
 
-        //     // Define a quick access link (adjust the route as needed)
-        //     $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        //     $statusLogLink = env('BASE_URL') . '/vehicle-delivery-status-log/' . $woVehicle->id;
+        // Log email recipients for debugging
+        \Log::info('Email Recipients:', [
+            'managementEmail' => $managementEmail,
+            'operationsEmail' => $operationsEmail,
+            'createdByEmail' => $createdByEmail,
+            'salesPersonEmail' => $salesPersonEmail,
+            'customerEmail' => $customerEmail,
+        ]);
 
-        //     // Retrieve and validate email addresses from .env
-        //     $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        //     $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        //     $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
-        //     $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
+        // Handle invalid email addresses
+        if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
+            \Log::error('Invalid email addresses provided:', [
+                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                'createdByEmail' => $createdByEmail,
+            ]);
+            throw new \Exception('One or more email addresses are invalid.');
+        }
 
-        //     // Log email addresses to help with debugging
-        //     \Log::info('Email Recipients:', [
-        //         'managementEmail' => $managementEmail,
-        //         'operationsEmail' => $operationsEmail,
-        //         'createdByEmail' => $createdByEmail,
-        //         'salesPersonEmail' => $salesPersonEmail,
-        //     ]);
+        // Prepare the email subject based on status
+        $statusName = $validatedData['status'];
+        $subject = "Work Order Vehicle Delivery Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
 
-        //     // Check if the salesPerson exists before trying to access properties
-        //     $shouldSendToSalesPerson = false;
-        //     if ($workOrder->salesPerson) {
-        //         $shouldSendToSalesPerson = $createdByEmail !== $salesPersonEmail
-        //             && $workOrder->salesPerson->is_sales_rep === 'Yes'
-        //             && $workOrder->salesPerson->is_management === 'No';
-        //     }
+        // Retrieve the authenticated user's name
+        $authUserName = auth()->user()->name;
 
-        //     // Initialize recipient list
-        //     $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
+        // Define quick access links
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $statusLogLink = env('BASE_URL') . '/vehicle-delivery-status-log/' . $woVehicle->id;
 
-        //     // Add salesPersonEmail only if the condition is met
-        //     if ($shouldSendToSalesPerson && $salesPersonEmail) {
-        //         $recipients[] = $salesPersonEmail;
-        //     }
-
-        //     // Log and handle invalid email addresses
-        //     if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
-        //         \Log::error('Invalid email addresses provided:', [
-        //             'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-        //             'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-        //             'createdByEmail' => $createdByEmail,
-        //         ]);
-        //         throw new \Exception('One or more email addresses are invalid.');
-        //     }
-
-        //     // Send email using a Blade template
-        //     Mail::send('work_order.emails.delivery_status_update', [
-        //         'workOrder' => $workOrder,
-        //         'woVehicle' => $woVehicle,
-        //         'accessLink' => $accessLink,
-        //         'statusLogLink' => $statusLogLink,
-        //         'comments' => $validatedData['comment'],
-        //         'userName' => $authUserName,
-        //         'status' => $statusName,
-        //         'datetime' => Carbon::now(),
-        //         'statusTracking' => $statusTracking,
-        //     ], function ($message) use ($subject, $recipients, $template) {
-        //         $message->from($template['from'], $template['from_name'])
-        //                 ->to($recipients)
-        //                 ->subject($subject);
-        //     });
-        // }
+        // Send email using Blade template
+        Mail::send('work_order.emails.delivery_status_update', [
+            'workOrder' => $workOrder,
+            'woVehicle' => $woVehicle,
+            'accessLink' => $accessLink,
+            'statusLogLink' => $statusLogLink,
+            'comments' => $validatedData['comment'],
+            'userName' => $authUserName,
+            'status' => $statusName,
+            'datetime' => Carbon::now(),
+            'statusTracking' => $statusTracking,
+            'isCustomerEmail' => $validatedData['status'] === 'Ready' ? true : false, // To control the view for customer email
+        ], function ($message) use ($subject, $recipients) {
+            $message->from('no-reply@milele.com', 'Milele Matrix')
+                    ->to($recipients)
+                    ->subject($subject);
+        });
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);
