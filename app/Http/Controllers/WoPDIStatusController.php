@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Exception;
 use App\Models\WOVehiclePDIStatus;
 use App\Models\WorkOrder;
-use App\Models\WoVehicles;
+use App\Models\WOVehicles;
 
 class WoPDIStatusController extends Controller
 {
@@ -38,7 +38,7 @@ class WoPDIStatusController extends Controller
         ]);
 
         // Fetch the work order vehicle
-        $woVehicle = WoVehicles::findOrFail($validatedData['woVehicleId']);
+        $woVehicle = WOVehicles::findOrFail($validatedData['woVehicleId']);
         $workOrder = $woVehicle->workOrder; // Assuming a relationship exists from `WoVehicle` to `WorkOrder`
 
         // Only send an email if the status is "Completed"
@@ -131,7 +131,7 @@ class WoPDIStatusController extends Controller
         $data = WOVehiclePDIStatus::where('w_o_vehicle_id', $woVehicleId)->orderBy('created_at', 'DESC')->get();
 
         // Fetch the associated work order vehicle and work order
-        $vehicle = WoVehicles::findOrFail($woVehicleId);
+        $vehicle = WOVehicles::findOrFail($woVehicleId);
         $workOrder = $vehicle->workOrder; // Assuming WoVehicle belongs to WorkOrder
         $type = $workOrder->type;
 
