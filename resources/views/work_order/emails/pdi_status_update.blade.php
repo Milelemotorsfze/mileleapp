@@ -48,7 +48,7 @@
     <p>
     @if(empty($isCustomerEmail))
             <a href="{{ $accessLink }}">Click here to view the work order</a><br>
-            <a href="{{ $statusLogLink }}">Click here to view the status approval log</a>
+            <a href="{{ $statusLogLink }}">Click here to view the work order vehicle pdi status log</a>
     @endif       
     </p><br>
     <p>Best Regards,<br>Milele Matrix</p>
