@@ -1231,7 +1231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     <label class="badge @if($vehicle->latestPdiStatus->passed_status == 'Passed') badge-soft-success @elseif($vehicle->latestPdiStatus->passed_status == 'Failed') badge-soft-danger @endif">QC INSPECTION : <strong>{{ strtoupper($vehicle->latestPdiStatus->passed_status) ?? ''}}</strong></label>
                                                                 </td>
                                                                 @if($vehicle->latestPdiStatus->passed_status == 'Failed')
-                                                                    <td colspan="5">{{ $vehicle->latestPdiStatus->qc_inspector_remarks ?? '' }}</td>
+                                                                    <td colspan="5">QC Inspection Remarks : {{ $vehicle->latestPdiStatus->qc_inspector_remarks ?? '' }}</td>
                                                                 @endif
                                                             @endif
                                                             <td colspan="

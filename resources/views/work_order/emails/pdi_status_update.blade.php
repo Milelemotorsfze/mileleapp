@@ -34,7 +34,7 @@
             @endif<br>
         @endif
         @if(isset($statusTracking) && !empty($statusTracking->passed_status))
-        <strong>QC Inspection:</strong> <label class="badge @if($statusTracking->passed_status == 'Passed') badge-soft-success @elseif($statusTracking->passed_status == 'Failed') badge-soft-danger @endif">{{ $statusTracking->passed_status ?? ''}}</label></br>
+        <strong>QC Inspection:</strong> <label class="badge @if($statusTracking->passed_status == 'Passed') badge-soft-success @elseif($statusTracking->passed_status == 'Failed') badge-soft-danger @endif">{{ $statusTracking->passed_status ?? ''}}</label><br>
         @endif
         @if(isset($statusTracking) && !empty($statusTracking->qc_inspector_remarks))
             <strong>QC Inspector Remarks:</strong> {{ $statusTracking->qc_inspector_remarks ?? 'NA' }}<br>
