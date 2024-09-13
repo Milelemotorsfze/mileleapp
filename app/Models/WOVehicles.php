@@ -141,7 +141,7 @@ class WOVehicles extends Model
     }
     public function latestPdiStatus()
     {
-        return $this->hasOne(WoPDIStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
+        return $this->hasOne(WOPdiStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
 }
