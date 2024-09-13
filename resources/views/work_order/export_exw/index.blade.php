@@ -115,6 +115,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<th rowspan="2" class="light">Documentation Status</th>
 							<th rowspan="2" class="light">Vehicle Modification Status</th>
 							<th rowspan="2" class="light">PDI Status</th>
+							<th rowspan="2" class="light">Delivery Status</th>
 							<th rowspan="2" class="light">Sales Person</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
@@ -350,6 +351,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
 									<label class="float-end badge @if($data->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($data->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
 										<strong>{{ $data->pdi_summary ?? ''}}</strong>
+									</label>     
+								@endif
+							</td>
+							<td>
+								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
+									<label class="float-end badge @if($data->delivery_summary == 'READY') badge-soft-info @elseif($data->delivery_summary == 'ON HOLD') badge-soft-danger @elseif($data->delivery_summary == 'DELIVERED WITH DOCS HOLD') badge-soft-warning @elseif($data->delivery_summary == 'DELIVERED ') badge-soft-success @else badge-soft-dark @endif">
+										<strong>{{ $data->delivery_summary ?? ''}}</strong>
 									</label>     
 								@endif
 							</td>

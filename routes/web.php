@@ -31,6 +31,7 @@ use App\Http\Controllers\WoDocsStatusController;
 use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
+use App\Http\Controllers\WOVehicleDeliveryStatusController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -468,6 +469,10 @@ Route::get('/d', function () {
     Route::controller(WoPDIStatusController::class)->group(function(){
         Route::post('/update-vehicle-pdi-status', 'updateVehPdiStatus')->name('wo.updateVehPdiStatus');
         Route::get('/vehicle-pdi-status-log/{id}', 'vehPdiStatusHistory')->name('vehPdiStatusHistory');
+    }); 
+    Route::controller(WOVehicleDeliveryStatusController::class)->group(function(){
+        Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
+        Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
