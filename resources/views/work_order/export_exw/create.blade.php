@@ -227,8 +227,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                     {{ strtoupper($labelText) }} <strong>{{ strtoupper($workOrder->docs_status) ?? '' }}</strong>
                 </label>
 				
-				<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+				<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'NO MODIFICATIONS') badge-soft-warning @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
                     MODIFICATION : <strong>{{ $workOrder->vehicles_modification_summary ?? ''}}</strong>
+                </label>
+				<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($workOrder->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+				PDI : <strong>{{ $workOrder->pdi_summary ?? ''}}</strong>
                 </label>
             @endif
         @endif

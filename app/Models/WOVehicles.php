@@ -42,6 +42,7 @@ class WOVehicles extends Model
     protected $appends = [
         'certification_per_vin_name',
         'modification_status',
+        'pdi_status',
     ];
     public function getCertificationPerVinNameAttribute() {
         $certification = '';
@@ -74,12 +75,28 @@ class WOVehicles extends Model
                                 ->orderBy('created_at', 'DESC')
                                 ->first();
     
-        // Check if no modification jobs and no addons, set status to 'Completed'
+        // Check if no modification jobs and no addons, set status to 'No Modifications'
         if ($this->modification_or_jobs_to_perform_per_vin == null && $this->addons()->count() == 0) {
-            $status = 'Completed';
+            $status = 'No Modifications';
         }
         // Otherwise, if modification status data exists, use the latest status
         elseif ($data) {
+            $status = $data->status;
+        }
+    
+        return $status;
+    } 
+    public function getPDIStatusAttribute() {
+        // Set default status to 'Not Initiated'
+        $status = 'Not Initiated';
+    
+        // Get the latest pdi status from the database
+        $data = WOPdiStatus::where('w_o_vehicle_id', $this->id)
+                                ->orderBy('created_at', 'DESC')
+                                ->first();
+    
+        //if pdi status data exists, use the latest status
+        if ($data) {
             $status = $data->status;
         }
     
@@ -120,6 +137,11 @@ class WOVehicles extends Model
     public function latestModificationStatus()
     {
         return $this->hasOne(WOVehicleStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
+            ->latestOfMany('created_at');  // Sort by the date field
+    }
+    public function latestPdiStatus()
+    {
+        return $this->hasOne(WoPDIStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
 }

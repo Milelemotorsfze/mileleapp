@@ -134,9 +134,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                 <label style="font-size: 119%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
                     {{ strtoupper($labelText) }} <strong>{{ strtoupper($workOrder->docs_status) ?? '' }}</strong>
                 </label>
-                <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+                <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($workOrder->vehicles_modification_summary == 'NO MODIFICATIONS') badge-soft-warning @elseif($workOrder->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
                     MODIFICATION : <strong>{{ $workOrder->vehicles_modification_summary ?? ''}}</strong>
-                </label>        
+                </label>
+                <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($workOrder->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+                    PDI : <strong>{{ $workOrder->pdi_summary ?? ''}}</strong>
+                </label>         
             @endif
         @endif 
     </div>
@@ -192,7 +195,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 					<div class="row">
                         <div class="col-lg-2 col-md-2 col-sm-6 col-12">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-								<center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label> : <span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
+                                <center><label for="choices-single-default" class="form-label"> <strong> Date</strong></label> : <span class="data-font">@if($workOrder->date != ''){{\Carbon\Carbon::parse($workOrder->date)->format('d M Y') ?? ''}}@endif</span></center>
 							</div>
 						</div>
                         <div class="col-lg-2 col-md-2 col-sm-6 col-12">
@@ -1075,10 +1078,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                                     <i class="fas fa-eye"></i> Modification Status Log
                                                                                 </a>
                                                                             </li>
+                                                                        @endif	
+                                                                        @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                                            $workOrder->finance_approval_status == 'Approved' && 
+                                                                            $workOrder->coo_approval_status == 'Approved')
+                                                                            @php
+                                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['update-vehicle-pdi-status']);
+                                                                            @endphp
+                                                                            @if ($hasPermission)
+                                                                                <a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updatevehPDIStatusModal_{{$vehicle->id}}">
+                                                                                <i class="fa fa-search-plus" aria-hidden="true"></i> Update PDI Status
+                                                                                </a>
+                                                                            @endif
+                                                                        @endif
+                                                                        @php
+                                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-pdi-log']);
+                                                                        @endphp
+                                                                        @if ($hasPermission)
+                                                                            <li>
+                                                                                <a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                                                                                    href="{{route('vehPdiStatusHistory',$vehicle->id)}}">
+                                                                                    <i class="fas fa-eye"></i> PDI Status Log
+                                                                                </a>
+                                                                            </li>
                                                                         @endif											
                                                                     </ul>
                                                                 </div> 
                                                                 @include('work_order.export_exw.veh_modi_status_update')   
+                                                                @include('work_order.export_exw.veh_pdi_status_update')  
                                                             @endif 
                                                         </td>                                                                                                         
                                                         <td>{{$vehicle->boe_number ?? 'NA'}}</td>
@@ -1166,6 +1193,73 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <td colspan="5">Updated : {{$vehicle->latestModificationStatus->user->name ?? ''}} - 
                                                                 @if(!is_null($vehicle->latestModificationStatus) && !is_null($vehicle->latestModificationStatus->created_at))
                                                                     {{ $vehicle->latestModificationStatus->created_at->format('d M Y,  h:i:s A') }}
+                                                                @else
+                                                                    Not available
+                                                                @endif
+                                                            </td>                                                            
+                                                        </tr>
+                                                    @endif
+                                                    @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                        $workOrder->finance_approval_status == 'Approved' && 
+                                                        $workOrder->coo_approval_status == 'Approved')
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>
+                                                                @php
+                                                                    // Determine the badge class based on pdi_status
+                                                                    $badgeClass = '';
+                                                                    if ($vehicle->pdi_status == 'Scheduled') {
+                                                                        $badgeClass = 'badge-soft-info';
+                                                                    } elseif ($vehicle->pdi_status == 'Completed') {
+                                                                        $badgeClass = 'badge-soft-success';
+                                                                    } elseif ($vehicle->pdi_status == 'Not Initiated') {
+                                                                        $badgeClass = 'badge-soft-danger';
+                                                                    }
+                                                                @endphp
+
+                                                                <label style="font-size: 70%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
+                                                                    PDI : <strong>{{ strtoupper($vehicle->pdi_status) ?? '' }}</strong>
+                                                                </label>
+                                                            </td>
+                                                            @if($vehicle->pdi_status == 'Scheduled')
+                                                                <td colspan="3">PDI Sched. Time : @if(!empty($vehicle->latestPdiStatus->pdi_scheduled_at))
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestPdiStatus->pdi_scheduled_at)->format('d M Y, h:i:s A') }}
+                                                                    @endif
+                                                                </td> 
+                                                            @elseif($vehicle->pdi_status == 'Completed') 
+                                                                <td>
+                                                                    <label class="badge @if($vehicle->latestPdiStatus->passed_status == 'Passed') badge-soft-success @elseif($vehicle->latestPdiStatus->passed_status == 'Failed') badge-soft-danger @endif">QC INSPECTION : <strong>{{ strtoupper($vehicle->latestPdiStatus->passed_status) ?? ''}}</strong></label>
+                                                                </td>
+                                                                @if($vehicle->latestPdiStatus->passed_status == 'Failed')
+                                                                    <td colspan="5">{{ $vehicle->latestPdiStatus->qc_inspector_remarks ?? '' }}</td>
+                                                                @endif
+                                                            @endif
+                                                            <td colspan="
+                                                                @if(isset($type) && $type == 'export_cnf') 
+                                                                    @if($vehicle->pdi_status == 'Scheduled') 
+                                                                        10
+                                                                    @elseif($vehicle->pdi_status == 'Completed' && $vehicle->latestPdiStatus->passed_status == 'Passed') 
+                                                                        10
+                                                                    @elseif($vehicle->pdi_status == 'Completed' && $vehicle->latestPdiStatus->passed_status == 'Failed') 
+                                                                        9
+                                                                    @elseif($vehicle->pdi_status == 'Not Initiated') 
+                                                                        13
+                                                                    @endif
+                                                                @else
+                                                                    @if($vehicle->pdi_status == 'Scheduled') 
+                                                                        9
+                                                                    @elseif($vehicle->pdi_status == 'Completed' && $vehicle->latestPdiStatus->passed_status == 'Passed') 
+                                                                        9
+                                                                    @elseif($vehicle->pdi_status == 'Completed' && $vehicle->latestPdiStatus->passed_status == 'Failed') 
+                                                                        8
+                                                                    @elseif($vehicle->pdi_status == 'Not Initiated') 
+                                                                        12
+                                                                    @endif
+                                                                @endif">Comment : {{ $vehicle->latestPdiStatus->comment ?? '' }}
+                                                            </td>
+                                                            <td colspan="5">Updated : {{$vehicle->latestPdiStatus->user->name ?? ''}} - 
+                                                                @if(!is_null($vehicle->latestPdiStatus) && !is_null($vehicle->latestPdiStatus->created_at))
+                                                                    {{ $vehicle->latestPdiStatus->created_at->format('d M Y,  h:i:s A') }}
                                                                 @else
                                                                     Not available
                                                                 @endif
