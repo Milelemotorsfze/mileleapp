@@ -91,7 +91,7 @@ class WOVehicles extends Model
         $status = 'Not Initiated';
     
         // Get the latest pdi status from the database
-        $data = WOPdiStatus::where('w_o_vehicle_id', $this->id)
+        $data = WOVehiclePDIStatus::where('w_o_vehicle_id', $this->id)
                                 ->orderBy('created_at', 'DESC')
                                 ->first();
     
@@ -141,7 +141,7 @@ class WOVehicles extends Model
     }
     public function latestPdiStatus()
     {
-        return $this->hasOne(WOPdiStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
+        return $this->hasOne(WOVehiclePDIStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
 }

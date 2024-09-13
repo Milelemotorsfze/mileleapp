@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Exception;
-use App\Models\WoPDIStatus;
+use App\Models\WOVehiclePDIStatus;
 use App\Models\WorkOrder;
 use App\Models\WoVehicles;
 
@@ -27,7 +27,7 @@ class WoPDIStatusController extends Controller
         ]);
 
         // Always create a new status_tracking record
-        $statusTracking = WoPDIStatus::create([
+        $statusTracking = WOVehiclePDIStatus::create([
             'w_o_vehicle_id' => $validatedData['woVehicleId'], // Associate with the work order vehicle ID
             'user_id' => Auth::id(), // Set the ID of the authenticated user
             'status' => $validatedData['status'], // Set the status
@@ -128,7 +128,7 @@ class WoPDIStatusController extends Controller
     public function vehPdiStatusHistory($woVehicleId)
     {
         // Fetch the status history for the specific vehicle from status_tracking
-        $data = WoPDIStatus::where('w_o_vehicle_id', $woVehicleId)->orderBy('created_at', 'DESC')->get();
+        $data = WOVehiclePDIStatus::where('w_o_vehicle_id', $woVehicleId)->orderBy('created_at', 'DESC')->get();
 
         // Fetch the associated work order vehicle and work order
         $vehicle = WoVehicles::findOrFail($woVehicleId);
