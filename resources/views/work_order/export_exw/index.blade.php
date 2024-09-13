@@ -114,6 +114,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							</th>
 							<th rowspan="2" class="light">Documentation Status</th>
 							<th rowspan="2" class="light">Vehicle Modification Status</th>
+							<th rowspan="2" class="light">PDI Status</th>
 							<th rowspan="2" class="light">Sales Person</th>
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
@@ -340,9 +341,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							</td>
 							<td>
 								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
-									<label class="float-end badge @if($data->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($data->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+									<label class="float-end badge @if($data->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($data->vehicles_modification_summary == 'NO MODIFICATIONS') badge-soft-warning  @elseif($data->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
 										<strong>{{ $data->vehicles_modification_summary ?? ''}}</strong>
 									</label>
+								@endif
+							</td>
+							<td>
+								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
+									<label class="float-end badge @if($data->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($data->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
+										<strong>{{ $data->pdi_summary ?? ''}}</strong>
+									</label>     
 								@endif
 							</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>
