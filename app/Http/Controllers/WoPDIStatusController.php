@@ -11,19 +11,24 @@ use Exception;
 use App\Models\WOVehiclePDIStatus;
 use App\Models\WorkOrder;
 use App\Models\WOVehicles;
+use Illuminate\Validation\Rule;
 
 class WoPDIStatusController extends Controller
 {
     public function updateVehPdiStatus(Request $request)
     {
-        // Validate the incoming request data
         $validatedData = $request->validate([
-            'woVehicleId' => 'required|exists:w_o_vehicles,id', // Reference to w_o_vehicle_id
+            'woVehicleId' => 'required|exists:w_o_vehicles,id',
             'status' => 'required|in:Not Initiated,Scheduled,Completed',
             'comment' => 'nullable|string',
-            'pdi_scheduled_at' => 'nullable|date', // Ensure the datetime field is a valid date
-            'qc_inspector_remarks' => 'nullable|string', // Ensure current vehicle location is a string
-            'passed_status' => 'in:Passed,Failed',
+            'pdi_scheduled_at' => 'nullable|date',
+            'qc_inspector_remarks' => 'nullable|string',
+            // Apply validation to `passed_status` only if status is 'Completed'
+            'passed_status' => [
+                Rule::requiredIf($request->status === 'Completed'),
+                'nullable',
+                Rule::in(['Passed', 'Failed']),
+            ],
         ]);
 
         // Always create a new status_tracking record
