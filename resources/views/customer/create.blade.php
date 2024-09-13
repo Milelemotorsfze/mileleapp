@@ -8,17 +8,13 @@
         .image-row {
              text-align: center;
         }
-        .image-box {
-            width: 20%;
+        .other-docs {
+            width: 40%;
             padding: 1%;
             margin: .5%;
-            /* background: pink; */
             display: inline-block;
-            font-size: 0; /* fixes bottom padding */
         }
-        .image-box img {
-            max-width: 50%;
-        }
+       
     </style>
     @can('create-customer')
         @php
@@ -92,19 +88,19 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
-                                <input type="file" class="form-control" accept='image/*' name="passport_file" id="file1-upload"  placeholder="Upload Passport">
+                                <input type="file" class="form-control mygroup" accept='image/*' name="passport_file" id="file1-upload"  placeholder="Upload Passport">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Trade License</label>
-                                <input type="file" class="form-control" id="file2-upload"  accept='image/*'  name="trade_license_file" placeholder="Upload Trade License">
+                                <input type="file" class="form-control mygroup" id="file2-upload"  accept='image/*'  name="trade_license_file" placeholder="Upload Trade License">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Other Document</label>
-                                <input type="file" class="form-control" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
+                                <input type="file" class="form-control mygroup" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -114,6 +110,8 @@
                             </div>
                         </div>
                         <br>
+                       
+                    </div>
                         <div class="card preview-div" hidden>
                             <div class="card-body">
                                 <div class="row">
@@ -125,22 +123,16 @@
                                         <div id="file2-preview">
                                         </div>
                                     </div>
+                                   
                                 </div>
-                                <!-- <div class="image-row">
-                                     <div class="image-box">
-                                    </div> 
-                                    
-                                </div> -->
-                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 other-docs">
                                         <div id="file3-preview">
                                         </div>
                                     </div>
-                                </div>
                             </div>
                         </div>
-                    </div>
                         <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary mb-2">Submit</button>
                         </div>
                 </form>
             </div>
@@ -245,6 +237,9 @@
           $('#country-error').remove();
         })
         $("#form-create").validate({
+            groups: {
+                mygroup: 'passport_file trade_license_file other_document_file[]'
+            },
             rules: {
                 name: {
                     required: true,
@@ -256,16 +251,20 @@
                     required: true,
                 },
                 passport_file:{
-                      extension: "png|jpeg|jpg"
+                      extension: "png|jpeg|jpg",
+                      require_from_group: [1, '.mygroup']
                 },
                 trade_license_file:{
-                     extension: "png|jpeg|jpg"
+                     extension: "png|jpeg|jpg",
+                     require_from_group: [1, '.mygroup']
                 },
                 "other_document_file[]": {
                     extension: "png|jpeg|jpg",
-                    maxsize:5242880 
+                    maxsize:5242880,
+                    require_from_group: [1, '.mygroup']
                 },
             },
+           
             messages: {
                 trade_license_file: {
                     extension: "Please upload image file format (png,jpeg,jpg)"

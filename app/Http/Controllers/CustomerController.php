@@ -181,9 +181,13 @@ class CustomerController extends Controller
          $customer = Clients::find($id);
          $countries = Country::all();
          $customerCountries = $customer->clientCountries()->pluck('country_id')->toArray();
-        //  return $customerCountries;
+         $ispassortOrTradeLicenseAvailable = 0;
 
-         return view('customer.edit', compact('customer','countries','customerCountries'));
+        if($customer->passport || $customer->tradelicense) {
+            $ispassortOrTradeLicenseAvailable = 1;
+        }
+
+         return view('customer.edit', compact('customer','countries','customerCountries','ispassortOrTradeLicenseAvailable'));
     }
 
     /**
