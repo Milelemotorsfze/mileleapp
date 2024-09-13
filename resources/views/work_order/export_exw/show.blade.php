@@ -139,6 +139,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                 </label>
                 <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($workOrder->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($workOrder->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
                     PDI : <strong>{{ $workOrder->pdi_summary ?? ''}}</strong>
+                </label>  
+                <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->delivery_summary == 'READY') badge-soft-info @elseif($workOrder->delivery_summary == 'ON HOLD') badge-soft-danger @elseif($workOrder->delivery_summary == 'DELIVERED') badge-soft-success @elseif($workOrder->delivery_summary == 'DELIVERED WITH DOCS HOLD') badge-soft-warning @else badge-soft-dark @endif">
+                    DELIVERY : <strong>{{ $workOrder->delivery_summary ?? ''}}</strong>
                 </label>         
             @endif
         @endif 
@@ -1101,11 +1104,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                                     <i class="fas fa-eye"></i> PDI Status Log
                                                                                 </a>
                                                                             </li>
-                                                                        @endif											
+                                                                        @endif	
+                                                                        @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                                            $workOrder->finance_approval_status == 'Approved' && 
+                                                                            $workOrder->coo_approval_status == 'Approved')
+                                                                            @php
+                                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['update-wo-vehicle-delivery-status']);
+                                                                            @endphp
+                                                                            @if ($hasPermission)
+                                                                                <a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updatevehDeliveryStatusModal_{{$vehicle->id}}">
+                                                                                <i class="fa fa-car" aria-hidden="true"></i> Update Delivery Status
+                                                                                </a>
+                                                                            @endif
+                                                                        @endif
+                                                                        @php
+                                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['wo-vehicle-delivery-status-log']);
+                                                                        @endphp
+                                                                        @if ($hasPermission)
+                                                                            <li>
+                                                                                <a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                                                                                    href="{{route('vehDeliveryStatusHistory',$vehicle->id)}}">
+                                                                                    <i class="fas fa-eye"></i> Delivery Status Log
+                                                                                </a>
+                                                                            </li>
+                                                                        @endif												
                                                                     </ul>
                                                                 </div> 
                                                                 @include('work_order.export_exw.veh_modi_status_update')   
                                                                 @include('work_order.export_exw.veh_pdi_status_update')  
+                                                                @include('work_order.export_exw.veh_delivery_status_update')  
                                                             @endif 
                                                         </td>                                                                                                         
                                                         <td>{{$vehicle->boe_number ?? 'NA'}}</td>
@@ -1260,6 +1287,78 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <td colspan="5">Updated : {{$vehicle->latestPdiStatus->user->name ?? ''}} - 
                                                                 @if(!is_null($vehicle->latestPdiStatus) && !is_null($vehicle->latestPdiStatus->created_at))
                                                                     {{ $vehicle->latestPdiStatus->created_at->format('d M Y,  h:i:s A') }}
+                                                                @else
+                                                                    Not available
+                                                                @endif
+                                                            </td>                                                            
+                                                        </tr>
+                                                    @endif
+                                                    @if($workOrder->sales_support_data_confirmation_at != '' && 
+                                                        $workOrder->finance_approval_status == 'Approved' && 
+                                                        $workOrder->coo_approval_status == 'Approved')
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>
+                                                                @php
+                                                                    // Determine the badge class based on delivery_status
+                                                                    $badgeClass = '';
+                                                                    if ($vehicle->delivery_status == 'Ready') {
+                                                                        $badgeClass = 'badge-soft-info';
+                                                                    } elseif ($vehicle->delivery_status == 'Delivered') {
+                                                                        $badgeClass = 'badge-soft-success';
+                                                                    } elseif ($vehicle->delivery_status == 'On Hold') {
+                                                                        $badgeClass = 'badge-soft-danger';
+                                                                    } elseif ($vehicle->delivery_status == 'Delivered With Docs Hold') {
+                                                                        $badgeClass = 'badge-soft-warning';
+                                                                    }
+                                                                @endphp
+                                                                <label style="font-size: 70%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
+                                                                    DELIVERY : <strong>{{ strtoupper($vehicle->delivery_status) ?? '' }}</strong>
+                                                                </label>
+                                                                
+                                                            </td>
+                                                            @if($vehicle->delivery_status == 'Ready')
+                                                                <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->delivery_at))
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivery_at)->format('d M Y, h:i:s A') }}
+                                                                    @endif
+                                                                </td> 
+                                                                <td colspan="3">Location : {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}</td>
+
+                                                            @elseif($vehicle->delivery_status == 'Delivered') 
+                                                                
+                                                                    <td colspan="5">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
+                                                                    @elseif($vehicle->delivery_status == 'Delivered With Docs Hold')
+                                                                <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->doc_delivery_date))
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y, h:i:s A') }}
+                                                                    @endif
+                                                                </td> 
+                                                            @endif
+                                                            <td colspan="
+                                                                @if(isset($type) && $type == 'export_cnf') 
+                                                                    @if($vehicle->delivery_status == 'Ready') 
+                                                                        8
+                                                                    @elseif($vehicle->delivery_status == 'Delivered') 
+                                                                        9
+                                                                    @elseif($vehicle->delivery_status == 'On Hold') 
+                                                                        13
+                                                                    @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 
+                                                                        10
+                                                                    @endif
+                                                                @else
+                                                                    @if($vehicle->delivery_status == 'Ready') 
+                                                                        7
+                                                                    @elseif($vehicle->delivery_status == 'Delivered')
+                                                                        8
+                                                                    @elseif($vehicle->delivery_status == 'On Hold') 
+                                                                        12
+                                                                    @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 
+                                                                        9
+                                                                    @endif
+                                                                @endif">Remarks : {{ $vehicle->latestDeliveryStatus->comment ?? '' }}
+                                                            </td>
+                                                            <td colspan="5">Updated : {{$vehicle->latestDeliveryStatus->user->name ?? ''}} - 
+                                                                @if(!is_null($vehicle->latestDeliveryStatus) && !is_null($vehicle->latestDeliveryStatus->created_at))
+                                                                    {{ $vehicle->latestDeliveryStatus->created_at->format('d M Y,  h:i:s A') }}dd
                                                                 @else
                                                                     Not available
                                                                 @endif

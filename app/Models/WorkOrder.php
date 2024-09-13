@@ -114,6 +114,11 @@ class WorkOrder extends Model
         'pdi_not_initiated_count',
         'pdi_completed_count',
         'pdi_summary',
+        'delivery_ready_count',
+        'delivery_on_hold_count',
+        'delivery_delivered_count',
+        'delivery_delivered_with_docs_hold_count',
+        'delivery_summary',
     ];
     public function getStatusAttribute() {
         $status = '';
@@ -332,6 +337,64 @@ class WorkOrder extends Model
             return 'NO DATA AVAILABLE';
         }
     }
+    // Attribute to get the count of delivery "Ready" vehicles
+    public function getDeliveryReadyCountAttribute()
+    {
+        return $this->vehicles->where('delivery_status', 'Ready')->count();
+    }
+
+    // Attribute to get the count of delivery "On Hold" vehicles
+    public function getDeliveryOnHoldCountAttribute()
+    {
+        return $this->vehicles->where('delivery_status', 'On Hold')->count();
+    }
+
+    // Attribute to get the count of delivery "Delivered" vehicles
+    public function getDeliveryDeliveredCountAttribute()
+    {
+        return $this->vehicles->where('delivery_status', 'Delivered')->count();
+    }
+    // Attribute to get the count of delivery "Delivered With Docs Hold" vehicles
+    public function getDeliveryDeliveredWithDocsHoldCountAttribute()
+    {
+        return $this->vehicles->where('delivery_status', 'Delivered With Docs Hold')->count();
+    }
+   // Attribute to get the modification status summary for the work order
+    public function getDeliverySummaryAttribute()
+    {
+        $deliveredCount = $this->delivery_delivered_count;
+        $readyCount = $this->delivery_ready_count;
+        $onHoldCount = $this->delivery_on_hold_count;
+        $deliveredWithDocsHoldCount = $this->delivery_with_docs_hold_count;
+
+        // Logic to determine the summary status
+        if ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return 'DELIVERED';
+        } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$readyCount} READY";
+        } elseif ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$onHoldCount} ON HOLD";
+        } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$readyCount} READY & {$onHoldCount} ON HOLD";
+        } elseif ($readyCount > 0 && $deliveredCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return 'READY';
+        } elseif ($readyCount > 0 && $onHoldCount > 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$readyCount} READY & {$onHoldCount} ON HOLD";
+        } elseif ($onHoldCount > 0 && $readyCount == 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return 'ON HOLD';
+        } elseif ($deliveredWithDocsHoldCount > 0 && $deliveredCount == 0 && $readyCount == 0 && $onHoldCount == 0) {
+            return 'DELIVERED WITH DOCS HOLD';
+        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount == 0 && $onHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD";
+        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY";
+        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount > 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
+        } else {
+            return 'NO DATA AVAILABLE';
+        }
+    }
+
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');

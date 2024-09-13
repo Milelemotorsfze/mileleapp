@@ -43,6 +43,7 @@ class WOVehicles extends Model
         'certification_per_vin_name',
         'modification_status',
         'pdi_status',
+        'delivery_status',
     ];
     public function getCertificationPerVinNameAttribute() {
         $certification = '';
@@ -102,6 +103,22 @@ class WOVehicles extends Model
     
         return $status;
     }  
+    public function getDeliveryStatusAttribute() {
+        // Set default status to 'On Hold'
+        $status = 'On Hold';
+    
+        // Get the latest pdi status from the database
+        $data = WOVehicleDeliveryStatus::where('w_o_vehicle_id', $this->id)
+                                ->orderBy('created_at', 'DESC')
+                                ->first();
+    
+        //if pdi status data exists, use the latest status
+        if ($data) {
+            $status = $data->status;
+        }
+    
+        return $status;
+    }  
     public function addons()
     {
         return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
@@ -142,6 +159,11 @@ class WOVehicles extends Model
     public function latestPdiStatus()
     {
         return $this->hasOne(WOVehiclePDIStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
+            ->latestOfMany('created_at');  // Sort by the date field
+    }
+    public function latestDeliveryStatus()
+    {
+        return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
 }
