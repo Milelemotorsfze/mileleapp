@@ -96,6 +96,8 @@
             alertify.error('Please provide QC inspection remarks for a failed inspection.');
             return;
         }
+        // Determine the passed_status based on the selected status and QC inspection
+        const passedStatus = selectedStatus === 'Completed' && qcInspectionFailed ? 'Failed' : (selectedStatus === 'Completed' ? 'Passed' : null);
 
         // Display the confirmation dialog
         alertify.confirm(
@@ -112,7 +114,7 @@
                         woVehicleId: woVehicleId,
                         status: selectedStatus,
                         pdi_scheduled_at: selectedStatus === 'Scheduled' ? pdiScheduledAt : null,
-                        passed_status: selectedStatus === 'Completed' ? (qcInspectionFailed ? 'Failed' : 'Passed') : null,
+                        passed_status: passedStatus,
                         qc_inspector_remarks: selectedStatus === 'Completed' && qcInspectionFailed ? qcInspectionRemarks : null,
                         comment: comment,
                         _token: '{{ csrf_token() }}'
