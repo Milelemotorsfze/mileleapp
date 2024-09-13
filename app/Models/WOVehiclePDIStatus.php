@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WoPDIStatus extends Model
+class WOVehiclePDIStatus extends Model
 {
     use HasFactory;
     protected $table = 'wo_vehicle_pdi_status';
