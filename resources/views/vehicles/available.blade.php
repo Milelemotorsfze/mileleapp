@@ -260,7 +260,7 @@ table.dataTable thead th select {
 @endif
   <div class="card-header">
     <h4 class="card-title">
-     Incoming & Available Stock Info
+     Stock Info
     </h4>
     <br>
     <!-- Chat Modal -->
@@ -462,7 +462,6 @@ table.dataTable thead th select {
     </div>
   </div>
 </div>     
-  </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
     $hasManagementPermission = Auth::user()->hasPermissionForSelectedRole('cost-price-link-stock-report');
@@ -542,8 +541,6 @@ table.dataTable thead th select {
             </table>
           </div> 
         </div>  
-      </div> 
-      </div>
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -564,6 +561,7 @@ table.dataTable thead th select {
   </div>
   <script>
         $(document).ready(function () {
+var now = new Date();
     var columns3 = [
         { data: 'id', name: 'vehicles.id' },
         { data: 'brand_name', name: 'brands.brand_name' },
@@ -855,7 +853,7 @@ table.dataTable thead th select {
     processing: true,
     serverSide: true,
     ajax: {
-        url: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
+        url: "{{ route('vehicles.availablevehicles', ['status' => 'Available Stock']) }}",
         type: "POST",
         data: function(d) {
             // Add any additional parameters to be sent along with the POST request here
@@ -1032,12 +1030,12 @@ $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
         $('#dtBasicExample3_processing').hide();
     }
 });
-$('#dtBasicExample3 tbody').off('click', 'tr');
+$('#dtBasicExample3 tbody').off('click', 'td');
 $('#dtBasicExample3 tbody').on('click', 'td', function () {
     var table = $('#dtBasicExample3').DataTable();
     var cellIndex = table.cell(this).index().column; // Get the clicked cell's column index
     var columnHeader = table.column(cellIndex).header().innerText; // Get the header text of the clicked column
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -1046,12 +1044,12 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-    else if(columnHeader === 'Reservation End')
-    {
+    else if (columnHeader.includes('Reservation End')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
+    console.log("open booking");
         var data = table3.row(this).data();
         openBookingModal(data.id);
     @endif
@@ -1066,7 +1064,7 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         openenhancementModal(data.id);
     @endif
 }
-if (columnHeader === 'Ext Colour' || columnHeader === 'Int Colour') {
+if (columnHeader.includes('Ext Colour') || columnHeader.includes('Int Colour')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('editing-colours');
     @endphp
@@ -1076,6 +1074,56 @@ if (columnHeader === 'Ext Colour' || columnHeader === 'Int Colour') {
     @endif
 }
 });
+        function handleModalShow(modalId) {
+    $(modalId).on('show.bs.modal', function () {
+        var scrollTop = $(window).scrollTop();
+        $('body').css({
+            position: 'fixed',
+            top: -scrollTop + 'px',
+            width: '100%'
+        }).data('scrollTop', scrollTop);
+    }).on('hidden.bs.modal', function () {
+        var scrollTop = $('body').data('scrollTop');
+        $('body').css({
+            position: '',
+            top: '',
+            width: ''
+        });
+        $(window).scrollTop(scrollTop);
+    });
+}
+handleModalShow('#imageModal');
+handleModalShow('#noImageModal');
+handleModalShow('#variantview'); // Already existing modal
+});
+function exportToExcel(tableId) {
+    var table = document.getElementById(tableId);
+    var rows = table.rows;
+    var csvContent = "";
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        for (var j = 0; j < row.cells.length; j++) {
+            var cellText = row.cells[j].innerText || row.cells[j].textContent;
+            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+        }
+        csvContent += "\n";
+    }
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, 'export.csv');
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) {
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "export.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
   function generatePDF(vehicleId) {
     var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');

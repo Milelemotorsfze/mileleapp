@@ -260,7 +260,7 @@ table.dataTable thead th select {
 @endif
   <div class="card-header">
     <h4 class="card-title">
-     Stock Info
+     Demand And Planining Vehicles Only
     </h4>
     <br>
     <!-- Chat Modal -->
@@ -461,54 +461,7 @@ table.dataTable thead th select {
       </div>
     </div>
   </div>
-</div>
-    <ul class="nav nav-pills nav-fill">
-      <!-- <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
-          <span class="badge badge-danger row-badge1 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection
-        <span class="badge badge-danger row-badge2 badge-notification"></span>
-        </a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab3">Incoming / Available Stock
-        <span class="badge badge-danger row-badge3 badge-notification"></span>
-        </a>
-      <!-- </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked
-        <span class="badge badge-danger row-badge4 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold
-        <span class="badge badge-danger row-badge5 badge-notification"></span>
-        </a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered
-        <span class="badge badge-danger row-badge6 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">All Vehicles
-          <span class="badge badge-danger row-badge7 badge-notification"></span>
-        </a>
-      </li>
-      @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-vehicles-only');
-      @endphp
-      @if ($hasPermission)
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Demand & Plaining Vehicles
-          <span class="badge badge-danger row-badge8 badge-notification"></span>
-        </a>
-      </li>
-      @endif
-    </ul>      
+</div>    
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
@@ -519,420 +472,6 @@ table.dataTable thead th select {
     var hasPricePermission = @json($hasPricePermission);
     var hasManagementPermission = @json($hasManagementPermission);
 </script>
-  <div class="tab-content">
-      <!-- <div class="tab-pane fade show active" id="tab1"> 
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample1')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
-            <thead class="bg-soft-secondary">
-                <tr>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>Estimated Arrival</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>  
-        </div>  
-      </div>  
-      <div class="tab-pane fade show" id="tab2">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample2')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <div class="tab-pane fade show active" id="tab3">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
-            <tr id="toggleButtonsRow3">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-            <th>Status</th>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasManagementPermission)
-                  <th>Vehicle Cost</th>
-                  @endif
-                  @if ($hasPricePermission)
-                     <th>Minimum Commission</th>
-                     <th>GP %</th>
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Aging</th>
-                  <th>GRN Report</th>
-                  <th>Reservation End</th>
-                  <th>Reservation Sales Person</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div> 
-      <!-- <div class="tab-pane fade show" id="tab4">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample4')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Reservation Start</th>
-                  <th>Reservation End</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <!-- <div class="tab-pane fade show" id="tab5">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample5')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <div class="tab-pane fade show" id="tab6">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
-            <tr id="toggleButtonsRow6">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasManagementPermission)
-                  <th>Vehicle Cost</th>
-                @endif
-                  @if ($hasPricePermission)
-                  <th>Minimum Commission</th>
-                  <th>GP %</th>
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>
-      <div class="tab-pane fade show" id="tab7">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample7')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
-            <tr id="toggleButtonsRow7">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-                  <th>Status</th>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasManagementPermission)
-                  <th>Vehicle Cost</th>
-                @endif
-                  @if ($hasPricePermission)
-                  <th>Minimum Commission</th>
-                  <th>GP %</th>
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>Reservation End</th>
-                  <th>Reservation Sales Person</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>
-      <div class="tab-pane fade show" id="tab8">
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -1000,7 +539,6 @@ table.dataTable thead th select {
             </table>
           </div> 
         </div>  
-      </div>
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1684,12 +1222,12 @@ $('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
         $('#dtBasicExample3_processing').hide();
     }
 });
-$('#dtBasicExample3 tbody').off('click', 'tr');
+$('#dtBasicExample3 tbody').off('click', 'td');
 $('#dtBasicExample3 tbody').on('click', 'td', function () {
     var table = $('#dtBasicExample3').DataTable();
     var cellIndex = table.cell(this).index().column; // Get the clicked cell's column index
     var columnHeader = table.column(cellIndex).header().innerText; // Get the header text of the clicked column
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -1698,12 +1236,12 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-    else if(columnHeader === 'Reservation End')
-    {
+    else if (columnHeader.includes('Reservation End')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
+    console.log("open booking");
         var data = table3.row(this).data();
         openBookingModal(data.id);
     @endif
@@ -1718,7 +1256,7 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         openenhancementModal(data.id);
     @endif
 }
-if (columnHeader === 'Ext Colour' || columnHeader === 'Int Colour') {
+if (columnHeader.includes('Ext Colour') || columnHeader.includes('Int Colour')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('editing-colours');
     @endphp
@@ -2346,7 +1884,7 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
     var columnHeader = table6.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -2812,7 +2350,7 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
     var columnHeader = table7.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
@@ -2821,7 +2359,7 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
-else if(columnHeader === 'Reservation End')
+else if(columnHeader.includes('Reservation End'))
 {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
@@ -3258,7 +2796,7 @@ $('#dtBasicExample8 tbody').on('click', 'td', function () {
     var columnHeader = table9.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader === 'Custom Inspection Number' || columnHeader === 'Custom Inspection Status') {
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
