@@ -540,6 +540,7 @@ table.dataTable thead th select {
                   <th>SO Date</th>
                   <th>SO Number</th>
                   <th>Sales Person</th>
+                  <th>Sales Remarks</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
                   <th>PDI Report</th>
@@ -691,6 +692,7 @@ table.dataTable thead th select {
 },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
+                { data: 'sales_remarks', name: 'vehicles.sales_remarks' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
                 {
     data: 'gdndate',
