@@ -1,6 +1,48 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    /* Ensure table rows do not wrap text */
+table.dataTable {
+    font-size: 12px; /* Decrease font size */
+    white-space: nowrap; /* Prevent text from wrapping into multiple lines */
+}
+/* Reduce padding for table cells */
+.table>tbody>tr>td, 
+.table>tbody>tr>th, 
+.table>tfoot>tr>td, 
+.table>tfoot>tr>th, 
+.table>thead>tr>td, 
+.table>thead>tr>th {
+    padding: 2px 3px; /* Decrease the padding */
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
+{
+   padding: 1px; 
+}
+/* Reduce the height of the rows */
+#dtBasicExample7 tbody tr {
+    height: 20px; /* Set a smaller height for the rows */
+}
+
+/* Adjust the header row to reduce space */
+#dtBasicExample7 thead th {
+    padding: 4px 5px; /* Reduce padding in the header */
+    font-size: 13px;  /* Slightly reduce the font size in the header */
+    white-space: nowrap; /* Prevent header text from wrapping */
+}
+.table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+    white-space: nowrap; /* Prevent text wrapping in table cells */
+}
+
+/* Ensure the table container takes the full height available */
+.table-responsive {
+    height: 80vh;
+    overflow-y: auto;
+}
    .btn-outline-primary {
     margin-bottom: 5px;
     width: 100%;
@@ -260,7 +302,7 @@ table.dataTable thead th select {
 @endif
   <div class="card-header">
     <h4 class="card-title">
-     Stock Info
+     Incoming and Available Vehicles
     </h4>
     <br>
     <!-- Chat Modal -->
@@ -480,7 +522,7 @@ table.dataTable thead th select {
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-<div class="table-responsive" style="height: 74vh;">
+<div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow3">
@@ -488,7 +530,22 @@ table.dataTable thead th select {
             </tr>
             <tr>
             <th>Status</th>
-            <th>Brand</th>
+            <th>PO</th>
+                  <th>PO Date</th>
+                  <th>Estimated Arrival</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>Inspection Date</th>
+                  <th>Inspection Remarks</th>
+                  <th>GRN Report</th>
+                  <th>Aging</th>
+                  <th>Reservation End</th>
+                  <th>Reservation Sales Person</th>
+                  <th>SO Date</th>
+                  <th>So Number</th>
+                  <th>Sales Person</th>
+                  <th>PDI Report</th>
+                  <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -514,20 +571,6 @@ table.dataTable thead th select {
                      <th>GP %</th>
                     <th>Price</th>
                 @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Aging</th>
-                  <th>GRN Report</th>
-                  <th>Reservation End</th>
-                  <th>Reservation Sales Person</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
@@ -564,6 +607,139 @@ table.dataTable thead th select {
 var now = new Date();
     var columns3 = [
         { data: 'id', name: 'vehicles.id' },
+        { data: 'po_number', name: 'purchasing_order.po_number' },
+        {
+    data: 'po_date',
+    name: 'purchasing_order.po_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+{
+    data: 'estimation_date',
+    name: 'vehicles.estimation_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'grn_number', name: 'grn.grn_number' },
+        {
+    data: 'date',
+    name: 'grn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        {
+    data: 'inspection_date',
+    name: 'vehicles.inspection_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'grn_remark', name: 'vehicles.grn_remark' },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+        { 
+            data: null,
+            render: function(data, type, row) {
+                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
+                var currentDate = new Date();
+                var timeDiff = currentDate - grnDate;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
+
+                return daysDiff + ' days';
+            },
+            searchable: false, // Disable searching for this column
+            orderable: false // Disable ordering from the server-side for this column
+        },
+        {
+    data: 'reservation_end_date',
+    name: 'vehicles.reservation_end_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'bpn', name: 'bp.name' },
+        {
+    data: 'so_date',
+    name: 'so.so_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'so_number', name: 'so.so_number' },
+        { data: 'spn', name: 'sp.name' },
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
         { data: 'brand_name', name: 'brands.brand_name' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
         { data: 'model_detail', name: 'varaints.model_detail' },
@@ -692,124 +868,6 @@ var now = new Date();
         });
     }
     columns3.push(
-        { data: 'po_number', name: 'purchasing_order.po_number' },
-        {
-    data: 'po_date',
-    name: 'purchasing_order.po_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        { data: 'grn_number', name: 'grn.grn_number' },
-        {
-    data: 'date',
-    name: 'grn.date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        {
-    data: 'inspection_date',
-    name: 'vehicles.inspection_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        { data: 'grn_remark', name: 'vehicles.grn_remark' },
-        { 
-            data: null,
-            render: function(data, type, row) {
-                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
-                var currentDate = new Date();
-                var timeDiff = currentDate - grnDate;
-                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
-
-                return daysDiff + ' days';
-            },
-            searchable: false, // Disable searching for this column
-            orderable: false // Disable ordering from the server-side for this column
-        },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        {
-    data: 'reservation_end_date',
-    name: 'vehicles.reservation_end_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        { data: 'bpn', name: 'bp.name' },
-        {
-    data: 'so_date',
-    name: 'so.so_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        { data: 'so_number', name: 'so.so_number' },
-        { data: 'spn', name: 'sp.name' },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.pdi_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
         { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
