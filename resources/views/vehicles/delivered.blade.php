@@ -681,7 +681,6 @@ var columns6 = [
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                console.log(row);
                 if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
