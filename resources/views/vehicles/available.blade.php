@@ -328,6 +328,30 @@ table.dataTable thead th select {
     </div>
   </div>
 </div>
+<div class="modal fade" id="remarksModal" tabindex="-1" role="dialog" aria-labelledby="remarksModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="remarksForm" method="POST" action="{{ route('vehicles.savesalesremarks') }}">
+                @csrf
+                <input type="hidden" name="vehicle_remarks_id" id="vehicle_remarks_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="remarksModalLabel">Sales Remarks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="remarks">Remarks</label>
+                        <textarea class="form-control" id="salesremarks" name="salesremarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -542,6 +566,7 @@ table.dataTable thead th select {
                   <th>SO Date</th>
                   <th>So Number</th>
                   <th>Sales Person</th>
+                  <th>Sales Remarks</th>
                   <th>PDI Report</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -725,11 +750,11 @@ var now = new Date();
 },
         { data: 'so_number', name: 'so.so_number' },
         { data: 'spn', name: 'sp.name' },
+        { data: 'sales_remarks', name: 'vehicles.sales_remarks' },
         { 
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                console.log(row);
                 if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
@@ -1104,9 +1129,17 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
     @if ($hasPermission)
-    console.log("open booking");
         var data = table3.row(this).data();
         openBookingModal(data.id);
+    @endif
+    }
+    else if (columnHeader.includes('Sales Remarks')) {
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+    @endphp
+    @if ($hasPermission)
+        var data = table3.row(this).data();
+        openremarksModal(data.id);
     @endif
     }
     else if(columnHeader === 'Variant Detail')
@@ -1369,6 +1402,21 @@ function displayGallery(imageUrls) {
 }
 </script>
 <script>
+    function openremarksModal(vehicleId) {
+    $('#vehicle_remarks_id').val(vehicleId);
+        $.ajax({
+        url: '/get-sales-remarks',
+        type: 'GET',
+        data: { vehicle_id: vehicleId },
+        success: function(response) {
+            $('#salesremarks').val(response.sales_remarks);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+    $('#remarksModal').modal('show');
+}
  function openBookingModal(vehicleId) {
     // Set the vehicle ID in the hidden input field
     $('#vehicle_id').val(vehicleId);
@@ -1464,6 +1512,32 @@ function openeditingcolorModal(vehicleId) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
     }
+    $('#remarksForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#remarksModal').modal('hide');
+            alert('Remarks saved successfully.');
+            location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
     $('#bookingForm').on('submit', function(e) {
     e.preventDefault();
     var formData = $(this).serialize();

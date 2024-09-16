@@ -3442,6 +3442,7 @@ public function availablevehicles(Request $request)
                         'warehouse.name as location',
                          'purchasing_order.po_date',
                          'vehicles.estimation_date',
+                         'vehicles.sales_remarks',
                          'vehicles.ppmmyyy',
                          DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
                         'vehicles.reservation_end_date',
@@ -3608,6 +3609,7 @@ public function availablevehicles(Request $request)
                     'vehicles.vin',
                     'vehicles.price',
                     'vehicles.territory',
+                    'vehicles.sales_remarks',
                     'vehicles.minimum_commission',
                     'vehicles.custom_inspection_number',
                     'vehicles.custom_inspection_status',
@@ -3764,6 +3766,7 @@ COALESCE(
                     'vehicles.grn_id',
                     'vehicles.gdn_id',
                     'vehicles.estimation_date',
+                    'vehicles.sales_remarks',
                     'vehicles.gp',
                     'vehicles.territory',
                     'vehicles.inspection_date',
@@ -3848,5 +3851,32 @@ COALESCE(
             }
             }
         return view('vehicles.demandplaninigstock', ['salesperson' => $sales_persons]);
+    }
+    public function savesalesremarks(Request $request)
+    {
+        $vehicle_id = $request->input('vehicle_remarks_id');
+        $salesremarks = $request->input('salesremarks');
+        $vehicle = vehicles::find($vehicle_id);
+        if ($vehicle) {
+            $vehicle->sales_remarks = $salesremarks;
+            $vehicle->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Vehicle not found']);
+        }
+    }
+    public function getsalesremarks(Request $request)
+    {
+        // Find the vehicle by ID and fetch its custom inspection details
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
+        if ($vehicle) {
+            // Return the custom inspection number and status
+            return response()->json([
+                'sales_remarks' => $vehicle->sales_remarks, // Replace with the actual column
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
     }
     }

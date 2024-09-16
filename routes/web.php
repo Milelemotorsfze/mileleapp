@@ -1000,5 +1000,7 @@ Route::get('/d', function () {
     Route::match(['get', 'post'], 'vehicles/available', [VehiclesController::class, 'availablevehicles'])->name('vehicles.availablevehicles');
     Route::match(['get', 'post'], 'vehicles/delivered', [VehiclesController::class, 'deliveredvehicles'])->name('vehicles.deliveredvehicles');
     Route::match(['get', 'post'], 'vehicles/dpvehicles', [VehiclesController::class, 'dpvehicles'])->name('vehicles.dpvehicles');
+    Route::post('/sales-remarks', [VehiclesController::class, 'savesalesremarks'])->name('vehicles.savesalesremarks');
+    Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
 });
 
