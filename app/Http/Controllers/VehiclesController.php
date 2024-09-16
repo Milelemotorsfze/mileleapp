@@ -3217,7 +3217,7 @@ return response()->json(['success' => 'Vehicle updated successfully']);
         $vehicle->custom_inspection_number = $request->input('custom_inspection_number');
         $vehicle->custom_inspection_status = $request->input('custom_inspection_status');
         $vehicle->save();
-        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
     public function getReservation(Request $request)
 {
@@ -3253,7 +3253,7 @@ public function saveenhancement(Request $request)
         $vehicleslog->created_by = auth()->user()->id;
         $vehicleslog->role = Auth::user()->selectedRole;
         $vehicleslog->save();
-        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
     public function getVariants(Request $request)
     {
@@ -3344,7 +3344,7 @@ public function saveenhancement(Request $request)
         $vehicleslog->role = Auth::user()->selectedRole;
         $vehicleslog->save();
         }
-        return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }  
     public function getCustomInspectionData(Request $request)
 {
