@@ -205,7 +205,6 @@
                             <div class="row customer-doc-div" >
                                
                             </div>
-                            
                         </div>
                     </div>
                     <div class="row mb-3 mt-3">
@@ -252,9 +251,7 @@
                         </div>
                     </div>
                     
-                 
-
-                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
+                 <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
                         <span id="country-comment"></span><br>
                     </div>
                     <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="loi-country-validation-div">                       
@@ -342,7 +339,7 @@
                     </select>
                     <input type="hidden" value="0" name="is_passport_added" id="add-passport-to-loi">
                     <input type="hidden" value="0" name="is_trade_license_added" id="add-trade-license-to-loi">
-                   
+                    
                 </form>
             </div>
             </div>
@@ -357,6 +354,7 @@
         let formValid = true;
         let previousSelected = $('#customer-type').val();
         let customerDocumetIds = [];
+    
         // const fileInputLicense = document.querySelector("#file-upload");
         // const previewFile = document.querySelector("#file-preview");
       
@@ -690,6 +688,11 @@
         }
          
         function showCustomerDocuments() {
+            // clear existing doc selected data
+            $('#add-passport-to-loi').val(0);
+            $('#add-trade-license-to-loi').val(0);
+            $('#customer_other_documents').empty();
+
             let client_id = $('#customer').val();
             let url = '{{ route('loi.customer-documents') }}';
             if(client_id.length > 0) {
@@ -754,8 +757,7 @@
                                         </div>
                                         `);                       
                                 });
-                            }
-                                     
+                            }                                   
                         }
                         if(otherDocuments.length <= 0 && data.passort_file && data.trade_license_file)
                         {
@@ -785,7 +787,7 @@
             customerDocumetIds = jQuery.grep(customerDocumetIds, function(value) {
                 return value != id;
                 });
-            $(".customer_other_documents option[value='"+id+"']").remove();
+            $("#customer_other_documents option[value='"+id+"']").remove();
             $('#add-LOI-'+id).attr('hidden',false);
             $('#remove-LOI-'+id).attr('hidden', true);
             console.log("after removal array values");
@@ -796,16 +798,19 @@
             $('#add-passport-to-loi').val(1);
             $('.add-passport-LOI').attr('hidden', true);
             $('.remove-passport-LOI').attr('hidden', false);
+           
         }
         function removePassportFromLOI() {
             $('#add-passport-to-loi').val(0);
             $('.add-passport-LOI').attr('hidden', false);
             $('.remove-passport-LOI').attr('hidden', true);
+          
         }
         function addTradeDocToLOI() {
             $('#add-trade-license-to-loi').val(1);
             $('.add-trade-license-LOI').attr('hidden', true);
             $('.remove-trade-license-LOI').attr('hidden', false);
+           
         }
         function removeTradeDocFromLOI() {
             $('#add-trade-license-to-loi').val(0);
@@ -1310,15 +1315,26 @@
             e.preventDefault();
             uniqueCheckSoNumber();
             let isvalidCountryCheck = $('#is-country-validation-error').val();
-            if (formValid == true && isvalidCountryCheck == 0) {
-                if($("#form-create").valid()) {
-                    $('#form-create').unbind('submit').submit();
-                    // alert("submit");
+            let ispassportAdded = $('#add-passport-to-loi').val();
+            let isTradeLicenseAdded = $('#add-trade-license-to-loi').val();
+            let customerOtherDocAddedCount = $('#customer_other_documents option').length;
+            // check the form
+            if(ispassportAdded == 1 || isTradeLicenseAdded == 1 || customerOtherDocAddedCount > 0) {
+                if (formValid == true && isvalidCountryCheck == 0) {
+                    if($("#form-create").valid()) {
+                        $('#form-create').unbind('submit').submit();
+                        // alert("submit");
+                        e.preventDefault();
+                    }
+                }else{
                     e.preventDefault();
                 }
             }else{
+                var confirm = alertify.confirm('Atleast one Customer Document Required',function (e) {
+                }).set({title:"Error !"})
                 e.preventDefault();
             }
+            
         
             // alert(formValid);
            

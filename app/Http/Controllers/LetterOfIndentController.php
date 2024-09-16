@@ -560,6 +560,7 @@ class LetterOfIndentController extends Controller
                     ->get();
         $isCustomerPassport = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                                 ->where('is_passport',true)->first();
+                            
         $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                                     ->where('is_trade_license',true)->first();
         $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
@@ -570,7 +571,6 @@ class LetterOfIndentController extends Controller
         $customerOtherDocNotAdded = clientDocument::where('client_id',$letterOfIndent->client_id)
                                         ->whereNotIn('document', $customerOtherDocAddedArray)
                                         ->get(); 
-
 
         $salesPersons = User::where('status','active')->get();
 
@@ -707,6 +707,20 @@ class LetterOfIndentController extends Controller
                         $LoiDocument->save();
                     }
                 }
+                if($request->is_passport_added == 1) {
+                    $LoiDocument = new LetterOfIndentDocument();
+                    $LoiDocument->loi_document_file = $customer->passport;
+                    $LoiDocument->letter_of_indent_id = $LOI->id;
+                    $LoiDocument->is_passport = true;
+                    $LoiDocument->save();
+                }
+                if($request->is_trade_license_added == 1) {
+                    $LoiDocument = new LetterOfIndentDocument();
+                    $LoiDocument->loi_document_file = $customer->tradelicense;
+                    $LoiDocument->letter_of_indent_id = $LOI->id;
+                    $LoiDocument->is_trade_license = true;
+                    $LoiDocument->save();
+                }
 
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();
                 $updatedRows = [];
@@ -840,7 +854,6 @@ class LetterOfIndentController extends Controller
     }
     public function updateComment(Request $request) {
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');
-        info($request->all());
         $LOI = LetterOfIndent::find($request->id);
         $LOI->comments = $request->comments;
         $LOI->save();

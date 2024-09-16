@@ -194,8 +194,8 @@
                         </div>
                     </div>
                     <!-- Customer Documents -->
-                   
-                    <div class="card mb-3 mt-3">
+              
+                    <div class="card mb-3 mt-3" id="customer-files">
                         <div class="card-header">
                             <h4 class="card-title">
                                  Customer Documents
@@ -203,7 +203,8 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                         
+                                <div class="col-lg-3 col-md-6 col-sm-12 text-center sign-div">
                                     <div class="mb-3" id="signature-preview">
                                         @if($letterOfIndent->signature)
                                         <label class="text-center">Signature File</label>
@@ -212,52 +213,52 @@
                                         @endif
                                     </div>
                                 </div>
-                                @if($letterOfIndent->LOIDocuments->count() > 0)
+                            </div>
+                            
+                            <div class="row customer-doc-div">
                                     <!-- consider the LOI selected customer passport or any doc and current passport or any doc, it may differ -->
-                                    @if($isCustomerPassport)
-                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                            <label> Passport </label>
-                                            <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
-                                            <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-passport-button"
-                                            onclick="addPassportToLOI()" >
-                                                Add to LOI </button>
-                                            <button type="button"  class="btn btn-danger btn-sm text-center mt-2 remove-passport-button"
-                                            onclick="removePassportFromLOI()">
-                                            Remove From LOI </button>   
-                                        </div>
-                                    @elseif($letterOfIndent->client->passport)
-                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                            <label> Passport </label>
-                                            <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
-                                            <button type="button" onclick="addPassportToLOI()" class="btn btn-info btn-sm text-center mt-2 add-passport-button">
-                                                Add to LOI </button>
-                                            <button type="button" hidden onclick="removePassportFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-passport-button">
-                                            Remove From LOI </button>               
-                                        </div>  
-                                    @endif
-                                    @if($isCustomerTradeLicense)  
-                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                            <label> Trade License </label>
-                                            <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"></iframe>
-                                            <button type="button" hidden onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
-                                            Add to LOI </button>    
-                                            <button type="button" onclick="removeTradeDocFromLOI()"  class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
-                                            Remove From LOI </button>
-                                        </div>
-                                    @elseif($letterOfIndent->client->tradelicense)
-                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                            <label> Trade License  </label>
-                                            <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
-                                            <button type="button" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button"
-                                            onclick="addTradeDocToLOI()">
-                                                    Add to LOI </button>    
-                                            <button type="button" hidden onclick="removeTradeDocFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
-                                            Remove From LOI </button>     
-                                        </div>    
-                                    @endif
-                                    @if($letterOfIndent->client->clientDocuments->count() > 0 )
-                                        <label class="text-center"> Other Documents </label>
-
+                                @if($isCustomerPassport)
+                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <label> Passport </label>
+                                        <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
+                                        <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-passport-button"
+                                        onclick="addPassportToLOI()" >
+                                            Add to LOI </button>
+                                        <button type="button"  class="btn btn-danger btn-sm text-center mt-2 remove-passport-button"
+                                        onclick="removePassportFromLOI()">
+                                        Remove From LOI </button>   
+                                    </div>
+                                @elseif($letterOfIndent->client->passport)          
+                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <label> Passport </label>
+                                        <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
+                                        <button type="button" onclick="addPassportToLOI()" class="btn btn-info btn-sm text-center mt-2 add-passport-button">
+                                            Add to LOI </button>
+                                        <button type="button" hidden onclick="removePassportFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-passport-button">
+                                        Remove From LOI </button>               
+                                    </div>  
+                                @endif
+                                @if($isCustomerTradeLicense)  
+                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <label> Trade License </label>
+                                        <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"></iframe>
+                                        <button type="button" hidden onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
+                                        Add to LOI </button>    
+                                        <button type="button" onclick="removeTradeDocFromLOI()"  class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
+                                        Remove From LOI </button>
+                                    </div>
+                                @elseif($letterOfIndent->client->tradelicense)
+                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <label> Trade License  </label>
+                                        <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
+                                        <button type="button" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button"
+                                        onclick="addTradeDocToLOI()"> Add to LOI </button>    
+                                        <button type="button" hidden onclick="removeTradeDocFromLOI()" class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
+                                        Remove From LOI </button>     
+                                    </div>    
+                                @endif
+                                @if($letterOfIndent->client->clientDocuments->count() > 0 )
+                                    <label class="text-center"> Other Documents </label>
                                         @foreach($customerOtherDocAdded as $key => $CustomerOtherDoc)
                                             <div class="col-lg-3 col-md-6 col-sm-12 text-center">
                                                 <iframe src="{{ url('customer-other-documents/'.$CustomerOtherDoc->loi_document_file) }}"></iframe>
@@ -269,19 +270,18 @@
                                                     Add to LOI </button>
                                             </div>
                                         @endforeach
-                                        <!--  refereing the client document table for not added Document -->
-                                        @foreach($customerOtherDocNotAdded as $docNotAdded)
-                                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                                <iframe src="{{ url('customer-other-documents/'.$docNotAdded->document) }}"></iframe>
-                                                <button type="button" onclick="addDocToLOI({{ $docNotAdded->id }})"  class="btn btn-info btn-sm text-center mt-2 "
-                                                id="add-other-doc-{{ $docNotAdded->id }}" > Add to LOI </button>
+                                    <!--  refereing the client document table for not added Document -->
+                                    @foreach($customerOtherDocNotAdded as $docNotAdded)
+                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                            <iframe src="{{ url('customer-other-documents/'.$docNotAdded->document) }}"></iframe>
+                                            <button type="button" onclick="addDocToLOI({{ $docNotAdded->id }})"  class="btn btn-info btn-sm text-center mt-2 "
+                                            id="add-other-doc-{{ $docNotAdded->id }}" > Add to LOI </button>
 
-                                                <button type="button" hidden onclick="removeDocToLOI({{ $docNotAdded->id }})"
-                                                 id="remove-other-doc-{{ $docNotAdded->id }}" class="btn btn-danger btn-sm text-center mt-2 ">
-                                                Remove From LOI </button>
-                                            </div>
-                                        @endforeach
-                                     @endif
+                                            <button type="button" hidden onclick="removeDocToLOI({{ $docNotAdded->id }})"
+                                            id="remove-other-doc-{{ $docNotAdded->id }}" class="btn btn-danger btn-sm text-center mt-2 ">
+                                            Remove From LOI </button>
+                                        </div>
+                                    @endforeach
                                 @endif
                             </div>     
                         </div>
@@ -424,15 +424,13 @@
                     </select>
                     <select name="customer_other_documents_Ids[]" id="added-customer-docs" hidden="hidden" multiple>
                     </select>
-                    <input type="hidden" value="@if($isCustomerPassport) 1 @else 0 @endif" name="is_passport_added" id="add-passport-to-loi">
-                    <input type="hidden" value="@if($isCustomerTradeLicense) 1 @else 0 @endif" name="is_trade_license_added" id="add-trade-license-to-loi">
+                    <input type="hidden" value="{{ $isCustomerPassport ? 1 : 0 }}" name="is_passport_added" id="add-passport-to-loi">
+                    <input type="hidden" value="{{ $isCustomerTradeLicense ? 1 : 0 }}" name="is_trade_license_added" id="add-trade-license-to-loi">
                    
-                    <!-- <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" > -->
+                    <!-- <input type="hidden" id="other-document-count" value="{{ $customerOtherDocAdded->count() }}" > -->
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
                     </div>
-
-
                 </form>
             </div>
             <input type="hidden" id="is-country-validation-error" value="0">
@@ -518,6 +516,7 @@
                 maximumSelectionLength: 1,
             }).on('change', function() {
                 getCustomers();
+                $('.customer-doc-div').html('');
               
             });
             $('#customer').select2({
@@ -527,7 +526,15 @@
             }).on('change', function() {
                 $('#customer-error').remove();
                 checkCountryCriterias();
+                let customer = $('#customer').val();
+                if(customer.length > 0) {
+                    showCustomerDocuments();
+                }else{
+                    // $('#customer-files').attr('hidden',true);
+                    $('.customer-doc-div').html('');
+                }
             });
+
             $('#dealer').change(function () {
                 var value = $('#dealer').val();
                 $('#dealer-input').val(value);
@@ -552,6 +559,7 @@
    
             $('#customer-type').change(function () {
                 getCustomers();
+               
                 let customerType = $('#customer-type').val();
             
                 var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Customer Type!',function (e) {
@@ -571,6 +579,7 @@
                             $('#template-type option[value=individual]').prop('disabled', false);
                             $('#template-type option[value=business]').prop('disabled', false);
                         }
+                        $('.customer-doc-div').html('');
                        
                     }
                 }).set({title:"Are You Sure?"}).set('oncancel', function(closeEvent){ 
@@ -581,6 +590,7 @@
              
             });
 
+
         $('.remove-signature-button').click(function () {
             $('#is_signature_removed').val(1);
             $('#signature-preview').hide();
@@ -589,6 +599,88 @@
         $(document.body).on('input', ".quantities", function (e) {
             checkCountryCriterias();
         });
+        function showCustomerDocuments() {
+            $('#add-passport-to-loi').val(0);
+            $('#add-trade-license-to-loi').val(0);
+            $('#added-customer-docs').empty();
+            $('#deleted-docs').empty();
+
+            let client_id = $('#customer').val();
+            let url = '{{ route('loi.customer-documents') }}';
+            if(client_id.length > 0) {
+                $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    client_id: client_id[0],
+                
+                },
+                 success:function (data){
+                    console.log(data);
+                    let otherDocuments = data.customer_documents;
+                    
+                    if(otherDocuments.length > 0 || data.passport_file || data.trade_license_file)
+                        {
+                            $('#customer-files').attr('hidden',false);
+                            if(data.passport_file)
+                            {
+                                let passportUrl = 'storage/app/public/passports/'+data.passport_file;
+                                $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <h6>Passport</h6>
+                                        <iframe src="{{ url('${passportUrl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button"  onclick="addPassportToLOI()" 
+                                        class="btn btn-info btn-sm text-center mt-2 add-passport-LOI">
+                                        Add to LOI </a>
+                                        <button type="button"  hidden onclick="removePassportFromLOI()"
+                                         class="btn btn-danger btn-sm text-center mt-2 remove-passport-LOI">
+                                            Remove From LOI </a>
+                                    </div>
+                                    `);  
+                            }
+                            if(data.trade_license_file)
+                            {
+                                let tradelicenseUrl = 'storage/app/public/tradelicenses/'+ data.trade_license_file;
+                                $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <h6>Trade License</h6>
+                                        <iframe src="{{ url('${tradelicenseUrl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button" onclick="addTradeDocToLOI()" 
+                                        class="btn btn-info btn-sm text-center mt-2 add-trade-license-LOI">
+                                        Add to LOI </a>
+                                        <button type="button" hidden onclick="removeTradeDocFromLOI()"
+                                         class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-LOI">
+                                            Remove From LOI </a>
+                                    </div>
+                                    `); 
+                                
+                            }           
+                            $(otherDocuments.length > 0 )
+                            {
+                                $('.customer-doc-div').append(`<h6 class="text-center mt-2">Other Documents</h6>`);
+                                jQuery.each(otherDocuments, function(key,value){
+                                    let fileurl = 'customer-other-documents/'+value.document;
+                                    let id = value.id;
+                                    $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <iframe src="{{ url('${fileurl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button" id="add-LOI-${id}" onclick="addtoLOI(${id})" class="btn btn-info btn-sm text-center mt-2">
+                                        Add to LOI </button>
+                                       <button type="button" id="remove-LOI-${id}" onclick="removeFromLOI(${id})" hidden class="btn btn-danger btn-sm text-center mt-2">
+                                        Remove From LOI </button>
+                                        </div>
+                                        `);                       
+                                });
+                            }
+                                     
+                        }
+                        if(otherDocuments.length <= 0 && data.passort_file && data.trade_license_file)
+                        {
+                            $('#customer-files').attr('hidden',true);
+                            $('.customer-doc-div').html();
+                        }                  
+                    }
+                });
+            }
+        }
 
         function checkCountryCriterias() {
             // console.log('reached');
@@ -699,6 +791,7 @@
                 $('#remove-customer-doc-'+id).attr('hidden', false);
                 let type = "add";
                 updateDocumentCount(type); 
+                // other-document-count
                 
             });
            
@@ -728,44 +821,47 @@
                 updateDocumentCount(type);
             }
             function updateDocumentCount(type) {
-                console.log(totalDocumentCount);
-
                 if(type == 'add') {
                     console.log('add');
                     totalDocumentCount = parseInt(totalDocumentCount) + 1;
                 }else{
-                    console.log('subtract')
+                    console.log('subtract');
                     if(totalDocumentCount > 0) {
                         totalDocumentCount = parseInt(totalDocumentCount) - 1;                   
                     }
-                 
-                }
+                  }
                 console.log("totalDocumentCount");
                 console.log(totalDocumentCount);
-               
             }
+
             function addPassportToLOI() {
                 $('#add-passport-to-loi').val(1);
                 $('.add-passport-button').attr('hidden', true);
                 $('.remove-passport-button').attr('hidden', false);
+                let type = 'add';
+                updateDocumentCount(type);
             }
             function removePassportFromLOI() {
                 $('#add-passport-to-loi').val(0);
                 $('.add-passport-button').attr('hidden', false);
                 $('.remove-passport-button').attr('hidden', true);
+                let type = 'subtract';
+                updateDocumentCount(type);
             }
             function addTradeDocToLOI() {
                 $('#add-trade-license-to-loi').val(1);
                 $('.add-trade-license-button').attr('hidden', true);
                 $('.remove-trade-license-button').attr('hidden', false);
+                let type = 'add';
+                updateDocumentCount(type);
             }
             function removeTradeDocFromLOI() {
                 $('#add-trade-license-to-loi').val(0);
                 $('.add-trade-license-button').attr('hidden', false);
                 $('.remove-trade-license-button').attr('hidden', true);
+                let type = 'subtract';
+                updateDocumentCount(type);
             }
-
-
 
 
             ////////////////////////////////////
@@ -1369,14 +1465,24 @@
         $('#submit-button').click(function (e) {
             e.preventDefault();
             let isValidCountryCheck = $('#is-country-validation-error').val();
+            let ispassportAdded = $('#add-passport-to-loi').val();
+            let isTradeLicenseAdded = $('#add-trade-license-to-loi').val();
+            // alert(ispassportAdded);
+            // alert(totalDocumentCount);
             uniqueCheckSoNumber();
-            if (formValid == true && isValidCountryCheck == 0) {
-                if($("#form-update").valid()) {
-                    $('#form-update').unbind('submit').submit();
+            if(ispassportAdded == 1 || isTradeLicenseAdded == 1 || totalDocumentCount > 0) {
+                if (formValid == true && isValidCountryCheck == 0) {
+                    if($("#form-update").valid()) {
+                        $('#form-update').unbind('submit').submit();
+                    }
+                }else{
+                    e.preventDefault();
                 }
             }else{
+                var confirm = alertify.confirm('Atleast one Customer Document Required',function (e) {
+                }).set({title:"Error !"});
                 e.preventDefault();
-            }
+            }            
         });
 
         function showSoNumberError($msg,i)
