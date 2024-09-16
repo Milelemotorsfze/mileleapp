@@ -981,7 +981,7 @@ var now = new Date();
         column.data().unique().sort().each(function (d, j) {
             if (d) {
                 // If this is the 'po_date' column, format the date
-                if (columnHeader === 'PO Date' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
