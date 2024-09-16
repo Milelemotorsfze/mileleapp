@@ -672,7 +672,6 @@ var now = new Date();
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                console.log(row);
                 if (row.grn_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
                 } else {

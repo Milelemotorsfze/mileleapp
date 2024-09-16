@@ -522,7 +522,7 @@ table.dataTable thead th select {
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-<div class="table-responsive" style="height: 74vh;">
+<div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow8">
@@ -536,6 +536,7 @@ table.dataTable thead th select {
                   <th>GRN</th>
                   <th>GRN Date</th>
                   <th>GRN Report</th>
+                  <th>Aging</th>
                   <th>SO Date</th>
                   <th>SO Number</th>
                   <th>Sales Person</th>
@@ -660,6 +661,19 @@ table.dataTable thead th select {
                 }
             }
         },
+        { 
+            data: null,
+            render: function(data, type, row) {
+                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
+                var currentDate = new Date();
+                var timeDiff = currentDate - grnDate;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
+
+                return daysDiff + ' days';
+            },
+            searchable: false, // Disable searching for this column
+            orderable: false // Disable ordering from the server-side for this column
+        },
                 {
     data: 'so_date',
     name: 'so.so_date',
@@ -697,7 +711,6 @@ table.dataTable thead th select {
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                console.log(row);
                 if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
