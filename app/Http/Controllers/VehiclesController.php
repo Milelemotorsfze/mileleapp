@@ -3441,6 +3441,7 @@ public function availablevehicles(Request $request)
                         'vehicles.id as id',
                         'warehouse.name as location',
                          'purchasing_order.po_date',
+                         'vehicles.estimation_date',
                          'vehicles.ppmmyyy',
                          DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
                         'vehicles.reservation_end_date',

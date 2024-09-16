@@ -40,7 +40,7 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 
 /* Ensure the table container takes the full height available */
 .table-responsive {
-    height: 74vh;
+    height: 80vh;
     overflow-y: auto;
 }
    .btn-outline-primary {
@@ -522,7 +522,7 @@ table.dataTable thead th select {
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-<div class="table-responsive" style="height: 74vh;">
+<div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow7">
