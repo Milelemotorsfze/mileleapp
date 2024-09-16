@@ -304,8 +304,6 @@ table.dataTable thead th select {
     <h4 class="card-title">
      Incoming and Available Vehicles
     </h4>
-    <br>
-    <!-- Chat Modal -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
