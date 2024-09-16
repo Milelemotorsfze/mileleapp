@@ -2774,6 +2774,7 @@ foreach ($variants as $variant) {
                         'vehicles.grn_id',
                         'vehicles.gdn_id',
                         'vehicles.gp',
+                        'vehicles.estimation_date',
                         'vehicles.territory',
                         'vehicles.inspection_date',
                         'vehicles.custom_inspection_number',

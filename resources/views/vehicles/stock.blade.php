@@ -1,6 +1,48 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+/* Ensure table rows do not wrap text */
+table.dataTable {
+    font-size: 12px; /* Decrease font size */
+    white-space: nowrap; /* Prevent text from wrapping into multiple lines */
+}
+/* Reduce padding for table cells */
+.table>tbody>tr>td, 
+.table>tbody>tr>th, 
+.table>tfoot>tr>td, 
+.table>tfoot>tr>th, 
+.table>thead>tr>td, 
+.table>thead>tr>th {
+    padding: 2px 3px; /* Decrease the padding */
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
+{
+   padding: 1px; 
+}
+/* Reduce the height of the rows */
+#dtBasicExample7 tbody tr {
+    height: 20px; /* Set a smaller height for the rows */
+}
+
+/* Adjust the header row to reduce space */
+#dtBasicExample7 thead th {
+    padding: 4px 5px; /* Reduce padding in the header */
+    font-size: 13px;  /* Slightly reduce the font size in the header */
+    white-space: nowrap; /* Prevent header text from wrapping */
+}
+.table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+    white-space: nowrap; /* Prevent text wrapping in table cells */
+}
+
+/* Ensure the table container takes the full height available */
+.table-responsive {
+    height: 74vh;
+    overflow-y: auto;
+}
    .btn-outline-primary {
     margin-bottom: 5px;
     width: 100%;
@@ -259,10 +301,9 @@ table.dataTable thead th select {
     </div>
 @endif
   <div class="card-header">
-    <h4 class="card-title">
+    <h6 class="card-title">
      All vehicles
-    </h4>
-    <br>
+    </h6>
     <!-- Chat Modal -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -485,28 +526,42 @@ table.dataTable thead th select {
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow7">
-                <!-- Toggle buttons will be added here dynamically -->
             </tr>
             <tr>
-                  <th>Status</th>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
+            <th>Status</th>
+            <th>PO</th>
+            <th>PO Date</th>
+            <th>Estimated Arrival</th>
+            <th>GRN</th>
+            <th>GRN Date</th>
+            <th>GRN Report</th>
+            <th>Aging</th>
+            <th>SO Date</th>
+            <th>SO Number</th>
+            <th>Sales Person</th>
+            <th>Reservation End</th>
+            <th>Reservation Sales Person</th>
+            <th>GDN</th>
+            <th>GDN Date</th>
+            <th>PDI Report</th>
+            <th>Brand</th>
+            <th>Model Line</th>
+            <th>Model Description</th>
+            <th>Variant</th>
+            <th>Variant Detail</th>
+            <th>VIN</th>
+            <th>Engine</th>
+            <th>MY</th>
+            <th>Steering</th>
+            <th>Fuel</th>
+            <th>Gear</th>
+            <th>Ext Colour</th>
+            <th>Int Colour</th>
+            <th>Upholstery</th>
+            <th>Production Year</th>
+            <th>Location</th>
+            <th>Territory</th>
+            <th>Preferred Destination</th>
                   @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
                 @endif
@@ -515,19 +570,6 @@ table.dataTable thead th select {
                   <th>GP %</th>
                     <th>Price</th>
                 @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>Reservation End</th>
-                  <th>Reservation Sales Person</th>
-                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
@@ -564,6 +606,138 @@ table.dataTable thead th select {
         var now = new Date();
         var columns7 = [
               { data: 'id', name: 'vehicles.id' },
+              { data: 'po_number', name: 'purchasing_order.po_number' },
+                {
+    data: 'po_date',
+    name: 'purchasing_order.po_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+{
+    data: 'estimation_date',
+    name: 'vehicles.estimation_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+                { data: 'grn_number', name: 'grn.grn_number' },
+                {
+    data: 'date',
+    name: 'grn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+{ 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
+{ 
+            data: null,
+            render: function(data, type, row) {
+                var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
+                var currentDate = new Date();
+                var timeDiff = currentDate - grnDate;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)); // Convert time difference to days
+
+                return daysDiff + ' days';
+            },
+            searchable: false, // Disable searching for this column
+            orderable: false // Disable ordering from the server-side for this column
+        },
+{
+    data: 'so_date',
+    name: 'so.so_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'spn', name: 'sp.name' },
+                {
+    data: 'reservation_end_date',
+    name: 'vehicles.reservation_end_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'bpn', name: 'bp.name' },
+                { data: 'gdn_number', name: 'gdn.gdn_number' },
+                {
+    data: 'gdndate',
+    name: 'gdn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                console.log(row);
+                if (row.pdi_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
+                }
+            }
+        },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -691,110 +865,6 @@ table.dataTable thead th select {
         });
     }
                 columns7.push(
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                {
-    data: 'po_date',
-    name: 'purchasing_order.po_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-                { data: 'grn_number', name: 'grn.grn_number' },
-                {
-    data: 'date',
-    name: 'grn.date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-{
-    data: 'so_date',
-    name: 'so.so_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'spn', name: 'sp.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                {
-    data: 'gdndate',
-    name: 'gdn.date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-                { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        {
-    data: 'reservation_end_date',
-    name: 'vehicles.reservation_end_date',
-    render: function(data, type, row) {
-        if (data) {
-            // Assuming data is in Y-m-d format (default SQL date format)
-            var dateObj = new Date(data);
-            var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric'
-            });
-            return formattedDate;
-        }
-        return ''; // If no date, return empty
-    }
-},
-        { data: 'bpn', name: 'bp.name' },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.pdi_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
@@ -911,7 +981,7 @@ table.dataTable thead th select {
         column.data().unique().sort().each(function (d, j) {
             if (d) {
                 // If this is the 'po_date' column, format the date
-                if (columnHeader === 'PO Date' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'GDN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'GDN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
@@ -1017,7 +1087,6 @@ $('#dtBasicExample7 tbody').on('click', 'td', function () {
 
     // Check for "Custom Inspection Number" column click
     if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
-        console.log('pouch');
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
         @endphp
