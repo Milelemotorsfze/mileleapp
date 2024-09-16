@@ -3763,6 +3763,7 @@ COALESCE(
                     'vehicles.id',
                     'vehicles.grn_id',
                     'vehicles.gdn_id',
+                    'vehicles.estimation_date',
                     'vehicles.gp',
                     'vehicles.territory',
                     'vehicles.inspection_date',
@@ -3846,6 +3847,6 @@ COALESCE(
                 return DataTables::of($data)->toJson();
             }
             }
-        return view('vehicles.delivered', ['salesperson' => $sales_persons]);
+        return view('vehicles.demandplaninigstock', ['salesperson' => $sales_persons]);
     }
     }
