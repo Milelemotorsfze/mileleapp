@@ -978,6 +978,12 @@
                                         <span data-key="t-extra-pages">Leads</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Sales Order</span>
+                                    </a>
+                                </li>
                                 @endif
                                 <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
