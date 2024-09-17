@@ -338,27 +338,29 @@ class MigrationDataCheckController extends Controller
                                 // return $letterOfIndentDocuments;
         foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
             info($letterOfIndentDocument);
-            $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
-            if(!$customerDoc) {
+            // $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
+            // if(!$customerDoc) {
                 info($letterOfIndentDocument->LOI->client->passport);
                 info($letterOfIndentDocument->LOI->client->tradelicense);
                 if($letterOfIndentDocument->LOI->client->passport || $letterOfIndentDocument->LOI->client->tradelicense) {
                     info("passport / treade license  exist");
                     $isPassport[] = $letterOfIndentDocument->loi_document_file;
-                   
+                    $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->LOI->client->tradelicense;
+                    $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->LOI->client->passport;
+                    $letterOfIndentDocument->save();
                 }
                     info("other doc exist");
-                    $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
-                    $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
+                //     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
+                //     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
        
-                   // return $new_path;
-                   File::copy($old_path, $new_path);
-                   $customerDoc = new clientDocument();
-                   $customerDoc->document = $letterOfIndentDocument->loi_document_file;
-                   $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
-                   $customerDoc->save();
+                //    // return $new_path;
+                //    File::copy($old_path, $new_path);
+                //    $customerDoc = new clientDocument();
+                //    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
+                //    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
+                //    $customerDoc->save();
                                    
-            }
+            // }
         }
         info("passport");
         info($isPassport);
