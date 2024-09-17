@@ -98,7 +98,7 @@ input[type=number]::-webkit-outer-spin-button {
             <select name="payment_term_id" class="form-select" id="payment_term" required>
                                 <option value="" selected>Select Payment Term</option>
                                 @foreach($payments as $payment)
-                                    <option value="{{ $payment->id }}">{{ $payment->name }}</option>
+                                    <option value="{{ $payment->id }}" {{ $payment->id == 1 ? 'selected' : '' }}>{{ $payment->name }}</option>
                                 @endforeach
                             </select>
         </div>
@@ -108,7 +108,9 @@ input[type=number]::-webkit-outer-spin-button {
             <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                                 <option value="" disabled>Select The Vendor</option>
                                 @foreach($vendors as $vendors)
-                                    <option value="{{ $vendors->id }}">{{ $vendors->supplier }}</option>
+                                <option value="{{ $vendors->id }}" {{ $vendors->id == 1149 ? 'selected' : '' }}>
+                {{ $vendors->supplier }}
+            </option>
                                 @endforeach
             </select>
         </div>
@@ -125,7 +127,7 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="basicpill-firstname-input" class="form-label">Currency: </label>
             <select class="form-control" autofocus name="currency" required>
                                     <option value="AED">AED</option>
-                                    <option value="USD">USD</option>
+                                    <option value="USD" selected>USD</option>
                                     <option value="EUR">EUR</option>
                                     <option value="GBP">GBP</option>
                                     <option value="JPY">JPY</option>
