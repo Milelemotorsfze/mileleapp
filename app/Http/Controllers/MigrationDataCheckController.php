@@ -11,7 +11,7 @@ use App\Models\LoiSoNumber;
 use App\Models\ClientCountry;
 use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
-use App\Models\clientDocument;
+use App\Models\ClientDocument;
 
 use Illuminate\Http\Request;
 
@@ -338,7 +338,7 @@ class MigrationDataCheckController extends Controller
                                 // return $letterOfIndentDocuments;
         foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
             info($letterOfIndentDocument);
-            $customerDoc = clientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
+            $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
             if(!$customerDoc) {
                 info($letterOfIndentDocument->LOI->client->passport);
                 info($letterOfIndentDocument->LOI->client->tradelicense);
