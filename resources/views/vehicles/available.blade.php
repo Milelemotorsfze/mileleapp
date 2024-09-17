@@ -551,6 +551,7 @@ table.dataTable thead th select {
                 <!-- Toggle buttons will be added here dynamically -->
             </tr>
             <tr>
+            <th>Ser No</th>
             <th>Status</th>
             <th>PO</th>
                   <th>PO Date</th>
@@ -629,6 +630,15 @@ table.dataTable thead th select {
         $(document).ready(function () {
 var now = new Date();
     var columns3 = [
+        {
+        data: null,
+        name: 'serial_number',
+        render: function (data, type, row, meta) {
+            return meta.row + 1;  // This will calculate the serial number based on the row index (meta.row) + 1
+        },
+        orderable: false,  // Disable ordering for this column
+        searchable: false  // Disable searching for this column
+    },
         { data: 'id', name: 'vehicles.id' },
         { data: 'po_number', name: 'purchasing_order.po_number' },
         {
