@@ -442,7 +442,7 @@ table.dataTable thead th select {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="booking_start_date">Custom Inspection Number</label>
+                        <label for="custom_inspection_number">Custom Inspection Number</label>
                         <input type="number" class="form-control" id="custom_inspection_number" name="custom_inspection_number" required>
                     </div>
                     <div class="form-group">
@@ -893,8 +893,20 @@ table.dataTable thead th select {
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
-        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
-        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
+        { 
+        data: 'custom_inspection_number', 
+        name: 'vehicles.custom_inspection_number',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+    { 
+        data: 'custom_inspection_status', 
+        name: 'vehicles.custom_inspection_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         {
     data: null,
     name: 'chat',
@@ -1617,8 +1629,28 @@ $('#custominspectionForm').on('submit', function(e) {
         data: formData,
         success: function(response) {
             $('#custominspectionModal').modal('hide');
-            alert('Custom Inspection Update Successfully.');
-            location.reload();
+            alertify.success('Custom Inspection Update Successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_idinspection').val();
+    console.log("Vehicle ID from form:", vehicleId);
+
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            custom_inspection_number: response.custom_inspection_number, // Update inspection number
+            custom_inspection_status: response.custom_inspection_status // Update inspection status
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
