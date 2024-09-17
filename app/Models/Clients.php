@@ -31,6 +31,10 @@ class Clients extends Model
     {
         return $this->hasMany(ClientCountry::class,'client_id','id');
     }
+    public function clientDocuments()
+    {
+        return $this->hasMany(ClientDocument::class,'client_id','id');
+    }
     public function getIsDeletableAttribute() {
 
         $isExistLOI = LetterOfIndent::where('client_id', $this->id)->count();
@@ -49,7 +53,10 @@ class Clients extends Model
                         if($isExistClientCountries <= 0) {
                             $isExistPFI = PFI::where('client_id', $this->id)->count();
                             if($isExistPFI <= 0) {
-                                return true;
+                                $isExistClientDocuments = ClientDocument::where('client_id', $this->id)->count();
+                                if($isExistClientDocuments <= 0) {
+                                    return true;
+                                }
                             }
                         }
                         

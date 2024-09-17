@@ -78,12 +78,6 @@
                             </div>
                         </div>
 
-{{--                        <div class="col-lg-3 col-md-6">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="choices-single-default" class="form-label">Company Name</label>--}}
-{{--                                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name" value="{{ old('company_name', $customer->company_name) }}">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
@@ -98,6 +92,12 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Other Document</label>
+                                <input type="file" class="form-control" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
                                 <textarea class="form-control" name="address" rows="5" cols="25">{{ old('address', $customer->address) }}</textarea>
                             </div>
@@ -105,46 +105,80 @@
                         <div class="col-lg-6 col-md-6" id="file-preview">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                            <div id="file1-preview">
-                                @if($customer->passport)
-                                    <h6 class="fw-bold text-center">Passport</h6>
-                                    <iframe src="{{ url('storage/app/public/passports/' . $customer->passport) }}" alt="Trade License "></iframe>
-
+                        <div class="card preview-file"> 
+                            <div class="card-header">
+                                <h4 class="card-title">Customer Document</h4> </div>
+                                <div class="card-body">
+                                    
+                                 <div class="row">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                        <div id="file1-preview">
+                                            @if($customer->passport)
+                                                <h6 class="fw-bold text-center">Passport</h6>
+                                                <iframe src="{{ url('storage/app/public/passports/' .$customer->passport) }}"
+                                                width="500px;" height="300px;" alt="Passport"></iframe>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                        <div id="file2-preview">
+                                            @if($customer->tradelicense)
+                                                <h6 class="fw-bold text-center">Trade License</h6>
+                                                <iframe src="{{ url('storage/app/public/tradelicenses/' .$customer->tradelicense) }}" 
+                                                width="500px;" height="300px;" alt="Trade License"></iframe>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @if($customer->clientDocuments->count() > 0)
+                                    <h6 class="fw-bold text-center other-doc-title p-2" style="background-color:#E9EAEC">Other Documents</h6>
+                                    <div class="row">
+                                        @foreach($customer->clientDocuments as $key => $customerDocument)
+                                        <div class="col-lg-4 col-md-12 col-sm-12 text-center" id="remove-doc-{{$customerDocument->id}}">
+                                            <iframe src="{{ url('customer-other-documents/' . $customerDocument->document) }}" alt="File"></iframe>
+                                            <a href="#"  data-id="{{ $customerDocument->id }}"
+                                            class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 @endif
-
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                        <div id="preview-other-documents">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+                                </select>
+                                 <input type="hidden" id="is-passport-or-trade-licence-added" value="{{ $ispassortOrTradeLicenseAvailable }}">
+                                <input type="hidden" id="remaining-customer-document-count" value="{{ $customer->clientDocuments->count() }}" >
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                            <div id="file2-preview">
-                                @if($customer->tradelicense)
-                                    <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('storage/app/public/tradelicenses/' . $customer->tradelicense) }}" alt="Trade License"></iframe>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="col-12 text-center mt-3">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary" id="submit-button">Submit</button>
                     </div>
+
                 </form>
             </div>
         @endif
     @endcan
 @endsection
 @push('scripts')
-    <script>
-
+    <script>       
+        let cusDocCount = '{{ $customer->clientDocuments->count() }}';
+        let deletedDocumetIds = [];
 
         const fileInputLicense1 = document.querySelector("#file1-upload");
         const fileInputLicense2 = document.querySelector("#file2-upload");
+        const fileInputLicense3 = document.querySelector("#file3-upload");
 
         const previewFile1 = document.querySelector("#file1-preview");
         const previewFile2 = document.querySelector("#file2-preview");
+        const previewFile3 = document.querySelector("#preview-other-documents");
 
         fileInputLicense1.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
             const files = event.target.files;
             while (previewFile1.firstChild) {
                 previewFile1.removeChild(previewFile1.firstChild);
@@ -168,8 +202,12 @@
                     previewFile1.appendChild(image);
                 }
             }
+            $('#is-passport-or-trade-licence-added').val(1);
+
         });
         fileInputLicense2.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile2.firstChild) {
                 previewFile2.removeChild(previewFile2.firstChild);
@@ -192,7 +230,45 @@
                     previewFile2.appendChild(image);
                 }
             }
+            $('#is-passport-or-trade-licence-added').val(1);
+
         });
+        
+        fileInputLicense3.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
+            const files = event.target.files;
+            while (previewFile3.firstChild) {
+                previewFile3.removeChild(previewFile3.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile3.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    console.log(image);
+                    previewFile3.appendChild(image);
+                }
+            }
+            let remainingCount = $('#remaining-customer-document-count').val(0);
+            let deletedCount = $('#deleted-docs option').length;
+            console.log(deletedCount);
+            let existingDocumentCount = cusDocCount - parseInt(deletedCount);
+            let totalDocumentCount = parseInt(existingDocumentCount) + parseInt(files.length);
+            $('#remaining-customer-document-count').val(totalDocumentCount);
+
+        });
+
 
         $('#country').select2({
             placeholder: 'Select Country'
@@ -216,7 +292,11 @@
                 },
                 trade_license_file:{
                      extension: "png|jpeg|jpg"
-                }
+                },
+                "other_document_file[]": {
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880 
+                },
             },
             messages: {
                 trade_license_file: {
@@ -224,9 +304,49 @@
                 },
                 passport_file:{
                     extension: "Please upload Image file format (png,jpeg,jpg)"
-                }
+                },
+                other_document_file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
+                },
             },
         });
+
+        $('.remove-doc-button').click(function () {
+                let id = $(this).attr('data-id');
+                console.log(id);
+                $('#remove-doc-'+id).remove();
+                deletedDocumetIds.push(id);
+                $('#deleted-docs').empty();
+
+                jQuery.each(deletedDocumetIds, function (key, value) {
+
+                    $('#deleted-docs').append('<option value="' + value + '" >' + value+ '</option>');
+                    $("#deleted-docs option").attr("selected", "selected");
+                });
+                let remainingCount = $('#remaining-customer-document-count').val();
+                    remainingCount = parseInt(remainingCount) - 1;
+                $('#remaining-customer-document-count').val(remainingCount);
+
+            });
+            $('#submit-button').click(function (e) {
+                    e.preventDefault();
+                let isFileCount = $('#remaining-customer-document-count').val();
+                let isPasssOrLicenseExist = $('#is-passport-or-trade-licence-added').val();
+                if (isFileCount > 0 || isPasssOrLicenseExist == 1) {
+                    if($("#form-update").valid()) {
+                        $('#form-update').unbind('submit').submit();
+                        // alert("submit");
+                        e.preventDefault();
+                    }
+                }else{
+                    var confirm = alertify.confirm('Atleast one Document Required',function (e) {
+                    }).set({title:"Error !"})
+                    e.preventDefault();
+                }
+            
+        });
+
+        
     </script>
 @endpush
 

@@ -93,7 +93,13 @@
     </div>
         <div class="row">
             @foreach($letterOfIndent->LOIDocuments as $LOIDocument)
-                 <img src="{{ public_path('LOI-Documents/'.$LOIDocument->loi_document_file) }}"  class="mt-2">
+                @if($letterOfIndentDocument->is_passport)
+                    <img src="{{ public_path('storage/app/public/passports/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
+                @elseif($letterOfIndentDocument->is_trade_license)
+                    <img src="{{ public_path('storage/app/public/tradelicenses/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
+                @else
+                    <img src="{{ public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
+                @endif
             @endforeach
         </div>
 </div>

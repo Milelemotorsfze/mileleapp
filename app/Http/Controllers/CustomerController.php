@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 use App\Models\ClientCountry;
+use App\Models\ClientDocument;
 use App\Models\MasterModelLines;
 use App\Models\UserActivities;
 use App\Models\Clients;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
 use Rap2hpoutre\FastExcel\FastExcel;
+use Illuminate\Support\Facades\File;
 use Storage;
 
 class CustomerController extends Controller
@@ -71,6 +73,7 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request->all();
         
         (new UserActivityController)->createActivity('New Customer Created');
 
@@ -80,7 +83,7 @@ class CustomerController extends Controller
             'type' => 'required',
         ]);
 
-            $isCustomerExist = Clients::where('name', $request->name)
+            $isCustomerExist = Clients::select('name','is_demand_planning_customer')->where('name', $request->name)
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
@@ -126,8 +129,26 @@ class CustomerController extends Controller
                 $client->tradelicense = $fileName2;
 
             }
-        
             $client->save();
+
+            if ($request->has('other_document_file'))
+            {
+                foreach ($request->file('other_document_file') as $key => $file) {
+
+                    $extension = $file->getClientOriginalExtension();
+                    $clientfileName = $key.time().'.'.$extension;
+                    $destinationPath1 = 'customer-other-documents';
+                    if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath1)) {
+                        \Illuminate\Support\Facades\File::makeDirectory($destinationPath1, $mode = 0777, true, true);
+                    }
+                    $file->move($destinationPath1, $clientfileName);
+                    $clientDocument = new ClientDocument();
+                    $clientDocument->document = $clientfileName;
+                    $clientDocument->client_id = $client->id;
+                    $clientDocument->save();
+                }
+            }
+        
             if($request->country_id) {
                 foreach($request->country_id as $countryId) {
                     $clientCountry = new ClientCountry();
@@ -160,9 +181,13 @@ class CustomerController extends Controller
          $customer = Clients::find($id);
          $countries = Country::all();
          $customerCountries = $customer->clientCountries()->pluck('country_id')->toArray();
-        //  return $customerCountries;
+         $ispassortOrTradeLicenseAvailable = 0;
 
-         return view('customer.edit', compact('customer','countries','customerCountries'));
+        if($customer->passport || $customer->tradelicense) {
+            $ispassortOrTradeLicenseAvailable = 1;
+        }
+
+         return view('customer.edit', compact('customer','countries','customerCountries','ispassortOrTradeLicenseAvailable'));
     }
 
     /**
@@ -177,7 +202,8 @@ class CustomerController extends Controller
             'country_id' => 'required',
             'type' => 'required',
         ]);
-            $isCustomerExist = Clients::where('name', $request->name)
+            $isCustomerExist = Clients::select('id','name','is_demand_planning_customer')
+                                    ->where('name', $request->name)
                                     ->whereNot('id',$id)
                                     ->where('is_demand_planning_customer', true)->first();
             
@@ -228,6 +254,26 @@ class CustomerController extends Controller
 
         }
         $client->save();
+        if ($request->has('other_document_file'))
+        {
+            foreach ($request->file('other_document_file') as $key => $file) {
+
+                $extension = $file->getClientOriginalExtension();
+                $clientfileName = $key.time().'.'.$extension;
+                $destinationPath1 = 'customer-other-documents';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath1)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath1, $mode = 0777, true, true);
+                }
+                $file->move($destinationPath1, $clientfileName);
+                $clientDocument = new ClientDocument();
+                $clientDocument->document = $clientfileName;
+                $clientDocument->client_id = $client->id;
+                $clientDocument->save();
+            }
+        }
+        if($request->deletedIds) {           
+            ClientDocument::whereIn('id', $request->deletedIds)->delete();
+        }
         $client->clientCountries()->delete();
         if($request->country_id) {
                 foreach($request->country_id as $countryId) {
