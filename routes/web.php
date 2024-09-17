@@ -1027,5 +1027,6 @@ Route::get('/d', function () {
     Route::match(['get', 'post'], 'vehicles/dpvehicles', [VehiclesController::class, 'dpvehicles'])->name('vehicles.dpvehicles');
     Route::post('/sales-remarks', [VehiclesController::class, 'savesalesremarks'])->name('vehicles.savesalesremarks');
     Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
+    Route::resource('salesorder', SalesOrderController::class);
 });
 

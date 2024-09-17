@@ -62,6 +62,27 @@ class DailyleadsController extends Controller
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            if($status === "Closed")
+            {
+                $so = so::select([
+                    'calls.name as customername',
+                    'calls.email',
+                    'calls.phone',
+                    'quotations.created_at',
+                    'quotations.deal_value',
+                    'quotations.sales_notes',
+                    'quotations.file_path',
+                    'users.name',
+                    'so.so_number',
+                    'so.so_date',
+                ])
+                ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
+                ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+                ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                ->groupby('so.id')
+                ->get();
+                return DataTables::of($so)->toJson();  
+            }
             if($status === "Preorder")
             {
                 $preorders = PreOrder::select([
