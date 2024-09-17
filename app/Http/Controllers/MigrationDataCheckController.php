@@ -334,7 +334,7 @@ class MigrationDataCheckController extends Controller
     {
         $isPassport = [];
         // $isTradeLicense = [];
-        $letterOfIndentDocuments = LetterOfIndentDocument::where('id',17)->get();
+        $letterOfIndentDocuments = LetterOfIndentDocument::all();
                                 // return $letterOfIndentDocuments;
         foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
             info($letterOfIndentDocument);
