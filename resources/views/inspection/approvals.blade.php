@@ -496,6 +496,10 @@
     </div>
   </div>
   <script>
+              function showFullText(button) {
+        var fullText = button.getAttribute('data-fulltext');
+        alert(fullText);
+    }
         $(document).ready(function () {
         $('#dtBasicExample1').DataTable({
             processing: true,
@@ -515,7 +519,24 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                {
+                    data: 'detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
