@@ -816,8 +816,20 @@ var now = new Date();
         { data: 'steering', name: 'varaints.steering' },
         { data: 'fuel_type', name: 'varaints.fuel_type' },
         { data: 'gearbox', name: 'varaints.gearbox' },
-        { data: 'exterior_color', name: 'ex_color.name' },
-        { data: 'interior_color', name: 'int_color.name' },
+        { 
+        data: 'exterior_color', 
+        name: 'ex_color.name',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+    { 
+        data: 'interior_color', 
+        name: 'int_color.name',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { data: 'upholestry', name: 'varaints.upholestry' },
         {
     data: 'ppmmyyy',
@@ -1636,8 +1648,24 @@ $('#editColorForm').on('submit', function(e) {
         data: formData,
         success: function(response) {
             $('#colorModal').modal('hide');
-            alert('Enhancement Colour saved successfully.');
-            location.reload();
+            alertify.success('Colour Change successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table3 = $('#dtBasicExample3').DataTable();
+           var vehicleId = $('#vehicle_colour').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table3.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
