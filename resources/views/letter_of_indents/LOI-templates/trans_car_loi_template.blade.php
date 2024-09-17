@@ -161,16 +161,15 @@
         </div>
         <span class="pt-5">
         @if($letterOfIndent->LOIDocuments->count() > 0)
-                <h5 class="fw-bold text-center">Customer Document</h5>
-            @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                <div class="mt-3" id="remove-doc-{{$letterOfIndentDocument->id}}">
-                    @if($letterOfIndentDocument->is_passport)
-                        <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndentDocument->loi_document_file) }}"   height="500px;"></iframe>
-                    @elseif($letterOfIndentDocument->is_trade_license)
-                        <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndentDocument->loi_document_file) }}"  height="500px;"></iframe>
-                    @else
-                        <iframe src="{{ url('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}"   height="500px;"></iframe>
-                    @endif
+            <h5 class="fw-bold text-center">Customer Document</h5>
+            @if($isCustomerPassport)
+                <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"   height="500px;"></iframe>
+            @elseif($isCustomerTradeLicense)
+                <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"  height="500px;"></iframe>
+            @endif
+            @foreach($customerOtherDocAdded as $letterOfIndentDocument)
+                <div class="mt-3" >
+                   <iframe src="{{ url('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}"   height="500px;"></iframe>
                 </div>
             @endforeach
         @endif
