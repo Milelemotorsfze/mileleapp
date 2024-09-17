@@ -346,7 +346,7 @@ class MigrationDataCheckController extends Controller
                     info("passport / treade license  exist");
                     $isPassport[] = $letterOfIndentDocument->loi_document_file;
                    
-                }else{
+                }
                     info("other doc exist");
                     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
                     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
@@ -357,9 +357,7 @@ class MigrationDataCheckController extends Controller
                    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
                    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
                    $customerDoc->save();
-                    
-                }
-               
+                                   
             }
         }
         info("passport");
