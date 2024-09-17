@@ -169,10 +169,10 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="exColour" class="form-label">Estimated Arrival:</label>
         </div>
         <div class="col-lg-1 col-md-6">
-            <label for="engineNumber" class="form-label">Engine Number:</label>
+            <label for="QTY" class="form-label">VIN:</label>
         </div>
         <div class="col-lg-1 col-md-6">
-            <label for="QTY" class="form-label">VIN:</label>
+            <label for="engineNumber" class="form-label">Engine Number:</label>
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Territory:</label>
@@ -368,7 +368,7 @@ $(document).ready(function() {
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
             var engineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control" placeholder="Engine"></div>');
-            var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
+            var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" value="Africa" class="form-control"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
             var unitPrice = parseFloat(unitPriceCol.find('input').val());
             // Populate Exterior Colors dropdown
@@ -386,8 +386,16 @@ $(document).ready(function() {
             }
         }
         totalUnitPrice += unitPrice;
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, unitPriceCol, estimatedCol,engineCol, vinCol, territory, removeBtn);
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, unitPriceCol, estimatedCol, vinCol, engineCol, territory, removeBtn);
             $('#variantRowsContainer').append(newRow);
+            exColourDropdown.select2({
+    placeholder: 'Exterior Color',
+    width: '100%' // Ensure it fits well in the column
+});
+intColourDropdown.select2({
+    placeholder: 'Interior Color',
+    width: '100%' // Ensure it fits well in the column
+});
         }
         $('#totalUnitPriceInput').text(totalUnitPrice);
         $('#totalUnitPriceInputHidden').val(totalUnitPrice);
@@ -473,7 +481,6 @@ $(document).ready(function() {
       var variantIds = $('input[name="variant_id[]"]').map(function() {
         return $(this).val();
       }).get();
-
       if (variantIds.length === 0) {
         e.preventDefault();
         alert('Please select at least one variant');

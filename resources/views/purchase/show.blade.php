@@ -1,9 +1,11 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    
    .select2-container {
       z-index: 2050; /* Adjust this value as needed */
       width: 100% !important;
+      min-width: 200px;
     }
     .select2-selection {
       width: 100% !important;
@@ -1586,8 +1588,8 @@
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
-                                <th>Engine Number</th>
                                 <th>VIN Number</th>
+                                <th>Engine Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
@@ -1661,7 +1663,7 @@
                             @if($vehicles->grn_id === null)
 							@if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1673,7 +1675,7 @@
                                 </select>
                             </td>
                             <td class="editable-field int_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1684,14 +1686,14 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1703,7 +1705,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1714,15 +1716,15 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1734,7 +1736,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1745,8 +1747,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -1780,8 +1782,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ $vehicles->vin }}</td>
+                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
                                 <td>{{ $vehicles->ppmmyyy }}</td>
@@ -5118,5 +5120,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+</script>
+<script>
+    $(document).ready(function() {
+        $('.ex-colour-select').select2({
+            placeholder: 'Exterior Color',
+            allowClear: true,
+            width: 'resolve'  // This tells Select2 to inherit the width from the CSS or element itself
+        });
+
+        $('.int-colour-select').select2({
+            placeholder: 'Interior Color',
+            allowClear: true,
+            width: 'resolve'  // Adjust the width dynamically or apply your custom width
+        });
+    });
 </script>
 @endsection
