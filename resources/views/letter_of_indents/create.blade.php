@@ -2,8 +2,8 @@
 @section('content')
     <style>
         iframe {
-            min-height: 300px;
-            max-height: 300px;
+            height: 400px;
+            margin-bottom: 10px;
         }
         .bg-light-pink{
             background-color: #ece6e6;
@@ -1330,7 +1330,7 @@
                     e.preventDefault();
                 }
             }else{
-                var confirm = alertify.confirm('Atleast one Customer Document Required',function (e) {
+                var confirm = alertify.confirm('Atleast one Customer Document Required! If customer document is not showing please add Customer documents in customer master data',function (e) {
                 }).set({title:"Error !"})
                 e.preventDefault();
             }

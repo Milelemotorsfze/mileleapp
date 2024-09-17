@@ -2,8 +2,8 @@
 @section('content')
     <style>
         iframe {
-            min-height: 300px;
-            max-height: 300px;
+            min-height: 400px;
+            max-height: 400px;
         }
         .modal-content{
             width: 1000px;
@@ -204,7 +204,7 @@
                         <div class="card-body">
                             <div class="row">
                          
-                                <div class="col-lg-3 col-md-6 col-sm-12 text-center sign-div">
+                                <div class="col-lg-4 col-md-6 col-sm-12 text-center sign-div">
                                     <div class="mb-3" id="signature-preview">
                                         @if($letterOfIndent->signature)
                                         <label class="text-center">Signature File</label>
@@ -218,8 +218,8 @@
                             <div class="row customer-doc-div">
                                     <!-- consider the LOI selected customer passport or any doc and current passport or any doc, it may differ -->
                                 @if($isCustomerPassport)
-                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                        <label> Passport </label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                        <h6> Passport </h6>
                                         <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
                                         <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-passport-button"
                                         onclick="addPassportToLOI()" >
@@ -229,8 +229,8 @@
                                         Remove From LOI </button>   
                                     </div>
                                 @elseif($letterOfIndent->client->passport)          
-                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                        <label> Passport </label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                        <h6> Passport </h6>
                                         <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
                                         <button type="button" onclick="addPassportToLOI()" class="btn btn-info btn-sm text-center mt-2 add-passport-button">
                                             Add to LOI </button>
@@ -239,8 +239,8 @@
                                     </div>  
                                 @endif
                                 @if($isCustomerTradeLicense)  
-                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                        <label> Trade License </label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                        <h6> Trade License </h6>
                                         <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"></iframe>
                                         <button type="button" hidden onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
                                         Add to LOI </button>    
@@ -248,8 +248,8 @@
                                         Remove From LOI </button>
                                     </div>
                                 @elseif($letterOfIndent->client->tradelicense)
-                                    <div class="col-lg-3 col-md-6 col-sm-12 text-center">
-                                        <label> Trade License  </label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                        <h6> Trade License  </h6>
                                         <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
                                         <button type="button" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button"
                                         onclick="addTradeDocToLOI()"> Add to LOI </button>    
@@ -258,9 +258,10 @@
                                     </div>    
                                 @endif
                                 @if($letterOfIndent->client->clientDocuments->count() > 0 )
-                                    <label class="text-center"> Other Documents </label>
+                                    <h6 class="text-center p-2"> Other Documents </h6>
                                         @foreach($customerOtherDocAdded as $key => $CustomerOtherDoc)
-                                            <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <!-- <iframe src="{{ url('customer-other-documents/'.$CustomerOtherDoc->loi_document_file) }}"></iframe> -->
+                                            <div class="col-lg-4 col-md-6 col-sm-12 text-center">
                                                 <iframe src="{{ url('customer-other-documents/'.$CustomerOtherDoc->loi_document_file) }}"></iframe>
                                                 <button type="button" data-id="{{ $CustomerOtherDoc->id }}" id="remove-customer-doc-{{ $CustomerOtherDoc->id }}" 
                                                 class="btn btn-danger btn-sm text-center mt-2 remove-other-cus-doc">
@@ -272,13 +273,13 @@
                                         @endforeach
                                     <!--  refereing the client document table for not added Document -->
                                     @foreach($customerOtherDocNotAdded as $docNotAdded)
-                                        <div class="col-lg-3 col-md-6 col-sm-12 text-center">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 text-center">
                                             <iframe src="{{ url('customer-other-documents/'.$docNotAdded->document) }}"></iframe>
-                                            <button type="button" onclick="addDocToLOI({{ $docNotAdded->id }})"  class="btn btn-info btn-sm text-center mt-2 "
+                                            <button type="button" onclick="addDocToLOI({{ $docNotAdded->id }})"  class="btn btn-info btn-sm text-center mt-2"
                                             id="add-other-doc-{{ $docNotAdded->id }}" > Add to LOI </button>
 
                                             <button type="button" hidden onclick="removeDocToLOI({{ $docNotAdded->id }})"
-                                            id="remove-other-doc-{{ $docNotAdded->id }}" class="btn btn-danger btn-sm text-center mt-2 ">
+                                            id="remove-other-doc-{{ $docNotAdded->id }}" class="btn btn-danger btn-sm text-center mt-2">
                                             Remove From LOI </button>
                                         </div>
                                     @endforeach
@@ -767,6 +768,7 @@
 
             $('.remove-other-cus-doc').click(function () {
                 let id = $(this).attr('data-id');
+                console.log(id);
                 $('#remove-doc-'+id).remove();
                 deletedDocumetIds.push(id);
                 $('#deleted-docs').empty();
@@ -776,6 +778,7 @@
                     $("#deleted-docs option").attr("selected", "selected");
                 });
                 $(this).attr('hidden',true);
+                // $(".add-customer-doc option[value='"+id+"']").remove();
                 $('#add-customer-doc-'+id).attr('hidden', false);
                 let type = "subtract";
                 updateDocumentCount(type);
@@ -814,6 +817,7 @@
                 AddedDocumetIds = jQuery.grep(AddedDocumetIds, function(value) {
                 return value != id;
                 });
+                $("#added-customer-docs  option[value='"+id+"']").remove();
                 $("#deleted-docs option[value='"+id+"']").remove();
                 $('#add-other-doc-'+id).attr('hidden',false);
                 $('#remove-other-doc-'+id).attr('hidden', true);
@@ -1479,7 +1483,7 @@
                     e.preventDefault();
                 }
             }else{
-                var confirm = alertify.confirm('Atleast one Customer Document Required',function (e) {
+                var confirm = alertify.confirm('Atleast one Customer Document Required! If customer document is not showing please add Customer documents in customer master data',function (e) {
                 }).set({title:"Error !"});
                 e.preventDefault();
             }            

@@ -571,6 +571,7 @@ class LetterOfIndentController extends Controller
         $customerOtherDocNotAdded = clientDocument::where('client_id',$letterOfIndent->client_id)
                                         ->whereNotIn('document', $customerOtherDocAddedArray)
                                         ->get(); 
+                                        // return $customerOtherDocAdded;
 
         $salesPersons = User::where('status','active')->get();
 
@@ -713,6 +714,9 @@ class LetterOfIndentController extends Controller
                     $LoiDocument->letter_of_indent_id = $LOI->id;
                     $LoiDocument->is_passport = true;
                     $LoiDocument->save();
+                }else{
+                    LetterOfIndentDocument::where('letter_of_indent_id',$LOI->id)
+                                            ->where('is_passport',true)->delete();
                 }
                 if($request->is_trade_license_added == 1) {
                     $LoiDocument = new LetterOfIndentDocument();
@@ -720,6 +724,9 @@ class LetterOfIndentController extends Controller
                     $LoiDocument->letter_of_indent_id = $LOI->id;
                     $LoiDocument->is_trade_license = true;
                     $LoiDocument->save();
+                }else{
+                    LetterOfIndentDocument::where('letter_of_indent_id',$LOI->id)
+                                            ->where('is_trade_license',true)->delete();
                 }
 
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();

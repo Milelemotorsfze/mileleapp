@@ -14,7 +14,16 @@
             margin: .5%;
             display: inline-block;
         }
-       
+        .overlay
+        {
+            position: fixed; /* Positioning and size */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); /* color */
+            display: none; /* making it hidden by default */
+        }
     </style>
     @can('create-customer')
         @php
@@ -132,10 +141,11 @@
                             </div>
                         </div>
                         <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                            <button type="submit" class="btn btn-primary mb-2" id="submit-button">Submit</button>
                         </div>
                 </form>
             </div>
+            <div class="overlay"></div>
         @endif
     @endcan
 @endsection
@@ -277,6 +287,7 @@
                 },
             },
         });
+       
     </script>
 @endpush
 
