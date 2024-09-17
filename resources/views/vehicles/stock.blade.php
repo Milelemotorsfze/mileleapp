@@ -985,6 +985,7 @@ table.dataTable thead th select {
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
             columnDefs: [
         {
             targets: 0,

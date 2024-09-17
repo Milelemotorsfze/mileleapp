@@ -320,6 +320,10 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="form-group mt-3">
+                    <label for="remarks">Remarks:</label>
+                    <textarea id="remarks" name="remarks" class="form-control" rows="4" placeholder="Enter any remarks here..."></textarea>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="saveDetails">Save</button>
@@ -4685,6 +4689,7 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         const data = {
             paymentOption: paymentOption,
             purchaseOrderId: purchaseOrderId,
+            remarks: $('#remarks').val(),
             adjustmentAmount: $('#adjustmentAmount').val()
         };
 

@@ -4313,6 +4313,7 @@ public function requestAdditionalPayment(Request $request)
     try { // Added try-catch for overall error handling
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
+        $remarks = $request->input('remarks');
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         
         // Get purchase order details
@@ -4333,7 +4334,7 @@ public function requestAdditionalPayment(Request $request)
             }
         }
         
-        $accountCurrency = $supplierAccount->currency;
+        $accountCurrency = $purchaseOrder->currency;
         $transactionType = 'Draft';
         $status = 'Draft';
         $transactionAmount = 0;
@@ -4366,6 +4367,7 @@ public function requestAdditionalPayment(Request $request)
         $supplierAccountTransaction->created_by = $createdBy;
         $supplierAccountTransaction->account_currency = $accountCurrency;
         $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->remarks = $remarks;
         $supplierAccountTransaction->status = $status;
         
         if (!$supplierAccountTransaction->save()) {
@@ -4438,6 +4440,8 @@ public function submitPaymentDetails(Request $request)
     try { // Added try-catch for overall error handling
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
+        $remarks = $request->input('remarks');
+        info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         
         // Get purchase order details
@@ -4458,7 +4462,7 @@ public function submitPaymentDetails(Request $request)
             }
         }
         
-        $accountCurrency = $supplierAccount->currency;
+        $accountCurrency = $purchaseOrder->currency;
         $transactionType = 'Initiate Payment Request';
         $status = 'Initiate Payment Request';
         $transactionAmount = 0;
@@ -4491,6 +4495,7 @@ public function submitPaymentDetails(Request $request)
         $supplierAccountTransaction->created_by = $createdBy;
         $supplierAccountTransaction->account_currency = $accountCurrency;
         $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->remarks = $remarks;
         $supplierAccountTransaction->status = $status;
         
         if (!$supplierAccountTransaction->save()) {
