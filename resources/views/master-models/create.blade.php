@@ -58,8 +58,8 @@
                     <div class="mb-3">
                         <label  class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" name="steering" >
-                            <option value="LHS">LHD</option>
-                            <option value='RHS'>RHD</option>
+                            <option value="LHD">LHD</option>
+                            <option value='RHD'>RHD</option>
                         </select>
                     </div>
                 </div>

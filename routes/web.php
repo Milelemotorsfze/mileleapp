@@ -27,6 +27,11 @@ use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\WOApprovalsController;
+use App\Http\Controllers\WoDocsStatusController;
+use App\Http\Controllers\WoStatusController;
+use App\Http\Controllers\WoVehicleController;
+use App\Http\Controllers\WoPDIStatusController;
+use App\Http\Controllers\WOVehicleDeliveryStatusController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -112,6 +117,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\VendorAccountController;
 use App\Http\Controllers\BankAccountsController;
 use App\Http\Controllers\LOIExpiryConditionController;
+use App\Http\Controllers\LOIItemController;
 use App\Http\Controllers\BanksController;
 use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
@@ -175,6 +181,8 @@ Route::get('/d', function () {
     Route::post('/update-history-info', [ProfileController::class, 'updatehistoryInfo'])->name('profile.updatehistoryInfo');
     // User
     Route::resource('users', UserController::class);
+    Route::get('/getUser/{id}', [UserController::class, 'getUserById']);
+    Route::get('/users-search', [UserController::class, 'searchUsers']);
     Route::get('users/updateStatus/{id}', [UserController::class, 'updateStatus'])->name('users.updateStatus');
     Route::get('users/makeActive/{id}', [UserController::class, 'makeActive'])->name('users.makeActive');
     Route::get('users/restore/{id}', [UserController::class, 'restore'])->name('users.restore');
@@ -438,6 +446,7 @@ Route::get('/d', function () {
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
+        Route::post('work-order/wo-unique-check', 'uniqueWO')->name('work-order.uniqueWO');
         Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
         Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
         Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
@@ -445,7 +454,26 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
     });
-
+    Route::controller(WoDocsStatusController::class)->group(function(){
+        Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
+        Route::get('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
+    });    
+    Route::controller(WoStatusController::class)->group(function(){
+        Route::post('/update-wo-status', 'updateStatus')->name('wo.updateStatus');
+        Route::get('/wo-status-history/{id}', 'woStatusHistory')->name('woStatusHistory');
+    }); 
+    Route::controller(WoVehicleController::class)->group(function(){
+        Route::post('/update-vehicle-modification-status', 'updateVehModiStatus')->name('wo.updateVehModiStatus');
+        Route::get('/vehicle-modification-status-log/{id}', 'vehModiStatusHistory')->name('vehModiStatusHistory');
+    }); 
+    Route::controller(WoPDIStatusController::class)->group(function(){
+        Route::post('/update-vehicle-pdi-status', 'updateVehPdiStatus')->name('wo.updateVehPdiStatus');
+        Route::get('/vehicle-pdi-status-log/{id}', 'vehPdiStatusHistory')->name('vehPdiStatusHistory');
+    }); 
+    Route::controller(WOVehicleDeliveryStatusController::class)->group(function(){
+        Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
+        Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
+    }); 
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -482,13 +510,22 @@ Route::get('/d', function () {
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
+    Route::resource('letter-of-indent-items', LOIItemController::class);
+    Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
+                ->name('letter-of-indents.status-update'); 
+    Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
+    ->name('letter-of-indents.loi-expiry-status-update'); 
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
+    Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
-    Route::post('pfi-released-amount/update/{id}', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
-    Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
+    Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
+    Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
+    Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
+    Route::get('pfi-item/get-master-models', [PFIController::class,'getChildModels'])->name('pfi-item.master-models');
+    Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
 
@@ -973,5 +1010,23 @@ Route::get('/d', function () {
     Route::get('/vehicle-details-dp', [StockMessageController::class, 'getVehicleDetailsdp'])->name('vehicle.detailsdp');
     Route::get('/vehicle-details-dpbelgium', [StockMessageController::class, 'getVehicleDetailsdpbelgium'])->name('vehicle.detailsdpbelgium');
     Route::post('/vehiclenetsuitecost/upload', [VehicleNetSuiteCostController::class, 'upload'])->name('vehiclenetsuitecost.upload');
+    Route::get('/all-variant-prices', [VehiclesController::class, 'allvariantprice'])->name('variantprices.allvariantprice');
+    Route::post('/all-variant-prices-update', [VehiclesController::class, 'allvariantpriceupdate'])->name('variantprices.allvariantpriceupdate');
+    Route::post('/custom-inspection-update', [VehiclesController::class, 'custominspectionupdate'])->name('vehicles.savecustominspection');
+    Route::post('/booking/canceling', [BookingController::class, 'canceling'])->name('booking.canceling');
+    Route::post('/get-reservation', [VehiclesController::class, 'getReservation'])->name('get.reservation');
+    Route::post('/movement/revised/{id}', [MovementController::class, 'revise'])->name('movement.revised');
+    Route::post('/enhancement', [VehiclesController::class, 'saveenhancement'])->name('enhancement.save');
+    Route::get('/enhancement/getVariants', [VehiclesController::class, 'getVariants'])->name('enhancement.getVariants');
+    Route::get('/enhancement/getcolours', [VehiclesController::class, 'getcolours'])->name('get.color.data');
+    Route::post('/enhancementcolour', [VehiclesController::class, 'saveenhancementcolor'])->name('enhancement.savecolour');
+    Route::post('/vehicles/uploadVinFile', [MovementController::class, 'uploadVinFile'])->name('vehicles.uploadVinFile');
+    Route::get('/get-custom-inspection-data', [VehiclesController::class, 'getCustomInspectionData']);
+    Route::match(['get', 'post'], 'vehicles/available', [VehiclesController::class, 'availablevehicles'])->name('vehicles.availablevehicles');
+    Route::match(['get', 'post'], 'vehicles/delivered', [VehiclesController::class, 'deliveredvehicles'])->name('vehicles.deliveredvehicles');
+    Route::match(['get', 'post'], 'vehicles/dpvehicles', [VehiclesController::class, 'dpvehicles'])->name('vehicles.dpvehicles');
+    Route::post('/sales-remarks', [VehiclesController::class, 'savesalesremarks'])->name('vehicles.savesalesremarks');
+    Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
+    Route::resource('salesorder', SalesOrderController::class);
 });
 

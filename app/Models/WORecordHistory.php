@@ -44,7 +44,8 @@ class WORecordHistory extends Model
             'customer_representative_email' => 'Customer Representative Email',
             'customer_representative_name' => 'Customer Representative Name',
             // date is not coming in history table
-            'delivery_contact_person' => 'Delivery Contact Person',
+            'delivery_contact_person' => 'Delivery Contact Person Name',
+            'delivery_contact_person_number' => 'Delivery Contact Person Number',
             'delivery_date' => 'Delivery Date',
             'delivery_location' => 'Delivery Location',
             'deposit_received_as' => 'Deposit Received As',
@@ -60,10 +61,12 @@ class WORecordHistory extends Model
             'freight_agent_contact_number.full' => 'Freight Agent Contact Number',
             'freight_agent_email' => 'Freight Agent Email',
             'freight_agent_name' => 'Freight Agent Name',
+            'is_batch' => 'Is Batch',
             'noc' => 'NOC',
             'payment_receipts' => 'Payment Receipts',
             'port_of_discharge' => 'Port Of Discharge',
             'port_of_loading' => 'Port Of Loading',
+            'sales_person_id' => 'Sales Person',
             'sales_support_data_confirmation_at' => 'Sales Support Data Confirmation At',
             'sales_support_data_confirmation_by' => 'Sales Support Data Confirmation By',
             'shipment' => 'Shipment',
@@ -82,6 +85,12 @@ class WORecordHistory extends Model
             'vehicle_handover_person_id' => 'Vehicle Handover Person ID',
             'vin_multiple' => 'VIN Multiple', // check the need of this field
             'wo_number' => 'WO Number',
+            'preferred_shipping_line_of_customer' => 'Preferred Shipping Line Of Customer', 
+            'bill_of_loading_details' => 'Bill Of Loading Details',
+            'shipper' => 'Shipper',
+            'consignee' => 'Consignee',
+            'notify_party' => 'Notify Party',
+            'special_or_transit_clause_or_request' => 'Special/Transit Clause/Request',
         ];
     
         return $fieldMapping[$this->field_name] ?? '';

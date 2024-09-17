@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\So;
 use App\Models\Quotation;
 use App\Models\Booking;
+use App\Models\UserActivities;
 use App\Models\BookingRequest;
 use App\Models\Closed;
 use App\Models\Calls;
 use App\Models\Vehicles;
+use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\QuotationItem;
@@ -31,9 +33,68 @@ class SalesOrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $useractivities = new UserActivities();
+        $useractivities->activity = "Open Sales Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        if ($request->ajax()) {
+            $status = $request->input('status');
+            if($status === "SalesOrder")
+            {
+                $id = Auth::user()->id;
+                info($id);
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        if($hasPermission)
+        {
+                $data = So::select([
+                    'calls.name as customername',
+                    'calls.email',
+                    'calls.phone',
+                    'quotations.created_at',
+                    'quotations.deal_value',
+                    'quotations.sales_notes',
+                    'quotations.file_path',
+                    'users.name',
+                    'so.so_number',
+                    'so.so_date',
+                    'quotations.calls_id',
+                ])
+                ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
+                ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+                ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                ->groupby('so.id')
+                ->orderBy('so.so_date', 'desc');
+        }
+        else
+        {
+            $data = So::select([
+                'calls.name as customername',
+                'calls.email',
+                'calls.phone',
+                'quotations.created_at',
+                'quotations.deal_value',
+                'quotations.sales_notes',
+                'quotations.file_path',
+                'users.name',
+                'so.so_number',
+                'so.so_date',
+                'quotations.calls_id',
+            ])
+            ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
+            ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+            ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+            ->where('calls.sales_person', $id)
+            ->groupby('so.id')
+            ->orderBy('so.so_date', 'desc');  
+        }
+    }  
+            if ($data) {
+                return DataTables::of($data)->toJson();
+            }
+            }
+        return view('dailyleads.salesorder');
     }
 
     /**

@@ -122,84 +122,6 @@
                   <th>Sales Person Remarks</th>
                 </tr>
               </thead>
-              <tbody>
-              <div hidden>{{$i=0;}}</div>
-                @foreach ($data as $key => $calls)
-                <tr data-id="1">
-                  <td>{{ ++$i }}</td>
-                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
-                     @php
-                     $sales_persons_name = "";
-                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
-                     @endphp  
-                    <td>{{ $sales_persons_name }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $calls->custom_brand_model }}</td>
-                    @php
-                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
-                     $leadsources = $leadsource->source_name;
-                     @endphp
-                    <td>{{ $leadsources }}</td>
-                    <td>{{ $calls->language }}</td>
-                    <td>{{ $calls->location }}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
-    @php
-    $sales_notes = "";
-    if ($calls->status == "Prospecting") {
-        $result = DB::table('prospectings')->where('calls_id', $calls->id)->first();
-        if ($result) {
-            $sales_notes = $result->salesnotes;
-        }
-    } elseif ($calls->status == "New Demand") {
-        $result = DB::table('demand')->where('calls_id', $calls->id)->first();
-        if ($result) {
-            $sales_notes = $result->salesnotes;
-        }
-    } elseif ($calls->status == "Quoted") {
-        $result = DB::table('quotations')->where('calls_id', $calls->id)->first();
-        if ($result) {
-            $sales_notes = $result->sales_notes;
-        }
-    } else {
-        $result = DB::table('negotiations')->where('calls_id', $calls->id)->first();
-        if ($result) {
-            $sales_notes = $result->sales_notes;
-        }
-    }
-@endphp
-
-<td>{{ $sales_notes }}</td>
-                  </tr>
-                @endforeach
-              </tbody>
             </table>
           </div> 
         </div>  
@@ -208,73 +130,75 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript">
-$(document).ready(function () {
-  $('.select2').select2();
-  var dataTable = $('#dtBasicExample1').DataTable({
-  pageLength: 10,
-  columnDefs: [
-    { type: 'date', targets: [1] }
-  ],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
-        });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
+  <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    var dataTable = $('#dtBasicExample1').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("calls.inprocess") }}',
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'type', name: 'type' },
+            { data: 'name', name: 'name' },
+            { data: 'phone', name: 'phone' },
+            { data: 'email', name: 'email' },
+            { data: 'sales_person', name: 'sales_person' },
+            { data: 'brands_models', name: 'brands_models' },
+            { data: 'custom_brand_model', name: 'custom_brand_model' },
+            { data: 'lead_source', name: 'lead_source' },
+            { data: 'language', name: 'language' },
+            { data: 'location', name: 'location' },
+            { data: 'remarks_messages', name: 'remarks_messages' },
+            { data: 'sales_person_remarks', name: 'sales_person_remarks' },
+        ]
+    });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
-      
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
-      });
+    $('#export-excel').on('click', function() {
+        var tableData = dataTable.rows().data().toArray();
+        var excelData = [
+            ['S.No', 'Date', 'Selling Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages', 'Sales Notes']
+        ];
+
+        tableData.forEach(function(rowData) {
+            var row = [];
+            row.push(rowData.DT_RowIndex);
+            row.push(rowData.created_at);
+            row.push(rowData.type);
+            row.push(rowData.name);
+            row.push(rowData.phone);
+            row.push(rowData.email);
+            row.push(rowData.sales_person);
+            row.push(rowData.brands_models);
+            row.push(rowData.custom_brand_model);
+            row.push(rowData.lead_source);
+            row.push(rowData.language);
+            row.push(rowData.location);
+            row.push(rowData.remarks_messages);
+            row.push(rowData.sales_person_remarks);
+            excelData.push(row);
+        });
+
+        var workbook = XLSX.utils.book_new();
+        var worksheet = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Call.xlsx';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
-  }
-});
-$('#my-table_filter').hide();
-$('#export-excel').on('click', function() {
-    var filteredData = dataTable.rows({ search: 'applied' }).data();
-    var data = [];
-    filteredData.each(function(rowData) {
-        var row = [];
-        for (var i = 0; i < rowData.length; i++) {
-                row.push(rowData[i]);
-        }
-        data.push(row);
-    });
-    var excelData = [
-        ['S.No', 'Date', 'Selling Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages', 'Sales Notes']
-    ];
-    excelData = excelData.concat(data);
-    var workbook = XLSX.utils.book_new();
-    var worksheet = XLSX.utils.aoa_to_sheet(excelData);
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    var link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Call.xlsx';
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-});
-function s2ab(s) {
-    var buf = new ArrayBuffer(s.length);
-    var view = new Uint8Array(buf);
-    for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-    return view;
-}
+
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return view;
+    }
 });
 </script>
 @else

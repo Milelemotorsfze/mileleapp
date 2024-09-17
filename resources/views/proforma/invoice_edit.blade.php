@@ -2625,10 +2625,10 @@ $('#shipping_port').select2();
 
                     if(currency == 'USD') {
                         var value = '{{ $aed_to_usd_rate->value }}';
-                        var price = price / parseFloat(value);
+                        var price = price;
                     }else if(currency == 'ERU') {
                         var value = '{{ $aed_to_eru_rate->value }}';
-                        var price = price / parseFloat(value);
+                        var price = price;
                     }
                     return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
                         '    <span id="priceError' +  row['index'] +'" class="price-error invalid-feedback"></span>';

@@ -108,7 +108,7 @@
                     <th>Aging</th>
                     <th>Production Month</th>
                     <th>DN Number/Status</th>
-                    <th>LOI</th>
+                    <th>LOI Item Code</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
                     <th>updated By</th>
@@ -196,7 +196,7 @@
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}</td>
                             <td data-field="delivery_note"  id="delivery_note-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->delivery_note}} </td>
-                            <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
+                            <td>{{ $supplierInventory->letterOfIndentItem->code ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
                             <td>{{ $supplierInventory->updatedBy->name ?? '' }}</td>

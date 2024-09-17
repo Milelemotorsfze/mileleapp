@@ -28,13 +28,14 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
                     @endphp
                     @if ($hasPermission)
-
                         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
+                <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" title="Model-SFX Detail View" href="{{ route('letter-of-indent-items.index') }}" >
+                    <i class="fa fa-table" ></i> </a>
                 <div class="card-body">
                     @if (count($errors) > 0)
-                        <div class="alert alert-danger">
+                        <div class="alert alert-danger mt-3 mb-0">
                             <strong>Whoops!</strong> There were some problems with your input.<br><br>
                             <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                             <ul>
@@ -45,14 +46,14 @@
                         </div>
                     @endif
                     @if (Session::has('error'))
-                        <div class="alert alert-danger" >
+                        <div class="alert alert-danger mt-3 mb-0" >
                             <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                             {{ Session::get('error') }}
                         </div>
                     @endif
                     @if (Session::has('success'))
-                        <div class="alert alert-success" id="success-alert">
-                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        <div class="alert alert-success mt-3 mb-0" id="success-alert">
+                            <button type="button" class="btn-close p-0 close " data-dismiss="alert">x</button>
                             {{ Session::get('success') }}
                         </div>
                     @endif
@@ -76,9 +77,11 @@
             <div class="tab-content">
                 <div class="card-body">
                 <div class="tab-pane fade show active table-responsive" id="new-LOI">
-                        <table class="table table-bordered new-LOI-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered  table-striped table-editable table-edits table table-condensed new-LOI-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
+                                    <th>Action</th>
+                                    <th>Send Supplier Approval</th>
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
@@ -98,8 +101,6 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Send Supplier Approval</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,10 +108,12 @@
                         </table>                      
                     </div>
                     <div class="tab-pane fade table-responsive" id="waiting-for-approval-LOI">
-                        <table class="table table-bordered waiting-for-approval-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered  table-striped table-editable table-edits table table-condensed waiting-for-approval-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
-                                <th>S.No</th>
+                                    <th>Action</th>
+                                    <th>Status Update</th>
+                                    <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
                                     <th>Cutsomer Name</th>
@@ -130,8 +133,6 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Approve / Reject </th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -139,10 +140,11 @@
                         </table>                      
                     </div>
                     <div class="tab-pane fade table-responsive" id="supplier-response-LOI">
-                        <table class="table table-bordered supplier-response-table" style = "width:100%;">
-                            <thead>
+                        <table class="table table-bordered table-striped table-editable table-edits table table-condensed supplier-response-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
                                 <tr>
-                                <th>S.No</th>
+                                    <th>Action</th>
+                                    <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
                                     <th>Cutsomer Name</th>
@@ -164,7 +166,6 @@
                                     <th>Created At</th>
                                     <th>Updated By</th>
                                     <th>Updated At</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -187,12 +188,14 @@
             searching:true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'NEW']) }}",
         columns: [
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },      
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
             {'data' : 'client.name', 'name' : 'client.name'},
             {'data' : 'client.customertype', 'name': 'client.customertype' },          
-            {'data' : 'client.country.name', 'name': 'client.country.name' },        
+            {'data' : 'country.name', 'name': 'country.name' },        
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
             {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
@@ -206,8 +209,6 @@
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },        
-            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },      
-            {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
         
         });
@@ -217,12 +218,14 @@
             serverSide: true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'WAITING_FOR_APPROVAL']) }}",
         columns: [
+            {'data': 'action', name: 'action', orderable: false, searchable: false},
+            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },    
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex','title' : 'S.NO:', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
             {'data' : 'client.name', 'name' : 'client.name'},
             {'data' : 'client.customertype', 'name': 'client.customertype' },         
-            {'data' : 'client.country.name', 'name': 'client.country.name' },         
+            {'data' : 'country.name', 'name': 'country.name' },         
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
             {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
@@ -237,8 +240,6 @@
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },  
-            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },    
-            {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
         
      });
@@ -248,12 +249,13 @@
             serverSide: true,
             ajax: "{{ route('letter-of-indents.index', ['tab' => 'SUPPLIER_RESPONSE']) }}",
         columns: [
+            {data: 'action', name: 'action', orderable: false, searchable: false},
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex','title' : 'S.NO:', orderable: false, searchable: false },
             {'data' : 'uuid', 'name' : 'uuid'},
             {'data' : 'date', 'name' : 'date' },
             {'data' : 'client.name', 'name' : 'client.name'},
             {'data' : 'client.customertype', 'name': 'client.customertype' },        
-            {'data' : 'client.country.name', 'name': 'client.country.name' },        
+            {'data' : 'country.name', 'name': 'country.name' },        
             {'data' : 'category', 'name': 'category' },        
             {'data' : 'dealers', 'name': 'dealers' },        
             {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
@@ -270,8 +272,6 @@
             {'data' : 'created_at', 'name': 'created_at' },        
             {'data' : 'updated_by', 'name': 'updatedBy.name' },        
             {'data' : 'updated_at', 'name': 'updated_at' },  
-            // {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },           
-            {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
         
         });

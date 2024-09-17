@@ -2721,216 +2721,120 @@ $normalizationMap = [
 'Speakers' => 'Speakers',
 'sunroof' => 'sunroof'
 ];
-
 foreach ($variants as $variant) {
-$details = [];
-$otherDetails = [];
-foreach ($variant->variantItems as $item) {
-    $modelSpecification = $item->model_specification;
-    $modelSpecificationOption = $item->model_specification_option;
-    if ($modelSpecification && $modelSpecificationOption) {
-        $name = $modelSpecification->name;
-        $optionName = $modelSpecificationOption->name;
-        $normalized = null;
-        foreach ($normalizationMap as $key => $values) {
-            if (is_array($values)) {
-                if (in_array($name, $values)) {
+    $details = [];
+    $otherDetails = [];
+    foreach ($variant->variantItems as $item) {
+        $modelSpecification = $item->model_specification;
+        $modelSpecificationOption = $item->model_specification_option;
+        if ($modelSpecification && $modelSpecificationOption) {
+            $name = $modelSpecification->name;
+            $optionName = $modelSpecificationOption->name;
+            $normalized = null;
+            foreach ($normalizationMap as $key => $values) {
+                if (is_array($values)) {
+                    if (in_array($name, $values)) {
+                        $normalized = $key;
+                        break;
+                    }
+                } elseif ($name === $values) {
                     $normalized = $key;
                     break;
                 }
-            } elseif ($name === $values) {
-                $normalized = $key;
-                break;
             }
-        }
-
-        if ($normalized) {
-            $name = $normalized;
-        }
-        if (in_array(strtolower($optionName), ['yes', 'no'])) {
-            if (strtolower($optionName) === 'yes') {
-                $optionName = $name;
+    
+            if ($normalized) {
+                $name = $normalized;
+            }
+            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                if (strtolower($optionName) === 'yes') {
+                    $optionName = $name;
+                } else {
+                    continue;
+                }
+            }
+            if (in_array($name, $sequence)) {
+                $index = array_search($name, $sequence);
+                $details[$index] = $optionName;
             } else {
-                continue;
+                $otherDetails[] = $optionName;
             }
-        }
-        if (in_array($name, $sequence)) {
-            $index = array_search($name, $sequence);
-            $details[$index] = $optionName;
-        } else {
-            $otherDetails[] = $optionName;
         }
     }
-}
-ksort($details);
-$variant->detail = implode(', ', array_merge($details, $otherDetails));
-$variant->save();
-}
+    ksort($details);
+    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+    $variant->save();
+    }
         if ($request->ajax()) {
             $status = $request->input('status');
-            if($status === "Incoming")
-            {
-                $data = Vehicles::select( [
-                        'vehicles.id',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                        'vehicles.estimation_date',
-                        'vehicles.vin',
-                        'vehicles.price',
-                        'vehicles.territory',
-                        'vehicles.engine',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.model_detail',
-                        'countries.name as fd',
-                        'varaints.id as variant_id',
-                        'varaints.detail as variant_detail',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'so.so_number',
-                        'purchasing_order.po_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("
-            COALESCE(
-                (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                ''
-            ) as costprice
-        ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->whereNull('vehicles.inspection_date')
-                    ->whereNull('vehicles.gdn_id')
-                    ->whereNull('vehicles.grn_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');
-                }
-                else if($status === "Pending Inspection")
+            if($status === "allstock")
                 {
                     $data = Vehicles::select( [
                         'vehicles.id',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
+                        'vehicles.grn_id',
+                        'vehicles.gdn_id',
+                        'vehicles.gp',
+                        'vehicles.sales_remarks',
                         'vehicles.estimation_date',
-                        'vehicles.vin',
                         'vehicles.territory',
+                        'vehicles.inspection_date',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
+                        'vehicles.so_id',
+                        'vehicles.minimum_commission',
+                        'vehicles.reservation_end_date',
+                        'warehouse.name as location',
+                        'purchasing_order.po_date',
+                        'vehicles.ppmmyyy',
+                        'vehicles.vin as vin',
+                        'inspection_grn.id as grn_inspectionid',
+                        'inspection_pdi.id as pdi_inspectionid',
                         'vehicles.engine',
                         'vehicles.price',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.id as variant_id',
-                        'varaints.model_detail',
-                        'varaints.detail as variant_detail',
                         'countries.name as fd',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'so.so_number',
-                        'purchasing_order.po_number',
-                        'grn.grn_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->whereNull('vehicles.inspection_date')
-                    ->whereNull('vehicles.gdn_id')
-                    ->whereNotNull('vehicles.grn_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');  
-                } 
-                else if($status === "Available Stock")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id as id',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                         DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
-                         DB::raw("DATE_FORMAT(vehicles.reservation_end_date, '%d-%b-%Y') as reservation_end_date"),
-                        'vehicles.vin',
-                        DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
-                        'vehicles.engine',
-                        'inspection.id as inspectionid',
-                        'vehicles.territory',
-                        'vehicles.price as price',
-                        'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
-                        'varaints.model_detail',
                         'varaints.id as variant_id',
-                        'varaints.detail as variant_detail',
-                       'countries.name as fd',
+                        'varaints.model_detail',
+                        'varaints.detail',
                         'varaints.seat',
+                        'varaints.detail as variant_detail',
                         'varaints.upholestry',
                         'varaints.steering',
                         'varaints.my',
                         'varaints.fuel_type',
                         'varaints.gearbox',
+                        'so.so_number',
                         'master_model_lines.model_line',
                         'int_color.name as interior_color',
                         'ex_color.name as exterior_color',
-                        'so.so_number',
                         'purchasing_order.po_number',
-                        'grn.grn_number',
-                        'sp.name as spn',
                         'documents.import_type',
                         'documents.owership',
                         'documents.document_with',
+                        'grn.grn_number',
+                        'gdn.gdn_number',
                         'bp.name as bpn',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        'sp.name as spn',
+                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                        'so.so_date',
+                        'grn.date',
+                        'gdn.date as gdndate',
+                        DB::raw("
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
                     ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                     ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
                     ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
                     ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
                     ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
@@ -2939,346 +2843,21 @@ $variant->save();
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->whereNull('vehicles.gdn_id')
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
                     ->where('vehicles.status', 'Approved');
                     $data = $data->groupBy('vehicles.id');  
                 }
-                else if($status === "Booked")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'warehouse.name as location',
-                        DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                        DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
-                        DB::raw("DATE_FORMAT(vehicles.reservation_end_date, '%d-%b-%Y') as reservation_end_date"),
-                        DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
-                        DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                        'vehicles.estimation_date',
-                        'vehicles.vin',
-                        'vehicles.price',
-                        'vehicles.territory',
-                        'vehicles.grn_remark',
-                        'vehicles.engine',
-                        'varaints.model_detail',
-                        'countries.name as fd',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.detail as variant_detail',
-                        'varaints.id as variant_id',
-                        'varaints.detail',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'so.so_number',
-                        'purchasing_order.po_number',
-                        'grn.grn_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'vehicles.booking_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->whereNotNull('vehicles.inspection_date')
-                    ->whereNull('vehicles.gdn_id')
-                    ->whereNull('vehicles.so_id')
-                    ->whereDate('vehicles.reservation_end_date', '>=', now())
-                    ->whereNotNull('vehicles.grn_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');  
-                }
-                else if($status === "Sold")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                         'vehicles.vin',
-                         'vehicles.territory',
-                         'vehicles.price',
-                         'vehicles.engine',
-                         'vehicles.grn_remark',
-                         'brands.brand_name',
-                         'countries.name as fd',
-                         'varaints.name as variant',
-                         'varaints.id as variant_id',
-                         'varaints.model_detail',
-                         'varaints.detail as variant_detail',
-                         'varaints.seat',
-                         'varaints.upholestry',
-                         'varaints.steering',
-                         'varaints.my',
-                         'varaints.fuel_type',
-                         'varaints.gearbox',
-                         'master_model_lines.model_line',
-                         'int_color.name as interior_color',
-                         'ex_color.name as exterior_color',
-                         'so.so_number',
-                         'purchasing_order.po_number',
-                         'grn.grn_number',
-                         'users.name',
-                         DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                         DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                         DB::raw("
-                         COALESCE(
-                             (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                             (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                             ''
-                         ) as costprice
-                     ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->whereNotNull('vehicles.inspection_date')
-                    ->whereNull('vehicles.gdn_id')
-                    ->whereNotNull('vehicles.so_id')
-                    ->whereNotNull('vehicles.grn_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');  
-                }
-                else if($status === "Delivered")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                        'vehicles.vin',
-                        'vehicles.price',
-                        'vehicles.territory',
-                        'vehicles.engine',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.id as variant_id',
-                        'varaints.detail as variant_detail',
-                        'varaints.model_detail',
-                        'varaints.detail',
-                        'countries.name as fd',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'so.so_number',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'purchasing_order.po_number',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'grn.grn_number',
-                        'gdn.gdn_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->whereNotNull('vehicles.inspection_date')
-                    ->whereNotNull('vehicles.gdn_id')
-                    ->whereNotNull('vehicles.grn_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');  
-                }
-                else if($status === "allstock")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'vehicles.grn_id',
-                        'vehicles.gdn_id',
-                        'vehicles.territory',
-                        'vehicles.inspection_date',
-                        'vehicles.so_id',
-                        'vehicles.reservation_end_date',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                         DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                        'vehicles.vin as vin',
-                        'vehicles.engine',
-                        'vehicles.price',
-                        'countries.name as fd',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.detail as variant_detail',
-                        'varaints.id as variant_id',
-                        'varaints.model_detail',
-                        'varaints.detail',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'so.so_number',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'purchasing_order.po_number',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'grn.grn_number',
-                        'gdn.gdn_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->where('vehicles.status', 'Approved');
-                    $data = $data->groupBy('vehicles.id');  
-                }
-                else if($status === "dpvehicles")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'vehicles.grn_id',
-                        'vehicles.gdn_id',
-                        'vehicles.territory',
-                        'vehicles.inspection_date',
-                        'vehicles.so_id',
-                        'vehicles.reservation_end_date',
-                        'warehouse.name as location',
-                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                        DB::raw("DATE_FORMAT(vehicles.ppmmyyy, '%M-%Y') as ppmmyyy"),
-                        'vehicles.vin as vin',
-                        'vehicles.engine',
-                        'vehicles.price',
-                        'countries.name as fd',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.detail as variant_detail',
-                        'varaints.id as variant_id',
-                        'varaints.model_detail',
-                        'varaints.detail',
-                        'varaints.seat',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'varaints.gearbox',
-                        'so.so_number',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'purchasing_order.po_number',
-                        'grn.grn_number',
-                        'gdn.gdn_number',
-                        'users.name',
-                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
-                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
-                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
-                        DB::raw("
-                        COALESCE(
-                            (SELECT cost FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-                            (SELECT unit_price FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-                            ''
-                        ) as costprice
-                    ")
-                    ])
-                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
-                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
-                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
-                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->where('vehicles.status', 'Approved')
-                    ->where('purchasing_order.is_demand_planning_po', '=', '1');
-                    $data = $data->groupBy('vehicles.id');  
-                }
-            if ($data) {
-                return DataTables::of($data)->toJson();
-            }
+        if ($data) {
+            return DataTables::of($data)->toJson();
+        }
         }
         return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
@@ -3487,7 +3066,7 @@ private function fetchPost($variant, $exteriorColor)
     $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
     $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
     $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
-
+    $createdby = User::where('id', $inspection->created_by)->pluck('name')->first();
     $data = [
         'inspection' => $inspection,
         'PdiInspectionData' => $PdiInspectionData,
@@ -3499,7 +3078,7 @@ private function fetchPost($variant, $exteriorColor)
         'Incidentpicturelink' => $Incidentpicturelink,
         'incident' => $incident,
         'remarks' => $inspection->remarks,
-        'created_by' => Auth::user()->name,
+        'created_by' => $createdby,
     ];
 
     $pdf = PDF::loadView('Reports.pdi', $data);
@@ -3531,5 +3110,774 @@ public function hold(Request $request, $id)
     $vehicle->save();
     return response()->json(['success' => true]);
 }
+public function allvariantprice(Request $request)
+    {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Open All Variant Price";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        if ($request->ajax()) {
+            $data = Vehicles::select( [
+                    'brands.brand_name',
+                    'vehicles.gp',
+                    'vehicles.minimum_commission',
+                    'vehicles.varaints_id',
+                    'vehicles.int_colour',
+                    'vehicles.ex_colour',
+                    'vehicles.price',
+                    'varaints.name',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                ])
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->wherenotnull('vehicles.int_colour')
+                ->groupBy('varaints.name', 'int_color.name', 'ex_color.name');
+                return DataTables::of($data)
+        ->editColumn('price', function($data) {
+            return number_format($data->price, 0, '.', ',');
+        })
+        ->editColumn('minimum_commission', function($data) {
+            return number_format($data->minimum_commission, 0, '.', ',');
+        })
+        ->toJson();
+            }
+        return view('variant-prices.allindex');
+    }
+    public function allvariantpriceupdate(Request $request)
+{
+// Validate the incoming request
+$request->validate([
+    'varaints_id' => 'required|integer|exists:varaints,id',
+    'field' => 'required|string|in:price,gp,minimum_commission',
+    'value' => 'required|string'
+]);
 
+// Find the vehicle by varaints_id, and optionally by int_colour and ex_colour
+$query = Vehicles::where('varaints_id', $request->varaints_id);
+
+if (!empty($request->int_colour)) {
+    $query->where('int_colour', $request->int_colour);
+}
+
+if (!empty($request->ex_colour)) {
+    $query->where('ex_colour', $request->ex_colour);
+}
+
+$vehicle = $query->first();
+
+if (!$vehicle) {
+    return response()->json(['error' => 'Vehicle not found'], 404);
+}
+$oldValue = $vehicle->{$request->field};
+$field = $request->field;
+$value = $request->value;
+info($field);
+if ($field == 'price') {
+    $value = str_replace(',', '', $value);
+}
+if ($field == 'minimum_commission') {
+    $value = str_replace(',', '', $value);
+}
+$vehicle->$field = $value;
+$vehicle->save();
+$currentDateTime = Carbon::now();
+$vehicleslog = new Vehicleslog();
+$vehicleslog->time = $currentDateTime->toTimeString();
+$vehicleslog->date = $currentDateTime->toDateString();
+$vehicleslog->status = 'Update Vehicles Selling Price / GP';
+$vehicleslog->vehicles_id = $vehicle->id;
+$vehicleslog->field = $field;
+$vehicleslog->old_value = $oldValue;
+$vehicleslog->new_value = $value;
+$vehicleslog->category = "Sales";
+$vehicleslog->created_by = auth()->user()->id;
+$vehicleslog->role = Auth::user()->selectedRole;
+$vehicleslog->save();
+return response()->json(['success' => 'Vehicle updated successfully']);
+    }
+    public function custominspectionupdate(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'custom_inspection_number' => 'required|numeric',
+            'custom_inspection_status' => 'required|in:pending,done,start',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->custom_inspection_number = $request->input('custom_inspection_number');
+        $vehicle->custom_inspection_status = $request->input('custom_inspection_status');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
+    }
+    public function getReservation(Request $request)
+{
+    $vehicle_id = $request->input('vehicle_id');
+    $reservation = DB::table('vehicles')
+        ->where('id', $vehicle_id)
+        ->whereDate('reservation_end_date', '>=', Carbon::today())
+        ->first();
+        info($reservation);
+    return response()->json($reservation);
+}
+public function saveenhancement(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $variantId = $request->input('variant_id');
+        info($vehicleId);
+        $vehicle = Vehicles::find($vehicleId);
+        $oldValue = $vehicle->varaints_id;
+        if ($vehicle) {
+            $vehicle->varaints_id = $variantId;
+            $vehicle->save();
+        }
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Variant After Enhancement';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Variant";
+        $vehicleslog->old_value = $oldValue;
+        $vehicleslog->new_value = $variantId;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
+    }
+    public function getVariants(Request $request)
+    {
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::find($vehicleId);
+    if ($vehicle) {
+        $variantId = $vehicle->varaints_id;
+        $varaiant = Varaint::find($variantId);
+        $masterModelLinesId = $varaiant->master_model_lines_id;
+        $variants = Varaint::where('master_model_lines_id', $masterModelLinesId)
+                            ->get();
+                            return response()->json([
+                                'success' => true,
+                                'data' => [
+                                    'variants' => $variants,
+                                    'vin' => $vehicle->vin,  // Assuming the VIN is stored in the vehicle model
+                                ]
+                            ]);
+    }
+    return response()->json(['success' => false, 'message' => 'Vehicle not found']);
+    }
+    public function getcolours(Request $request)
+    {
+        $vehicleId = $request->get('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        $intColorOptions = ColorCode::where('belong_to', 'int')->get();
+        $extColorOptions = ColorCode::where('belong_to', 'ex')->get();
+        $vin = $vehicle->vin;
+        $intColorSelect = '<option value="">Select Interior Color</option>';
+        foreach ($intColorOptions as $color) {
+            $selected = $vehicle->int_colour == $color->id ? 'selected' : '';
+            $intColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+        }
+        $extColorSelect = '<option value="">Select Exterior Color</option>';
+        foreach ($extColorOptions as $color) {
+            $selected = $vehicle->ex_colour == $color->id ? 'selected' : '';
+            $extColorSelect .= '<option value="'.$color->id.'" '.$selected.'>'.$color->name.'</option>';
+        }
+        return response()->json([
+            'intColorOptions' => $intColorSelect,
+            'extColorOptions' => $extColorSelect,
+            'vin' => $vin,
+        ]);
+    } 
+    public function saveenhancementcolor(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $int_color = $request->input('int_color_dropdown');
+        $ext_color = $request->input('ext_color_dropdown');
+        info($int_color);
+        $vehicle = Vehicles::find($vehicleId);
+        $oldValueint = $vehicle->int_colour;
+        $oldValueex = $vehicle->ex_colour;
+        if ($vehicle) {
+            $vehicle->int_colour = $int_color;
+            $vehicle->ex_colour = $ext_color;
+            $vehicle->save();
+        }
+        if($oldValueint != $int_color)
+        {
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Interior Colours';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Interior Colour";
+        $vehicleslog->old_value = $oldValueint;
+        $vehicleslog->new_value = $int_color;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        }
+        if($oldValueex != $ext_color)
+        {
+        $currentDateTime = Carbon::now();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $currentDateTime->toTimeString();
+        $vehicleslog->date = $currentDateTime->toDateString();
+        $vehicleslog->status = 'Update Vehicle Exterior Colours';
+        $vehicleslog->vehicles_id = $vehicle->id;
+        $vehicleslog->field = "Exterior Colour";
+        $vehicleslog->old_value = $oldValueex;
+        $vehicleslog->new_value = $ext_color;
+        $vehicleslog->category = "Enhancement";
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        }
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
+    }  
+    public function getCustomInspectionData(Request $request)
+{
+    // Find the vehicle by ID and fetch its custom inspection details
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
+
+    if ($vehicle) {
+        // Return the custom inspection number and status
+        return response()->json([
+            'custom_inspection_number' => $vehicle->custom_inspection_number, // Replace with the actual column
+            'custom_inspection_status' => $vehicle->custom_inspection_status  // Replace with the actual column
+        ]);
+    } else {
+        return response()->json(['error' => 'Vehicle not found'], 404);
+    }
+}
+public function availablevehicles(Request $request)
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "View the Stock Status Wise";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        // Variant detail computation
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
+        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+        ->orderBy('id', 'DESC')
+        ->get();
+        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+        $normalizationMap = [
+        'COO' => 'COO',
+        'SFX' => 'SFX',
+        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+        'HeadLamp Type' => 'HeadLamp Type',
+        'infotainment type' => 'infotainment type',
+        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+        'Speakers' => 'Speakers',
+        'sunroof' => 'sunroof'
+        ];
+    foreach ($variants as $variant) {
+    $details = [];
+    $otherDetails = [];
+    foreach ($variant->variantItems as $item) {
+        $modelSpecification = $item->model_specification;
+        $modelSpecificationOption = $item->model_specification_option;
+        if ($modelSpecification && $modelSpecificationOption) {
+            $name = $modelSpecification->name;
+            $optionName = $modelSpecificationOption->name;
+            $normalized = null;
+            foreach ($normalizationMap as $key => $values) {
+                if (is_array($values)) {
+                    if (in_array($name, $values)) {
+                        $normalized = $key;
+                        break;
+                    }
+                } elseif ($name === $values) {
+                    $normalized = $key;
+                    break;
+                }
+            }
+    
+            if ($normalized) {
+                $name = $normalized;
+            }
+            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                if (strtolower($optionName) === 'yes') {
+                    $optionName = $name;
+                } else {
+                    continue;
+                }
+            }
+            if (in_array($name, $sequence)) {
+                $index = array_search($name, $sequence);
+                $details[$index] = $optionName;
+            } else {
+                $otherDetails[] = $optionName;
+            }
+        }
+    }
+    ksort($details);
+    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+    $variant->save();
+    }
+        if ($request->ajax()) {
+            $status = $request->input('status');
+                if($status === "Available Stock")
+                {
+                    $data = Vehicles::select( [
+                        'vehicles.id as id',
+                        'warehouse.name as location',
+                         'purchasing_order.po_date',
+                         'vehicles.estimation_date',
+                         'vehicles.sales_remarks',
+                         'vehicles.ppmmyyy',
+                         DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
+                        'vehicles.reservation_end_date',
+                        'vehicles.vin',
+                        'vehicles.inspection_date',
+                        'vehicles.engine',
+                        'vehicles.minimum_commission',
+                        'vehicles.custom_inspection_number',
+                        'vehicles.custom_inspection_status',
+                        'vehicles.gp',
+                        'inspection_grn.id as grn_inspectionid',
+                        'vehicles.territory',
+                        'vehicles.price as price',
+                        'inspection_pdi.id as pdi_inspectionid',
+                        'vehicles.grn_remark',
+                        'brands.brand_name',
+                        'varaints.name as variant',
+                        'varaints.model_detail',
+                        'varaints.id as variant_id',
+                        'varaints.detail as variant_detail',
+                       'countries.name as fd',
+                        'varaints.seat',
+                        'varaints.upholestry',
+                        'varaints.steering',
+                        'varaints.my',
+                        'varaints.fuel_type',
+                        'varaints.gearbox',
+                        'master_model_lines.model_line',
+                        'int_color.name as interior_color',
+                        'ex_color.name as exterior_color',
+                        'so.so_number',
+                        'purchasing_order.po_number',
+                        'grn.grn_number',
+                        'sp.name as spn',
+                        'documents.import_type',
+                        'documents.owership',
+                        'documents.document_with',
+                        'bp.name as bpn',
+                        'so.so_date',
+                        'grn.date',
+                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                        DB::raw("
+    COALESCE(
+        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+        ''
+    ) as costprice,
+    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
+                    ])
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('booking', 'vehicles.id', '=', 'booking.vehicle_id')
+                    ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users as sp', 'so.sales_person_id', '=', 'sp.id') // Join for sales person
+                    ->leftJoin('users as bp', 'vehicles.booking_person_id', '=', 'bp.id') // Join for booking person
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection as inspection_grn', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                             ->where('inspection_grn.stage', '=', 'GRN');
+                    })
+                    ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                        $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                             ->where('inspection_pdi.stage', '=', 'PDI');
+                    })
+                    ->whereNull('vehicles.gdn_id')
+                    ->where('vehicles.status', 'Approved');
+                    $data = $data->groupBy('vehicles.id');  
+                }
+        if ($data) {
+            return DataTables::of($data)->toJson();
+        }
+        }
+        return view('vehicles.available', ['salesperson' => $sales_persons]);
+    }
+    public function deliveredvehicles(Request $request)
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "View the Stock Status Wise";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        // Variant detail computation
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
+        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+        ->orderBy('id', 'DESC')
+        ->get();
+        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+        $normalizationMap = [
+        'COO' => 'COO',
+        'SFX' => 'SFX',
+        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+        'HeadLamp Type' => 'HeadLamp Type',
+        'infotainment type' => 'infotainment type',
+        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+        'Speakers' => 'Speakers',
+        'sunroof' => 'sunroof'
+        ];
+    foreach ($variants as $variant) {
+    $details = [];
+    $otherDetails = [];
+    foreach ($variant->variantItems as $item) {
+        $modelSpecification = $item->model_specification;
+        $modelSpecificationOption = $item->model_specification_option;
+        if ($modelSpecification && $modelSpecificationOption) {
+            $name = $modelSpecification->name;
+            $optionName = $modelSpecificationOption->name;
+            $normalized = null;
+            foreach ($normalizationMap as $key => $values) {
+                if (is_array($values)) {
+                    if (in_array($name, $values)) {
+                        $normalized = $key;
+                        break;
+                    }
+                } elseif ($name === $values) {
+                    $normalized = $key;
+                    break;
+                }
+            }
+    
+            if ($normalized) {
+                $name = $normalized;
+            }
+            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                if (strtolower($optionName) === 'yes') {
+                    $optionName = $name;
+                } else {
+                    continue;
+                }
+            }
+            if (in_array($name, $sequence)) {
+                $index = array_search($name, $sequence);
+                $details[$index] = $optionName;
+            } else {
+                $otherDetails[] = $optionName;
+            }
+        }
+    }
+    ksort($details);
+    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+    $variant->save();
+    }
+        if ($request->ajax()) {
+            $status = $request->input('status');
+            if($status === "Delivered")
+            {
+                $data = Vehicles::select( [
+                    'vehicles.id',
+                    'warehouse.name as location',
+                    'purchasing_order.po_date',
+                    'vehicles.ppmmyyy',
+                    'vehicles.reservation_end_date',
+                    'vehicles.vin',
+                    'vehicles.price',
+                    'vehicles.territory',
+                    'vehicles.sales_remarks',
+                    'vehicles.minimum_commission',
+                    'vehicles.custom_inspection_number',
+                    'vehicles.custom_inspection_status',
+                    'inspection_grn.id as grn_inspectionid',
+                    'inspection_pdi.id as pdi_inspectionid',
+                    'vehicles.engine',
+                    'vehicles.gp',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.id as variant_id',
+                    'varaints.model_detail',
+                    'varaints.detail as variant_detail',
+                    'countries.name as fd',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'so.so_number',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'documents.import_type',
+                    'documents.owership',
+                    'documents.document_with',
+                    'grn.grn_number',
+                    'gdn.gdn_number',
+                    'users.name',
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    'so.so_date',
+                    'grn.date',
+                    'gdn.date as gdndate',
+                    DB::raw("
+COALESCE(
+    (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+    (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+    ''
+) as costprice,
+(SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
+                ])
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
+                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->leftJoin('inspection as inspection_grn', function($join) {
+                    $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                         ->where('inspection_grn.stage', '=', 'GRN');
+                })
+                ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                ->leftJoin('inspection as inspection_pdi', function($join) {
+                    $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                         ->where('inspection_pdi.stage', '=', 'PDI');
+                })
+                ->whereNotNull('vehicles.inspection_date')
+                ->whereNotNull('vehicles.gdn_id')
+                ->whereNotNull('vehicles.grn_id')
+                ->where('vehicles.status', 'Approved');
+                $data = $data->groupBy('vehicles.id');  
+            }
+            if ($data) {
+                return DataTables::of($data)->toJson();
+            }
+            }
+        return view('vehicles.delivered', ['salesperson' => $sales_persons]);
+    }
+    public function dpvehicles(Request $request)
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "View the Stock Status Wise";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        // Variant detail computation
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
+        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+        ->orderBy('id', 'DESC')
+        ->get();
+        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+        $normalizationMap = [
+        'COO' => 'COO',
+        'SFX' => 'SFX',
+        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+        'HeadLamp Type' => 'HeadLamp Type',
+        'infotainment type' => 'infotainment type',
+        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+        'Speakers' => 'Speakers',
+        'sunroof' => 'sunroof'
+        ];
+    foreach ($variants as $variant) {
+    $details = [];
+    $otherDetails = [];
+    foreach ($variant->variantItems as $item) {
+        $modelSpecification = $item->model_specification;
+        $modelSpecificationOption = $item->model_specification_option;
+        if ($modelSpecification && $modelSpecificationOption) {
+            $name = $modelSpecification->name;
+            $optionName = $modelSpecificationOption->name;
+            $normalized = null;
+            foreach ($normalizationMap as $key => $values) {
+                if (is_array($values)) {
+                    if (in_array($name, $values)) {
+                        $normalized = $key;
+                        break;
+                    }
+                } elseif ($name === $values) {
+                    $normalized = $key;
+                    break;
+                }
+            }
+    
+            if ($normalized) {
+                $name = $normalized;
+            }
+            if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                if (strtolower($optionName) === 'yes') {
+                    $optionName = $name;
+                } else {
+                    continue;
+                }
+            }
+            if (in_array($name, $sequence)) {
+                $index = array_search($name, $sequence);
+                $details[$index] = $optionName;
+            } else {
+                $otherDetails[] = $optionName;
+            }
+        }
+    }
+    ksort($details);
+    $variant->detail = implode(', ', array_merge($details, $otherDetails));
+    $variant->save();
+    }
+        if ($request->ajax()) {
+            $status = $request->input('status');
+            if($status === "dpvehicles")
+            {
+                $data = Vehicles::select( [
+                    'vehicles.id',
+                    'vehicles.grn_id',
+                    'vehicles.gdn_id',
+                    'vehicles.estimation_date',
+                    'vehicles.sales_remarks',
+                    'vehicles.gp',
+                    'vehicles.territory',
+                    'vehicles.inspection_date',
+                    'vehicles.custom_inspection_number',
+                    'vehicles.custom_inspection_status',
+                    'vehicles.so_id',
+                    'vehicles.reservation_end_date',
+                    'warehouse.name as location',
+                    'purchasing_order.po_date',
+                    'vehicles.ppmmyyy',
+                    'vehicles.vin as vin',
+                    'vehicles.minimum_commission',
+                    'inspection_grn.id as grn_inspectionid',
+                    'inspection_pdi.id as pdi_inspectionid',
+                    'vehicles.engine',
+                    'vehicles.price',
+                    'countries.name as fd',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.detail as variant_detail',
+                    'varaints.id as variant_id',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'documents.import_type',
+                    'documents.owership',
+                    'documents.document_with',
+                    'varaints.gearbox',
+                    'so.so_number',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'grn.grn_number',
+                    'gdn.gdn_number',
+                    'users.name',
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                   'so.so_date',
+                    'grn.date',
+                    'gdn.date as gdndate',
+                    DB::raw("
+COALESCE(
+    (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+    (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+    ''
+) as costprice,
+(SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+")
+
+                ])
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
+                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->leftJoin('inspection as inspection_grn', function($join) {
+                    $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
+                         ->where('inspection_grn.stage', '=', 'GRN');
+                })
+                ->leftJoin('inspection as inspection_pdi', function($join) {
+                    $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
+                         ->where('inspection_pdi.stage', '=', 'PDI');
+                })
+                ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
+                ->where('vehicles.status', 'Approved')
+                ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                $data = $data->groupBy('vehicles.id');
+    }  
+            if ($data) {
+                return DataTables::of($data)->toJson();
+            }
+            }
+        return view('vehicles.demandplaninigstock', ['salesperson' => $sales_persons]);
+    }
+    public function savesalesremarks(Request $request)
+    {
+        $vehicle_id = $request->input('vehicle_remarks_id');
+        $salesremarks = $request->input('salesremarks');
+        $vehicle = vehicles::find($vehicle_id);
+        if ($vehicle) {
+            $vehicle->sales_remarks = $salesremarks;
+            $vehicle->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Vehicle not found']);
+        }
+    }
+    public function getsalesremarks(Request $request)
+    {
+        // Find the vehicle by ID and fetch its custom inspection details
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId); // Assume you have a Vehicle model
+        if ($vehicle) {
+            // Return the custom inspection number and status
+            return response()->json([
+                'sales_remarks' => $vehicle->sales_remarks, // Replace with the actual column
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+    }
     }

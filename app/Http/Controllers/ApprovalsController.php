@@ -576,16 +576,42 @@ class ApprovalsController extends Controller
                 $vehicles->qc_remarks = $comments;
             }
             $vehicles->save();
-        $selectedSpecifications = [];
-        foreach ($request->all() as $key => $value) {
-            if (strpos($key, 'specification_') !== false) {
-                $specificationId = substr($key, strlen('specification_'));
-                $selectedSpecifications[] = [
-                    'specification_id' => $specificationId,
-                    'value' => $value,
-                ];
+            $selectedSpecifications = [];
+            foreach ($request->all() as $key => $value) {
+                if (strpos($key, 'specification_') !== false) {
+                    $specificationId = substr($key, strlen('specification_'));
+                    $selectedSpecifications[] = [
+                        'specification_id' => $specificationId,
+                        'value' => $value,
+                    ];
+                }
             }
-        }
+            $variantoption = $request->input('variantoption');
+            if($variantoption == 'updateexisting')
+            {
+            $existingvehiclevariant = Varaint::find($vehicles->varaints_id);
+            foreach ($selectedSpecifications as $specificationData) {
+                // Check if a record with the same variant_id and model_specification_id exists
+                $specification = VariantItems::where('varaint_id', $existingvehiclevariant->id)
+                                             ->where('model_specification_id', $specificationData['specification_id'])
+                                             ->first();
+                
+                if ($specification) {
+                    // Update the existing record
+                    $specification->model_specification_options_id = $specificationData['value'];
+                    $specification->save();
+                } else {
+                    // Insert a new record if it does not exist
+                    VariantItems::create([
+                        'varaint_id' => $existingvehiclevariant->id,
+                        'model_specification_id' => $specificationData['specification_id'],
+                        'model_specification_options_id' => $specificationData['value'],
+                    ]);
+                }
+            }
+            }
+            else
+            {
         $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
     ->where('fuel_type', $request->input('fuel_type'))
@@ -1029,8 +1055,7 @@ class ApprovalsController extends Controller
                 }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
           "PFI Number: " . $purchasingOrder->pl_number . "\n" .
-          "Stage: " . "Payment Requested for Initiation\n" .
-          "Number of Units: " . $transactionCount . " Vehicles\n" .
+          "Stage: " . "QC Inspection Done\n" .
           "Old Variant: " . $oldVariantName . " Vehicles\n" .
           "New Variant: " . $newVariantName . " Vehicles\n" .
           "Order URL: " . $orderUrl;
@@ -1053,7 +1078,8 @@ class ApprovalsController extends Controller
                     $dnaccess->department_notifications_id = $notification->id;
                     $dnaccess->save();
                 }
-        }  
+        }
+    }  
             return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Approval successfully Done.');
     }
     }
@@ -1088,6 +1114,8 @@ class ApprovalsController extends Controller
     }
     public function approvalsrotein(Request $request)
     {
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
         $useractivities =  New UserActivities();
         $useractivities->activity = "Approved the routain inspection";
         $useractivities->users_id = Auth::id();

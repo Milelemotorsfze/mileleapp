@@ -46,7 +46,6 @@ class ModelLinesController extends Controller
         if ($validator->fails() ) {
 
             if($request->request_from == 'Quotation') {
-                info("inside condition");
                 $data['error'] = $validator->messages()->first();
                 return response($data);
             }else{

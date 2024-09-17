@@ -21,6 +21,7 @@ use App\Models\HRM\Employee\Leave;
 use App\Models\HRM\Employee\OverTime;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -31,6 +32,7 @@ class User extends Authenticatable
         'selected_role', // Add the selected_role column here
         'sales_rap',
         'is_management',
+        'is_sales_rep',
     ];
     protected $hidden = [
         'password',
@@ -587,6 +589,11 @@ class User extends Authenticatable
     }
     public function joiningReport() {
         return $this->hasMany(JoiningReport::class,'employee_id','id');
+    }
+
+    public function mentionedInComments(): BelongsToMany
+    {
+        return $this->belongsToMany(WOComments::class, 'comment_user', 'user_id', 'comment_id');
     }
     public function department()
     {

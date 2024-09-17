@@ -27,6 +27,10 @@ class Clients extends Model
     {
         return $this->belongsTo(User::class,'created_by','id');
     }
+    public function clientCountries()
+    {
+        return $this->hasMany(ClientCountry::class,'client_id','id');
+    }
     public function getIsDeletableAttribute() {
 
         $isExistLOI = LetterOfIndent::where('client_id', $this->id)->count();
@@ -41,7 +45,14 @@ class Clients extends Model
                     $isExistClientLeads = ClientLeads::where('clients_id', $this->id)->count();
                     if($isExistClientLeads <= 0) {
 
-                        return true;
+                        $isExistClientCountries = ClientCountry::where('client_id', $this->id)->count();
+                        if($isExistClientCountries <= 0) {
+                            $isExistPFI = PFI::where('client_id', $this->id)->count();
+                            if($isExistPFI <= 0) {
+                                return true;
+                            }
+                        }
+                        
                     }
                 }             
             }

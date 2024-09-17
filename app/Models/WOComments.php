@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class WOComments extends Model
 {
@@ -44,5 +45,9 @@ class WOComments extends Model
     public function updated_vehicles() {
         return $this->hasMany(CommentVehicleMapping::class, 'comment_id')
             ->where('type', 'update');
+    }
+    public function mentionedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'comment_user', 'comment_id', 'user_id');
     }
 }

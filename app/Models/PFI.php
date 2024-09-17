@@ -15,23 +15,29 @@ class PFI extends Model
     public const PFI_PAYMENT_STATUS_UNPAID = 'UNPAID';
     public const PFI_PAYMENT_STATUS_PARTIALY_PAID = 'PARTIALY PAID';
     public const PFI_PAYMENT_STATUS_CANCELLED = 'CANCELLED';
-
-    public $appends = [
-        'pfi_items'
-    ];
-    public function letterOfIndent()
-    {
-        return $this->belongsTo(LetterOfIndent::class);
-    }
+   
     public function supplier()
     {
         return $this->belongsTo(Supplier::class,'supplier_id','id');
     }
-    public function getpfiItemsAttribute()
+    public function pfiItems()
     {
-        $approvedPfis = ApprovedLetterOfIndentItem::where('pfi_id', $this->id)
-            ->get();
-
-        return $approvedPfis;
+        return $this->hasMany(PfiItem::class,'pfi_id','id');
+    }
+    public function customer()
+    {
+        return $this->belongsTo(Clients::class,'client_id','id');
+    }
+    public function country()
+    {
+        return $this->belongsTo(Country::class,'country_id','id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
     }
 }
