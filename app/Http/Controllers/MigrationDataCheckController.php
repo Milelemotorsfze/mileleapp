@@ -365,7 +365,7 @@ class MigrationDataCheckController extends Controller
         info("passport");
         info($isPassport);
      
-        return 1;
+        return $isPassport;
     }
     // transfer file from LOI Documents to Customer Documents
     public function migrateCustomerDocs() {
