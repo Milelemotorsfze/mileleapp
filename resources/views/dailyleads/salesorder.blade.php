@@ -327,15 +327,15 @@ table.dataTable thead th select {
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
                 <th>Customer Name</th>
+                <th>Sales Person</th>
+                  <th>Sales Date</th>
+                  <th>SO Number</th>
                 <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
                   <th>Quotation Notes</th>
                   <th>View Quotation</th>
-                  <th>Sales Person</th>
-                  <th>Sales Date</th>
-                  <th>SO Number</th>
                   <th>SO Update</th>
                   <th>SO Canacel</th>
                 </tr>
@@ -367,6 +367,22 @@ table.dataTable thead th select {
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
             { data: 'customername', name: 'calls.name' },
+            { data: 'name', name: 'users.name' },
+            {
+                data: 'so_date',
+                name: 'so.so_date',
+                render: function(data, type, row) {
+                    if (data) {
+                        var dateObj = new Date(data);
+                        var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                            day: '2-digit', month: 'short', year: 'numeric'
+                        });
+                        return formattedDate;
+                    }
+                    return ''; // If no date, return empty
+                }
+            },
+            { data: 'so_number', name: 'so.so_number' },
             { data: 'phone', name: 'calls.phone' },
             { data: 'email', name: 'calls.email' },
             {
@@ -397,22 +413,6 @@ table.dataTable thead th select {
                     }
                 }
             },
-            { data: 'name', name: 'users.name' },
-            {
-                data: 'so_date',
-                name: 'so.so_date',
-                render: function(data, type, row) {
-                    if (data) {
-                        var dateObj = new Date(data);
-                        var formattedDate = dateObj.toLocaleDateString('en-GB', {
-                            day: '2-digit', month: 'short', year: 'numeric'
-                        });
-                        return formattedDate;
-                    }
-                    return ''; // If no date, return empty
-                }
-            },
-            { data: 'so_number', name: 'so.so_number' },
             {
                 data: 'calls_id',
                 name: 'quotations.calls_id',
