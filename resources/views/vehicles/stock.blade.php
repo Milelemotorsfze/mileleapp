@@ -1578,8 +1578,24 @@ function openeditingcolorModal(vehicleId) {
         data: formData,
         success: function(response) {
             $('#bookingModal').modal('hide');
-            alert('Booking saved successfully.');
-            location.reload();
+            alertify.success('Booking saved successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_id').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
