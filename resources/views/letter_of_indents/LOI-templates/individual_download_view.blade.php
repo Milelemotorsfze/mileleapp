@@ -91,15 +91,15 @@
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
     </div>
+    <div class="page_break"></div>
         <div class="row">
-            @foreach($letterOfIndent->LOIDocuments as $LOIDocument)
-                @if($letterOfIndentDocument->is_passport)
-                    <img src="{{ public_path('storage/app/public/passports/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
-                @elseif($letterOfIndentDocument->is_trade_license)
-                    <img src="{{ public_path('storage/app/public/tradelicenses/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
-                @else
-                    <img src="{{ public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2">
-                @endif
+            @if($isCustomerPassport)
+                <img src="{{ public_path('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}" class="mt-2"></iframe>
+            @elseif($isCustomerTradeLicense)
+                <img src="{{ public_path('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}" class="mt-2"></iframe>
+            @endif
+            @foreach($customerOtherDocAdded as $letterOfIndentDocument)
+                <img src="{{ public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2"></iframe>
             @endforeach
         </div>
 </div>

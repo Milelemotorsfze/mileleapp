@@ -412,54 +412,66 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::select('id','date','signature','client_id','year_code','country_id')->where('id',$request->id)->first();
         $fileName = $letterOfIndent->client->name .'-'.$letterOfIndent->year_code.'.pdf';
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
-      
+        $isCustomerPassport = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                            ->where('is_passport',true)->first();
+    
+        $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                        ->where('is_trade_license',true)->first();
+        $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
+                                        ->where('is_passport', false)
+                                        ->where('is_trade_license',false)
+                                        ->get(); 
+
         if ($request->type == 'trans_cars') {
             $width = $request->width;
 
             if($request->download == 1) {
                 try{ 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
                  return $pdfFile->download($fileName);
                
             }
-            return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+            return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems',
+            'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
                 $width = $request->width;
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
                
                  return $pdfFile->download($fileName);
             }
-            return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+            return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems',
+            'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         } else if($request->type == 'business'){
             if($request->download == 1) {
                 $width = $request->width;
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
                 return $pdfFile->download($fileName);
                
             }
-            return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
+            return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems',
+        'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         }
         else if($request->type == 'individual') {
             if($request->download == 1) {
                 $width = $request->width;
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -467,12 +479,13 @@ class LetterOfIndentController extends Controller
                 return $pdfFile->download($fileName);
                 
             }
-            return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
+            return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems',
+            'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         }else{
             if($request->download == 1) {
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
-                    compact('letterOfIndent'));
+                    compact('letterOfIndent','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -480,7 +493,7 @@ class LetterOfIndentController extends Controller
                 return $pdfFile->download($fileName);
                 
             }
-            return view('letter_of_indents.LOI-templates.general_template', compact('letterOfIndent'));
+            return view('letter_of_indents.LOI-templates.general_template', compact('letterOfIndent','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         }
 
         return redirect()->back()->withErrors("error", "Something went wrong!Please try again");
