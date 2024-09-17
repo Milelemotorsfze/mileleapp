@@ -484,14 +484,15 @@
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <select name="to[]" class="form-control mb-1" id="to" required>
-                                        @foreach ($warehouses as $warehouse)
-                                            @if ($warehouse->name !== 'Supplier')
-                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                </div>
+            <select name="to[]" class="form-control mb-1" id="to" required>
+                <option value="">Select</option>
+                @foreach ($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
+                        {{ $warehouse->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
                                 </div>
