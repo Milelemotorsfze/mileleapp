@@ -637,11 +637,18 @@ class LetterOfIndentController extends Controller
             ->where('status', LetterOfIndent::LOI_STATUS_NEW)
             ->first();
 
+
         if (!$LOI) {
             DB::beginTransaction();
             try{
 
                 $LOI = LetterOfIndent::find($id);
+
+                $isCustomerPassport = LetterOfIndentDocument::where('letter_of_indent_id', $LOI->id)
+                ->where('is_passport',true)->first();
+
+                $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id', $LOI->id)
+                        ->where('is_trade_license',true)->first();
 
                 $customer = Clients::find($request->client_id);
                 $country = Country::find($request->country);
@@ -721,25 +728,19 @@ class LetterOfIndentController extends Controller
                         $LoiDocument->save();
                     }
                 }
-                if($request->is_passport_added == 1) {
+                if($request->is_passport_added == 1 && !$isCustomerPassport) {
                     $LoiDocument = new LetterOfIndentDocument();
                     $LoiDocument->loi_document_file = $customer->passport;
                     $LoiDocument->letter_of_indent_id = $LOI->id;
                     $LoiDocument->is_passport = true;
                     $LoiDocument->save();
-                }else{
-                    LetterOfIndentDocument::where('letter_of_indent_id',$LOI->id)
-                                            ->where('is_passport',true)->delete();
                 }
-                if($request->is_trade_license_added == 1) {
+                if($request->is_trade_license_added == 1 && !$isCustomerTradeLicense) {
                     $LoiDocument = new LetterOfIndentDocument();
                     $LoiDocument->loi_document_file = $customer->tradelicense;
                     $LoiDocument->letter_of_indent_id = $LOI->id;
                     $LoiDocument->is_trade_license = true;
                     $LoiDocument->save();
-                }else{
-                    LetterOfIndentDocument::where('letter_of_indent_id',$LOI->id)
-                                            ->where('is_trade_license',true)->delete();
                 }
 
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();
