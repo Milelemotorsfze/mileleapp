@@ -719,7 +719,13 @@ table.dataTable thead th select {
 },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'spn', name: 'sp.name' },
-                { data: 'sales_remarks', name: 'vehicles.sales_remarks' },
+                { 
+        data: 'sales_remarks', 
+        name: 'vehicles.sales_remarks',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
                 {
     data: 'reservation_end_date',
     name: 'vehicles.reservation_end_date',
@@ -1455,8 +1461,20 @@ $('#remarksForm').on('submit', function(e) {
         data: formData,
         success: function(response) {
             $('#remarksModal').modal('hide');
-            alert('Remarks saved successfully.');
-            location.reload();
+            alertify.success('Remarks saved successfully');
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_remarks_id').val();
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId;
+    });
+    if (row.node()) {
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging

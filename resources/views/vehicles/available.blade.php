@@ -750,7 +750,13 @@ var now = new Date();
 },
         { data: 'so_number', name: 'so.so_number' },
         { data: 'spn', name: 'sp.name' },
-        { data: 'sales_remarks', name: 'vehicles.sales_remarks' },
+        { 
+        data: 'sales_remarks', 
+        name: 'vehicles.sales_remarks',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { 
             data: 'id', 
             name: 'id',
@@ -1534,8 +1540,24 @@ function openeditingcolorModal(vehicleId) {
         data: formData,
         success: function(response) {
             $('#remarksModal').modal('hide');
-            alert('Remarks saved successfully.');
-            location.reload();
+            alertify.success('Remarks saved successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table3 = $('#dtBasicExample3').DataTable();
+           var vehicleId = $('#vehicle_remarks_id').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table3.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
