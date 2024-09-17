@@ -332,40 +332,60 @@ class MigrationDataCheckController extends Controller
     }
     public function index(Request $request)
     {
-        $isPassport = [];
-        // $isTradeLicense = [];
-        $letterOfIndentDocuments = LetterOfIndentDocument::all();
-                                // return $letterOfIndentDocuments;
-        foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
-            info($letterOfIndentDocument);
-            // $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
-            // if(!$customerDoc) {
-                info($letterOfIndentDocument->LOI->client->passport);
-                info($letterOfIndentDocument->LOI->client->tradelicense);
-                if($letterOfIndentDocument->LOI->client->passport || $letterOfIndentDocument->LOI->client->tradelicense) {
-                    info("passport / treade license  exist");
-                    $isPassport[] = $letterOfIndentDocument->loi_document_file;
-                    $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->LOI->client->tradelicense;
-                    $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->LOI->client->passport;
-                    $letterOfIndentDocument->save();
-                }
-                    info("other doc exist");
-                //     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
-                //     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
+        // // $isPassport = [];
+        // // $isTradeLicense = [];
+        // // $letterOfIndentDocuments = LetterOfIndentDocument::all();
+        // //                         // return $letterOfIndentDocuments;
+        // // foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
+        // //     info($letterOfIndentDocument);
+        //     // $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
+        //     // if(!$customerDoc) {
+        //         // info($letterOfIndentDocument->LOI->client->passport);
+        //         // info($letterOfIndentDocument->LOI->client->tradelicense);
+        //         // if($letterOfIndentDocument->LOI->client->passport || $letterOfIndentDocument->LOI->client->tradelicense) {
+        //         //     info("passport / treade license  exist");
+        //         //     $isPassport[] = $letterOfIndentDocument->loi_document_file;
+        //         //     $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->LOI->client->tradelicense;
+        //         //     $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->LOI->client->passport;
+        //         //     $letterOfIndentDocument->save();
+        //         // }
+        //         if($letterOfIndentDocument->customer_trade_license_file_name) {
+        //             $data = ClientDocument::where('document','like', '%' . $letterOfIndentDocument->loi_document_file . '%')->first();
+                    
+        //             if($data) {
+        //                 info($data);
+        //                 $data->delete();
+        //             }
+        //             $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->loi_document_file;
+        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_trade_license_file_name;
+        //             $letterOfIndentDocument->is_trade_license = 1;
+        //             $letterOfIndentDocument->save();
+        //         }
+        //         if($letterOfIndentDocument->customer_passport_file_name) {
+        //             ClientDocument::where('document','like','%' . $letterOfIndentDocument->loi_document_file . '%')->delete();
+
+        //             $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->loi_document_file;
+        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_passport_file_name;
+        //             $letterOfIndentDocument->is_passport = 1;
+        //             $letterOfIndentDocument->save();
+        //         }
+        //             info("other doc exist");
+        //         //     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
+        //         //     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
        
-                //    // return $new_path;
-                //    File::copy($old_path, $new_path);
-                //    $customerDoc = new clientDocument();
-                //    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
-                //    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
-                //    $customerDoc->save();
+        //         //    // return $new_path;
+        //         //    File::copy($old_path, $new_path);
+        //         //    $customerDoc = new clientDocument();
+        //         //    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
+        //         //    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
+        //         //    $customerDoc->save();
                                    
-            // }
-        }
-        info("passport");
-        info($isPassport);
+        //     // }
+        // }
+        // info("passport");
+        // info($isPassport);
      
-        return $isPassport;
+        // return $isPassport;
     }
     // transfer file from LOI Documents to Customer Documents
     public function migrateCustomerDocs() {
