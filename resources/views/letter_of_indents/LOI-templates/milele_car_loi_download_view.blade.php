@@ -226,7 +226,8 @@
         <div class="row">
             @if($isCustomerPassport)
                 <img src="{{ public_path('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}" class="mt-2"></iframe>
-            @elseif($isCustomerTradeLicense)
+            @endif
+            @if($isCustomerTradeLicense)
                 <img src="{{ public_path('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}" class="mt-2"></iframe>
             @endif
             @foreach($customerOtherDocAdded as $letterOfIndentDocument)

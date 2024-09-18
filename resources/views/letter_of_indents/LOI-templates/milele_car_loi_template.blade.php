@@ -214,7 +214,8 @@
                         <h5 class="fw-bold text-center">Customer Document</h5>
                         @if($isCustomerPassport)
                             <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"   height="500px;"></iframe>
-                        @elseif($isCustomerTradeLicense)
+                        @endif
+                        @if($isCustomerTradeLicense)
                             <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"  height="500px;"></iframe>
                         @endif
                         @foreach($customerOtherDocAdded as $letterOfIndentDocument)
