@@ -458,7 +458,7 @@ table.dataTable thead th select {
                     if (index === 10 || index === 11) {
     return; // Skip adding a filter for these columns
 }
-                    if (index === 3 || index === 8) { // Assuming date columns are 3 and 8
+                    if (index === 2 || index === 6) { // Assuming date columns are 3 and 8
                         if (d) {
                             var dateObj = new Date(d);
                             var formattedDate = dateObj.toLocaleDateString('en-GB', {
