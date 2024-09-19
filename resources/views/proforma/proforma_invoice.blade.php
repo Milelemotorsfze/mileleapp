@@ -550,7 +550,7 @@
                 Net Total In AED:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{"AED ". number_format($quotation->deal_value * 3.67) }}
+                {{"AED ". number_format($quotation->deal_value * 3.675) }}
             </td>
         </tr>
         @endif

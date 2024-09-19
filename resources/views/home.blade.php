@@ -333,7 +333,7 @@ Procurement
                                         @forelse ($undersalesleads as $undersaleslead)
                                         <tr>
                                             <td>{{ $undersaleslead->salespersonname }}</td>
-                                            <td>{{ $undersaleslead->lead_count }}</td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Pending Leads']) }}">{{ $undersaleslead->lead_count }}</a></td>
                                             @php
                                                 $responsetime = null;
                                                 $responsetime = DB::table('calls')
