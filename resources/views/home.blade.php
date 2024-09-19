@@ -307,6 +307,99 @@ Procurement
                             <!-- end card body -->
                         </div>
         @endif
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sale-team-dashboard');
+        @endphp
+        @if ($hasPermission)
+            <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Showroom Sales Person Leads Summary</h4>
+                            </div>
+                                <table id="dtBasicExample2" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                            <tr>
+                                                <th>Sales Person</th>
+                                                <th>Pending Leads</th>
+                                                <th>Response Time</th>
+                                                <th>Open Leads</th>
+                                                <th>Quotation Issued</th>
+                                                <th>Rejected</th>
+                                                <th>Sales Order</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @forelse ($undersalesleads as $undersaleslead)
+                                        <tr>
+                                            <td>{{ $undersaleslead->salespersonname }}</td>
+                                            <td>{{ $undersaleslead->lead_count }}</td>
+                                            @php
+                                                $responsetime = null;
+                                                $responsetime = DB::table('calls')
+                                                    ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
+                                                    ->where('calls.status', '!=', 'New')
+                                                    ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                    ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                    ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, prospectings.created_at)) as average_response_time'))
+                                                    ->first();
+                                            @endphp
+                                            <td>{{ $responsetime ? number_format($responsetime->average_response_time, 0) . ' Hrs' : 'N/A' }}</td>
+                                            @php
+                                               $openLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->where('calls.status', '!=', 'Closed')
+                                                    ->orWhere('calls.status', '=', 'Quoted')
+                                                        ->orWhere('calls.status', '!=', 'Rejected');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $openLeadsCount }}</td>
+                                            @php
+                                               $closedLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->where('calls.status', '=', 'Closed');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            @php
+                                               $closedLeadsCountrejected = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->Where('calls.status', '=', 'Rejected');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            @php
+                                               $closedLeadsCountquoted = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->Where('calls.status', '=', 'Quoted');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $closedLeadsCountquoted }}</td>
+                                            <td>{{ $closedLeadsCountrejected }}</td>
+                                            <td>{{ $closedLeadsCount }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">No pending leads found.</td>
+                                        </tr>
+                                    @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         @endphp

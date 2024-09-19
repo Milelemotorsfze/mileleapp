@@ -464,12 +464,16 @@ class SalesOrderController extends Controller
 }
 public function cancel($id)
 {
+    info($id);
     $quotation = Quotation::where('calls_id', $id)->first();
     $calls = Calls::find($id);
     $calls->status = 'Quoted';
     $calls->save();
     $leadclosed = Closed::where('call_id', $id)->first();
+    if($leadclosed)
+    {
     $leadclosed->delete();
+    }
     $so = So::where('quotation_id', $quotation->id)->first();
     $soitems = Soitems::where('so_id', $so->id)->get();
     foreach ($soitems as $soitem) {
@@ -498,6 +502,7 @@ public function cancel($id)
     $solog->so_id = $so->id;
     $solog->role = Auth::user()->selectedRole;
     $solog->save();
+    $so->delete();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
 }
         }
