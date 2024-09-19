@@ -505,4 +505,39 @@ public function cancel($id)
     $so->delete();
     return redirect()->back()->with('success', 'Sales Order and related items canceled successfully.');
 }
+public function showSalesSummary($sales_person_id, $count_type)
+{
+    $salesperson = DB::table('salespersons')->where('id', $sales_person_id)->first();
+    // Filter the leads data based on the count_type
+    $leadsQuery = DB::table('calls')
+        ->where('sales_person', $sales_person_id)
+        ->whereDate('created_at', '>=', '2023-10-01');
+    
+    // Modify the query based on the count_type
+    switch ($count_type) {
+        case 'Pending Leads':
+            $leadsQuery->where('status', '!=', 'Closed');
+            break;
+        case 'Open Leads':
+            $leadsQuery->where('status', 'Open');
+            break;
+        case 'Quotation':
+            $leadsQuery->where('status', 'Quoted');
+            break;
+        case 'Rejection':
+            $leadsQuery->where('status', 'Rejected');
+            break;
+        case 'Sales Order':
+            $leadsQuery->where('status', 'Closed');
+            break;
+        default:
+            break;
+    }
+    $leadsSummary = $leadsQuery->get();
+    return view('dailyleads.leadssummary', [
+        'salesperson' => $salesperson,
+        'leadsSummary' => $leadsSummary,
+        'countType' => $count_type, // Send the count type for display
+    ]);
+}
         }

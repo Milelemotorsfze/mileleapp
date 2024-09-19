@@ -1030,5 +1030,6 @@ Route::get('/d', function () {
     Route::post('/sales-remarks', [VehiclesController::class, 'savesalesremarks'])->name('vehicles.savesalesremarks');
     Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
     Route::resource('salesorder', SalesOrderController::class);
+    Route::get('/sales-summary/{sales_person_id}/{count_type}', [SalesOrderController::class, 'showSalesSummary'])->name('sales.summary');
 });
 
