@@ -218,16 +218,27 @@
                             <div class="row customer-doc-div">
                                     <!-- consider the LOI selected customer passport or any doc and current passport or any doc, it may differ -->
                                 @if($isCustomerPassport)
+                                
                                     <div class="col-lg-4 col-md-6 col-sm-12 text-center">
                                         <h6> Passport </h6>
                                         <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
-                                        <button type="button" hidden class="btn btn-info btn-sm text-center mt-2 add-passport-button"
+                                        <button type="button" hidden id="add-old-passport" class="btn btn-info btn-sm text-center mt-2 add-passport-button"
                                         onclick="addPassportToLOI()" >
                                             Add to LOI </button>
-                                        <button type="button"  class="btn btn-danger btn-sm text-center mt-2 remove-passport-button"
+                                        <button type="button" id="remove-old-passport" class="btn btn-danger btn-sm text-center mt-2 remove-passport-button"
                                         onclick="removePassportFromLOI()">
                                         Remove From LOI </button>   
                                     </div>
+                                    @if($isCustomerPassport->loi_document_file != $letterOfIndent->client->passport)
+                                    
+                                        <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                            <h6> Latest Passport </h6>
+                                            <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
+                                            <button type="button" id="add-new-passport" onclick="addLatestPassportToLOI()" class="btn btn-info btn-sm text-center mt-2">
+                                                Add to LOI </button>
+                                            <button type="button" id="remove-new-passport" hidden onclick="removeLatestPassportToLOI()" class="btn btn-danger btn-sm text-center mt-2">                                        Remove From LOI </button>               
+                                        </div> 
+                                    @endif
                                 @elseif($letterOfIndent->client->passport)          
                                     <div class="col-lg-4 col-md-6 col-sm-12 text-center">
                                         <h6> Passport </h6>
@@ -257,7 +268,7 @@
                                         Remove From LOI </button>     
                                     </div>    
                                 @endif
-                                @if($letterOfIndent->client->clientDocuments->count() > 0 )
+                                @if($customerOtherDocNotAdded->count() > 0 ||  $customerOtherDocAdded->count() > 0)
                                     <h6 class="text-center p-2"> Other Documents </h6>
                                         @foreach($customerOtherDocAdded as $key => $CustomerOtherDoc)
                                         <!-- <iframe src="{{ url('customer-other-documents/'.$CustomerOtherDoc->loi_document_file) }}"></iframe> -->
@@ -427,7 +438,7 @@
                     </select>
                     <input type="hidden" value="{{ $isCustomerPassport ? 1 : 0 }}" name="is_passport_added" id="add-passport-to-loi">
                     <input type="hidden" value="{{ $isCustomerTradeLicense ? 1 : 0 }}" name="is_trade_license_added" id="add-trade-license-to-loi">
-                   
+                    
                     <!-- <input type="hidden" id="other-document-count" value="{{ $customerOtherDocAdded->count() }}" > -->
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
@@ -836,6 +847,41 @@
                   }
                 console.log("totalDocumentCount");
                 console.log(totalDocumentCount);
+            }
+
+            function addLatestPassportToLOI() {
+                var confirm = alertify.confirm('Are you sure ?  while adding latest passport the old passport will remove by default',function (e) {
+                   // if value 2 remove old passport and add latest passport for the loi
+                //    if value 1 chcek passport is alredy existing or not , if not existing create new loi document
+                // if value 0 remove all the passport
+                    $('#add-passport-to-loi').val(2);
+                    $('#add-old-passport').addClass('disabled');
+                    $('#remove-old-passport').addClass('disabled');
+
+                    $('#add-new-passport').attr('hidden', true);
+                    $('#remove-new-passport').attr('hidden', false);
+
+                }).set({title:"Alert !"})
+               
+                // let type = 'add';
+                // updateDocumentCount(type);
+            }
+            function removeLatestPassportToLOI() {
+                var confirm = alertify.confirm('Are you sure ? while removing latest passport the old passport will add by default!',function (e) {
+                   // if value 2 remove old passport and add latest passport for the loi
+                //    if value 1 chcek passport is alredy existing or not , if not existing create new loi document
+                // if value 0 remove all the passport
+                    $('#add-passport-to-loi').val(1);
+                    $('#add-old-passport').removeClass('disabled');
+                    $('#remove-old-passport').removeClass('disabled');
+
+                    $('#add-new-passport').attr('hidden', false);
+                    $('#remove-new-passport').attr('hidden', true);
+
+                }).set({title:"Alert !"})
+               
+                // let type = 'add';
+                // updateDocumentCount(type);
             }
 
             function addPassportToLOI() {
@@ -1474,7 +1520,7 @@
             // alert(ispassportAdded);
             // alert(totalDocumentCount);
             uniqueCheckSoNumber();
-            if(ispassportAdded == 1 || isTradeLicenseAdded == 1 || totalDocumentCount > 0) {
+            if(ispassportAdded != 0 || isTradeLicenseAdded == 1 || totalDocumentCount > 0) {
                 if (formValid == true && isValidCountryCheck == 0) {
                     if($("#form-update").valid()) {
                         $('#form-update').unbind('submit').submit();

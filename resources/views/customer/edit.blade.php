@@ -142,7 +142,7 @@
                                         @endforeach
                                     </div>
                                 @endif
-                                <div class="row">
+                                <div class="row mt-2">
                                     <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                                         <div id="preview-other-documents">
                                         </div>

@@ -729,9 +729,13 @@ class LetterOfIndentController extends Controller
                         $LoiDocument->save();
                     }
                 }
+                 // if is_passport_added value 2 remove old passport and add latest passport for the loi
+                //    if is_passport_added value 1 chcek passport is alredy existing or not , if not existing create new loi document
+                // if is_passport_added value 0 remove all the passport
                 if($request->is_passport_added == 1) {
-                    info("passport added");
+                    info("passport added or keep existing");
                     if(!$isCustomerPassport) {
+                        info("passport new added");
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->passport;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -739,7 +743,17 @@ class LetterOfIndentController extends Controller
                         $LoiDocument->save();
                     }
                    
-                }else{
+                }else if($request->is_passport_added == 2){
+                    // value 2
+                    // update new passport
+                    info("latest passport => update data");
+                    if($isCustomerPassport) {
+                        $isCustomerPassport->loi_document_file = $customer->passport;
+                        $isCustomerPassport->save();
+                    }                       
+                 }else{
+                    // value 0
+                    info("no passport selected => delete data");
                     LetterOfIndentDocument::where('is_passport', true)
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
