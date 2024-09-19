@@ -436,7 +436,7 @@
                     </select>
                     <select name="customer_other_documents_Ids[]" id="added-customer-docs" hidden="hidden" multiple>
                     </select>
-                    <input type="hidden" value="{{ $isCustomerPassport ? 1 : 0 }}" name="is_passport_added" id="add-passport-to-loi">
+                    <input type="hidden" value="{{ $isCustomerPassport ? 1 : 0 }}" current-data="{{ $isCustomerPassport ? 1 : 0 }}" name="is_passport_added" id="add-passport-to-loi">
                     <input type="hidden" value="{{ $isCustomerTradeLicense ? 1 : 0 }}" name="is_trade_license_added" id="add-trade-license-to-loi">
                     
                     <!-- <input type="hidden" id="other-document-count" value="{{ $customerOtherDocAdded->count() }}" > -->
@@ -871,7 +871,8 @@
                    // if value 2 remove old passport and add latest passport for the loi
                 //    if value 1 chcek passport is alredy existing or not , if not existing create new loi document
                 // if value 0 remove all the passport
-                    $('#add-passport-to-loi').val(1);
+                    let value =$('#add-passport-to-loi').attr("current-data");
+                    $('#add-passport-to-loi').val(value);
                     $('#add-old-passport').removeClass('disabled');
                     $('#remove-old-passport').removeClass('disabled');
 
@@ -890,6 +891,7 @@
                 $('.remove-passport-button').attr('hidden', false);
                 let type = 'add';
                 updateDocumentCount(type);
+                $('#add-passport-to-loi').attr("current-data",1);
             }
             function removePassportFromLOI() {
                 $('#add-passport-to-loi').val(0);
@@ -897,6 +899,7 @@
                 $('.remove-passport-button').attr('hidden', true);
                 let type = 'subtract';
                 updateDocumentCount(type);
+                $('#add-passport-to-loi').attr("current-data",0);
             }
             function addTradeDocToLOI() {
                 $('#add-trade-license-to-loi').val(1);
