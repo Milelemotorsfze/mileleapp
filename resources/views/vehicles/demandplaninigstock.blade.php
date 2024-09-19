@@ -916,7 +916,7 @@ if (hasPricePermission) {
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             columnDefs: [
         {
-            targets: 0,
+            targets: 1,
             render: function (data, type, row) {
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';

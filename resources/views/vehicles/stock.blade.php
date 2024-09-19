@@ -988,7 +988,7 @@ table.dataTable thead th select {
             pageLength: -1,
             columnDefs: [
         {
-            targets: 0,
+            targets: 1,
             render: function (data, type, row) {
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
