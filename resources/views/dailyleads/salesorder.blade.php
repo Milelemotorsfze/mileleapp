@@ -428,7 +428,7 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
-                    return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO ${data}</button>`;
+                    return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
                 }
             }
         ],
