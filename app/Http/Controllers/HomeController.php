@@ -238,6 +238,22 @@ $totalvariantss = [
             $sales_personsname = [];
             $leadsCount = [];
         }
+        $saleshasPermission = Auth::user()->hasPermissionForSelectedRole('sale-team-dashboard');
+        if ($saleshasPermission) {
+            $person = Auth::id();
+            $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
+            info($salespersonunder);
+            $undersalesleads = DB::table('calls')
+            ->join('users', 'calls.sales_person', '=', 'users.id')
+            ->where('calls.status', '=', 'New')
+            ->whereIn('calls.sales_person', $salespersonunder->pluck('person_id')->toArray())
+            ->groupBy('users.name')
+            ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
+            ->get();
+        }
+        else{
+            $undersalesleads = [];
+        }
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         if ($hasPermission) {
             $dpdashboarduae = DB::table('vehicles')
@@ -268,7 +284,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads'));
         }
         else
         {
@@ -276,7 +292,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads'));
         }
     }
     public function marketingupdatechart(Request $request)
