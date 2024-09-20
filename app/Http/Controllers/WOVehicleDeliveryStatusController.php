@@ -24,6 +24,7 @@ class WOVehicleDeliveryStatusController extends Controller
             'doc_delivery_date' => 'nullable|date',
             'delivery_at' => 'nullable|date',
             'gdn_number' => 'nullable|string',
+            'delivered_at' => 'nullable|date',
             'location' => 'nullable|exists:master_office_locations,id', // Ensure it references a valid location
         ]);
 
@@ -36,6 +37,7 @@ class WOVehicleDeliveryStatusController extends Controller
             'doc_delivery_date' => $validatedData['doc_delivery_date'] ?? null,
             'delivery_at' => $validatedData['delivery_at'] ?? null,
             'gdn_number' => $validatedData['gdn_number'] ?? null,
+            'delivered_at' => $validatedData['delivered_at'] ?? null,
             'location' => $validatedData['location'] ?? null,
         ]);
 
