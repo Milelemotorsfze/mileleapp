@@ -362,20 +362,20 @@ class WorkOrder extends Model
    // Attribute to get the modification status summary for the work order
     public function getDeliverySummaryAttribute()
     {
-        $deliveredCount = $this->delivery_delivered_count;
+        $deliveredCount = $this->delivery_delivered_count; 
         $readyCount = $this->delivery_ready_count;
         $onHoldCount = $this->delivery_on_hold_count;
-        $deliveredWithDocsHoldCount = $this->delivery_with_docs_hold_count;
+        $deliveredWithDocsHoldCount = $this->delivery_delivered_with_docs_hold_count;
 
         // Logic to determine the summary status
         if ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return 'DELIVERED';
+            return 'DELIVERED WITH DOCUMENTS';
         } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$readyCount} READY";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY";
         } elseif ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS& {$onHoldCount} ON HOLD";
         } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$readyCount} READY & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY & {$onHoldCount} ON HOLD";
         } elseif ($readyCount > 0 && $deliveredCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
             return 'READY';
         } elseif ($readyCount > 0 && $onHoldCount > 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
@@ -383,13 +383,13 @@ class WorkOrder extends Model
         } elseif ($onHoldCount > 0 && $readyCount == 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
             return 'ON HOLD';
         } elseif ($deliveredWithDocsHoldCount > 0 && $deliveredCount == 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return 'DELIVERED WITH DOCS HOLD';
+            return 'DELIVERED/DOCUMENTS HOLD';
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD";
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY";
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount > 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
         } else {
             return 'NO DATA AVAILABLE';
         }

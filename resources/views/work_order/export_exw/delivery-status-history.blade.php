@@ -109,6 +109,7 @@
                             <th>Delivery At</th>                            
                             <th>location</th>
                             <th>GDN Number</th>
+                            <th>Delivered At</th>
                             <th>Docs Delivery Date</th>
                             <th>Updated By</th>
                             <th>Updated At</th>
@@ -121,7 +122,25 @@
                                 <tr data-id="{{ $one->id }}">
                                     <td>{{ ++$i }}</td>
                                     <td>
-                                        <label class="badge @if($one->status == 'Ready') badge-soft-info @elseif($one->status == 'Delivered') badge-soft-success @elseif($one->status == 'On Hold') badge-soft-danger  @elseif($one->status == 'Delivered With Docs Hold') badge-soft-warning @endif">{{ $one->status ?? ''}}</label>
+                                        <label class="badge 
+                                            @if($one->status == 'Ready') 
+                                                badge-soft-info 
+                                            @elseif($one->status == 'Delivered') 
+                                                badge-soft-success 
+                                            @elseif($one->status == 'On Hold') 
+                                                badge-soft-danger  
+                                            @elseif($one->status == 'Delivered With Docs Hold') 
+                                                badge-soft-warning 
+                                            @endif">
+                                            
+                                            @if($one->status == 'Delivered')
+                                                DELIVERED WITH DOCUMENTS
+                                            @elseif($one->status == 'Delivered With Docs Hold')
+                                                DELIVERED/DOCUMENTS HOLD
+                                            @else
+                                                {{ strtoupper($one->status) ?? '' }}
+                                            @endif
+                                        </label>
                                     </td>
                                     <td>{{ $one->comment ?? '' }}</td>
                                     <td>
@@ -130,7 +149,12 @@
                                         @endif
                                     </td>                                     
                                     <td>{{$one->locationName->name ?? ''}}</td> 
-                                    <td>{{$one->gdn_number ?? ''}}</td>                                  
+                                    <td>{{$one->gdn_number ?? ''}}</td>  
+                                    <td>
+                                        @if(!empty($one->delivered_at))
+                                            {{ \Carbon\Carbon::parse($one->delivered_at)->format('d M Y, h:i:s A') }}
+                                        @endif
+                                    </td>                                  
                                     <td>
                                         @if(!empty($one->doc_delivery_date))
                                             {{ \Carbon\Carbon::parse($one->doc_delivery_date)->format('d M Y, h:i:s A') }}
