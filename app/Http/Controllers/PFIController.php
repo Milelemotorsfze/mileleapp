@@ -113,6 +113,18 @@ class PFIController extends Controller
     }
     public function PFIItemList(Request $request) {
         (new UserActivityController)->createActivity('Open PFI Item List Section');
+        // pass the data to show in filter options
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
+        $masterModels = MasterModel::with('modelLine')->select('id','master_model_line_id','model','sfx')
+                                      ->groupBy('model')->get();
+         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
+         $countries = Country::select('id','name')->get();
+            /// end ///
 
         $data = PfiItem::where('is_parent', true)->orderBy('updated_at','DESC')->with([
             'pfi' => function ($query) {
@@ -143,7 +155,49 @@ class PFIController extends Controller
             'pfi.country'  => function ($query) {
                 $query->select('id','name');
             }]);
+           
+            if($request->has('code')) {
+                $data->whereHas('letterOfIndentItem',function($query) use($request) {
+                        $query->where('code', 'like', "%{$request->code}%");
+                    });
+            }
+            if($request->has('status')) {
+                $data->whereHas('letterOfIndentItem.LOI',function($query) use($request) {
+                        $query->where('status', 'like', "%{$request->status}%");
+                    });
+            }
+            // if(!empty($request->has('pfi_date'))) {
+            //     info($request->pfi_date);
+            //     $data->whereHas('pfi',function($query) use($request) {
+            //             $query->whereDate('pfi_date', $request->pfi_date);
+            //         });
+            // }
+            if($request->has('pfi_number')) {
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('pfi_reference_number', 'like', "%{$request->pfi_number}%");
+                    });
+            }
+            if($request->has('client_id')) {
+                $data->whereHas('letterOfIndentItem.LOI',function($query) use($request) {
+                        $query->where('client_id',$request->client_id);
+                    });
+            }
+   
+            if($request->has('country_id')) {
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('country_id', $request->country_id);
+                    });
+            }
+            if($request->has('supplier_id')) {
+                info("test");
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('supplier_id', $request->supplier_id);
+                    });
+            }
+            info($data->count());
+            // info($request->all());
             if($request->export == 'EXCEL') {
+             info($request->all());
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
 
                 $data = $data->get();
@@ -178,7 +232,7 @@ class PFIController extends Controller
 
             if (request()->ajax()) {
                 return DataTables::of($data)
-                    ->addIndexColumn()
+                    ->addIndexColumn()                 
                     ->editColumn('unit_price', function($query) {
                         return number_format($query->unit_price);
                     })
@@ -215,7 +269,7 @@ class PFIController extends Controller
                     ->toJson();
                 }
             
-            return view('pfi.pfi-items.index');
+            return view('pfi.pfi-items.index', compact('suppliers','masterModels','customers','countries'));
     }
 
     /**
@@ -279,7 +333,7 @@ class PFIController extends Controller
         {
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
-            $fileName = time().'.'.$extension;
+            $fileName = 'MILELE - ('.$request->pfi_reference_number.')';
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
@@ -494,7 +548,7 @@ class PFIController extends Controller
 
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
-            $fileName = time().'.'.$extension;
+            $fileName = 'MILELE - ('.$request->pfi_reference_number.')';
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }

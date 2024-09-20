@@ -6,6 +6,18 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
         @endphp
         @if ($hasPermission)
+        <style>
+            .medium-width {
+                max-width:200px !important;
+                min-width:100px !important;
+                height:20px!important;
+            }
+          
+            .small-width{
+                max-width:150px !important;
+            }
+        </style>
+
             <div class="card-header">
                 <h4 class="card-title">
                     PFI Items Lists
@@ -50,22 +62,60 @@
                     @endif
                 </div>
             </div>
-
+           
             <div class="card-body">
             <div class="tab-pane fade show active table-responsive">
-                    <table class="table table-bordered table-striped table-editable table-edits table table-condensed PFI-Items-table" style="width:100%;">
-                        <thead class="bg-soft-secondary">
+                    <table id="PFI-Items-table" class="table table-bordered table-striped table-editable table-edits table table-condensed" style="width:100%;">
+                   
+                    <thead class="bg-soft-secondary">
                             <tr>
                                 <th>S.No</th>
-                                <th>LOI Item Code</th> 
-                                <th>LOI Status</th> 
-                                <th>PFI Date</th>                                                                              
-                                <th>PFI Number</th>
-                                <th>Customer Name </th>
-                                <th>Country</th>  
-                                <th>Vendor</th>  
-                                <th>Currency</th> 
-                                <th>Steering</th>                              
+                                <th>LOI Item Code
+                                    <input class="small-width" onkeyup="reload()" type="text" id="code" placeholder="LOI Item Code">
+                                </th> 
+                                <th>LOI Status
+                                    <input type="text" id="loi-status" onkeyup="reload()" placeholder="LOI Status">
+                                </th> 
+                                <th>PFI Date
+                                    <input type="date" class="small-width" onchange="reload()" id="pfi-date" placeholder="PFI Date">
+                                </th>                                                                              
+                                <th>PFI Number  <input type="text" onkeyup="reload()" class="small-width" id="pfi-number" placeholder="PFI Number"></th>
+                                <th>
+                                    Customer Name
+                                     <select class="medium-width" id="customer-id" multiple onchange="reload()" >
+                                        @foreach($customers as $customer)
+                                            <option value="{{$customer->id}}"> {{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>
+                                <th>
+                                    Country 
+                                    <select class="small-width" id="country-id" multiple onchange="reload()">
+                                        @foreach($countries as $country)
+                                            <option value="{{$country->id}}"> {{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>  
+                                <th>
+                                    Vendor  
+                                     <select  class="small-width" id="supplier-id" multiple onchange="reload()">
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{$supplier->id}}"> {{ $supplier->supplier }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>  
+                                <th>Currency 
+                                    <select  class="small-width" id="currency" onchange="reload()">
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                    </select>
+                                </th> 
+                                <th>Steering 
+                                    <select  class="small-width" id="steering" onchange="reload()">
+                                        <option value="LHD">LHD</option>
+                                        <option value="RHD">RHD</option>
+                                    </select>
+                                </th>                              
                                 <th>Brand</th>
                                 <th>Model Line</th>                           
                                 <th>Model</th>
@@ -76,12 +126,14 @@
                                 <th>PFI Amount</th>
                                 <th>Comment</th>                      
                             </tr>
+                           
                         </thead>
                         <tbody>
                         </tbody>
                     </table>                      
                 </div>                          
             </div>  
+        </form>
         @endif
     @endcan
 @endsection
@@ -89,19 +141,33 @@
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function () {
-            var table1 = $('.PFI-Items-table').DataTable({      
+            
+            var table = $('#PFI-Items-table').DataTable({      
             processing: true,
             serverSide: true,
             searching:true,
-            ajax: "{{ route('pfi-item.list') }}",
+            ajax: {
+            url:  "{{ route('pfi-item.list') }}",
+            data: function (d) {
+
+                d.code = $('#code').val();  // Add custom parameters to send to the server
+                d.status = $('#loi-status').val();
+                d.pfi_date = $('#pfi-date').val();
+                d.pfi_number = $('#pfi-number').val();
+                d.supplier_id = $('#supplier-id').val();
+                d.client_id = $('#customer-id').val();
+                d.country_id = $('#country-id').val();
+         
+            }
+        },
         columns: [
             {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'loi_item_code', 'name' : 'letterOfIndentItem.code' , orderable: false},
             {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},
-            {'data' : 'pfi.customer.name', 'name' : 'pfi.customer.name', orderable: false },
-            {'data' : 'pfi.country.name', 'name' : 'pfi.country.name', orderable: false },
+            {'data' : 'pfi.customer.name', 'name' : 'pfi.customer.name', orderable: false,},
+            {'data' : 'pfi.country.name', 'name' : 'pfi.country.name', orderable: false , },
             {'data' : 'pfi.supplier.supplier', 'name' : 'pfi.supplier.supplier', orderable: false },
             {'data' : 'pfi.currency', 'name' : 'pfi.currency', orderable: false },         
             {'data' : 'master_model.steering', 'name': 'masterModel.steering', orderable: false }, 
@@ -116,8 +182,30 @@
             {'data' : 'pfi.comment', 'name': 'pfi.comment', orderable: false },        
         ]
         });
+
+        // $('#code, #status #pfi-date #customer-id #supplier-id #pfi-number #customer-id').on('keyup change', function() {
+        //     table.draw(); // Redraw table with new filters
+        // });
         
+          
     });
+        function reload() {
+            var table = $('#PFI-Items-table').DataTable();
+            table.draw(); 
+        }  
+        $('#supplier-id').select2({
+            placeholder: "Filter By Vendor",
+            maximumSelectionLength: 1
+        });
+        $('#customer-id').select2({
+            placeholder: "Filter By Customer",
+            maximumSelectionLength: 1
+        });
+        $('#country-id').select2({
+            placeholder: "Filter By Country",
+            maximumSelectionLength: 1
+    });
+
  
     </script>
 @endpush

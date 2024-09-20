@@ -32,7 +32,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Create New PFI</h4>
+                <h4 class="card-title">New PFI Details</h4>
                
                 <a  class="btn btn-sm btn-info float-end mr-2" href="{{ route('pfi.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                 @can('LOI-list')
@@ -90,11 +90,19 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                <span class="error">* </span>
+                                                    <label for="choices-single-default" class="form-label">PFI Date</label>
+                                                    <input type="date" class="form-control widthinput" value="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"
+                                                     name="pfi_date">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
                                                     <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Vendor</label>
                                                     <select class="form-control widthinput" name="supplier_id" id="supplier-id" multiple >
                                                         @foreach($suppliers as $supplier)
-                                                            <option value="{{$supplier->id}}" data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
+                                                            <option value="{{$supplier->id}}" {{ $supplier->supplier == 'AMS' ? 'selected' : '' }} data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
                                                                 {{ $supplier->supplier }}
                                                             </option>
                                                         @endforeach
@@ -137,13 +145,7 @@
                                                     <input type="file" id="file" class="form-control widthinput" name="file">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6">
-                                                <div class="mb-3">
-                                                <span class="error">* </span>
-                                                    <label for="choices-single-default" class="form-label">PFI Date</label>
-                                                    <input type="date" class="form-control widthinput" name="pfi_date">
-                                                </div>
-                                            </div>
+                                          
                                           
                                             <div class="col-lg-4 col-md-6 mmc-items-div" hidden>
                                                 <div class="mb-3">
