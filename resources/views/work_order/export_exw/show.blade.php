@@ -1312,10 +1312,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                         $badgeClass = 'badge-soft-warning';
                                                                     }
                                                                 @endphp
-                                                                <label style="font-size: 70%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
-                                                                    DELIVERY : <strong>{{ strtoupper($vehicle->delivery_status) ?? '' }}</strong>
-                                                                </label>
-                                                                
+                                                                <label style="font-size: 70%; margin-right: 3px;" class="float-end badge {{ $badgeClass }}">
+                                                                    DELIVERY : 
+                                                                    <strong>
+                                                                        @if(strtoupper($vehicle->delivery_status) == 'DELIVERED')
+                                                                            DELIVERED WITH DOCUMENTS
+                                                                        @elseif(strtoupper($vehicle->delivery_status) == 'DELIVERED WITH DOCS HOLD')
+                                                                            DELIVERED/DOCUMENTS HOLD
+                                                                        @else
+                                                                            {{ strtoupper($vehicle->delivery_status) ?? '' }}
+                                                                        @endif
+                                                                    </strong>
+                                                                </label>                                                           
                                                             </td>
                                                             @if($vehicle->delivery_status == 'Ready')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->delivery_at))
@@ -1326,7 +1334,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 
                                                             @elseif($vehicle->delivery_status == 'Delivered') 
                                                                 
-                                                                    <td colspan="5">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
+                                                                    <td colspan="2">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
+                                                                    <td colspan="3">Delivered At : @if(!empty($vehicle->latestDeliveryStatus->delivered_at)){{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivered_at)->format('d M Y, h:i:s A') }}@endif</td>
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->doc_delivery_date))
                                                                         {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y, h:i:s A') }}
@@ -1338,7 +1347,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     @if($vehicle->delivery_status == 'Ready') 
                                                                         8
                                                                     @elseif($vehicle->delivery_status == 'Delivered') 
-                                                                        9
+                                                                        8
                                                                     @elseif($vehicle->delivery_status == 'On Hold') 
                                                                         13
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 
@@ -1348,7 +1357,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     @if($vehicle->delivery_status == 'Ready') 
                                                                         7
                                                                     @elseif($vehicle->delivery_status == 'Delivered')
-                                                                        8
+                                                                        7
                                                                     @elseif($vehicle->delivery_status == 'On Hold') 
                                                                         12
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 
