@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\So;
 use App\Models\Quotation;
+use Illuminate\Support\Facades\Log;
 use App\Models\Booking;
 use App\Models\UserActivities;
 use App\Models\BookingRequest;
@@ -507,37 +508,186 @@ public function cancel($id)
 }
 public function showSalesSummary($sales_person_id, $count_type)
 {
-    $salesperson = DB::table('salespersons')->where('id', $sales_person_id)->first();
-    // Filter the leads data based on the count_type
-    $leadsQuery = DB::table('calls')
-        ->where('sales_person', $sales_person_id)
-        ->whereDate('created_at', '>=', '2023-10-01');
-    
-    // Modify the query based on the count_type
+    // Fetch salesperson details
+    $salesperson = DB::table('users')->where('id', $sales_person_id)->first();
     switch ($count_type) {
         case 'Pending Leads':
-            $leadsQuery->where('status', '!=', 'Closed');
+        $leadsQuery = DB::table('calls')
+        ->select([
+            'calls.id',
+            'calls.created_at',
+            'calls.name',
+            'calls.custom_brand_model',
+            'calls.phone',
+            'calls.email',
+            'calls.remarks',
+            'calls.type',
+            'calls.location',
+            'calls.language',
+            'calls.priority',
+            'master_model_lines.model_line',
+            'brands.brand_name'
+        ])
+        ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+        ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+        ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+        ->where('calls.sales_person', $sales_person_id);
+        $leadsQuery->where('calls.status', 'New');
+        break;
+        case 'Prospecting':
+            $leadsQuery = DB::table('calls')
+            ->select([
+                'calls.id',
+                'calls.created_at',
+                'calls.name',
+                'calls.custom_brand_model',
+                'calls.phone',
+                'calls.email',
+                'calls.remarks',
+                'calls.type',
+                'calls.location',
+                'calls.language',
+                'calls.priority',
+                'master_model_lines.model_line',
+                'prospectings.medium',
+                'prospectings.time',
+                'prospectings.date',
+                'prospectings.salesnotes',
+                'brands.brand_name'
+            ])
+            ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
+            ->where('calls.sales_person', $sales_person_id)
+            ->where('calls.status', 'Prospecting')
+            ->whereDate('calls.created_at', '>=', '2023-10-01')
+            ->groupby('calls.id');
             break;
-        case 'Open Leads':
-            $leadsQuery->where('status', 'Open');
+            case 'Follow Up':
+                $leadsQuery = DB::table('calls')
+                ->select([
+                    'calls.id',
+                    'calls.created_at',
+                    'calls.name',
+                    'calls.custom_brand_model',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.location',
+                    'calls.language',
+                    'calls.priority',
+                    'master_model_lines.model_line',
+                    'fellow_up.method',
+                    'fellow_up.time',
+                    'fellow_up.date',
+                    'fellow_up.sales_notes',
+                    'brands.brand_name'
+                ])
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('fellow_up', 'calls.id', '=', 'fellow_up.calls_id')
+                ->where('calls.sales_person', $sales_person_id)
+                ->where('calls.status', 'Follow Up')
+                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                ->groupby('calls.id');
+                break;
+        case 'Quoted':
+            $leadsQuery = DB::table('calls')
+            ->select([
+                'calls.id',
+                'calls.created_at',
+                'calls.name',
+                'calls.custom_brand_model',
+                'calls.phone',
+                'calls.email',
+                'calls.remarks',
+                'calls.type',
+                'calls.location',
+                'calls.language',
+                'calls.priority',
+                'master_model_lines.model_line',
+                'quotations.deal_value',
+                'quotations.date',
+                'quotations.sales_notes',
+                'quotations.file_path',
+                'brands.brand_name'
+            ])
+            ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id')
+            ->where('calls.sales_person', $sales_person_id)
+            ->where('calls.status', 'Quoted')
+            ->whereDate('calls.created_at', '>=', '2023-10-01')
+            ->groupby('calls.id');
             break;
-        case 'Quotation':
-            $leadsQuery->where('status', 'Quoted');
-            break;
-        case 'Rejection':
-            $leadsQuery->where('status', 'Rejected');
+        case 'Rejected':
+            $leadsQuery = DB::table('calls')
+            ->select([
+                'calls.id',
+                'calls.created_at',
+                'calls.name',
+                'calls.custom_brand_model',
+                'calls.phone',
+                'calls.email',
+                'calls.remarks',
+                'calls.type',
+                'calls.location',
+                'calls.language',
+                'calls.priority',
+                'master_model_lines.model_line',
+                'lead_rejection.Reason',
+                'lead_rejection.date',
+                'lead_rejection.sales_notes',
+                'brands.brand_name'
+            ])
+            ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id')
+            ->where('calls.sales_person', $sales_person_id)
+            ->where('calls.status', 'Rejected')
+            ->whereDate('calls.created_at', '>=', '2023-10-01')
+            ->groupby('calls.id');
             break;
         case 'Sales Order':
-            $leadsQuery->where('status', 'Closed');
+            $leadsQuery = DB::table('so')
+            ->select([
+                'calls.name as customername',
+                'calls.email',
+                'calls.phone',
+                'quotations.created_at',
+                'quotations.deal_value',
+                'quotations.sales_notes',
+                'quotations.file_path',
+                'users.name',
+                'so.so_number',
+                'so.so_date',
+                'quotations.calls_id',
+            ])
+            ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
+            ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+            ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+            ->where('so.sales_person_id', $sales_person_id)
+            ->groupby('so.id');
             break;
         default:
-            break;
+            // If count_type doesn't match any case, return an empty response
+            return response()->json(['error' => 'Invalid count type'], 400);
     }
-    $leadsSummary = $leadsQuery->get();
+
+    // Return the JSON data for DataTables
+    if (request()->ajax()) {
+        return DataTables::of($leadsQuery)->make(true);
+    }
+
+    // Render the view
     return view('dailyleads.leadssummary', [
         'salesperson' => $salesperson,
-        'leadsSummary' => $leadsSummary,
-        'countType' => $count_type, // Send the count type for display
+        'countType' => $count_type,
     ]);
 }
         }

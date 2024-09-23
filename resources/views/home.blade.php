@@ -311,6 +311,7 @@ Procurement
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('sale-team-dashboard');
         @endphp
         @if ($hasPermission)
+        @if ($undersalesleads->isNotEmpty())
             <div class="card">
                             <div class="card-body px-0">
                                 <div class="table-responsive px-3">
@@ -323,7 +324,8 @@ Procurement
                                                 <th>Sales Person</th>
                                                 <th>Pending Leads</th>
                                                 <th>Response Time</th>
-                                                <th>Open Leads</th>
+                                                <th>Prospectings</th>
+                                                <th>Fellow Up</th>
                                                 <th>Quotation Issued</th>
                                                 <th>Rejected</th>
                                                 <th>Sales Order</th>
@@ -348,15 +350,23 @@ Procurement
                                             @php
                                                $openLeadsCount = DB::table('calls')
                                                 ->where(function ($query) use ($undersaleslead) {
-                                                    $query->where('calls.status', '!=', 'Closed')
-                                                    ->orWhere('calls.status', '=', 'Quoted')
-                                                        ->orWhere('calls.status', '!=', 'Rejected');
+                                                    $query->Where('calls.status', '=', 'Prospecting');
                                                 })
                                                 ->where('calls.sales_person', '=', $undersaleslead->sales_person)
                                                 ->whereDate('calls.created_at', '>=', '2023-10-01')
                                                 ->count();
                                             @endphp
-                                            <td>{{ $openLeadsCount }}</td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Prospecting']) }}">{{ $openLeadsCount }}</a></td>
+                                            @php
+                                               $openLeadsCountfellow = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->where('calls.status', '=', 'Follow Up');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Follow Up']) }}">{{ $openLeadsCountfellow }}</a></td>
                                             @php
                                                $closedLeadsCount = DB::table('calls')
                                                 ->where(function ($query) use ($undersaleslead) {
@@ -384,9 +394,9 @@ Procurement
                                                 ->whereDate('calls.created_at', '>=', '2023-10-01')
                                                 ->count();
                                             @endphp
-                                            <td>{{ $closedLeadsCountquoted }}</td>
-                                            <td>{{ $closedLeadsCountrejected }}</td>
-                                            <td>{{ $closedLeadsCount }}</td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Quoted']) }}">{{ $closedLeadsCountquoted }}</a></td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Rejected']) }}">{{ $closedLeadsCountrejected }}</a></td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Sales Order']) }}">{{ $closedLeadsCount }}</a></td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -399,6 +409,7 @@ Procurement
                             </div>
                             <!-- end card body -->
                         </div>
+                        @endif
                         @endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');

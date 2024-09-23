@@ -242,7 +242,6 @@ $totalvariantss = [
         if ($saleshasPermission) {
             $person = Auth::id();
             $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
-            info($salespersonunder);
             $undersalesleads = DB::table('calls')
             ->join('users', 'calls.sales_person', '=', 'users.id')
             ->where('calls.status', '=', 'New')
