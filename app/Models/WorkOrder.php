@@ -169,7 +169,12 @@ class WorkOrder extends Model
         return $status;
     }
     public function getDocsStatusAttribute() {
-        $status = 'Not Initiated';
+        if($this->sales_support_data_confirmation_at != '' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved') {
+            $status = 'Not Initiated';
+        }
+        else {
+            $status = 'Blank';
+        }
         
         // Fetch the most recent record for the current work order
         $data = WoDocsStatus::where('wo_id', $this->id)
@@ -456,6 +461,18 @@ class WorkOrder extends Model
             ->whereIn('status', ['approved', 'rejected'])
             ->latestOfMany('action_at');
     }
+    public function latestFinance()
+    {
+        return $this->hasOne(WOApprovals::class)
+                    ->where('type', 'finance')  // Filter for finance type
+                    ->orderBy('updated_at', 'DESC');  // Get the latest based on updated_at
+    }
+    public function latestCOO()
+    {
+        return $this->hasOne(WOApprovals::class)
+                    ->where('type', 'coo')  // Filter for coo type
+                    ->orderBy('updated_at', 'DESC');  // Get the latest based on updated_at
+    }
     public function latestCooPendingApproval()
     {
         return $this->hasOne(WOApprovals::class)
@@ -467,6 +484,11 @@ class WorkOrder extends Model
     {
         return $this->hasOne(WoDocsStatus::class, 'wo_id') // Explicitly define the foreign key here
             ->latestOfMany('doc_status_changed_at');  // Sort by the date field
+    }
+    public function latestDocs()
+    {
+        return $this->hasOne(WoDocsStatus::class, 'wo_id')  // Specify the correct foreign key here
+                    ->orderBy('doc_status_changed_at', 'DESC');  // Get the latest based on doc_status_changed_at
     }
     public function latestStatus()
     {

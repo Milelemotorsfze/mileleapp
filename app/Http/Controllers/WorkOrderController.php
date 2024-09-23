@@ -23,6 +23,7 @@ use App\Models\Clients;
 use App\Models\Vehicles;
 use App\Models\User;
 use App\Models\AddonDetails;
+use App\Models\WOUserFilterInputs;
 use App\Models\Masters\MasterAirlines;
 use App\Models\Masters\MasterCharges;
 use App\Models\Masters\MasterOfficeLocation;
@@ -173,18 +174,134 @@ class WorkOrderController extends Controller
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
             'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
         ]);
-
-      // Build the query with conditional adjustments
+    
+        // Fetch saved filters for the current user and decode JSON into an array
+        $savedFilters = WOUserFilterInputs::where('user_id', $authId)->first();
+        $filters = $savedFilters ? json_decode($savedFilters->filters, true) : []; 
+        $statuses = WoStatus::distinct()->orderBy('status', 'asc')->pluck('status');
+        $workOrders = WorkOrder::all();
+        $salesSupportDataConfirmations = $workOrders->pluck('sales_support_data_confirmation')->unique()->sort()->values();
+        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->unique()->sort()->values();
+        $financeApprovalStatuses = $financeApprovalStatuses->push('Blank')->sort()->values();
+        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->unique()->sort()->values();
+        $cooApprovalStatuses = $cooApprovalStatuses->push('Blank')->sort()->values();
+        $docsStatuses = $workOrders->pluck('docs_status')->unique()->sort()->values();
+        // $docsStatuses = $docsStatuses->push('Blank')->sort()->values();
+        $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
+        $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
+        $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
         $datas = WorkOrder::when($type !== 'all', function ($query) use ($type) {
-                return $query->where('type', $type);
-            })
-            ->when($hasLimitedAccess, function ($query) use ($authId) {
-                return $query->where('created_by', $authId);
-            })
-            ->latest()
-            ->get();
-
-        return view('work_order.export_exw.index', compact('type', 'datas'));
+            return $query->where('type', $type);
+        })
+        ->when($hasLimitedAccess, function ($query) use ($authId) {
+            return $query->where('created_by', $authId);
+        })
+        ->when($filters, function ($query) use ($filters) {
+            // Apply status filter
+            if (isset($filters['status_filter']) && !empty($filters['status_filter'])) {
+                $query->whereHas('latestStatus', function ($q) use ($filters) {
+                    $q->whereIn('status', $filters['status_filter']);
+                });
+            }
+    
+            // Apply sales support filter
+            if (isset($filters['sales_support_filter']) && !empty($filters['sales_support_filter'])) {
+                $query->where(function ($q1) use ($filters) {
+                    if (in_array('Confirmed', $filters['sales_support_filter'])) {
+                        $q1->orWhereNotNull('sales_support_data_confirmation_at');
+                    }
+                    if (in_array('Not Confirmed', $filters['sales_support_filter'])) {
+                        $q1->orWhereNull('sales_support_data_confirmation_at');
+                    }
+                });
+            }
+    
+        })
+        ->with('latestFinance','latestDocs')  // Eager-load the latest finance approval
+        ->latest()
+        ->get();
+        $filteredDatas = $datas;
+        if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
+            // Normalize the status filter array to lowercase
+            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
+        
+            // Check if 'Blank' is in the filter (case-insensitive)
+            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);
+        
+            // Filter datas where either latestFinance status is in $filters['finance_approval_filter'] or latestFinance is null (if 'Blank' is included)
+            $filteredDatas = $datas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
+                if ($includeBlank && !$data->latestFinance) {
+                    // Include data where latestFinance is null if 'Blank' is selected
+                    return true;
+                }
+        
+                // Otherwise, filter based on the latestFinance status
+                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter);
+            });
+        }
+        
+        if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
+            // Normalize the status filter array to lowercase
+            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
+            
+            // Check if 'Blank' is in the filter (case-insensitive)
+            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);
+        
+            // Filter datas where either latestCOO status is in $filters['coo_approval_filter'] or latestCOO is null (if 'Blank' is included)
+            $filteredDatas = $datas->filter(function ($data) use ($normalizedCOOApprovalFilter, $includeBlankCOO) {
+                if ($includeBlankCOO && !$data->latestCOO) {
+                    // Include data where latestCOO is null if 'Blank' is selected
+                    return true;
+                }
+        
+                // Otherwise, filter based on the latestCOO status
+                return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter);
+            });
+        }
+        if (isset($filters['docs_status_filter']) && !empty($filters['docs_status_filter'])) {
+            // Use the docs status filter directly
+            $docsStatusFilter = $filters['docs_status_filter'];
+        
+            // Check if 'Blank' is in the filter
+            $includeBlankDocs = in_array('Blank', $docsStatusFilter);
+            // Filter datas where either docs_status is in $filters['docs_status_filter'] or docs_status is 'Not Initiated' (if 'Blank' is included)
+            $filteredDatas = $datas->filter(function ($data) use ($docsStatusFilter, $includeBlankDocs) {
+                return in_array($data->docs_status, $docsStatusFilter);
+            });
+        
+            // Optionally convert filtered results to array
+            // $filteredDatas = $filteredDatas->values()->toArray();
+        }
+        if (isset($filters['modification_filter']) && !empty($filters['modification_filter'])) {
+            // Use the modification filter directly
+            $modificationFilter = $filters['modification_filter'];
+        
+            // Check if 'Blank' is in the filter
+            $includeBlankModi = in_array('Blank', $modificationFilter);
+        
+            // Filter work orders where at least one vehicle's modification_status matches the filter
+            $filteredDatas = $datas->filter(function ($data) use ($modificationFilter, $includeBlankModi) {
+                // Loop through each vehicle for the current work order
+                foreach ($data->vehicles as $vehicle) {
+                    // If 'Blank' is in the filter and the modification status is 'Not Initiated', include the work order
+                    if ($includeBlankModi && $vehicle->modification_status === 'Not Initiated') {
+                        return true;
+                    }
+        
+                    // If any vehicle's modification_status is in the modificationFilter, include the work order
+                    if (in_array($vehicle->modification_status, $modificationFilter)) {
+                        return true;
+                    }
+                }
+        
+                // If no vehicle matches the filter, exclude the work order
+                return false;
+            });
+        }
+    $datas = $filteredDatas;
+        // Return the view with the type, data, applied filters, and unique options for the select filters
+        return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
+            'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
 
 
@@ -2619,4 +2736,39 @@ class WorkOrderController extends Controller
             }
         }
     }
+    public function saveFilters(Request $request)
+    { 
+        // Get the authenticated user's ID
+        $userId = auth()->user()->id;
+    
+        // Serialize the filters to store as a JSON string
+        $filters = json_encode([
+            'status_filter' => $request->status_filter,
+            'sales_support_filter' => $request->sales_support_filter,
+            'finance_approval_filter' => $request->finance_approval_filter,
+            'coo_approval_filter' => $request->coo_approval_filter,
+            'docs_status_filter' => $request->docs_status_filter,
+            'modification_filter' => $request->modification_filter,
+            'pdi_filter' => $request->pdi_filter,
+            'delivery_filter' => $request->delivery_filter
+        ]);
+    
+        // Check if the filter record exists for the current user
+        $userFilter = WOUserFilterInputs::where('user_id', $userId)->first();
+    
+        if ($userFilter) {
+            // If record exists, update the filters
+            $userFilter->filters = $filters;
+            $userFilter->save();
+        } else {
+            // If no record exists, create a new one
+            WOUserFilterInputs::create([
+                'user_id' => $userId,
+                'filters' => $filters
+            ]);
+        }
+    
+        // Redirect back to the index route with the type parameter
+        return redirect()->route('work-order.index', ['type' => $request->input('type')]);
+    }    
 }

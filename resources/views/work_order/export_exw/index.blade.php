@@ -98,6 +98,137 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 @if ($hasPermission)
 <div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
+			<div class="row">
+				<input type="hidden" name="type" value={{$type ?? ''}}>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
+					<div class="dropdown-option-div">
+						<label for="status-filter" class="col-form-label text-md-end">{{ __('Status') }}</label>
+						<select name="status-filter[]" id="status-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($statuses as $status)
+								<option value="{{ $status }}" 
+									@if(isset($filters['status_filter']) && in_array($status, $filters['status_filter']))
+										selected
+									@endif>
+									{{ $status }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
+					<div class="dropdown-option-div">
+						<label for="sales-support-filter" class="col-form-label text-md-end">{{ __('Data Confirmation') }}</label>
+						<select name="sales_support_filter[]" id="sales-support-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($salesSupportDataConfirmations as $dataConfirmation)
+								<option value="{{ $dataConfirmation }}" 
+									@if(isset($filters['sales_support_filter']) && in_array($dataConfirmation, $filters['sales_support_filter']))
+										selected
+									@endif
+								>
+									{{ $dataConfirmation }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
+					<div class="dropdown-option-div">
+						<label for="finance-approval-filter" class="col-form-label text-md-end">{{ __('Fin. Approval') }}</label>
+						<select name="finance-approval-filter[]" id="finance-approval-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($financeApprovalStatuses as $finApproval)
+								<option value="{{ $finApproval }}" 
+									@if(isset($filters['finance_approval_filter']) && in_array($finApproval, $filters['finance_approval_filter']))
+										selected
+									@endif
+								>
+									{{ ucfirst($finApproval) }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div">
+					<div class="dropdown-option-div">
+						<label for="coo-approval-filter" class="col-form-label text-md-end">{{ __('COO Approval') }}</label>
+						<select name="coo-approval-filter[]" id="coo-approval-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($cooApprovalStatuses as $cooApproval)
+								<option value="{{ $cooApproval }}"
+									@if(isset($filters['coo_approval_filter']) && in_array($cooApproval, $filters['coo_approval_filter']))
+										selected
+									@endif
+								>
+									{{ $cooApproval }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div">
+					<div class="dropdown-option-div">
+						<label for="docs-status-filter" class="col-form-label text-md-end">{{ __('Documentation') }}</label>
+						<select name="docs-status-filter[]" id="docs-status-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($docsStatuses as $docsStatus)
+								<option value="{{ $docsStatus }}"
+									@if(isset($filters['docs_status_filter']) && in_array($docsStatus, $filters['docs_status_filter']))
+										selected
+									@endif
+								>
+									{{ $docsStatus }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="modification-filter-div" hidden>
+					<div class="dropdown-option-div">
+						<label for="modification-filter" class="col-form-label text-md-end">{{ __('Modification') }}</label>
+						<select name="modification-filter[]" id="modification-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($vehiclesModificationSummary as $modificationStatus)
+								<option value="{{ $modificationStatus }}"
+									@if(isset($filters['modification_filter']) && in_array($modificationStatus, $filters['modification_filter']))
+										selected
+									@endif
+								>
+									{{ $modificationStatus }}
+								</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="pdi-filter-div" hidden>
+					<div class="dropdown-option-div">
+						<label for="pdi-filter" class="col-form-label text-md-end">{{ __('PDI') }}</label>
+						<select name="pdi-filter" id="pdi-filter" multiple="true" class="form-control widthinput" autofocus>
+							@foreach($pdiSummary as $pdi)
+								<option value="{{$pdi}}">{{$pdi}}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="delivery-filter-div" hidden>
+					<div class="dropdown-option-div">
+						<label for="delivery-filter" class="col-form-label text-md-end">{{ __('Delivery') }}</label>
+						<select name="delivery-filter" id="delivery-filter" multiple="true" class="form-control widthinput" autofocus>
+						@foreach($deliverySummary as $delivery)
+							<option value="{{$delivery}}">
+								@if($delivery == 'Delivered')
+									Delivered With Documents
+								@elseif($delivery == 'Delivered With Docs Hold')
+									Delivered/Documents Hold
+								@else
+									{{$delivery}}
+								@endif
+							</option>
+						@endforeach
+						</select>
+					</div>
+				</div>
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="apply-filter-div">
+					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
+						Save & Apply Filters
+					</button>
+				</div>
+			</div></br>
 			<div class="table-responsive">
 				<table class="my-datatable table table-striped table-editable table" style="width:100%;">
 					<thead>
@@ -558,6 +689,78 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
+		$('#status-filter').select2({
+			allowClear: true,
+			placeholder:"Status",
+		});
+		$('#sales-support-filter').select2({
+			allowClear: true,
+			placeholder:"Data Confirmation",
+		});
+		$('#finance-approval-filter').select2({
+			allowClear: true,
+			placeholder:"Fin. Approval",
+		});	
+		$('#coo-approval-filter').select2({
+			allowClear: true,
+			placeholder:"COO Approval",
+		});	
+		$('#docs-status-filter').select2({
+			allowClear: true,
+			placeholder:"Documentation",
+		});	
+		$('#modification-filter').select2({
+			allowClear: true,
+			placeholder:"Modification",
+		});	
+		$('#pdi-filter').select2({
+			allowClear: true,
+			placeholder:"PDI",
+		});	
+		$('#delivery-filter').select2({
+			allowClear: true,
+			placeholder:"Delivery",
+		});	
+		$('#apply-filters').on('click', function(e) {
+			e.preventDefault();
+
+			// Capture selected filter inputs
+			let statusFilter = $('#status-filter').val();
+			let salesSupportFilter = $('#sales-support-filter').val();
+			let financeApprovalFilter = $('#finance-approval-filter').val();
+			let cooApprovalFilter = $('#coo-approval-filter').val();
+			let docsStatusFilter = $('#docs-status-filter').val();
+			let modificationFilter = $('#modification-filter').val();
+			let pdiFilter = $('#pdi-filter').val();
+			let deliveryFilter = $('#delivery-filter').val();
+
+			// Capture the type variable
+			let type = "{{ isset($type) ? $type : '' }}";
+
+			// Create a data object to send via AJAX
+			let filterData = {
+				status_filter: statusFilter,
+				sales_support_filter: salesSupportFilter,
+				finance_approval_filter: financeApprovalFilter,
+				coo_approval_filter: cooApprovalFilter,
+				docs_status_filter: docsStatusFilter,
+				modification_filter: modificationFilter,
+				pdi_filter: pdiFilter,
+				delivery_filter: deliveryFilter,
+				type: type,
+				_token: '{{ csrf_token() }}' // Laravel CSRF protection
+			};
+
+			// Send the data to the backend via AJAX
+			$.post("{{ route('save.filters') }}", filterData, function(response) {
+				// On success, reload the page with the filters applied
+				window.location.href = "{{ route('work-order.index', '') }}/" + type;
+			}).fail(function() {
+				alert("Failed to apply filters. Please try again.");
+			});
+		});
+
+
         // Initialize DataTable with default 100 entries
         var table = $('.my-datatable').DataTable({
             "pageLength": 100, // Set the default number of entries to display
