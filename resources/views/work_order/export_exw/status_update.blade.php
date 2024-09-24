@@ -7,7 +7,8 @@
             </div>
             <div class="modal-body">
                 <form id="StatusForm_{{$data->id}}">
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <!-- Existing Status Options -->
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusActive_{{$data->id}}" value="Active" {{ $data->status == 'Active' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusActive_{{$data->id}}" style="font-size: 14px;">
@@ -18,6 +19,25 @@
                             <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusOnHold_{{$data->id}}" value="On Hold" {{ $data->status == 'On Hold' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusOnHold_{{$data->id}}" style="font-size: 14px;">
                                 On Hold
+                            </label>
+                        </div>
+                        <!-- New Status Options -->
+                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusPartiallyDelivered_{{$data->id}}" value="Partially Delivered" {{ $data->status == 'Partially Delivered' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="StatusPartiallyDelivered_{{$data->id}}" style="font-size: 14px;">
+                                Partially Delivered
+                            </label>
+                        </div>
+                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusSucceeded_{{$data->id}}" value="Succeeded" {{ $data->status == 'Succeeded' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="StatusSucceeded_{{$data->id}}" style="font-size: 14px;">
+                                Succeeded
+                            </label>
+                        </div>
+                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                            <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusCancelled_{{$data->id}}" value="Cancelled" {{ $data->status == 'Cancelled' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="StatusCancelled_{{$data->id}}" style="font-size: 14px;">
+                                Cancelled
                             </label>
                         </div>
                     </div>
