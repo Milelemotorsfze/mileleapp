@@ -1039,7 +1039,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <th>Variant</th>
                                                     <th>Engine</th>
                                                     <th>Model Description</th>
+                                                    @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-modal-year']);
+                                                    @endphp
+                                                    @if ($hasPermission)
                                                     <th>Model Year</th>
+                                                    @endif
                                                     <th>Document Model Year</th>
                                                     <th>Steering</th>
                                                     <th>Exterior Colour</th>
@@ -1149,7 +1154,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         <td>{{$vehicle->variant ?? 'NA'}}</td>
                                                         <td>{{$vehicle->engine ?? 'NA'}}</td>
                                                         <td>{{$vehicle->model_description ?? 'NA'}}</td>
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-modal-year']);
+                                                        @endphp
+                                                        @if ($hasPermission)
                                                         <td>{{$vehicle->model_year ?? 'NA'}}</td>
+                                                        @endif
                                                         <td>{{$vehicle->model_year_to_mention_on_documents ?? 'NA'}}</td>
                                                         <td>{{$vehicle->steering ?? 'NA'}}</td>
                                                         <td>{{$vehicle->exterior_colour ?? 'NA'}}</td>
