@@ -72,7 +72,7 @@ namespace App\Http\Controllers;
             $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
             $user->selected_role = $request->roles[0];
             $user->save();
-            $empProfile = new Profile();
+            $empProfile = new EmployeeProfile();
             $empProfile->user_id = $user->id;
             $empProfile->first_name = $request->input('name');
             $empProfile->company_number = $request->input('phone');
@@ -165,7 +165,7 @@ namespace App\Http\Controllers;
     $user->selected_role = $request->roles[0];
     $user->save();
 
-    $empProfile = $user->empProfile ?? new EmpProfile();
+    $empProfile = $user->empProfile ?? new EmployeeProfile();
     $empProfile->user_id = $user->id; // Ensure the relationship is set
     $empProfile->first_name = $request->input('name');
     $empProfile->company_number = $request->input('phone');
