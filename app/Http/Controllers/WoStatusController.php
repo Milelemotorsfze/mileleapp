@@ -18,7 +18,7 @@ class WoStatusController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'workOrderId' => 'required|exists:work_orders,id',
-            'status' => 'required|in:Active,On Hold',
+            'status' => 'required|in:Active,On Hold,Partially Delivered,Succeeded,Cancelled', // Add new statuses here
             'comment' => 'nullable|string',
         ]);
 
@@ -37,7 +37,7 @@ class WoStatusController extends Controller
         ];
 
         // Fetch the work order
-        $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);  
+        $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
 
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';

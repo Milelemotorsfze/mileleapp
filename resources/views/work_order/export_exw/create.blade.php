@@ -193,7 +193,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	@endif
 	<div class="col-12 d-flex flex-wrap float-end">
 		@if(isset($workOrder))
-			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->status == 'Active') badge-soft-success @elseif($workOrder->status == 'On Hold') badge-soft-info @endif"><strong>{{ strtoupper($workOrder->status) ?? '' }}</strong></label>
+			<label style="font-size: 119%; margin-right:3px;" class="float-end badge 
+				@if($workOrder->status == 'On Hold') badge-soft-warning
+				@elseif($workOrder->status == 'Active') badge-soft-success
+				@elseif($workOrder->status == 'Cancelled') badge-soft-danger
+				@elseif($workOrder->status == 'Succeeded') badge-soft-primary
+				@elseif($workOrder->status == 'Partially Delivered') badge-soft-info
+				@endif">
+				<strong>{{ strtoupper($workOrder->status) ?? '' }}</strong>
+			</label>
 			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">SALES SUPPORT : <strong>{{ strtoupper($workOrder->sales_support_data_confirmation) ?? ''}}</strong></label>
 			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">FINANCE : <strong>{{ strtoupper($workOrder->finance_approval_status) ?? ''}}</strong></label>
 			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO OFFICE : <strong>{{ strtoupper($workOrder->coo_approval_status) ?? ''}}</strong></label>

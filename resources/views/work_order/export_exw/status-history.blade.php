@@ -115,7 +115,15 @@
                             <tr data-id="{{ $one->id }}">
                                 <td>{{ ++$i }}</td>
                                 <td>
-                                    <label class="badge @if($one->status == 'On Hold') badge-soft-info @elseif($one->status == 'Active') badge-soft-success @endif">{{ strtoupper($one->status) ?? ''}}</label>
+                                    <label class="badge 
+                                        @if($one->status == 'On Hold') badge-soft-warning
+                                        @elseif($one->status == 'Active') badge-soft-success
+                                        @elseif($one->status == 'Cancelled') badge-soft-danger
+                                        @elseif($one->status == 'Succeeded') badge-soft-primary
+                                        @elseif($one->status == 'Partially Delivered') badge-soft-info
+                                        @endif">
+                                        {{ strtoupper($one->status) ?? ''}}
+                                    </label>
                                 </td>
                                 <td>{{ $one->comment ?? '' }}</td>
                                 <td>{{ $one->user->name ?? '' }}</td>
