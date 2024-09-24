@@ -78,7 +78,7 @@
         </div>
         <div class="col-md-4">
             <label for="user_image" class="form-label">User Image</label>
-            @if(!is_null($user->empProfile->image_path))
+            @if($user->empProfile && $user->empProfile->image_path)
                 <div class="mb-3">
                     <img src="{{ asset($user->empProfile->image_path) }}" alt="User Image" class="img-thumbnail" width="150">
                 </div>
