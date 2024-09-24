@@ -70,6 +70,12 @@
                 <label class="form-check-label" for="is_sales_rep">Is Sales Rep.</label>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="can_send_wo_email" name="can_send_wo_email" value="yes" {{ old('can_send_wo_email', $user->can_send_wo_email) == 'yes' ? 'checked' : '' }}>
+                <label class="form-check-label" for="can_send_wo_email">Can Send Work Order Email</label>
+            </div>
+        </div>
         <div class="col-md-4">
             <label for="user_image" class="form-label">User Image</label>
             @if(!is_null($user->empProfile->image_path))

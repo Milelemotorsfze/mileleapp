@@ -56,7 +56,7 @@ class WoVehicleController extends Controller
             $statusName = $validatedData['status'];
 
             // Prepare email subject
-            $subject = "Work Order Vehicle Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
+            $subject = "Work Order Vehicle Modification Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
 
             // Retrieve the authenticated user's name
             $authUserName = auth()->user()->name;
