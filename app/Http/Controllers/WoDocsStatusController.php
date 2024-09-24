@@ -56,19 +56,20 @@ class WoDocsStatusController extends Controller
             $statusLogLink = env('BASE_URL') . '/wo-doc-status-history/' . $workOrder->id;
 
             // Retrieve and validate email addresses from .env
-            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
             $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            // Get all users with 'can_send_wo_email' set to 'yes'
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->toArray();
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
-                'managementEmail' => $managementEmail,
                 'operationsEmail' => $operationsEmail,
                 'createdByEmail' => $createdByEmail,
                 'salesPersonEmail' => $salesPersonEmail,
                 'customerEmail' => $customerEmail,
+                'managementEmails' => implode(', ', $managementEmails),
             ]);
 
             // Check if the salesPerson exists before trying to access properties
@@ -79,8 +80,8 @@ class WoDocsStatusController extends Controller
                     && $workOrder->salesPerson->is_management === 'No';
             }
 
-            // Initialize recipient list
-            $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
+            // Initialize recipient list with operations email and management emails from the database
+            $recipients = array_merge([$operationsEmail, $createdByEmail], $managementEmails);
 
             // Add salesPersonEmail only if the condition is met
             if ($shouldSendToSalesPerson && $salesPersonEmail) {
@@ -93,9 +94,8 @@ class WoDocsStatusController extends Controller
             }
 
             // Log and handle invalid email addresses
-            if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
-                \Log::error('Invalid email addresses provided:', [
-                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+            if (!$operationsEmail || !$createdByEmail) {
+                \Log::error('Invalid or missing email addresses:', [
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                     'createdByEmail' => $createdByEmail,
                 ]);

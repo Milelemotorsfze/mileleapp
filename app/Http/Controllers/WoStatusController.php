@@ -53,17 +53,22 @@ class WoStatusController extends Controller
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $statusLogLink = env('BASE_URL') . '/wo-status-history/' . $workOrder->id;
 
-        // Retrieve and validate email addresses from .env
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        // Retrieve email addresses from the users table where can_send_wo_email is true
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+        // Validate that the list of management emails is not empty
+        if (empty($managementEmails)) {
+            \Log::error('No email addresses found for users with permission to receive WO emails.');
+            throw new \Exception('No valid email addresses found for work order updates.');
+        }
+        // Retrieve and validate email addresses from .env for operations team
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
 
-        // Log and handle invalid email addresses
-        if (!$managementEmail || !$operationsEmail) {
-            \Log::error('Invalid email addresses provided:', [
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+        // Log and handle invalid operations email
+        if (!$operationsEmail) {
+            \Log::error('Invalid operations email address provided:', [
                 'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
             ]);
-            throw new \Exception('One or more email addresses are invalid.');
+            throw new \Exception('Operations team email address is invalid.');
         }
 
         // Send email using a Blade template
@@ -75,9 +80,9 @@ class WoStatusController extends Controller
             'userName' => $authUserName,
             'status' => $statusName, // Use the correct status name
             'datetime' => Carbon::now(),
-        ], function ($message) use ($subject, $managementEmail, $operationsEmail, $template) {
+        ], function ($message) use ($subject, $managementEmails, $operationsEmail, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$managementEmail, $operationsEmail])
+                    ->to(array_merge($managementEmails, [$operationsEmail]))
                     ->subject($subject);
         });
         // Return a JSON response indicating success

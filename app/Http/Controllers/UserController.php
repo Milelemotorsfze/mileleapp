@@ -69,6 +69,7 @@ namespace App\Http\Controllers;
             $user->status = 'active';
             $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
             $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
+            $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
             $user->selected_role = $request->roles[0];
             $user->save();
             $empProfile = new Profile();
@@ -160,6 +161,7 @@ namespace App\Http\Controllers;
     $user->email = $request->input('email');
     $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
     $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
+    $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
     $user->selected_role = $request->roles[0];
     $user->save();
 

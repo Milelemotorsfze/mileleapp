@@ -788,23 +788,29 @@ class WorkOrderController extends Controller
 
             // Retrieve and validate email addresses from .env
             $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            // Get all users with 'can_send_wo_email' set to 'yes' from the database
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->toArray();
 
             // Check if any email is invalid and handle the error
-            if (!$financeEmail || !$managementEmail || !$operationsEmail) {
+            if (!$financeEmail || !$operationsEmail || empty($managementEmails)) {
                 \Log::error('Invalid email addresses provided:', [
                     'financeEmail' => env('FINANCE_TEAM_EMAIL'),
-                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                    'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
                 ]);
-                throw new \Exception('One or more email addresses are invalid.');
+                throw new \Exception('One or more email addresses are invalid or missing.');
             }
+            // Combine all recipient emails into a single array
+            $recipients = array_merge([$financeEmail, $operationsEmail], $managementEmails);
 
             // Send email using a Blade template
-            Mail::send('work_order.emails.new_wo', ['workOrder' => $workOrder, 'accessLink' => $accessLink], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
+            Mail::send('work_order.emails.new_wo', [
+                'workOrder' => $workOrder,
+                'accessLink' => $accessLink,
+            ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
-                        ->to([$financeEmail, $managementEmail, $operationsEmail])
+                        ->to($recipients)
                         ->subject($subject);
             });
             $checkRecords = $workOrder->dataHistories()
@@ -826,39 +832,39 @@ class WorkOrderController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-    private function sendSOAmountUpdateEmail($workOrder,$comment) {
+    private function sendSOAmountUpdateEmail($workOrder, $comment) {
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
-        $template['from_name'] = 'Milele Matrix';
-
+        $template['from_name'] = 'Milele Matrix';   
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
         // Construct the email subject
-        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
-
+        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;    
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;   
         // Retrieve and validate email addresses from .env
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';   
+        // Get all users with 'can_send_wo_email' set to 'yes' from the database
+        $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->toArray();  
         // Retrieve the CreatedBy user's email and validate it
-        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
+        $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);   
         // Check if any email is invalid and handle the error
-        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
-            \Log::error('Invalid email addresses provided:', [
+        if (!$financeEmail || !$operationsEmail || empty($managementEmails) || !$createdByEmail) {
+            \Log::error('Invalid or missing email addresses:', [
                 'financeEmail' => env('FINANCE_TEAM_EMAIL'),
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
-                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
+                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
+                'managementEmails' => implode(', ', $managementEmails) ?: 'none',
+                'createdByEmail' => $createdByEmail ?? 'null'
             ]);
-            throw new \Exception('One or more email addresses are invalid.');
-        }
+            throw new \Exception('One or more email addresses are invalid or missing.');
+        }   
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
-
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
+        // Combine all recipient emails into a single array
+        $recipients = array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails);   
         // Send email using a Blade template
         Mail::send('work_order.emails.amount_update', [
             'workOrder' => $workOrder,
@@ -866,13 +872,14 @@ class WorkOrderController extends Controller
             'authUserName' => $authUserName, // Pass the authenticated user's name
             'currentDateTime' => $currentDateTime, // Pass the current date and time
             'comment' => $comment,
-        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
+        ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
+                    ->to($recipients)
                     ->subject($subject);
         });
-    }
-    private function sendDataUpdateEmail($workOrder,$comment) {
+    } 
+    private function sendDataUpdateEmail($workOrder, $comment)
+    {
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
         $template['from_name'] = 'Milele Matrix';
@@ -884,16 +891,16 @@ class WorkOrderController extends Controller
 
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        // Retrieve and validate email addresses from .env
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        // Check if any email is invalid and handle the error
-        if (!$managementEmail || !$operationsEmail) {
-            \Log::error('Invalid email addresses provided:', [
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),                  
-            ]);
-            throw new \Exception('One or more email addresses are invalid.');
+        // Retrieve all users who can receive WO emails
+        $users = \DB::table('users')->where('can_send_wo_email', true)->pluck('email');
+        // Filter valid email addresses
+        $emailList = $users->filter(function($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        });
+        // Check if the email list is empty and handle the error
+        if ($emailList->isEmpty()) {
+            \Log::error('No valid email addresses found for WO email sending.');
+            throw new \Exception('No valid email addresses found.');
         }
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
@@ -907,43 +914,33 @@ class WorkOrderController extends Controller
             'authUserName' => $authUserName, // Pass the authenticated user's name
             'currentDateTime' => $currentDateTime, // Pass the current date and time
             'comment' => $comment,
-        ], function ($message) use ($subject, $managementEmail, $operationsEmail, $template) {
+        ], function ($message) use ($subject, $emailList, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$managementEmail, $operationsEmail])
+                    ->to($emailList->toArray()) // Convert the collection to an array
                     ->subject($subject);
         });
     }
-    private function sendVehicleUpdateEmail($workOrder,$newComment) {
+    private function sendVehicleUpdateEmail($workOrder, $newComment) {
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
-        $template['from_name'] = 'Milele Matrix';
-
+        $template['from_name'] = 'Milele Matrix';   
         // Handle cases where customer_name is null
-        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';     
         // Construct the email subject
-        $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
-
+        $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $workOrder->customer_name . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;   
         // Define a quick access link (adjust the route as needed)
-        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-        // Retrieve and validate email addresses from .env
-        $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-
-        // Check if any email is invalid and handle the error
-        if (!$financeEmail || !$managementEmail || !$operationsEmail) {
-            \Log::error('Invalid email addresses provided:', [
-                'financeEmail' => env('FINANCE_TEAM_EMAIL'),
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-            ]);
-            throw new \Exception('One or more email addresses are invalid.');
-        }
+        $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;    
+        // Retrieve email addresses from the users table where can_send_wo_email is true
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();   
+        // Check if there are any valid email addresses
+        if (empty($managementEmails)) {
+            \Log::error('No email addresses found for users with permission to receive WO emails.');
+            throw new \Exception('No valid email addresses found for work order updates.');
+        }   
         // Retrieve the authenticated user's name
-        $authUserName = auth()->user()->name;
-
+        $authUserName = auth()->user()->name; 
         // Get the current date and time in d M Y, h:i:s A format
-        $currentDateTime = now()->format('d M Y, h:i:s A');
+        $currentDateTime = now()->format('d M Y, h:i:s A');  
         // Send email using a Blade template
         Mail::send('work_order.emails.vehicle_update', [
             'workOrder' => $workOrder,
@@ -951,12 +948,12 @@ class WorkOrderController extends Controller
             'newComment' => $newComment,
             'authUserName' => $authUserName, // Pass the authenticated user's name
             'currentDateTime' => $currentDateTime, // Pass the current date and time
-        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $template) {
+        ], function ($message) use ($subject, $managementEmails, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$financeEmail, $managementEmail, $operationsEmail])
+                    ->to($managementEmails)
                     ->subject($subject);
         });
-    }
+    }   
     public function processNewAddons($woVehicles,$addonData,$authId) { 
         $createWOVehiclesAddons = [];
         $createWOVehiclesAddons['w_o_vehicle_id'] = $woVehicles->id;                          
@@ -2484,36 +2481,33 @@ class WorkOrderController extends Controller
         $template['from_name'] = 'Milele Matrix';
 
         // Handle cases where customer_name is null
-        $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-        $statusName = '';
-        if($status == 'approved') {
-            $statusName = 'Approved';
-        } else if($status == 'rejected') {
-            $statusName = 'Rejected';
-        }
+        $customerName = $workOrder->customer_name ?? 'Unknown Customer';       
+        // Determine status name
+        $statusName = $status === 'approved' ? 'Approved' : 'Rejected';
         // Prepare email subject
-        $subject = "WO Finance ".$statusName." " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+        $subject = "WO Finance " . $statusName . " " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $workOrder->id;
-        // Retrieve and validate email addresses from .env
+        // Retrieve email addresses from the users table where can_send_wo_email is true
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+        // Retrieve and validate email addresses from .env for finance and operations teams
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
 
         // Retrieve the CreatedBy user's email and validate it
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
 
-        // Check if any email is invalid and handle the error
-        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
-            \Log::error('Invalid email addresses provided:', [
+        // Validate that all necessary emails are present and correct
+        if (!$financeEmail || !$operationsEmail || !$createdByEmail || empty($managementEmails)) {
+            \Log::error('Invalid email addresses provided or no management emails found:', [
                 'financeEmail' => env('FINANCE_TEAM_EMAIL'),
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
                 'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
+                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null',
+                'managementEmails' => $managementEmails
             ]);
-            throw new \Exception('One or more email addresses are invalid.');
+            throw new \Exception('One or more email addresses are invalid or missing.');
         }
 
         // Send email using a Blade template
@@ -2524,9 +2518,9 @@ class WorkOrderController extends Controller
             'comments' => $comments,
             'userName' => $userName,
             'status' => $status
-        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
+        ], function ($message) use ($subject, $financeEmail, $operationsEmail, $createdByEmail, $managementEmails, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
+                    ->to(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails))
                     ->subject($subject);
         });
     }
@@ -2591,35 +2585,32 @@ class WorkOrderController extends Controller
 
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-        $statusName = '';
-        if($status == 'approved') {
-            $statusName = 'Approved';
-        } else if($status == 'rejected') {
-            $statusName = 'Rejected';
-        }
+        // Determine status name
+        $statusName = $status === 'approved' ? 'Approved' : 'Rejected';
         // Prepare email subject
-        $subject = "WO COO Office ".$statusName." " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+        $subject = "WO COO Office " . $statusName . " " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
 
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
-        // Retrieve and validate email addresses from .env
+        // Retrieve email addresses from the users table where can_send_wo_email is true
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+        // Retrieve and validate email addresses from .env for finance and operations teams
         $financeEmail = filter_var(env('FINANCE_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
         $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
 
         // Retrieve the CreatedBy user's email and validate it
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
 
-        // Check if any email is invalid and handle the error
-        if (!$financeEmail || !$managementEmail || !$operationsEmail || !$createdByEmail) {
-            \Log::error('Invalid email addresses provided:', [
+        // Validate that all necessary emails are present and correct
+        if (!$financeEmail || !$operationsEmail || !$createdByEmail || empty($managementEmails)) {
+            \Log::error('Invalid email addresses provided or no management emails found:', [
                 'financeEmail' => env('FINANCE_TEAM_EMAIL'),
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
                 'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null'
+                'createdByEmail' => $workOrder->CreatedBy->email ?? 'null',
+                'managementEmails' => $managementEmails
             ]);
-            throw new \Exception('One or more email addresses are invalid.');
+            throw new \Exception('One or more email addresses are invalid or missing.');
         }
 
         // Send email using a Blade template
@@ -2630,9 +2621,9 @@ class WorkOrderController extends Controller
             'comments' => $comments,
             'userName' => $userName,
             'status' => $status
-        ], function ($message) use ($subject, $financeEmail, $managementEmail, $operationsEmail, $createdByEmail, $template) {
+        ], function ($message) use ($subject, $financeEmail, $operationsEmail, $createdByEmail, $managementEmails, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to([$financeEmail, $managementEmail, $operationsEmail, $createdByEmail])
+                    ->to(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails))
                     ->subject($subject);
         });
     }
