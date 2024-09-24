@@ -65,8 +65,9 @@ class WoVehicleController extends Controller
             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
             $statusLogLink = env('BASE_URL') . '/vehicle-modification-status-log/' . $woVehicle->id;
 
-            // Retrieve and validate email addresses from .env
-            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            // Retrieve email addresses from the users table where can_send_wo_email is true
+            $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+            // Retrieve and validate email addresses for other recipients
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
@@ -74,7 +75,7 @@ class WoVehicleController extends Controller
 
             // Log email addresses to debug
             \Log::info('Email Recipients:', [
-                'managementEmail' => $managementEmail,
+                'managementEmails' => $managementEmails,
                 'operationsEmail' => $operationsEmail,
                 'createdByEmail' => $createdByEmail,
                 'salesPersonEmail' => $salesPersonEmail,
@@ -89,8 +90,8 @@ class WoVehicleController extends Controller
                     && $workOrder->salesPerson->is_management === 'No';
             }
 
-            // Initialize recipient list
-            $recipients = [$managementEmail, $operationsEmail];
+            // Initialize recipient list with management emails from the database
+            $recipients = array_merge($managementEmails, [$operationsEmail]);
 
             // Add createdByEmail if valid
             if ($createdByEmail) {
@@ -107,13 +108,12 @@ class WoVehicleController extends Controller
                 $recipients[] = $customerEmail;
             }
 
-            // Log and handle invalid email addresses
-            if (!$managementEmail || !$operationsEmail) {
-                \Log::error('Invalid management or operations email addresses provided:', [
-                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+            // Log and handle invalid operations email
+            if (!$operationsEmail) {
+                \Log::error('Invalid operations email address provided:', [
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                 ]);
-                throw new \Exception('One or more email addresses are invalid.');
+                throw new \Exception('Operations team email address is invalid.');
             }
             // Determine if the email is being sent to the customer
             $isCustomerEmail = in_array($customerEmail, $recipients);
