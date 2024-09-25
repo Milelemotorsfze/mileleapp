@@ -208,7 +208,7 @@ class CustomerController extends Controller
                                     ->where('is_demand_planning_customer', true)->first();
             
             if($isCustomerExist) {
-                return redirect()->back()->with('error', 'This customer name and country is already existing!');
+                return redirect()->back()->with('error', 'This customer name is already existing!');
             }
         DB::beginTransaction();
 
