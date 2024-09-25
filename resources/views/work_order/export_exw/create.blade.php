@@ -437,7 +437,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									@if(isset($workOrder) && $workOrder->delivery_advise == 'yes') checked @endif>
 							</div>
 							<div class="col-xxl-6 col-lg-6 col-md-6">
-								<label for="showroom_transfer" class="col-form-label text-md-end">Showroom Transfer</label></br>
+								<label for="showroom_transfer" class="col-form-label text-md-end">Transfer Of Ownership</label></br>
 								<input type="checkbox" id="showroom_transfer" name="showroom_transfer" value="yes" class="custom-checkbox @error('showroom_transfer') is-invalid @enderror" autocomplete="showroom_transfer"
 									@if(isset($workOrder) && $workOrder->showroom_transfer == 'yes') checked @endif>
 							</div>

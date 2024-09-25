@@ -265,7 +265,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								<center>Freight Agent</center>
 							</th>
 							<th rowspan="2" class="light">Delivery Advise</th>
-							<th rowspan="2" class="light">Showroom Transfer</th>
+							<th rowspan="2" class="light">Transfer Of Ownership</th>
                             @endif
 							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
 								<th rowspan="2" class="light">Cross Trade</th>
