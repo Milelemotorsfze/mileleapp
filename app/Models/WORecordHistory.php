@@ -32,6 +32,7 @@ class WORecordHistory extends Model
             'coe_office_approval_by' => 'COO Office Approval By',
             'coe_office_approved_at' => 'COO Office Approved At',
             'container_number' => 'Container Number',
+            'cross_trade' => 'Cross Trade',
             'currency' => 'Currency',
             'customer_address' => 'Customer Address',
             'customer_company_number' => 'Customer Company Number', // either customer_company_number OR customer_company_number.full needed

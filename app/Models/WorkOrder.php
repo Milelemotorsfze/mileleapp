@@ -16,6 +16,7 @@ class WorkOrder extends Model
         'so_number',
         'delivery_advise',
         'showroom_transfer',
+        'cross_trade',
         'is_batch',
         'batch',
         'wo_number',
