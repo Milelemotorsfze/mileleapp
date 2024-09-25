@@ -67,11 +67,11 @@
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                                 <select class="form-control" name="type" id="customer-type">
                                     <option value="" disabled>Type</option>
-                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}" {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL ? 'selected' : '' }}>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}" {{ $customer->customertype == \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL ? 'selected' : '' }}>
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
-                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}" {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_COMPANY ? 'selected' : '' }}>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}" {{ $customer->customertype == \App\Models\Clients::CUSTOMER_TYPE_COMPANY ? 'selected' : '' }}>
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_COMPANY }}</option>
-                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}"  {{ $customer->type == \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT ? 'selected' : '' }}>
+                                    <option value="{{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}"  {{ $customer->customertype == \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT ? 'selected' : '' }}>
                                         {{ \App\Models\Clients::CUSTOMER_TYPE_GOVERMENT }}</option>
                                     
                                 </select>
