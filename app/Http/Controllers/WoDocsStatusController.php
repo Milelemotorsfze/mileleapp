@@ -61,7 +61,9 @@ class WoDocsStatusController extends Controller
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
             $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
             // Get all users with 'can_send_wo_email' set to 'yes'
-            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->toArray();
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
@@ -81,7 +83,7 @@ class WoDocsStatusController extends Controller
             }
 
             // Initialize recipient list with operations email and management emails from the database
-            $recipients = array_merge([$operationsEmail, $createdByEmail], $managementEmails);
+            $recipients = array_filter(array_merge([$operationsEmail, $createdByEmail], $managementEmails));
 
             // Add salesPersonEmail only if the condition is met
             if ($shouldSendToSalesPerson && $salesPersonEmail) {
@@ -93,13 +95,17 @@ class WoDocsStatusController extends Controller
                 $recipients[] = $customerEmail;
             }
 
-            // Log and handle invalid email addresses
+            // Log and handle invalid email addresses for operations and createdByEmail (skip email if missing)
             if (!$operationsEmail || !$createdByEmail) {
                 \Log::error('Invalid or missing email addresses:', [
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                     'createdByEmail' => $createdByEmail,
                 ]);
-                throw new \Exception('One or more email addresses are invalid.');
+            }
+            // If no valid recipients, skip sending the email but don't stop execution
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                return;
             }
             // Determine if the email is being sent to the customer
             $isCustomerEmail = in_array($customerEmail, $recipients);

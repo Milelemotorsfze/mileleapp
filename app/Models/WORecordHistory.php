@@ -44,6 +44,7 @@ class WORecordHistory extends Model
             'customer_representative_email' => 'Customer Representative Email',
             'customer_representative_name' => 'Customer Representative Name',
             // date is not coming in history table
+            'delivery_advise' => 'Delivery Advise',
             'delivery_contact_person' => 'Delivery Contact Person Name',
             'delivery_contact_person_number' => 'Delivery Contact Person Number',
             'delivery_date' => 'Delivery Date',
@@ -71,6 +72,7 @@ class WORecordHistory extends Model
             'sales_support_data_confirmation_by' => 'Sales Support Data Confirmation By',
             'shipment' => 'Shipment',
             'shipping_line' => 'Shipping Line',
+            'showroom_transfer' => 'Showroom Transfer',
             'signed_contract' => 'Signed Contract',
             'signed_pfi' => 'Signed PFI',
             'so_number' => 'SO Number',

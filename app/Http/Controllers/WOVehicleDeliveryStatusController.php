@@ -47,9 +47,11 @@ class WOVehicleDeliveryStatusController extends Controller
         $workOrder = $woVehicle->workOrder;
 
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        })->toArray();
         // Retrieve and validate other recipients' emails
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
         $customerEmail = filter_var($workOrder->customer_email ?? null, FILTER_VALIDATE_EMAIL);
@@ -61,8 +63,8 @@ class WOVehicleDeliveryStatusController extends Controller
             'salesPersonEmail' => $salesPersonEmail,
             'customerEmail' => $customerEmail,
         ]);
-        // Basic recipient list starts with management emails from the database and operations email
-        $recipients = array_merge($managementEmails, [$operationsEmail]);
+        // Initialize recipient list with management emails from the database and operations email
+        $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
         // Add createdByEmail if valid
         if ($createdByEmail) {
             $recipients[] = $createdByEmail;
@@ -77,12 +79,10 @@ class WOVehicleDeliveryStatusController extends Controller
             $recipients[] = $customerEmail;
         }
 
-        // Handle invalid operations email address
-        if (!$operationsEmail) {
-            \Log::error('Invalid operations email address provided:', [
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-            ]);
-            throw new \Exception('Operations team email address is invalid.');
+        // If no valid recipients, skip sending the email and log the issue
+        if (empty($recipients)) {
+            \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
+            return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);
         }
 
         // Prepare the email subject based on status
@@ -117,6 +117,7 @@ class WOVehicleDeliveryStatusController extends Controller
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);
     }
+
 
     public function vehDeliveryStatusHistory($woVehicleId)
     {
