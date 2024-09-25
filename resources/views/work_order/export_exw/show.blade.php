@@ -222,7 +222,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
                             <div class="col-lg-2 col-md-2 col-sm-6 col-12">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">{{ $workOrder->batch ?? '' }}</span></center>
+                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">@if($workOrder->is_batch == 0) Single @else {{$workOrder->batch ?? ''}} @endif</span></center>
                                 </div>
                             </div>
                         @endif
