@@ -73,7 +73,7 @@ class WORecordHistory extends Model
             'sales_support_data_confirmation_by' => 'Sales Support Data Confirmation By',
             'shipment' => 'Shipment',
             'shipping_line' => 'Shipping Line',
-            'showroom_transfer' => 'Showroom Transfer',
+            'showroom_transfer' => 'Transfer Of Ownership',
             'signed_contract' => 'Signed Contract',
             'signed_pfi' => 'Signed PFI',
             'so_number' => 'SO Number',
