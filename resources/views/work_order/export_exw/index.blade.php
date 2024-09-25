@@ -522,8 +522,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <td>{{$data->freight_agent_name ?? ''}}</td>
                                 <td>{{$data->freight_agent_email ?? ''}}</td>
                                 <td>{{$data->freight_agent_contact_number ?? ''}}</td>
-								<td>{{ $data->delivery_advise ?? '' }}</td>
-								<td>{{ $data->showroom_transfer ?? '' }}</td>
+								<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
+								<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
                             @endif
                             @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
                                 <td>{{$data->port_of_loading ?? ''}}</td>
