@@ -54,21 +54,27 @@ class WoStatusController extends Controller
         $statusLogLink = env('BASE_URL') . '/wo-status-history/' . $workOrder->id;
 
         // Retrieve email addresses from the users table where can_send_wo_email is true
-        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
-        // Validate that the list of management emails is not empty
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        })->toArray();
+        // Log and handle if no management emails are found
         if (empty($managementEmails)) {
-            \Log::error('No email addresses found for users with permission to receive WO emails.');
-            throw new \Exception('No valid email addresses found for work order updates.');
+            \Log::info('No valid email addresses found for users with permission to receive WO emails. Skipping email for WO-' . $workOrder->wo_number);
+            // No need to throw an exception, just continue without sending the email
         }
         // Retrieve and validate email addresses from .env for operations team
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
 
         // Log and handle invalid operations email
         if (!$operationsEmail) {
-            \Log::error('Invalid operations email address provided:', [
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-            ]);
-            throw new \Exception('Operations team email address is invalid.');
+            \Log::info('Invalid or missing operations team email. Skipping email for WO-' . $workOrder->wo_number);
+        }
+        // Combine all valid recipient emails
+        $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
+        // If no valid recipients, skip sending the email
+        if (empty($recipients)) {
+            \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
+            return; // Exit the function without throwing an exception
         }
 
         // Send email using a Blade template
@@ -80,9 +86,9 @@ class WoStatusController extends Controller
             'userName' => $authUserName,
             'status' => $statusName, // Use the correct status name
             'datetime' => Carbon::now(),
-        ], function ($message) use ($subject, $managementEmails, $operationsEmail, $template) {
+        ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
-                    ->to(array_merge($managementEmails, [$operationsEmail]))
+                    ->to($recipients)
                     ->subject($subject);
         });
         // Return a JSON response indicating success

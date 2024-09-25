@@ -14,6 +14,8 @@ class WorkOrder extends Model
         'type',
         'date',
         'so_number',
+        'delivery_advise',
+        'showroom_transfer',
         'is_batch',
         'batch',
         'wo_number',

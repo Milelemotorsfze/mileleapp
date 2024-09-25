@@ -422,31 +422,47 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
-						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
-						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
-							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
-							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
-							<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
+							<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
+							<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
+								is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
+								value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+								<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
+						</div>
 					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<div class="row">
+							<div class="col-xxl-6 col-lg-6 col-md-6">
+								<label for="delivery_advise" class="col-form-label text-md-end">Delivery Advise</label></br>
+								<input type="checkbox" id="delivery_advise" name="delivery_advise" value="yes" class="custom-checkbox @error('delivery_advise') is-invalid @enderror" autocomplete="delivery_advise"
+									@if(isset($workOrder) && $workOrder->delivery_advise == 'yes') checked @endif>
+							</div>
+							<div class="col-xxl-6 col-lg-6 col-md-6">
+								<label for="showroom_transfer" class="col-form-label text-md-end">Showroom Transfer</label></br>
+								<input type="checkbox" id="showroom_transfer" name="showroom_transfer" value="yes" class="custom-checkbox @error('showroom_transfer') is-invalid @enderror" autocomplete="showroom_transfer"
+									@if(isset($workOrder) && $workOrder->showroom_transfer == 'yes') checked @endif>
+							</div>
+						</div>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
 							name="port_of_loading" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+
+					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
 							name="port_of_discharge" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Port of Discharge" value="{{ isset($workOrder) ? $workOrder->port_of_discharge : '' }}" autocomplete="port_of_discharge" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+
+					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
 							name="final_destination" onkeyup="sanitizeInput(this)"

@@ -50,29 +50,25 @@ class WoVehicleController extends Controller
                 'from' => 'no-reply@milele.com',
                 'from_name' => 'Milele Matrix',
             ];
-
             // Handle cases where customer_name is null
             $customerName = $workOrder->customer_name ?? 'Unknown Customer';
             $statusName = $validatedData['status'];
-
             // Prepare email subject
             $subject = "Work Order Vehicle Modification Status changed to $statusName for Vehicle VIN: " . $woVehicle->vin . " under Work Order " . $workOrder->wo_number;
-
             // Retrieve the authenticated user's name
             $authUserName = auth()->user()->name;
-
             // Define a quick access link (adjust the route as needed)
             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
             $statusLogLink = env('BASE_URL') . '/vehicle-modification-status-log/' . $woVehicle->id;
-
             // Retrieve email addresses from the users table where can_send_wo_email is true
-            $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->toArray();
+            $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
             // Retrieve and validate email addresses for other recipients
-            $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+            $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
             $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
-
             // Log email addresses to debug
             \Log::info('Email Recipients:', [
                 'managementEmails' => $managementEmails,
@@ -81,7 +77,6 @@ class WoVehicleController extends Controller
                 'salesPersonEmail' => $salesPersonEmail,
                 'customerEmail' => $customerEmail,
             ]);
-
             // Check if the salesPerson exists before trying to access properties
             $shouldSendToSalesPerson = false;
             if ($workOrder->salesPerson) {
@@ -89,35 +84,27 @@ class WoVehicleController extends Controller
                     && $workOrder->salesPerson->is_sales_rep === 'Yes'
                     && $workOrder->salesPerson->is_management === 'No';
             }
-
             // Initialize recipient list with management emails from the database
-            $recipients = array_merge($managementEmails, [$operationsEmail]);
-
+            $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
             // Add createdByEmail if valid
             if ($createdByEmail) {
                 $recipients[] = $createdByEmail;
             }
-
             // Add salesPersonEmail only if the condition is met
             if ($shouldSendToSalesPerson && $salesPersonEmail) {
                 $recipients[] = $salesPersonEmail;
             }
-
             // Add customerEmail if valid
             if ($customerEmail) {
                 $recipients[] = $customerEmail;
             }
-
-            // Log and handle invalid operations email
-            if (!$operationsEmail) {
-                \Log::error('Invalid operations email address provided:', [
-                    'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-                ]);
-                throw new \Exception('Operations team email address is invalid.');
+            // If no valid recipients, skip sending the email and log the issue
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
+                return; // Exit the function without throwing an exception
             }
             // Determine if the email is being sent to the customer
             $isCustomerEmail = in_array($customerEmail, $recipients);
-
             // Send email using a Blade template
             Mail::send('work_order.emails.modification_status_update', [
                 'workOrder' => $workOrder,
