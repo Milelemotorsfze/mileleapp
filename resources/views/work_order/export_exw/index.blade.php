@@ -512,7 +512,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
                             @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))															
-							    <td>{{$data->batch ?? ''}}</td>	
+							    <td>@if($data->is_batch == 0) Single @else {{$data->batch ?? ''}} @endif</td>	
                             @endif						
 							<td>{{$data->customer_name ?? ''}}</td>
 							<td>{{$data->customer_email ?? ''}}</td>
