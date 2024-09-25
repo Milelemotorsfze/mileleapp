@@ -444,8 +444,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						</div>
 					</div>
 					@endif
+					@if(isset($type) && $type == 'export_cnf')
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="cross_trade" class="col-form-label text-md-end">Cross Trade</label></br>
+						<input type="checkbox" id="cross_trade" name="cross_trade" value="yes" class="custom-checkbox @error('cross_trade') is-invalid @enderror" autocomplete="cross_trade"
+								@if(isset($workOrder) && $workOrder->cross_trade == 'yes') checked @endif>
+					</div>
+					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
 						<span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
@@ -453,7 +460,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
 
-					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
 						<span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
@@ -461,13 +468,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter Port of Discharge" value="{{ isset($workOrder) ? $workOrder->port_of_discharge : '' }}" autocomplete="port_of_discharge" autofocus>
 					</div>
 
-					<div class="{{ $type == 'export_exw' ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
 						<span class="error">* </span>
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
 							name="final_destination" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Final Destination" value="{{ isset($workOrder) ? $workOrder->final_destination : '' }}" autocomplete="final_destination" autofocus>
 					</div>
+
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">

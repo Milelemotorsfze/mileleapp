@@ -1282,6 +1282,12 @@ class WorkOrderController extends Controller
             else {
                 $newData['showroom_transfer'] = 'no';
             }
+            if(isset($request->cross_trade)) {
+                $newData['cross_trade'] = 'yes';
+            }
+            else {
+                $newData['cross_trade'] = 'no';
+            }
             // Extract full values for specific nested fields
             $nestedFields = [
                 'customer_company_number',
