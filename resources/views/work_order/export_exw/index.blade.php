@@ -103,7 +103,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
 					<div class="dropdown-option-div">
 						<label for="status-filter" class="col-form-label text-md-end">{{ __('Status') }}</label>
-						<select name="status-filter[]" id="status-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="status-filter" id="status-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($statuses as $status)
 								<option value="{{ $status }}" 
 									@if(isset($filters['status_filter']) && in_array($status, $filters['status_filter']))
@@ -118,7 +118,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
 					<div class="dropdown-option-div">
 						<label for="sales-support-filter" class="col-form-label text-md-end">{{ __('Data Confirmation') }}</label>
-						<select name="sales_support_filter[]" id="sales-support-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="sales_support_filter" id="sales-support-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($salesSupportDataConfirmations as $dataConfirmation)
 								<option value="{{ $dataConfirmation }}" 
 									@if(isset($filters['sales_support_filter']) && in_array($dataConfirmation, $filters['sales_support_filter']))
@@ -134,7 +134,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
 					<div class="dropdown-option-div">
 						<label for="finance-approval-filter" class="col-form-label text-md-end">{{ __('Fin. Approval') }}</label>
-						<select name="finance-approval-filter[]" id="finance-approval-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="finance-approval-filter" id="finance-approval-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($financeApprovalStatuses as $finApproval)
 								<option value="{{ $finApproval }}" 
 									@if(isset($filters['finance_approval_filter']) && in_array($finApproval, $filters['finance_approval_filter']))
@@ -150,7 +150,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div">
 					<div class="dropdown-option-div">
 						<label for="coo-approval-filter" class="col-form-label text-md-end">{{ __('COO Approval') }}</label>
-						<select name="coo-approval-filter[]" id="coo-approval-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="coo-approval-filter" id="coo-approval-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($cooApprovalStatuses as $cooApproval)
 								<option value="{{ $cooApproval }}"
 									@if(isset($filters['coo_approval_filter']) && in_array($cooApproval, $filters['coo_approval_filter']))
@@ -166,7 +166,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div">
 					<div class="dropdown-option-div">
 						<label for="docs-status-filter" class="col-form-label text-md-end">{{ __('Documentation') }}</label>
-						<select name="docs-status-filter[]" id="docs-status-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="docs-status-filter" id="docs-status-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($docsStatuses as $docsStatus)
 								<option value="{{ $docsStatus }}"
 									@if(isset($filters['docs_status_filter']) && in_array($docsStatus, $filters['docs_status_filter']))
@@ -182,7 +182,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="modification-filter-div" hidden>
 					<div class="dropdown-option-div">
 						<label for="modification-filter" class="col-form-label text-md-end">{{ __('Modification') }}</label>
-						<select name="modification-filter[]" id="modification-filter" multiple="true" class="form-control widthinput" autofocus>
+						<select name="modification-filter" id="modification-filter" multiple="true" class="form-control widthinput" autofocus>
 							@foreach($vehiclesModificationSummary as $modificationStatus)
 								<option value="{{ $modificationStatus }}"
 									@if(isset($filters['modification_filter']) && in_array($modificationStatus, $filters['modification_filter']))
@@ -745,36 +745,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 			e.preventDefault();
 
 			// Capture selected filter inputs
-			let statusFilter = $('#status-filter').val();
-			let salesSupportFilter = $('#sales-support-filter').val();
-			let financeApprovalFilter = $('#finance-approval-filter').val();
-			let cooApprovalFilter = $('#coo-approval-filter').val();
-			let docsStatusFilter = $('#docs-status-filter').val();
-			let modificationFilter = $('#modification-filter').val();
-			let pdiFilter = $('#pdi-filter').val();
-			let deliveryFilter = $('#delivery-filter').val();
-
-			// Capture the type variable
-			let type = "{{ isset($type) ? $type : '' }}";
-
-			// Create a data object to send via AJAX
 			let filterData = {
-				status_filter: statusFilter,
-				sales_support_filter: salesSupportFilter,
-				finance_approval_filter: financeApprovalFilter,
-				coo_approval_filter: cooApprovalFilter,
-				docs_status_filter: docsStatusFilter,
-				modification_filter: modificationFilter,
-				pdi_filter: pdiFilter,
-				delivery_filter: deliveryFilter,
-				type: type,
+				status_filter: $('#status-filter').val(),
+				sales_support_filter: $('#sales-support-filter').val(),
+				finance_approval_filter: $('#finance-approval-filter').val(),
+				coo_approval_filter: $('#coo-approval-filter').val(),
+				docs_status_filter: $('#docs-status-filter').val(),
+				modification_filter: $('#modification-filter').val(),
+				pdi_filter: $('#pdi-filter').val(),
+				delivery_filter: $('#delivery-filter').val(),
+				type: "{{ isset($type) ? $type : '' }}",
 				_token: '{{ csrf_token() }}' // Laravel CSRF protection
 			};
 
 			// Send the data to the backend via AJAX
 			$.post("{{ route('save.filters') }}", filterData, function(response) {
 				// On success, reload the page with the filters applied
-				window.location.href = "{{ route('work-order.index', '') }}/" + type;
+				window.location.href = "{{ route('work-order.index', '') }}/" + filterData.type;
 			}).fail(function() {
 				alert("Failed to apply filters. Please try again.");
 			});

@@ -181,9 +181,13 @@ class WorkOrderController extends Controller
         $statuses = WoStatus::distinct()->orderBy('status', 'asc')->pluck('status');
         $workOrders = WorkOrder::all();
         $salesSupportDataConfirmations = $workOrders->pluck('sales_support_data_confirmation')->unique()->sort()->values();
-        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->unique()->sort()->values();
+        $financeApprovalStatuses = $workOrders->pluck('finance_approval_status')->filter(function($value) {
+                return $value !== ''; // Exclude empty strings
+            })->unique()->sort()->values();
         $financeApprovalStatuses = $financeApprovalStatuses->push('Blank')->sort()->values();
-        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->unique()->sort()->values();
+        $cooApprovalStatuses = $workOrders->pluck('coo_approval_status')->filter(function($value) {
+                return $value !== ''; // Exclude empty strings
+            })->unique()->sort()->values();
         $cooApprovalStatuses = $cooApprovalStatuses->push('Blank')->sort()->values();
         $docsStatuses = $workOrders->pluck('docs_status')->unique()->sort()->values();
         // $docsStatuses = $docsStatuses->push('Blank')->sort()->values();
