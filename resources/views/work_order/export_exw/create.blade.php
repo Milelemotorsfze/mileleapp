@@ -3530,7 +3530,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						if(response.is_batch == '1') {
 							document.getElementById('is_batch').checked = true;
 							if(response.largest_batch != 0) {
-								if(workOrder.so_number == SONumber) {
+								if(workOrder != null && workOrder.so_number == SONumber) {
 									NextNum = response.largest_batch;
 								} else {
 									NextNum = response.largest_batch + 1;
