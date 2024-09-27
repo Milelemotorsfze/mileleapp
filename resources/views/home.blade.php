@@ -411,6 +411,42 @@ Procurement
                         </div>
                         @endif
                         @endif
+                        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
+        @endphp
+        @if ($hasPermission)
+        @if ($undersalesleads->isNotEmpty())
+            <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sold Vehicles GP & Commission Summary</h4>
+                            </div>
+                                <table id="dtBasicExample5" class="table table-striped table-bordered">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                                <th>Sales Person</th>
+                                                <th>Number of Vehicles</th>
+                                                <th>Total Cost Price</th>
+                                                <th>Total Sale Price</th>
+                                                <th>Gross Profit Margin</th>
+                                                <th>Commission Rate</th>
+                                                <th>Total Commission</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                            </td>
+                                        <tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
+                        @endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         @endphp
