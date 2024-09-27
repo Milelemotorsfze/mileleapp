@@ -123,6 +123,7 @@ use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
+use App\Http\Controllers\VehicleInvoiceController;
 
 /*
 /*
@@ -1029,5 +1030,8 @@ Route::get('/d', function () {
     Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
     Route::resource('salesorder', SalesOrderController::class);
     Route::get('/sales-summary/{sales_person_id}/{count_type}', [SalesOrderController::class, 'showSalesSummary'])->name('sales.summary');
+    Route::resource('vehicleinvoice', VehicleInvoiceController::class);
+    Route::post('/get-vehicles-by-so', [VehicleInvoiceController::class, 'getVehiclesBySO'])->name('getVehiclesBySO');
+    Route::get('/viewinvoicereport/method', [VehicleInvoiceController::class, 'generateinvoicePDF']);
 });
 

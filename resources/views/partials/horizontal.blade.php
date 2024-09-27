@@ -1015,6 +1015,17 @@
                                 @endif
                                 @endcan -->
                                 @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('fin-vehicle-invoice');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicleinvoice.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Vehicle Delivery Invoice</span>
+                                    </a>
+                                </li>
+                                @endif
+                                @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
                                 @endphp
                                 @if ($hasPermission)
