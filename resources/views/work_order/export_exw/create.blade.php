@@ -295,19 +295,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
-							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()">
+							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="isSOExist()">
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-1 col-lg-2 col-md-2">
 						<label for="is_batch" class="col-form-label text-md-end">Is Batch ?</label></br>
 						<input type="checkbox" id="is_batch" name="is_batch" value="yes" class="custom-checkbox @error('is_batch') is-invalid @enderror" 
-							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()">				
+							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()"
+							@if(isset($canDisableBatch) && $canDisableBatch == true) disabled @endif>				
 					</div>
 					<div class="col-xxl-2 col-lg-4 col-md-4 select-button-main-div">
 						<div id="batchDropdownSection" class="dropdown-option-div" style="display: @if(isset($workOrder) && $workOrder->is_batch == 1) block @else none @endif;">							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
+							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()" @if(isset($canDisableBatch) && $canDisableBatch == true) disabled @endif>
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 50; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
@@ -1225,6 +1226,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		});	
 	}
 	$(document).ready(function () { 
+		$.ajaxSetup({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			}
+		});
 		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
@@ -2324,6 +2330,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#enduser_passport').prop('disabled', false).trigger('change');	
 				$('#enduser_contract').prop('disabled', false).trigger('change');	
 				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
+				document.getElementById('is_batch').disabled = false; 
+				document.getElementById('batch').disabled = false;  
 				var table = document.getElementById('myTable');
 				if (table) {
 					var selects = table.querySelectorAll('select');
@@ -3474,14 +3482,95 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
         }
 	// CUSTOMER DETAILS SECTION END
-
+	function isSOExist() { console.log('inside isSOExist');
+		var SONumber = $('#so_number').val().trim();
+		var editWoId = '';
+		if(workOrder != null) {
+			editWoId = workOrder.id;
+		}
+		console.log("isEdit is - "+editWoId);
+		var selectedBatch = '';
+		// Ensure 'batch' exists before accessing its value
+		if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
+			selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
+		}
+		
+		if (SONumber === '') { // Check if SO Number is empty
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		// Step 1: Split the string to get the part after "SO-"
+		let parts = SONumber.split("SO-");
+		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		// Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
+		let numberPart = parts[1];
+		if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		if (type === 'local_sale') {
+			setWo();
+		} else {
+			$.ajax({
+				url: '/check-so-number',
+				method: 'POST',
+				data: {
+					_token: $('meta[name="csrf-token"]').attr('content'), // Add CSRF token
+					so_number: SONumber,
+					work_order_id: editWoId ? editWoId : null // If in edit mode, pass the work_order_id
+				},
+				success: function(response) { 
+					if (response.exists) { 
+						if(response.is_batch == '1') {
+							document.getElementById('is_batch').checked = true;
+							if(response.largest_batch != 0) {
+								if(workOrder.so_number == SONumber) {
+									NextNum = response.largest_batch;
+								} else {
+									NextNum = response.largest_batch + 1;
+								}
+								document.getElementById('batch').value = "Batch "+NextNum; 
+								document.getElementById('batchDropdownSection').style.display = 'block'; 																							 
+							}
+							isBatchChecked = true;
+						} else {
+							document.getElementById('is_batch').checked = false;
+							document.getElementById('batch').value = null;  
+							document.getElementById('batchDropdownSection').style.display = 'none'; 
+							isBatchChecked = false;
+						} 
+						setWo();
+						document.getElementById('is_batch').disabled = true; 
+						document.getElementById('batch').disabled = true;  
+					} else {
+						document.getElementById('batch').value = null;    
+						document.getElementById('is_batch').checked = false;
+						document.getElementById('batchDropdownSection').style.display = 'none';
+						isBatchChecked = false;
+						setWo();
+						document.getElementById('is_batch').disabled = false; 
+						document.getElementById('batch').disabled = false;  
+					}
+				},
+				error: function(xhr) {
+					console.error(xhr.responseText); // Log errors
+				} 
+			}); 
+		}
+	}
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
     var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
     var selectedBatch = '';
     
     if (type == 'export_exw' || type == 'export_cnf') {
-        selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
+        selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
     }
     
     if (SONumber === '') { // Check if SO Number is empty
@@ -3512,7 +3601,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
     } else {
         if (isBatchChecked) {
             // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
-            let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+            let batchNumber = '';
+			if (selectedBatch && typeof selectedBatch === 'string') {
+				batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+			}
             if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
                 document.getElementById('wo_number').value = ''; // Clear the WO Number field
                 return; // Exit the function

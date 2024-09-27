@@ -1233,7 +1233,12 @@ class WorkOrderController extends Controller
                 $q = $q->where('type','employee');
             })->get();
         }
-        return view('work_order.export_exw.create',compact('previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges','salesPersons'))->with([
+        $canDisableBatch = false;
+        $otherWo = WorkOrder::whereNot('id',$workOrder->id)->where('so_number',$workOrder->so_number)->get();
+        if(count($otherWo) > 0){
+            $canDisableBatch = true;
+        }
+        return view('work_order.export_exw.create',compact('canDisableBatch','previous','next','workOrder','customerCount','type','customers','airlines','vins','users','addons','charges','salesPersons'))->with([
             'vinsJson' => $vins->toJson(), // Single encoding here
         ]);
     }
@@ -2804,5 +2809,52 @@ class WorkOrderController extends Controller
     
         // Redirect back to the index route with the type parameter
         return redirect()->route('work-order.index', ['type' => $request->input('type')]);
+    }    
+    public function checkSONumber(Request $request)
+    {
+        $soNumber = $request->input('so_number');  
+        $workOrderId = $request->input('work_order_id'); // In case of edit 
+        if ($workOrderId) {
+            $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
+            if($workOrders->so_number == $soNumber) {
+                $largestBatch = $workOrders->batch; // Get the max batch number
+                $isBatch = $workOrders->is_batch; // Get the is_batch status from the first result
+                return response()->json([
+                    'exists' => true,
+                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'is_batch' => $isBatch,
+                ]);
+            } else {
+                // Find work orders with the same SO number, excluding the current one in edit mode
+                $query = WorkOrder::where('so_number', $soNumber);                
+                $workOrders = $query->get();
+                if ($workOrders->isEmpty()) {
+                    return response()->json(['exists' => false]); // SO number doesn't exist
+                }
+                // Get the largest batch number and check is_batch status
+                $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
+                $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
+                return response()->json([
+                    'exists' => true,
+                    'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                    'is_batch' => $isBatch,
+                ]);
+            }
+        } else {
+            // Find work orders with the same SO number, excluding the current one in edit mode
+            $query = WorkOrder::where('so_number', $soNumber);           
+            $workOrders = $query->get();
+            if ($workOrders->isEmpty()) {
+                return response()->json(['exists' => false]); // SO number doesn't exist
+            }
+            // Get the largest batch number and check is_batch status
+            $largestBatch = $workOrders->where('is_batch', 1)->max('batch'); // Get the max batch number
+            $isBatch = $workOrders->first()->is_batch; // Get the is_batch status from the first result
+            return response()->json([
+                'exists' => true,
+                'largest_batch' => $largestBatch ? (int) str_replace('Batch ', '', $largestBatch) : 0,
+                'is_batch' => $isBatch,
+            ]);
+        }
     }    
 }

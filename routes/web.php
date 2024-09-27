@@ -454,6 +454,7 @@ Route::get('/d', function () {
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
         Route::post('/save-filters', 'saveFilters')->name('save.filters');
+        Route::post('/check-so-number', 'checkSONumber')->name('wo.checkSONumber');
     });
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
