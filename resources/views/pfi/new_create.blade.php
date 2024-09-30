@@ -456,6 +456,17 @@
             $('.pfi-amount').val(sum);
            
         }
+
+        $('.parent-pfi-quantities').on('input', function() {
+            var index = $(this).attr('index');
+            var sum = 0;
+            var quantity = $('#pfi-quantity-'+index+'-item-0').val();
+            var unitPrice = $('#unit-price-'+index+'-item-0').val();
+            var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
+            $('#total-amount-'+index+'-item-0').val(eachItemTotal);
+            sum = sum + eachItemTotal;
+              calculatePfiAmount();
+        });
         
         function calculateTotalAmount(index,childIndex) {
             // var pfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
@@ -463,7 +474,7 @@
             // var parentPfiQty = $('#pfi-quantity-'+index+'-item-0').val();
             // console.log(parentPfiQty);
             // var totalPfiQty =  parseFloat(pfiQty) + parseFloat(parentPfiQty);
-            //             
+                        
                 let totalPfiQty = 0;
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<=totalIndex;j++) 
@@ -471,7 +482,10 @@
                     let pfiQty = $('#pfi-quantity-'+index+'-item-'+j).val(); 
                    totalPfiQty = parseFloat(totalPfiQty) + parseFloat(pfiQty);             
                 }
-                $('#pfi-quantity-'+index+'-item-0').val(totalPfiQty);
+                if(totalIndex > 0) {
+                    $('#pfi-quantity-'+index+'-item-0').val(totalPfiQty);
+                }
+               
                 var unitPrice = $('#unit-price-'+index+'-item-0').val();
             // var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();        
             var eachItemTotal = parseFloat(totalPfiQty) * parseFloat(unitPrice);
