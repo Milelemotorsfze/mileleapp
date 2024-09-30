@@ -1039,5 +1039,7 @@ Route::get('/d', function () {
     Route::resource('vehicleinvoice', VehicleInvoiceController::class);
     Route::post('/get-vehicles-by-so', [VehicleInvoiceController::class, 'getVehiclesBySO'])->name('getVehiclesBySO');
     Route::get('/viewinvoicereport/method', [VehicleInvoiceController::class, 'generateinvoicePDF']);
+    Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
+    Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
 });
 

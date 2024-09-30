@@ -413,6 +413,7 @@ Procurement
                         @endif
                         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
+            $currentMonth = request()->get('month') ?? now()->format('Y-m');
         @endphp
         @if ($hasPermission)
         @if ($undersalesleads->isNotEmpty())
@@ -421,6 +422,23 @@ Procurement
                                 <div class="table-responsive px-3">
                                 <div class="card-header align-items-center ">
                             <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sold Vehicles GP & Commission Summary</h4>
+                            <form id="filterForm" action="{{ route('home') }}" method="GET">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-control" name="month" id="monthSelector" onchange="this.form.submit()">
+                                @for ($i = 0; $i < 12; $i++)
+                                    @php
+                                        $date = now()->startOfMonth()->subMonths($i)->format('Y-m');
+                                        $selected = ($currentMonth === $date) ? 'selected' : '';
+                                    @endphp
+                                    <option value="{{ $date }}" {{ $selected }}>
+                                        {{ now()->startOfMonth()->subMonths($i)->format('F Y') }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                </form>
                             </div>
                                 <table id="dtBasicExample5" class="table table-striped table-bordered">
                                 <thead class="bg-soft-secondary">
@@ -435,10 +453,20 @@ Procurement
                                             </tr>
                                         </thead>
                                         <tbody>
+                                        @foreach ($commissons as $data)
                                         <tr>
-                                            <td>
-                                            </td>
-                                        <tr>
+            <td><a href="{{ route('salesperson.commissions', ['sales_person_id' => $data->sales_person_id, 'month' => request()->get('month') ?? now()->format('Y-m')]) }}">
+                {{ $data->name }}
+            </a>
+            </td>
+            <td>{{ $data->total_invoice_items }}</td> <!-- Number of Vehicles -->
+            <td>{{ number_format($data->total_vehicle_cost, 2) }}</td> <!-- Total Cost Price -->
+            <td>{{ number_format($data->total_rate_in_aed, 2) }}</td> <!-- Total Sale Price in AED -->
+            <td>{{ number_format($data->total_rate_in_aed - $data->total_vehicle_cost, 2) }}</td> <!-- Gross Profit Margin in AED -->
+            <td>{{ number_format($data->commission_rate, 2) }}%</td> <!-- Commission Rate -->
+            <td>{{ number_format(($data->total_rate_in_aed - $data->total_vehicle_cost) * ($data->commission_rate / 100), 2) }}</td> <!-- Total Commission in AED -->
+        </tr>
+        @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -1822,6 +1850,22 @@ $(document).ready(function() {
 
         return detailHtmlbelgium;
     }
+});
+document.getElementById('monthSelector').addEventListener('change', function() {
+    const selectedMonth = this.value;
+    const url = document.getElementById('filterForm').action;
+    
+    fetch(`${url}?month=${selectedMonth}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Replace the commission table with the updated data
+        document.getElementById('commissionTable').innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
 });
     </script>
 @endpush

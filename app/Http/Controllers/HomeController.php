@@ -19,7 +19,7 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function index()
+    public function index(Request $request)
     {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open the DashBoard";
@@ -253,6 +253,45 @@ $totalvariantss = [
         else{
             $undersalesleads = [];
         }
+        $hasPermissiongp = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
+        if ($hasPermissiongp) {
+            $usdToAedRate = 3.67;
+            $selectedMonth = $request->get('month') ?? now()->format('Y-m'); // Get the selected month, default to current
+    
+            $commissons = DB::table('vehicle_invoice')
+                ->join('vehicle_invoice_items', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
+                ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
+                ->join('users', 'so.sales_person_id', '=', 'users.id')
+                ->leftJoin('vehicle_netsuite_cost', 'vehicle_invoice_items.vehicles_id', '=', 'vehicle_netsuite_cost.vehicles_id')
+                ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth) // Filter by selected month
+                ->select(
+                    'so.sales_person_id',
+                    'users.name',
+                    DB::raw('COUNT(vehicle_invoice_items.id) as total_invoice_items'),
+                    DB::raw('SUM(vehicle_netsuite_cost.cost) as total_vehicle_cost'),
+                    DB::raw("SUM(CASE WHEN vehicle_invoice.currency = 'USD' THEN vehicle_invoice_items.rate * $usdToAedRate ELSE vehicle_invoice_items.rate END) as total_rate_in_aed"),
+                    DB::raw('GROUP_CONCAT(vehicle_invoice_items.vehicles_id) as all_vehicles_ids'),
+                    'vehicle_invoice.currency'
+                )
+                ->groupBy('so.sales_person_id', 'users.name')
+                ->get();
+    
+            // Calculate commission rates
+            foreach ($commissons as $item) {
+                $totalSales = $item->total_rate_in_aed;
+                $commissionSlot = DB::table('commission_slots')
+                    ->where('min_sales', '<=', $totalSales)
+                    ->where(function($query) use ($totalSales) {
+                        $query->where('max_sales', '>=', $totalSales)
+                              ->orWhereNull('max_sales');
+                    })
+                    ->orderBy('min_sales', 'desc')
+                    ->first();
+                $item->commission_rate = $commissionSlot ? $commissionSlot->rate : 0;
+            }
+        } else {
+            $commissons = [];
+        }
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         if ($hasPermission) {
             $dpdashboarduae = DB::table('vehicles')
@@ -283,7 +322,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons'));
         }
         else
         {
@@ -291,7 +330,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons'));
         }
     }
     public function marketingupdatechart(Request $request)
