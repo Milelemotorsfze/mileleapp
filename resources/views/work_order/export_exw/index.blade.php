@@ -271,6 +271,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								<th rowspan="2" class="light">Cross Trade</th>
 							@endif
                             @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf' || $type == 'all'))
+								<th rowspan="2" class="light">Temporary Exit</th>
                                 <th rowspan="2" class="light">Port Of Loading</th>
                                 <th rowspan="2" class="light">Port Of Discharge</th>
                                 <th rowspan="2" class="light">Final Destination</th>
@@ -532,6 +533,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								<td>@if($data->type == 'export_cnf'){{ $data->cross_trade ?? '' }}@endif</td>
 							@endif
                             @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
+								<td>@if($data->type == 'export_exw' || $data->type == 'export_cnf'){{ $data->temporary_exit ?? '' }}@endif</td>
                                 <td>{{$data->port_of_loading ?? ''}}</td>
                                 <td>{{$data->port_of_discharge ?? ''}}</td>
                                 <td>{{$data->final_destination ?? ''}}</td>

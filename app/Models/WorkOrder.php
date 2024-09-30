@@ -14,6 +14,7 @@ class WorkOrder extends Model
         'type',
         'date',
         'so_number',
+        'temporary_exit',
         'delivery_advise',
         'showroom_transfer',
         'cross_trade',
