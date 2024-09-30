@@ -529,7 +529,9 @@ Route::get('/d', function () {
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
     Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
-    Route::get('pfi-item/get-master-models', [PFIController::class,'getChildModels'])->name('pfi-item.master-models');
+    Route::get('pfi-item/get-models', [PFIController::class,'getModels'])->name('pfi-item.models');
+    Route::get('pfi-item/get-master-models', [PFIController::class,'getMasterModel'])->name('pfi-item.master-model-ids');
+    Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);

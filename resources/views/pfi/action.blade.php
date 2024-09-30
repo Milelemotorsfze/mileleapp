@@ -173,7 +173,7 @@
                                             <div class="row mt-3">
                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                     <dt class="d-lg-none d-xl-none d-xxl-none">LOI Item Code</dt>
-                                                    <dl> {{ $pfiItem->letterOfIndentItem->code ?? ''}} </dl>
+                                                    <dl> {{ $pfiItem->loi_item_code }} </dl>
                                                 </div>
                                               
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
@@ -191,7 +191,7 @@
                                                 </div>
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                     <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Quantity</dt>
-                                                    <dl>{{ $pfiItem->quantity }}</dl>
+                                                    <dl>{{ $pfiItem->pfi_quantity }}</dl>
                                                 </div>
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                     <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Total Price ({{ $pfi->currency }})</dt>
