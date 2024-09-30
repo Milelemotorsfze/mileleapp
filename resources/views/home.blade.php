@@ -416,7 +416,7 @@ Procurement
             $currentMonth = request()->get('month') ?? now()->format('Y-m');
         @endphp
         @if ($hasPermission)
-        @if ($undersalesleads->isNotEmpty())
+        @if (!empty($undersalesleads))
             <div class="card">
                             <div class="card-body px-0">
                                 <div class="table-responsive px-3">
