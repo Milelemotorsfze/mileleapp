@@ -349,7 +349,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($datas as $key => $data)
 						<tr data-id="1">
-                            <td>
+                            <td class="no-click">
                                 <div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
@@ -516,16 +516,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							    <td>@if($data->is_batch == 0) Single @else {{$data->batch ?? ''}} @endif</td>	
                             @endif						
 							<td>{{$data->customer_name ?? ''}}</td>
-							<td>{{$data->customer_email ?? ''}}</td>
-							<td>{{$data->customer_company_number ?? ''}}</td>
+							<td class="no-click">{{$data->customer_email ?? ''}}</td>
+							<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
 							<td>{{$data->customer_address ?? ''}}</td>
 							<td>{{$data->customer_representative_name ?? ''}}</td>
-							<td>{{$data->customer_representative_email ?? ''}}</td>
-							<td>{{$data->customer_representative_contact ?? ''}}</td>	
+							<td class="no-click">{{$data->customer_representative_email ?? ''}}</td>
+							<td class="no-click">{{$data->customer_representative_contact ?? ''}}</td>	
                             @if(isset($type) && $type == 'export_exw'|| $type == 'all')													
                                 <td>{{$data->freight_agent_name ?? ''}}</td>
-                                <td>{{$data->freight_agent_email ?? ''}}</td>
-                                <td>{{$data->freight_agent_contact_number ?? ''}}</td>
+                                <td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
+                                <td class="no-click">{{$data->freight_agent_contact_number ?? ''}}</td>
 								<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
 								<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
                             @endif
@@ -568,7 +568,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 										{{$data->transportation_company ?? ''}}
 									@endif
 								</td>
-                                <td>
+                                <td class="@if($data->transport_type == 'road') no-click @endif">
 									@if($data->transport_type == 'air')
 										{{$data->airway_details ?? ''}}
 									@elseif($data->transport_type == 'sea')
@@ -596,7 +596,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
 							<td>{{$data->delivery_location ?? ''}}</td>
 							<td>{{$data->delivery_contact_person ?? ''}}</td>
-							<td>{{$data->delivery_contact_person_number ?? ''}}</td>
+							<td class="no-click">{{$data->delivery_contact_person_number ?? ''}}</td>
                             <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
 							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
 								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
@@ -769,7 +769,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 			});
 		});
 
+		$('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
+			// Get the `data-id` attribute of the row or use the associated `id` for redirection
+			let row = $(this).closest('tr');
+			let workOrderId = row.data('id'); // Assuming your row has a data-id attribute
 
+			if (workOrderId) {
+				// Redirect to the "show details" page for that work order
+				window.location.href = `/work-order/${workOrderId}`;
+			}
+		});
         // Initialize DataTable with default 100 entries
         var table = $('.my-datatable').DataTable({
             "pageLength": 100, // Set the default number of entries to display
