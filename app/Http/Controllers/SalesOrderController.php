@@ -690,4 +690,100 @@ public function showSalesSummary($sales_person_id, $count_type)
         'countType' => $count_type,
     ]);
 }
+public function showSalespersonCommissions($sales_person_id, Request $request)
+{
+    $usdToAedRate = 3.67;
+    $selectedMonth = $request->get('month') ?? now()->format('Y-m'); // Get the selected month, default to current
+    // Fetch the salesperson's name
+    $salesPerson = DB::table('users')->where('id', $sales_person_id)->select('name')->first();
+    // Filter commissions for the selected salesperson and month
+    $commissions = DB::table('vehicle_invoice')
+        ->join('vehicle_invoice_items', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
+        ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
+        ->join('users', 'so.sales_person_id', '=', 'users.id')
+        ->leftJoin('vehicle_netsuite_cost', 'vehicle_invoice_items.vehicles_id', '=', 'vehicle_netsuite_cost.vehicles_id')
+        ->where('so.sales_person_id', '=', $sales_person_id)
+        ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth) // Filter by selected month
+        ->select(
+            'vehicle_invoice.invoice_number',
+            'vehicle_invoice.id as invoice_id',
+            'users.name',
+            DB::raw('COUNT(vehicle_invoice_items.id) as total_invoice_items'),
+            DB::raw('SUM(vehicle_netsuite_cost.cost) as total_vehicle_cost'),
+            DB::raw("SUM(CASE WHEN vehicle_invoice.currency = 'USD' THEN vehicle_invoice_items.rate * $usdToAedRate ELSE vehicle_invoice_items.rate END) as total_rate_in_aed"),
+            DB::raw('GROUP_CONCAT(vehicle_invoice_items.vehicles_id) as all_vehicles_ids'),
+            'vehicle_invoice.currency'
+        )
+        ->groupBy('vehicle_invoice.id', 'users.name')
+        ->get();
+    // Calculate commission rates for the selected salesperson
+    foreach ($commissions as $item) {
+        $totalSales = $item->total_rate_in_aed;
+        $commissionSlot = DB::table('commission_slots')
+            ->where('min_sales', '<=', $totalSales)
+            ->where(function($query) use ($totalSales) {
+                $query->where('max_sales', '>=', $totalSales)
+                      ->orWhereNull('max_sales');
+            })
+            ->orderBy('min_sales', 'desc')
+            ->first();
+        $item->commission_rate = $commissionSlot ? $commissionSlot->rate : 0;
+    }
+    // Return the view for this salesperson's commission
+    return view('salesorder.commission', compact('commissions', 'selectedMonth', 'sales_person_id', 'salesPerson'));
+}
+public function showVehicles($vehicle_invoice_id)
+{
+    $usdToAedRate = 3.67;
+
+    // Fetch salesperson and invoice details
+    $invoiceData = DB::table('vehicle_invoice')
+        ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
+        ->join('users', 'so.sales_person_id', '=', 'users.id')
+        ->where('vehicle_invoice.id', $vehicle_invoice_id)
+        ->select('vehicle_invoice.invoice_number', 'users.name as sales_person_name')
+        ->first();
+
+    // Get detailed data for the selected vehicle invoice and group by vehicle_id
+    $vehicles = DB::table('vehicle_invoice_items')
+        ->join('vehicle_invoice', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
+        ->join('vehicles', 'vehicle_invoice_items.vehicles_id', '=', 'vehicles.id')
+        ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+        ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->leftJoin('vehicle_netsuite_cost', 'vehicles.id', '=', 'vehicle_netsuite_cost.vehicles_id')
+        ->where('vehicle_invoice.id', '=', $vehicle_invoice_id)
+        ->select(
+            'vehicles.vin',
+            'brands.brand_name',
+            'master_model_lines.model_line',
+            'varaints.name as variant_name',
+            DB::raw('SUM(vehicle_netsuite_cost.cost) as total_vehicle_cost'),
+            DB::raw("SUM(CASE WHEN vehicle_invoice.currency = 'USD' THEN vehicle_invoice_items.rate * $usdToAedRate ELSE vehicle_invoice_items.rate END) as total_rate_in_aed"),
+            'vehicle_invoice.currency'
+        )
+        ->groupBy('vehicles.id', 'brands.brand_name', 'master_model_lines.model_line', 'varaints.name', 'vehicles.vin')
+        ->get();
+
+    // Calculate commission rates for the selected vehicles
+    foreach ($vehicles as $item) {
+        $totalSales = $item->total_rate_in_aed;
+        $commissionSlot = DB::table('commission_slots')
+            ->where('min_sales', '<=', $totalSales)
+            ->where(function ($query) use ($totalSales) {
+                $query->where('max_sales', '>=', $totalSales)
+                    ->orWhereNull('max_sales');
+            })
+            ->orderBy('min_sales', 'desc')
+            ->first();
+        $item->commission_rate = $commissionSlot ? $commissionSlot->rate : 0;
+    }
+
+    // Pass the data to the view
+    return view('salesorder.vehicles', [
+        'vehicles' => $vehicles,
+        'salesPerson' => $invoiceData->sales_person_name,
+        'invoice_number' => $invoiceData->invoice_number
+    ]);
+}
         }
