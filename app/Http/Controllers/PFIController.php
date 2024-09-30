@@ -247,12 +247,9 @@ class PFIController extends Controller
                 });
             }
             if(!empty($request->total_price)) {
-                // $data->whereRaw("(pfi_quantity * unit_price) as total_price", 'like', "%{$request->total_price}%");
+                $data->whereRaw("CAST((pfi_quantity * unit_price) AS CHAR) like ?", ["%$total_price%"]);
 
-                    // ->where('total_price','like', "%{$request->total_price}%" );
             }
-            info($request->all());
-            // return $data->get();
            
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
