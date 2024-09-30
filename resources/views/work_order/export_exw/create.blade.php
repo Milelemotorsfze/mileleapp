@@ -453,7 +453,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="temporary_exit" class="col-form-label text-md-end">Temporary Exit</label></br>
+						<input type="checkbox" id="temporary_exit" name="temporary_exit" value="yes" class="custom-checkbox @error('temporary_exit') is-invalid @enderror" autocomplete="temporary_exit"
+								@if(isset($workOrder) && $workOrder->temporary_exit == 'yes') checked @endif>
+					</div>
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
 						<span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
@@ -461,7 +466,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
 
-					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
 						<span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"

@@ -1285,6 +1285,12 @@ class WorkOrderController extends Controller
             else {
                 $newData['delivery_advise'] = 'no';
             }
+            if(isset($request->temporary_exit)) {
+                $newData['temporary_exit'] = 'yes';
+            }
+            else {
+                $newData['temporary_exit'] = 'no';
+            }
             if(isset($request->showroom_transfer)) {
                 $newData['showroom_transfer'] = 'yes';
             }

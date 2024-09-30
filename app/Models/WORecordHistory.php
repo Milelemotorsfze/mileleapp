@@ -79,6 +79,7 @@ class WORecordHistory extends Model
             'so_number' => 'SO Number',
             'so_total_amount' => 'SO Total Amount',
             'so_vehicle_quantity' => 'SO Vehicle Quantity',
+            'temporary_exit' => 'Temporary Exit',
             'trailer_number_plate' => 'Trailer Number Plate',
             'transport_type' => 'Transport Type',
             'transportation_company' => 'Transportation Company',
