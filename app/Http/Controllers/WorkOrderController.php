@@ -2321,7 +2321,7 @@ class WorkOrderController extends Controller
     {
         // Validate the request data, making 'text' nullable
         $request->validate([
-            'text' => 'nullable|string|max:255',
+            'text' => 'nullable|string',
             'parent_id' => 'nullable|integer|exists:w_o_comments,id',
             'work_order_id' => 'required|integer|exists:work_orders,id',
             'mentioned_users' => 'array',

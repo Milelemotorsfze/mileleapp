@@ -226,8 +226,8 @@
             return;
         }
 
-        if (text.length > 1000) { // Set an appropriate limit for your application
-            alert('The text field must not be greater than 1000 characters.');
+        if (text.length > 16777215) { // mediumText limit
+            alert('The text is too long.');
             return;
         }
 
