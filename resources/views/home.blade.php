@@ -459,12 +459,12 @@ Procurement
                 {{ $data->name }}
             </a>
             </td>
-            <td>{{ $data->total_invoice_items }}</td> <!-- Number of Vehicles -->
-            <td>{{ number_format($data->total_vehicle_cost, 2) }}</td> <!-- Total Cost Price -->
-            <td>{{ number_format($data->total_rate_in_aed, 2) }}</td> <!-- Total Sale Price in AED -->
-            <td>{{ number_format($data->total_rate_in_aed - $data->total_vehicle_cost, 2) }}</td> <!-- Gross Profit Margin in AED -->
-            <td>{{ number_format($data->commission_rate, 2) }}%</td> <!-- Commission Rate -->
-            <td>{{ number_format(($data->total_rate_in_aed - $data->total_vehicle_cost) * ($data->commission_rate / 100), 2) }}</td> <!-- Total Commission in AED -->
+            <td>{{ $data->total_invoice_items }}</td>
+            <td>{{ number_format($data->total_vehicle_cost, 2) }}</td>
+            <td>{{ number_format($data->total_rate_in_aed, 2) }}</td>
+            <td>{{ number_format($data->total_rate_in_aed - $data->total_vehicle_cost, 2) }}</td>
+            <td>{{ number_format($data->commission_rate, 2) }}%</td>
+            <td>{{ number_format(($data->total_rate_in_aed - $data->total_vehicle_cost) * ($data->commission_rate / 100), 2) }}</td>
         </tr>
         @endforeach
                                         </tbody>
