@@ -840,13 +840,22 @@ class WorkOrderController extends Controller
         }
     }
     private function sendSOAmountUpdateEmail($workOrder, $comment) {
+        // Check if the user has permission to edit confirmed work orders
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);     
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
         $template['from_name'] = 'Milele Matrix';   
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-        // Construct the email subject
-        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;    
+        // Construct the email subject based on permission
+        if ($hasEditConfirmedPermission) {
+            // Include system administrator details in the subject
+            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type 
+                . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
+        } else {
+            // Standard subject line without admin details
+            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+        }
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;   
         // Retrieve and validate email addresses from .env
@@ -863,7 +872,7 @@ class WorkOrderController extends Controller
             'financeEmail' => $financeEmail,
             'operationsEmail' => $operationsEmail,
             'managementEmails' => implode(', ', $managementEmails) ?: 'none found',
-            'createdByEmail' => $createdByEmail ?? 'null'
+            'createdByEmail' => $createdByEmail ?? 'null',
         ]);
         // Combine all recipient emails into a single array
         $recipients = array_filter(array_merge([$financeEmail, $operationsEmail, $createdByEmail], $managementEmails)); 
@@ -874,6 +883,7 @@ class WorkOrderController extends Controller
         } 
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
+        $authUserEmail = auth()->user()->email;  // Also include the email
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
@@ -881,8 +891,10 @@ class WorkOrderController extends Controller
             'workOrder' => $workOrder,
             'accessLink' => $accessLink,
             'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail, // Pass the authenticated user's email
             'currentDateTime' => $currentDateTime, // Pass the current date and time
             'comment' => $comment,
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $recipients, $template) {
             $message->from($template['from'], $template['from_name'])
                     ->to($recipients)
@@ -891,15 +903,23 @@ class WorkOrderController extends Controller
     } 
     private function sendDataUpdateEmail($workOrder, $comment)
     {
+        // Check if the user has permission to edit confirmed work orders
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
         $template['from_name'] = 'Milele Matrix';
 
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-        // Construct the email subject
-        $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
-
+        // Construct the email subject based on permission
+        if ($hasEditConfirmedPermission) {
+            // Include system administrator details in the subject
+            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type
+            . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
+        } else {
+            // Standard subject line without admin details
+            $subject = "WO Deposit Update WO-" . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+        }
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
         // Retrieve all users who can receive WO emails
@@ -915,7 +935,7 @@ class WorkOrderController extends Controller
         }
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
-
+        $authUserEmail = auth()->user()->email;
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
@@ -923,8 +943,10 @@ class WorkOrderController extends Controller
             'workOrder' => $workOrder,
             'accessLink' => $accessLink,
             'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail,
             'currentDateTime' => $currentDateTime, // Pass the current date and time
             'comment' => $comment,
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $emailList, $template) {
             $message->from($template['from'], $template['from_name'])
                     ->to($emailList->toArray()) // Convert the collection to an array
@@ -932,13 +954,21 @@ class WorkOrderController extends Controller
         });
     }
     private function sendVehicleUpdateEmail($workOrder, $newComment) {
+        // Check if the user has permission to edit confirmed work orders
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Prepare the from details
         $template['from'] = 'no-reply@milele.com';
         $template['from_name'] = 'Milele Matrix';
         // Handle cases where customer_name is null
         $customerName = $workOrder->customer_name ?? 'Unknown Customer';  
-        // Construct the email subject
-        $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+        if ($hasEditConfirmedPermission) {
+            // Include system administrator details in the subject
+            $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type
+            . " By system administrator (" . Auth::user()->name . " - " . Auth::user()->email . ")";
+        } else {
+            // Standard subject line without admin details
+            $subject = "WO Vehicle Update " . $workOrder->order_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->sale_type;
+        }
         // Define a quick access link (adjust the route as needed)
         $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id; 
         // Retrieve email addresses from the users table where can_send_wo_email is true
@@ -952,6 +982,7 @@ class WorkOrderController extends Controller
         }
         // Retrieve the authenticated user's name
         $authUserName = auth()->user()->name;
+        $authUserEmail = auth()->user()->email;
         // Get the current date and time in d M Y, h:i:s A format
         $currentDateTime = now()->format('d M Y, h:i:s A');
         // Send email using a Blade template
@@ -960,7 +991,9 @@ class WorkOrderController extends Controller
             'accessLink' => $accessLink,
             'newComment' => $newComment,
             'authUserName' => $authUserName, // Pass the authenticated user's name
+            'authUserEmail' => $authUserEmail,
             'currentDateTime' => $currentDateTime, // Pass the current date and time
+            'hasEditConfirmedPermission' => $hasEditConfirmedPermission, // Pass the permission flag
         ], function ($message) use ($subject, $managementEmails, $template) {
             $message->from($template['from'], $template['from_name'])
                     ->to($managementEmails)
@@ -1248,8 +1281,10 @@ class WorkOrderController extends Controller
      */
     public function update(Request $request, WorkOrder $workOrder)
     { 
+        // Check if the user has permission to edit confirmed work orders
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
         // Check if the sales support data has been confirmed
-        if (!is_null($workOrder->sales_support_data_confirmation_at)) {
+        if (!is_null($workOrder->sales_support_data_confirmation_at) && !$hasEditConfirmedPermission) {
             return response()->json(['success' => false, 'message' => "Can't edit the work order because the sales support confirmed the data."], 400);
         }
         DB::beginTransaction();
@@ -1262,7 +1297,7 @@ class WorkOrderController extends Controller
             $authId = Auth::id();            
             $newComment = WOComments::create([
                 'work_order_id' => $workOrder->id,
-                'text' => "The work order data was changed as follows by ".auth()->user()->name, // Allow null text
+                'text' => "The work order data was changed as follows by " . auth()->user()->name . ($hasEditConfirmedPermission ? " (System Administrator)" : ""), // Conditionally append "System Administrator"
                 'parent_id' => null, // Temporary null, will update later
                 'user_id' => null,
             ]);
@@ -2186,33 +2221,38 @@ class WorkOrderController extends Controller
                 }
             }
             if($canCreateFinanceApproval == true) {
-                $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
-                if($financePendingApproval == null) { 
-                    WOApprovals::create([
-                        'work_order_id' => $workOrder->id,
-                        'type' => 'finance', 
-                        'status' => 'pending', 
-                        'action_at' =>NULL,
-                    ]);
-                }
-                else {
-                    $financePendingApproval->updated_at = Carbon::now();
-                    $financePendingApproval->update();
+                if(!$hasEditConfirmedPermission) {
+                    $financePendingApproval = WOApprovals::where('work_order_id',$workOrder->id)->where('type','finance')->where('status','pending')->first();
+                    if($financePendingApproval == null) { 
+                        WOApprovals::create([
+                            'work_order_id' => $workOrder->id,
+                            'type' => 'finance', 
+                            'status' => 'pending', 
+                            'action_at' =>NULL,
+                        ]);
+                    }
+                    else {
+                        $financePendingApproval->updated_at = Carbon::now();
+                        $financePendingApproval->update();
+                    }
                 }
             }
+            info($canCreateCOOApproval);
             if($canCreateCOOApproval == true) {
-                $cooPendingApprovals = WOApprovals::where('work_order_id',$workOrder->id)->where('type','coo')->where('status','pending')->first();
-                if($cooPendingApprovals == null) { 
-                    WOApprovals::create([
-                        'work_order_id' => $workOrder->id,
-                        'type' => 'coo', 
-                        'status' => 'pending', 
-                        'action_at' =>NULL,
-                    ]);
-                }
-                else {
-                    $cooPendingApprovals->updated_at = Carbon::now();
-                    $cooPendingApprovals->update();
+                if(!$hasEditConfirmedPermission) {
+                    $cooPendingApprovals = WOApprovals::where('work_order_id',$workOrder->id)->where('type','coo')->where('status','pending')->first();
+                    if($cooPendingApprovals == null) { 
+                        WOApprovals::create([
+                            'work_order_id' => $workOrder->id,
+                            'type' => 'coo', 
+                            'status' => 'pending', 
+                            'action_at' =>NULL,
+                        ]);
+                    }
+                    else {
+                        $cooPendingApprovals->updated_at = Carbon::now();
+                        $cooPendingApprovals->update();
+                    }      
                 }                
                 // Call the private function to send the email
                 $this->sendVehicleUpdateEmail($workOrder,$newComment);

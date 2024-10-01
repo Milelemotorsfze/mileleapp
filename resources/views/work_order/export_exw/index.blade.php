@@ -368,7 +368,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 
 										@php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-                                        $isDisabled = $data->sales_support_data_confirmation_at != '';
+										$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+										$isDisabled = !$hasEditConfirmedPermission && $data->sales_support_data_confirmation_at != '';
 										@endphp
                                         @if ($hasPermission)
                                         <li>

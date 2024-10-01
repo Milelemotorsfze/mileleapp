@@ -164,7 +164,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
         @include('work_order.export_exw.approvals')
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-        $isDisabled = isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '';
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+		$isDisabled = !$hasEditConfirmedPermission && isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '';
         @endphp
         @if ($hasPermission)
         <a title="Edit" class="btn btn-sm btn-info me-2 {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $workOrder->id ?? '') }}">
