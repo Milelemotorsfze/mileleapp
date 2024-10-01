@@ -1826,17 +1826,24 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 		
 		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
-			// Select all input, select, and textarea elements and disable them
-			var elements = document.querySelectorAll('#WOForm #submit');
-			// #WOForm input, #WOForm select, #WOForm textarea, 
-			elements.forEach(function(element) {
-				element.disabled = true;
-			});
-			// Also disable the submit button with ID "submit-from-top"
-			var submitFromTopButton = document.getElementById('submit-from-top');
-			if (submitFromTopButton) {
-				submitFromTopButton.disabled = true;
-				submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+			// Inject the PHP check for the permission into JavaScript
+			var hasEditConfirmedPermission = <?php echo json_encode(Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order'])); ?>;			
+			// Determine if the form should be disabled
+			var isDisabled = !hasEditConfirmedPermission;
+			// If the user doesn't have permission and sales support data confirmation exists, disable the form
+			if (isDisabled) {
+				// Select all input, select, and textarea elements and disable them
+				var elements = document.querySelectorAll('#WOForm #submit');
+				// #WOForm input, #WOForm select, #WOForm textarea, 
+				elements.forEach(function(element) {
+					element.disabled = true;
+				});
+				// Also disable the submit button with ID "submit-from-top"
+				var submitFromTopButton = document.getElementById('submit-from-top');
+				if (submitFromTopButton) {
+					submitFromTopButton.disabled = true;
+					submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+				}
 			}
 		}
 		// Initialize mentions for the main comment textarea
@@ -2335,8 +2342,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#enduser_passport').prop('disabled', false).trigger('change');	
 				$('#enduser_contract').prop('disabled', false).trigger('change');	
 				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
-				document.getElementById('is_batch').disabled = false; 
-				document.getElementById('batch').disabled = false;  
+				const isBatchElement = document.getElementById('is_batch');
+				if (isBatchElement) {
+				isBatchElement.disabled = false;
+				}
+				const batchElement = document.getElementById('batch');
+				if (batchElement) {
+				batchElement.disabled = false;
+				}
 				var table = document.getElementById('myTable');
 				if (table) {
 					var selects = table.querySelectorAll('select');
