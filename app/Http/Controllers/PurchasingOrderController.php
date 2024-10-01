@@ -90,7 +90,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $useractivities =  New UserActivities();
         $useractivities->activity = "Purchasing Order Index Page View";
         $useractivities->users_id = Auth::id();
@@ -170,7 +172,7 @@ class PurchasingOrderController extends Controller
             ->get();
         }
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filter($status)
     {
