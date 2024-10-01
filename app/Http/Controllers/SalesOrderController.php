@@ -732,19 +732,15 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     // Return the view for this salesperson's commission
     return view('salesorder.commission', compact('commissions', 'selectedMonth', 'sales_person_id', 'salesPerson'));
 }
-public function showVehicles($vehicle_invoice_id)
-{
+    public function showVehicles($vehicle_invoice_id)
+    {
     $usdToAedRate = 3.67;
-
-    // Fetch salesperson and invoice details
     $invoiceData = DB::table('vehicle_invoice')
         ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
         ->join('users', 'so.sales_person_id', '=', 'users.id')
         ->where('vehicle_invoice.id', $vehicle_invoice_id)
         ->select('vehicle_invoice.invoice_number', 'users.name as sales_person_name')
         ->first();
-
-    // Get detailed data for the selected vehicle invoice and group by vehicle_id
     $vehicles = DB::table('vehicle_invoice_items')
         ->join('vehicle_invoice', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
         ->join('vehicles', 'vehicle_invoice_items.vehicles_id', '=', 'vehicles.id')
@@ -764,9 +760,12 @@ public function showVehicles($vehicle_invoice_id)
         )
         ->groupBy('vehicles.id', 'brands.brand_name', 'master_model_lines.model_line', 'varaints.name', 'vehicles.vin')
         ->get();
-
-    // Calculate commission rates for the selected vehicles
     foreach ($vehicles as $item) {
+        $gross = $item->total_rate_in_aed - $item->total_vehicle_cost;
+        if ($gross <= 0) {
+            $item->commission_rate = 0;
+            continue;
+        }
         $totalSales = $item->total_rate_in_aed;
         $commissionSlot = DB::table('commission_slots')
             ->where('min_sales', '<=', $totalSales)
@@ -778,12 +777,10 @@ public function showVehicles($vehicle_invoice_id)
             ->first();
         $item->commission_rate = $commissionSlot ? $commissionSlot->rate : 0;
     }
-
-    // Pass the data to the view
     return view('salesorder.vehicles', [
         'vehicles' => $vehicles,
         'salesPerson' => $invoiceData->sales_person_name,
         'invoice_number' => $invoiceData->invoice_number
     ]);
-}
+    }
         }
