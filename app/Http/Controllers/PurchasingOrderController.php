@@ -197,9 +197,11 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filtercancel($status)
     {
@@ -224,9 +226,11 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterapprovedonly($status)
     {
@@ -251,7 +255,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -288,7 +294,7 @@ class PurchasingOrderController extends Controller
         ->groupBy('purchasing_order.id')
         ->get();        
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterapproved($status)
     {
@@ -313,7 +319,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -364,7 +372,7 @@ class PurchasingOrderController extends Controller
             ->groupBy('purchasing_order.id')
             ->get(); 
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterincomings($status)
 {
@@ -389,7 +397,9 @@ class PurchasingOrderController extends Controller
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -429,7 +439,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
     public function filterpayment($status)
     {
@@ -454,7 +464,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -476,7 +488,7 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpaymentrejectioned($status)
     {
@@ -501,7 +513,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -523,7 +537,7 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpaymentrel($status)
     {
@@ -548,7 +562,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -574,7 +590,7 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterintentreq($status)
     {
@@ -599,7 +615,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -625,7 +643,7 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingrelease($status)
     {
@@ -650,7 +668,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -676,7 +696,7 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingdebits($status)
     {
@@ -701,7 +721,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -724,7 +746,7 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingfellow($status)
     {
@@ -749,7 +771,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -784,7 +808,7 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function filterconfirmation($status)
 {
@@ -809,7 +833,9 @@ public function filterconfirmation($status)
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -842,7 +868,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function paymentinitiation($status)
 {
@@ -867,7 +893,9 @@ public function paymentinitiation($status)
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -913,7 +941,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
     /**
      * Show the form for creating a new resource.
@@ -3502,7 +3530,9 @@ if($purchasingOrder->is_demand_planning_po == 1)
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -3533,7 +3563,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function rerequestpayment(Request $request)
 {
