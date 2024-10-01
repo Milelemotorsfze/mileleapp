@@ -79,10 +79,10 @@ th.nowrap-td {
                     @endphp
                     @if ($hasPermission)
     <a class="btn btn-sm btn-info" href="#" style="text-align: right; margin-right: 10px;">
-    Total Outflows : {{ number_format($suggestedPaymentTotalAED, 0, '', ',') }} AED
+    Total Outflows : {{ number_format($suggestedPaymentTotalAED, 0, '', ',') }} AED / {{ number_format($suggestedPaymentTotalUSD, 0, '', ',') }} USD
 </a>
 <a class="btn btn-sm btn-success" href="#" style="text-align: right;">
-    Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED
+    Total Available Funds is {{ number_format($availableFunds, 0, '', ',') }} AED / {{ number_format($availableFundsUSD, 0, '', ',') }} USD
 </a>
 @endif
   <br>

@@ -260,7 +260,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </select>
           </div>
             <div class="col-lg-3 col-md-6 mt-3">
-                <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" >
+                <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" checked>
                 <label for="is_demand_planning_po" class="form-label fw-bold">Is Demand Planning PO ?</label>
             </div>
             </div>
