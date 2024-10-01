@@ -255,15 +255,18 @@ $totalvariantss = [
         }
         $hasPermissiongp = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
         if ($hasPermissiongp) {
+            $person = Auth::id();
+            $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
             $usdToAedRate = 3.67;
             $selectedMonth = $request->get('month') ?? now()->format('Y-m'); // Get the selected month, default to current
-    
             $commissons = DB::table('vehicle_invoice')
                 ->join('vehicle_invoice_items', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
                 ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
                 ->join('users', 'so.sales_person_id', '=', 'users.id')
                 ->leftJoin('vehicle_netsuite_cost', 'vehicle_invoice_items.vehicles_id', '=', 'vehicle_netsuite_cost.vehicles_id')
                 ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth) // Filter by selected month
+                ->whereIn('so.sales_person_id', $salespersonunder->pluck('person_id')->toArray())
+                ->orwhere('so.sales_person_id', $person)
                 ->select(
                     'so.sales_person_id',
                     'users.name',
