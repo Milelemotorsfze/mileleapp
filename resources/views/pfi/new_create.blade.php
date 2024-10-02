@@ -175,7 +175,10 @@
                                         </div>
                                     </div>                                  
                                 </div>
-                                
+                                <div class="alert alert-success m-2 existing-pfi-details" role="alert" hidden >
+                                   
+                                </div>
+
                                 <div class="card">
                                     <div class="card-header">
                                         <h4 class="card-title">Add PFI Item Details</h4>
@@ -409,12 +412,7 @@
         // get the unit price while supplier select
 
         $(document.body).on('select2:select', "#supplier-id", function (e) {
-            // $('#pfi-items-div').attr('hidden',false);
-            // let loiItems = [];
-            //  $('.loi_item_ids').map(function(){
-            //     loiItems.push($(this).val());
-            //     });
-            // let supplier = $(this).val();
+           
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
 
             if(MMC == 1) {
@@ -427,12 +425,7 @@
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {
-                // let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                // for(let j=1; j<=childIndex;j++) 
-                // {
-                    // getLOIItemDetails(i,j);   
-                    getMasterModelId(i)              
-                // }
+                getMasterModelId(i)              
             }
         });
 
@@ -457,7 +450,7 @@
            
         }
 
-        $('.parent-pfi-quantities').on('input', function() {
+        $(document.body).on('input', ".parent-pfi-quantities", function (e) {
             var index = $(this).attr('index');
             var sum = 0;
             var quantity = $('#pfi-quantity-'+index+'-item-0').val();
@@ -469,12 +462,6 @@
         });
         
         function calculateTotalAmount(index,childIndex) {
-            // var pfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
-            // console.log(pfiQty);       
-            // var parentPfiQty = $('#pfi-quantity-'+index+'-item-0').val();
-            // console.log(parentPfiQty);
-            // var totalPfiQty =  parseFloat(pfiQty) + parseFloat(parentPfiQty);
-                        
                 let totalPfiQty = 0;
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<=totalIndex;j++) 
@@ -487,35 +474,11 @@
                 }
                
                 var unitPrice = $('#unit-price-'+index+'-item-0').val();
-            // var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();        
             var eachItemTotal = parseFloat(totalPfiQty) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-0').val(eachItemTotal);
 
             calculatePfiAmount();
         }
-
-        // $('form').on('submit', function(e){
-        //     $('.overlay').show();
-            
-        //     let quantitySum = 0;
-        //     $('.pfi-quantities').each(function() {
-        //         var quantity = $(this).val();
-        //         quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
-                
-        //     });
-        //     if(quantitySum <= 0) {
-        //         $('.overlay').hide();
-        //         e.preventDefault();
-        //         alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
-        //     }else {
-        //         if($("#form-create").valid()) {
-        //             $('#form-create').submit();
-        //         }else{
-        //             $('.overlay').hide();
-        //             e.preventDefault();
-        //         }
-        //     }
-        // });
 
         ///// start new code ////
       
@@ -637,12 +600,7 @@
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=1; j<=childIndex;j++) 
                 {
-                    // if(j == 0) {
-                    //     $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                    // }else{
-                    //     $("#model-"+i+"-item-"+j).empty();
-                    // }
-                    // $("#sfx-"+i+"-item-"+j).empty();
+                    
                     $("#loi-item-"+i+"-item-"+j).empty();
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remaining-quantity-"+i+"-item-"+j).val("");
@@ -665,13 +623,7 @@
            let index = $(this).attr('index');
            let childIndex = $(this).attr('item');
            var model = e.params.data.id;
-        //    let sfx =  $('#sfx-'+index+'-item-0').val();
-           // if unselected model is in the parent row append model in every parent line items
-        //    if(childIndex == 0) {              
-                // if(sfx.length > 0) {
-                    appendModel(index,model);
-                // }
-                // should append model
+                appendModel(index,model);
                 var sfx = $('#sfx-'+index+'-item-0').val();
                 appendSFX(index,model,sfx[0]);
                 $('#sfx-'+index+'-item-0').empty();
@@ -684,25 +636,6 @@
                     resetRowData(index,j); 
                 }
                 enableOrDisableAddMoreButton(index);
-        //    }else{
-               
-        //          var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
-        //          var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
-        //         appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText);
-        //         $('#sfx-'+index+'-item-'+childIndex).empty();
-        //         resetRowData(index,childIndex); 
-        //    }
-        //    var confirm = alertify.confirm('By changing model child items data will be reset!',function (e) {
-        //         if (e) {
-        //             resetData();                               
-        //         }
-        //     }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
-        //         $("#model-"+index+'-item-0').val(model).trigger('change');
-                
-        //         });  
-       
-           // call append LOI Item code if same model am
-           
        });
 
        function resetRowData(index,childIndex) {
@@ -722,13 +655,7 @@
             let childIndex = $(this).attr('item');
             $('#sfx-'+index+'-item-'+childIndex +'-error').remove();
             let sfx = $('#sfx-'+index+'-item-0').val();
-                // if selected sfx is in the parent row hide corresponding model in every parent line items
-            // if(childIndex == 0) {
-                // hideParentModel(index);
-                // hideParentSFX(index);
-                // let type = 'all';
-                // getChildModels(index,0,type);
-            // }
+                
             hideSFX(index, sfx);
             let totalchildIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<=totalchildIndex;j++) 
@@ -744,9 +671,7 @@
             let model = $('#model-'+index+'-item-0').val();
             var value = e.params.data.id;
                // if unselected sfx is in the parent row append corresponding model in every parent line items
-            // if(childIndex == 0) {
                 appendSFX(index,model[0],value);
-                // appendParentSFX(index,value);
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 console.log(totalIndex);
                  $('#master-model-id-'+index+'-item-0').val("");
@@ -755,16 +680,7 @@
                 {
                     resetRowData(index,j); 
                 }
-                // appendModel(index,model[0]);
                 enableOrDisableAddMoreButton(index);
-            // }else{
-            //     var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
-            //     var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
-            //     appendLOIItemCode(index,childIndex,loiItemId[0],loiItemText);
-            //     resetRowData(index,childIndex);
-            // }
-           
-         
         });
         $(document.body).on('select2:select', ".loi-items", function (e) {
             let index = $(this).attr('index');
@@ -779,8 +695,6 @@
             let childIndex = $(this).attr('item');
             var id = e.params.data.id;
             var text = e.params.data.text;
-            // let model = $('#model-'+index+'-item-'+childIndex).val();
-            // let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
 
             appendLOIItemCode(index,childIndex,id,text);
             $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
@@ -797,12 +711,6 @@
             let unitPrice =  $("#unit-price-"+index+"-item-0").val();
             let item =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
 
-            // let loiItem = $('#loi-item-'+index+'-item-0').val();
-            //    if(loiItem[0] == 'NULL')  {
-            //     var confirm = alertify.confirm('This model and sfx do not have any LOI, So you can not add child items',function (e) {
-            //     }).set({title:"Can't Add Child PFI Item"})
-            //    }else{
-          
                 $(".pfi-child-item-div-"+index).append(`
                      <div class="row pt-2 m-0 chilItems child-item-${index}" id="row-${index}-item-${item}" style="background-color:#eaeaea">
                             <div class="col-lg-2 "></div>
@@ -831,29 +739,12 @@
                    
                     `);
                     let parentSfx = $('#sfx-'+index+'-item-0').val();
-                    // populate child models if parent have value
-                    // if(parentSfx[0]) {
-                    //     let type = 'add-new';
-                    //     getChildModels(index,item,type);
-
-                    // }else{
-                    //    $('#model-'+index+'-item-'+item).select2({
-                    //      placeholder: 'Select Model',
-                    //      maximumSelectionLength: 1
-                    //  });
-                    // }                   
-                    // $('#sfx-'+index+'-item-'+item).select2({
-                    //     placeholder: 'Select SFX',
-                    //     maximumSelectionLength: 1
-                    // });
-                    // call loi item codes
+                   
                     $('#loi-item-'+index+'-item-'+item).select2({
                         placeholder: 'Select Code',
                         maximumSelectionLength: 1
                     });
                     getLOIItemCode(index,item);
-
-                // }
         });
       
         $('.add-pfi-btn').click(function() {
@@ -920,42 +811,37 @@
                    
                     </div>
                     `;
-                        $('#pfi-items').append(newRow);
-                        let type = 'add-new';
-                        getModels(index,0,type);
-                        
-                        $('#model-'+index+'-item-0').select2({
-                            placeholder: 'Select Model',
-                            maximumSelectionLength: 1
-                        });
-                        $('#sfx-'+index+'-item-0').select2({
-                            placeholder: 'Select SFX',
-                            maximumSelectionLength: 1
-                        });
-                        $('#loi-item-'+index+'-item-0').select2({
-                        placeholder: 'Select Code',
-                        maximumSelectionLength: 1
-                    });
+                $('#pfi-items').append(newRow);
+                let type = 'add-new';
+                getModels(index,0,type);
+                
+                $('#model-'+index+'-item-0').select2({
+                    placeholder: 'Select Model',
+                    maximumSelectionLength: 1
+                });
+                $('#sfx-'+index+'-item-0').select2({
+                    placeholder: 'Select SFX',
+                    maximumSelectionLength: 1
+                });
+                $('#loi-item-'+index+'-item-0').select2({
+                placeholder: 'Select Code',
+                maximumSelectionLength: 1
+                });
                   
         });
         $(document.body).on('click', ".removePFIItemButton", function (e) {
             var index = $(this).attr('index');
-            // var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
             var childIndex = $(this).attr('item');
-
-            // var sfx = $('#sfx-'+index+'-item-'+childIndex).val();
-            // var model = $('#model-'+index+'-item-'+childIndex).val();
             var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
-            var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
-           
+            let currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
+            let loiItemText = $('#' + currentLOIItemId + ' option:selected').text();
+
             if(loiItemId[0]) {
                 appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
             }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
-                 
-                
          });
         $(document.body).on('click', ".removePFIButton", function (e) {
             var rowCount = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -967,7 +853,6 @@
                 
                 if(sfx[0]) {
                     appendSFX(indexNumber,model[0],sfx[0]);
-                    // appendParentSFX(indexNumber,sfx[0]);                 
                 }
 
                 $(this).closest('#row-'+indexNumber).remove();
@@ -1010,7 +895,6 @@
                     $(this).find('.sfx').attr('id','sfx-'+index+'-item-'+i);
                     $(this).find('.parent-pfi-quantities').attr('item',i);
                     $(this).find('.parent-pfi-quantities').attr('id','pfi-quantity-'+index+'-item-'+i);
-                    $(this).find('.parent-pfi-quantities').attr('oninput','calculateTotalAmount('+index+','+i+')');
                     $(this).find('.unit-prices').attr('item',i);
                     $(this).find('.unit-prices').attr('id','unit-price-'+index+'-item-'+i);
                
@@ -1146,12 +1030,7 @@
                 success:function (data) {
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
-                    // if(data.is_loi_available == 'NO') {
-                    //     let id = 'loi-item-'+index+'-item-'+childIndex;
-                    //     $('#'+id).append('<option value="NULL">NO LOI</option>');
-                    //     $('#'+id ).val("NULL").trigger('change');
-                           
-                    // }else{
+                    
                      let exactMatchIds = data.parentCodes;
                      let msg = "";
                     if(data.codes) {
@@ -1164,35 +1043,13 @@
                             $('#loi-item-'+index+'-item-'+childIndex).append('<option value="'+ value.id +'">'+ value.code+' '+ msg +'</option>');
                         });
                         if(data.parentCodes) {
-                        // console.log("first child")
                             if(childIndex == 1) {
-                                // console.log("exact match ecxist");
                                 $('#loi-item-'+index+'-item-'+childIndex).val(data.parentCodes[0]).trigger("change");
                                 getLOIItemDetails(index,childIndex);
-                            }else{
-                                console.log("hide the code for all item");
-                                let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-                                // hide selected item code from second schild onwards;
-                                for(let j=2; j<=totalIndex;j++) 
-                                {
-                                    let id = 'loi-item-'+index+'-item-'+j;
-                                    $('#' + id + ' option[value=' + data.parentCodes[0] + ']').detach(); 
-                                }
                             }
-                            // else{
-                            //     let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-                            //     // hide selected item code from second schild onwards;
-                            //     for(let j=2; j<=totalIndex;j++) 
-                            //     {
-                            //         // let id = 'loi-item'
-                            //         hideLOIItemCode(index,j,data.parentCodes[0]);
-                            //     }
-                            // }
                         }
                     }
                        
-                    // }
-                    // $('#master-model-id-'+index+'-item-'+childIndex).val(data.master_model_id);
                     $('.overlay').hide();
                 }
             });
@@ -1200,7 +1057,13 @@
        }
        function getLOIItemDetails(index,childIndex) {
             let loiItem = $('#loi-item-'+index+'-item-'+childIndex).val();
+            let currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
+            let loiItemText = $('#' + currentLOIItemId + ' option:selected').text();
+
             let vendor = $('#supplier-id').val();
+            let country = $('#country_id').val();
+            let customer = $('#client_id').val();
+
             if(loiItem.length > 0) {
                 $('.overlay').show();
 
@@ -1211,18 +1074,28 @@
                     dataType: "json",
                     data: {
                         loi_item_id: loiItem[0],   
-                        supplier_id: vendor[0]            
+                        supplier_id: vendor[0],
+                        client_id: customer[0],
+                        country_id: country[0]         
                     },
                     success:function (data) {
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
                         $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
-                        // if(childIndex == 0) {
-                        //     $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
-                        // }else{
-                        //     let unitPrice = $('#unit-price-'+index+'-item-0').val();
-                        //     $('#unit-price-'+index+'-item-'+childIndex).val(unitPrice);
-                        // }
-                        calculateTotalAmount(index,childIndex)
+                       
+                        calculateTotalAmount(index,childIndex);
+                        if(data.isLOIItemPfiExist.length > 0) {
+                            $('.existing-pfi-details').html('');
+                            let existPfiItems = data.isLOIItemPfiExist;
+                             $('.existing-pfi-details').attr('hidden', false);
+                             $('.existing-pfi-details').append('<span>This LOI Code (' + loiItemText + ') is already added under PFI Number </span>');
+                            jQuery.each(existPfiItems, function(key,value){
+                                $('.existing-pfi-details').append('<span>'+ value.pfi.pfi_reference_number +' ( Quantity -'+ value.pfi_quantity +' ) </span>');
+                            });
+                        }else{
+
+                            $('.existing-pfi-details').attr('hidden', true);
+                            $('.existing-pfi-details').html('');
+                        }
                         $('.overlay').hide();
                     }
                 });
@@ -1231,7 +1104,6 @@
       
        function getModels(index,item,type) {
            
-            // let customer = $('#client_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -1245,8 +1117,6 @@
                         selectedModelIds.push(eachSelectedModelId);
                     }
                 }
-                console.log(selectedModelIds);
-            // if(customer.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     url:"{{route('pfi-item.models')}}",
@@ -1292,7 +1162,6 @@
                         $('.overlay').hide();
                     }
                 });
-            // }          
        }
        function getMasterModelId(index) {
 
@@ -1310,7 +1179,6 @@
                         supplier_id:supplier[0]
                     },
                     success:function (data) {        
-                        console.log(data);      
                         $('#master-model-id-'+index+'-item-0').val(data.master_model_id);
                         $('#unit-price-'+index+'-item-0').val(data.unit_price)
                     }
@@ -1318,64 +1186,8 @@
             }
            
        }
-    //    function getChildModels(index,item,type) {
-    //         let customer = $('#client_id').val();
-    //         let country = $('#country_id').val();
-    //         let parentModel = $('#model-'+index+'-item-0').val();
-    //         let parentSfx = $('#sfx-'+index+'-item-0').val();
-    //         if(customer.length > 0 && parentModel.length > 0 && parentSfx.length > 0) {
-    //             $('.overlay').show();
-    //             $.ajax({
-    //                 url:"{{route('pfi-item.models')}}",
-    //                 type: "GET",
-    //                 data:
-    //                     {
-    //                         model: parentModel[0],
-    //                         sfx:parentSfx[0],
-    //                         is_child:'Yes',
-    //                         customer:customer[0],
-    //                         country_id:country[0],
-    //                     },
-    //                 dataType : 'json',
-    //                 success: function(data) {
-    //                     let rowIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-    //                     let modelDropdownData   = [];
-    //                     $.each(data,function(key,value)
-    //                     {
-    //                         modelDropdownData.push
-    //                         ({
-    //                             id: value.model,
-    //                             text: value.model
-    //                         });
-    //                     });
-    //                     if(type == 'add-new') {
-    //                         $('#model-'+index+'-item-'+item).html("");
-    //                         $('#model-'+index+'-item-'+item).select2({
-    //                             placeholder: 'Select Model',
-    //                             data: modelDropdownData,
-    //                             maximumSelectionLength: 1,
-    //                         });
-    //                     } else{
-    //                             for(let i=1; i<=rowIndex; i++)
-    //                             {
-    //                                 $('#model-'+index+'-item-'+i).html("");
-    //                                 $('#model-'+index+'-item-'+i).select2({
-    //                                     placeholder: 'Select Model',
-    //                                     data: modelDropdownData,
-    //                                     maximumSelectionLength: 1,
-    //                                 });
-    //                             }
-    //                         }
-                       
-    //                     $('.overlay').hide();
-    //                 }
-    //             });
-    //         } 
-    //    }
+   
        function hideLOIItemCode(index,childIndex,value) {
-        console.log(index);
-        console.log(childIndex);
-            
         var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {
@@ -1403,10 +1215,6 @@
                 for(let j=0; j<=rowIndex;j++) 
                 {             
                     var currentId = 'loi-item-'+i+'-item-'+j;                     
-                    // let currentmodel = $('#model-'+i+'-item-'+j).val();
-                    // let currentsfx = $('#sfx-'+i+'-item-'+j).val();
-                 
-                    // if(selectedId != currentId && selectedmodel == currentmodel[0] && selectedsfx == currentsfx[0]) {
                         if(selectedId != currentId) {
                         $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
                     }
@@ -1414,39 +1222,6 @@
             }    
         }
 
-        // function hideParentModel(index) {
-        //     var selectedId = 'model-'+index+'-item-0';
-        //     let model = $('#model-'+index+'-item-0').val(); 
-        //     let sfx = $('#sfx-'+index+'-item-0').val(); 
-        //     var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-        //         for(let i=1; i<=parentIndex;i++) 
-        //         { 
-        //             var currentId = 'model-'+i+'-item-0';
-        //             let currentModel = $('#' + currentId).val();
-        //             let currentsfx = $('#sfx-'+i+'-item-0').val(); 
-        //             if(selectedId != currentId ) {                  
-        //                 $('#' + currentId + ' option[value=' + model[0] + ']').detach(); 
-        //                 // if(currentModel[0] == model[0]) {
-        //                     $('#sfx-'+i+'-item-0').empty();
-        //                 // }
-                      
-        //             }
-                  
-        //         }
-        // }
-        // function appendParentModel(index,model,sfx) {
-        //     var selectedId = 'model-'+index+'-item-0';
-        //     var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-        //         for(let i=1; i<=parentIndex;i++) 
-        //         { 
-        //             var currentId = 'model-'+i+'-item-0';                     
-        //             // let currentmodel = $('#model-'+i+'-item-0').val();
-        //             // let currentsfx = $('#sfx-'+i+'-item-0').val();
-        //             if(selectedId != currentId ) {
-        //                 $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}));    
-        //             }
-        //         }
-        // }
         function appendModel(index,model){
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex; i++)
@@ -1478,38 +1253,7 @@
                 }
             }
         }
-        // function hideParentSFX(index) {
-        //     var selectedId = 'sfx-'+index+'-item-0';
-        //     // let model = $('#model-'+index+'-item-0').val(); 
-        //     let sfx = $('#sfx-'+index+'-item-0').val(); 
-        //     var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-        //         for(let i=1; i<=parentIndex;i++) 
-        //         { 
-        //             var currentId = 'sfx-'+i+'-item-0';
-        //             // let currentModel = $('#model-'+i+'-item-0').val(); 
-        //             if(selectedId != currentId) {                  
-        //                 $('#' + currentId + ' option[value=' + sfx[0] + ']').detach(); 
-        //                 // if(currentModel[0] == model[0]) {
-        //                     // $('#sfx-'+i+'-item-0').empty();
-        //                 // }
-                      
-        //             }
-        //         }      
-        // }
-        // function appendParentSFX(index,value) {
-        //     var selectedId = 'sfx-'+index+'-item-0';
-        //     let model = $('#model-'+index+'-item-0').val(); 
-        //     var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-        //         for(let i=1; i<=parentIndex;i++) 
-        //         { 
-        //             var currentId = 'sfx-'+i+'-item-0';
-        //             let currentModel = $('#model-'+i+'-item-0').val(); 
-        //             if(selectedId != currentId && model[0] == currentModel[0] ) {                  
-        //                 $('#sfx-'+i+'-item-0').append($('<option>', {value: value, text : value})); 
-                      
-        //             }
-        //         }                
-        // }
+       
         function appendSFX(index,unSelectedmodel,sfx){
            var totalIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
 
@@ -1526,11 +1270,9 @@
          
          var totalIndex = $("#pfi-items").find(".pfi-items-parent-div").length
          let model = $('#model-'+index+'-item-0').val();
-        
             for(let i=1; i<=totalIndex; i++)
             {
                 let currentmodel = $('#model-'+i+'-item-0').val();
-                
                 if(i != index && currentmodel == model[0]) {
                     console.log(i);
                     console.log("detach sfx");
