@@ -440,7 +440,6 @@
         // check the pfi number is unique within the year
         $('#pfi_reference_number').keyup(function(){
             let pfi_id = '{{ $pfi->id  }}';
-            // console.log(pfi_id);
             $.ajax({
                 type:"POST",
                 async: false,
@@ -501,12 +500,10 @@
             $('.remaining-quantities').val(0);
         });
         $(document.body).on('input', ".parent-pfi-quantities", function (e) {
-            console.log("inside parent qua");
             var index = $(this).attr('index');
             var sum = 0;
             var quantity = $('#pfi-quantity-'+index+'-item-0').val();
             var unitPrice = $('#unit-price-'+index+'-item-0').val();
-            console.log(quantity);
             var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-0').val(eachItemTotal);
             sum = sum + eachItemTotal;
@@ -625,7 +622,6 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 let model = $('#model-'+i+'-item-0').val();
-                console.log(model);
                 let sfx = $('#sfx-'+i+'-item-0').val();
                 if(model.length > 0 || sfx.length > 0 )
                     {
@@ -741,7 +737,6 @@
                // if unselected sfx is in the parent row append corresponding model in every parent line items
                 appendSFX(index,model[0],value);
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-                console.log(totalIndex);
                  $('#master-model-id-'+index+'-item-0').val("");
 
                 for(let j=1; j<= totalIndex;j++) 
@@ -1076,8 +1071,6 @@
           let model = $('#model-'+index+'-item-0').val();
           let sfx = $('#sfx-'+index+'-item-0').val();
           let url = '{{ route('loi-item-code') }}';
-          console.log(model);
-          console.log(sfx);
           var selectedLOIItemIds = [];
 
           var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -1092,7 +1085,6 @@
                   }
               }
           }
-          console.log(selectedLOIItemIds);
           if(model.length > 0  && sfx.length > 0) {
               $('.overlay').show();
               $.ajax({
@@ -1108,7 +1100,6 @@
               },
               success:function (data) {
                   let codes = data.codes;
-                  console.log(codes);
                   $('#loi-item-'+index+'-item-'+childIndex).empty();
                   
                    let exactMatchIds = data.parentCodes;
@@ -1259,7 +1250,6 @@
                        supplier_id:supplier[0]
                    },
                    success:function (data) {        
-                       console.log(data);      
                        $('#master-model-id-'+index+'-item-0').val(data.master_model_id);
                        $('#unit-price-'+index+'-item-0').val(data.unit_price)
                    }
@@ -1314,8 +1304,6 @@
                 let currentmodel = $('#model-'+i+'-item-0').val();
                 
                 if(i != index && currentmodel == model[0]) {
-                    console.log(i);
-                    console.log("detach sfx");
                     var currentId = 'sfx-' + i+'-item-0';
                     $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
@@ -1351,7 +1339,6 @@
                         },
                     dataType : 'json',
                     success: function(data) {
-                        console.log(data);
                         if(data == 1) {
                             // brand is toyota
                             $('#add-more-'+index).removeClass('disabled');

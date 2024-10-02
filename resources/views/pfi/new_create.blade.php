@@ -558,7 +558,6 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 let model = $('#model-'+i+'-item-0').val();
-                console.log(model);
                 let sfx = $('#sfx-'+i+'-item-0').val();
                 if(model.length > 0 || sfx.length > 0 )
                     {
@@ -673,7 +672,6 @@
                // if unselected sfx is in the parent row append corresponding model in every parent line items
                 appendSFX(index,model[0],value);
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
-                console.log(totalIndex);
                  $('#master-model-id-'+index+'-item-0').val("");
 
                 for(let j=1; j<= totalIndex;j++) 
@@ -997,8 +995,6 @@
             let model = $('#model-'+index+'-item-0').val();
             let sfx = $('#sfx-'+index+'-item-0').val();
             let url = '{{ route('loi-item-code') }}';
-            console.log(model);
-            console.log(sfx);
             var selectedLOIItemIds = [];
 
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -1228,9 +1224,6 @@
             {
                 if(i != index) {
                     let Currentmodel = $('#model-'+index+'-item-0').val();
-                    console.log(Currentmodel);
-                    console.log("model");
-                    console.log(model);
         
                     if(model !== Currentmodel[0] ) {
                         // chcek this option value alredy exist in dropdown list or not.
@@ -1243,7 +1236,6 @@
                                 return false;
                             }
                         });
-                        console.log(isOptionExist);
                         if(isOptionExist == 'no'){
                             $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}))
 
@@ -1274,8 +1266,6 @@
             {
                 let currentmodel = $('#model-'+i+'-item-0').val();
                 if(i != index && currentmodel == model[0]) {
-                    console.log(i);
-                    console.log("detach sfx");
                     var currentId = 'sfx-' + i+'-item-0';
                     $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
@@ -1299,7 +1289,6 @@
                         },
                     dataType : 'json',
                     success: function(data) {
-                        console.log(data);
                         if(data == 1) {
                             // brand is toyota
                             $('#add-more-'+index).removeClass('disabled');

@@ -211,7 +211,6 @@ class LetterOfIndentController extends Controller
             'category' => 'required',
             'date' => 'required',
             'dealers' => 'required'
-          
         ]);
        
         $LOI = LetterOfIndent::where('client_id', $request->client_id)

@@ -355,17 +355,6 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-        // foreach($request->PfiItem as $key => $data) {
-        //     return $data['unit_price'];
-        //     if(array_key_exists("loi_item", $data)) {
-        //         info($data['loi_item']);
-        //     // if($pfiItem['loi_item']) {
-
-        //     }
-        // }
-        // return $request->all();
-
-       
         (new UserActivityController)->createActivity('New PFI Created');
 
         $request->validate([
@@ -410,7 +399,6 @@ class PFIController extends Controller
         foreach($request->PfiItem as $key => $PfiData) {
                 $model = $PfiData['model'];               
                 $sfx = $PfiData['sfx'];
-                // $loiItemId = $pfiItem['loi_item'][$keyValue];
                 $pfiQuantity = $PfiData['parent_pfi_quantity'];
                 $unitPrice = $PfiData['unit_price'];
 
@@ -440,12 +428,8 @@ class PFIController extends Controller
                     $pfiItemParentRow->is_parent = true;
                     $pfiItemParentRow->save();
                     $parentId = $pfiItemParentRow->id;
-                    // return $request->all();
-                    info($parentId);
                      if(array_key_exists("loi_item", $PfiData)) {
                         foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
-                            // return  $PfiData['pfi_quantity'][$keyValue];
-                            // info($loiItem);
                             $latestItem = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
                             if($latestItem){
                                 $latestUUID =  $latestItem->code;
@@ -458,13 +442,10 @@ class PFIController extends Controller
                             }
 
                             $LOIItem = LetterOfIndentItem::find($loiItem);
-                            info($LOIItem);
             
                             $pfiItemRow = new PfiItem();
                             $pfiItemRow->pfi_id = $pfi->id;
-                            // if($loiItemId != 'NULL') {
-                                $pfiItemRow->loi_item_id = $loiItem;
-                            // }
+                            $pfiItemRow->loi_item_id = $loiItem;
                             $pfiItemRow->code = $latestCode;
                             $pfiItemRow->master_model_id = $LOIItem->masterModel->id ?? '';
                             $pfiItemRow->pfi_quantity =  $PfiData['pfi_quantity'][$keyValue];
@@ -473,12 +454,7 @@ class PFIController extends Controller
                             $pfiItemRow->parent_pfi_item_id = $parentId;
             
                             $pfiItemRow->save();
-                            // if($keyValue == 0) {
-                            //     $pfiItemRow->is_parent = true;
-                            //     $parentId = $pfiItemRow->id;
-                            // }else{
-                            //     $pfiItemRowParentId[] = $parentId;
-                            // }
+                            
                         }
                     }
           
@@ -519,7 +495,6 @@ class PFIController extends Controller
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
-       info($request->all());
         $pfi = PFI::select('id','pfi_reference_number','created_at')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
                 ->whereYear('created_at', Carbon::now()->year);
@@ -620,8 +595,6 @@ class PFIController extends Controller
     {
         (new UserActivityController)->createActivity('Updated PFI Details');
 
-        // return $request->all();
-
         $request->validate([
             'pfi_reference_number' => 'required',
             'pfi_date' => 'required',
@@ -670,25 +643,10 @@ class PFIController extends Controller
         foreach($request->PfiItem as $key => $PfiData) {
             $model = $PfiData['model'];               
             $sfx = $PfiData['sfx'];
-            // $loiItemId = $pfiItem['loi_item'][$keyValue];
             $pfiQuantity = $PfiData['parent_pfi_quantity'];
             $unitPrice = $PfiData['unit_price'];
 
             $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
-            
-            // $latestRow = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
-            //     $length = 6;
-            //     $offset = 2;
-            //     $prefix = "P ";
-            //     if($latestRow){
-            //         $latestUUID =  $latestRow->code;
-            //         $latestUUIDNumber = substr($latestUUID, $offset, $length);
-                    
-            //         $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
-            //         $code =  $prefix.$newCode;
-            //     }else{
-            //         $code = $prefix.'001';
-            //     }
                 // create parent row
                 $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)->where('pfi_id',$pfi->id)->first();
                 if(!$pfiItemParentRow) {
@@ -722,12 +680,8 @@ class PFIController extends Controller
                 $pfiItemParentRow->save();
 
                 $parentId = $pfiItemParentRow->id;
-                // return $request->all();
-                info($parentId);
                  if(array_key_exists("loi_item", $PfiData)) {
                     foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
-                        // return  $PfiData['pfi_quantity'][$keyValue];
-                        // info($loiItem);
                         $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)->where('pfi_id',$pfi->id)->first();
                         if(!$pfiItemRow) {
                             $pfiItemRow = new PfiItem();
@@ -761,14 +715,6 @@ class PFIController extends Controller
                         $pfiItemRow->created_by = Auth::id();
                         $pfiItemRow->parent_pfi_item_id = $parentId;
                         $pfiItemRow->save();
-
-                       
-                        // if($keyValue == 0) {
-                        //     $pfiItemRow->is_parent = true;
-                        //     $parentId = $pfiItemRow->id;
-                        // }else{
-                        //     $pfiItemRowParentId[] = $parentId;
-                        // }
                     }
                 }
       
@@ -776,68 +722,6 @@ class PFIController extends Controller
 
         $deletedRows = array_diff($alreadyAddedRows,$updatedRows);
         PfiItem::whereIn('id', $deletedRows)->delete();
-
-        // foreach($request->PfiItem as $key => $pfiItem) {
-        //     $parentId = NULL;
-        //     foreach($pfiItem['model'] as $keyValue => $model) 
-        //     {
-        //         $model = $pfiItem['model'][$keyValue];               
-        //         $sfx = $pfiItem['sfx'][$keyValue];
-        //         $loiItemId = $pfiItem['loi_item'][$keyValue];
-        //         $pfiQuantity = $pfiItem['pfi_quantity'][$keyValue];
-        //         $unitPrice = $pfiItem['unit_price'][$keyValue];
-
-        //         $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
-                
-        //         if($masterModel) {
-        //             $pfiItemRow = PfiItem::where('loi_item_id', $loiItemId)
-        //                                 ->where('pfi_id', $pfi->id)->first();
-        //             if($pfiItemRow) {
-        //                 $pfiItemRow->is_parent = false;
-        //                 $pfiItemRow->parent_pfi_item_id = NULL;
-        //                 $pfiItemRow->update();
-        //                 $updatedRows[] = $pfiItemRow->id;
-                        
-        //             }else{
-        //                 $latestRow = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
-        //                 $length = 6;
-        //                 $offset = 2;
-        //                 $prefix = "P ";
-        //                 if($latestRow){
-        //                     $latestUUID =  $latestRow->code;
-        //                     $latestUUIDNumber = substr($latestUUID, $offset, $length);
-                            
-        //                     $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
-        //                     $code =  $prefix.$newCode;
-        //                 }else{
-        //                     $code = $prefix.'001';
-        //                 }
-        //                     $pfiItemRow = new PfiItem();
-        //                     $pfiItemRow->code = $code;
-        //             }
-        //             $pfiItemRow->pfi_id = $pfi->id;
-        //             if($loiItemId != 'NULL') {
-        //                 $pfiItemRow->loi_item_id = $loiItemId;
-        //             }
-                    
-        //             $pfiItemRow->master_model_id = $masterModel->id ?? '';
-        //             $pfiItemRow->pfi_quantity = $pfiQuantity;
-        //             $pfiItemRow->unit_price = $unitPrice;
-        //             $pfiItemRow->created_by = Auth::id();
-        //             $pfiItemRow->save();
-        //             if($keyValue == 0) {
-        //                 $pfiItemRow->is_parent = true;
-        //                 $parentId = $pfiItemRow->id;
-        //             }else{
-        //                 $pfiItemRowParentId[] = $parentId;
-        //                 $pfiItemRow->parent_pfi_item_id = $parentId;
-        //             }    
-        //         }
-                
-        //         $pfiItemRow->save();
-        //     }
-        // }
-      
 
         DB::commit();
 
@@ -885,14 +769,12 @@ class PFIController extends Controller
         return response($pfi);
     }
     public function getLOIItemCode(Request $request) {
-        // info($request->all());
        $data = [];
 
        $parentModel = MasterModel::where('model', $request->model)
                             ->where('sfx', $request->sfx)->first();
         $parentModelsteering = $parentModel->steering;
         $parentModelLine = $parentModel->master_model_line_id;
-        // info($parentModelLine);
 
        $loiItems = LetterOfIndentItem::with('masterModel','LOI')
                 ->whereColumn('utilized_quantity', '<', 'quantity')
@@ -907,91 +789,34 @@ class PFIController extends Controller
                         ->where('is_expired', false);
                 });
                 
-                // if($request->model && $request->sfx) {
-                  //    $data = $data->where('steering', $parentModel->steering);
-                    $model_line = 'HIACE';
-                    $parentModelLine = strtoupper($parentModel->modelLine->model_line);
-                    if(str_contains($parentModelLine, $model_line)){
-                        $loiItems = $loiItems->whereHas('masterModel.modelLine', function($query)use($model_line){
-                            $query->where('model_line', 'LIKE', '%'. $model_line .'%');
-                        });
-                    }else{
-                        $loiItems = $loiItems->whereHas('masterModel', function($query)use($parentModel){
-                            $query->where('master_model_line_id', $parentModel->master_model_line_id); 
-                        });
-                    }              
-                // }
-                // info($loiItems->get());
-            if($request->selectedLOIItemIds) {
-                $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
-            }
-            // info($loiItems->get());
-
-    //    $masterModel = MasterModel::where('model', $request->model)
-    //                     ->where('sfx', $request->sfx)
-    //                     ->orderBy('model_year','DESC')
-    //                     ->first();
-    //     $data['is_loi_available'] = 'YES';
-    //      $LOINotAvailableBrands = ['HINO','SUZUKI'];
-
-    //     if($masterModel) {
-    //        if( in_array($masterModel->modelLine->brand->brand_name, $LOINotAvailableBrands) ){
-    //         $data['is_loi_available'] = 'NO';
-    //        }
-    //     }             
-                             
-        
+            $model_line = 'HIACE';
+            $parentModelLine = strtoupper($parentModel->modelLine->model_line);
+            if(str_contains($parentModelLine, $model_line)){
+                $loiItems = $loiItems->whereHas('masterModel.modelLine', function($query)use($model_line){
+                    $query->where('model_line', 'LIKE', '%'. $model_line .'%');
+                });
+            }else{
+                $loiItems = $loiItems->whereHas('masterModel', function($query)use($parentModel){
+                    $query->where('master_model_line_id', $parentModel->master_model_line_id); 
+                });
+            }              
+        if($request->selectedLOIItemIds) {
+            $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
+        }
         $data['codes'] = $loiItems->get();
         $parentModels = MasterModel::where('model', $request->model)
                                 ->where('sfx', $request->sfx)
                                 ->pluck('id')->toArray(); 
-
         $data['parentCodes'] = $loiItems->whereIn('master_model_id', $parentModels)->pluck('id')->toArray();
-        // info($data['parentCodes']); 
-       
-    //    $data['master_model_id'] = $masterModel->id;
-       
-       if($request->page == 'Edit') {
+        if($request->page == 'Edit') {
             return $data;
-       }
+        }
         return response($data);
-       
     }
   
-    // need to be commented
     public function getModels(Request $request) {
                 
-             $data = MasterModel::orderBy('id','DESC');
-             
-            //  if($request->is_child == 'Yes') {
-            //     $data = $data->with('loiItems.LOI')
-            //     ->whereHas('loiItems.LOI', function($query)use($request){
-            //         $query->select('client_id','status','id','is_expired','country_id')
-            //         ->where('client_id', $request->customer)
-            //         ->where('country_id', $request->country_id)
-            //         ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
-            //         ->where('is_expired', false);
-            //     }); 
-
-            //  }
-
-            // if($request->model && $request->sfx) {
-               
-            //     $parentModel = MasterModel::where('model', $request->model)
-            //                         ->where('sfx', $request->sfx)->first();
-
-            //    $data = $data->where('steering', $parentModel->steering);
-            //     $model_line = 'HIACE';
-            //     if(str_contains($parentModel->modelLine->model_line, $model_line)){
-            //         $data = $data->whereHas('modelLine', function($query)use($model_line){
-            //             $query->where('model_line', 'LIKE', '%'. $model_line .'%');
-            //         });
-            //     }else{
-            //         $data = $data->where('master_model_line_id', $parentModel->master_model_line_id); 
-            //     }  
-                       
-            // }
-            
+        $data = MasterModel::orderBy('id','DESC');           
             if($request->selectedModelIds) {
                 $restrictedModelIds = [];
                 foreach($request->selectedModelIds as $selectedModelId){
@@ -1022,9 +847,7 @@ class PFIController extends Controller
                         ->orderBy('id','DESC')
                         ->first();
         $supplier = Supplier::find($request->supplier_id);
-        info($supplier);
         if($supplier && $masterModel) {
-           info($supplier->is_MMC);
             if($supplier->is_MMC == true) {
                 $price = $masterModel->amount_belgium > 0 ?  $masterModel->amount_belgium : 0;
             }else if($supplier->is_AMS == true) {
@@ -1040,7 +863,6 @@ class PFIController extends Controller
         return response($data);
     }
     public function getLOIItemDetails(Request $request) {
-        info($request->all());
         $data = [];
         $supplier = Supplier::find($request->supplier_id);
         $loiItem = LetterOfIndentItem::find($request->loi_item_id);
@@ -1060,10 +882,8 @@ class PFIController extends Controller
             $isLOIItemPfiExist->whereNot('pfi_id', $request->pfi_id);
         }
 
-           $data['isLOIItemPfiExist'] =   $isLOIItemPfiExist->get();
+        $data['isLOIItemPfiExist'] =   $isLOIItemPfiExist->get();
 
-        // info($isLOIItemPfiExist);
-       
         return response($data);
     }
 
