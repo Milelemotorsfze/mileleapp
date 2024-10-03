@@ -104,6 +104,8 @@ class WorkOrder extends Model
         'status',
         'sales_support_data_confirmation',
         'finance_approval_status',
+        'can_show_fin_approval',
+        'can_show_coo_approval',
         'coo_approval_status',
         'docs_status',
         'total_number_of_boe',
@@ -159,6 +161,24 @@ class WorkOrder extends Model
             $status = 'Rejected';
         }
         return $status;
+    }
+    public function getCanShowFinApprovalAttribute() {
+        $canShowFinApproval = 'yes';
+        $current = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
+        $first = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','ASC')->first();
+        if(isset($current) && isset($first) && $current->id == $first->id && $this->sales_support_data_confirmation_at == '' && $current->status == 'pending') {
+            $canShowFinApproval = 'no';
+        }
+        return $canShowFinApproval;
+    }
+    public function getCanShowCOOApprovalAttribute() {
+        $canShowCOOApproval = 'yes';
+        $current = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
+        $first = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','ASC')->first();
+        if((isset($current) && isset($first) && $current->id == $first->id) && ($this->sales_support_data_confirmation_at == '' || $this->finance_approval_status != 'Approved') && $current->status == 'pending') {
+            $canShowCOOApproval = 'no';
+        }
+        return $canShowCOOApproval;
     }
     public function getCooApprovalStatusAttribute() {
         $status = '';

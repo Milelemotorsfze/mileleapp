@@ -113,7 +113,11 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $approval->created_at->format('d M Y, H:i:s') ?? '' }}</td>
                                     <td>
-                                        <label class="badge @if($approval->status == 'pending') badge-soft-info @elseif($approval->status == 'approved') badge-soft-success @elseif($approval->status == 'rejected') badge-soft-danger @endif">{{ $approval->status ?? ''}}</label>
+                                    @if($approval->status == 'pending' && $approval->workOrder->can_show_coo_approval == 'yes')
+                                        <label class="badge @if($approval->status == 'pending') badge-soft-info @endif">{{ $approval->status ?? ''}}</label>
+                                    @elseif($approval->status == 'approved' || $approval->status == 'rejected')                                        
+                                        <label class="badge @if($approval->status == 'approved') badge-soft-success @elseif($approval->status == 'rejected') badge-soft-danger @endif">{{ $approval->status ?? ''}}</label>
+                                    @endif
                                     </td>
                                     <td>@if($approval->action_at != '')
                                             {{ \Carbon\Carbon::parse($approval->action_at)->format('d M Y, H:i:s') }}
@@ -123,7 +127,7 @@
                                     <td>{{ $approval->user->name ?? '' }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-primary view-details-btn" data-id="{{ $approval->id }}">Details</button>
-                                        @if($approval->status == 'pending')
+                                        @if($approval->status == 'pending' && $approval->workOrder->can_show_coo_approval == 'yes')
                                             <a title="COO Approval" style="margin-top:0px;" class="btn btn-sm btn-info" 
                                             data-bs-toggle="modal" data-bs-target="#financeApprovalModal_{{$approval->id}}">
                                                 <i class="fas fa-hourglass-start" title="COO Approval"></i> Approval

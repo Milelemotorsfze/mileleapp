@@ -20,7 +20,7 @@
 	<a title="Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info btn-sales-approval" data-id="{{ isset($workOrder) ? $workOrder->id : '' }}">
 	<i class="fas fa-hourglass-start"></i> Sales Support Data Confirmation</a>
 @endif
-@if(isset($workOrder) && isset($workOrder->financePendingApproval))
+@if(isset($workOrder) && isset($workOrder->financePendingApproval) && $workOrder->can_show_fin_approval == 'yes')
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-finance-approval']);
 	@endphp
@@ -70,7 +70,7 @@
 	@endif
 @endif
 @endif
-@if(isset($workOrder) && isset($workOrder->cooPendingApproval))
+@if(isset($workOrder) && isset($workOrder->cooPendingApproval) && $workOrder->can_show_coo_approval == 'yes')
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['do-coo-office-approval']);
 	@endphp
