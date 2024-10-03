@@ -2540,48 +2540,55 @@ class WorkOrderController extends Controller
                             'wo_addon_history_id' => $record->id
                         ]);
                     }
-                    // if(isset($woApprovals) && $woApprovals->status == 'approved') {
-                    //     $cooPending = WOApprovals::where('work_order_id', $workOrder->id)
-                    //     ->where('type', 'coo')
-                    //     ->where('status', 'pending')
-                    //     ->orderBy('id', 'ASC')
-                    //     ->first(); 
-                    //     if ($cooPending) {
-                    //         $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-                        
-                    //         // Find all roles that have permission 'do-coo-office-approval'
-                    //         $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                    //             $query->where('name', 'do-coo-office-approval');
-                    //         })->pluck('id')->toArray();
-                        
-                    //         // Find all users with those roles and make sure we get unique users
-                    //         $usersWithRoles = User::role($rolesWithPermission)->orderBy('status','DESC')->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')->get()->unique('email');                       
-                    //         // Queue email to each user, ensuring they only receive one email
-                    //         foreach ($usersWithRoles as $user) {
-                    //             dispatch(function () use ($workOrder, $user) {
-                    //                 $template = [
-                    //                     'from' => 'no-reply@milele.com',
-                    //                     'from_name' => 'Milele Matrix'
-                    //                 ];
-                    //                 $customerName = $workOrder->customer_name ?? 'Unknown Customer';
-                    //                 $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
-                    //                 $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
-                    //                 $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
-                                
-                    //                 Mail::send('work_order.emails.confirmed_coo_pending', [
-                    //                     'workOrder' => $workOrder,
-                    //                     'accessLink' => $accessLink,
-                    //                     'approvalHistoryLink' => $approvalHistoryLink,
-                    //                     'user' => $user // Pass the user object to the view
-                    //                 ], function ($message) use ($subject, $template, $user) {
-                    //                     $message->from($template['from'], $template['from_name'])
-                    //                             ->to($user->email)
-                    //                             ->subject($subject);
-                    //                 });
-                    //             })->onQueue('emails');
-                    //         }
-                    //     } 
-                    // }     
+                    if(isset($woApprovals) && $woApprovals->status == 'approved') {
+                        $cooPending = WOApprovals::where('work_order_id', $workOrder->id)
+                        ->where('type', 'coo')
+                        ->where('status', 'pending')
+                        ->orderBy('id', 'ASC')
+                        ->first(); 
+                        if ($cooPending) {
+                            // Prepare the from details
+                            $template['from'] = 'no-reply@milele.com';
+                            $template['from_name'] = 'Milele Matrix';
+
+                            // Handle cases where customer_name is null
+                            $customerName = $workOrder->customer_name ?? 'Unknown Customer';
+
+                            // Prepare email data
+                            $subject = "Finance approved the work order " . $workOrder->wo_number . " " . $customerName . " " . $workOrder->vehicle_count . " Unit " . $workOrder->type_name;
+
+                            // Define a quick access link (adjust the route as needed)
+                            $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
+                            $approvalHistoryLink = env('BASE_URL') . '/coo-approval-history/' . $workOrder->id;
+
+                            $rolesWithPermission = Role::whereHas('permissions', function ($query) {
+                                $query->where('name', 'do-coo-office-approval');
+                            })->pluck('id')->toArray();                   
+                            $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')
+                            ->pluck('email')->filter(function($email) {
+                                return filter_var($email, FILTER_VALIDATE_EMAIL);
+                            })->toArray(); 
+                            // Log email addresses to help with debugging
+                            \Log::info('Email Recipients:', [
+                                'recipients' => implode(', ', $recipients) ?: 'none found',
+                            ]);
+                            // Log and handle invalid email addresses (but do not throw an exception, just log)
+                            if (empty($recipients)) {
+                                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                                return;
+                            }
+                            // Send email using a Blade template
+                            Mail::send('work_order.emails.confirmed_coo_pending', [
+                                'workOrder' => $workOrder,
+                                'accessLink' => $accessLink,
+                                'approvalHistoryLink' => $approvalHistoryLink,
+                            ], function ($message) use ($subject, $recipients, $template) {
+                                $message->from($template['from'], $template['from_name'])
+                                        ->to($recipients)
+                                        ->subject($subject);
+                            });                            
+                        } 
+                    }     
                     DB::commit();
                     // Send email notification
                     $this->sendFinanceApprovalEmail($workOrder, $woApprovals->status, $woApprovals->comments,$woApprovals->user->name);
@@ -2797,47 +2804,53 @@ class WorkOrderController extends Controller
                         'type' => 'Set',
                         'changed_at' => Carbon::now()
                     ]);
-                    // $financePending = WOApprovals::where('work_order_id', $wo->id)
-                    // ->where('type', 'finance')
-                    // ->where('status', 'pending')
-                    // ->orderBy('id', 'ASC')
-                    // ->first(); 
-                    // if ($financePending) {
-                    //     $customerName = $wo->customer_name ?? 'Unknown Customer';
-                    
-                    //     // Find all roles that have permission 'do-finance-approval'
-                    //     $rolesWithPermission = Role::whereHas('permissions', function ($query) {
-                    //         $query->where('name', 'do-finance-approval');
-                    //     })->pluck('id')->toArray();
-                    
-                    //     // Find all users with those roles and make sure we get unique users
-                    //     $usersWithRoles = User::role($rolesWithPermission)->orderBy('status','DESC')->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')->get()->unique('email');                       
-                    //     // Queue email to each user, ensuring they only receive one email
-                    //     foreach ($usersWithRoles as $user) {
-                            
-                    //         (function () use ($wo, $user) {
-                    //             $template = [
-                    //                 'from' => 'no-reply@milele.com',
-                    //                 'from_name' => 'Milele Matrix'
-                    //             ];
-                    //             $customerName = $wo->customer_name ?? 'Unknown Customer';
-                    //             $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
-                    //             $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
-                    //             $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
-                            
-                    //             Mail::send('work_order.emails.confirmed_fin_pending', [
-                    //                 'workOrder' => $wo,
-                    //                 'accessLink' => $accessLink,
-                    //                 'approvalHistoryLink' => $approvalHistoryLink,
-                    //                 'user' => $user // Pass the user object to the view
-                    //             ], function ($message) use ($subject, $template, $user) {
-                    //                 $message->from($template['from'], $template['from_name'])
-                    //                         ->to($user->email)
-                    //                         ->subject($subject);
-                    //             });
-                    //         })->onQueue('emails');
-                    //     }
-                    // }                 
+                    $financePending = WOApprovals::where('work_order_id', $wo->id)
+                    ->where('type', 'finance')
+                    ->where('status', 'pending')
+                    ->orderBy('id', 'ASC')
+                    ->first(); 
+                    if ($financePending) {
+                        // Prepare the from details
+                        $template['from'] = 'no-reply@milele.com';
+                        $template['from_name'] = 'Milele Matrix';
+
+                        // Handle cases where customer_name is null
+                        $customerName = $wo->customer_name ?? 'Unknown Customer';
+
+                        // Prepare email data
+                        $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
+
+                        // Define a quick access link (adjust the route as needed)
+                        $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
+                        $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
+
+                        $rolesWithPermission = Role::whereHas('permissions', function ($query) {
+                            $query->where('name', 'do-finance-approval');
+                        })->pluck('id')->toArray();                   
+                        $recipients = \App\Models\User::role($rolesWithPermission)->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')
+                        ->pluck('email')->filter(function($email) {
+                            return filter_var($email, FILTER_VALIDATE_EMAIL);
+                        })->toArray(); 
+                        // Log email addresses to help with debugging
+                        \Log::info('Email Recipients:', [
+                            'recipients' => implode(', ', $recipients) ?: 'none found',
+                        ]);
+                        // Log and handle invalid email addresses (but do not throw an exception, just log)
+                        if (empty($recipients)) {
+                            \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $wo->wo_number);
+                            return;
+                        }
+                        // Send email using a Blade template
+                        Mail::send('work_order.emails.confirmed_fin_pending', [
+                            'workOrder' => $wo,
+                            'accessLink' => $accessLink,
+                            'approvalHistoryLink' => $approvalHistoryLink,
+                        ], function ($message) use ($subject, $recipients, $template) {
+                            $message->from($template['from'], $template['from_name'])
+                                    ->to($recipients)
+                                    ->subject($subject);
+                        });  
+                    }                 
                     DB::commit();
                     return response()->json('success');
                 }
