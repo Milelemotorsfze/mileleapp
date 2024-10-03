@@ -488,16 +488,13 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 resetData();
-
                 let type = 'all';
                 getModels(i,0,type);
                 enableOrDisableAddMoreButton(i);
 
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-
                 for(let j=0; j<=childIndex;j++) 
                 {
-                    
                     getLOIItemCode(i,j);
                     // call unit price,remaining qty, total quantity
                 }
