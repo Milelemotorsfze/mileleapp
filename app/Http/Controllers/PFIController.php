@@ -132,9 +132,10 @@ class PFIController extends Controller
          $modelLines = MasterModelLines::select('id','model_line')->get();
             /// end ///
 
-        $data = PfiItem::select("*", DB::raw('pfi_quantity * unit_price as total_price'))->where('is_parent', true)
-        ->orderBy('updated_at','DESC')->with([
-            'pfi' => function ($query) {
+        $data = PfiItem::select("*", DB::raw('pfi_quantity * unit_price as total_price'))
+            ->where('is_parent', true)
+            ->orderBy('updated_at','DESC')->with([
+                'pfi' => function ($query) {
                 $query->select('id','supplier_id','country_id','client_id','pfi_reference_number',
                 'currency','amount','comment','pfi_date');
             },
@@ -278,7 +279,7 @@ class PFIController extends Controller
                         'SFX' => $data->masterModel->sfx,
                         'PFI Quantity' => $data->pfi_quantity,
                         'Unit Price' => $data->unit_price,
-                        'Total Price' => $data->unit_price * $data->pfi_quantity,
+                        'Total Price' => $data->total_price,
                         'PFI Amount' => $data->pfi->amount,
                         'Comment' => $data->pfi->comment ?? '',
                        
@@ -314,7 +315,7 @@ class PFIController extends Controller
                     ->addColumn('loi_status', function($query) {
                         return $query->letterOfIndentItem->LOI->status ?? '';
                     })
-                    ->addColumn('total_price', function($query) {
+                    ->editColumn('total_price', function($query) {
                         return number_format($query->total_price);
                     })
                     ->rawColumns(['pfi_date','loi_item_code','total_price'])
