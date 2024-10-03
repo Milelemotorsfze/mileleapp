@@ -31,7 +31,6 @@
                             <i class="fa fa-download" aria-hidden="true"></i> Export</button>
                     @endif
                 @endcan 
-               
                        <a  class="btn btn-sm btn-info float-end" style="margin-right:5px;" title="LOI List View"
                         href="{{ route('pfi.index') }}" > <i class="fa fa-th-large" ></i> 
                        </a>
