@@ -168,7 +168,7 @@ class PFIController extends Controller
 
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
-                        $query->where('code', $request->code);
+                        $query->where('code', 'like', "%{$request->code}%");
                     });
             }
             if(!empty($request->pfi_date)) {
