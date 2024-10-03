@@ -1310,15 +1310,13 @@
                                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
                                                             @endphp
                                                             @if ($hasPermission)
-                                                                <a href="{{route('pfi.create')}}" class="dropdown-item" data-key="t-login">Create PFI </a>
+                                                                <a href="{{route('pfi.create')}}" class="dropdown-item" data-key="t-login">Add New PFI Details </a>
                                                             @endif
                                                         @endcan
                                                     </div>
                                                 </div>
                                                 @endif
                                             @endcan
-
-                                           
                                         </div>
                                     </li>
                                     @endif

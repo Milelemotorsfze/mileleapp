@@ -282,7 +282,7 @@
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
                                                                     @if($child_Key == 0 )  <label class="form-label">PFI Quantity</label> @endif
-                                                                    <input type="number" min="1" placeholder="0" required oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}}) 
+                                                                    <input type="number" min="1" max="{{ $childPfiItem->remainingQuantity }}" placeholder="0" required oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}}) 
                                                                     name="PfiItem[{{$key+1}}][pfi_quantity][{{$child_Key+1}}]" class="form-control mb-2 widthinput pfi-quantities" 
                                                                     index="{{$key+1}}" item="{{$child_Key+1}}" id="pfi-quantity-{{$key+1}}-item-{{$child_Key+1}}" value="{{ $childPfiItem->pfi_quantity}}">
                                                                 </div>
@@ -481,23 +481,23 @@
         // get the unit price while supplier select
 
         $(document.body).on('select2:select', "#supplier-id", function (e) {
-            let loiItems = [];
-             $('.loi_item_ids').map(function(){
-                loiItems.push($(this).val());
-                });
+            // let loiItems = [];
+            //  $('.loi_item_ids').map(function(){
+            //     loiItems.push($(this).val());
+            //     });
             hideorShowMMCDiv();
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
             for(let i=1; i<=parentIndex;i++) 
             {
                   
-                getMasterModelId(i)              
+                getMasterModelId(i);            
             }
-
+            // calculatePfiAmount();
         });
 
         $(document.body).on('select2:unselect', "#supplier-id", function (e) {
             $('.unit-prices').val(0);
-            $('.remaining-quantities').val(0);
+            // $('.remaining-quantities').val(0);
         });
         $(document.body).on('input', ".parent-pfi-quantities", function (e) {
             var index = $(this).attr('index');
@@ -515,7 +515,9 @@
                 var index = $(this).attr('index');
                 var childIndex = $(this).attr('item');
                 var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
-                var eachItemTotal = parseFloat(quantity) * parseFloat(this.value);
+                var unitPrice = $('#unit-price-'+index+'-item-'+childIndex).val();
+                var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
+                
                 $('#total-amount-'+index+'-item-'+childIndex).val(eachItemTotal);
                 sum = sum + eachItemTotal;
             });
@@ -1251,7 +1253,8 @@
                    },
                    success:function (data) {        
                        $('#master-model-id-'+index+'-item-0').val(data.master_model_id);
-                       $('#unit-price-'+index+'-item-0').val(data.unit_price)
+                       $('#unit-price-'+index+'-item-0').val(data.unit_price);
+                       calculatePfiAmount();
                    }
                });    
            }

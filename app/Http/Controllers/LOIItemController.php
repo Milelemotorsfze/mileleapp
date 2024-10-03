@@ -70,9 +70,10 @@ class LOIItemController extends Controller
                         ->get();
                         if($pfiIds->count() > 0) {}
                         foreach($pfiIds as $pfi) {
-                            $pfiItem= PfiItem::where('loi_item_id', $loi_item_id)
-                                    ->where('pfi_id', $pfi->id)->first();
-                                    $pfiNumbers[] = $pfi->pfi_reference_number. ' - ('. $pfiItem->pfi_quantity .')';
+                            $pfiItem = PfiItem::where('loi_item_id', $loi_item_id)
+                                    ->where('pfi_id', $pfi->id)
+                                    ->first();
+                            $pfiNumbers[] = $pfi->pfi_reference_number. ' - ('. $pfiItem->pfi_quantity .')';
                         }
 
                         $pfiNumbers = implode("<br>", $pfiNumbers); 
@@ -105,7 +106,6 @@ class LOIItemController extends Controller
                         ];
                     });
                 }
-
 
         if (request()->ajax()) {
             return DataTables::of($data)

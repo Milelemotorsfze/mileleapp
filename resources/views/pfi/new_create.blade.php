@@ -431,8 +431,7 @@
 
         $(document.body).on('select2:unselect', "#supplier-id", function (e) {
             $('.unit-prices').val(0);
-            $('.remaining-quantities').val(0);
-            $('.pfi-quantities').attr('max',0);
+           
         });
      
         function calculatePfiAmount() {
@@ -1176,7 +1175,8 @@
                     },
                     success:function (data) {        
                         $('#master-model-id-'+index+'-item-0').val(data.master_model_id);
-                        $('#unit-price-'+index+'-item-0').val(data.unit_price)
+                        $('#unit-price-'+index+'-item-0').val(data.unit_price);
+                        calculatePfiAmount();
                     }
                 });    
             }
