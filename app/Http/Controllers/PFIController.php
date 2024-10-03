@@ -132,8 +132,7 @@ class PFIController extends Controller
          $modelLines = MasterModelLines::select('id','model_line')->get();
             /// end ///
 
-        $data = PfiItem::where('is_parent', true)
-        // ->select(DB::raw("pfi_quantity * unit_price  as total_price"))
+        $data = PfiItem::select("*", DB::raw('pfi_quantity * unit_price as total_price'))->where('is_parent', true)
         ->orderBy('updated_at','DESC')->with([
             'pfi' => function ($query) {
                 $query->select('id','supplier_id','country_id','client_id','pfi_reference_number',
@@ -142,9 +141,7 @@ class PFIController extends Controller
             'letterOfIndentItem' => function ($query) {
                 $query->select('id','code','master_model_id','letter_of_indent_id');
             },
-            // 'letterOfIndentItem.LOI' => function ($query) {
-            //     $query->select('id','status');
-            // },
+           
             'masterModel'  => function ($query) {
                 $query->select('id','model','sfx','steering','master_model_line_id');
             },
@@ -164,7 +161,7 @@ class PFIController extends Controller
                 $query->select('id','name');
             }]);
 
-            // return $data->all();
+            // return $data->get();
 
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
@@ -247,10 +244,11 @@ class PFIController extends Controller
                 });
             }
             if(!empty($request->total_price)) {
-                $data->whereRaw("CAST((pfi_quantity * unit_price) AS CHAR) like ?", ["%$total_price%"]);
+                $data->having("total_price", 'like', "%{$request->total_price}%");
 
             }
            
+            // return $data->get();
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
                 $data = $data->get();
@@ -317,13 +315,9 @@ class PFIController extends Controller
                         return $query->letterOfIndentItem->LOI->status ?? '';
                     })
                     ->addColumn('total_price', function($query) {
-                        $pfiQuantity = PfiItem::where('parent_pfi_item_id', $query->id)
-                        ->sum('pfi_quantity');
-                        $quantity = $pfiQuantity + $query->pfi_quantity;
-                        $total = $quantity * $query->unit_price;
-                        return number_format($total);
+                        return number_format($query->total_price);
                     })
-                    ->rawColumns(['pfi_date','loi_item_code'])
+                    ->rawColumns(['pfi_date','loi_item_code','total_price'])
                     ->toJson();
                 }
             
