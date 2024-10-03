@@ -2815,27 +2815,27 @@ class WorkOrderController extends Controller
                         // Queue email to each user, ensuring they only receive one email
                         foreach ($usersWithRoles as $user) {
                             
-                            (function () use ($wo, $user) {
-                                $template = [
-                                    'from' => 'no-reply@milele.com',
-                                    'from_name' => 'Milele Matrix'
-                                ];
-                                $customerName = $wo->customer_name ?? 'Unknown Customer';
-                                $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
-                                $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
-                                $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
+                            // (function () use ($wo, $user) {
+                            //     $template = [
+                            //         'from' => 'no-reply@milele.com',
+                            //         'from_name' => 'Milele Matrix'
+                            //     ];
+                            //     $customerName = $wo->customer_name ?? 'Unknown Customer';
+                            //     $subject = "Sales support confirmed the work order " . $wo->wo_number . " " . $customerName . " " . $wo->vehicle_count . " Unit " . $wo->type_name;
+                            //     $accessLink = env('BASE_URL') . '/work-order/' . $wo->id;
+                            //     $approvalHistoryLink = env('BASE_URL') . '/finance-approval-history/' . $wo->id;
                             
-                                Mail::send('work_order.emails.confirmed_fin_pending', [
-                                    'workOrder' => $wo,
-                                    'accessLink' => $accessLink,
-                                    'approvalHistoryLink' => $approvalHistoryLink,
-                                    'user' => $user // Pass the user object to the view
-                                ], function ($message) use ($subject, $template, $user) {
-                                    $message->from($template['from'], $template['from_name'])
-                                            ->to($user->email)
-                                            ->subject($subject);
-                                });
-                            })->onQueue('emails');
+                            //     Mail::send('work_order.emails.confirmed_fin_pending', [
+                            //         'workOrder' => $wo,
+                            //         'accessLink' => $accessLink,
+                            //         'approvalHistoryLink' => $approvalHistoryLink,
+                            //         'user' => $user // Pass the user object to the view
+                            //     ], function ($message) use ($subject, $template, $user) {
+                            //         $message->from($template['from'], $template['from_name'])
+                            //                 ->to($user->email)
+                            //                 ->subject($subject);
+                            //     });
+                            // })->onQueue('emails');
                         }
                     }                 
                     DB::commit();
