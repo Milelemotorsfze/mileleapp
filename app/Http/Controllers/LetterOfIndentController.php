@@ -126,13 +126,16 @@ class LetterOfIndentController extends Controller
                         $currentDate = Carbon::now();
                         $year = $LOIExpiryCondition->expiry_duration_year;
                         $expiryDate = Carbon::parse($LOI->date)->addYears($year);
-                        $test = $currentDate->gt($expiryDate);
                         // do not make status expired, becasue to know at which status stage it got expired
                         if($currentDate->gt($expiryDate) == true) {
-                            $LOI->is_expired = true;              
+                            $LOI->is_expired = true;     
+                            $LOI->expired_date = Carbon::now()->format('Y-m-d');
+                            $LOI->timestamps = false;        
                             $LOI->save();  
                         }else{
-                            $LOI->is_expired = false;              
+                            $LOI->is_expired = false;  
+                            $LOI->expired_date = NULL;  
+                            $LOI->timestamps = false;               
                             $LOI->save();  
                         }
                     }
@@ -971,6 +974,8 @@ class LetterOfIndentController extends Controller
         
         $LOI = LetterOfIndent::find($id);
         $LOI->is_expired = true;
+        $LOI->expired_date = Carbon::now()->format('Y-m-d');
+        $LOI->timestamps = false;
         $LOI->save();
 
         return response(true);

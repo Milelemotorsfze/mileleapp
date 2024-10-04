@@ -179,13 +179,7 @@
                                 </select>
                             </div>
                         </div>
-                        <!-- <div class="col-lg-3 col-md-6">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Customer Document</label>
-                                <input type="file" name="files[]" class="form-control widthinput mb-3" multiple accept="image/*" 
-                                    autofocus id="file-upload" >
-                            </div>
-                        </div> -->
+                        
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Signature</label>
@@ -458,27 +452,6 @@
         let AddedDocumetIds = [];
         let totalDocumentCount = '{{ $letterOfIndent->LOIDocuments->count() }}';
        
-        // const fileInputLicense = document.querySelector("#file-upload");
-        // const previewFile = document.querySelector("#file-preview");
-        // fileInputLicense.addEventListener("change", function(event) {
-        //     const files = event.target.files;
-        //     while (previewFile.firstChild) {
-        //         previewFile.removeChild(previewFile.firstChild);
-        //     }
-        //     for (let i = 0; i < files.length; i++)
-        //     {
-        //         const file = files[i];
-                
-        //          if (file.type.match("image/*"))
-        //         {
-        //             const objectUrl = URL.createObjectURL(file);
-        //             const image = new Image();
-        //             image.src = objectUrl;
-        //             previewFile.appendChild(image);
-        //         }
-        //     }
-        // });
-
         const signatureFileInput = document.querySelector("#signature");
         const signaturePreviewFile = document.querySelector("#signature-preview");
 
