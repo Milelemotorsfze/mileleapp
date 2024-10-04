@@ -68,7 +68,8 @@ class WoVehicleController extends Controller
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
-            $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            // $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            $customerEmail = '';
             // Log email addresses to debug
             \Log::info('Email Recipients:', [
                 'managementEmails' => $managementEmails,
