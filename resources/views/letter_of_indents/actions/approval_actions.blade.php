@@ -1,10 +1,10 @@
-    
+@if($letterOfIndent->is_expired == false)
     <div class="dropdown">
         <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Status Update">
         <i class="fa fa-list" aria-hidden="true"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-start"> 
-            @if($letterOfIndent->is_expired == false)
+           
                 @if($type == 'NEW')
                     @can('LOI-approve')
                         @php
@@ -49,10 +49,9 @@
                         @endif
                     @endcan
                 @endif
-        
-            @endif
         </ul>
     </div>
+    @endif
    
     <!-- To Reject LOI -->
 
@@ -221,8 +220,7 @@
                                 <span id="approval-review-error-{{$letterOfIndent->id}}" class="text-danger"> </span>
                             </div>
                         </div>
-                        <!-- <input type="hidden" value="{{ $letterOfIndent->id }}" id="id" name="id"> -->
-                        <!-- <input type="hidden" value="APPROVE" id="status-approve" name="status"> -->
+                      
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -283,6 +281,8 @@
                         success:function (data) {
                             var table = $('.new-LOI-table').DataTable();
                             table.ajax.reload();
+                            var table1 = $('.waiting-for-approval-table').DataTable();
+                            table1.ajax.reload();
                             alertify.success('Approval Request Send Successfully.');
                         }
                     });
@@ -363,7 +363,6 @@
                                 },
                                 success: function (response)
                                 {
-                                    console.log(response);
                                     var table1 = $('.waiting-for-approval-table').DataTable();
                                     table1.ajax.reload();
                                     var table3 = $('.supplier-response-table').DataTable();
