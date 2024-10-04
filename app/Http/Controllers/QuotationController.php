@@ -599,7 +599,7 @@ class QuotationController extends Controller
         $agentIdsArray = explode(',', $agentsId);
         $agentsCount = count($agentIdsArray);
         $existingAgentIds = [];
-    
+        if ($agentsCount == 1) {
         foreach ($agentIdsArray as $agentId) {
             $agentsin = 1;
             $multipleAgent = MuitlpleAgents::updateOrCreate(
@@ -610,6 +610,7 @@ class QuotationController extends Controller
             $existingAgentIds[] = $agentId;
             $lastAgentId = $agentId;
         }
+    }
         // Find and delete agents that are not in the $agentIdsArray
         MuitlpleAgents::where('quotations_id', $quotation->id)
             ->whereNotIn('agents_id', $existingAgentIds)
