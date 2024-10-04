@@ -59,7 +59,8 @@ class WoDocsStatusController extends Controller
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
-            $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            // $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            $customerEmail = '';
             // Get all users with 'can_send_wo_email' set to 'yes'
             $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
                 return filter_var($email, FILTER_VALIDATE_EMAIL);
