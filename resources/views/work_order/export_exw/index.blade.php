@@ -348,7 +348,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($datas as $key => $data)
-						<tr data-id="1">
+						<tr data-id="{{$data->id ?? ''}}">
                             <td class="no-click">
                                 <div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
