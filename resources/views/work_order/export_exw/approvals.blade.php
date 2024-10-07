@@ -12,7 +12,7 @@
 	@endif
 @endif
 <!-- wo status -->
-@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '')
+@if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->can_revert_confirmation == 'yes')
 	<a title="Revert Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
 		<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
 	</a>
