@@ -103,6 +103,7 @@ class WorkOrder extends Model
     protected $appends = [
         'status',
         'sales_support_data_confirmation',
+        'can_revert_confirmation',
         'finance_approval_status',
         'can_show_fin_approval',
         'can_show_coo_approval',
@@ -116,15 +117,18 @@ class WorkOrder extends Model
         'vehicles_not_initiated_count',
         'vehicles_completed_count',
         'vehicles_modification_summary',
+        'is_modification_initial_stage',
         'pdi_scheduled_count',
         'pdi_not_initiated_count',
         'pdi_completed_count',
         'pdi_summary',
+        'is_pdi_initial_stage',
         'delivery_ready_count',
         'delivery_on_hold_count',
         'delivery_delivered_count',
         'delivery_delivered_with_docs_hold_count',
         'delivery_summary',
+        'is_delivery_initial_stage',
     ];
     public function getStatusAttribute() {
         $status = '';
@@ -149,6 +153,15 @@ class WorkOrder extends Model
             $status = 'Confirmed';
         }
         return $status;
+    }
+    public function getCanRevertConfirmationAttribute() {
+        $canRevert = 'yes';
+        if(($this->sales_support_data_confirmation == 'Confirmed' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved')
+            && (($this->docs_status != 'Blank' && $this->docs_status != 'Not Initiated') || $this->is_modification_initial_stage == 'no' 
+                || $this->is_pdi_initial_stage == 'no' || $this->is_delivery_initial_stage == 'no')) {
+                $canRevert = 'no';
+            }
+        return $canRevert;
     }
     public function getFinanceApprovalStatusAttribute() {
         $status = '';
@@ -322,7 +335,13 @@ class WorkOrder extends Model
             return implode(' & ', $parts);
         }
     }
-
+    public function getIsModificationInitialStageAttribute() {
+        $isModificationInitialStage = 'yes';
+        if($this->vehicles_completed_count > 0 || $this->vehicles_initiated_count > 0) {
+            $isModificationInitialStage = 'no';
+        }
+        return $isModificationInitialStage;
+    }
     // Attribute to get the count of pdi "Scheduled" vehicles
     public function getPDIScheduledCountAttribute()
     {
@@ -365,6 +384,13 @@ class WorkOrder extends Model
         } else {
             return 'NO DATA AVAILABLE';
         }
+    }
+    public function getIsPDIInitialStageAttribute() {
+        $isPDIInitialStage = 'yes';
+        if($this->pdi_scheduled_count > 0 || $this->pdi_completed_count > 0) {
+            $isPDIInitialStage = 'no';
+        }
+        return $isPDIInitialStage;
     }
     // Attribute to get the count of delivery "Ready" vehicles
     public function getDeliveryReadyCountAttribute()
@@ -423,7 +449,13 @@ class WorkOrder extends Model
             return 'NO DATA AVAILABLE';
         }
     }
-
+    public function getIsDeliveryInitialStageAttribute() {
+        $isDeliveryInitialStage = 'yes';
+        if($this->delivery_ready_count > 0 || $this->delivery_delivered_count > 0 || $this->delivery_delivered_with_docs_hold_count > 0) {
+            $isDeliveryInitialStage = 'no';
+        }
+        return $isDeliveryInitialStage;
+    }
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
