@@ -3,6 +3,55 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	/* Tooltip container */
+	.tooltip-container {
+		position: relative;
+		display: inline-block;
+		cursor: pointer;
+	}
+
+	/* Tooltip text */
+	.tooltip-text {
+		visibility: hidden;
+		width: 300px; /* Adjust width as needed */
+		background-color: #e1efff; /* Light blue background */
+		color: #000;
+		text-align: left;
+		border-radius: 5px;
+		padding: 10px;
+		position: absolute;
+		z-index: 1;
+		right: -320px; /* Position to the right of the status label */
+		top: 50%;
+		transform: translateY(-50%);
+		border: 1px solid #99c2ff; /* Border color for the tooltip */
+		font-size: 14px;
+		opacity: 0;
+		transition: opacity 0.3s ease-in-out;
+		box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+	}
+
+	/* Tooltip header styling */
+	.tooltip-header {
+		font-weight: bold;
+		background-color: #b4d2f7;
+		padding: 5px;
+		border-bottom: 1px solid #99c2ff;
+		text-align: center;
+	}
+
+	/* Tooltip body */
+	.tooltip-body {
+		padding: 10px;
+		white-space: pre-line; /* Ensures the text breaks into multiple lines */
+	}
+
+	/* Show the tooltip text on hover */
+	.tooltip-container:hover .tooltip-text {
+		visibility: visible;
+		opacity: 1;
+	}
+
 	.btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;
@@ -472,7 +521,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									$data->coo_approval_status == 'Approved') 
 
 									@php
-										// Determine the badge class based on docs_status
 										$badgeClass = '';
 										if ($data->docs_status == 'In Progress') {
 											$badgeClass = 'badge-soft-info';
@@ -483,9 +531,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 										}
 									@endphp
 
-									<label class="badge {{ $badgeClass }}">
-										<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
-									</label>
+									<div class="tooltip-container">
+										<label class="badge {{ $badgeClass }} docs-status">
+											<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
+										</label>
+										@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
+											<!-- Tooltip structure with "Remarks" as a title -->
+											<div class="tooltip-text">
+												<div class="tooltip-header">Remarks</div>
+												<div class="tooltip-body">
+													{{ $data->latestDocsStatus->documentation_comment }}
+												</div>
+											</div>
+										@endif
+									</div>
 								@endif
 							</td>
 							<td>
@@ -712,6 +771,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
+		$('.tooltip-container').hover(function() {
+			$(this).find('.tooltip-text').css('visibility', 'visible').css('opacity', '1');
+		}, function() {
+			$(this).find('.tooltip-text').css('visibility', 'hidden').css('opacity', '0');
+		});
 		$('#status-filter').select2({
 			allowClear: true,
 			placeholder:"Status",
