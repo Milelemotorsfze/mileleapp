@@ -72,8 +72,8 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -179,8 +179,8 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -208,8 +208,8 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -237,8 +237,8 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -301,8 +301,8 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -379,8 +379,8 @@ class PurchasingOrderController extends Controller
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -446,8 +446,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -495,8 +495,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -544,8 +544,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -597,8 +597,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -650,8 +650,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -703,8 +703,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -753,8 +753,8 @@ return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPayme
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -815,8 +815,8 @@ public function filterconfirmation($status)
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -875,8 +875,8 @@ public function paymentinitiation($status)
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -3512,8 +3512,8 @@ if($purchasingOrder->is_demand_planning_po == 1)
     $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -3783,7 +3783,7 @@ public function updatePrices(Request $request)
 
     $conversionRates = [
         'USD' => 3.67,
-        'EUR' => 3.94,
+        'EUR' => 4.03,
         'GBP' => 4.66,
         'JPY' => 0.023,
         'CAD' => 2.69
@@ -4475,14 +4475,12 @@ public function submitPaymentDetails(Request $request)
         $remarks = $request->input('remarks');
         info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
-        
         // Get purchase order details
         $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
         if (!$purchaseOrder) { // Check if purchase order exists
             return response()->json(['error' => 'Purchase order not found'], 404);
         }
         $supplierAccountId = $purchaseOrder->vendors_id;
-        
         // Check if supplier account exists, if not create a new one
         $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
         if (!$supplierAccount) {
@@ -4493,12 +4491,10 @@ public function submitPaymentDetails(Request $request)
                 return response()->json(['error' => 'Failed to create supplier account'], 500);
             }
         }
-        
         $accountCurrency = $purchaseOrder->currency;
         $transactionType = 'Initiate Payment Request';
         $status = 'Initiate Payment Request';
         $transactionAmount = 0;
-        
         if ($paymentOption == 'purchasedOrder') {
             $purchasedOrderOption = $request->input('purchasedOrderOption');
             $transactionAmount = $request->input('amount');
@@ -4518,7 +4514,6 @@ public function submitPaymentDetails(Request $request)
                 $transactionAmount += $vehicle['initiatedPrice'];
             }
         }
-        
         // Store in supplier_account_transaction table
         $supplierAccountTransaction = new SupplierAccountTransaction();
         $supplierAccountTransaction->transaction_type = $transactionType;
@@ -4533,7 +4528,6 @@ public function submitPaymentDetails(Request $request)
         if (!$supplierAccountTransaction->save()) {
             return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
         }
-        
         $adjustmentAmount = $request->input('adjustmentAmount');
         $vendorpayment = new VendorPaymentAdjustments();
         $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
@@ -4786,13 +4780,23 @@ public function submitPaymentDetails(Request $request)
                             "USD" => 3.67,
                             "EUR" => 3.94,
                             "GBP" => 4.67,
-                            "JPY" => 0.023,
+                            "JPY" => 0.025,
                             "AED" => 1,
                             "CAD" => 2.68
                         ];
-                        $conversionRate = $conversionRates[$currency] ?? 1;
-                        $totalcostconverted = $transactionAmount * $conversionRate;
-                        $supplierAccount->current_balance -= $totalcostconverted;
+                        // Check if the currencies are different
+                        if ($purchasingOrder->currency != $supplierAccount->currency) {
+                            // Convert the transactionAmount to the SupplierAccount currency
+                            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+                            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+                            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+                            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+                            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+                        } else {
+                            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                        }
+                        $supplierAccount->current_balance -= $totalCostConverted;
                         $supplierAccount->save();
                 }
             }
@@ -4972,10 +4976,23 @@ public function submitPaymentDetails(Request $request)
                     "AED" => 1,
                     "CAD" => 2.68
                 ];
-                $conversionRate = $conversionRates[$currency] ?? 1;
-                $totalcostconverted = $transactionAmount * $conversionRate;
-                $supplierAccount->current_balance += $totalcostconverted;
-                $supplierAccount->save();
+                // Check if the currencies are different
+        if ($purchasingOrder->currency != $supplierAccount->currency) {
+            // Convert the transactionAmount to the SupplierAccount currency
+            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+        } else {
+            // If the currencies are the same, no conversion is needed
+            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+        }
+
+        // Update the supplier account balance
+        $supplierAccount->current_balance += $totalCostConverted;
+        $supplierAccount->save();
         }
     }
     }
@@ -5083,10 +5100,23 @@ public function submitPaymentDetails(Request $request)
                         "AED" => 1,
                         "CAD" => 2.68
                     ];
-                    $conversionRate = $conversionRates[$currency] ?? 1;
-                    $totalCostConverted = $transactionAmount * $conversionRate;
-                    $supplierAccount->current_balance += $totalCostConverted;
-                    $supplierAccount->save();
+                    // Check if the currencies are different
+        if ($purchasingOrder->currency != $supplierAccount->currency) {
+            // Convert the transactionAmount to the SupplierAccount currency
+            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+        } else {
+            // If the currencies are the same, no conversion is needed
+            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+        }
+
+        // Update the supplier account balance
+        $supplierAccount->current_balance += $totalCostConverted;
+        $supplierAccount->save();
                 }
             }
             $this->updateRelatedStatuses($transitionId);
