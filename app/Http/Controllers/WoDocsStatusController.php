@@ -20,6 +20,8 @@ class WoDocsStatusController extends Controller
             'workOrderId' => 'required|exists:work_orders,id',
             'status' => 'required|in:Not Initiated,In Progress,Ready',
             'comment' => 'nullable|string',
+            'declarationNumber' => 'nullable|digits:13', // 13 digits, optional
+            'declarationDate' => 'nullable|date', // Valid date, optional
         ]);
 
         // Always create a new wo_docs_status record
@@ -29,6 +31,8 @@ class WoDocsStatusController extends Controller
             'documentation_comment' => $validatedData['comment'], // Optional comment
             'doc_status_changed_by' => Auth::id(), // Set the ID of the authenticated user
             'doc_status_changed_at' => now(), // Set the current timestamp
+            'declaration_number' => $validatedData['declarationNumber'] ?? null, // Store Declaration Number (if provided)
+            'declaration_date' => $validatedData['declarationDate'] ?? null, // Store Declaration Date (if provided)
         ]);
         // Fetch the work order vehicle
         $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
@@ -121,6 +125,8 @@ class WoDocsStatusController extends Controller
                 'status' => $statusName,
                 'datetime' => Carbon::now(),
                 'isCustomerEmail' => $isCustomerEmail,  // Pass this flag to the email template
+                'declarationNumber' => $validatedData['declarationNumber'] ?? 'N/A', // Pass Declaration Number
+                'declarationDate' => $validatedData['declarationDate'] ?? 'N/A', // Pass Declaration Date
             ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
                         ->to($recipients)
