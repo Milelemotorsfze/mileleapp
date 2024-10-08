@@ -1028,7 +1028,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             </div>
                                                         </div>
                                                     @endif
-                                                    @if($workOrder->latestDocsStatus->doc_status_changed_at != '')
+                                                    @if($workOrder->latestDocsStatus->declaration_date != '')
                                                         <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                             <div class="row">
                                                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
