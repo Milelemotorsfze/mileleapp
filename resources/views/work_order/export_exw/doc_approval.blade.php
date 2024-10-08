@@ -75,6 +75,7 @@
         const selectedStatus = document.querySelector('input[name="docStatus"]:checked').value;
         const declarationFields = document.getElementById('declarationFields');
 
+        // Show declaration fields only if the status is "Ready"
         if (selectedStatus === 'Ready') {
             declarationFields.style.display = 'block';
         } else {
@@ -103,39 +104,57 @@
 
         // Get Declaration Number and Date (only if status is Ready)
         let declarationNumber = '';
-		// Get the value of the textarea
-		const comment = document.getElementById(`docComment`).value;
-		// Display the confirmation dialog
-		alertify.confirm(
-			'Confirmation Required', // Title of the confirmation dialog
-			`Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`, // Message in the dialog
+        let declarationDate = '';
+
+        if (selectedStatus === 'Ready') {
+            declarationNumber = document.getElementById('declarationNumber').value;
+            declarationDate = document.getElementById('declarationDate').value;
+
+            // Validate Declaration Number only if it has any value
+            if (declarationNumber) {
+                // Check if the length is exactly 13 digits and consists only of numbers
+                if (!/^\d{13}$/.test(declarationNumber)) {
+                    document.getElementById('declarationNumberError').textContent = 'Please enter a valid 13-digit Declaration Number.';
+                    return;
+                }
+            }
+        }
+
+        const comment = document.getElementById('docComment').value;
+
+        // Display confirmation dialog
+        alertify.confirm(
+            'Confirmation Required',
+            `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`,
 			function() { // If the user clicks "OK"
-				// Perform the AJAX request to update the status
-				$.ajax({
-					url: '/update-wo-doc-status',
-					method: 'POST',
-					data: {
-						workOrderId: workOrderId,
-						status: selectedStatus,
-						comment: comment,
+                // Perform the AJAX request to update the status
+                $.ajax({
+                    url: '/update-wo-doc-status',
+                    method: 'POST',
+                    data: {
+                        workOrderId: workOrderId,
+                        status: selectedStatus,
+                        comment: comment,
+                        declarationNumber: declarationNumber,
+                        declarationDate: declarationDate,
 						_token: '{{ csrf_token() }}' // Laravel CSRF token
-					},
-					success: function(response) {
-						// Handle the response (e.g., show a success message, close the modal)
-						alertify.success(response.message);
-						$(`#updateDocStatusModal`).modal('hide');
-						location.reload(); // Reload the page after success
-					},
-					error: function(xhr) {
-						// Handle any errors
-						alertify.error('Failed to update status');
-					}
-				});
-			},
+                    },
+                    success: function(response) {
+                        // Handle the response (e.g., show a success message, close the modal)
+                        alertify.success(response.message);
+                        $(`#updateDocStatusModal`).modal('hide');
+                        location.reload(); // Reload the page after success
+                    },
+                    error: function(xhr) {
+                        // Handle any errors
+                        alertify.error('Failed to update status');
+                    }
+                });
+            },
 			function() { // If the user clicks "Cancel"
-				alertify.error('Action canceled');
-			}
-		);
-	}
+                alertify.error('Action canceled');
+            }
+        );
+    }
 
 </script>

@@ -51,7 +51,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitDocStatus('{{ $data->id }}', '{{ $data->wo_number }}')">Update Status</button>						
+                <button type="button" class="btn btn-primary" onclick="submitDocStatus('{{ $data->id }}', '{{ $data->wo_number }}')">Update Status</button>
             </div>
         </div>
     </div>
