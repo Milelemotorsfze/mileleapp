@@ -82,9 +82,9 @@
 
     function submitDocStatus(workOrderId, woNumber) {
         // Clear previous errors
-        document.getElementById('docCommentError_{{$data->id}}').textContent = '';
-        document.getElementById('declarationNumberError_{{$data->id}}').textContent = '';
-        document.getElementById('declarationDateError_{{$data->id}}').textContent = '';
+        document.getElementById('docCommentError_'+workOrderId).textContent = '';
+        document.getElementById('declarationNumberError_'+workOrderId).textContent = '';
+        document.getElementById('declarationDateError_'+workOrderId).textContent = '';
 
         // Get the selected status
         const selectedStatus = document.querySelector(`#updateDocStatusModal_${workOrderId} input[name="docStatus_${workOrderId}"]:checked`).value;
@@ -92,23 +92,27 @@
         // Get Declaration Number and Date (only if status is Ready)
         let declarationNumber = '';
         let declarationDate = '';
-        if (selectedStatus === 'Ready') {
-            declarationNumber = document.getElementById(`declarationNumber_{{$data->id}}`).value;
-            declarationDate = document.getElementById(`declarationDate_{{$data->id}}`).value;
 
-            // Validate Declaration Number only if it contains any value
-            if (declarationNumber && declarationNumber.length !== 13) {
-                document.getElementById('declarationNumberError_{{$data->id}}').textContent = 'Please enter a valid 13-digit Declaration Number.';
-                return;
+        if (selectedStatus === 'Ready') {
+            // Corrected function names
+            declarationNumber = document.getElementById(`declarationNumber_`+workOrderId).value;
+            declarationDate = document.getElementById(`declarationDate_`+workOrderId).value;
+
+            // Validate Declaration Number only if it has any value
+            if (declarationNumber) {
+                if (!/^\d{13}$/.test(declarationNumber)) {
+                    document.getElementById('declarationNumberError_'+workOrderId).textContent = 'Please enter a valid 13-digit Declaration Number.';
+                    return;
+                }
             }
         }
 
-        const comment = document.getElementById(`docComment_{{$data->id}}`).value;
+        const comment = document.getElementById(`docComment_`+workOrderId).value;
 
         // Display confirmation dialog
         alertify.confirm(
-            'Confirmation Required', // Title of the confirmation dialog
-            `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`, // Message in the dialog
+            'Confirmation Required',
+            `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`,
             function() { // If the user clicks "OK"
                 $.ajax({
                     url: '/update-wo-doc-status',
@@ -122,13 +126,11 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
-                        // Handle the response (e.g., show a success message, close the modal)
                         alertify.success(response.message);
                         $(`#updateDocStatusModal_${workOrderId}`).modal('hide');
                         location.reload(); // Reload the page after success
                     },
                     error: function(xhr) {
-                        // Handle any errors
                         alertify.error('Failed to update status');
                     }
                 });
@@ -138,4 +140,5 @@
             }
         );
     }
+
 </script>
