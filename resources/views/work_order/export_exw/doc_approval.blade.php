@@ -69,10 +69,17 @@
         @endif
     @endif
 @endif
+@if(isset($workOrder))
 <script type="text/javascript">
     // Function to toggle the display of Declaration Fields based on the status selection
     function toggleDeclarationFields() {
-        const selectedStatus = document.querySelector('input[name="docStatus"]:checked').value;
+        const selectedStatusElement = document.querySelector('input[name="docStatus"]:checked');
+        // Check if the selected radio button exists
+        if (!selectedStatusElement) {
+            console.error('No radio button is selected or present.');
+            return; // Exit the function to avoid the error
+        }
+        const selectedStatus = selectedStatusElement.value;
         const declarationFields = document.getElementById('declarationFields');
 
         // Show declaration fields only if the status is "Ready"
@@ -158,3 +165,4 @@
     }
 
 </script>
+@endif
