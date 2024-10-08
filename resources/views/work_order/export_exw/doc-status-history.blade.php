@@ -104,6 +104,8 @@
                             <th>Sl No</th>
                             <th>Status</th>
                             <th>Comment</th>
+                            <th>Declaration Number</th>
+                            <th>Declaration Date</th>
                             <th>Updated By</th>
                             <th>Updated At</th>
                         </tr>
@@ -118,6 +120,8 @@
                                         <label class="badge @if($one->is_docs_ready == 'In Progress') badge-soft-info @elseif($one->is_docs_ready == 'Ready') badge-soft-success @elseif($one->is_docs_ready == 'Not Initiated') badge-soft-danger @endif">{{ $one->is_docs_ready ?? ''}}</label>
                                     </td>
                                     <td>{{ $one->documentation_comment ?? '' }}</td>
+                                    <td>{{ $one->declaration_number ?? ''}}</td>
+                                    <td>@if($one->declaration_date != ''){{\Carbon\Carbon::parse($one->declaration_date)->format('d M Y') ?? ''}}@endif</td>
                                     <td>{{ $one->user->name ?? '' }}</td>
                                     <td>@if($one->doc_status_changed_at != ''){{ $one->doc_status_changed_at->format('d M Y,  h:i:s A') ?? '' }}@endif</td>                                 
                                 </tr>

@@ -1012,6 +1012,37 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    @if($workOrder->latestDocsStatus->declaration_number != '')
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label">Declaration Number</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">
+                                                                        <span class="data-font">
+                                                                            {{ $workOrder->latestDocsStatus->declaration_number ?? '' }}
+                                                                        </span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    @if($workOrder->latestDocsStatus->doc_status_changed_at != '')
+                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                    <label for="choices-single-default" class="form-label">Declaration Date</label>
+                                                                </div>
+                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                    <span class="data-font">
+                                                                        <span class="data-font">
+                                                                        @if($workOrder->latestDocsStatus->declaration_date != ''){{\Carbon\Carbon::parse($workOrder->latestDocsStatus->declaration_date)->format('d M Y') ?? ''}}@endif                                                                       </span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                                 @if(isset($workOrder->latestStatus))
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-12">

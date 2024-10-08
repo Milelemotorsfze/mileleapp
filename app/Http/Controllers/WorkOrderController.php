@@ -1074,7 +1074,8 @@ class WorkOrderController extends Controller
             ->with([
                 'comments',
                 'financePendingApproval',
-                'cooPendingApproval'
+                'cooPendingApproval',
+                'latestDocsStatus',
             ]);
     
         // Adjust the query based on user permissions
