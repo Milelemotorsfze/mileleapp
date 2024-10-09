@@ -26,6 +26,7 @@
             background-color: rgba(128,128,128,0.5); /* color */
             display: none; /* making it hidden by default */
         }
+      
     </style>
     @can('LOI-edit')
         @php
@@ -483,6 +484,7 @@
             $('#template-type').select2({
                 placeholder : 'Select Template Type',
                 allowClear: true,
+                maximumSelectionLength: 1
             }).on('change', function() {
                 $('#template-type-error').remove();
             });
@@ -995,8 +997,7 @@
                 // },
                 loi_signature: {
                     required:function(element) {
-                        let currentDealer = '{{ $letterOfIndent->dealers }}';
-                        return $("#dealer").val() == 'Milele Motors' && currentDealer == 'Trans Cars'
+                        return $("#template-type").val() != 'general';
                     },
                     extension: "png|jpeg|jpg|svg",
                       maxsize:5242880  

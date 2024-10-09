@@ -4,6 +4,7 @@
         iframe {
             height: 400px;
             margin-bottom: 10px;
+            
         }
         .bg-light-pink{
             background-color: #ece6e6;
@@ -25,6 +26,7 @@
             background-color: rgba(128,128,128,0.5); /* color */
             display: none; /* making it hidden by default */
         }
+       
 
     </style>
   @can('LOI-create')
@@ -411,7 +413,7 @@
                 },
                 loi_signature: {
                     required:function(element) {
-                        return $("#dealer").val() == 'Milele Motors'
+                        return $("#template-type").val() != 'general'
                     },
                     extension: "png|jpeg|jpg|svg",
                     maxsize:5242880 
@@ -445,8 +447,6 @@
             return this.valid();
         };
        
-       
-        
         $('#loi-category').select2({
             placeholder : 'Select LOI Category',
             allowClear: true,
@@ -457,6 +457,7 @@
         $('#template-type').select2({
             placeholder : 'Select Template Type',
             allowClear: true,
+            maximumSelectionLength: 1
         }).on('change', function() {
             $('#template-type-error').remove();
         });

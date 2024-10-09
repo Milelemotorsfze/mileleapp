@@ -31,9 +31,7 @@ return new class extends Migration
             $table->foreign('entity_id')->references('id')->on('customers');
             $table->bigInteger('supplier_id')->unsigned()->index()->nullable();
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            // $table->bigInteger('customer_id')->nullable();
-            // $table->bigInteger('supplier_id')->nullable();
-            // $table->bigInteger('entity_id')->nullable();
+          
         });
     }
 };

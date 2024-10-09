@@ -425,13 +425,34 @@ class LetterOfIndentController extends Controller
                                         ->where('is_trade_license',false)
                                         ->get(); 
 
+
+
         if ($request->type == 'trans_cars') {
             $width = $request->width;
 
             if($request->download == 1) {
+                
+                if($isCustomerPassport) {
+                    $isCustomerPassport->order = $request->passport_order;
+                    $isCustomerPassport->save();
+                }
+                if($isCustomerTradeLicense) {
+                    $isCustomerTradeLicense->order = $request->trade_license_order;
+                    $isCustomerTradeLicense->save();
+                }
+
+                if($customerOtherDocAdded->count() > 0) {
+                    foreach($customerOtherDocAdded as $otherDoc) {
+                        $otherDoc->order = $request->other_document_order;
+                        $otherDoc->save();
+                    }
+                }
+            $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+
                 try{ 
+                    
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+                    compact('letterOfIndent','letterOfIndentItems','width','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -440,12 +461,33 @@ class LetterOfIndentController extends Controller
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems',
             'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+
         }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
+
                 $width = $request->width;
+
+                if($isCustomerPassport) {
+                    $isCustomerPassport->order = $request->passport_order;
+                    $isCustomerPassport->save();
+                }
+                if($isCustomerTradeLicense) {
+                    $isCustomerTradeLicense->order = $request->trade_license_order;
+                    $isCustomerTradeLicense->save();
+                }
+
+                if($customerOtherDocAdded->count() > 0) {
+                    foreach($customerOtherDocAdded as $otherDoc) {
+                        $otherDoc->order = $request->other_document_order;
+                        $otherDoc->save();
+                    }
+                }
+                $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+
+
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+                    compact('letterOfIndent','letterOfIndentItems','width','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -455,11 +497,32 @@ class LetterOfIndentController extends Controller
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems',
             'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         } else if($request->type == 'business'){
+
             if($request->download == 1) {
                 $width = $request->width;
+
+                if($isCustomerPassport) {
+                    $isCustomerPassport->order = $request->passport_order;
+                    $isCustomerPassport->save();
+                }
+                if($isCustomerTradeLicense) {
+                    $isCustomerTradeLicense->order = $request->trade_license_order;
+                    $isCustomerTradeLicense->save();
+                }
+
+                if($customerOtherDocAdded->count() > 0) {
+                    foreach($customerOtherDocAdded as $otherDoc) {
+                        $otherDoc->order = $request->other_document_order;
+                        $otherDoc->save();
+                    }
+                }
+
+                $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+
+
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+                    compact('letterOfIndent','letterOfIndentItems','width','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -472,9 +535,26 @@ class LetterOfIndentController extends Controller
         else if($request->type == 'individual') {
             if($request->download == 1) {
                 $width = $request->width;
+                if($isCustomerPassport) {
+                    $isCustomerPassport->order = $request->passport_order;
+                    $isCustomerPassport->save();
+                }
+                if($isCustomerTradeLicense) {
+                    $isCustomerTradeLicense->order = $request->trade_license_order;
+                    $isCustomerTradeLicense->save();
+                }
+
+                if($customerOtherDocAdded->count() > 0) {
+                    foreach($customerOtherDocAdded as $otherDoc) {
+                        $otherDoc->order = $request->other_document_order;
+                        $otherDoc->save();
+                    }
+                }
+                $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','width','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+                    compact('letterOfIndent','letterOfIndentItems','width','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
@@ -486,9 +566,25 @@ class LetterOfIndentController extends Controller
             'customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
         }else{
             if($request->download == 1) {
+                if($isCustomerPassport) {
+                    $isCustomerPassport->order = $request->passport_order;
+                    $isCustomerPassport->save();
+                }
+                if($isCustomerTradeLicense) {
+                    $isCustomerTradeLicense->order = $request->trade_license_order;
+                    $isCustomerTradeLicense->save();
+                }
+
+                if($customerOtherDocAdded->count() > 0) {
+                    foreach($customerOtherDocAdded as $otherDoc) {
+                        $otherDoc->order = $request->other_document_order;
+                        $otherDoc->save();
+                    }
+                }
+  $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
-                    compact('letterOfIndent','customerOtherDocAdded','isCustomerTradeLicense','isCustomerPassport'));
+                    compact('letterOfIndent','documents'));
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
