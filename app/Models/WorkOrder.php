@@ -414,7 +414,7 @@ class WorkOrder extends Model
     {
         return $this->vehicles->where('delivery_status', 'Delivered With Docs Hold')->count();
     }
-   // Attribute to get the modification status summary for the work order
+    // Attribute to get the modification status summary for the work order
     public function getDeliverySummaryAttribute()
     {
         $deliveredCount = $this->delivery_delivered_count; 
@@ -499,6 +499,10 @@ class WorkOrder extends Model
     public function dataHistories()
     {
         return $this->hasMany(WORecordHistory::class,'work_order_id','id');
+    }
+    public function boe()
+    {
+        return $this->hasMany(WOBOE::class,'wo_id','id');
     }
     public function financePendingApproval() {
         return $this->hasOne(WOApprovals::class)

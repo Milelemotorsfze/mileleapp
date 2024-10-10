@@ -27,17 +27,17 @@
                                 <!-- Radio buttons for doc status -->
                                 <div class="d-flex justify-content-between">
                                     <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusNotInitiated" value="Not Initiated">
+                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusNotInitiated" value="Not Initiated" {{ $workOrder->docs_status == 'Not Initiated' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="docStatusNotInitiated">Not Initiated</label>
                                     </div>
 
                                     <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusInProgress" value="In Progress">
+                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusInProgress" value="In Progress" {{ $workOrder->docs_status == 'In Progress' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="docStatusInProgress">In Progress</label>
                                     </div>
 
                                     <div class="form-check flex-fill d-flex align-items-left justify-content-left">
-                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusReady" value="Ready">
+                                        <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusReady" value="Ready" {{ $workOrder->docs_status == 'Ready' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="docStatusReady">Ready</label>
                                     </div>
                                 </div>
@@ -66,7 +66,8 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label for="declarationNumber_{{ $i }}" class="form-label">Declaration Number:</label>
-                                                    <input type="text" class="form-control" id="declarationNumber_{{ $i }}" name="declarationNumber[]" maxlength="13" pattern="\d*" placeholder="Enter 13 digit Declaration Number" value="{{ $boeInfo->declaration_number ?? '' }}">
+                                                    <input type="text" class="form-control declaration-number" id="declarationNumber_{{ $i }}" name="declarationNumber[]" maxlength="13" pattern="\d*" placeholder="Enter 13 digit Declaration Number" value="{{ $boeInfo->declaration_number ?? '' }}">
+                                                    <span id="declarationNumberError_{{ $i }}" class="text-danger"></span>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label for="declarationDate_{{ $i }}" class="form-label">Declaration Date:</label>
@@ -125,8 +126,10 @@
 
     function submitDocStatus(workOrderId, woNumber) {
         // Clear previous errors
-        document.getElementById('docCommentError').textContent = '';
-        
+        document.querySelectorAll('.text-danger').forEach(function(span) {
+            span.textContent = ''; // Clear all error messages
+        });
+
         // Check for radio button selection before proceeding
         const selectedStatusElement = document.querySelector('input[name="docStatus"]:checked');
         if (!selectedStatusElement) {
@@ -138,19 +141,25 @@
         const boeFields = document.querySelectorAll('.boe-set');
 
         const boeData = [];
+        let valid = true;
         boeFields.forEach((boeSet, index) => {
-            const boe_number = document.getElementById(`boe_${index}`).value;
-            const boe = document.getElementById(`boeNumber_${index}`).value;
-            const declaration_number = document.getElementById(`declarationNumber_${index}`).value;
-            const declaration_date = document.getElementById(`declarationDate_${index}`).value;
+            const declarationNumber = document.getElementById(`declarationNumber_${index}`).value;
+            // If Declaration Number is provided, validate it: it must be 13 digits and positive
+            if (declarationNumber && (!/^\d{13}$/.test(declarationNumber) || parseInt(declarationNumber) <= 0)) {
+                document.getElementById(`declarationNumberError_${index}`).textContent = 'Please enter a valid 13-digit positive Declaration Number.';
+                valid = false;
+            }
 
             boeData.push({
-                boe_number,
-                boe,
-                declaration_number,
-                declaration_date
+                boe_number: document.getElementById(`boe_${index}`).value,
+                boe: document.getElementById(`boeNumber_${index}`).value,
+                declaration_number: declarationNumber,
+                declaration_date: document.getElementById(`declarationDate_${index}`).value
             });
         });
+        if (!valid) {
+            return; // Stop form submission if there are validation errors
+        }
 
         const comment = document.getElementById('docComment').value;
 
@@ -172,7 +181,7 @@
                     },
                     success: function(response) {
                         alertify.success(response.message);
-                        $(`#updateDocStatusModal`).modal('hide');
+                        $('#updateDocStatusModal').modal('hide');
                         location.reload(); // Reload the page after success
                     },
                     error: function(xhr) {

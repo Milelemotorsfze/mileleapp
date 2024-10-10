@@ -778,7 +778,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
+                                                            <span class="data-font">@if($workOrder->total_number_of_boe != 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1012,37 +1012,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    @if($workOrder->latestDocsStatus->declaration_number != '')
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
-                                                            <div class="row">
-                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                                    <label for="choices-single-default" class="form-label">Declaration Number</label>
-                                                                </div>
-                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                                    <span class="data-font">
-                                                                        <span class="data-font">
-                                                                            {{ $workOrder->latestDocsStatus->declaration_number ?? '' }}
-                                                                        </span>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                    @if($workOrder->latestDocsStatus->declaration_date != '')
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
-                                                            <div class="row">
-                                                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                                                    <label for="choices-single-default" class="form-label">Declaration Date</label>
-                                                                </div>
-                                                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                                    <span class="data-font">
-                                                                        <span class="data-font">
-                                                                        @if($workOrder->latestDocsStatus->declaration_date != ''){{\Carbon\Carbon::parse($workOrder->latestDocsStatus->declaration_date)->format('d M Y') ?? ''}}@endif                                                                       </span>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
                                                 @endif
                                                 @if(isset($workOrder->latestStatus))
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-12">
@@ -1089,6 +1058,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     </div>
                                                 @endif
                                             </div>  
+                                            <div class="row">
+                                                @if(isset($workOrder->boe) && count($workOrder->boe) > 0)
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                                        <table class="table table-striped table-editable table-edits table-condensed">
+                                                            <thead style="background-color: #e6f1ff">
+                                                                <tr>
+                                                                    <th>BOE Number</th>
+                                                                    <th>Declaration Number</th>
+                                                                    <th>Declaration date</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($workOrder->boe as $one)
+                                                                    <tr>
+                                                                        <td>{{ $one->boe ?? '' }}</td>
+                                                                        <td>{{ $one->declaration_number ?? ''}}</td>
+                                                                        <td>@if($one->declaration_date != ''){{\Carbon\Carbon::parse($one->declaration_date)->format('d M Y') ?? ''}}@endif</td>                               
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

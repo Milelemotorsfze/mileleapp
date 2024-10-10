@@ -10,18 +10,22 @@ use Carbon\Carbon;
 use Exception;
 use App\Models\WoDocsStatus;
 use App\Models\WorkOrder;
+use App\Models\WOBOE;
 
 class WoDocsStatusController extends Controller
 {
     public function updateDocStatus(Request $request)
-    {
+    {   
         // Validate the incoming request data
         $validatedData = $request->validate([
             'workOrderId' => 'required|exists:work_orders,id',
             'status' => 'required|in:Not Initiated,In Progress,Ready',
             'comment' => 'nullable|string',
-            'declarationNumber' => 'nullable|digits:13', // 13 digits, optional
-            'declarationDate' => 'nullable|date', // Valid date, optional
+            'boeData' => 'nullable|array', // BOE data is optional
+            'boeData.*.boe_number' => 'string|nullable', // BOE number should be a string
+            'boeData.*.boe' => 'string|nullable', // BOE field should be a string
+            'boeData.*.declaration_number' => 'nullable|digits:13', // 13 digits, optional
+            'boeData.*.declaration_date' => 'nullable|date', // Valid date, optional
         ]);
 
         // Always create a new wo_docs_status record
@@ -31,16 +35,44 @@ class WoDocsStatusController extends Controller
             'documentation_comment' => $validatedData['comment'], // Optional comment
             'doc_status_changed_by' => Auth::id(), // Set the ID of the authenticated user
             'doc_status_changed_at' => now(), // Set the current timestamp
-            'declaration_number' => $validatedData['declarationNumber'] ?? null, // Store Declaration Number (if provided)
-            'declaration_date' => $validatedData['declarationDate'] ?? null, // Store Declaration Date (if provided)
         ]);
+        // Handle the BOE data if it exists
+        if (!empty($validatedData['boeData'])) {
+            foreach ($validatedData['boeData'] as $boeEntry) {
+                // Check if the record already exists
+                $existingBoe = WOBOE::where('wo_id', $validatedData['workOrderId'])
+                                    ->where('boe_number', $boeEntry['boe_number'] ?? null) // Safely access boe_number
+                                    ->first();
+
+                if ($existingBoe) {
+                    // Update existing BOE record
+                    $existingBoe->update([
+                        'boe' => $boeEntry['boe'] ?? null, // Safely access 'boe' with null fallback
+                        'declaration_number' => $boeEntry['declaration_number'] ?? null,
+                        'declaration_date' => $boeEntry['declaration_date'] ?? null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                } else {
+                    // Create a new BOE record
+                    WOBOE::create([
+                        'wo_id' => $validatedData['workOrderId'],
+                        'boe_number' => $boeEntry['boe_number'] ?? null, // Safely access 'boe_number'
+                        'boe' => $boeEntry['boe'] ?? null, // Safely access 'boe'
+                        'declaration_number' => $boeEntry['declaration_number'] ?? null,
+                        'declaration_date' => $boeEntry['declaration_date'] ?? null,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ]);
+                }
+            }
+        }
         // Fetch the work order vehicle
         $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
 
         // Only send an email if the status is "Ready"
         if ($validatedData['status'] === 'Ready') {
-            // Prepare email template details
-            $template = [
+             // Prepare email template details
+             $template = [
                 'from' => 'no-reply@milele.com',
                 'from_name' => 'Milele Matrix',
             ];
@@ -136,7 +168,7 @@ class WoDocsStatusController extends Controller
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $woDocStatus]);
-    }
+    }  
     public function docStatusHistory($id)
     {
         $data = WoDocsStatus::where('wo_id', $id)->orderBy('doc_status_changed_at','DESC')->get();

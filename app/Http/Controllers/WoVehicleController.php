@@ -149,4 +149,23 @@ class WoVehicleController extends Controller
         // Return the view with the status history and navigation data
         return view('work_order.export_exw.wo-vehicle-status-history', compact('data', 'type', 'woVehicleId', 'previous', 'next', 'workOrder', 'vehicle','locations'));
     }
+    public function fetchBoeNumber(Request $request)
+    {
+        $workOrderId = $request->input('work_order_id');
+        // Check the WOVehicles model for the given work_order_id and fetch unique boe_number
+        $boeNumber = WOVehicles::where('work_order_id', $workOrderId)
+                    ->distinct()
+                    ->value('boe_number');
+        if ($boeNumber) {
+            return response()->json([
+                'success' => true,
+                'boe_number' => $boeNumber
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No unique boe_number found.'
+            ]);
+        }
+    }
 }
