@@ -444,6 +444,7 @@ Procurement
                                 <thead class="bg-soft-secondary">
                                 <tr>
                                                 <th>Sales Person</th>
+                                                <th>Number of Invoices</th>
                                                 <th>Number of Vehicles</th>
                                                 <th>Total Cost Price</th>
                                                 <th>Total Sale Price</th>
@@ -459,7 +460,8 @@ Procurement
                 {{ $data->name }}
             </a>
             </td>
-            <td>{{ $data->total_invoice_items }}</td>
+            <td>{{ $data->total_invoices }}</td>
+            <td>{{ $data->total_invoices_items }}</td>
             <td>{{ number_format($data->total_vehicle_cost, 2) }}</td>
             <td>{{ number_format($data->total_rate_in_aed, 2) }}</td>
             <td>{{ number_format($data->total_rate_in_aed - $data->total_vehicle_cost, 2) }}</td>
