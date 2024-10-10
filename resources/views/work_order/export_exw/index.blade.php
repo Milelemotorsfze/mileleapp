@@ -94,14 +94,14 @@
 	@endphp
 	@if ($hasPermission)
 	<h4 class="card-title">
-    @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @elseif(isset($type) && $type == 'all') All @endif Work Order Info
+    @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @elseif(isset($type) && $type == 'all') All @elseif(isset($type) && $type == 'status_report') Status Report - @endif Work Order Info
 	</h4>
 	@endif
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo']);
 	@endphp
 	@if ($hasPermission)
-		@if(isset($type) && $type == 'all')
+		@if(isset($type) && ($type == 'all' || $type == 'status_report'))
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','local_sale')}}">
 		<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
 		</a>
@@ -111,7 +111,7 @@
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_exw')}}">
 		<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
 		</a>
-		@elseif(isset($type) && $type != 'all')
+		@elseif(isset($type) && ($type != 'all' || $type != 'status_report'))
 			<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
 			<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
 			</a>
@@ -284,7 +284,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						<tr>
                             <th rowspan="2" class="dark">Action</th>
 							<th rowspan="2" class="light">Sl No</th>
-							@if(isset($type) && ($type == 'all'))	
+							@if(isset($type) && ($type == 'all' || $type == 'status_report'))	
 							<th rowspan="2" class="light">Type</th>
 							@endif
 							<th rowspan="2" class="light">Status</th>
@@ -300,9 +300,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <th rowspan="2" class="light">SO No</th>                           
                             <th rowspan="2" class="light">WO No</th>                           
                             <th rowspan="2" class="light">Date</th>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf' || $type == 'all'))
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf' || $type == 'all' || $type == 'status_report'))
                                 <th rowspan="2" class="light">Batch</th>
                             @endif
+							@if(isset($type) && $type != 'status_report')
 							<th colspan="4" class="dark">
 								<center>Customer</center>
 							</th>
@@ -355,17 +356,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                 <center>End User</center>
                             </th>
                             <th rowspan="2" class="dark">Handover Person ID</th>
+							@endif
 							<th rowspan="2" class="light">Created By</th>
                             <th rowspan="2" class="light">Created At</th>
                             <th rowspan="2" class="dark">Last Updated By</th>
                             <th rowspan="2" class="dark">Last Updated At</th>
+							@if(isset($type) && $type != 'status_report')
 							<th rowspan="2" class="dark">Sales Support Data Confirmation By</th>
                             <th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 							<th rowspan="2" class="dark">Total Number Of BOE</th>
+							@endif
 						</tr>
 						<tr>
 							<td class="dark">Finance</td>
 							<td class="dark">COO Office</td>
+							@if(isset($type) && $type != 'status_report')
 							<td class="dark">Name</td>
                             <td class="dark">Email</td>
 							<td class="dark">Contact</td>
@@ -392,6 +397,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                             <td class="light">Trade License</td>
                             <td class="light">Passport</td>
                             <td class="light">Contract</td>
+							@endif
 						</tr>
 					</thead>
 					<tbody>
@@ -498,7 +504,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								@include('work_order.export_exw.status_update')                   
                             </td>
 							<td>{{ ++$i }}</td>
-							@if(isset($type) && ($type == 'all'|| $type == 'all'))	
+							@if(isset($type) && ($type == 'all'|| $type == 'all' || $type == 'status_report'))	
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
 							<td>
@@ -572,9 +578,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							<td>{{$data->so_number ?? ''}}</td>
                             <td>{{$data->wo_number ?? ''}}</td>
 							<td>@if($data->date != ''){{\Carbon\Carbon::parse($data->date)->format('d M Y') ?? ''}}@endif</td>
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))															
+                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all' || $type == 'status_report'))															
 							    <td>@if($data->is_batch == 0) Single @else {{$data->batch ?? ''}} @endif</td>	
-                            @endif						
+                            @endif	
+							@if(isset($type) && $type != 'status_report')					
 							<td>{{$data->customer_name ?? ''}}</td>
 							<td class="no-click">{{$data->customer_email ?? ''}}</td>
 							<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
@@ -746,13 +753,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</a>
 								@endif
 							</td>
+							@endif
 							<td>{{$data->CreatedBy->name ?? ''}}</td>
-                            <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                            <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}@endif</td>
 							<td>{{$data->UpdatedBy->name ?? ''}}</td>
-                            <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
+                            <td>@if($data->updated_at != '' && $data->updated_by != '' && $data->updated_at != $data->created_at){{\Carbon\Carbon::parse($data->updated_at)->format('d M Y') ?? ''}}@endif</td>
+							@if(isset($type) && $type != 'status_report')
 							<td>@if($data->sales_support_data_confirmation_at != ''){{$data->salesSupportDataConfirmationBy->name ?? ''}}@endif</td>
                             <td>@if($data->sales_support_data_confirmation_at != '') {{\Carbon\Carbon::parse($data->sales_support_data_confirmation_at)->format('d M Y, H:i:s') ?? ''}}@endif</td>
 							<td>@if($data->total_number_of_boe != 0){{$data->total_number_of_boe ?? ''}}@endif</td>
+							@endif
 						</tr>
 						@endforeach
 					</tbody>

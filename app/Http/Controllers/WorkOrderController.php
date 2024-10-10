@@ -195,7 +195,7 @@ class WorkOrderController extends Controller
         $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
         $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
         $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
-        $datas = WorkOrder::when($type !== 'all', function ($query) use ($type) {
+        $datas = WorkOrder::when($type !== 'all' && $type !== 'status_report', function ($query) use ($type) {
             return $query->where('type', $type);
         })
         ->when($hasLimitedAccess, function ($query) use ($authId) {
