@@ -110,7 +110,13 @@
                                         {{ $loiCountryCriteria->is_only_company_allowed == ' '  ? 'selected'  : ''}} > None </option>
                                 </select>
                             </div>
-
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Steering </label>
+                                <select class="form-control widthinput" multiple name="steering" id="steering" autofocus>
+                                    <option value="LHD" {{ $loiCountryCriteria->steering == 'LHD' ? 'selected' : '' }}>LHD</option>
+                                    <option value="RHD" {{ $loiCountryCriteria->steering == 'RHD' ? 'selected' : '' }}>RHD </option>
+                                </select>
+                            </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
@@ -142,6 +148,11 @@
     <script>
         $('#country').select2({
             placeholder : 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#steering').select2({
+            placeholder : 'Select Steering',
             allowClear: true,
             maximumSelectionLength: 1
         });

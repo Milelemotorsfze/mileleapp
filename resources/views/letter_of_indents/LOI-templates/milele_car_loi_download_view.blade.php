@@ -223,21 +223,22 @@
 </div>
     @if($letterOfIndent->LOIDocuments->count() > 0)
         <div class="page_break"></div>
-        <div class="row">
-            @if($isCustomerPassport)
-                <img src="{{ public_path('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}" class="mt-2"></iframe>
-            @endif
-            @if($isCustomerTradeLicense)
-                <img src="{{ public_path('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}" class="mt-2"></iframe>
-            @endif
-            @foreach($customerOtherDocAdded as $letterOfIndentDocument)
-                <img src="{{ public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}" class="mt-2"></iframe>
+        <div class="row" >
+            @foreach($documents as $document) 
+                @if($document->is_passport == 1) 
+                    <img src="{{ public_path('storage/app/public/passports/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+                @elseif($document->is_trade_license == 1)
+                    <img src="{{ public_path('storage/app/public/tradelicenses/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+                @else
+                    <img src="{{ public_path('customer-other-documents/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+
+                @endif
             @endforeach
+           
         </div>
     @endif
-
 </body>
-</html>
 
+</html>
 
 
