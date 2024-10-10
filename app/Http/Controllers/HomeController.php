@@ -258,19 +258,20 @@ $totalvariantss = [
             $person = Auth::id();
             $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
             $usdToAedRate = 3.67;
-            $selectedMonth = $request->get('month') ?? now()->format('Y-m'); // Get the selected month, default to current
+            $selectedMonth = $request->get('month') ?? now()->format('Y-m');
             $commissons = DB::table('vehicle_invoice')
                 ->join('vehicle_invoice_items', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
                 ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
                 ->join('users', 'so.sales_person_id', '=', 'users.id')
                 ->leftJoin('vehicle_netsuite_cost', 'vehicle_invoice_items.vehicles_id', '=', 'vehicle_netsuite_cost.vehicles_id')
-                ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth) // Filter by selected month
+                ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth)
                 ->whereIn('so.sales_person_id', $salespersonunder->pluck('person_id')->toArray())
                 ->orwhere('so.sales_person_id', $person)
                 ->select(
                     'so.sales_person_id',
                     'users.name',
-                    DB::raw('COUNT(vehicle_invoice_items.id) as total_invoice_items'),
+                    DB::raw('COUNT(DISTINCT vehicle_invoice.id) as total_invoices'),
+                    DB::raw('COUNT(vehicle_invoice_items.id) as total_invoices_items'),
                     DB::raw('SUM(vehicle_netsuite_cost.cost) as total_vehicle_cost'),
                     DB::raw("SUM(CASE WHEN vehicle_invoice.currency = 'USD' THEN vehicle_invoice_items.rate * $usdToAedRate ELSE vehicle_invoice_items.rate END) as total_rate_in_aed"),
                     DB::raw('GROUP_CONCAT(vehicle_invoice_items.vehicles_id) as all_vehicles_ids'),
@@ -278,8 +279,6 @@ $totalvariantss = [
                 )
                 ->groupBy('so.sales_person_id', 'users.name')
                 ->get();
-    
-            // Calculate commission rates
             foreach ($commissons as $item) {
                 $totalSales = $item->total_rate_in_aed;
                 $commissionSlot = DB::table('commission_slots')
