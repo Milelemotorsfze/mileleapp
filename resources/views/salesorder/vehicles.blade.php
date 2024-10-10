@@ -5,8 +5,19 @@
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
-    <p>Salesperson Name: {{ $salesPerson }}</p>
-    <p>Invoice Number: {{ $invoice_number }}</p>
+<div class="row">
+    <div class="col-md-6">
+        <p><strong>Salesperson Name:</strong> {{ $salesPerson }}</p>
+        <p><strong>Invoice Number:</strong> {{ $invoice_number }}</p>
+        <p><strong>POL:</strong> {{ $pol }}</p>
+        <p><strong>POD:</strong> {{ $pod }}</p>
+    </div>
+    <div class="col-md-6">
+        <p><strong>Customer Name:</strong> {{ $customername }}</p>
+        <p><strong>Customer Phone:</strong> {{ $customerphone }}</p>
+        <p><strong>Customer Email:</strong> {{ $customeremail }}</p>
+    </div>
+</div>
     <div class="table-responsive">
         <table id="dtBasicExample2" class="table table-striped table-bordered">
             <thead class="bg-soft-secondary">
