@@ -508,7 +508,6 @@ public function cancel($id)
 }
 public function showSalesSummary($sales_person_id, $count_type)
 {
-    // Fetch salesperson details
     $salesperson = DB::table('users')->where('id', $sales_person_id)->first();
     switch ($count_type) {
         case 'Pending Leads':
@@ -526,9 +525,11 @@ public function showSalesSummary($sales_person_id, $count_type)
             'calls.language',
             'calls.priority',
             'master_model_lines.model_line',
+            'users.name as created_by',
             'brands.brand_name'
         ])
         ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+        ->leftJoin('users', 'calls.created_by', '=', 'users.id')
         ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
         ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
         ->where('calls.sales_person', $sales_person_id);
@@ -553,9 +554,11 @@ public function showSalesSummary($sales_person_id, $count_type)
                 'prospectings.time',
                 'prospectings.date',
                 'prospectings.salesnotes',
+                'users.name as created_by',
                 'brands.brand_name'
             ])
             ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('users', 'calls.created_by', '=', 'users.id')
             ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
             ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
@@ -583,9 +586,11 @@ public function showSalesSummary($sales_person_id, $count_type)
                     'fellow_up.time',
                     'fellow_up.date',
                     'fellow_up.sales_notes',
+                    'users.name as created_by',
                     'brands.brand_name'
                 ])
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('users', 'calls.created_by', '=', 'users.id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->leftJoin('fellow_up', 'calls.id', '=', 'fellow_up.calls_id')
@@ -613,9 +618,11 @@ public function showSalesSummary($sales_person_id, $count_type)
                 'quotations.date',
                 'quotations.sales_notes',
                 'quotations.file_path',
+                'users.name as created_by',
                 'brands.brand_name'
             ])
             ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('users', 'calls.created_by', '=', 'users.id')
             ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
             ->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id')
@@ -642,9 +649,11 @@ public function showSalesSummary($sales_person_id, $count_type)
                 'lead_rejection.Reason',
                 'lead_rejection.date',
                 'lead_rejection.sales_notes',
+                'users.name as created_by',
                 'brands.brand_name'
             ])
             ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('users', 'calls.created_by', '=', 'users.id')
             ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
             ->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id')
@@ -667,10 +676,12 @@ public function showSalesSummary($sales_person_id, $count_type)
                 'so.so_number',
                 'so.so_date',
                 'quotations.calls_id',
+                'users.name as created_by',
             ])
             ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
             ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
             ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+            ->leftJoin('users', 'calls.created_by', '=', 'users.id')
             ->where('so.sales_person_id', $sales_person_id)
             ->groupby('so.id');
             break;
@@ -678,12 +689,10 @@ public function showSalesSummary($sales_person_id, $count_type)
             // If count_type doesn't match any case, return an empty response
             return response()->json(['error' => 'Invalid count type'], 400);
     }
-
     // Return the JSON data for DataTables
     if (request()->ajax()) {
         return DataTables::of($leadsQuery)->make(true);
     }
-
     // Render the view
     return view('dailyleads.leadssummary', [
         'salesperson' => $salesperson,

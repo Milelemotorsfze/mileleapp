@@ -227,6 +227,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Preferred Language</th>
                   <th>Location</th>
                   <th>Remarks & Messages</th>
+                  <th>Created By</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -291,11 +292,17 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
                     @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    $text = $calls->remarks;
+                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                    @endphp
+                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
                     <td>
+                    @php
+                    $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
+                    @endphp
+                    {{ $created_by->name }}
+                  </td>
+                  <td>
                     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
       <i class="fa fa-bars" aria-hidden="true"></i>
