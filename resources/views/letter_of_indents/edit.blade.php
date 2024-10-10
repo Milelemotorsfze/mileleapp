@@ -505,6 +505,7 @@
             }).on('change', function() {
                 getCustomers();
                 $('.customer-doc-div').html('');
+                getModels(1,'all');
               
             });
             $('#customer').select2({
@@ -605,7 +606,6 @@
                 
                 },
                  success:function (data){
-                    console.log(data);
                     let otherDocuments = data.customer_documents;
                     
                     if(otherDocuments.length > 0 || data.passport_file || data.trade_license_file)
@@ -687,7 +687,6 @@
 
                 var model_lines = $('.model_lines').val();
                 var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-                console.log(totalIndex);
                 var selectedModelLineIds = [];
                 for(let i=1; i<=totalIndex; i++)
                 {
@@ -697,7 +696,6 @@
                         selectedModelLineIds.push(eachSelectedModelLineId);
                     }
                 }
-                console.log(selectedModelLineIds);
             if(customer.length > 0 && customer_type.length > 0 && date.length > 0) {
               
                 $('.overlay').show();
@@ -714,7 +712,6 @@
                         selectedModelLineIds:selectedModelLineIds
                     },
                     success:function (data) {
-                        console.log(data);
                         $('#is-country-validation-error').val(data.error);
                        
                         if(data.comment) {
@@ -736,7 +733,6 @@
                         }
                        
                         if(data.validation_error) {
-                         console.log(data.validation_error);
                             $('#validation-error').html(data.validation_error);
                             $('#validation-error').attr('hidden', false);
                          
@@ -755,7 +751,6 @@
 
             $('.remove-other-cus-doc').click(function () {
                 let id = $(this).attr('data-id');
-                console.log(id);
                 $('#remove-doc-'+id).remove();
                 deletedDocumetIds.push(id);
                 $('#deleted-docs').empty();
@@ -813,16 +808,12 @@
             }
             function updateDocumentCount(type) {
                 if(type == 'add') {
-                    console.log('add');
                     totalDocumentCount = parseInt(totalDocumentCount) + 1;
                 }else{
-                    console.log('subtract');
                     if(totalDocumentCount > 0) {
                         totalDocumentCount = parseInt(totalDocumentCount) - 1;                   
                     }
                   }
-                console.log("totalDocumentCount");
-                console.log(totalDocumentCount);
             }
 
             function addLatestPassportToLOI() {
@@ -1213,7 +1204,7 @@
             $('.overlay').show();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
             let dealer = $('#dealer').val();
-
+            var country = $('#country').val();
             var selectedModelIds = [];
             for(let i=1; i<=totalIndex; i++)
             {
@@ -1231,6 +1222,7 @@
                     {
                         selectedModelIds: selectedModelIds,
                         dealer:dealer,
+                        country_id:country[0]
                     },
                 dataType : 'json',
                 success: function(data) {
@@ -1364,8 +1356,7 @@
             {
                 let currentmodel = $('#model-'+i).val();               
                 if(i != index && currentmodel == model[0]) {
-                    console.log(i);
-                    console.log("detach sfx");
+                   
                     var currentId = 'sfx-' + i;
                     $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
