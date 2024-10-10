@@ -25,6 +25,7 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Facades\File;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PFIController extends Controller
 {
@@ -330,6 +331,18 @@ class PFIController extends Controller
      */
     public function create()
     {
+        $pfi = PFI::find(3);
+        $pfiItems = PfiItem::where('is_parent', true)
+                    ->where('pfi_id', $pfi->id)->get();
+        try{ 
+        //    return view('pfi.pfi_document_template', compact('pfi','pfiItems'));
+            $pdfFile = PDF::loadView('pfi.pfi_document_template', compact('pfi','pfiItems'));
+            return $pdfFile->stream('document.pdf');
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
+        // return $pdfFile->stream($pdfFile);
+           
         (new UserActivityController)->createActivity('Open PFI Create Page');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -342,7 +355,7 @@ class PFIController extends Controller
                                       ->groupBy('model')->get();
          $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
  
-         return view('pfi.new_create', compact('suppliers','masterModels','customers'));
+         return view('pfi.create', compact('suppliers','masterModels','customers'));
     }
 
     /**
@@ -363,6 +376,10 @@ class PFIController extends Controller
         ]);
 
         DB::beginTransaction();
+        if($request->supplier == 'AMS' && !$request->has('file')){
+                return 1;
+        }
+        return 2;
         $pfi = new PFI();
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
@@ -454,6 +471,8 @@ class PFIController extends Controller
                     }
           
         }
+
+        
 
                
         // document sealing

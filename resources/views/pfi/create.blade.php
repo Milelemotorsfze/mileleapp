@@ -355,7 +355,9 @@
                 },
                 
                 file: {
-                    required:true,
+                    required: function(element) {
+                        return $("#supplier-id").find('option:selected').attr("data-is-MMC") == 1;
+                    },
                     extension: "pdf|png|jpg|jpeg|svg",
                     maxsize:5242880 
                 },
