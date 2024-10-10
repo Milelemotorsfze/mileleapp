@@ -736,11 +736,22 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     {
     $usdToAedRate = 3.67;
     $invoiceData = DB::table('vehicle_invoice')
-        ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
-        ->join('users', 'so.sales_person_id', '=', 'users.id')
-        ->where('vehicle_invoice.id', $vehicle_invoice_id)
-        ->select('vehicle_invoice.invoice_number', 'users.name as sales_person_name')
-        ->first();
+    ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
+    ->join('clients', 'vehicle_invoice.clients_id', '=', 'clients.id')
+    ->join('users', 'so.sales_person_id', '=', 'users.id')
+    ->leftJoin('master_shipping_ports as pol_ports', 'vehicle_invoice.pol', '=', 'pol_ports.id') // Left join for POL
+    ->leftJoin('master_shipping_ports as pod_ports', 'vehicle_invoice.pod', '=', 'pod_ports.id') // Left join for POD
+    ->where('vehicle_invoice.id', $vehicle_invoice_id)
+    ->select(
+        'vehicle_invoice.invoice_number',
+        'users.name as sales_person_name',
+        'pol_ports.name as pol_name', // Port of Loading name, nullable
+        'clients.name as customername',
+        'clients.phone as customerphone',
+        'clients.email as customeremail',
+        'pod_ports.name as pod_name'  // Port of Discharge name, nullable
+    )
+    ->first();
     $vehicles = DB::table('vehicle_invoice_items')
         ->join('vehicle_invoice', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
         ->join('vehicles', 'vehicle_invoice_items.vehicles_id', '=', 'vehicles.id')
@@ -780,7 +791,12 @@ public function showSalespersonCommissions($sales_person_id, Request $request)
     return view('salesorder.vehicles', [
         'vehicles' => $vehicles,
         'salesPerson' => $invoiceData->sales_person_name,
+        'pol' => $invoiceData->pol_name,
+        'pod' => $invoiceData->pod_name,
+        'customername' => $invoiceData->customername,
+        'customerphone' => $invoiceData->customerphone,
+        'customeremail' => $invoiceData->customeremail,
         'invoice_number' => $invoiceData->invoice_number
-    ]);
+    ]);    
     }
         }
