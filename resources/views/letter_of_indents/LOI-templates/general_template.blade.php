@@ -12,6 +12,10 @@
         iframe{
             height: 400px;
         }
+         .border-outline {
+            border: 1px solid #0f0f0f;
+            padding: 10px !important;
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">LOI Template</h4>
@@ -63,7 +67,7 @@
                     </div>
                 </div>
             </form>
-            <dv class="card-body text-center">
+            <div class="card-body text-center">
                 @if($letterOfIndent->LOIDocuments->count() > 0)
                     <h5 class="fw-bold ">Customer Document</h5>
                     @if($isCustomerPassport)
