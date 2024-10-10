@@ -222,7 +222,7 @@ class WorkOrderController extends Controller
             }
     
         })
-        ->with('latestFinance','latestDocs')  // Eager-load the latest finance approval
+        ->with('latestFinance','latestDocs','boe')  // Eager-load the latest finance approval
         ->latest()
         ->get();
         $filteredDatas = $datas;
@@ -1076,6 +1076,7 @@ class WorkOrderController extends Controller
                 'financePendingApproval',
                 'cooPendingApproval',
                 'latestDocsStatus',
+                'boe',
             ]);
     
         // Adjust the query based on user permissions

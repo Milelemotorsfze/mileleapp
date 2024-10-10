@@ -468,6 +468,7 @@ Route::get('/d', function () {
     Route::controller(WoVehicleController::class)->group(function(){
         Route::post('/update-vehicle-modification-status', 'updateVehModiStatus')->name('wo.updateVehModiStatus');
         Route::get('/vehicle-modification-status-log/{id}', 'vehModiStatusHistory')->name('vehModiStatusHistory');
+        Route::post('/fetch-boe-number', 'fetchBoeNumber')->name('fetch.boe_number');
     }); 
     Route::controller(WoPDIStatusController::class)->group(function(){
         Route::post('/update-vehicle-pdi-status', 'updateVehPdiStatus')->name('wo.updateVehPdiStatus');

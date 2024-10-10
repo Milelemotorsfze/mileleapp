@@ -1,5 +1,6 @@
+@if(isset($data))
 <div class="modal fade" id="updateDocStatusModal_{{$data->id}}" tabindex="-1" aria-labelledby="updateDocStatusModalLabel_{{$data->id}}" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg"> <!-- Add modal-dialog here -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="updateDocStatusModalLabel_{{$data->id}}">Update Documentation Status for {{$data->wo_number ?? ''}}</h5>
@@ -33,19 +34,37 @@
                         <span id="docCommentError_{{$data->id}}" class="text-danger"></span>
                     </div>
 
-                    <!-- Declaration Fields - initially hidden -->
-                    <div id="declarationFields_{{$data->id}}" style="display: none;">
-                        <div class="mb-3">
-                            <label for="declarationNumber_{{$data->id}}" class="form-label">Declaration Number:</label>
-                            <input type="text" class="form-control" id="declarationNumber_{{$data->id}}" name="declarationNumber" maxlength="13" pattern="\d*" placeholder="Enter 13 digit Declaration Number">
-                            <span id="declarationNumberError_{{$data->id}}" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="declarationDate_{{$data->id}}" class="form-label">Declaration Date:</label>
-                            <input type="date" class="form-control" id="declarationDate_{{$data->id}}" name="declarationDate">
-                            <span id="declarationDateError_{{$data->id}}" class="text-danger"></span>
-                        </div>
+                    <!-- BOE Fields -->
+                    <div id="boeFields_{{$data->id}}" style="display: none;">
+                        @php
+                            $boeCount = $data->total_number_of_boe == 0 ? 1 : $data->total_number_of_boe;
+                            $woNumber = $data->wo_number;
+                            $boeData = $data->boe ?? [];
+                        @endphp
+                        @for($i = 0; $i < $boeCount; $i++)
+                            @php
+                                $boeNumber = sprintf("%s-BOE%02d", $woNumber, $i + 1);
+                                $boeInfo = $boeData[$i] ?? null;
+                            @endphp
+                            <div class="boe-set mb-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="boeNumber_{{$data->id}}_{{ $i }}" class="form-label">BOE Number:</label>
+                                        <input type="text" class="form-control" id="boeNumber_{{$data->id}}_{{ $i }}" name="boeNumber[]" value="{{ $boeInfo->boe ?? $boeNumber }}" readonly>
+                                        <input type="text" class="form-control" id="boe_{{$data->id}}_{{ $i }}" name="boe[]" value="{{ $boeInfo->boe_number ?? ($i+1) }}" hidden>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="declarationNumber_{{$data->id}}_{{ $i }}" class="form-label">Declaration Number:</label>
+                                        <input type="text" class="form-control" id="declarationNumber_{{$data->id}}_{{ $i }}" name="declarationNumber[]" maxlength="13" pattern="\d*" placeholder="Enter 13 digit Declaration Number" value="{{ $boeInfo->declaration_number ?? '' }}">
+                                        <span id="declarationNumberError_{{$data->id}}_{{ $i }}" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="declarationDate_{{$data->id}}_{{ $i }}" class="form-label">Declaration Date:</label>
+                                        <input type="date" class="form-control" id="declarationDate_{{$data->id}}_{{ $i }}" name="declarationDate[]" value="{{ $boeInfo->declaration_date ?? '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        @endfor
                     </div>
                 </form>
             </div>
@@ -58,76 +77,87 @@
 </div>
 
 <script type="text/javascript">
-    // Function to toggle the display of Declaration Fields based on the status selection
-    function toggleDeclarationFields_{{$data->id}}() {
-        const selectedStatus = document.querySelector(`input[name="docStatus_{{$data->id}}"]:checked`).value;
-        const declarationFields = document.getElementById('declarationFields_{{$data->id}}');
+    function toggleFields_{{$data->id}}() {
+        const selectedStatus = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked').value;
+        const boeFields = document.getElementById('boeFields_{{$data->id}}');
 
         if (selectedStatus === 'Ready') {
-            declarationFields.style.display = 'block';
+            boeFields.style.display = 'block';
         } else {
-            declarationFields.style.display = 'none';
+            boeFields.style.display = 'none';
         }
     }
 
-    // Event listener for the radio button changes
-    document.querySelectorAll(`input[name="docStatus_{{$data->id}}"]`).forEach((radio) => {
-        radio.addEventListener('change', toggleDeclarationFields_{{$data->id}});
-    });
-
-    // Trigger Declaration fields toggle on modal open
     document.addEventListener('DOMContentLoaded', function() {
-        toggleDeclarationFields_{{$data->id}}(); // Ensure fields are toggled correctly on page load
+        toggleFields_{{$data->id}}(); // Ensure fields are toggled correctly on page load
+    });
+    document.querySelectorAll('input[name="docStatus_{{$data->id}}"]').forEach((radio) => {
+        radio.addEventListener('change', toggleFields_{{$data->id}});
     });
 
     function submitDocStatus(workOrderId, woNumber) {
-        // Clear previous errors
-        document.getElementById('docCommentError_'+workOrderId).textContent = '';
-        document.getElementById('declarationNumberError_'+workOrderId).textContent = '';
-        document.getElementById('declarationDateError_'+workOrderId).textContent = '';
-
-        // Get the selected status
-        const selectedStatus = document.querySelector(`#updateDocStatusModal_${workOrderId} input[name="docStatus_${workOrderId}"]:checked`).value;
-
-        // Get Declaration Number and Date (only if status is Ready)
-        let declarationNumber = '';
-        let declarationDate = '';
-
-        if (selectedStatus === 'Ready') {
-            // Corrected function names
-            declarationNumber = document.getElementById(`declarationNumber_`+workOrderId).value;
-            declarationDate = document.getElementById(`declarationDate_`+workOrderId).value;
-
-            // Validate Declaration Number only if it has any value
-            if (declarationNumber) {
-                if (!/^\d{13}$/.test(declarationNumber)) {
-                    document.getElementById('declarationNumberError_'+workOrderId).textContent = 'Please enter a valid 13-digit Declaration Number.';
-                    return;
-                }
-            }
+        document.querySelectorAll('.text-danger').forEach(function(span) {
+            span.textContent = ''; // Clear all error messages
+        });
+        const selectedStatus = document.querySelector('#updateDocStatusModal_' + workOrderId + ' input[name="docStatus_' + workOrderId + '"]:checked');
+        if (!selectedStatus) {
+            alertify.error('Please select a documentation status.');
+            return; // Exit if no status is selected
         }
+        let valid = true; // Assume form is valid
+        if (selectedStatus.value === 'Ready') {
+            document.querySelectorAll('.boe-set').forEach((boeSet, index) => {
+                const declarationNumberField = document.getElementById('declarationNumber_'+workOrderId+'_' + index);
+                // console.log()
+                if (declarationNumberField) {
+                    const declarationNumber = declarationNumberField.value; 
+                    if (declarationNumber && (!/^\d{13}$/.test(declarationNumber) || parseInt(declarationNumber) <= 0)) {
+                        document.getElementById('declarationNumberError_'+workOrderId+'_' + index).textContent = 'Please enter a valid 13-digit positive Declaration Number.';
+                        valid = false;
+                    }
+                }
+            });
+        }
+        if (!valid) {
+            return; // Stop submission if validation fails
+        }
+        const boeData = [];
+        document.querySelectorAll('.boe-set').forEach((boeSet, index) => {
+            const boeNumberField = document.getElementById(`boeNumber_${workOrderId}_${index}`);
+            const boeField = document.getElementById(`boe_${workOrderId}_${index}`);
+            const declarationNumberField = document.getElementById(`declarationNumber_${workOrderId}_${index}`);
+            const declarationDateField = document.getElementById(`declarationDate_${workOrderId}_${index}`);
+            
+            if (boeNumberField && declarationNumberField && declarationDateField) {
+                boeData.push({
+                    boe_number: boeNumberField.value,  // BOE Number
+                    boe: boeNumberField.value,  // BOE Number
+                    declaration_number: declarationNumberField.value,  // Declaration Number (if provided)
+                    declaration_date: declarationDateField.value  // Declaration Date
+                });
+            }
+        });
 
-        const comment = document.getElementById(`docComment_`+workOrderId).value;
+        const comment = document.getElementById('docComment_' + workOrderId).value;
 
         // Display confirmation dialog
         alertify.confirm(
             'Confirmation Required',
-            `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`,
+            `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus.value}?`,
             function() { // If the user clicks "OK"
                 $.ajax({
                     url: '/update-wo-doc-status',
                     method: 'POST',
                     data: {
                         workOrderId: workOrderId,
-                        status: selectedStatus,
+                        status: selectedStatus.value,
                         comment: comment,
-                        declarationNumber: declarationNumber,
-                        declarationDate: declarationDate,
+                        boeData: boeData,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
                         alertify.success(response.message);
-                        $(`#updateDocStatusModal_${workOrderId}`).modal('hide');
+                        $('#updateDocStatusModal_' + workOrderId).modal('hide');
                         location.reload(); // Reload the page after success
                     },
                     error: function(xhr) {
@@ -142,3 +172,4 @@
     }
 
 </script>
+@endif
