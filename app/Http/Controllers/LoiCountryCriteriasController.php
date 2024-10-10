@@ -25,7 +25,7 @@ class LoiCountryCriteriasController extends Controller
     {
         (new UserActivityController)->createActivity('Open LOI Restricted Counties List');
 
-        $loiCountryCriterias = LoiCountryCriteria::orderBy('id','DESC')->get();
+        $loiCountryCriterias = LoiCountryCriteria::orderBy('updated_at','DESC')->get();
 
         return view('loi-country-criterias.index', compact('loiCountryCriterias'));
     }
@@ -64,6 +64,7 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
         $loiCountryCriteria->status = LoiCountryCriteria::STATUS_ACTIVE;
+        $loiCountryCriteria->steering = $request->steering;
         if($request->allowed_master_model_line_ids) {
            
             foreach($request->allowed_master_model_line_ids as $allowedModelLine) {
@@ -137,6 +138,7 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
         $loiCountryCriteria->updated_by = Auth::id();
+        $loiCountryCriteria->steering = $request->steering;
         $loiCountryCriteria->save();
         LoiAllowedOrRestrictedModelLines::where('country_id', $request->country_id)->delete();
 

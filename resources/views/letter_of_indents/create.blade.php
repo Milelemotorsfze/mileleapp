@@ -501,6 +501,7 @@
             $('#country-error').remove();
             $('#customer-files').attr('hidden',true);
             $('.customer-doc-div').html('');
+            getModels(1,'all');
         });
 
         $('#date').change(function (){
@@ -791,8 +792,8 @@
             $('.overlay').show();
 
             let dealer = $('#dealer').val();
+            var country = $('#country').val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
             var selectedModelIds = [];
             for(let i=1; i<=totalIndex; i++)
             {
@@ -809,6 +810,7 @@
                     {
                         selectedModelIds: selectedModelIds,
                         dealer:dealer,
+                        country_id:country[0]
                     },
                 dataType : 'json',
                 success: function(data) {

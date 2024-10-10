@@ -43,6 +43,7 @@
                         <tr>
                             <th>S.NO:</th>
                             <th>Country</th>
+                            <th>Steering</th>
                             <th>Is LOI Restricted</th>
                             <th>Restricted Model Lines</th>
                             <th>Allowed Model Lines</th>
@@ -67,6 +68,7 @@
                                 
                                 <td> {{ ++$i }}</td>                              
                                 <td>{{ $loiCountryCriteria->country->name ?? '' }}</td>
+                                <td>{{ $loiCountryCriteria->steering }} </td>
                                 <td>   @if($loiCountryCriteria->is_loi_restricted == true) Yes @else No @endif  </td>
                                 <td>{{ implode(", ",$loiCountryCriteria->restricted_model_lines)  ?? '' }}</td>
                                 <td>{{ implode(", ",$loiCountryCriteria->allowed_model_lines)  ?? '' }}</td>

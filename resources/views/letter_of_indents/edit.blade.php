@@ -451,6 +451,7 @@
         let formValid = true;
         let deletedDocumetIds = [];
         let AddedDocumetIds = [];
+        let signature = '{{ $letterOfIndent->signature }}';
         let totalDocumentCount = '{{ $letterOfIndent->LOIDocuments->count() }}';
        
         const signatureFileInput = document.querySelector("#signature");
@@ -997,7 +998,7 @@
                 // },
                 loi_signature: {
                     required:function(element) {
-                        return $("#template-type").val() != 'general';
+                        return $("#template-type").val() != 'general' && signature == '';
                     },
                     extension: "png|jpeg|jpg|svg",
                       maxsize:5242880  
