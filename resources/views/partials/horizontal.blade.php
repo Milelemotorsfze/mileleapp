@@ -143,9 +143,14 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('work-order.index','all')}}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> List All</span>
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Report</span>
+                                                <div class="arrow-down"></div>
                                             </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">                                             
+                                                <a href="{{route('work-order.index','status_report')}}" class="dropdown-item" data-key="t-login">Status Report</a>                                             
+                                                <a href="{{route('work-order.index','all')}}" class="dropdown-item" data-key="t-login">Full Data</a>
+                                            </div>
                                         </div>
                                         @endif
 
