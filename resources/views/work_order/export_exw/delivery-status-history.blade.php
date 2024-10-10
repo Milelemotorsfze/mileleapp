@@ -157,7 +157,7 @@
                                     </td>                                  
                                     <td>
                                         @if(!empty($one->doc_delivery_date))
-                                            {{ \Carbon\Carbon::parse($one->doc_delivery_date)->format('d M Y, h:i:s A') }}
+                                            {{ \Carbon\Carbon::parse($one->doc_delivery_date)->format('d M Y') }}
                                         @endif
                                     </td>  
                                     <td>{{ $one->user->name ?? '' }}</td>

@@ -59,7 +59,7 @@
                     <!-- Delivered With Docs Hold: Docs Delivery Date -->
                     <div class="mb-3 mt-3" id="docsHoldFields_{{$vehicle->id}}" style="display:none;">
                         <label for="docsDeliveryDate_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">Docs Delivery Date:</label>
-                        <input type="datetime-local" class="form-control" id="docsDeliveryDate_{{$vehicle->id}}" name="doc_delivery_date" min="{{ now()->format('Y-m-d\TH:i') }}" style="font-size: 14px;">
+                        <input type="date" class="form-control" id="docsDeliveryDate_{{$vehicle->id}}" name="doc_delivery_date" style="font-size: 14px;">
                     </div>
 
                     <!-- Comment Field -->
