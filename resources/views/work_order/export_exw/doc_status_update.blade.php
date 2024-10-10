@@ -129,8 +129,8 @@
             const declarationDateField = document.getElementById(`declarationDate_${workOrderId}_${index}`);
             
             if (boeNumberField && declarationNumberField && declarationDateField) {
-                boeData.push({
-                    boe_number: boeNumberField.value,  // BOE Number
+                boeData.push({                    
+                    boe_number: boeField.value,  // BOE Number
                     boe: boeNumberField.value,  // BOE Number
                     declaration_number: declarationNumberField.value,  // Declaration Number (if provided)
                     declaration_date: declarationDateField.value  // Declaration Date
