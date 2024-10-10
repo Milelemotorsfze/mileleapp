@@ -29,19 +29,13 @@
             text-align: right;
             /*margin-left: 20px;*/
         }
-        img{
-            transform: scaleY(-1);
-        }
         .page_break { page-break-before: always; }
 
     </style>
 
 </head>
 <body>
-    <div class="card">
-        <div class="">
-        </div>
-    </div>
+  
     @if($letterOfIndent->LOIDocuments->count() > 0)
         <div class="row">
             @foreach($documents as $document) 
