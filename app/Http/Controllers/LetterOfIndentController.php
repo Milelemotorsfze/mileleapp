@@ -477,10 +477,11 @@ class LetterOfIndentController extends Controller
                 }
 
                 if($customerOtherDocAdded->count() > 0) {
-                    foreach($customerOtherDocAdded as $otherDoc) {
-                        $otherDoc->order = $request->other_document_order;
-                        $otherDoc->save();
+                    foreach($customerOtherDocAdded as $customerOtherDocAdded) {
+                        $customerOtherDocAdded->order = $request->other_document_order;
+                        $customerOtherDocAdded->save();
                     }
+
                 }
                 $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
 
