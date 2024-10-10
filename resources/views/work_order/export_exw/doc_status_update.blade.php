@@ -75,18 +75,27 @@
         </div>
     </div>
 </div>
-
+@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
 <script type="text/javascript">
     function toggleFields_{{$data->id}}() {
-        const selectedStatus = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked').value;
-        const boeFields = document.getElementById('boeFields_{{$data->id}}');
+        // Try to get the selected radio button
+        const selectedStatusInput = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked');
 
-        if (selectedStatus === 'Ready') {
-            boeFields.style.display = 'block';
+        // Check if the selected radio input exists
+        if (selectedStatusInput) {
+            const selectedStatus = selectedStatusInput.value;
+            const boeFields = document.getElementById('boeFields_{{$data->id}}');
+
+            if (selectedStatus === 'Ready') {
+                boeFields.style.display = 'block';
+            } else {
+                boeFields.style.display = 'none';
+            }
         } else {
-            boeFields.style.display = 'none';
+            console.error('No radio input selected for "docStatus_{{$data->id}}".');
         }
     }
+
 
     document.addEventListener('DOMContentLoaded', function() {
         toggleFields_{{$data->id}}(); // Ensure fields are toggled correctly on page load
@@ -172,4 +181,5 @@
     }
 
 </script>
+@endif
 @endif
