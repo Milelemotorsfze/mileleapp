@@ -5226,16 +5226,13 @@ public function paymentconfirm(Request $request)
     }
     // Method to save DN numbers
     public function saveDnNumbers(Request $request)
-{
+    {
     $purchasingOrderId = $request->input('purchasingOrderId');
     $type = $request->input('type');
     if ($type == 'full') {
         $dnNumber = $request->input('dnNumber');
-        // Save the DN number for the full PO using the $purchasingOrderId
-        // Example: Save to the PurchasingOrder model (Assuming you have such a model)
-        // $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
-        // $purchasingOrder->dn_number = $dnNumber;
-        // $purchasingOrder->save();
+
+        info($vehicleId);
     } else if ($type == 'vehicle') {
         $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
     $batchNumber = 1;
@@ -5252,6 +5249,8 @@ public function paymentconfirm(Request $request)
         foreach ($vehicleDNData as $vehicleData) {
             $vehicleId = $vehicleData['vehicleId'];
             $dnNumber = $vehicleData['dnNumber'];
+            if($dnNumber)
+            {
             $vehicledn = New VehicleDn();
             $vehicledn->dn_number = $dnNumber;
             $vehicledn->vehicles_id = $vehicleId;
@@ -5261,6 +5260,7 @@ public function paymentconfirm(Request $request)
             $vehicle = Vehicles::find($vehicleId);
             $vehicle->dn_id = $vehicledn->id;
             $vehicle->save();
+            }
         }
     }
     return response()->json(['success' => true]);

@@ -2228,11 +2228,29 @@
                     </div>
                     </div>
                     <div class="tab-pane fade" id="dn-vehicle" role="tabpanel" aria-labelledby="dn-vehicle-tab">
+                    <div class="card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div></div> <!-- Empty div to take up space on the left -->
         <a href="#" class="btn btn-sm btn-success adddnnumberbutton-btn" data-id="{{ $purchasingOrder->id }}" data-bs-toggle="modal" data-bs-target="#addDNModalUnique">Add New DN Numbers</a>
     </div>
-    
+    <div class="table-responsive">
+                        <table id="dtBasicExample10" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Ref No</th>
+                                <th>Brand</th>
+                                <th>Model Line</th>
+                                <th>Variant</th>
+                                <th>Exterior Colour</th>
+                                <th>Interior Colour</th>
+                                <th>VIN</th>
+                                <th>DN Number</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
             </div>
         </div>
     </div>
