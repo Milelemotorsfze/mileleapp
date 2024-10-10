@@ -1412,7 +1412,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             </td>
                                                             @if($vehicle->delivery_status == 'Ready')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->delivery_at))
-                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivery_at)->format('d M Y, h:i:s A') }}
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivery_at)->format('d M Y') }}
                                                                     @endif
                                                                 </td> 
                                                                 <td colspan="3">Location : {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}</td>
@@ -1423,7 +1423,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     <td colspan="3">Delivered At : @if(!empty($vehicle->latestDeliveryStatus->delivered_at)){{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivered_at)->format('d M Y, h:i:s A') }}@endif</td>
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->doc_delivery_date))
-                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y, h:i:s A') }}
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y') }}
                                                                     @endif
                                                                 </td> 
                                                             @endif

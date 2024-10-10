@@ -30,7 +30,7 @@
         @endif
         <strong>Sales Person:</strong> {{ $workOrder->salesPerson->name ?? 'N/A' }}<br><br>
         @if(!empty($statusTracking->doc_delivery_date))
-            <strong>Docs Delivery Date:</strong> {{ \Carbon\Carbon::parse($statusTracking->doc_delivery_date)->format('d M Y, h:i:s A') }}<br>
+            <strong>Docs Delivery Date:</strong> {{ \Carbon\Carbon::parse($statusTracking->doc_delivery_date)->format('d M Y') }}<br>
         @endif
         @if(!empty($statusTracking->gdn_number))
             <strong>GDN Number:</strong> {{ $statusTracking->gdn_number }}<br>
