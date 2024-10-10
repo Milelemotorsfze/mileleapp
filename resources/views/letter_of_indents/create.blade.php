@@ -618,7 +618,6 @@
                         }
                        
                         if(data.validation_error) {
-                         console.log(data.validation_error);
                             $('#validation-error').html(data.validation_error);
                             $('#validation-error').attr('hidden', false);
                          
@@ -676,7 +675,6 @@
                 
                 },
                  success:function (data){
-                    console.log(data);
                     let otherDocuments = data.customer_documents;
                     
                     if(otherDocuments.length > 0 || data.passport_file || data.trade_license_file)
@@ -750,8 +748,7 @@
                 $('#customer_other_documents').append('<option value="' + value + '" >' + value+ '</option>');
                 $("#customer_other_documents option").attr("selected", "selected");
             });
-            console.log("after add array values");
-            console.log(customerDocumetIds);
+           
                
         }
         function removeFromLOI(id) {
@@ -761,8 +758,6 @@
             $("#customer_other_documents option[value='"+id+"']").remove();
             $('#add-LOI-'+id).attr('hidden',false);
             $('#remove-LOI-'+id).attr('hidden', true);
-            console.log("after removal array values");
-            console.log(customerDocumetIds);
                
         }
         function addPassportToLOI() {
@@ -1133,8 +1128,6 @@
                 let currentmodel = $('#model-'+i).val();
                 
                 if(i != index && currentmodel == model[0]) {
-                    console.log(i);
-                    console.log("detach sfx");
                     var currentId = 'sfx-' + i;
                     $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
