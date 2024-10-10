@@ -536,6 +536,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
                     <th>Language</th>
                     <th>Location</th>
                     <th>Remarks</th>
+                    <th>Created By</th>
                     @if($countType == "Prospecting")
                     <th>Method</th>
                     <th>Date</th>
@@ -573,6 +574,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
                     <th><select id="filterLanguage" class="filter-select" multiple="multiple"></select></th>
                     <th><select id="filterLocation" class="filter-select" multiple="multiple"></select></th>
                     <th><select id="filterRemarks" class="filter-select" multiple="multiple"></select></th>
+                    <th><select id="filtercreatedby" class="filter-select" multiple="multiple"></select></th>
                     @if($countType == "Prospecting")
                     <th><select id="filtermedium" class="filter-select" multiple="multiple"></select></th>
                     <th><select id="filtertime" class="filter-select" multiple="multiple"></select></th>
@@ -633,6 +635,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
                 {data: 'language', name: 'calls.language'},
                 {data: 'location', name: 'calls.location'},
                 {data: 'remarks', name: 'calls.remarks'},
+                {data: 'created_by', name: 'users.name'},
                 @if($countType == "Prospecting")
                 {data: 'medium', name: 'prospectings.medium'},
                 {data: 'time', name: 'prospectings.time'},
