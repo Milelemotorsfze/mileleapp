@@ -121,6 +121,9 @@ use App\Http\Controllers\LOIItemController;
 use App\Http\Controllers\BanksController;
 use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
+use App\Http\Controllers\AchievementCertificateController;
+use App\Http\Controllers\LetterRequestController;
+use App\Http\Controllers\SalaryCertificateController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
@@ -667,7 +670,36 @@ Route::get('/d', function () {
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
+    // Salary Certificate Routes
+    Route::prefix('employee-relation/salary-certificate')->group(function () {
+        Route::get('/create', [SalaryCertificateController::class, 'create'])->name('employeeRelation.salaryCertificate.create');
+        Route::post('/store', [SalaryCertificateController::class, 'store'])->name('employeeRelation.salaryCertificate.store');
+        Route::get('/index', [SalaryCertificateController::class, 'index'])->name('employeeRelation.salaryCertificate.index');
+        Route::get('/{id}/generate', [SalaryCertificateController::class, 'generateSalaryCertificate'])->name('employeeRelation.salaryCertificate.generateSalaryCertificate');
 
+        Route::get('/{id}/show', [SalaryCertificateController::class, 'show'])->name('employeeRelation.salaryCertificate.show');
+        Route::get('/{id}/edit', [SalaryCertificateController::class, 'edit'])->name('employeeRelation.salaryCertificate.edit');
+        Route::post('/{id}/update', [SalaryCertificateController::class, 'update'])->name('employeeRelation.salaryCertificate.update');
+        Route::get('/{id}', [SalaryCertificateController::class, 'downloadCertificate'])->name('employeeRelation.salaryCertificate.downloadCertificate');
+    });
+
+    // Achievement Certificate Routes
+    Route::prefix('employee-relation/achievement-certificate')->group(function () {
+        Route::get('/create', [AchievementCertificateController::class, 'create'])->name('employeeRelation.achievementCertificate.create');
+        Route::post('/store', [AchievementCertificateController::class, 'store'])->name('employeeRelation.achievementCertificate.store');
+        Route::get('/index', [AchievementCertificateController::class, 'index'])->name('employeeRelation.achievementCertificate.index');
+        Route::get('/{id}/show', [AchievementCertificateController::class, 'show'])->name('employeeRelation.achievementCertificate.show');
+        Route::post('/{id}/update', [AchievementCertificateController::class, 'update'])->name('employeeRelation.achievementCertificate.update');
+    });
+
+    // Letter Request Routes
+    Route::prefix('employee-relation/letter-request')->group(function () {
+        Route::get('/create', [LetterRequestController::class, 'create'])->name('employeeRelation.letterRequest.create');
+        Route::post('/store', [LetterRequestController::class, 'store'])->name('employeeRelation.letterRequest.store');
+        Route::get('/index', [LetterRequestController::class, 'index'])->name('employeeRelation.letterRequest.index');
+        Route::get('/{id}/show', [LetterRequestController::class, 'show'])->name('employeeRelation.letterRequest.show');
+        Route::post('/{id}/update', [LetterRequestController::class, 'update'])->name('employeeRelation.letterRequest.update');
+    });
     //WareHouse
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
@@ -1043,4 +1075,3 @@ Route::get('/d', function () {
     Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
     Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
 });
-
