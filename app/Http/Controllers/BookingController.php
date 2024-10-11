@@ -663,6 +663,25 @@ public function approval(Request $request)
         $vehicle->booking_person_id = $validatedData['salesperson'];
         $vehicle->save();
     }
-    return redirect()->route('vehicles.statuswise', ['status' => 'Available Stock']);
+    return redirect()->route('vehicles.availablevehicles', ['status' => 'Available Stock']);
+    }
+    public function canceling(Request $request)
+    {
+        $vehicle_id = $request->input('vehicle_id');
+        $bookingrequest = BookingRequest::where('vehicle_id', $vehicle_id)->first();
+        $booking = Booking::where('vehicle_id', $vehicle_id)->first();
+        if ($bookingrequest) {
+            $booking->delete();
+            $bookingrequest->status = 'Rejected';
+            $bookingrequest->save();
+            $vehicle = Vehicles::find($vehicle_id);
+            $vehicle->reservation_start_date = Null;
+            $vehicle->reservation_end_date = Null;
+            $vehicle->booking_person_id = Null;
+            $vehicle->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Booking not found']);
+        }
     }
     }

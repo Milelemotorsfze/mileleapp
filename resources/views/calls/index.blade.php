@@ -425,6 +425,7 @@
       </div>
     </div>
   </div>
+  <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
   <script type="text/javascript">
 $(document).ready(function () {
   $('.select2').select2();
@@ -465,6 +466,7 @@ $(document).ready(function () {
 });
 $('#my-table_filter').hide();
 $('#export-excel').on('click', function() {
+console.log("new");
     var filteredData = dataTable.rows({ search: 'applied' }).data();
     var data = [];
     filteredData.each(function(rowData) {
@@ -493,6 +495,7 @@ $('#export-excel').on('click', function() {
     document.body.removeChild(link);
 });
 $('#export-normal').on('click', function() {
+  console.log("googlr");
     var filteredData = dataTableb.rows({ search: 'applied' }).data();
     var data = [];
     filteredData.each(function(rowData) {

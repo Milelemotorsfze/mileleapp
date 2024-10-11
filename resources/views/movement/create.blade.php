@@ -61,6 +61,17 @@
         </div>
         </div>
         <br>
+        <div class="row">
+        <div class="col-lg-2 col-md-6">
+        <div class="form-group">
+    <label for="vin_file">Upload VIN File:</label>
+    <input type="file" id="vin_file" class="form-control" accept=".csv, .txt" />
+</div>
+<br>
+<button id="upload-vin-button" class="btn btn-primary">Upload VIN File</button>
+    </div>
+    </div>
+<br>
         <div id ="rows-containertitle">
         <div class="row">
         <div class="col-lg-1 col-md-6" style="width:12%;">
@@ -424,6 +435,123 @@
             });
         });
     });
+    $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+    $(document).ready(function () {
+    // Handle VIN file upload
+    $("#upload-vin-button").click(function (e) {
+        e.preventDefault();
+
+        // Get the uploaded file
+        var vinFile = $("#vin_file")[0].files[0];
+        if (!vinFile) {
+            alert("Please upload a VIN file.");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("vin_file", vinFile);
+
+        // AJAX call to upload the file
+        $.ajax({
+            url: "{{ route('vehicles.uploadVinFile') }}",  // Define a new route for file upload
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    // Clear any existing rows before inserting new ones
+                    $("#rows-containerpo").html("");
+                    
+                    response.vehicleDetails.forEach(function (vehicle) {
+                        var rowHtml = `
+                            <div class="row">
+                            <div class="col-lg-2 col-md-6" style="width: 12%;">
+                                    <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
+                                </div>
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                    <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
+                                </div>
+                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                    <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+            <select name="to[]" class="form-control mb-1" id="to" required>
+                <option value="">Select</option>
+                @foreach ($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" ${vehicle.matchedWarehouseId == {{ $warehouse->id }} ? 'selected' : ''}>
+                        {{ $warehouse->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <input type="text" name="model-line" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.modelLine}">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
+                                </div>
+                                `;
+        if (vehicle.warehouseNames == 'Supplier') {
+            rowHtml += `
+                <div class="col-lg-1 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                </div>
+                                </div>
+                            </div>
+            `;
+        }
+        else{
+            rowHtml += `
+                                <div class="col-lg-2 col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                </div>
+                                </div>
+                            </div>
+                            `;
+                        }
+                        rowHtml += `</div>`;
+                        $("#rows-containerpo").append(rowHtml);
+                    });
+
+                    // Attach the remove-row event handler
+                    attachRemoveRowHandler();
+                } else {
+                    alert("VIN comparison failed: " + response.message);
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    function attachRemoveRowHandler() {
+        $(".remove-row-btn").on("click", function () {
+            $(this).closest(".row").remove();
+        });
+    }
+});
 </script>
 @else
     @php

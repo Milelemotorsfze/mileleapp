@@ -4,7 +4,7 @@ const EmployeeRelation = () => {
     return (
         <div>
             {/* Your React component content goes here */}
-            <h1>Employee Relation Component</h1>
+            <h1>Eployee Rlation Cmponent</h1>
             <ol>
                 <li>
                     <div>Hammad Mukhtar</div>

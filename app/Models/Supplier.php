@@ -53,7 +53,7 @@ class Supplier extends Model
     ];
     protected $appends = [
         'is_deletable',
-        'sub_categories',
+        // 'sub_categories',
         'is_any_document_available'
 
     ];
@@ -105,59 +105,59 @@ class Supplier extends Model
     public function personContactBy() {
         return $this->belongsTo(User::class,'person_contact_by');
     }
-    public function getSubCategoriesAttribute() {
+    // public function getSubCategoriesAttribute() {
 
-        $vehicleSubCategories = [
-            'Bulk' => 'Bulk',
-            'Small Segment' => 'Small Segment'
-        ];
-        $partsSubCategories = [
-            'spare_parts' => 'Spare Parts',
-            'accessories' => 'Accessories',
-            'warranty' => 'Warranty',
-            'freelancer' => 'freelancer',
-            'garage' => 'garage'
-        ];
+    //     $vehicleSubCategories = [
+    //         'Bulk' => 'Bulk',
+    //         'Small Segment' => 'Small Segment'
+    //     ];
+    //     $partsSubCategories = [
+    //         'spare_parts' => 'Spare Parts',
+    //         'accessories' => 'Accessories',
+    //         'warranty' => 'Warranty',
+    //         'freelancer' => 'freelancer',
+    //         'garage' => 'garage'
+    //     ];
 
-        $vendorCategories = VendorCategory::where('supplier_id', $this->id)->pluck('category')->toArray();
-        if($vendorCategories) {
-            if(count($vendorCategories) > 1) {
-                if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
-                    in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES, $vendorCategories))
-                {
-                        $subCategories = array_merge($vehicleSubCategories, $partsSubCategories);
-                        return $subCategories;
-                }else if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
-                    in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
-                {
-                    $partsSubCategories['Other'] = 'Other';
-                    return $vehicleSubCategories;
-                }else if(in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES,$vendorCategories) &&
-                    in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
-                {
-                    $partsSubCategories['Other'] = 'Other';
-                    return $partsSubCategories;
-                }
-            }else{
-                if($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_VEHICLES)
-                {
-                    return $vehicleSubCategories;
-                }elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES)
-                {
-                    return $partsSubCategories;
-                }
-                elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_OTHER)
-                {
-                    $otherSubCategories = [
-                        'Other' => 'Other',
-                        'demand_planning' => 'Demand Planning'
-                    ];
-                    return $otherSubCategories;
-                }
-            }
-        }
+    //     $vendorCategories = VendorCategory::where('supplier_id', $this->id)->pluck('category')->toArray();
+    //     if($vendorCategories) {
+    //         if(count($vendorCategories) > 1) {
+    //             if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
+    //                 in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES, $vendorCategories))
+    //             {
+    //                     $subCategories = array_merge($vehicleSubCategories, $partsSubCategories);
+    //                     return $subCategories;
+    //             }else if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
+    //                 in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
+    //             {
+    //                 $partsSubCategories['Other'] = 'Other';
+    //                 return $vehicleSubCategories;
+    //             }else if(in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES,$vendorCategories) &&
+    //                 in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
+    //             {
+    //                 $partsSubCategories['Other'] = 'Other';
+    //                 return $partsSubCategories;
+    //             }
+    //         }else{
+    //             if($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_VEHICLES)
+    //             {
+    //                 return $vehicleSubCategories;
+    //             }elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES)
+    //             {
+    //                 return $partsSubCategories;
+    //             }
+    //             elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_OTHER)
+    //             {
+    //                 $otherSubCategories = [
+    //                     'Other' => 'Other',
+    //                     'demand_planning' => 'Demand Planning'
+    //                 ];
+    //                 return $otherSubCategories;
+    //             }
+    //         }
+    //     }
 
-    }
+    // }
     public function getIsDeletableAttribute()
     {
         $vendorAddons =  SupplierAddons::where('supplier_id', $this->id)->count();

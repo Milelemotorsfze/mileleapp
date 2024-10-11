@@ -22,7 +22,9 @@
             margin-right: 0px;
             padding-right: 0px;
         }
-       
+       .error{
+        color:red;
+       }
     </style>
     @can('PFI-create')
         @php
@@ -30,9 +32,18 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Create New PFI</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-
+                <h4 class="card-title">New PFI Details</h4>
+               
+                <a  class="btn btn-sm btn-info float-end mr-2" href="{{ route('pfi.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                @can('LOI-list')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-primary float-end" style="margin-right:5px;" title="Model-SFX Detail View of LOI Items" href="{{ route('letter-of-indent-items.index') }}" >
+                        <i class="fa fa-table" ></i> LOI List </a>
+                    @endif
+                @endcan
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -70,6 +81,7 @@
                                         <div class="row">
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Number</label>
                                                     <input type="text" class="form-control widthinput" id="pfi_reference_number" autofocus placeholder="Enter PFI Number"
                                                            name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
@@ -78,10 +90,19 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                <span class="error">* </span>
+                                                    <label for="choices-single-default" class="form-label">PFI Date</label>
+                                                    <input type="date" class="form-control widthinput" value="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"
+                                                     name="pfi_date">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Vendor</label>
                                                     <select class="form-control widthinput" name="supplier_id" id="supplier-id" multiple >
                                                         @foreach($suppliers as $supplier)
-                                                            <option value="{{$supplier->id}}" data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
+                                                            <option value="{{$supplier->id}}" {{ $supplier->supplier == 'AMS' ? 'selected' : '' }} data-is-MMC="{{$supplier->is_MMC}}" data-is-AMS="{{$supplier->is_AMS}}" >
                                                                 {{ $supplier->supplier }}
                                                             </option>
                                                         @endforeach
@@ -90,6 +111,7 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Customer</label>
                                                     <select class="form-control widthinput" name="client_id" id="client_id" multiple >
                                                         @foreach($customers as $customer)
@@ -102,6 +124,7 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">Country</label>
                                                     <select class="form-control widthinput" name="country_id" id="country_id" multiple >
                                                         
@@ -117,10 +140,12 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
+                                                <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Document</label>
                                                     <input type="file" id="file" class="form-control widthinput" name="file">
                                                 </div>
                                             </div>
+                                          
                                           
                                             <div class="col-lg-4 col-md-6 mmc-items-div" hidden>
                                                 <div class="mb-3">
@@ -150,6 +175,7 @@
                                         </div>
                                     </div>                                  
                                 </div>
+                                
                                 <div class="card">
                                     <div class="card-header">
                                         <h4 class="card-title">Add PFI Item Details</h4>
@@ -160,6 +186,7 @@
                                                 <div class="row pfi-child-item-div-1" id="parentItem" index="1" >
                                                     <div class="row chilItems child-item-1" id="row-1-item-0">
                                                     <div class="col-lg-2 col-md-6">
+                                                        <span class="error">* </span>
                                                         <label class="form-label text-center">Model</label>
                                                         <select class="form-select widthinput text-dark models mb-2 border-bold"  required
                                                         index="1" item="0" id="model-1-item-0" multiple name="PfiItem[1][model][0]">
@@ -170,6 +197,7 @@
                                                             </select>  
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
+                                                        <span class="error">* </span>
                                                         <label class="form-label ">SFX</label>
                                                         <select class="form-control text-dark widthinput sfx mb-2" required
                                                             multiple name="PfiItem[1][sfx][0]" index="1" item="0" id="sfx-1-item-0">
@@ -178,6 +206,7 @@
                                                     
                                                     </div>
                                                     <div class="col-lg-2 col-md-6">
+                                                        <span class="error">* </span>
                                                         <label class="form-label"> LOI Code</label>
                                                         <select class="form-control text-dark widthinput loi-items mb-2" required multiple
                                                         name="PfiItem[1][loi_item][0]" index="1" item="0" id="loi-item-1-item-0" 
@@ -186,6 +215,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-lg-1 col-md-6">
+                                                         <span class="error">* </span>
                                                         <label class="form-label ">PFI QTY</label>
                                                         <input type="number" min="1" oninput=calculateTotalAmount(1,0) required name="PfiItem[1][pfi_quantity][0]"
                                                             class="form-control mb-2 widthinput pfi-quantities" placeholder="0"
@@ -198,6 +228,7 @@
                                                             index="1" item="0" id="remaining-quantity-1-item-0">
                                                     </div>
                                                     <div class="col-lg-2 col-md-6">
+                                                        <span class="error">* </span>
                                                         <label class="form-label ">Unit Price</label>
                                                         <input type="number" min="0"  required placeholder="0" name="PfiItem[1][unit_price][0]" oninput=calculateTotalAmount(1,0) 
                                                             class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
@@ -245,6 +276,7 @@
 @endsection
 @push('scripts')
     <script type="text/javascript">
+
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -269,7 +301,6 @@
                 }
         });
 
-          let loi_id = '{{ request()->id }}';
         $('#supplier-id').select2({
             placeholder: "Select Vendor",
             maximumSelectionLength: 1
@@ -301,12 +332,12 @@
                 pfi_reference_number: {
                 required: true,
                 },
-                pfi_date: {
-                    required: true,
-                },
                 amount: {
                     required: true,
                 },
+                pfi_date: {
+                    required: true,
+                },               
                 supplier_id:{
                     required:true
                 },
@@ -428,37 +459,44 @@
         }
         
         function calculateTotalAmount(index,childIndex) {
-            var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
             var unitPrice = $('#unit-price-'+index+'-item-'+childIndex).val();
+            if(childIndex == 0) {
+                let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+                for(let j=1; j<=totalIndex;j++) 
+                {
+                   $('#unit-price-'+index+'-item-'+j).val(unitPrice);              
+                }
+            }
+            
+            var quantity = $('#pfi-quantity-'+index+'-item-'+childIndex).val();        
             var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-'+childIndex).val(eachItemTotal);
 
             calculatePfiAmount();
         }
 
-        $('form').on('submit', function(e){
-            $('.overlay').show();
+        // $('form').on('submit', function(e){
+        //     $('.overlay').show();
             
-            let quantitySum = 0;
-            $('.pfi-quantities').each(function() {
-                var quantity = $(this).val();
-                quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
+        //     let quantitySum = 0;
+        //     $('.pfi-quantities').each(function() {
+        //         var quantity = $(this).val();
+        //         quantitySum = parseFloat(quantitySum) + parseFloat(quantity);
                 
-            });
-            console.log(quantitySum);
-            if(quantitySum <= 0) {
-                $('.overlay').hide();
-                e.preventDefault();
-                alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
-            }else {
-                if($("#form-create").valid()) {
-                    $('#form-create').submit();
-                }else{
-                    $('.overlay').hide();
-                    e.preventDefault();
-                }
-            }
-        });
+        //     });
+        //     if(quantitySum <= 0) {
+        //         $('.overlay').hide();
+        //         e.preventDefault();
+        //         alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
+        //     }else {
+        //         if($("#form-create").valid()) {
+        //             $('#form-create').submit();
+        //         }else{
+        //             $('.overlay').hide();
+        //             e.preventDefault();
+        //         }
+        //     }
+        // });
 
         ///// start new code ////
       
@@ -469,9 +507,11 @@
             for(let i=1; i<=parentIndex;i++) 
             {
                 resetData();
+
                 let type = 'all';
                 getModels(i,0,type);
                 enableOrDisableAddMoreButton(i);
+
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
 
                 for(let j=0; j<=childIndex;j++) 
@@ -483,10 +523,10 @@
             }
             getCustomerCountries()
         });
-        $(document.body).on('select2:unselect', "#client_id", function (e) {
+        $(document.body).on('select2:unselect', "#country_id", function (e) {
             
             let data =  e.params.data.id;
-            $('#country_id').empty();
+            let isDataAvailable = false;
            // chcek any item selcted 
            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
 
@@ -499,17 +539,68 @@
                     let sfx = $('#sfx-'+i+'-item-'+j).val();
                     let loiCode = $('#loi-item-'+i+'-item-'+j).val();
                     if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 ){
-                        var confirm = alertify.confirm('While changing customer entire pfi items data will be reset to empty!',function (e) {
-                            if (e) {
-                                resetData();                               
-                            }
+                     isDataAvailable = true;
+                        break;
+                                                 
+                    }                                                
+                }
+            
+            }
+            if(isDataAvailable == true) {
+                var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
+                        if (e) {
+                            resetData();  
+                                                
+                        }
+                        }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                            $("#country_id").val(data).trigger('change');
+                            
+                            }); 
+            }else{
+                resetData(); 
+            }
+
+                   
+
+        });
+        $(document.body).on('select2:unselect', "#client_id", function (e) {
+            
+            let data =  e.params.data.id;
+            let isData = false;
+
+           // chcek any item selcted 
+           var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+
+            for(let i=1; i<=parentIndex;i++) 
+            {
+                let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                for(let j=0; j<=childIndex;j++) 
+                {
+                    let model = $('#model-'+i+'-item-'+j).val();
+                    let sfx = $('#sfx-'+i+'-item-'+j).val();
+                    let loiCode = $('#loi-item-'+i+'-item-'+j).val();
+                    if(model.length > 0 || sfx.length > 0 || loiCode.length > 0 )
+                    {
+                        isData = true;
+                         break;
+
+                    }                                             
+                }
+            
+            }
+
+            if(isData == true) {
+                var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
+                        if (e) {
+                            resetData();  
+                                                
+                        }
                         }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
                             $("#client_id").val(data).trigger('change');
                             
-                            });                           
-                    }                                                  
-                }
-            
+                            }); 
+            }else{
+                resetData(); 
             }
 
         });
@@ -525,19 +616,21 @@
                 {
                     if(j == 0) {
                         $("#model-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                        $("#sfx-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
-                        $("#loi-item-"+i+"-item-"+j).prop("selectedIndex", -1).trigger("change");
                     }else{
                         $("#model-"+i+"-item-"+j).empty();
-                        $("#sfx-"+i+"-item-"+j).empty();
-                        $("#loi-item-"+i+"-item-"+j).empty();
                     }
+                    $("#sfx-"+i+"-item-"+j).empty();
+                    $("#loi-item-"+i+"-item-"+j).empty();
                     
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remaining-quantity-"+i+"-item-"+j).val("");
                     $("#unit-price-"+i+"-item-"+j).val("");
                     $("#total-amount-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
+                    $('#master-model-id-'+i+'-item-'+j).val("");
+                    // country unselect if client id unselect
+                    $('#country_id').prop("selectedIndex", -1).trigger("change");          
+                    
                 }
             }
         }
@@ -672,9 +765,17 @@
 
         $(document.body).on('click', ".add-more", function (e) {
             let index = $(this).attr('index');
+
+            let unitPrice =  $("#unit-price-"+index+"-item-0").val();
             let item =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
+
+            let loiItem = $('#loi-item-'+index+'-item-0').val();
+               if(loiItem[0] == 'NULL')  {
+                var confirm = alertify.confirm('This model and sfx do not have any LOI, So you can not add child items',function (e) {
+                }).set({title:"Can't Add Child PFI Item"})
+               }else{
           
-             $(".pfi-child-item-div-"+index).append(`
+                $(".pfi-child-item-div-"+index).append(`
                      <div class="row chilItems child-item-${index}" id="row-${index}-item-${item}">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <select class="form-select widthinput text-dark models" multiple name="PfiItem[${index}][model][${item}]"
@@ -714,9 +815,9 @@
                                     index="${index}" item="${item}" id="remaining-quantity-${index}-item-${item}">
                             </div>
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  required placeholder="0" index="${index}" name="PfiItem[${index}][unit_price][${item}]" 
-                                oninput=calculateTotalAmount(${index}) class="form-control widthinput mb-2 unit-prices"
-                                    id="unit-price-${index}-item-${item}" item="${item}" placeholder="Unit price">
+                                <input type="number" min="0" placeholder="0" index="${index}" name="PfiItem[${index}][unit_price][${item}]" 
+                                readonly oninput=calculateTotalAmount(${index},${item}) class="form-control widthinput mb-2 unit-prices"
+                                    id="unit-price-${index}-item-${item}" item="${item}" placeholder="Unit price" value="${unitPrice}">
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0" readonly class="form-control mb-2 widthinput total-amounts" index="${index}"
@@ -742,9 +843,7 @@
                          placeholder: 'Select Model',
                          maximumSelectionLength: 1
                      });
-                    }
-                 
-                    
+                    }                   
                     $('#sfx-'+index+'-item-'+item).select2({
                         placeholder: 'Select SFX',
                         maximumSelectionLength: 1
@@ -753,6 +852,7 @@
                         placeholder: 'Select Code',
                         maximumSelectionLength: 1
                     });
+                }
         });
       
         $('.add-pfi-btn').click(function() {
@@ -804,7 +904,7 @@
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <input type="number" min="0"  required placeholder="0" index="${index}" name="PfiItem[${index}][unit_price][0]" 
-                                class="form-control widthinput mb-2 unit-prices"
+                                class="form-control widthinput mb-2 unit-prices"  oninput=calculateTotalAmount(${index},0)
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -855,8 +955,7 @@
             var loiItemText = $('#loi-item-'+index+'-item-'+childIndex).text();
            
             if(loiItemId[0]) {
-                console.log("item code selected");
-                appendLOIItemCode(index,childIndex,loiItemId,loiItemText.model[0],sfx[0]);
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText,model[0],sfx[0]);
             }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
@@ -928,6 +1027,7 @@
                 $(this).find('.unit-prices').attr('name', 'PfiItem['+ index +'][unit_price]['+ i +']');
                 $(this).find('.unit-prices').attr('item',i);
                 $(this).find('.unit-prices').attr('id','unit-price-'+index+'-item-'+i);
+                $(this).find('.unit-prices').attr('oninput','calculateTotalAmount('+index+','+i+')');
 
                 $(this).find('.total-amounts').attr('item',i);
                 $(this).find('.total-amounts').attr('id','total-amount-'+index+'-item-'+i);
@@ -979,7 +1079,6 @@
                     }
                 }                 
             }
-            console.log(selectedModelIds);
             
             $.ajax({
                 type: "GET",
@@ -1005,6 +1104,7 @@
        function getLOIItemCode(index,childIndex) {
           
             let customer = $('#client_id').val();
+            let country = $('#country_id').val();
             let model = $('#model-'+index+'-item-'+childIndex).val();
             let sfx = $('#sfx-'+index+'-item-'+childIndex).val();
             let url = '{{ route('loi-item-code') }}';
@@ -1033,10 +1133,10 @@
                     model: model[0],
                     sfx:sfx[0],
                     client_id:customer[0],
+                    country_id:country[0],
                     selectedLOIItemIds:selectedLOIItemIds
                 },
                 success:function (data) {
-                    console.log(data);
                     let codes = data.codes;
                     $('#loi-item-'+index+'-item-'+childIndex).empty();
                     if(data.is_loi_available == 'NO') {
@@ -1056,12 +1156,9 @@
         }           
        }
        function getLOIItemDetails(index,childIndex) {
-           console.log("reached");
             let loiItem = $('#loi-item-'+index+'-item-'+childIndex).val();
             let vendor = $('#supplier-id').val();
-            console.log(vendor);
             if(loiItem.length > 0) {
-                console.log(vendor);
                 $('.overlay').show();
 
                 let url = '{{ route('loi-item-details') }}';
@@ -1074,10 +1171,14 @@
                         supplier_id: vendor[0]            
                     },
                     success:function (data) {
-                        console.log(data);
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
                         $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
-                        $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        if(childIndex == 0) {
+                            $('#unit-price-'+index+'-item-'+childIndex).val(data.unit_price);
+                        }else{
+                            let unitPrice = $('#unit-price-'+index+'-item-0').val();
+                            $('#unit-price-'+index+'-item-'+childIndex).val(unitPrice);
+                        }
                         calculateTotalAmount(index,childIndex)
                         $('.overlay').hide();
                     }
@@ -1101,7 +1202,6 @@
                         selectedModelIds.push(eachSelectedModelId);
                     }
                 }
-                console.log(selectedModelIds);
             // if(customer.length > 0) {
                 $('.overlay').show();
                 $.ajax({
@@ -1153,6 +1253,7 @@
        }
        function getChildModels(index,item,type) {
             let customer = $('#client_id').val();
+            let country = $('#country_id').val();
             let parentModel = $('#model-'+index+'-item-0').val();
             let parentSfx = $('#sfx-'+index+'-item-0').val();
             if(customer.length > 0 && parentModel.length > 0 && parentSfx.length > 0) {
@@ -1165,7 +1266,8 @@
                             model: parentModel[0],
                             sfx:parentSfx[0],
                             is_child:'Yes',
-                            customer:customer[0]
+                            customer:customer[0],
+                            country_id:country[0],
                         },
                     dataType : 'json',
                     success: function(data) {
@@ -1236,7 +1338,6 @@
                     let currentsfx = $('#sfx-'+i+'-item-'+j).val();
                  
                     if(selectedId != currentId && selectedmodel == currentmodel[0] && selectedsfx == currentsfx[0]) {
-                        console.log(currentId);
                         $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
                     }
                 }
@@ -1280,7 +1381,6 @@
             var selectedId = 'sfx-'+index+'-item-0';
             let model = $('#model-'+index+'-item-0').val(); 
             let sfx = $('#sfx-'+index+'-item-0').val(); 
-            console.log(model[0]);
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
                 for(let i=1; i<=parentIndex;i++) 
                 { 
@@ -1333,7 +1433,6 @@
                         client_id: customer[0],   
                     },
                     success:function (data) {
-                        console.log(data);
                         $('#country_id').empty();
                         jQuery.each(data, function(key,value){
                             $('#country_id').append('<option value="'+ value.id +'">'+ value.name+'</option>');

@@ -41,6 +41,7 @@
     </table>
            </div>
         </div>
+        <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
 <script>
     $(document).ready(function() {
         var table = $('#dtBasicExample2').DataTable({

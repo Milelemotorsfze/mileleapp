@@ -5,6 +5,25 @@
             height: 400px;
             margin-bottom: 10px;
         }
+        .image-row {
+             text-align: center;
+        }
+        .other-docs {
+            width: 40%;
+            padding: 1%;
+            margin: .5%;
+            display: inline-block;
+        }
+        .overlay
+        {
+            position: fixed; /* Positioning and size */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); /* color */
+            display: none; /* making it hidden by default */
+        }
     </style>
     @can('create-customer')
         @php
@@ -78,13 +97,19 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Passport File</label>
-                                <input type="file" class="form-control" accept='image/*' name="passport_file" id="file1-upload"  placeholder="Upload Passport">
+                                <input type="file" class="form-control mygroup" accept='image/*' name="passport_file" id="file1-upload"  placeholder="Upload Passport">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Trade License</label>
-                                <input type="file" class="form-control" id="file2-upload"  accept='image/*'  name="trade_license_file" placeholder="Upload Trade License">
+                                <input type="file" class="form-control mygroup" id="file2-upload"  accept='image/*'  name="trade_license_file" placeholder="Upload Trade License">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Other Document</label>
+                                <input type="file" class="form-control mygroup" id="file3-upload"  accept='image/*' multiple  name="other_document_file[]" placeholder="Upload Other Document">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -94,6 +119,8 @@
                             </div>
                         </div>
                         <br>
+                       
+                    </div>
                         <div class="card preview-div" hidden>
                             <div class="card-body">
                                 <div class="row">
@@ -105,15 +132,20 @@
                                         <div id="file2-preview">
                                         </div>
                                     </div>
+                                   
                                 </div>
+                                    <div class="col-lg-4 col-md-12 col-sm-12 other-docs">
+                                        <div id="file3-preview">
+                                        </div>
+                                    </div>
                             </div>
                         </div>
-                    </div>
                         <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary mb-2" id="submit-button">Submit</button>
                         </div>
                 </form>
             </div>
+            <div class="overlay"></div>
         @endif
     @endcan
 @endsection
@@ -122,9 +154,11 @@
 
         const fileInputLicense1 = document.querySelector("#file1-upload");
         const fileInputLicense2 = document.querySelector("#file2-upload");
+        const fileInputLicense3 = document.querySelector("#file3-upload");
 
         const previewFile1 = document.querySelector("#file1-preview");
         const previewFile2 = document.querySelector("#file2-preview");
+        const previewFile3 = document.querySelector("#file3-preview");
 
         fileInputLicense1.addEventListener("change", function(event) {
             $('.preview-div').attr('hidden', false);
@@ -178,6 +212,33 @@
                 }
             }
         });
+        fileInputLicense3.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
+            const files = event.target.files;
+            while (previewFile3.firstChild) {
+                previewFile3.removeChild(previewFile3.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile3.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    console.log(image);
+                    previewFile3.appendChild(image);
+                }
+            }
+        });
 
         $('#country').select2({
             placeholder: 'Select Country'
@@ -186,6 +247,9 @@
           $('#country-error').remove();
         })
         $("#form-create").validate({
+            groups: {
+                mygroup: 'passport_file trade_license_file other_document_file[]'
+            },
             rules: {
                 name: {
                     required: true,
@@ -197,21 +261,33 @@
                     required: true,
                 },
                 passport_file:{
-                      extension: "png|jpeg|jpg"
+                      extension: "png|jpeg|jpg",
+                      require_from_group: [1, '.mygroup']
                 },
                 trade_license_file:{
-                     extension: "png|jpeg|jpg"
-                }
+                     extension: "png|jpeg|jpg",
+                     require_from_group: [1, '.mygroup']
+                },
+                "other_document_file[]": {
+                    extension: "png|jpeg|jpg",
+                    maxsize:5242880,
+                    require_from_group: [1, '.mygroup']
+                },
             },
+           
             messages: {
                 trade_license_file: {
                     extension: "Please upload image file format (png,jpeg,jpg)"
                 },
                 passport_file:{
                     extension: "Please upload Image file format (png,jpeg,jpg)"
-                }
+                },
+                other_document_file: {
+                    extension: "Please upload file format (png,jpeg,jpg)"
+                },
             },
         });
+       
     </script>
 @endpush
 

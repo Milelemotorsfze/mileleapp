@@ -175,6 +175,7 @@
                     <option value="PHEV" @if($variant_request->fuel_type == 'PHEV') selected @endif>PHEV</option>
                     <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option>
                     <option value="EV" @if($variant_request->fuel_type == 'EV') selected @endif>EV</option>
+                    <option value="PH" @if($variant_request->fuel_type == 'PH') selected @endif>PH</option>
                  </select>
                 </td>
                 <td>
@@ -822,6 +823,22 @@
     </div>
 @endif
 <hr>
+<div class="form-group">
+                <label>:</label><br>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="variantoption" id="updateexisting" value="updateexisting" required>
+                    <label class="form-check-label" for="updateexisting">
+                        Update the Existing Variant - <strong> {{$variant->name}} </strong>
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="variantoption" id="newcreation" value="newcreation" required>
+                    <label class="form-check-label" for="newcreation">
+                        Matrix Auto Comparing
+                    </label>
+                </div>
+     </div>
+     </br>
     <input type="hidden" name="inspection_id" value="{{ $inspection->id }}">
     <input type="hidden" id="buttonValue" name="buttonValue" value="">
     <div class="form-group">
@@ -1017,15 +1034,24 @@ function saveincidents() {
 <script>
   function setButtonValue(value) {
     document.getElementById('buttonValue').value = value;
-    if (value === 'approve') {
-        if (confirm('Are you sure you want to approve?')) {
-            document.getElementById('approveForm').submit();
-        }
+
+    // Get the selected variant option
+    const selectedVariantOption = document.querySelector('input[name="variantoption"]:checked').value;
+
+    let confirmMessage = '';
+
+    if (selectedVariantOption === 'updateexisting') {
+        confirmMessage = 'Are you sure you want to approve this inspection and update the existing variant? All options will be updated according to this inspection. Please note that any other vehicles associated with this variant will also be affected and updated accordingly';
+    } else if (value === 'approve') {
+        confirmMessage = 'Are you sure you want to approve?';
     } else if (value === 'reinspect') {
-        if (confirm('Are you sure you want to request reinspection?')) {
-            document.getElementById('approveForm').submit();
-        }
+        confirmMessage = 'Are you sure you want to request reinspection?';
     }
-}
+
+    // Show confirmation dialog with the appropriate message
+    if (confirm(confirmMessage)) {
+        document.getElementById('approveForm').submit();
+    }
+  }
 </script>
 @endpush

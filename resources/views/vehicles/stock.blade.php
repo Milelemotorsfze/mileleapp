@@ -1,9 +1,88 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+/* Ensure table rows do not wrap text */
+table.dataTable {
+    font-size: 12px; /* Decrease font size */
+    white-space: nowrap; /* Prevent text from wrapping into multiple lines */
+}
+/* Reduce padding for table cells */
+.table>tbody>tr>td, 
+.table>tbody>tr>th, 
+.table>tfoot>tr>td, 
+.table>tfoot>tr>th, 
+.table>thead>tr>td, 
+.table>thead>tr>th {
+    padding: 2px 3px; /* Decrease the padding */
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
+{
+   padding: 1px; 
+}
+/* Reduce the height of the rows */
+#dtBasicExample7 tbody tr {
+    height: 20px; /* Set a smaller height for the rows */
+}
+
+/* Adjust the header row to reduce space */
+#dtBasicExample7 thead th {
+    padding: 4px 5px; /* Reduce padding in the header */
+    font-size: 13px;  /* Slightly reduce the font size in the header */
+    white-space: nowrap; /* Prevent header text from wrapping */
+}
+.table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+    white-space: nowrap; /* Prevent text wrapping in table cells */
+}
+
+/* Ensure the table container takes the full height available */
+.table-responsive {
+    height: 80vh;
+    overflow-y: auto;
+}
    .btn-outline-primary {
     margin-bottom: 5px;
     width: 100%;
+}
+.select2-container--default .select2-search--inline .select2-search__field {
+    font-size: 12px !important; /* Adjust the font-size as per your needs */
+    width: 100% !important;
+}
+/* Ensure the Select2 dropdown fits the column width */
+table.dataTable thead th select {
+    width: 100% !important; /* Ensures the select element fits the header width */
+    min-width: 100%; /* Ensures it takes at least 100% width */
+}
+
+/* Ensure the Select2 dropdown fits the full header width when opened */
+.select2-container {
+    width: 100% !important; /* Ensures the container takes full width */
+}
+
+/* Ensure the dropdown itself is properly styled */
+.select2-dropdown {
+    width: auto !important; /* Let the dropdown size adjust dynamically */
+    min-width: 100%; /* Ensure the dropdown is at least the width of the select element */
+    box-sizing: border-box; /* Makes sure the padding is included in width */
+}
+
+/* Ensure proper spacing between dropdown options */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #007bff;
+    border: 1px solid #0056b3;
+    padding: 0 5px;
+    margin: 3px 5px 3px 0;
+    color: black;
+    font-size: 12px;
+}
+
+/* Highlight the selected items */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #007bff;
+    color: white;
 }
 .dataTables_processing {
     position: absolute;
@@ -77,10 +156,16 @@
       position: relative;
     }
     thead th {
-      position: sticky!important;
-      top: 0;
-      background-color: rgb(194, 196, 204)!important;
-      z-index: 1;
+        white-space: nowrap; /* Prevent text from wrapping into two lines */
+    text-overflow: ellipsis; /* Show ellipsis ("...") if the text overflows */
+    overflow: hidden; /* Hide overflowed text */
+    width: auto; /* Allow the header to take up available width */
+    padding: 8px; /* Adjust padding for better alignment */
+    vertical-align: middle; /* Vertically align the text in the middle */
+    background-color: rgb(194, 196, 204)!important; /* Ensure sticky header color */
+    position: sticky!important; /* Sticky header */
+    top: 0;
+    z-index: 1;
     }
     #table-responsive {
       height: 100vh;
@@ -216,10 +301,9 @@
     </div>
 @endif
   <div class="card-header">
-    <h4 class="card-title">
-     Stock Info
-    </h4>
-    <br>
+    <h6 class="card-title">
+     All vehicles
+    </h6>
     <!-- Chat Modal -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -245,7 +329,7 @@
     </div>
   </div>
 </div>
-    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="bookingForm" method="POST" action="{{ route('booking.savedirectly') }}">
@@ -253,6 +337,7 @@
                 <input type="hidden" name="vehicle_id" id="vehicle_id">
                 <div class="modal-header">
                     <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
+                    <button type="button" style="margin-left: 10px;" class="btn btn-danger" id="cancelBookingButton">Cancel Booking</button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -267,6 +352,7 @@
                     <div class="form-group">
                         <label for="user_id">Sales Person</label>
                         <select class="form-control" id="salesperson" name="salesperson" required>
+                        <option value="" disabled selected>Select the Sales Person</option>
                         @foreach($salesperson as $salesperson)
                                 <option value="{{ $salesperson->id }}">{{ $salesperson->name }}</option>
                             @endforeach
@@ -286,6 +372,64 @@
         </div>
     </div>
 </div>
+    <div class="modal fade" id="enhancementModal" tabindex="-1" role="dialog" aria-labelledby="enhancementModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="enhancementForm" method="POST" action="{{ route('enhancement.save') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_idenchacment">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="enhancementModalLabel">Enhancement Details - <span id="vehicleVin"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="booking_start_date">Update Variant</label>
+                        <select class="form-control" id="variantSelect" name="variant_id" required>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Enhancement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Structure -->
+<div class="modal fade" id="colorModal" tabindex="-1" role="dialog" aria-labelledby="colorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="colorModalLabel">Edit Colors - <span id="vehicleVincolor"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editColorForm" method="POST" action="{{ route('enhancement.savecolour') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_colour">
+                    <div class="form-group">
+                        <label for="int_color_dropdown">Interior Color</label>
+                        <select name = "int_color_dropdown" id="int_color_dropdown" class="form-control">
+                            <!-- Options will be populated by AJAX -->
+                        </select>
+                    </div>
+</br>
+                    <div class="form-group">
+                        <label for="ext_color_dropdown">Exterior Color</label>
+                        <select name = "ext_color_dropdown" id="ext_color_dropdown" class="form-control">
+                            <!-- Options will be populated by AJAX -->
+                        </select>
+                    </div>
+</br>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="custominspectionModal" tabindex="-1" role="dialog" aria-labelledby="custominspectionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -298,7 +442,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="booking_start_date">Custom Inspection Number</label>
+                        <label for="custom_inspection_number">Custom Inspection Number</label>
                         <input type="number" class="form-control" id="custom_inspection_number" name="custom_inspection_number" required>
                     </div>
                     <div class="form-group">
@@ -343,6 +487,30 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="remarksModal" tabindex="-1" role="dialog" aria-labelledby="remarksModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="remarksForm" method="POST" action="{{ route('vehicles.savesalesremarks') }}">
+                @csrf
+                <input type="hidden" name="vehicle_remarks_id" id="vehicle_remarks_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="remarksModalLabel">Sales Remarks</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="remarks">Remarks</label>
+                        <textarea class="form-control" id="salesremarks" name="salesremarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="noImageModal" tabindex="-1" role="dialog" aria-labelledby="noImageModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -358,54 +526,7 @@
       </div>
     </div>
   </div>
-</div>
-    <ul class="nav nav-pills nav-fill">
-      <!-- <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
-          <span class="badge badge-danger row-badge1 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection
-        <span class="badge badge-danger row-badge2 badge-notification"></span>
-        </a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab3">Incoming / Available Stock
-        <span class="badge badge-danger row-badge3 badge-notification"></span>
-        </a>
-      <!-- </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked
-        <span class="badge badge-danger row-badge4 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold
-        <span class="badge badge-danger row-badge5 badge-notification"></span>
-        </a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered
-        <span class="badge badge-danger row-badge6 badge-notification"></span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">All Vehicles
-          <span class="badge badge-danger row-badge7 badge-notification"></span>
-        </a>
-      </li>
-      @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-vehicles-only');
-      @endphp
-      @if ($hasPermission)
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Demand & Plaining Vehicles
-          <span class="badge badge-danger row-badge8 badge-notification"></span>
-        </a>
-      </li>
-      @endif
-    </ul>      
+</div>      
   </div>
   @php
     $hasPricePermission = Auth::user()->hasPermissionForSelectedRole('selling-price-stock-report-view');
@@ -416,343 +537,6 @@
     var hasPricePermission = @json($hasPricePermission);
     var hasManagementPermission = @json($hasManagementPermission);
 </script>
-  <div class="tab-content">
-      <!-- <div class="tab-pane fade show active" id="tab1"> 
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample1')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
-            <thead class="bg-soft-secondary">
-                <tr>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>Estimated Arrival</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>  
-        </div>  
-      </div>  
-      <div class="tab-pane fade show" id="tab2">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample2')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <div class="tab-pane fade show active" id="tab3">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
-            <tr id="toggleButtonsRow3">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-            <th>Status</th>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
-                  <th>Vehicle Cost</th>
-                     <th>GP</th>
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Aging</th>
-                  <th>GRN Report</th>
-                  <th>Reservation End</th>
-                  <th>Reservation Sales Person</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div> 
-      <!-- <div class="tab-pane fade show" id="tab4">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample4')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Reservation Start</th>
-                  <th>Reservation End</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <!-- <div class="tab-pane fade show" id="tab5">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample5')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-          <div class="table-responsive">
-            <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  <th>Min Price</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>  -->
-      <div class="tab-pane fade show" id="tab6">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
-            <tr id="toggleButtonsRow6">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-            <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
-                  <th>Vehicle Cost</th>
-                  <th>GP</th>
-                    <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>
-      <div class="tab-pane fade show" id="tab7">
         <div class="card-body">
         @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
@@ -762,48 +546,56 @@
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
-<div class="table-responsive" style="height: 74vh;">
+<div class="table-responsive" style="height: 80vh;">
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr id="toggleButtonsRow7">
-                <!-- Toggle buttons will be added here dynamically -->
             </tr>
             <tr>
-                  <th>Status</th>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
+            <th>Ser No</th>
+            <th>Status</th>
+            <th>PO</th>
+            <th>PO Date</th>
+            <th>Estimated Arrival</th>
+            <th>GRN</th>
+            <th>GRN Date</th>
+            <th>GRN Report</th>
+            <th>Aging</th>
+            <th>SO Date</th>
+            <th>SO Number</th>
+            <th>Sales Person</th>
+            <th>Sales Remarks</th>
+            <th>Reservation End</th>
+            <th>Reservation Sales Person</th>
+            <th>GDN</th>
+            <th>GDN Date</th>
+            <th>PDI Report</th>
+            <th>Brand</th>
+            <th>Model Line</th>
+            <th>Model Description</th>
+            <th>Variant</th>
+            <th>Variant Detail</th>
+            <th>VIN</th>
+            <th>Engine</th>
+            <th>MY</th>
+            <th>Steering</th>
+            <th>Fuel</th>
+            <th>Gear</th>
+            <th>Ext Colour</th>
+            <th>Int Colour</th>
+            <th>Upholstery</th>
+            <th>Production Year</th>
+            <th>Location</th>
+            <th>Territory</th>
+            <th>Preferred Destination</th>
+                  @if ($hasManagementPermission)
                   <th>Vehicle Cost</th>
-                  <th>GP</th>
+                @endif
+                  @if ($hasPricePermission)
+                  <th>Minimum Commission</th>
+                  <th>GP %</th>
                     <th>Price</th>
                 @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>PDI Report</th>
                   <th>Import Type</th>
                   <th>Owership</th>
                   <th>Document With</th>
@@ -817,73 +609,6 @@
             </table>
           </div> 
         </div>  
-      </div>
-      <div class="tab-pane fade show" id="tab8">
-        <div class="card-body">
-        @php
-      $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
-      @endphp
-      @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample8')">
-  <i class="bi bi-file-earmark-excel"></i> Export to Excel
-</button>
-@endif
-<div class="table-responsive" style="height: 74vh;">
-            <table id="dtBasicExample8" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
-            <thead class="bg-soft-secondary" style="position: sticky; top: 0; z-index: 1000;">
-            <tr id="toggleButtonsRow8">
-                <!-- Toggle buttons will be added here dynamically -->
-            </tr>
-            <tr>
-                  <th>Status</th>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant</th>
-                  <th>Variant Detail</th>
-                  <th>VIN</th>
-                  <th>Engine</th>
-                  <th>MY</th>
-                  <th>Steering</th>
-                  <th>Fuel</th>
-                  <th>Gear</th>
-                  <th>Ext Colour</th>
-                  <th>Int Colour</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Location</th>
-                  <th>Territory</th>
-                  <th>Preferred Destination</th>
-                  @if ($hasPricePermission)
-                  <th>Vehicle Cost</th>
-                  <th>GP</th>
-                  <th>Price</th>
-                @endif
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>GRN Report</th>
-                  <th>PDI Report</th>
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
-                  <th>Custom Inspection Number</th>
-                  <th>Custom Inspection Status</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div>
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -904,303 +629,77 @@
   </div>
   <script>
         $(document).ready(function () {
-//            var columns1 = [
-//               { data: 'brand_name', name: 'brands.brand_name' },
-//                 { data: 'model_line', name: 'master_model_lines.model_line' },
-//                 { data: 'model_detail', name: 'varaints.model_detail' },
-//                 { 
-//                 data: 'variant', 
-//                 name: 'varaints.name',
-//                 render: function(data, type, row) {
-//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-//                 }
-//             },
-//             {
-//                     data: 'variant_detail', // Updated to use the alias
-//                     name: 'varaints.detail',
-//                     render: function(data, type, row) {
-//                         if (!data) {
-//                             return ''; // Return an empty string if data is undefined or null
-//                         }
-                        
-//                         var words = data.split(' ');
-//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-//                         var fullText = data;
-
-//                         return `
-//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-//                                 ${firstFiveWords}
-//                             </div>
-//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-//                         `;
-//                     }
-//                 },
-//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-//         }},        
-//         { data: 'engine', name: 'vehicles.engine' },
-//                 { data: 'my', name: 'varaints.my' },
-//                 { data: 'steering', name: 'varaints.steering' },
-//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
-//                 { data: 'gearbox', name: 'varaints.gearbox' },
-//                 { data: 'exterior_color', name: 'ex_color.name' },
-//                 { data: 'interior_color', name: 'int_color.name' },
-//                 { data: 'upholestry', name: 'varaints.upholestry' },
-//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-//                 { data: 'location', name: 'warehouse.name' },
-//                 { data: 'territory', name: 'vehicles.territory' },
-//                 { data: 'fd', name: 'countries.name' },
-//             ];
-//         if (hasPricePermission) {
-//                     columns1.push({
-//                     data: 'price', 
-//                     name: 'vehicles.price', 
-//                     render: function(data, type, row) {
-//                         if (data) {
-//                             // Convert the string to a float, then format it with commas
-//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-//                                 minimumFractionDigits: 0,
-//                                 maximumFractionDigits: 0
-//                             });
-
-//                             // Return the price wrapped in a span with button-like styling
-//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-//                         }
-//                         return ''; // Return an empty string if there's no price
-//                     }
-// });
-//             }
-//             columns1.push(
-//                 { data: 'po_number', name: 'purchasing_order.po_number' },
-//                 { data: 'po_date', name: 'purchasing_order.po_date' },
-//                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
-//                 { data: 'so_number', name: 'so.so_number' },
-//                 { data: 'so_date', name: 'so.so_date' },
-//                 { data: 'name', name: 'users.name' },
-//                 {
-//                 data: null,
-//                 name: 'chat',
-//                 render: function(data, type, row) {
-//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-//                 },
-//                 orderable: false,
-//                 searchable: false
-//             },
-//             );
-//             var table1 = $('#dtBasicExample1').DataTable({
-//             processing: true,
-//             serverSide: true,
-//             columns: columns1,
-//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
-//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-//             buttons: [
-//         'excelHtml5' // Add the export to Excel button
-//     ]
-//         });
-//         table1.on('draw', function () {
-//             var rowCount = table1.page.info().recordsDisplay;
-//             if (rowCount > 0) {
-//                 $('.row-badge1').text(rowCount).show();
-//             } else {
-//                 $('.row-badge1').hide();
-//             }
-//         });
-//         var table2 = $('#dtBasicExample2').DataTable({
-//           processing: true,
-//             serverSide: true,
-//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
-//             columns: [
-//               { data: 'brand_name', name: 'brands.brand_name' },
-//                 { data: 'model_line', name: 'master_model_lines.model_line' },
-//                 { data: 'model_detail', name: 'varaints.model_detail' },
-//                 { 
-//                 data: 'variant', 
-//                 name: 'varaints.name',
-//                 render: function(data, type, row) {
-//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-//                 }
-//             },
-//             {
-//                     data: 'variant_detail', // Updated to use the alias
-//                     name: 'varaints.detail',
-//                     render: function(data, type, row) {
-//                         if (!data) {
-//                             return ''; // Return an empty string if data is undefined or null
-//                         }
-                        
-//                         var words = data.split(' ');
-//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-//                         var fullText = data;
-
-//                         return `
-//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-//                                 ${firstFiveWords}
-//                             </div>
-//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-//                         `;
-//                     }
-//                 },
-//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-//         }},
-//                 { data: 'engine', name: 'vehicles.engine' },
-//                 { data: 'my', name: 'varaints.my' },
-//                 { data: 'steering', name: 'varaints.steering' },
-//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
-//                 { data: 'gearbox', name: 'varaints.gearbox' },
-//                 { data: 'exterior_color', name: 'ex_color.name' },
-//                 { data: 'interior_color', name: 'int_color.name' },
-//                 { data: 'upholestry', name: 'varaints.upholestry' },
-//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-//                 { data: 'location', name: 'warehouse.name' },
-//                 { data: 'territory', name: 'vehicles.territory' },
-//                 { data: 'fd', name: 'countries.name' },
-//                 {
-//                     data: 'price', 
-//                     name: 'vehicles.price', 
-//                     render: function(data, type, row) {
-//                         if (data) {
-//                             // Convert the string to a float, then format it with commas
-//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-//                                 minimumFractionDigits: 0,
-//                                 maximumFractionDigits: 0
-//                             });
-
-//                             // Return the price wrapped in a span with button-like styling
-//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-//                         }
-//                         return ''; // Return an empty string if there's no price
-//                     }
-//                 },
-//               { data: 'po_number', name: 'purchasing_order.po_number' },
-//               { data: 'po_date', name: 'purchasing_order.po_date' },
-//                 { data: 'grn_number', name: 'grn.grn_number' },
-//                 { data: 'date', name: 'grn.date' },
-//                 { data: 'so_number', name: 'so.so_number' },
-//                 { data: 'so_date', name: 'so.so_date' },
-//                 { data: 'name', name: 'users.name' },
-//                 {
-//                 data: null,
-//                 name: 'chat',
-//                 render: function(data, type, row) {
-//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-//                 },
-//                 orderable: false,
-//                 searchable: false
-//             },
-//             ],
-//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-//         });
-//         table2.on('draw', function () {
-//             var rowCount = table2.page.info().recordsDisplay;
-//             if (rowCount > 0) {
-//                 $('.row-badge2').text(rowCount).show();
-//             } else {
-//                 $('.row-badge2').hide();
-//             }
-//         });
-    var columns3 = [
-        { data: 'id', name: 'vehicles.id' },
-        { data: 'brand_name', name: 'brands.brand_name' },
-        { data: 'model_line', name: 'master_model_lines.model_line' },
-        { data: 'model_detail', name: 'varaints.model_detail' },
-        { 
-            data: 'variant', 
-            name: 'varaints.name',
-            render: function(data, type, row) {
-                return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-            }
+        var now = new Date();
+        var columns7 = [
+            {
+        data: null,
+        name: 'serial_number',
+        render: function (data, type, row, meta) {
+            return meta.row + 1;  // This will calculate the serial number based on the row index (meta.row) + 1
         },
-        {
-            data: 'variant_detail',
-            name: 'varaints.detail',
+        orderable: false,  // Disable ordering for this column
+        searchable: false  // Disable searching for this column
+    },
+              { data: 'id', name: 'vehicles.id' },
+              { data: 'po_number', name: 'purchasing_order.po_number' },
+                {
+    data: 'po_date',
+    name: 'purchasing_order.po_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+{
+    data: 'estimation_date',
+    name: 'vehicles.estimation_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+                { data: 'grn_number', name: 'grn.grn_number' },
+                {
+    data: 'date',
+    name: 'grn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+{ 
+            data: 'id', 
+            name: 'id',
             render: function(data, type, row) {
-                if (!data) {
-                    return '';
+                if (row.grn_inspectionid) {
+                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+                } else {
+                    return 'Not Available';
                 }
-                var words = data.split(' ');
-                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                var fullText = data;
-
-                return `
-                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${firstFiveWords}
-                    </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                `;
             }
         },
-        {
-    data: 'vin',
-    name: 'vehicles.vin',
-    render: function(data, type, row) {
-        if (data) {
-            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '/GRN?csf=1&web=1&e=GPkael';
-            return '<a href="' + url + '" target="_blank">' + data + '</a>';
-        } else {
-            return data;
-        }
-    }
-},
-        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-        { data: 'my', name: 'varaints.my' },
-        { data: 'steering', name: 'varaints.steering' },
-        { data: 'fuel_type', name: 'varaints.fuel_type' },
-        { data: 'gearbox', name: 'varaints.gearbox' },
-        { data: 'exterior_color', name: 'ex_color.name' },
-        { data: 'interior_color', name: 'int_color.name' },
-        { data: 'upholestry', name: 'varaints.upholestry' },
-        { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-        { data: 'location', name: 'warehouse.name' },
-        { data: 'territory', name: 'vehicles.territory' },
-        { data: 'fd', name: 'countries.name' },
-    ];
-    if (hasPricePermission) {
-        columns3.push(
-            {
-    data: 'costprice',
-    name: 'costprice',
-    searchable: false,
-    render: function(data, type, row) {
-        if (data) {
-            if (row.netsuite_link && hasManagementPermission) {
-                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
-            } else {
-                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
-            }
-        }
-        return ''; // Return an empty string if there's no price
-    }
-},
-            { data: 'gp', name: 'vehicles.gp' },
-            {
-            data: 'price', 
-            name: 'vehicles.price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-        });
-    }
-    columns3.push(
-        { data: 'po_number', name: 'purchasing_order.po_number' },
-        { data: 'po_date', name: 'purchasing_order.po_date' },
-        { data: 'grn_number', name: 'grn.grn_number' },
-        { data: 'date', name: 'grn.date' },
-        { data: 'inspection_date', name: 'inspection_date' },
-        { data: 'grn_remark', name: 'vehicles.grn_remark' },
-        { 
+{ 
             data: null,
             render: function(data, type, row) {
                 var grnDate = new Date(row.date); // Assuming `row.date` is the GRN date
@@ -1213,509 +712,66 @@
             searchable: false, // Disable searching for this column
             orderable: false // Disable ordering from the server-side for this column
         },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        { data: 'reservation_end_date', name: 'vehicles.reservation_end_date' },
-        { data: 'bpn', name: 'bp.name' },
-        { data: 'so_date', name: 'so.so_date' },
-        { data: 'so_number', name: 'so.so_number' },
-        { data: 'spn', name: 'sp.name' },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.pdi_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
-        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
-        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-        {
-    data: null,
-    name: 'chat',
-    render: function(data, type, row) {
-        const messageCount = row.message_count || 0; // message_count is now available
-        const badgeHtml = messageCount > 0 ? `
-            <span style="
-                position: absolute;
-                top: -10px;
-                right: -10px;
-                background-color: #cb3365;
-                color: #fff;
-                padding: 0.25em 0.5em;
-                font-size: 75%;
-                border-radius: 0.25rem;
-                transform: translate(50%, -50%);
-            ">
-                ${messageCount}
-            </span>` : '';
-        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
-
-        return `
-            <div style="position: relative; display: inline-block;">
-                ${badgeHtml}
-                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
-                    Comments
-                </button>
-            </div>
-        `;
-    },
-    orderable: false,
-    searchable: false
-},
-        );
-            var table3 = $('#dtBasicExample3').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: {
-        url: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
-        type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    },
-    columns: columns3,
-    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    pageLength: -1,
-    columnDefs: [
-        {
-            targets: 0,
-            render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
-                    return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
-                    return 'Pending Inspection';
-                } else if (row.inspection_date != null && row.so_id == null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
-                    return 'Available Stock';
-                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
-                    return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
-                    return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
-                    return 'Delivered';
-                } else {
-                    return '';
-                }
-            }
-        }
-    ],
-    colReorder: true
-    });
-// Create the Hide All and Unhide All buttons
-var hideAllButton = $('<button>')
-        .text('Hide All')
-        .addClass('btn btn-sm btn-danger')
-        .on('click', function () {
-            table3.columns().every(function () {
-                this.visible(false); // Hide all columns
-            });
-            $('#toggleButtonsRow3').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
-        });
-
-    var unhideAllButton = $('<button>')
-        .text('Unhide All')
-        .addClass('btn btn-sm btn-success')
-        .on('click', function () {
-            table3.columns().every(function () {
-                this.visible(true); // Unhide all columns
-            });
-            $('#toggleButtonsRow3').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
-        });
-
-    // Add the buttons above the table
-    $('#dtBasicExample3_wrapper').prepend(
-        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
-    );
-
-    // Create toggle buttons for each column
-    table3.columns().every(function (index) {
-        var column = this;
-        var columnTitle = $(column.header()).text();
-
-        // Create a button element
-        var toggleButton = $('<button>')
-            .text(columnTitle)
-            .addClass('btn btn-sm btn-outline-primary')
-            .on('click', function () {
-                column.visible(!column.visible()); // Toggle column visibility
-                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
-            });
-
-        // Add the button above the column header
-        $('#toggleButtonsRow3').append($('<th>').append(toggleButton));
-    });
-table3.on('draw', function () {
-    var rowCount = table3.page.info().recordsDisplay;
-    if (rowCount > 0) {
-        $('.row-badge3').text(rowCount).show();
-    } else {
-        $('.row-badge3').hide();
-    }
-});
-$('#dtBasicExample3').on('processing.dt', function(e, settings, processing) {
-    if (processing) {
-        // Optionally, customize the indicator here, or just use the default one
-        $('#dtBasicExample3_processing').show();
-    } else {
-        $('#dtBasicExample3_processing').hide();
-    }
-});
-$('#dtBasicExample3 tbody').on('click', 'tr', function () {
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
-    @endphp
-    @if ($hasPermission)
-        var data = table3.row(this).data();
-        openBookingModal(data.id);
-    @endif
-    @if ($hascustominspectionPermission)
-        var datainspection = table3.row(this).data();
-        opencustominspectionModal(datainspection.id);
-    @endif
-});
-//         var table4 = $('#dtBasicExample4').DataTable({
-//           processing: true,
-//             serverSide: true,
-//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
-//             columns: [
-//               { data: 'brand_name', name: 'brands.brand_name' },
-//                 { data: 'model_line', name: 'master_model_lines.model_line' },
-//                 { data: 'model_detail', name: 'varaints.model_detail' },
-//                 { 
-//                 data: 'variant', 
-//                 name: 'varaints.name',
-//                 render: function(data, type, row) {
-//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-//                     }
-//                 },
-//                 {
-//                     data: 'variant_detail', // Updated to use the alias
-//                     name: 'varaints.detail',
-//                     render: function(data, type, row) {
-//                         if (!data) {
-//                             return ''; // Return an empty string if data is undefined or null
-//                         }
-                        
-//                         var words = data.split(' ');
-//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-//                         var fullText = data;
-
-//                         return `
-//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-//                                 ${firstFiveWords}
-//                             </div>
-//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-//                         `;
-//                     }
-//                 },
-//                 { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-//         }},
-//                 { data: 'engine', name: 'vehicles.engine' },
-//                 { data: 'my', name: 'varaints.my' },
-//                 { data: 'steering', name: 'varaints.steering' },
-//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
-//                 { data: 'gearbox', name: 'varaints.gearbox' },
-//                 { data: 'exterior_color', name: 'ex_color.name' },
-//                 { data: 'interior_color', name: 'int_color.name' },
-//                 { data: 'upholestry', name: 'varaints.upholestry' },
-//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-//                 { data: 'location', name: 'warehouse.name' },
-//                 { data: 'territory', name: 'vehicles.territory' },
-//                 { data: 'fd', name: 'countries.name' },
-//                 {
-//                     data: 'price', 
-//                     name: 'vehicles.price',  
-//                     render: function(data, type, row) {
-//                         if (data) {
-//                             // Convert the string to a float, then format it with commas
-//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-//                                 minimumFractionDigits: 0,
-//                                 maximumFractionDigits: 0
-//                             });
-
-//                             // Return the price wrapped in a span with button-like styling
-//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-//                         }
-//                         return ''; // Return an empty string if there's no price
-//                     }
-//                 },
-//                 { data: 'po_number', name: 'purchasing_order.po_number' },
-//                 { data: 'po_date', name: 'purchasing_order.po_date' },
-//                 { data: 'grn_number', name: 'grn.grn_number' },
-//                 { data: 'date', name: 'grn.date' },
-//                 { data: 'inspection_date', name: 'inspection_date' },
-//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
-//                 { data: 'reservation_start_date', name: 'reservation_start_date' },
-//                 { data: 'reservation_end_date', name: 'reservation_end_date' },
-//                 { data: 'name', name: 'users.name' },
-//                 {
-//                 data: null,
-//                 name: 'chat',
-//                 render: function(data, type, row) {
-//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-//                 },
-//                 orderable: false,
-//                 searchable: false
-//             },
-//             ],
-//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-//         });
-//         table4.on('draw', function () {
-//             var rowCount = table4.page.info().recordsDisplay;
-//             if (rowCount > 0) {
-//                 $('.row-badge4').text(rowCount).show();
-//             } else {
-//                 $('.row-badge4').hide();
-//             }
-//         });
-//         $('#dtBasicExample4 tbody').on('click', 'tr', function () {
-//     @php
-//     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
-//     @endphp
-//     @if ($hasPermission)
-//         var data = table4.row(this).data();
-//         openBookingModal(data.id);
-//     @endif
-// });
-//         var table5 = $('#dtBasicExample5').DataTable({
-//           processing: true,
-//             serverSide: true,
-//             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
-//             columns: [
-//               { data: 'brand_name', name: 'brands.brand_name' },
-//                 { data: 'model_line', name: 'master_model_lines.model_line' },
-//                 { data: 'model_detail', name: 'varaints.model_detail' },
-//                 { 
-//                 data: 'variant', 
-//                 name: 'varaints.name',
-//                 render: function(data, type, row) {
-//                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-//                 }
-//             },
-//             {
-//                     data: 'variant_detail', // Updated to use the alias
-//                     name: 'varaints.detail',
-//                     render: function(data, type, row) {
-//                         if (!data) {
-//                             return ''; // Return an empty string if data is undefined or null
-//                         }
-                        
-//                         var words = data.split(' ');
-//                         var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-//                         var fullText = data;
-
-//                         return `
-//                             <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-//                                 ${firstFiveWords}
-//                             </div>
-//                             <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-//                         `;
-//                     }
-//                 },
-//             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
-//             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-//         }},
-//                 { data: 'engine', name: 'vehicles.engine' },
-//                 { data: 'my', name: 'varaints.my' },
-//                 { data: 'steering', name: 'varaints.steering' },
-//                 { data: 'fuel_type', name: 'varaints.fuel_type' },
-//                 { data: 'gearbox', name: 'varaints.gearbox' },
-//                 { data: 'exterior_color', name: 'ex_color.name' },
-//                 { data: 'interior_color', name: 'int_color.name' },
-//                 { data: 'upholestry', name: 'varaints.upholestry' },
-//                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-//                 { data: 'location', name: 'warehouse.name' },
-//                 { data: 'territory', name: 'vehicles.territory' },
-//                 { data: 'fd', name: 'countries.name' },
-//                 {
-//                     data: 'price', 
-//                     name: 'vehicles.price', 
-//                     render: function(data, type, row) {
-//                         if (data) {
-//                             // Convert the string to a float, then format it with commas
-//                             var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-//                                 minimumFractionDigits: 0,
-//                                 maximumFractionDigits: 0
-//                             });
-
-//                             // Return the price wrapped in a span with button-like styling
-//                             return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-//                         }
-//                         return ''; // Return an empty string if there's no price
-//                     }
-//                 },
-//                 { data: 'po_number', name: 'purchasing_order.po_number' },
-//                 { data: 'po_date', name: 'purchasing_order.po_date' },
-//                 { data: 'grn_number', name: 'grn.grn_number' },
-//                 { data: 'date', name: 'grn.date' },
-//                 { data: 'inspection_date', name: 'inspection_date' },
-//                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
-//                 { data: 'so_date', name: 'so.so_date' },
-//                 { data: 'so_number', name: 'so.so_number' },
-//                 { data: 'name', name: 'users.name' },
-//                 {
-//                 data: null,
-//                 name: 'chat',
-//                 render: function(data, type, row) {
-//                     return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-//                 },
-//                 orderable: false,
-//                 searchable: false
-//             },
-//             ],
-//             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-//         });
-//         table5.on('draw', function () {
-//             var rowCount = table5.page.info().recordsDisplay;
-//             if (rowCount > 0) {
-//                 $('.row-badge5').text(rowCount).show();
-//             } else {
-//                 $('.row-badge5').hide();
-//             }
-//         });
-var columns6 = [
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-            data: 'variant_detail',
-            name: 'varaints.detail',
-            render: function(data, type, row) {
-                if (!data) {
-                    return '';
-                }
-                
-                var words = data.split(' ');
-                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                var fullText = data;
-
-                return `
-                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${firstFiveWords}
-                    </div>
-                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                `;
-            }
-        },
-        {
-    data: 'vin',
-    name: 'vehicles.vin',
+{
+    data: 'so_date',
+    name: 'so.so_date',
     render: function(data, type, row) {
         if (data) {
-            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
-            return '<a href="' + url + '" target="_blank">' + data + '</a>';
-        } else {
-            return data;
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
         }
+        return ''; // If no date, return empty
     }
 },
-        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-            ];
-                if (hasPricePermission) {
-                    columns6.push(
-                        {
-    data: 'costprice',
-    name: 'costprice',
-    searchable: false,
-    render: function(data, type, row) {
-        if (data) {
-            if (row.netsuite_link && hasManagementPermission) {
-                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
-            } else {
-                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
-            }
-        }
-        return ''; // Return an empty string if there's no price
-    }
-},
-                    { data: 'gp', name: 'vehicles.gp' },
-                    {
-                    data: 'price', 
-                    name: 'vehicles.price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-                });
-            }
-                columns6.push(
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
+                { data: 'spn', name: 'sp.name' },
                 { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
+        data: 'sales_remarks', 
+        name: 'vehicles.sales_remarks',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+                {
+    data: 'reservation_end_date',
+    name: 'vehicles.reservation_end_date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
+        { data: 'bpn', name: 'bp.name' },
+                { data: 'gdn_number', name: 'gdn.gdn_number' },
+                {
+    data: 'gdndate',
+    name: 'gdn.date',
+    render: function(data, type, row) {
+        if (data) {
+            // Assuming data is in Y-m-d format (default SQL date format)
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            return formattedDate;
+        }
+        return ''; // If no date, return empty
+    }
+},
         { 
             data: 'id', 
             name: 'id',
             render: function(data, type, row) {
-                console.log(row);
                 if (row.pdi_inspectionid) {
                     return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
                 } else {
@@ -1723,104 +779,6 @@ var columns6 = [
                 }
             }
         },
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
-        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
-        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-            {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
-        );
-        var table6 = $('#dtBasicExample6').DataTable({
-          processing: true,
-            serverSide: true,
-            columns: columns6,
-            ajax: {
-        url: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
-        type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            pageLength: -1,
-            colReorder: true
-    });
-// Create the Hide All and Unhide All buttons
-var hideAllButton = $('<button>')
-        .text('Hide All')
-        .addClass('btn btn-sm btn-danger')
-        .on('click', function () {
-            table6.columns().every(function () {
-                this.visible(false); // Hide all columns
-            });
-            $('#toggleButtonsRow6').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
-        });
-
-    var unhideAllButton = $('<button>')
-        .text('Unhide All')
-        .addClass('btn btn-sm btn-success')
-        .on('click', function () {
-            table6.columns().every(function () {
-                this.visible(true); // Unhide all columns
-            });
-            $('#toggleButtonsRow6').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
-        });
-
-    // Add the buttons above the table
-    $('#dtBasicExample6_wrapper').prepend(
-        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
-    );
-
-    // Create toggle buttons for each column
-    table6.columns().every(function (index) {
-        var column = this;
-        var columnTitle = $(column.header()).text();
-
-        // Create a button element
-        var toggleButton = $('<button>')
-            .text(columnTitle)
-            .addClass('btn btn-sm btn-outline-primary')
-            .on('click', function () {
-                column.visible(!column.visible()); // Toggle column visibility
-                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
-            });
-
-        // Add the button above the column header
-        $('#toggleButtonsRow6').append($('<th>').append(toggleButton));
-    });
-        table6.on('draw', function () {
-            var rowCount = table6.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge6').text(rowCount).show();
-            } else {
-                $('.row-badge6').hide();
-            }
-        });
-        $('#dtBasicExample6 tbody').on('click', 'tr', function () {
-    @php
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
-    @endphp
-    @if ($hascustominspectionPermission)
-        var datainspection = table6.row(this).data();
-        opencustominspectionModal(datainspection.id);
-    @endif
-});
-        var now = new Date();
-        
-        var columns7 = [
-              { data: 'id', name: 'vehicles.id' },
               { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -1868,15 +826,42 @@ var hideAllButton = $('<button>')
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
+                { 
+        data: 'exterior_color', 
+        name: 'ex_color.name',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+    { 
+        data: 'interior_color', 
+        name: 'int_color.name',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
                 { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+                {
+    data: 'ppmmyyy',
+    name: 'vehicles.ppmmyyy',
+    render: function(data, type, row) {
+        if (data) {
+            var dateObj = new Date(data);
+            var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                year: 'numeric',
+                month: 'long'
+            });
+            return formattedDate;  // Example: "January 2024"
+        }
+        return ''; // If no date, return empty
+    }
+},
                 { data: 'location', name: 'warehouse.name' },
                 { data: 'territory', name: 'vehicles.territory' },
                 { data: 'fd', name: 'countries.name' },
     ];
                 if (hasPricePermission) {
+                    if (hasManagementPermission) {
                     columns7.push(
                         {
     data: 'costprice',
@@ -1892,8 +877,28 @@ var hideAllButton = $('<button>')
         }
         return ''; // Return an empty string if there's no price
     }
-},
+});
+    }
+
+    columns7.push(
                     { data: 'gp', name: 'vehicles.gp' },
+                    {
+            data: 'minimum_commission', 
+            name: 'vehicles.minimum_commission', 
+                    render: function(data, type, row) {
+                        if (data) {
+                            // Convert the string to a float, then format it with commas
+                            var formattedminimum_commission = parseFloat(data).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0
+                            });
+
+                            // Return the price wrapped in a span with button-like styling
+                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedminimum_commission + '</span>';
+                        }
+                        return ''; // Return an empty string if there's no price
+                    }
+        },
                     {
                     data: 'price', 
                     name: 'vehicles.price', 
@@ -1913,52 +918,56 @@ var hideAllButton = $('<button>')
         });
     }
                 columns7.push(
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' }, 
-                { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.pdi_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
                 { data: 'import_type', name: 'documents.import_type' },
         { data: 'owership', name: 'documents.owership' },
         { data: 'document_with', name: 'documents.document_with' },
-        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
-        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            },
+        { 
+        data: 'custom_inspection_number', 
+        name: 'vehicles.custom_inspection_number',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+    { 
+        data: 'custom_inspection_status', 
+        name: 'vehicles.custom_inspection_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
+        {
+    data: null,
+    name: 'chat',
+    render: function(data, type, row) {
+        const messageCount = row.message_count || 0; // message_count is now available
+        const badgeHtml = messageCount > 0 ? `
+            <span style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: #cb3365;
+                color: #fff;
+                padding: 0.25em 0.5em;
+                font-size: 75%;
+                border-radius: 0.25rem;
+                transform: translate(50%, -50%);
+            ">
+                ${messageCount}
+            </span>` : '';
+        const buttonClass = messageCount > 0 ? 'btn-warning' : 'btn-primary';
+
+        return `
+            <div style="position: relative; display: inline-block;">
+                ${badgeHtml}
+                <button class="btn ${buttonClass} btn-sm" onclick="openChatModal(${row.id})">
+                    Comments
+                </button>
+            </div>
+        `;
+    },
+    orderable: false,
+    searchable: false
+},
 );
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
@@ -1976,9 +985,10 @@ var hideAllButton = $('<button>')
         }
     },
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: -1,
             columnDefs: [
         {
-            targets: 0,
+            targets: 1,
             render: function (data, type, row) {
                 if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
                     return 'Incoming';
@@ -1999,7 +1009,89 @@ var hideAllButton = $('<button>')
         }
     ],
     pageLength: -1,
-            colReorder: true
+            colReorder: true,
+            initComplete: function () {
+    var api = this.api();
+    // For each column in the table, create a dropdown filter
+    api.columns().every(function (index) {
+        var column = this;
+        var columnHeader = $(column.header()).text();  // Get the column header text
+        var headerWidth = $(column.header()).outerWidth(); // Get the actual width of the header
+        // List of column headers you want to exclude from filtering
+        var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'GRN Report', 'Aging', 'Vehicle Cost'];
+        // Skip columns where you don't want filters (either by header name or index)
+        if (excludeFilters.includes(columnHeader)) {
+            return; // Skip this column
+        }
+        // Create a select element
+        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+            .appendTo($(column.header()).empty())  // Append to the header cell
+            .on('change', function () {
+                // Get the selected values
+                var selectedValues = $(this).val();
+                
+                if (selectedValues && selectedValues.length > 0) {
+                    // Join selected values as a string that looks for exact matches
+                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
+                    column
+                        .search(exactSearch, true, false)  // Exact match using regex search
+                        .draw();
+                } else {
+                    column
+                        .search('', true, false)  // Clear search if no values selected
+                        .draw();
+                }
+            });
+
+        // Populate the select element with unique values from the column
+        column.data().unique().sort().each(function (d, j) {
+            if (d) {
+                // If this is the 'po_date' column, format the date
+                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'GDN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        day: '2-digit', month: 'short', year: 'numeric'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                } 
+                else if (columnHeader === 'Production Year') { 
+                    var dateObj = new Date(d);
+                    var formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        year: 'numeric',
+                        month: 'long'
+                    });
+                    select.append('<option value="' + d + '">' + formattedDate + '</option>');
+                }
+                else if (columnHeader === 'Price') {
+                    var formattedPrice = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedPrice + '</option>');
+                }
+                else if (columnHeader === 'Minimum Commission') {
+                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
+                }
+                else {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                }
+            }
+        });
+        select.select2({
+            placeholder: columnHeader, // Placeholder for the column
+            allowClear: true,  // Option to clear selections
+            dropdownAutoWidth: true,  // Dynamically adjust dropdown width based on content
+            width: headerWidth + 'px'  // Set the width of the select2 dropdown equal to the header width
+        });
+
+        // Also, set the width of the <select> element to match the header
+        select.css('width', headerWidth + 'px');
+    });
+}
     });
 // Create the Hide All and Unhide All buttons
 var hideAllButton = $('<button>')
@@ -2052,252 +1144,53 @@ var hideAllButton = $('<button>')
                 $('.row-badge7').hide();
             }
         });
-        $('#dtBasicExample7 tbody').on('click', 'tr', function () {
+        $('#dtBasicExample7 tbody').off('click', 'tr');
+// Add specific click event listeners for relevant columns
+$('#dtBasicExample7 tbody').on('click', 'td', function () {
+    var table7 = $('#dtBasicExample7').DataTable();
+    var cellIndex = table7.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table7.column(cellIndex).header().innerText; // Get the header text of the clicked column
+
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader.includes('Custom Inspection Number') || columnHeader.includes('Custom Inspection Status')) {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table7.row(this).data();
+            opencustominspectionModal(datainspection.id);
+        @endif
+    }
+    else if (columnHeader.includes('Sales Remarks')) {
     @php
-    $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-custom-inspection');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
     @endphp
-    @if ($hascustominspectionPermission)
-        var datainspection = table7.row(this).data();
-        opencustominspectionModal(datainspection.id);
+    @if ($hasPermission)
+        var data = table7.row(this).data();
+        openremarksModal(data.id);
     @endif
+    }
+else if(columnHeader.includes('Reservation End'))
+{
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
+    @endphp
+    @if ($hasPermission)
+        var data = table7.row(this).data();
+        openBookingModal(data.id);
+    @endif
+}
+else if(columnHeader === 'Variant Detail')
+{
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('adding-enhancement');
+    @endphp
+    @if ($hasPermission)
+        var data = table7.row(this).data();
+        openenhancementModal(data.id);
+    @endif
+}
 });
-        var columns9 = [
-              { data: 'id', name: 'vehicles.id' },
-              { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { 
-                data: 'variant', 
-                name: 'varaints.name',
-                render: function(data, type, row) {
-                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
-            {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
-                {
-    data: 'vin',
-    name: 'vehicles.vin',
-    render: function(data, type, row) {
-        if (data) {
-            var url = 'https://milelemotors.sharepoint.com/:f:/r/sites/source/DMS/Warehouse%20%26%20Operations/VEHICLE%20PICTURES/' + data + '?csf=1&web=1&e=GPkael';
-            return '<a href="' + url + '" target="_blank">' + data + '</a>';
-        } else {
-            return data;
-        }
-    }
-},
-        { data: 'engine', name: 'vehicles.engine', render: function(data, type, row) {
-            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'territory', name: 'vehicles.territory' },
-                { data: 'fd', name: 'countries.name' },
-            ];
-
-if (hasPricePermission) {
-    columns9.push(
-        {
-    data: 'costprice',
-    name: 'costprice',
-    searchable: false,
-    render: function(data, type, row) {
-        if (data) {
-            if (row.netsuite_link && hasManagementPermission) {
-                return `<a href="${row.netsuite_link}" target="_blank" style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</a>`;
-            } else {
-                return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
-            }
-        }
-        return ''; // Return an empty string if there's no price
-    }
-},
-        { data: 'gp', name: 'vehicles.gp' },
-        {
-                    data: 'price', 
-                    name: 'vehicles.price', 
-                    render: function(data, type, row) {
-                        if (data) {
-                            // Convert the string to a float, then format it with commas
-                            var formattedPrice = parseFloat(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-
-                            // Return the price wrapped in a span with button-like styling
-                            return '<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">' + formattedPrice + '</span>';
-                        }
-                        return ''; // Return an empty string if there's no price
-                    }
-        });
-    }
-                columns9.push(
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
-                { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                if (row.grn_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-        { 
-            data: 'id', 
-            name: 'id',
-            render: function(data, type, row) {
-                console.log(row);
-                if (row.pdi_inspectionid) {
-                    return `<button class="btn btn-info" onclick="generatePDFpdi(${data})">Generate PDF</button>`;
-                } else {
-                    return 'Not Available';
-                }
-            }
-        },
-                { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
-        { data: 'custom_inspection_number', name: 'vehicles.custom_inspection_number' },
-        { data: 'custom_inspection_status', name: 'vehicles.custom_inspection_status' },
-                {
-                data: null,
-                name: 'chat',
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm" onclick="openChatModal(' + row.id + ')">Comments</button>';
-                },
-                orderable: false,
-                searchable: false
-            }, 
-        );
-            
-    var table8 = $('#dtBasicExample8').DataTable({
-          processing: true,
-            serverSide: true,
-            columns: columns9,
-            ajax: {
-        url: "{{ route('vehicles.statuswise', ['status' => 'dpvehicles']) }}",
-        type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    },
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            columnDefs: [
-        {
-            targets: 0,
-            render: function (data, type, row) {
-                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
-                    return 'Incoming';
-                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
-                    return 'Pending Inspection';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
-                    return 'Available Stock';
-                  } else if (row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) >= now ) {
-                    return 'Booked';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
-                    return 'Sold';
-                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
-                    return 'Delivered';
-                } else {
-                    return '';
-                }
-            }
-        }
-    ],
-    pageLength: -1,
-    colReorder: true
-    });
-// Create the Hide All and Unhide All buttons
-var hideAllButton = $('<button>')
-        .text('Hide All')
-        .addClass('btn btn-sm btn-danger')
-        .on('click', function () {
-            table8.columns().every(function () {
-                this.visible(false); // Hide all columns
-            });
-            $('#toggleButtonsRow8').find('button').addClass('btn-primary').removeClass('btn-outline-primary');
-        });
-
-    var unhideAllButton = $('<button>')
-        .text('Unhide All')
-        .addClass('btn btn-sm btn-success')
-        .on('click', function () {
-            table8.columns().every(function () {
-                this.visible(true); // Unhide all columns
-            });
-            $('#toggleButtonsRow8').find('button').addClass('btn-outline-primary').removeClass('btn-primary');
-        });
-
-    // Add the buttons above the table
-    $('#dtBasicExample8_wrapper').prepend(
-        $('<div class="d-flex mb-2">').append(hideAllButton).append(unhideAllButton)
-    );
-
-    // Create toggle buttons for each column
-    table8.columns().every(function (index) {
-        var column = this;
-        var columnTitle = $(column.header()).text();
-
-        // Create a button element
-        var toggleButton = $('<button>')
-            .text(columnTitle)
-            .addClass('btn btn-sm btn-outline-primary')
-            .on('click', function () {
-                column.visible(!column.visible()); // Toggle column visibility
-                $(this).toggleClass('btn-primary btn-outline-primary'); // Toggle button style
-            });
-
-        // Add the button above the column header
-        $('#toggleButtonsRow8').append($('<th>').append(toggleButton));
-    });
-        table8.on('draw', function () {
-            var rowCount = table8.page.info().recordsDisplay;
-            if (rowCount > 0) {
-                $('.row-badge8').text(rowCount).show();
-            } else {
-                $('.row-badge8').hide();
-            }
-        });
         function handleModalShow(modalId) {
     $(modalId).on('show.bs.modal', function () {
         var scrollTop = $(window).scrollTop();
@@ -2538,12 +1431,148 @@ function displayGallery(imageUrls) {
 }
 </script>
 <script>
-  function openBookingModal(vehicleId) {
+        function openremarksModal(vehicleId) {
+    $('#vehicle_remarks_id').val(vehicleId);
+        $.ajax({
+        url: '/get-sales-remarks',
+        type: 'GET',
+        data: { vehicle_id: vehicleId },
+        success: function(response) {
+            $('#salesremarks').val(response.sales_remarks);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+    $('#remarksModal').modal('show');
+}
+ function openBookingModal(vehicleId) {
+    // Set the vehicle ID in the hidden input field
     $('#vehicle_id').val(vehicleId);
+
+    // Now, retrieve the value of vehicle_id from the hidden input field
+    var vehicleIdValue = $('#vehicle_id').val();
+
+    $.ajax({
+        url: '{{ route('get.reservation') }}',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            vehicle_id: vehicleIdValue
+        },
+        success: function(response) {
+            if (response && Object.keys(response).length > 0) {
+                $('#cancelBookingButton').show();
+            } else {
+                $('#cancelBookingButton').hide();
+            }
+        },
+        error: function(xhr) {
+            console.log('An error occurred while fetching the reservation data.');
+        }
+    });
+
     $('#bookingModal').modal('show');
 }
-function opencustominspectionModal(vehicleIdInspection) {
+$('#remarksForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#remarksModal').modal('hide');
+            alertify.success('Remarks saved successfully');
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_remarks_id').val();
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId;
+    });
+    if (row.node()) {
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+function openenhancementModal(vehicleId) {
+    $.ajax({
+        url: "{{ route('enhancement.getVariants') }}",
+        method: "GET",
+        data: { vehicle_id: vehicleId },
+        success: function(response) {
+            if(response.success) {
+                let variantOptions = '';
+                response.data.variants.forEach(function(variant) {
+                    variantOptions += `<option value="${variant.id}">${variant.name}</option>`;
+                });
+                $('#variantSelect').html(variantOptions);
+                $('#vehicleVin').text(response.data.vin);
+                $('#vehicle_idenchacment').val(vehicleId);
+                $('#enhancementModal').modal('show');
+            }
+        },
+        error: function() {
+            alert('Error fetching data. Please try again.');
+        }
+    });
+}
+function openeditingcolorModal(vehicleId) {
+        $.ajax({
+            url: '{{ route('get.color.data') }}',
+            type: 'GET',
+            data: {
+                vehicle_id: vehicleId
+            },
+            success: function(response) {
+                $('#int_color_dropdown').html(response.intColorOptions);
+                $('#ext_color_dropdown').html(response.extColorOptions);
+                $('#vehicleVincolor').text(response.vin);
+                $('#vehicle_colour').val(vehicleId);
+                $('#colorModal').modal('show');
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+    function opencustominspectionModal(vehicleIdInspection) {
+    // Set the vehicle_idinspection value
     $('#vehicle_idinspection').val(vehicleIdInspection);
+
+    // Make an AJAX call to get the custom inspection details
+    $.ajax({
+        url: '/get-custom-inspection-data',  // The route to get the custom inspection data
+        type: 'GET',
+        data: { vehicle_id: vehicleIdInspection },
+        success: function(response) {
+            // Populate the modal fields with the fetched data
+            $('#custom_inspection_number').val(response.custom_inspection_number);
+            $('#custom_inspection_status').val(response.custom_inspection_status);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+
+    // Show the modal
     $('#custominspectionModal').modal('show');
 }
     function showFullText(button) {
@@ -2560,8 +1589,94 @@ function opencustominspectionModal(vehicleIdInspection) {
         data: formData,
         success: function(response) {
             $('#bookingModal').modal('hide');
-            alert('Booking saved successfully.');
+            alertify.success('Booking saved successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_id').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#enhancementForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#enhancementModal').modal('hide');
+            alert('Enhancement saved successfully.');
             location.reload();
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#editColorForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#colorModal').modal('hide');
+            alertify.success('Colour Change successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_colour').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            sales_remarks: response.sales_remarks, // Update inspection number
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
@@ -2587,8 +1702,28 @@ $('#custominspectionForm').on('submit', function(e) {
         data: formData,
         success: function(response) {
             $('#custominspectionModal').modal('hide');
-            alert('Custom Inspection Update Successfully.');
-            location.reload();
+            alertify.success('Custom Inspection Update Successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table7 = $('#dtBasicExample7').DataTable();
+           var vehicleId = $('#vehicle_idinspection').val();
+    console.log("Vehicle ID from form:", vehicleId);
+
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table7.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            custom_inspection_number: response.custom_inspection_number, // Update inspection number
+            custom_inspection_status: response.custom_inspection_status // Update inspection status
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
         },
         error: function(xhr) {
     console.log(xhr.responseText); // Log full response for debugging
@@ -2759,5 +1894,30 @@ $(document).ready(function() {
         sendReply(messageId);
     });
 });
+</script>
+<script>
+    document.getElementById('cancelBookingButton').addEventListener('click', function() {
+        var vehicleId = document.getElementById('vehicle_id').value;
+        
+        if(confirm('Are you sure you want to cancel this booking?')) {
+            // Send AJAX request to cancel booking
+            fetch('{{ route('booking.canceling') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ vehicle_id: vehicleId })
+            }).then(response => response.json())
+              .then(data => {
+                  if(data.success) {
+                      alert('Booking canceled successfully.');
+                      $('#bookingModal').modal('hide');
+                  } else {
+                      alert('Failed to cancel the booking.');
+                  }
+              }).catch(error => console.error('Error:', error));
+        }
+    });
 </script>
 @endsection

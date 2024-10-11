@@ -23,6 +23,10 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
+    public function pfiItems()
+    {
+        return $this->hasMany(PfiItem::class,'loi_item_id','id');
+    }
     public function getSteeringAttribute()
     {
        $mastermodel = MasterModel::where('model',$this->model)
@@ -38,7 +42,7 @@ class LetterOfIndentItem extends Model
     {
         $Loi = LetterOfIndent::find($this->letter_of_indent_id);
         $LoiItem = LetterOfIndentItem::find($this->id);
-
+        
         if($Loi->dealers == 'Trans Cars') {
             $loiDescription = $LoiItem->masterModel->transcar_loi_description ?? '';
         }else{
@@ -56,7 +60,6 @@ class LetterOfIndentItem extends Model
     // }
     public function getInventoryQuantityAttribute()
     {
-      
         $masterModel = MasterModel::find($this->master_model_id);
         $masterModelIds = MasterModel::where('model', $masterModel->model)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
