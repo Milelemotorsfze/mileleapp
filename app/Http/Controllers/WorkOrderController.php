@@ -40,6 +40,7 @@ use Validator;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
+use App\Models\WOBOE;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -303,7 +304,7 @@ class WorkOrderController extends Controller
                 return false;
             });
         }
-    $datas = $filteredDatas;
+        $datas = $filteredDatas;
         // Return the view with the type, data, applied filters, and unique options for the select filters
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
@@ -315,7 +316,20 @@ class WorkOrderController extends Controller
      */
     public function create()
     {
-        //
+        $today = Carbon::today();
+        // dd($today);
+        // Get all records where the 25th day after the declaration date is today or earlier
+        $boes = WOBOE::where('declaration_date', '<=', $today->subDays(24))->get();
+        dd($boes);
+
+        foreach ($boes as $boe) {
+            // Assuming each BOE is associated with a salesperson, fetch the salesperson
+            $salesperson = Salesperson::where('wo_id', $boe->wo_id)->first(); // Example relationship
+            
+            // Send the email to the salesperson or default to a specific email
+            Mail::to('rejitha.rajendran@milele.com')//$salesperson->email ?? 
+                ->send(new WOBOEStatusMail($boe, $salesperson));
+        }
     }
 
     /**

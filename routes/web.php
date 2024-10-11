@@ -436,7 +436,7 @@ Route::get('/d', function () {
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'show','store','edit','update'
+        'show','store','edit','update','create'
     ]);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
