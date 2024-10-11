@@ -42,11 +42,11 @@
         <p> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
             <span style="margin-left:20px;">{{ strtoupper($pfi->customer->name ?? '') }} </span>
         </p>
-        <p style="margin-left:20px;margin-bottom:0px;"> <span style="font-size:9px"> SAMARI RETAIL BLOC A</span>
-            <span style="margin-left:265px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
+        <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:9px"> SAMARI RETAIL BLOC A</span>
+            <span style="margin-left:245px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
         </p>
-        <p style="margin-left:20px;margin-top:1px;font-size:9px">RAS EL KHOR- DUBAI-UAE </p>
-        <table style="margin-top:20px">
+        <p style="margin-left:40px;margin-top:1px;font-size:9px">RAS EL KHOR- DUBAI-UAE </p>
+        <table style="margin-top:20px;padding:0px;">
             <tr>
                 <td>Description</td>
                 <td>Product Code</td>
@@ -58,7 +58,8 @@
             </tr>
             @foreach($pfiItems as $pfiItem)
                 <tr>
-                    <td>Model Description </td>
+                    <td style="width:200px">HILUX DC 2393CC 2GD-DIESEL 4X4 6P
+                    WORK (LOW) J-DECK 6MT CANVAS </td>
                     <td>{{ $pfiItem->masterModel->model ?? '' }}</td>
                     <td>{{ $pfiItem->masterModel->sfx ?? '' }}</td>
                     <td style="font-weight:normal">Stock</td>
@@ -67,8 +68,8 @@
                     <td>{{ $pfi->currency }} {{ number_format(($pfiItem->pfi_quantity * $pfiItem->unit_price),2) }}</td>
                 </tr>
             @endforeach
-            <tr style="height: 35px;">
-                <td ></td>
+            <tr>
+                <td style="height:20px;"></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -76,8 +77,10 @@
                 <td></td>
                 <td></td>
             </tr>
-           
         </table>
+
+        <p>TOTAL EXW Jebel Ali Incoterms ® 2010</p>
+        <p>Terms of price :  </p>
     </div>
 </body>
 </html>
