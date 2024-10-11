@@ -142,8 +142,6 @@ use App\Http\Controllers\VehicleInvoiceController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-
 Route::get('/session-status', [SessionController::class, 'status']);
 Route::get('/auth/google', [GoogleOAuthController::class, 'redirectToGoogle']);
 Route::get('/callback', [GoogleOAuthController::class, 'handleGoogleCallback']);
@@ -158,39 +156,23 @@ Route::get('/d', function () {
 });
 
 
-Auth::routes();
-Route::controller(AuthOtpController::class)->group(function () {
-    Route::get('/otp/login', 'login')->name('otp.login');
-    Route::post('/otp/generate', 'generate')->name('otp.generate');
-    Route::post('/login/otp/generate', 'loginOtpGenerate')->name('otp.loginOtpGenerate');
-    Route::get('/otp/verification/{user_id}/{email}/{password}', 'verification')->name('otp.verification');
-});
-Route::controller(ResetPasswordController::class)->group(function () {
-    Route::get('/password/create/{email}', 'createPassword')->name('user.createPassword');
-    Route::post('/password/store', 'storePassword')->name('password.store');
-    Route::post('user-register', 'register')->name('users.register');
-    Route::post('/createPassword/otp/generate', 'createPasswordOtpGenerate')->name('otp.createPasswordOtpGenerate');
-    Route::get('createPassword/otp/verification/{user_id}/{email}/{password}/{password_confirmation}', 'verification')->name('createPassword.verification');
-});
-Route::post('/otp/login', [LoginController::class, 'loginWithOtp'])->name('otp.getlogin');
-Auth::routes();
-Route::controller(AuthOtpController::class)->group(function () {
-    Route::get('/otp/login', 'login')->name('otp.login');
-    Route::post('/otp/generate', 'generate')->name('otp.generate');
-    Route::post('/login/otp/generate', 'loginOtpGenerate')->name('otp.loginOtpGenerate');
-    Route::get('/otp/verification/{user_id}/{email}/{password}', 'verification')->name('otp.verification');
-});
-Route::controller(ResetPasswordController::class)->group(function () {
-    Route::get('/password/create/{email}', 'createPassword')->name('user.createPassword');
-    Route::post('/password/store', 'storePassword')->name('password.store');
-    Route::post('user-register', 'register')->name('users.register');
-    Route::post('/createPassword/otp/generate', 'createPasswordOtpGenerate')->name('otp.createPasswordOtpGenerate');
-    Route::get('createPassword/otp/verification/{user_id}/{email}/{password}/{password_confirmation}', 'verification')->name('createPassword.verification');
-});
-Route::post('/otp/login', [LoginController::class, 'loginWithOtp'])->name('otp.getlogin');
+    Auth::routes();
+    Route::controller(AuthOtpController::class)->group(function(){
+        Route::get('/otp/login', 'login')->name('otp.login');
+        Route::post('/otp/generate', 'generate')->name('otp.generate');
+        Route::post('/login/otp/generate', 'loginOtpGenerate')->name('otp.loginOtpGenerate');
+        Route::get('/otp/verification/{user_id}/{email}/{password}', 'verification')->name('otp.verification');
+    });
+    Route::controller(ResetPasswordController::class)->group(function(){
+        Route::get('/password/create/{email}', 'createPassword')->name('user.createPassword');
+        Route::post('/password/store', 'storePassword')->name('password.store');
+        Route::post('user-register', 'register')->name('users.register');
+        Route::post('/createPassword/otp/generate', 'createPasswordOtpGenerate')->name('otp.createPasswordOtpGenerate');
+        Route::get('createPassword/otp/verification/{user_id}/{email}/{password}/{password_confirmation}', 'verification')->name('createPassword.verification');
+    });
+    Route::post('/otp/login', [LoginController::class, 'loginWithOtp'])->name('otp.getlogin');
 
-Route::group(['middleware' => ['auth', 'checkstatus']], function () {
-Route::group(['middleware' => ['auth', 'checkstatus']], function () {
+    Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
     //Profile
@@ -211,23 +193,18 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('users/updateStatus/{id}', [UserController::class, 'updateStatus'])->name('users.updateStatus');
     Route::get('users/makeActive/{id}', [UserController::class, 'makeActive'])->name('users.makeActive');
     Route::get('users/restore/{id}', [UserController::class, 'restore'])->name('users.restore');
-    Route::get('users/destroy/{id}', [UserController::class, 'delete'])->name('users.delete');
-    Route::controller(UserController::class)->group(function () {
-    Route::get('users/destroy/{id}', [UserController::class, 'delete'])->name('users.delete');
-    Route::controller(UserController::class)->group(function () {
+    Route::get('users/destroy/{id}', [UserController::class,'delete'])->name('users.delete');
+    Route::controller(UserController::class)->group(function() {
         Route::post('user/email-unique-check', 'uniqueEmail')->name('user.uniqueEmail');
         Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');
-        Route::get('user/create-password-request/{id}', 'createLogin')->name('users.createLogin');
-        Route::get('user/create-password-request/{id}', 'createLogin')->name('users.createLogin');
+        Route::get('user/create-password-request/{id}','createLogin')->name('users.createLogin');
     });
     // Role
     Route::resource('roles', RoleController::class);
-    Route::get('roles/destroy/{id}', [RoleController::class, 'delete'])->name('roles.delete');
-    Route::get('roles/destroy/{id}', [RoleController::class, 'delete'])->name('roles.delete');
+    Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
     // Addon
     Route::resource('addon', AddonController::class);
-    Route::get('addons/details/edit/{id}', [AddonController::class, 'editAddonDetails'])->name('addon.editDetails');
-    Route::get('addons/details/edit/{id}', [AddonController::class, 'editAddonDetails'])->name('addon.editDetails');
+    Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
@@ -240,12 +217,10 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     // addon scroll list route
 
-    Route::get('getAddonlists', [AddonController::class, 'getAddonlists'])->name('addon.getAddonlists');
-    Route::get('getAddonlists', [AddonController::class, 'getAddonlists'])->name('addon.getAddonlists');
+    Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
-    Route::get('addons/{data}', [AddonController::class, 'index'])->name('addon.list');
-    Route::get('addons/{data}', [AddonController::class, 'index'])->name('addon.list');
+    Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
     Route::get('addon/kitItems/{id}', [AddonController::class, 'kitItems'])->name('addon.kitItems');
     Route::post('addon-selling-price/status-change', [AddonController::class, 'statusChange'])->name('addon-selling-price.status-change');
@@ -255,20 +230,15 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::post('createSellingPrice/{id}', [AddonController::class, 'createSellingPrice'])->name('addon.createSellingPrice');
     Route::post('addon/status-change', [AddonController::class, 'addonStatusChange'])->name('addon.status-change');
     Route::post('getKitItemsForAddon', [AddonController::class, 'getKitItemsForAddon']);
-    Route::get('getRelatedModelLines', [AddonController::class, 'getRelatedModelLines'])->name('addon.getRelatedModelLines');
-    Route::get('get_student_data', [SupplierAddonController::class, 'get_student_data'])->name('addon.get_student_data');
-    Route::get('getRelatedModelLines', [AddonController::class, 'getRelatedModelLines'])->name('addon.getRelatedModelLines');
-    Route::get('get_student_data', [SupplierAddonController::class, 'get_student_data'])->name('addon.get_student_data');
+    Route::get('getRelatedModelLines', [AddonController::class,'getRelatedModelLines'])->name('addon.getRelatedModelLines');
+    Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
 
     // Kit
     Route::resource('kit', KitCommonItemController::class);
-    Route::get('kit-suppliers/{id}', [KitCommonItemController::class, 'kitSuppliers'])->name('kit.suppliers');
-    Route::get('kit-edit-suppliers/{id}', [KitCommonItemController::class, 'editKitSuppliers'])->name('kit.editsuppliers');
-    Route::get('kits/details/edit/{id}', [KitCommonItemController::class, 'editAddonDetails'])->name('kit.editDetails');
-    Route::get('kit-suppliers/{id}', [KitCommonItemController::class, 'kitSuppliers'])->name('kit.suppliers');
-    Route::get('kit-edit-suppliers/{id}', [KitCommonItemController::class, 'editKitSuppliers'])->name('kit.editsuppliers');
-    Route::get('kits/details/edit/{id}', [KitCommonItemController::class, 'editAddonDetails'])->name('kit.editDetails');
+    Route::get('kit-suppliers/{id}', [KitCommonItemController::class,'kitSuppliers'])->name('kit.suppliers');
+    Route::get('kit-edit-suppliers/{id}', [KitCommonItemController::class,'editKitSuppliers'])->name('kit.editsuppliers');
+    Route::get('kits/details/edit/{id}', [KitCommonItemController::class,'editAddonDetails'])->name('kit.editDetails');
     Route::post('kit/suppliers/update/{id}', [KitCommonItemController::class, 'updateKitSupplier'])->name('kit.updateKitSupplier');
     Route::get('kit/kitItems/{id}', [KitCommonItemController::class, 'kitItems'])->name('kit.kitItems');
     Route::get('getCommonKitItems', [KitCommonItemController::class, 'getCommonKitItems'])->name('getCommonKitItems');
@@ -283,12 +253,10 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('warranty-brands', WarrantyBrandsController::class);
     Route::resource('warranty-price-histories', WarrantyPriceHistoriesController::class);
     Route::get('warranty-selling-price-histories', [WarrantyPriceHistoriesController::class, 'listSellingPrices'])
-        ->name('warranty-selling-price-histories.index');
-        ->name('warranty-selling-price-histories.index');
+            ->name('warranty-selling-price-histories.index');
     Route::post('warranty-brands/status-change', [WarrantyController::class, 'statusChange'])->name('warranty-brands.status-change');
     Route::post('warranty-brands/update-selling-price', [WarrantyBrandsController::class, 'updateSellingPrice'])
-        ->name('warranty-brands.update-selling-price');
-        ->name('warranty-brands.update-selling-price');
+            ->name('warranty-brands.update-selling-price');
     Route::get('warranty-sales-views', [WarrantyController::class, 'view'])->name('warranty.view');
     Route::get('warranty-lists', [WarrantyController::class, 'list'])->name('warranty.list');
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
@@ -297,12 +265,10 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     // Suppliers or vendor
     Route::resource('suppliers', SupplierController::class);
     Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
-    Route::get('suppliers/destroy/{id}', [SupplierController::class, 'delete'])->name('suppliers.delete');
-    Route::get('suppliers/destroy/{id}', [SupplierController::class, 'delete'])->name('suppliers.delete');
+    Route::get('suppliers/destroy/{id}', [SupplierController::class,'delete'])->name('suppliers.delete');
     Route::post('suppliers/updateStatus', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
-    Route::get('/vendor/sub-categories', [SupplierController::class, 'getVendorSubCategories'])->name('vendor.sub-categories');
-    Route::get('/vendor/sub-categories', [SupplierController::class, 'getVendorSubCategories'])->name('vendor.sub-categories');
+    Route::get('/vendor/sub-categories', [SupplierController::class,'getVendorSubCategories'])->name('vendor.sub-categories');
 
     Route::get('supplier/addon/price/{id}', [SupplierController::class, 'addonprice'])->name('suppliers.addonprice');
     Route::post('createNewSupplierAddonPrice', [SupplierController::class, 'createNewSupplierAddonPrice'])->name('addon.createNewSupplierAddonPrice');
@@ -314,10 +280,8 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::post('newSellingPriceRequest', [SupplierController::class, 'newSellingPriceRequest'])->name('addon.newSellingPriceRequest');
     Route::get('sellingPriceHistory/{id}', [SupplierController::class, 'sellingPriceHistory'])->name('suppliers.sellingPriceHistory');
 
-    //Profoma Invoice
-    Route::controller(ProformaInvoiceController::class)->group(function () {
-    //Profoma Invoice
-    Route::controller(ProformaInvoiceController::class)->group(function () {
+      //Profoma Invoice
+      Route::controller(ProformaInvoiceController::class)->group(function(){
         Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
         Route::get('/proforma_invoice_edit/{callId}', 'proforma_invoice_edit')->name('qoutation.proforma_invoice_edit');
         Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
@@ -328,8 +292,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
         Route::get('/addons-modal-forqoutation/{modelLineId}', [ProformaInvoiceController::class, 'addonsModal'])->name('addonsquotation.modal');
     });
     // ApprovalAwaitingController
-    Route::controller(ApprovalAwaitingController::class)->group(function () {
-    Route::controller(ApprovalAwaitingController::class)->group(function () {
+    Route::controller(ApprovalAwaitingController::class)->group(function(){
         Route::get('/addon-approval-awaiting/{type}', 'addonApprovalAwaiting')->name('addon.approval');
     });
 
@@ -337,14 +300,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     // Masters
     // Master Division and head
     Route::resource('division', DivisionController::class);
-    Route::controller(DivisionController::class)->group(function () {
-    Route::controller(DivisionController::class)->group(function () {
+    Route::controller(DivisionController::class)->group(function(){
         Route::post('master/division-unique-check', 'uniqueDivision')->name('master.uniqueDivision');
     });
     // Master Department and head
     Route::resource('department', DepartmentController::class);
-    Route::controller(DepartmentController::class)->group(function () {
-    Route::controller(DepartmentController::class)->group(function () {
+    Route::controller(DepartmentController::class)->group(function(){
         Route::post('master/department-unique-check', 'uniqueDepartment')->name('master.uniqueDepartment');
     });
     // Designation Approvals
@@ -352,21 +313,17 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     // Master Job Position
     Route::resource('master-job-position', MasterJobPositionController::class);
-    // Master Specific Industry Experience
-    Route::resource('industry-experience', MasterSpecificIndustryExperienceController::class);
-    // Master Specific Industry Experience
-    Route::resource('industry-experience', MasterSpecificIndustryExperienceController::class);
+      // Master Specific Industry Experience
+      Route::resource('industry-experience', MasterSpecificIndustryExperienceController::class);
     // Employee
     Route::resource('employee', EmployeeController::class);
-    Route::controller(EmployeeController::class)->group(function () {
-    Route::controller(EmployeeController::class)->group(function () {
+    Route::controller(EmployeeController::class)->group(function(){
         Route::post('employee/passport-unique-check', 'uniquePassport')->name('employee.uniquePassport');
         Route::post('employee/employee-code-unique-check', 'uniqueCandidateEmpCode')->name('employee.uniqueCandidateEmpCode');
     });
     // Employee Hiring Requset
     Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);
-    Route::controller(EmployeeHiringRequestController::class)->group(function () {
-    Route::controller(EmployeeHiringRequestController::class)->group(function () {
+    Route::controller(EmployeeHiringRequestController::class)->group(function(){
         Route::get('employee-hiring-request-approval-awaiting', 'approvalAwaiting')->name('employee-hiring-request.approval-awaiting');
         Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
         Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
@@ -376,17 +333,14 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
-    Route::controller(EmployeeHiringQuestionnaireController::class)->group(function () {
-    Route::controller(EmployeeHiringQuestionnaireController::class)->group(function () {
+    Route::controller(EmployeeHiringQuestionnaireController::class)->group(function(){
         Route::get('employee-hiring-questionnaire/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-questionnaire.create-or-edit');
         Route::post('employee-hiring-questionnaire/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-questionnaire.store-or-update');
     });
 
-    // Employee Job Description
-    // Employee Job Description
+        // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
-    Route::controller(JobDescriptionController::class)->group(function () {
-    Route::controller(JobDescriptionController::class)->group(function () {
+    Route::controller(JobDescriptionController::class)->group(function(){
         Route::get('employee-hiring-job-description/create-or-edit/{id}/{hiring_id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
         Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
         Route::post('employee-hiring-job-description/request-action', 'requestAction')->name('employee-hiring-job-description.request-action');
@@ -394,8 +348,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     });
     // Interview Summary Report
     Route::resource('interview-summary-report', InterviewSummaryReportController::class);
-    Route::controller(InterviewSummaryReportController::class)->group(function () {
-    Route::controller(InterviewSummaryReportController::class)->group(function () {
+    Route::controller(InterviewSummaryReportController::class)->group(function(){
         Route::get('interview-summary-report/create-or-edit/{id}', 'createOrEdit')->name('interview-summary-report.create-or-edit');
         Route::post('interview-summary-report/store-or-update/{id}', 'storeOrUpdate')->name('interview-summary-report.store-or-update');
         Route::post('interview-summary-report/request-action', 'requestAction')->name('interview-summary-report.request-action');
@@ -410,8 +363,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('candidate/listOfferLetter', [CandidatePersonalInfoController::class, 'getOfferLetterList'])->name('candidate.listOfferLetter');
     Route::get('candidate-offer-letter/send/{id}', [CandidatePersonalInfoController::class, 'sendJobOfferLetter'])->name('candidate-offer-letter.send');
     Route::resource('personal-info', CandidatePersonalInfoController::class);
-    Route::controller(CandidatePersonalInfoController::class)->group(function () {
-    Route::controller(CandidatePersonalInfoController::class)->group(function () {
+    Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
         Route::post('personal-info/create-offer-letter', 'createOfferLetter')->name('personal-info.create-offer-letter');
         Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
@@ -421,17 +373,13 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     });
 
     // Joining Report
-    Route::resource('joining_report', JoiningReportController::class)->only('store', 'update', 'show', 'edit');
-    Route::resource('joining_report', JoiningReportController::class)->only('store', 'update', 'show', 'edit');
+    Route::resource('joining_report', JoiningReportController::class)->only('store','update','show','edit');
     // Route::resource('enquires', EnquiresController::class)
-    Route::controller(JoiningReportController::class)->group(function () {
-    Route::controller(JoiningReportController::class)->group(function () {
+    Route::controller(JoiningReportController::class)->group(function(){
         Route::post('joining_report_action', 'requestAction')->name('joiningReport.action');
         Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
-        Route::get('employee_joining_report/{type}', 'index')->name('employee_joining_report.index');
-        Route::get('create_joining_report/{type}', 'create')->name('create_joining_report.create');
-        Route::get('employee_joining_report/{type}', 'index')->name('employee_joining_report.index');
-        Route::get('create_joining_report/{type}', 'create')->name('create_joining_report.create');
+        Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
+        Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
         Route::post('checkTempDateExist', 'checkTempDateExist')->name('temptransfer.checkTempDateExist');
         Route::post('candidate/joining-report-unique-check', 'uniqueJoiningReport')->name('candidate.uniqueJoiningReport');
     });
@@ -442,8 +390,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('asset_allocation', AssetAllocationController::class);
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
-    Route::controller(PassportRequestController::class)->group(function () {
-    Route::controller(PassportRequestController::class)->group(function () {
+    Route::controller(PassportRequestController::class)->group(function(){
         Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
         Route::post('employee-passport-submit/request-action', 'requestAction')->name('employee-passport-submit.request-action');
@@ -451,15 +398,13 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     });
     // Employee Passport Release
     Route::resource('passport_release', PassportReleaseController::class);
-    Route::controller(PassportReleaseController::class)->group(function () {
-    Route::controller(PassportReleaseController::class)->group(function () {
+    Route::controller(PassportReleaseController::class)->group(function(){
         Route::post('employee-passport-release/request-action', 'requestAction')->name('employee-passport-release.request-action');
         Route::get('employee-passport-release-approval-awaiting', 'approvalAwaiting')->name('passportRelease.approvalAwaiting');
     });
     // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
-    Route::controller(EmployeeLiabilityController::class)->group(function () {
-    Route::controller(EmployeeLiabilityController::class)->group(function () {
+    Route::controller(EmployeeLiabilityController::class)->group(function(){
         Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
         Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
         Route::post('liability_request_action', 'requestAction')->name('liabilityRequest.action');
@@ -468,8 +413,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     // Employee Leave
     Route::resource('employee_leave', EmployeeLeaveController::class);
-    Route::controller(EmployeeLeaveController::class)->group(function () {
-    Route::controller(EmployeeLeaveController::class)->group(function () {
+    Route::controller(EmployeeLeaveController::class)->group(function(){
         Route::get('employee-leave/create-or-edit/{id}', 'createOrEdit')->name('employee-leave.create-or-edit');
         Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
         Route::post('leave_request_action', 'requestAction')->name('leaveRequest.action');
@@ -489,42 +433,29 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('increment', IncrementController::class);
     // Employee Overtime Application
     Route::resource('overtime', OverTimeController::class);
-    Route::controller(OverTimeController::class)->group(function () {
-    Route::controller(OverTimeController::class)->group(function () {
+    Route::controller(OverTimeController::class)->group(function(){
         Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
         Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
         Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
     });
-    // Employee Overtime Application
-    Route::resource('separation-handover', SeparationController::class);
-    // Employee Overtime Application
-    Route::resource('separation-handover', SeparationController::class);
+     // Employee Overtime Application
+     Route::resource('separation-handover', SeparationController::class);
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'show',
-        'store',
-        'edit',
-        'update'
-        'show',
-        'store',
-        'edit',
-        'update'
+        'show','store','edit','update'
     ]);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
-    Route::controller(WorkOrderController::class)->group(function () {
-    Route::controller(WorkOrderController::class)->group(function () {
+    Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         Route::post('/comments', [WorkOrderController::class, 'storeComments'])->name('comments.store');
         Route::post('work-order/so-unique-check', 'uniqueSO')->name('work-order.uniqueSO');
         Route::post('work-order/wo-unique-check', 'uniqueWO')->name('work-order.uniqueWO');
-        Route::get('work-order-vehicle/data-history/{id}', 'vehicleDataHistory')->name('wo-vehicles.data-history');
-        Route::get('work-order-vehicle-addon/data-history/{id}', 'vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
-        Route::get('work-order-vehicle/data-history/{id}', 'vehicleDataHistory')->name('wo-vehicles.data-history');
-        Route::get('work-order-vehicle-addon/data-history/{id}', 'vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
+        Route::get('work-order-vehicle/data-history/{id}','vehicleDataHistory')->name('wo-vehicles.data-history');
+        Route::get('work-order-vehicle-addon/data-history/{id}','vehicleAddonDataHistory')->name('wo-vehicle-addon.data-history');
         Route::post('work-order/sales-approval', 'salesApproval')->name('work-order.sales-approval');
         Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
@@ -532,12 +463,27 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
         Route::post('/save-filters', 'saveFilters')->name('save.filters');
         Route::post('/check-so-number', 'checkSONumber')->name('wo.checkSONumber');
     });
-    Route::controller(WoDocsStatusController::class)->group(function () {
-    Route::controller(WoDocsStatusController::class)->group(function () {
+    Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
-        Route::post('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
-    });
-
+        Route::get('/wo-doc-status-history/{id}', 'docStatusHistory')->name('docStatusHistory');
+    });    
+    Route::controller(WoStatusController::class)->group(function(){
+        Route::post('/update-wo-status', 'updateStatus')->name('wo.updateStatus');
+        Route::get('/wo-status-history/{id}', 'woStatusHistory')->name('woStatusHistory');
+    }); 
+    Route::controller(WoVehicleController::class)->group(function(){
+        Route::post('/update-vehicle-modification-status', 'updateVehModiStatus')->name('wo.updateVehModiStatus');
+        Route::get('/vehicle-modification-status-log/{id}', 'vehModiStatusHistory')->name('vehModiStatusHistory');
+        Route::post('/fetch-boe-number', 'fetchBoeNumber')->name('fetch.boe_number');
+    }); 
+    Route::controller(WoPDIStatusController::class)->group(function(){
+        Route::post('/update-vehicle-pdi-status', 'updateVehPdiStatus')->name('wo.updateVehPdiStatus');
+        Route::get('/vehicle-pdi-status-log/{id}', 'vehPdiStatusHistory')->name('vehPdiStatusHistory');
+    }); 
+    Route::controller(WOVehicleDeliveryStatusController::class)->group(function(){
+        Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
+        Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
+    }); 
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -551,12 +497,9 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
-    Route::get('demand-planning/get-sfx', [DemandController::class, 'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-loi-description', [DemandController::class, 'getLOIDescription'])->name('demand.get-loi-description');
-    Route::get('demand-planning/getMasterModel', [DemandController::class, 'getMasterModel'])->name('demand.getMasterModel');
-    Route::get('demand-planning/get-sfx', [DemandController::class, 'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-loi-description', [DemandController::class, 'getLOIDescription'])->name('demand.get-loi-description');
-    Route::get('demand-planning/getMasterModel', [DemandController::class, 'getMasterModel'])->name('demand.getMasterModel');
+    Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
+    Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
+    Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
 
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
@@ -566,14 +509,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
     Route::post('letter-of-indents/supplier-approval', [LetterOfIndentController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
-    Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class, 'statusChange'])->name('loi-country-criterias.active-inactive');
-    Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class, 'statusChange'])->name('loi-country-criterias.active-inactive');
+    Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
         ->name('letter-of-indent.request-supplier-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
-        ->name('update-loi-comment');
-        ->name('update-loi-comment');
+    ->name('update-loi-comment');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
@@ -582,58 +523,43 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('letter-of-indent-items', LOIItemController::class);
     
     Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
-        ->name('letter-of-indents.status-update');
-        ->name('letter-of-indents.status-update');
+                ->name('letter-of-indents.status-update'); 
     Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
     ->name('letter-of-indents.loi-expiry-status-update'); 
     Route::get('loi/get-customer-documents', [LetterOfIndentController::class,'getCustomerDocuments'])->name('loi.customer-documents');
 
     // PFI
-    Route::post('/reference-number-unique-check', [PFIController::class, 'uniqueCheckPfiReferenceNumber']);
-    Route::post('/reference-number-unique-check', [PFIController::class, 'uniqueCheckPfiReferenceNumber']);
+    Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
-    Route::get('pfi-item/list', [PFIController::class, 'PFIItemList'])->name('pfi-item.list');
-    Route::get('pfi-item/list', [PFIController::class, 'PFIItemList'])->name('pfi-item.list');
+    Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
-    Route::post('pfi-released-amount/update/{id}', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
-    Route::get('pfi-item/get-loi-item', [PFIController::class, 'getLOIItemCode'])->name('loi-item-code');
-    Route::get('pfi-item/get-loi-item-details', [PFIController::class, 'getLOIItemDetails'])->name('loi-item-details');
-    Route::get('pfi-item/get-master-models', [PFIController::class, 'getChildModels'])->name('pfi-item.master-models');
-    Route::get('pfi-item/get-customer-countries', [PFIController::class, 'getCustomerCountries'])->name('pfi-item.customer-countries');
+    Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
+    Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
+    Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
+    Route::get('pfi-item/get-models', [PFIController::class,'getModels'])->name('pfi-item.models');
+    Route::get('pfi-item/get-master-models', [PFIController::class,'getMasterModel'])->name('pfi-item.master-model-ids');
+    Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
+    Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
-    Route::get('supplier-inventories/createNew', [SupplierInventoryController::class, 'createNew'])->name('supplier-inventories.createNew');
-    Route::post('supplier-inventories/excel-update', [SupplierInventoryController::class, 'ExcelUpdate'])->name('supplier-inventories.excel-update');
-    Route::get('supplier-inventories/lists', [SupplierInventoryController::class, 'lists'])->name('supplier-inventories.lists');
-    Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class, 'FileComparision'])->name('supplier-inventories.file-comparision');
-    Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class, 'FileComparisionReport'])
-    Route::get('supplier-inventories/createNew', [SupplierInventoryController::class, 'createNew'])->name('supplier-inventories.createNew');
-    Route::post('supplier-inventories/excel-update', [SupplierInventoryController::class, 'ExcelUpdate'])->name('supplier-inventories.excel-update');
-    Route::get('supplier-inventories/lists', [SupplierInventoryController::class, 'lists'])->name('supplier-inventories.lists');
-    Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class, 'FileComparision'])->name('supplier-inventories.file-comparision');
-    Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class, 'FileComparisionReport'])
+    Route::get('supplier-inventories/createNew', [SupplierInventoryController::class,'createNew'])->name('supplier-inventories.createNew');
+    Route::post('supplier-inventories/excel-update', [SupplierInventoryController::class,'ExcelUpdate'])->name('supplier-inventories.excel-update');
+    Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
+    Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
+    Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])
         ->name('supplier-inventories.file-comparision-report');
-    Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class, 'getDate'])->name('supplier-inventories.get-dates');
-    Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class, 'viewAll'])->name('supplier-inventories.view-all');
-    Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class, 'updateInventory'])->name('update-inventory');
-    Route::get('/check-unique-chasis', [SupplierInventoryController::class, 'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
-    Route::get('/check-production-month', [SupplierInventoryController::class, 'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
-    Route::get('/isExistColorCode', [SupplierInventoryController::class, 'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
-    Route::get('/unique-production-month', [SupplierInventoryController::class, 'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
-    Route::get('inventory-logs/{id}', [SupplierInventoryController::class, 'inventoryLogs'])->name('inventory-logs.lists');
-    Route::get('/check-delivery-note', [SupplierInventoryController::class, 'checkDeliveryNote'])->name('supplier-inventories.check-delivery-note');
-    Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class, 'getDate'])->name('supplier-inventories.get-dates');
-    Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class, 'viewAll'])->name('supplier-inventories.view-all');
-    Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class, 'updateInventory'])->name('update-inventory');
-    Route::get('/check-unique-chasis', [SupplierInventoryController::class, 'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
-    Route::get('/check-production-month', [SupplierInventoryController::class, 'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
-    Route::get('/isExistColorCode', [SupplierInventoryController::class, 'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
-    Route::get('/unique-production-month', [SupplierInventoryController::class, 'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
-    Route::get('inventory-logs/{id}', [SupplierInventoryController::class, 'inventoryLogs'])->name('inventory-logs.lists');
-    Route::get('/check-delivery-note', [SupplierInventoryController::class, 'checkDeliveryNote'])->name('supplier-inventories.check-delivery-note');
+    Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
+    Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class,'viewAll'])->name('supplier-inventories.view-all');
+    Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class,'updateInventory'])->name('update-inventory');
+    Route::get('/check-unique-chasis', [SupplierInventoryController::class,'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
+    Route::get('/check-production-month', [SupplierInventoryController::class,'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
+    Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
+    Route::get('/unique-production-month', [SupplierInventoryController::class,'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
+    Route::get('inventory-logs/{id}', [SupplierInventoryController::class,'inventoryLogs'])->name('inventory-logs.lists');
+    Route::get('/check-delivery-note', [SupplierInventoryController::class,'checkDeliveryNote'])->name('supplier-inventories.check-delivery-note');
 
 
     //BL Module
@@ -642,20 +568,13 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     //Marketing
     Route::resource('calls', CallsController::class)
-        ->parameters(['calls' => 'call']);
-    Route::get('callsinprocess', [CallsController::class, 'inprocess'])->name('calls.inprocess');
-    Route::get('callsconverted', [CallsController::class, 'converted'])->name('calls.converted');
-    Route::get('callsrejected', [CallsController::class, 'rejected'])->name('calls.rejected');
-    Route::get('callsdatacenter', [CallsController::class, 'datacenter'])->name('calls.datacenter');
-    Route::get('leadsexport', [CallsController::class, 'leadsexport'])->name('calls.leadsexport');
-    Route::post('exportsleadsform', [CallsController::class, 'exportsleadsform'])->name('calls.exportsleadsform');
-        ->parameters(['calls' => 'call']);
-    Route::get('callsinprocess', [CallsController::class, 'inprocess'])->name('calls.inprocess');
-    Route::get('callsconverted', [CallsController::class, 'converted'])->name('calls.converted');
-    Route::get('callsrejected', [CallsController::class, 'rejected'])->name('calls.rejected');
-    Route::get('callsdatacenter', [CallsController::class, 'datacenter'])->name('calls.datacenter');
-    Route::get('leadsexport', [CallsController::class, 'leadsexport'])->name('calls.leadsexport');
-    Route::post('exportsleadsform', [CallsController::class, 'exportsleadsform'])->name('calls.exportsleadsform');
+    ->parameters(['calls' => 'call']);
+    Route::get('callsinprocess', [CallsController::class,'inprocess'])->name('calls.inprocess');
+    Route::get('callsconverted', [CallsController::class,'converted'])->name('calls.converted');
+    Route::get('callsrejected', [CallsController::class,'rejected'])->name('calls.rejected');
+    Route::get('callsdatacenter', [CallsController::class,'datacenter'])->name('calls.datacenter');
+    Route::get('leadsexport', [CallsController::class,'leadsexport'])->name('calls.leadsexport');
+    Route::post('exportsleadsform', [CallsController::class,'exportsleadsform'])->name('calls.exportsleadsform');
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
     Route::get('/editreels/{id}', [VariatnsPicturesController::class, 'editreels'])->name('variant_pictures.editreels');
@@ -667,15 +586,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
         }
         abort(404);
     });
-    Route::get('calls-get/getmodelline', [CallsController::class, 'getmodelline'])->name('calls.get-modellines');
-    Route::get('download/rejected/{filename}', [CallsController::class, 'downloadRejected'])->name('download.rejected');
-    Route::get('calls-get/getmodelline', [CallsController::class, 'getmodelline'])->name('calls.get-modellines');
-    Route::get('download/rejected/{filename}', [CallsController::class, 'downloadRejected'])->name('download.rejected');
+    Route::get('calls-get/getmodelline', [CallsController::class,'getmodelline'])->name('calls.get-modellines');
+    Route::get('download/rejected/{filename}', [CallsController::class,'downloadRejected'])->name('download.rejected');
     Route::delete('/delete-video/{id}', [VariatnsPicturesController::class, 'deleteVideo'])->name('delete_video');
     Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
     Route::resource('lead_source', LeadSourceController::class);
-    Route::get('calls-bulk/createbulk', [CallsController::class, 'createbulk'])->name('calls.createbulk');
-    Route::get('calls-bulk/createbulk', [CallsController::class, 'createbulk'])->name('calls.createbulk');
+    Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
@@ -683,14 +599,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
     Route::post('/update-priority', [StrategyController::class, 'updatePriority'])->name('strategy.updatePriority');
-    Route::get('/simplefile', [CallsController::class, 'simplefile'])->name('calls.simplefile');
-    Route::get('/simplefile', [CallsController::class, 'simplefile'])->name('calls.simplefile');
+    Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
     Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
     Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
     Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');
-    Route::get('new-variants/createnewvarinats', [CallsController::class, 'createnewvarinats'])->name('calls.createnewvarinats');
-    Route::get('new-variants/createnewvarinats', [CallsController::class, 'createnewvarinats'])->name('calls.createnewvarinats');
+    Route::get('new-variants/createnewvarinats', [CallsController::class,'createnewvarinats'])->name('calls.createnewvarinats');
     Route::get('new-variants/varinatinfo', [CallsController::class, 'varinatinfo'])->name('calls.varinatinfo');
     Route::get('new-leads/addnewleads', [CallsController::class, 'addnewleads'])->name('calls.addnewleads');
     Route::post('new-leads/storeleads', [CallsController::class, 'storeleads'])->name('calls.storeleads');
@@ -703,55 +617,37 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
 
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
-    Route::get('quotation-data/get-my', [QuotationController::class, 'getmy'])->name('quotation.get-my');
-    Route::get('quotation-data/get-model-line', [QuotationController::class, 'getmodelline'])->name('quotation.get-model-line');
-    Route::get('quotation-data/get-sub-model', [QuotationController::class, 'getsubmodel'])->name('quotation.get-sub-model');
-    Route::get('quotation-data/get-my', [QuotationController::class, 'getmy'])->name('quotation.get-my');
-    Route::get('quotation-data/get-model-line', [QuotationController::class, 'getmodelline'])->name('quotation.get-model-line');
-    Route::get('quotation-data/get-sub-model', [QuotationController::class, 'getsubmodel'])->name('quotation.get-sub-model');
+    Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
+    Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
+    Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation-items', QuotationController::class);
-    Route::post('quotation-data/vehicles-insert', [QuotationController::class, 'addvehicles'])->name('quotation.vehicles-insert');
-    Route::get('/quotation/shipping-port', [QuotationController::class, 'getShippingPort'])->name('quotation.shipping_ports');
-    Route::get('/quotation/shipping-charges', [QuotationController::class, 'getShippingCharges'])->name('quotation.shipping_charges');
-    Route::get('/get-vehicle-count/{userId}', function ($userId) {
-        $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
-        return $count;
-    Route::post('quotation-data/vehicles-insert', [QuotationController::class, 'addvehicles'])->name('quotation.vehicles-insert');
-    Route::get('/quotation/shipping-port', [QuotationController::class, 'getShippingPort'])->name('quotation.shipping_ports');
-    Route::get('/quotation/shipping-charges', [QuotationController::class, 'getShippingCharges'])->name('quotation.shipping_charges');
-    Route::get('/get-vehicle-count/{userId}', function ($userId) {
-        $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
-        return $count;
+    Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
+    Route::get('/quotation/shipping-port', [QuotationController::class,'getShippingPort'])->name('quotation.shipping_ports');
+    Route::get('/quotation/shipping-charges', [QuotationController::class,'getShippingCharges'])->name('quotation.shipping_charges');
+        Route::get('/get-vehicle-count/{userId}', function($userId) {
+    $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
+    return $count;
     });
     Route::post('dailyleads/getvins', [QuotationController::class, 'getvinsqoutation'])->name('dailyleads.getvinsqoutation');
     Route::post('dailyleads/getlink', [QuotationController::class, 'getqoutationlink'])->name('dailyleads.getqoutationlink');
     // vehicle pictures
-    Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class, 'getVariantDetail'])->name('vehicle-pictures.variant-details');
-    Route::resource('vehicle-pictures', VehiclePicturesController::class);
-    Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
-    Route::get('vehicle_pictures/pending', [VehiclePicturesController::class, 'pending'])->name('vehicle_pictures.pending');
-    Route::post('vehicle_pictures/saving', [VehiclePicturesController::class, 'saving'])->name('vehicle_pictures.saving');
-    Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class, 'getVariantDetail'])->name('vehicle-pictures.variant-details');
-    Route::resource('vehicle-pictures', VehiclePicturesController::class);
-    Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
-    Route::get('vehicle_pictures/pending', [VehiclePicturesController::class, 'pending'])->name('vehicle_pictures.pending');
-    Route::post('vehicle_pictures/saving', [VehiclePicturesController::class, 'saving'])->name('vehicle_pictures.saving');
+     Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
+     Route::resource('vehicle-pictures', VehiclePicturesController::class);
+     Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
+     Route::get('vehicle_pictures/pending', [VehiclePicturesController::class,'pending'])->name('vehicle_pictures.pending');
+     Route::post('vehicle_pictures/saving', [VehiclePicturesController::class,'saving'])->name('vehicle_pictures.saving');
 
 
-    // Variants
-    // Variants
+     // Variants
     Route::resource('variants', VariantController::class);
-    Route::post('variants/modifications', [VariantController::class, 'variantmodifications'])->name('variants.variantmodifications');
-    Route::post('variants/modifications', [VariantController::class, 'variantmodifications'])->name('variants.variantmodifications');
+    Route::post('variants/modifications', [VariantController::class,'variantmodifications'])->name('variants.variantmodifications');
     Route::get('/variants/addons/{id}', [VariantController::class, 'variantsaddons'])->name('variants.variantsaddons');
-    Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class, 'edit'])->name('variant-price.edit');
-    Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class, 'edit'])->name('variant-price.edit');
+    Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class,'edit'])->name('variant-price.edit');
     Route::resource('variant-prices', VariantPriceController::class);
     Route::get('/getSpecificationDetails/{id}', [VariantController::class, 'getSpecificationDetails']);
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');
-    Route::post('quotation-data/addone-insert', [QuotationController::class, 'addqaddone'])->name('quotation.addone-insert');
-    Route::post('quotation-data/addone-insert', [QuotationController::class, 'addqaddone'])->name('quotation.addone-insert');
+    Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
     Route::get('model-lines/specification/{id}', [VariantController::class, 'specification'])->name('model-lines.specification');
@@ -759,18 +655,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::post('/variants/save-option', [VariantController::class, 'saveOption'])->name('variants.saveOption');
     Route::post('/variants/savespecification', [VariantController::class, 'savespecification'])->name('variants.savespecification');
     Route::name('calls.show')
-        ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
-        ->where([
-            'call' => '[0-9]+',
-            'brand_id' => '[0-9]+',
-            'model_line_id' => '[0-9]+',
-        ]);
-        ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
-        ->where([
-            'call' => '[0-9]+',
-            'brand_id' => '[0-9]+',
-            'model_line_id' => '[0-9]+',
-        ]);
+    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
+    ->where([
+        'call' => '[0-9]+',
+        'brand_id' => '[0-9]+',
+        'model_line_id' => '[0-9]+',
+    ]);
     Route::post('dailyleads/processStep', [DailyleadsController::class, 'processStep'])->name('processStep');
     Route::get('dailyleads/prospecting/{id}', [DailyleadsController::class, 'prospecting'])->name('dailyleads.prospecting');
 
@@ -783,15 +673,6 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
-
-    // Employee Relations
-    // Employee Relation Salary Certification Routes
-    // Route::prefix('employee-relation/certificates/salary-certificate')->group(function () {
-    //     Route::get('/create', [EmployeeRelationController::class, 'createSalaryCertificate'])->name('employeeRelation.salaryCertificate.create');
-    //     Route::get('/list', [EmployeeRelationController::class, 'listSalaryCertificates'])->name('employeeRelation.salaryCertificate.list');
-    //     Route::post('/store', [EmployeeRelationController::class, 'storeSalaryCertificate'])->name('employeeRelation.salaryCertificate.store');
-    // });
-
     // Salary Certificate Routes
     Route::prefix('employee-relation/salary-certificate')->group(function () {
         Route::get('/create', [SalaryCertificateController::class, 'create'])->name('employeeRelation.salaryCertificate.create');
@@ -822,50 +703,6 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
         Route::get('/{id}/show', [LetterRequestController::class, 'show'])->name('employeeRelation.letterRequest.show');
         Route::post('/{id}/update', [LetterRequestController::class, 'update'])->name('employeeRelation.letterRequest.update');
     });
-
-
-
-    // Employee Relations
-    // Employee Relation Salary Certification Routes
-    // Route::prefix('employee-relation/certificates/salary-certificate')->group(function () {
-    //     Route::get('/create', [EmployeeRelationController::class, 'createSalaryCertificate'])->name('employeeRelation.salaryCertificate.create');
-    //     Route::get('/list', [EmployeeRelationController::class, 'listSalaryCertificates'])->name('employeeRelation.salaryCertificate.list');
-    //     Route::post('/store', [EmployeeRelationController::class, 'storeSalaryCertificate'])->name('employeeRelation.salaryCertificate.store');
-    // });
-
-    // Salary Certificate Routes
-    Route::prefix('employee-relation/salary-certificate')->group(function () {
-        Route::get('/create', [SalaryCertificateController::class, 'create'])->name('employeeRelation.salaryCertificate.create');
-        Route::post('/store', [SalaryCertificateController::class, 'store'])->name('employeeRelation.salaryCertificate.store');
-        Route::get('/index', [SalaryCertificateController::class, 'index'])->name('employeeRelation.salaryCertificate.index');
-        Route::get('/{id}/generate', [SalaryCertificateController::class, 'generateSalaryCertificate'])->name('employeeRelation.salaryCertificate.generateSalaryCertificate');
-
-        Route::get('/{id}/show', [SalaryCertificateController::class, 'show'])->name('employeeRelation.salaryCertificate.show');
-        Route::get('/{id}/edit', [SalaryCertificateController::class, 'edit'])->name('employeeRelation.salaryCertificate.edit');
-        Route::post('/{id}/update', [SalaryCertificateController::class, 'update'])->name('employeeRelation.salaryCertificate.update');
-        Route::get('/{id}', [SalaryCertificateController::class, 'downloadCertificate'])->name('employeeRelation.salaryCertificate.downloadCertificate');
-    });
-
-    // Achievement Certificate Routes
-    Route::prefix('employee-relation/achievement-certificate')->group(function () {
-        Route::get('/create', [AchievementCertificateController::class, 'create'])->name('employeeRelation.achievementCertificate.create');
-        Route::post('/store', [AchievementCertificateController::class, 'store'])->name('employeeRelation.achievementCertificate.store');
-        Route::get('/index', [AchievementCertificateController::class, 'index'])->name('employeeRelation.achievementCertificate.index');
-        Route::get('/{id}/show', [AchievementCertificateController::class, 'show'])->name('employeeRelation.achievementCertificate.show');
-        Route::post('/{id}/update', [AchievementCertificateController::class, 'update'])->name('employeeRelation.achievementCertificate.update');
-    });
-
-    // Letter Request Routes
-    Route::prefix('employee-relation/letter-request')->group(function () {
-        Route::get('/create', [LetterRequestController::class, 'create'])->name('employeeRelation.letterRequest.create');
-        Route::post('/store', [LetterRequestController::class, 'store'])->name('employeeRelation.letterRequest.store');
-        Route::get('/index', [LetterRequestController::class, 'index'])->name('employeeRelation.letterRequest.index');
-        Route::get('/{id}/show', [LetterRequestController::class, 'show'])->name('employeeRelation.letterRequest.show');
-        Route::post('/{id}/update', [LetterRequestController::class, 'update'])->name('employeeRelation.letterRequest.update');
-    });
-
-
-
     //WareHouse
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
@@ -887,16 +724,13 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
 
     Route::resource('vehicle-detail-approvals', VehiclePendingApprovalRequestController::class);
-    Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class, 'ApproveOrRejectVehicleDetails'])
-        ->name('vehicle-detail.update');
-    Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class, 'ApproveOrRejectVehicleDetails'])
-        ->name('vehicle-detail.update');
+    Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class,'ApproveOrRejectVehicleDetails'])
+         ->name('vehicle-detail.update');
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
-    Route::get('grnlist/grnsimplefile', [MovementController::class, 'grnsimplefile'])->name('grnlist.grnsimplefile');
-    Route::get('grnlist/grnsimplefile', [MovementController::class, 'grnsimplefile'])->name('grnlist.grnsimplefile');
+    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
     Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
     Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
@@ -999,8 +833,7 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('inspection/pdi/{id}', [InspectionController::class, 'pdiinspectionf'])->name('inspection.pdiinspection');
     Route::resource('approvalsinspection', ApprovalsController::class);
     Route::resource('incident', IncidentController::class);
-    Route::post('incident/saving', [IncidentController::class, 'updatestatus'])->name('incidentupdate.updatestatus');
-    Route::post('incident/saving', [IncidentController::class, 'updatestatus'])->name('incidentupdate.updatestatus');
+    Route::post('incident/saving', [IncidentController::class,'updatestatus'])->name('incidentupdate.updatestatus');
     Route::resource('variantrequests', VariantRequests::class);
     Route::get('/check-variant', [VariantRequests::class, 'checkVariant']);
     Route::post('approvalsinspection/update-status', [ApprovalsController::class, 'updateStatus'])->name('approvalsinspection.updateStatus');
@@ -1017,32 +850,24 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('incident/showre/{id}', [IncidentController::class, 'showre'])->name('incident.showre');
     Route::post('incident/reinspectionsforapp', [IncidentController::class, 'reinspectionsforapp'])->name('incident.reinspectionsforapp');
     Route::get('/get-incident-works/{incidentId}', [IncidentController::class, 'getIncidentWorks']);
-    Route::post('incident/approvals', [IncidentController::class, 'approvals'])->name('incidentupdate.approvals');
-    Route::post('incident/approvals', [IncidentController::class, 'approvals'])->name('incidentupdate.approvals');
+    Route::post('incident/approvals', [IncidentController::class,'approvals'])->name('incidentupdate.approvals');
     Route::put('/dailyinspection/{vehicle}', [InspectionController::class, 'routineUpdate'])->name('dailyinspection.routainupdate');
     Route::get('/routine-inspection/{vehicleId}', [ApprovalsController::class, 'getRoutineInspectionData']);
-    Route::post('inspectionretuinapp/approvals', [ApprovalsController::class, 'approvalsrotein'])->name('inspectionapprovalroten.approvalsrotein');
-    Route::post('pdiinspection', [InspectionController::class, 'pdiinspection'])->name('pdi.pdiinspection');
-    Route::post('inspectionretuinapp/approvals', [ApprovalsController::class, 'approvalsrotein'])->name('inspectionapprovalroten.approvalsrotein');
-    Route::post('pdiinspection', [InspectionController::class, 'pdiinspection'])->name('pdi.pdiinspection');
+    Route::post('inspectionretuinapp/approvals', [ApprovalsController::class,'approvalsrotein'])->name('inspectionapprovalroten.approvalsrotein');
+    Route::post('pdiinspection', [InspectionController::class,'pdiinspection'])->name('pdi.pdiinspection');
     Route::get('inspection/reinspectionspec/{id}', [InspectionController::class, 'reinspectionspec'])->name('inspection.reinspectionspec');
     Route::get('/get-vehicle-extra-items/{vehicle_id}', [InspectionController::class, 'getVehicleExtraItems']);
     Route::get('/pdi-inspection/{vehicleId}', [ApprovalsController::class, 'getpdiInspectionData']);
     Route::get('/incident-inspection/{vehicleId}', [ApprovalsController::class, 'getincidentInspectionData']);
-    Route::post('inspectionpdiapp/approvals', [ApprovalsController::class, 'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
-    Route::post('inspectionpdiappin/approvals', [ApprovalsController::class, 'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
-    Route::post('inspectionpdiapp/approvals', [ApprovalsController::class, 'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
-    Route::post('inspectionpdiappin/approvals', [ApprovalsController::class, 'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
+    Route::post('inspectionpdiapp/approvals', [ApprovalsController::class,'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
+    Route::post('inspectionpdiappin/approvals', [ApprovalsController::class,'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
     Route::get('incidents/updatevehicledetails', [IncidentController::class, 'updatevehicledetails'])->name('incident.updatevehicledetails');
-    Route::post('incident/createincidents', [IncidentController::class, 'createincidents'])->name('incident.createincidents');
-    Route::post('incident/createincidents', [IncidentController::class, 'createincidents'])->name('incident.createincidents');
+    Route::post('incident/createincidents', [IncidentController::class,'createincidents'])->name('incident.createincidents');
     // Route::resource('modification', ModificationController::class);
     Route::post('incident/reinspectionsforre', [IncidentController::class, 'reinspectionsforre'])->name('incident.reinspectionsforre');
     Route::post('incident/reinspectionsforrem', [IncidentController::class, 'reinspectionsforrem'])->name('incident.reinspectionsforrem');
-    Route::get('/get-pdi-inspection/{incidentId}', [IncidentController::class, 'getPdiInspection']);
-    Route::get('/get-incident-details/{incidentId}', [IncidentController::class, 'getIncidentDetails']);
-    Route::get('/get-pdi-inspection/{incidentId}', [IncidentController::class, 'getPdiInspection']);
-    Route::get('/get-incident-details/{incidentId}', [IncidentController::class, 'getIncidentDetails']);
+    Route::get('/get-pdi-inspection/{incidentId}', [IncidentController::class,'getPdiInspection']);
+    Route::get('/get-incident-details/{incidentId}', [IncidentController::class,'getIncidentDetails']);
     Route::get('inspectionedit/edit/{id}', [ApprovalsController::class, 'inspectionedit'])->name('inspectionedit.edit');
     Route::post('/update-routine-inspection', [ApprovalsController::class, 'updateRoutineInspection']);
     Route::post('/update-pdi-inspection', [ApprovalsController::class, 'updatepdiInspectionedit']);
@@ -1054,15 +879,12 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
     Route::get('/view-remarks-details/{id}', [VehiclesController::class, 'viewremarks'])->name('vehiclesremarks.viewremarks');
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
-    Route::get('/listUsers', [LoginActivityController::class, 'listUsers'])->name('listUsers');
-    Route::post('/listUsersget-data', [LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
-    Route::get('/listUsers', [LoginActivityController::class, 'listUsers'])->name('listUsers');
-    Route::post('/listUsersget-data', [LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
+    Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
+    Route::post('/listUsersget-data',[LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
     Route::post('/listUsersget-dataac', [LoginActivityController::class, 'listUsersgetdataac'])->name('listUsersgetdataac');
     Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
-    Route::get('/stock-count-filter', [VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
-    Route::get('/stock-count-filter', [VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
+    Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
@@ -1075,14 +897,11 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
     Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
 
-    Route::get('master-model/getLoiDescription', [MasterModelController::class, 'getLoiDescription'])
-    Route::get('master-model/getLoiDescription', [MasterModelController::class, 'getLoiDescription'])
+    Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
-    Route::post('quotation/new-model-line', [ModelLinesController::class, 'StoreModellineOrBrand'])->name('modelline-or-brand.store');
-    Route::post('quotation/new-model-line', [ModelLinesController::class, 'StoreModellineOrBrand'])->name('modelline-or-brand.store');
+    Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
     // DASHBOARD PARTS AND PROCURMENT
-    Route::get('addon-dashboard/sellingPriceFilter', [HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
-    Route::get('addon-dashboard/sellingPriceFilter', [HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
+    Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
     //Logistics
     Route::resource('logisticsdocuments', DocumentController::class);
     Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
@@ -1244,4 +1063,18 @@ Route::group(['middleware' => ['auth', 'checkstatus']], function () {
     Route::get('/enhancement/getVariants', [VehiclesController::class, 'getVariants'])->name('enhancement.getVariants');
     Route::get('/enhancement/getcolours', [VehiclesController::class, 'getcolours'])->name('get.color.data');
     Route::post('/enhancementcolour', [VehiclesController::class, 'saveenhancementcolor'])->name('enhancement.savecolour');
+    Route::post('/vehicles/uploadVinFile', [MovementController::class, 'uploadVinFile'])->name('vehicles.uploadVinFile');
+    Route::get('/get-custom-inspection-data', [VehiclesController::class, 'getCustomInspectionData']);
+    Route::match(['get', 'post'], 'vehicles/available', [VehiclesController::class, 'availablevehicles'])->name('vehicles.availablevehicles');
+    Route::match(['get', 'post'], 'vehicles/delivered', [VehiclesController::class, 'deliveredvehicles'])->name('vehicles.deliveredvehicles');
+    Route::match(['get', 'post'], 'vehicles/dpvehicles', [VehiclesController::class, 'dpvehicles'])->name('vehicles.dpvehicles');
+    Route::post('/sales-remarks', [VehiclesController::class, 'savesalesremarks'])->name('vehicles.savesalesremarks');
+    Route::get('/get-sales-remarks', [VehiclesController::class, 'getsalesremarks']);
+    Route::resource('salesorder', SalesOrderController::class);
+    Route::get('/sales-summary/{sales_person_id}/{count_type}', [SalesOrderController::class, 'showSalesSummary'])->name('sales.summary');
+    Route::resource('vehicleinvoice', VehicleInvoiceController::class);
+    Route::post('/get-vehicles-by-so', [VehicleInvoiceController::class, 'getVehiclesBySO'])->name('getVehiclesBySO');
+    Route::get('/viewinvoicereport/method', [VehicleInvoiceController::class, 'generateinvoicePDF']);
+    Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
+    Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
 });
