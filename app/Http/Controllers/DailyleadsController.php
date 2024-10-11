@@ -8,6 +8,7 @@ use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
+use App\Models\ModelHasRoles;
 use Illuminate\Http\Request;
 use App\Models\Quotation;
 use App\Models\Rejection;
@@ -41,11 +42,15 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $id = Auth::user()->id;
+        $clients = SalespersonOfClients::with('client')
+        ->where('sales_person_id', $id)
+        ->get();
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         if($hasPermission)
         {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->where('calls.status', 'New')
+    ->whereNull('calls.leadtype')
     ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
     ->select('calls.*')
     ->get();
@@ -55,6 +60,7 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
         ->where('calls.status', 'New')
         ->where('calls.sales_person', $id)
+        ->whereNull('calls.leadtype')
         ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
         ->orderBy('calls.created_by', 'desc')
         ->select('calls.*')
@@ -140,6 +146,33 @@ class DailyleadsController extends Controller
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
             }
+            else if($status === "bulkleads")
+            {
+                $bulkleads = calls::select([
+                    'calls.id',
+                    'calls.name',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.location',
+                    'users.name as createdby',
+                    'calls.language',
+                    'master_model_lines.model_line',
+                    'brands.brand_name',
+                    'calls.remarks',
+                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
+                ])
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->where('calls.sales_person', $id)
+                ->whereNotNull('calls.leadtype')
+                ->groupby('calls.id')
+                ->get();
+                return DataTables::of($bulkleads)->toJson();   
+            }
             else
             {
             $searchValue = $request->input('search.value');
@@ -166,7 +199,7 @@ class DailyleadsController extends Controller
                 }
                 else
                 {
-                    $data->where('calls.status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->whereNull('calls.leadtype')->where('sales_person', $id)->orderBy('created_at', 'desc');
                 }
             }
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
@@ -333,7 +366,7 @@ class DailyleadsController extends Controller
                 ->toJson();
         }
     }
-        return view('dailyleads.index', compact('pendingdata'));
+        return view('dailyleads.index', compact('pendingdata', 'clients'));
     }
     public function create()
     {
@@ -346,8 +379,9 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $salespersonId)
         ->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries'));
+        return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries','sales_persons'));
     }
     /**
      * Store a newly created resource in storage.
@@ -364,6 +398,34 @@ class DailyleadsController extends Controller
         $modelLineIds = json_decode($modelLineIdsRaw, true);
         $modelLineIds = array_map('strval', $modelLineIds);
         }
+        $assignid = $request->input('assignto');
+        $salesPersonId = $assignid ? $assignid : Auth::id();
+        $client = $request->input('client_id');
+        if(!$client)
+        {
+            $date = Carbon::now();
+            $date->setTimezone('Asia/Dubai');
+            $dataValue = '40';
+            $formattedDate = $date->format('Y-m-d H:i:s');
+            $data = [
+                'source' => $dataValue,
+                'type' => $request->input('type'),
+                'sales_person' => $salesPersonId,
+                'remarks' => $request->input('remarks'),
+                'custom_brand_model' => $request->input('custom_brand_model'),
+                'created_at' => $formattedDate,
+                'assign_time' => $formattedDate,
+                'created_by' => Auth::id(),
+                'leadtype' => $request->input('leadtype'),
+                'status' => "New",
+                'priority' => "High",
+                'customer_coming_type' => "Direct From Sales",
+            ];
+            $calls = new Calls($data);
+            $calls->save();
+        }
+        else
+        {
         $client = Clients::find($request->input('client_id'));
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
@@ -374,7 +436,7 @@ class DailyleadsController extends Controller
             'source' => $dataValue,
             'email' => $client->email,
             'type' => $request->input('type'),
-            'sales_person' => Auth::id(),
+            'sales_person' => $salesPersonId,
             'remarks' => $request->input('remarks'),
             'location' => $client->destination,
             'phone' => $client->phone,
@@ -393,6 +455,7 @@ class DailyleadsController extends Controller
         $clientleads->calls_id = $calls->id; 
         $clientleads->clients_id = $client->id;
         $clientleads->save();
+        }
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->where('sales_person', Auth::id())
@@ -411,7 +474,7 @@ class DailyleadsController extends Controller
         $model->save();
         }
         }
-    }
+        }
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,
@@ -748,5 +811,31 @@ public function saveprospecting(Request $request)
     } else {
         return response()->json(['authorized' => false]);
     }
+}
+public function updateCallClient(Request $request)
+{
+    $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'call_id' => 'required|exists:calls,id',
+    ]);
+    $client = Clients::find($request->client_id);
+    if (!$client) {
+        return response()->json(['message' => 'Client not found!'], 404);
+    }
+    $call = Calls::find($request->call_id);
+    if (!$call) {
+        return response()->json(['message' => 'Call not found!'], 404);
+    }
+    $call->name = $client->name;
+    $call->phone = $client->phone;
+    $call->email = $client->email;
+    $call->language = $client->lauguage;
+    $call->location = $client->destination;
+    $call->save();
+    $clientLead = new ClientLeads();
+    $clientLead->clients_id = $request->client_id;
+    $clientLead->calls_id = $request->call_id;
+    $clientLead->save();
+    return response()->json(['message' => 'Client updated successfully!'], 200);
 }
 }
