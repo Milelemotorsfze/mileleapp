@@ -3632,7 +3632,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             let formattedBatchNumber = batchNumber.padStart(2, '0');
 
 		// Construct the WO Number with batch information
-		var WONumber = "WO-" + numberPart + "-B" + batchNumber;
+		WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
+        } else {
+            // Construct the WO Number with "-SB" when the batch is not checked
+            WONumber = "WO-" + numberPart + "-SW";
+        }
+    }
 
 		// Set the WO Number field
 		document.getElementById('wo_number').value = WONumber;
