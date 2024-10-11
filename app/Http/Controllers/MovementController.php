@@ -40,7 +40,6 @@ class MovementController extends Controller
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id');
     $warehouses = Warehouse::select('id', 'name')->get();
- 
     if ($request->ajax()) {
         $movementsQuery = Movement::query();
         foreach ($request->input('columns') as $column) {
@@ -75,10 +74,24 @@ class MovementController extends Controller
                     $query->where('po_number', 'like', '%' . $searchValue . '%');
                 });
             }
+            elseif ($columnName === 'remarks' && $searchValue !== null) {
+                $movementsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+            } elseif ($columnName === 'custom_inspection_number' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('vehicle', function ($query) use ($searchValue) {
+                    $query->where('custom_inspection_number', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'created_at' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('Movementrefernce', function ($query) use ($searchValue) {
+                    $query->where('created_at', 'like', '%' . $searchValue . '%');
+                });
+            }
         }
         return DataTables::of($movementsQuery)
             ->addColumn('date', function ($movement) {
                 return date('d-M-Y', strtotime($movement->Movementrefernce->date));
+            })
+            ->addColumn('created_at', function ($movement) {
+                return date('d-M-Y', strtotime($movement->Movementrefernce->created_at));
             })
             ->addColumn('model_detail', function ($movement) {
                 return $movement->vehicle->variant->model_detail ?? '';
@@ -94,6 +107,12 @@ class MovementController extends Controller
             })
             ->addColumn('po_number', function ($movement) {
                 return $movement->vehicle->purchasingOrder->po_number ?? '';
+            })
+            ->addColumn('custom_inspection_number', function ($movement) {
+                return $movement->vehicle->custom_inspection_number ?? '';
+            })
+            ->addColumn('remarks', function ($movement) {
+                return $movement->remarks ?? '';
             })
             ->toJson();
     }
@@ -294,7 +313,7 @@ class MovementController extends Controller
             $gdn = new Gdn();
             $gdn->date = $date;
             $gdn->save();
-            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
+            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdn->id]);
             $vehicleId = Vehicles::whereIn('vin', $gdnVins)->pluck('id');
             $vehicleslog = new Vehicleslog();
                             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -353,13 +372,7 @@ class MovementController extends Controller
         }
     }
 }    
-        $data = Movement::get();
-        $vehicles = Vehicles::whereNotNull('vin')
-        ->where('status', '!=', 'cancel')
-        ->pluck('vin', 'varaints_id'); 
-        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
-        $movementreference = MovementsReference::get(); 
-        return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
+return redirect()->back()->with('success', 'Transition has been successfully Saved!');
     }    
     /**
      * Display the specified resource.
@@ -640,4 +653,112 @@ public function grnfilepost(Request $request)
             }
          return response()->json($vehicleDetails);
     }
+    public function revise(Request $request, $id)
+{
+    $movementlast = Movement::findOrFail($id);
+    $vehicle = Vehicles::where('vin', $movementlast->vin)->first(); 
+    $revisedmovement = new Movement();
+    $revisedmovement->from = $movementlast->to;
+    $revisedmovement->to = $movementlast->from;
+    $revisedmovement->vin = $movementlast->vin;
+    $revisedmovement->reference_id = $movementlast->reference_id;
+    $revisedmovement->remarks = 'Revised Movement';
+    $revisedmovement->save();
+    if ($movementlast->from === 1) {
+        if ($vehicle) {
+            $vehicle->grn_id = null;
+            $vehicle->save();
+        }
+    } else if ($movementlast->to === 2) {
+        if ($vehicle) {
+            $vehicle->gdn_id = null;
+            $vehicle->save();
+        }
+    }
+    return redirect()->route('movement.index')->with('success', 'Movement has been revised successfully.');
+}
+public function uploadVinFile(Request $request)
+{
+    if ($request->hasFile('vin_file')) {
+        $file = $request->file('vin_file');
+        $vinData = [];
+        
+        // Process CSV file
+        if (($handle = fopen($file, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+                $vinData[] = [
+                    'vin' => $data[0], // VIN number
+                    'to' => $data[1] // Warehouse name (from file, you need to add this column)
+                ];
+            }
+            fclose($handle);
+        }
+
+        // Same permission check logic as before
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-movement');
+        $vinNumbers = array_column($vinData, 'vin');
+
+        // Retrieve vehicles based on permissions
+        if ($hasPermission) {
+            $vehicles = Vehicles::whereIn('vin', $vinNumbers)
+                ->whereNotNull('vin')
+                ->where('status', '!=', 'cancel')
+                ->whereNull('grn_id')
+                ->where('status', '=', 'Approved')
+                ->pluck('id');
+        } else {
+            $vehicles = Vehicles::whereIn('vin', $vinNumbers)
+                ->whereNotNull('vin')
+                ->where('status', '!=', 'cancel')
+                ->whereNull('gdn_id')
+                ->where('status', '=', 'Approved')
+                ->pluck('id');
+        }
+        if ($vehicles->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'No matching VINs found']);
+        }
+        // Fetch vehicle details and match warehouse names
+        $vehicleDetails = [];
+        foreach ($vehicles as $key => $vehicle) {
+            $data = Vehicles::find($vehicle);
+            $vehicle = Vehicles::where('vin', $data->vin)->first();
+            $variant = Varaint::find($vehicle->varaints_id)->name;
+            $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+            $so = $vehicle->so_id ? So::find($vehicle->so_id) : null;
+            $so_number = $so ? $so->so_number : '';
+            $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+            $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+            $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
+            $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+            $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+
+            // Default to Supplier if no warehouse name found
+            if (empty($warehouseName)) {
+                $warehouseName = $vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first() : 1;
+            }
+            if (empty($warehouseNames)) {
+                $warehouseNames = $vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first() : "Supplier";
+            }
+
+            // Match the 'to' warehouse from the CSV and set as default
+            $matchedWarehouse = Warehouse::where('name', $vinData[$key]['to'])->first();
+
+            $vehicleDetails[$key] = [
+                'vin' => $data->vin,
+                'variant' => $variant,
+                'modelLine' => $modelLine,
+                'brand' => $brand,
+                'warehouseName' => $warehouseName,
+                'warehouseNames' => $warehouseNames,
+                'po_number' => $po_number,
+                'so_number' => $so_number,
+                'matchedWarehouseId' => $matchedWarehouse ? $matchedWarehouse->id : null // Store the matched warehouse ID
+            ];
+        }
+
+        return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
+    } else {
+        return response()->json(['success' => false, 'message' => 'No file uploaded']);
+    }
+}
     }

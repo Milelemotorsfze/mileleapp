@@ -67,7 +67,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->customertype }}</td>
-                                <td>{{ $customer->country->name ?? '' }}</td>
+                                <td>{{ $customer->country }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td> {{ $customer->createdBy->name ?? ''}} </td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M Y') }}</td>
@@ -109,7 +109,7 @@
                                             <div class="modal-body">
                                                 @if($customer->passport)
                                                     <div class="row p-2">
-                                                        <h4>Passport</h4>
+                                                        <h6>Passport</h6>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
                                                                 <embed src="{{ url('storage/app/public/passports/'.$customer->passport) }}"  width="400" height="600"></embed>
@@ -119,13 +119,23 @@
                                                 @endif
                                                 @if($customer->tradelicense)
                                                     <div class="row p-2">
-                                                        <h4>Trade License</h4>
+                                                        <h6>Trade License</h6>
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
                                                                 <embed src="{{ url('storage/app/public/tradelicenses/'.$customer->tradelicense) }}"  width="400" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                @endif
+                                                @if($customer->clientDocuments()->count() > 0)
+                                                    <h6 class="fw-bold text-center">Other Documents</h6>
+                                                    @foreach($customer->clientDocuments as $key => $customerDocument)
+                                                    <div class="col-lg-12">
+                                                        <div class="row mt-2">
+                                                            <embed src="{{ url('customer-other-documents/' . $customerDocument->document) }}"  width="400" height="600" alt="File"></embed>
+                                                        </div>
+                                                    </div>
+                                                    @endforeach
                                                 @endif
                                             </div>
                                             <div class="modal-footer">

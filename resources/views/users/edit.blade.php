@@ -14,7 +14,7 @@
             </ul>
         </div>
     @endif
-    {!! Form::model($user, ['method' => 'PATCH', 'route' => ['users.update', $user->id]]) !!}
+    {!! Form::model($user, ['method' => 'PATCH', 'route' => ['users.update', $user->id], 'enctype' => 'multipart/form-data']) !!}
     <div class="row mb-3">
         <div class="col-md-4">
             <label for="name" class="form-label">Name</label>
@@ -58,11 +58,32 @@
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="form-check mt-4">
                 <input class="form-check-input" type="checkbox" id="sales_rap" name="sales_rap" value="yes" {{ old('sales_rap', $user->sales_rap) == 'Yes' ? 'checked' : '' }}>
-                <label class="form-check-label" for="sales_rap">Sales RAP</label>
+                <label class="form-check-label" for="sales_rap">Sales REP</label>
             </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="is_sales_rep" name="is_sales_rep" value="yes" {{ old('is_sales_rep', $user->is_sales_rep) == 'Yes' ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_sales_rep">Is Sales Rep.</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="can_send_wo_email" name="can_send_wo_email" value="yes" {{ old('can_send_wo_email', $user->can_send_wo_email) == 'yes' ? 'checked' : '' }}>
+                <label class="form-check-label" for="can_send_wo_email">Can Send Work Order Email</label>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="user_image" class="form-label">User Image</label>
+            @if($user->empProfile && $user->empProfile->image_path)
+                <div class="mb-3">
+                    <img src="{{ asset($user->empProfile->image_path) }}" alt="User Image" class="img-thumbnail" width="150">
+                </div>
+            @endif
+            <input type="file" name="user_image" id="user_image" class="form-control" accept=".jpg, .jpeg, .png">
         </div>
         <div class="col-md-4">
             <label for="roles" class="form-label">Roles</label>

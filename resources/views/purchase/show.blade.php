@@ -1,9 +1,11 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    
    .select2-container {
       z-index: 2050; /* Adjust this value as needed */
       width: 100% !important;
+      min-width: 200px;
     }
     .select2-selection {
       width: 100% !important;
@@ -319,6 +321,10 @@
                             <!-- Rows will be populated dynamically -->
                         </tbody>
                     </table>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="remarks">Remarks:</label>
+                    <textarea id="remarks" name="remarks" class="form-control" rows="4" placeholder="Enter any remarks here..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1582,8 +1588,8 @@
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
-                                <th>Engine Number</th>
                                 <th>VIN Number</th>
+                                <th>Engine Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
@@ -1657,7 +1663,7 @@
                             @if($vehicles->grn_id === null)
 							@if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1669,7 +1675,7 @@
                                 </select>
                             </td>
                             <td class="editable-field int_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1680,14 +1686,14 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1699,7 +1705,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1710,15 +1716,15 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1730,7 +1736,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1741,8 +1747,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
@@ -1776,8 +1782,8 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ $vehicles->vin }}</td>
+                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
                                 <td>{{ $vehicles->ppmmyyy }}</td>
@@ -2222,76 +2228,28 @@
                     </div>
                     </div>
                     <div class="tab-pane fade" id="dn-vehicle" role="tabpanel" aria-labelledby="dn-vehicle-tab">
+                    <div class="card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div></div> <!-- Empty div to take up space on the left -->
         <a href="#" class="btn btn-sm btn-success adddnnumberbutton-btn" data-id="{{ $purchasingOrder->id }}" data-bs-toggle="modal" data-bs-target="#addDNModalUnique">Add New DN Numbers</a>
     </div>
-    <div class="table-responsive mt-4">
-        <table id="dtBasicExample8" class="table table-striped table-editable table-edits table-bordered">
-            <thead class="bg-soft-secondary">
-                <tr>  
-                    <th>Ref No</th>
-                    <th>Brand</th>
-                    <th>Model Line</th>
-                    <th>Variant</th>
-                    <th>Variants Detail</th>
-                    <th>Exterior Colour</th>
-                    <th>Interior Colour</th>
-                    <th>VIN Number</th>
-                    <th>Territory</th>
-                    <th>Estimated Arrival</th>
-                    <th>Remarks</th>
-                    <th>DN Number</th>
-                </tr>
-            </thead>
-            <tbody>
-                            @foreach($vehiclesdel as $vehiclesdel)
-                                <tr>
-                                <td>{{ $vehiclesdel->id }}</td>
-                                @can('view-vehicle-model-sfx')
-                                @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
-                                @endphp
-                                @if ($hasPermission)
-                                    <td>
-                                        @if($vehiclesdel->model_id)
-                                            {{ $vehiclesdel->masterModel->model ?? ''  }} - {{ $vehiclesdel->masterModel->sfx ?? '' }}
-                                        @endif
-                                    </td>
-                                @endif
-                            @endcan
-                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->brand->brand_name)) }}</td>
-                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->master_model_lines->model_line)) }}</td>
-                            <td>{{ ucfirst($vehiclesdel->variant->name) }}</td>
-                        @php
-                        $words = explode(' ', ucfirst(strtolower($vehiclesdel->variant->detail)));
-                        $shortDetail = implode(' ', array_slice($words, 0, 3));
-                        $remainingDetail = implode(' ', array_slice($words, 3));
-                        @endphp
-                        <td>
-                            <span class="short-detail">{{ $shortDetail }}</span>
-                            @if(count($words) > 5)
-                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
-                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
-                            @endif
-                        </td>
-                        @if (!is_null($vehiclesdel->VehiclePurchasingCost->unit_price) && !is_numeric($vehiclesdel->VehiclePurchasingCost->unit_price))
-                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
-                        @else
-                        <td>{{ $vehiclesdel->VehiclePurchasingCost->unit_price }}</td>
-                        @endif
-                          <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
-                          <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
-                          <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
-                          <td>{{ $vehiclesdel->ppmmyyy ? \Carbon\Carbon::parse($vehiclesdel->ppmmyyy)->format('d-M-Y') : '' }}</td>
-                          <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
-                         <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
-                                </tr>
-                                @endforeach
-                    </tbody>
-                    </table>
+    <div class="table-responsive">
+                        <table id="dtBasicExample10" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Ref No</th>
+                                <th>Brand</th>
+                                <th>Model Line</th>
+                                <th>Variant</th>
+                                <th>Exterior Colour</th>
+                                <th>Interior Colour</th>
+                                <th>VIN</th>
+                                <th>DN Number</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
             </div>
         </div>
@@ -4751,6 +4709,7 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         const data = {
             paymentOption: paymentOption,
             purchaseOrderId: purchaseOrderId,
+            remarks: $('#remarks').val(),
             adjustmentAmount: $('#adjustmentAmount').val()
         };
 
@@ -5179,5 +5138,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+</script>
+<script>
+    $(document).ready(function() {
+        $('.ex-colour-select').select2({
+            placeholder: 'Exterior Color',
+            allowClear: true,
+            width: 'resolve'  // This tells Select2 to inherit the width from the CSS or element itself
+        });
+
+        $('.int-colour-select').select2({
+            placeholder: 'Interior Color',
+            allowClear: true,
+            width: 'resolve'  // Adjust the width dynamically or apply your custom width
+        });
+    });
 </script>
 @endsection

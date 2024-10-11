@@ -325,11 +325,15 @@
     </div>
         <hr>
         <div class="row">
-    <h6>Vehicles</h6>
+        @php
+    // Calculate the total number of vehicles
+    $totalVehicles = $quotationItems->sum('quantity');
+@endphp
+    <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
     <div class="col-md-12">
         @foreach($quotationItems as $quotationItem)
         <div class="mb-1">
-            <h6>{{ $quotationItem->description }}</h6>
+            <h6>{{ $loop->iteration }} - {{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
             <div class="row">
                 @for ($i = 0; $i < $quotationItem->quantity; $i++)
                 <div class="col-md-2 mb-3">

@@ -19,7 +19,7 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function index()
+    public function index(Request $request)
     {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open the DashBoard";
@@ -238,11 +238,102 @@ $totalvariantss = [
             $sales_personsname = [];
             $leadsCount = [];
         }
-       return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
-           'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
-           'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
-           'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-            'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname'));
+        $saleshasPermission = Auth::user()->hasPermissionForSelectedRole('sale-team-dashboard');
+        if ($saleshasPermission) {
+            $person = Auth::id();
+            $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
+            $undersalesleads = DB::table('calls')
+            ->join('users', 'calls.sales_person', '=', 'users.id')
+            ->where('calls.status', '=', 'New')
+            ->whereIn('calls.sales_person', $salespersonunder->pluck('person_id')->toArray())
+            ->groupBy('users.name')
+            ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
+            ->get();
+        }
+        else{
+            $undersalesleads = [];
+        }
+        $hasPermissiongp = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
+        if ($hasPermissiongp) {
+            $person = Auth::id();
+            $salespersonunder = DB::table('salesteam')->where('lead_person_id', $person)->get();
+            $usdToAedRate = 3.67;
+            $selectedMonth = $request->get('month') ?? now()->format('Y-m');
+            $commissons = DB::table('vehicle_invoice')
+                ->join('vehicle_invoice_items', 'vehicle_invoice.id', '=', 'vehicle_invoice_items.vehicle_invoice_id')
+                ->join('so', 'vehicle_invoice.so_id', '=', 'so.id')
+                ->join('users', 'so.sales_person_id', '=', 'users.id')
+                ->leftJoin('vehicle_netsuite_cost', 'vehicle_invoice_items.vehicles_id', '=', 'vehicle_netsuite_cost.vehicles_id')
+                ->where(DB::raw("DATE_FORMAT(vehicle_invoice.created_at, '%Y-%m')"), '=', $selectedMonth)
+                ->whereIn('so.sales_person_id', $salespersonunder->pluck('person_id')->toArray())
+                ->orwhere('so.sales_person_id', $person)
+                ->select(
+                    'so.sales_person_id',
+                    'users.name',
+                    DB::raw('COUNT(DISTINCT vehicle_invoice.id) as total_invoices'),
+                    DB::raw('COUNT(vehicle_invoice_items.id) as total_invoices_items'),
+                    DB::raw('SUM(vehicle_netsuite_cost.cost) as total_vehicle_cost'),
+                    DB::raw("SUM(CASE WHEN vehicle_invoice.currency = 'USD' THEN vehicle_invoice_items.rate * $usdToAedRate ELSE vehicle_invoice_items.rate END) as total_rate_in_aed"),
+                    DB::raw('GROUP_CONCAT(vehicle_invoice_items.vehicles_id) as all_vehicles_ids'),
+                    'vehicle_invoice.currency'
+                )
+                ->groupBy('so.sales_person_id', 'users.name')
+                ->get();
+            foreach ($commissons as $item) {
+                $totalSales = $item->total_rate_in_aed;
+                $commissionSlot = DB::table('commission_slots')
+                    ->where('min_sales', '<=', $totalSales)
+                    ->where(function($query) use ($totalSales) {
+                        $query->where('max_sales', '>=', $totalSales)
+                              ->orWhereNull('max_sales');
+                    })
+                    ->orderBy('min_sales', 'desc')
+                    ->first();
+                $item->commission_rate = $commissionSlot ? $commissionSlot->rate : 0;
+            }
+        } else {
+            $commissons = [];
+        }
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
+        if ($hasPermission) {
+            $dpdashboarduae = DB::table('vehicles')
+            ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+            ->join('color_codes as int_colours', 'vehicles.int_colour', '=', 'int_colours.id')
+            ->join('color_codes as ext_colours', 'vehicles.ex_colour', '=', 'ext_colours.id')
+            ->join('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->where('brands.brand_name', 'Toyota')
+            ->where('vehicles.latest_location', '!=', 38)
+            ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
+            ->select('varaints.name as variant_name', 'varaints.id as varaints_id')
+            ->distinct()
+            ->get();
+            $dpdashboardnon = DB::table('vehicles')
+            ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+            ->join('color_codes as int_colours', 'vehicles.int_colour', '=', 'int_colours.id')
+            ->join('color_codes as ext_colours', 'vehicles.ex_colour', '=', 'ext_colours.id')
+            ->join('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->where('brands.brand_name', 'Toyota')
+            ->where('vehicles.latest_location', '=', 38)
+            ->where('purchasing_order.is_demand_planning_po', true)  // Assuming true indicates demand planning PO
+            ->select('varaints.name as variant_name', 'varaints.id as varaints_id')
+            ->distinct()
+            ->get();
+            return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
+            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
+            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
+            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons'));
+        }
+        else
+        {
+            return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
+            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
+            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
+            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons'));
+        }
     }
     public function marketingupdatechart(Request $request)
     {

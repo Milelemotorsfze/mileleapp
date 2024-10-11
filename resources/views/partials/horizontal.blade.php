@@ -139,7 +139,23 @@
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
 
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','list-export-exw-wo']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Report</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">                                             
+                                                <a href="{{route('work-order.index','status_report')}}" class="dropdown-item" data-key="t-login">Status Report</a>                                             
+                                                <a href="{{route('work-order.index','all')}}" class="dropdown-item" data-key="t-login">Full Data</a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','list-export-exw-wo','view-current-user-export-exw-wo-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
@@ -181,7 +197,7 @@
                                                 <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo','list-export-cnf-wo','view-current-user-export-cnf-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('work-order.index','export_cnf') }}" class="dropdown-item" data-key="t-login">List</a>
@@ -207,7 +223,7 @@
                                                 <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Create</a>
                                                 @endif
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('work-order.index','local_sale') }}" class="dropdown-item" data-key="t-login">List</a>
@@ -909,36 +925,6 @@
                                         <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="" id="topnav-more" role="button">
-                                        <i data-feather="upload-cloud"></i>
-                                        <span data-key="t-extra-pages">Posting Records</span>
-                                        <div class="arrow-down"></div>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                        @php
-                                        $posting_platforms = DB::table('posting_platforms')->get();
-                                        @endphp
-                                        @foreach ($posting_platforms as $posting_platform)
-                                            @php
-                                            $lead_source = DB::table('lead_source')->where('id', $posting_platform->lead_source_id)->first();
-                                            @endphp
-                                            @if($lead_source)
-                                            <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('postingrecords', ['id' => $posting_platform->lead_source_id]) }}" id="topnav-utility" role="button">
-                                                    <span data-key="t-utility">{{$lead_source->source_name}}</span>
-                                                </a>
-                                            </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="shopping-bag"></i>
-                                        <span data-key="t-extra-pages">Purchashing & Payments</span>
-                                    </a>
-                                </li>
                                 @endif
                                 @endcan
                                 @can('View-daily-movemnets')
@@ -996,6 +982,12 @@
                                         <span data-key="t-extra-pages">Leads</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Sales Order</span>
+                                    </a>
+                                </li>
                                 @endif
                                 @can('sales-view')
                                 @php
@@ -1006,6 +998,12 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
                                         <i data-feather="film"></i>
                                         <span data-key="t-extra-pages">Leads</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Sales Order</span>
                                     </a>
                                 </li>
                                 @endif
@@ -1021,6 +1019,17 @@
                                 </li>
                                 @endif
                                 @endcan -->
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('fin-vehicle-invoice');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicleinvoice.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="check-circle"></i>
+                                        <span data-key="t-extra-pages">Vehicle Delivery Invoice</span>
+                                    </a>
+                                </li>
+                                @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
                                 @endphp
@@ -1282,9 +1291,9 @@
                                                 @endif
                                             @endcan
 
-                                            @can('PFI-list')
+                                            @canany(['PFI-list','PFI-create'])
                                                 @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['PFI-list','PFI-create']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <div class="dropdown">
@@ -1293,13 +1302,26 @@
                                                         <div class="arrow-down"></div>
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                                        @can('PFI-list')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                                            @endif
+                                                        @endcan
+                                                        @can('PFI-create')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('pfi.create')}}" class="dropdown-item" data-key="t-login">Add New PFI Details </a>
+                                                            @endif
+                                                        @endcan
                                                     </div>
                                                 </div>
                                                 @endif
                                             @endcan
-
-                                           
                                         </div>
                                     </li>
                                     @endif
@@ -1334,6 +1356,16 @@
                                         <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Variants </span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-netsuite-price');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('vehiclenetsuitecost.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Netsuite Vehicle Price</span>
                                             </a>
                                         </div>
                                         @endif
@@ -1433,7 +1465,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variantprices.allvariantprice')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Variant Price </span>
                                             </a>
                                         </div>
@@ -1493,8 +1525,23 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.availablevehicles')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Incoming & Available Vehicles</span>
+                                            </a>
+                                            </div>
+                                            <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.deliveredvehicles')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Delivered Vehicles</span>
+                                            </a>
+                                            </div>
+                                            <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.dpvehicles')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">DP Vehicles</span>
+                                            </a>
+                                            </div>
+                                            <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Status Wise</span>
+                                                <span data-key="t-utility">All Vehicles</span>
                                             </a>
                                             </div>
                                             <div class="dropdown">
@@ -1573,7 +1620,7 @@
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
                     <button class="btn username-toggle header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
-                        <img class="rounded-circle header-profile-user" src="{{ asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;">
+                    <img class="rounded-circle header-profile-user" src="{{ auth()->user()->empProfile && auth()->user()->empProfile->image_path ? asset(auth()->user()->empProfile->image_path) : asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;padding: 0px!important;">
                         <span class="d-none d-xl-inline-block fw-medium user-textname-div" style="line-height: 35px;">
                             @php
                             $userName = auth()->user()->name;

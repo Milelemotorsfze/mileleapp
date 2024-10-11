@@ -49,6 +49,10 @@ class LetterOfIndent extends Model
     {
         return $this->belongsTo(Clients::class,'client_id','id');
     }
+    public function country()
+    {
+        return $this->belongsTo(Country::class,'country_id','id');
+    }
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

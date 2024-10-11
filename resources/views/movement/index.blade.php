@@ -3,6 +3,18 @@
     #dtBasicExample2 {
         width: 100%;
     }
+    table.dataTable thead select {
+    width: 100%;
+    padding: 4px;
+    box-sizing: border-box;
+}
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-dropdown {
+    border-radius: 4px;
+}
 </style>
 @section('content')
 @php
@@ -67,8 +79,17 @@
                 <th>Vehicle Quantity</th>
                 <th>Created By</th>
                 <th>Created Date</th>
+                <th>Movement Date</th>
                 <th>Action</th>
                         </tr>
+                        <tr>
+                <th><select id="filter-movement-batch"><option value="">All</option></select></th>
+                <th><select id="filter-vehicle-quantity"><option value="">All</option></select></th>
+                <th><select id="filter-created-by"><option value="">All</option></select></th>
+                <th><select id="filter-created-date"><option value="">All</option></select></th>
+                <th><select id="filter-movement-date"><option value="">All</option></select></th>
+                <th></th>
+            </tr>
                         </thead>
                         <tbody>
                         <div hidden>{{$i=0;}}
@@ -85,6 +106,7 @@
                         $created_by = $created_bys->name;
                         @endphp
                         <td>{{ $created_by }}</td>
+                        <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->created_at)) }}</td>
                         <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->date)) }}</td>
                         <td><a title="Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('movement.show', $movementreference->id) }}"><i class="fa fa-car" aria-hidden="true"></i> View Details</a></td>
                       </tr>
@@ -99,17 +121,20 @@
       <div class="tab-content">
     <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
-            <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-                <thead class="bg-soft-secondary">
+        <div class="table-responsive" style="height: 74vh;">
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-                <th>Date</th>
+                <th>Creation Date</th>
+                <th>Movement Date</th>
                 <th>VIN</th>
-                <th>Model Detail</th>
-                <th>From Name</th>
-                <th>To Name</th>
+                <th>TRIM</th>
+                <th>From</th>
+                <th>To</th>
                 <th>SO Number</th>
                 <th>PO Number</th>
+                <th>Inspection No</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -181,13 +206,16 @@
 
             // Define column-specific filters
             "columns": [
+                { data: 'created_at', name: 'created_at' },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vin' },
                 { data: 'model_detail', name: 'model_detail' },
                 { data: 'from_name', name: 'from_name' },
                 { data: 'to_name', name: 'to_name' },
                 { data: 'so_number', name: 'so_number' },
-                { data: 'po_number', name: 'po_number' }
+                { data: 'po_number', name: 'po_number' },
+                { data: 'custom_inspection_number', name: 'custom_inspection_number' },
+                { data: 'remarks', name: 'remarks' }
             ]
         });
 
@@ -206,7 +234,73 @@
             });
         });
     });
+    $(document).ready(function () {
+    // Custom sorting for dates in the format dd-MMM-yyyy
+    $.fn.dataTable.ext.type.order['custom-date-pre'] = function (data) {
+        var dateParts = data.split('-');
+        var day = parseInt(dateParts[0], 10);
+        var month = new Date(Date.parse(dateParts[1] +" 1, 2022")).getMonth() + 1;
+        var year = parseInt(dateParts[2], 10);
+        return new Date(year, month - 1, day).getTime();
+    };
+
+    // Custom numeric sorting for MOV - XXX format
+    $.fn.dataTable.ext.type.order['mov-numeric-pre'] = function (data) {
+        var num = data.match(/\d+/); // Extract the numeric part from the string
+        return num ? parseInt(num[0], 10) : 0; // Convert to an integer for sorting
+    };
+
+    // Destroy existing DataTable if it exists
+    if ($.fn.DataTable.isDataTable('#dtBasicExample1')) {
+        $('#dtBasicExample1').DataTable().destroy();
+    }
+
+    // Initialize DataTables with custom sorting applied to specific columns
+    var table = $('#dtBasicExample1').DataTable({
+        columnDefs: [
+            { type: 'mov-numeric', targets: 0 }, // Apply MOV - XXX sorting to the first column
+            { type: 'custom-date', targets: [3, 4] } // Apply custom date sorting to the 4th and 5th columns (index 3 and 4)
+        ],
+        initComplete: function () {
+            // Populate dropdowns with unique values
+            this.api().columns().every(function () {
+                var column = this;
+                var select = $('select', column.header());
+                select.empty();
+                select.append('<option value="">All</option>');
+
+                // Retrieve unique values for each column and append to the select element
+                column.data().unique().sort().each(function (d, j) {
+                    if (d) { // Ensure that the value is not empty or undefined
+                        select.append('<option value="' + d + '">' + d + '</option>');
+                    }
+                });
+
+                // Initialize Select2 on the dropdown
+                select.select2({
+                    placeholder: "Select a value",
+                    allowClear: true
+                });
+            });
+        }
+    });
+
+    // Apply the filter with exact match
+    $('#dtBasicExample1 thead').on('change', 'select', function () {
+        var columnIndex = $(this).parent().index();
+        var searchTerm = this.value;
+
+        if (searchTerm !== "") {
+            // Use a regular expression to match exact value
+            table.column(columnIndex).search('^' + searchTerm + '$', true, false).draw();
+        } else {
+            // Clear the search if no value is selected
+            table.column(columnIndex).search('').draw();
+        }
+    });
+});
 </script>
+
             </div>
             @else
     @php

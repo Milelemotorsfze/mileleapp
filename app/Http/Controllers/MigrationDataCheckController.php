@@ -8,6 +8,10 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiTemplate;
 use App\Models\LoiSoNumber;
+use App\Models\ClientCountry;
+use App\Models\LetterOfIndentDocument;
+use Illuminate\Support\Facades\File;
+use App\Models\ClientDocument;
 
 use Illuminate\Http\Request;
 
@@ -171,7 +175,6 @@ class MigrationDataCheckController extends Controller
        $datas =  DB::table('migration_po_items')->get();
 
        foreach($datas as $data) {
-        info($data->variant_id);
        $model = DB::table('migration_master_models')
                     ->find($data->master_model_id);
 
@@ -193,7 +196,6 @@ class MigrationDataCheckController extends Controller
         foreach ($LOIs as $LOI) {
         $loiIds = DB::table('migration_loi_items')->where('loi_number', $LOI->loi_number)->pluck('master_model_id')->toArray();
         
-        info($loiIds);
             if (count($loiIds) !== count(array_unique($loiIds))) {
                 $duplicates[] = $LOI->loi_number;
             }
@@ -234,9 +236,7 @@ class MigrationDataCheckController extends Controller
                                 ->where('sfx', $masterModel->sfx)
                                 // ->whereIn('model_line_id', $data->model_line_id)
                                 ->pluck('id')->toArray();
-                                info($masterModel->model);
-                                info($masterModel->sfx);
-                                info($sameModelIds);
+                               
                                 
             // get the count of same model lines 
             $modelCountPO = DB::table('migration_po_items')
@@ -252,9 +252,7 @@ class MigrationDataCheckController extends Controller
                                         ->where('vendor', $data->vendor)
                                         ->count();  
                                         info("total count in po");
-                                info($modelCountPO);
-                                info("total count in inventory");
-                                info($modelCountInventory);                       
+                                                    
 
           if($modelCountInventory < $modelCountPO)  {
             $incorrectModelSfx[] = $masterModel->model."-".$masterModel->sfx;
@@ -332,56 +330,80 @@ class MigrationDataCheckController extends Controller
       }
       return 1;
     }
-    public function index()
+    public function index(Request $request)
     {
-        // $loiItemCodes = DB::table('loi_item_codes')->get();
-        // foreach($loiItemCodes as $loiItemCode) {
-        //     DB::table('letter_of_indent_items')
-        //         ->where('id', $loiItemCode->loi_item_id)
-        //         ->update([
-        //             'code' => $loiItemCode->code,
-        //         ]);
+        // // $isPassport = [];
+        // // $isTradeLicense = [];
+        // // $letterOfIndentDocuments = LetterOfIndentDocument::all();
+        // //                         // return $letterOfIndentDocuments;
+        // // foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
+        // //     info($letterOfIndentDocument);
+        //     // $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
+        //     // if(!$customerDoc) {
+        //         // info($letterOfIndentDocument->LOI->client->passport);
+        //         // info($letterOfIndentDocument->LOI->client->tradelicense);
+        //         // if($letterOfIndentDocument->LOI->client->passport || $letterOfIndentDocument->LOI->client->tradelicense) {
+        //         //     info("passport / treade license  exist");
+        //         //     $isPassport[] = $letterOfIndentDocument->loi_document_file;
+        //         //     $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->LOI->client->tradelicense;
+        //         //     $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->LOI->client->passport;
+        //         //     $letterOfIndentDocument->save();
+        //         // }
+        //         if($letterOfIndentDocument->customer_trade_license_file_name) {
+        //             $data = ClientDocument::where('document','like', '%' . $letterOfIndentDocument->loi_document_file . '%')->first();
+                    
+        //             if($data) {
+        //                 info($data);
+        //                 $data->delete();
+        //             }
+        //             $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->loi_document_file;
+        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_trade_license_file_name;
+        //             $letterOfIndentDocument->is_trade_license = 1;
+        //             $letterOfIndentDocument->save();
+        //         }
+        //         if($letterOfIndentDocument->customer_passport_file_name) {
+        //             ClientDocument::where('document','like','%' . $letterOfIndentDocument->loi_document_file . '%')->delete();
+
+        //             $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->loi_document_file;
+        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_passport_file_name;
+        //             $letterOfIndentDocument->is_passport = 1;
+        //             $letterOfIndentDocument->save();
+        //         }
+        //             info("other doc exist");
+        //         //     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
+        //         //     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
+       
+        //         //    // return $new_path;
+        //         //    File::copy($old_path, $new_path);
+        //         //    $customerDoc = new clientDocument();
+        //         //    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
+        //         //    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
+        //         //    $customerDoc->save();
+                                   
+        //     // }
         // }
+        // info("passport");
+        // info($isPassport);
+     
+        // return $isPassport;
+    }
+    // transfer file from LOI Documents to Customer Documents
+    public function migrateCustomerDocs() {
+        $letterOfIndentDocument = LetterOfIndentDocument::find(1);
+        $old_path = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
 
-        // $lois = LetterOfIndent::all();
-        // foreach($lois as $loi) {
-        //     $loi->utilized_quantity =  $loi->total_loi_quantity;
-        //     $loi->save();
-        // }
-
-        // return 1;
-
-       // loi templates options update for migration data
-
-    //    $lois = LetterOfIndent::all();
-    //    foreach($lois as $loi) {
-    //         if($loi->client->customertype == 'Individual'){
-    //             $loiTemplate = new LoiTemplate();
-    //             $loiTemplate->template_type = 'individual';
-    //             $loiTemplate->letter_of_indent_id = $loi->id;
-    //             $loiTemplate->save();
-    //         }else {
-    //             $loiTemplate = new LoiTemplate();
-    //             $loiTemplate->template_type = 'business';
-    //             $loiTemplate->letter_of_indent_id = $loi->id;
-    //             $loiTemplate->save();
-    //         }
-
-    //         if($loi->dealers == 'Milele Motors') {
-    //             $loiTemplate = new LoiTemplate();
-    //             $loiTemplate->template_type = 'milele_cars';
-    //             $loiTemplate->letter_of_indent_id = $loi->id;
-    //             $loiTemplate->save();
-    //         }else if($loi->dealers == 'Trans Cars') {
-    //             $loiTemplate = new LoiTemplate();
-    //             $loiTemplate->template_type = 'trans_cars';
-    //             $loiTemplate->letter_of_indent_id = $loi->id;
-    //             $loiTemplate->save();
-    //         }
-    //     }
-    //     return 1;
-    
-      
+        return $letterOfIndentDocument;
+        $move = File::move($old_path, $new_path);
+    }
+    public function migratecustomerCountries() {
+        $clients = Clients::where('is_demand_planning_customer', true)->get();
+      info($clients->count());
+      foreach($clients as $client) {
+        $clientCountry = new ClientCountry();
+        $clientCountry->client_id = $client->id;
+        $clientCountry->country_id = $client->country_id;
+        $clientCountry->save();
+      }
     }
     // add master model line id of respective variants
     public function chcekuniqueSonumberinLOI(){

@@ -169,9 +169,9 @@ class ShippingController extends Controller
         if($category == "Shipping") {
           $prefix = 'S-';
         }else if($category == "Shipping Documents") {
-            $prefix = 'D-';
-        }else if($category == "Certificates") {
             $prefix = 'DP-';
+        }else if($category == "Certificates") {
+            $prefix = 'D-';
             $length = 6;
             $offset = 3;
 

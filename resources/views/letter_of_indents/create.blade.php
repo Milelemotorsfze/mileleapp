@@ -2,8 +2,9 @@
 @section('content')
     <style>
         iframe {
-            min-height: 300px;
-            max-height: 500px;
+            height: 400px;
+            margin-bottom: 10px;
+            
         }
         .bg-light-pink{
             background-color: #ece6e6;
@@ -25,6 +26,7 @@
             background-color: rgba(128,128,128,0.5); /* color */
             display: none; /* making it hidden by default */
         }
+       
 
     </style>
   @can('LOI-create')
@@ -103,7 +105,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                                <input type="date" class="form-control widthinput" id="date" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"  name="date">
+                                <input type="date" class="form-control widthinput" value="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" id="date" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"  name="date">
                                 @error('date')
                                 <span role="alert">
                                     <strong>{{ $message }}</strong>
@@ -181,13 +183,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Customer Document</label>
-                                <input type="file" name="files[]" id="file-upload" accept="image/*" class="form-control widthinput text-dark" multiple
-                                    autofocus>
-                            </div>
-                        </div>
+                       
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Signature </label>
@@ -195,7 +191,27 @@
                             </div>
                         </div>
                     </div>
-                   
+                    <div class="card" hidden id="customer-files">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                 Customer Document
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row customer-doc-div" >
+                               
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 mt-3">
+                        
+                        <div class="col-lg-4 col-md-12 col-sm-12" id="sign-div" hidden>
+                            <h6>Signature</h6>
+                            <div id="signature-preview">
+                               
+                            </div>
+                        </div>
+                    </div>
                     <div class="card" id="soNumberDiv">
                         <div class="card-header">
                             <h4 class="card-title">
@@ -227,18 +243,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="file-preview">
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="signature-preview">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
+                    
+                 <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="country-comment-div">
                         <span id="country-comment"></span><br>
                     </div>
                     <div class="alert alert-danger m-2 country-validation" role="alert" hidden id="loi-country-validation-div">                       
@@ -321,6 +327,12 @@
                             <button type="submit" class="btn btn-primary" id="submit-button">Submit </button>
                         </div>
                     </div>
+                     <!-- customer doc fetch form customer data -->
+                    <select name="customer_other_documents_Ids[]" id="customer_other_documents" hidden="hidden" multiple>
+                    </select>
+                    <input type="hidden" value="0" name="is_passport_added" id="add-passport-to-loi">
+                    <input type="hidden" value="0" name="is_trade_license_added" id="add-trade-license-to-loi">
+                    
                 </form>
             </div>
             </div>
@@ -334,28 +346,8 @@
     <script type="text/javascript">
         let formValid = true;
         let previousSelected = $('#customer-type').val();
-        const fileInputLicense = document.querySelector("#file-upload");
-        const previewFile = document.querySelector("#file-preview");
-      
-        fileInputLicense.addEventListener("change", function(event) {
-            const files = event.target.files;
-            while (previewFile.firstChild) {
-                previewFile.removeChild(previewFile.firstChild);
-            }
-            for (let i = 0; i < files.length; i++)
-            {
-                const file = files[i];
-               
-                 if (file.type.match("image/*"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFile.appendChild(image);
-                }
-            }
-        });
-
+        let customerDocumetIds = [];
+    
         const signatureFileInput = document.querySelector("#signature-upload");
         const signaturePreviewFile = document.querySelector("#signature-preview");
 
@@ -373,6 +365,8 @@
             const iframe = document.createElement("iframe");
             iframe.src = objectUrl;
             signaturePreviewFile.appendChild(iframe);
+            $('#sign-div').attr('hidden', false);
+
 
         });
 
@@ -409,17 +403,17 @@
                 "quantity[]": {
                     required: true
                 },
-                "files[]": {
-                    required:true,
-                    extension: "png|jpeg|jpg",
-                    maxsize:5242880 
-                },
+                // "files[]": {
+                //     required:true,
+                //     extension: "png|jpeg|jpg",
+                //     maxsize:5242880 
+                // },
                 "template_type[]":{
                     required:true
                 },
                 loi_signature: {
                     required:function(element) {
-                        return $("#dealer").val() == 'Milele Motors'
+                        return $("#template-type").val() != 'general'
                     },
                     extension: "png|jpeg|jpg|svg",
                     maxsize:5242880 
@@ -428,9 +422,9 @@
             },
                 
             messages: {
-                file: {
-                    extension: "Please upload file format (png,jpeg,jpg)"
-                },
+                // file: {
+                //     extension: "Please upload file format (png,jpeg,jpg)"
+                // },
                 loi_signature:{
                     extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                 }
@@ -453,8 +447,6 @@
             return this.valid();
         };
        
-       
-        
         $('#loi-category').select2({
             placeholder : 'Select LOI Category',
             allowClear: true,
@@ -465,6 +457,7 @@
         $('#template-type').select2({
             placeholder : 'Select Template Type',
             allowClear: true,
+            maximumSelectionLength: 1
         }).on('change', function() {
             $('#template-type-error').remove();
         });
@@ -475,11 +468,18 @@
         });
         $('#customer').select2({
             placeholder : 'Select Customer',
-            allowClear: true,
             maximumSelectionLength: 1
         }).on('change', function() {
             $('#customer-error').remove();
             checkCountryCriterias();
+            let customer = $('#customer').val();
+            if(customer.length > 0) {
+                showCustomerDocuments();
+            }else{
+                $('#customer-files').attr('hidden',true);
+                $('.customer-doc-div').html('');
+            }
+        
         });
         $('#customer-type').select2({
             placeholder : 'Select Customer Type',
@@ -487,6 +487,8 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             $('#customer-type-error').remove();
+            $('#customer-files').attr('hidden',true);
+            $('.customer-doc-div').html('');
         });
        
         $('#country').select2({
@@ -497,6 +499,9 @@
             getCustomers();
             checkCountryCriterias();
             $('#country-error').remove();
+            $('#customer-files').attr('hidden',true);
+            $('.customer-doc-div').html('');
+            getModels(1,'all');
         });
 
         $('#date').change(function (){
@@ -555,6 +560,7 @@
           
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
+            var country = $('#country').val();
             var date = $('#date').val();
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
@@ -576,7 +582,7 @@
                     }
                 }
                
-            if(customer.length > 0 && customer_type.length > 0  && date.length > 0) {
+            if(country.length > 0 && customer_type.length > 0  && date.length > 0) {
                 $('.overlay').show();
                 $.ajax({
                     type: "GET",
@@ -585,6 +591,7 @@
                     data: {
                         loi_date:date,
                         customer_id: customer[0],
+                        country_id: country[0],
                         customer_type: customer_type[0],
                         total_quantities:total_quantities,
                         selectedModelLineIds:selectedModelLineIds
@@ -611,7 +618,6 @@
                         }
                        
                         if(data.validation_error) {
-                         console.log(data.validation_error);
                             $('#validation-error').html(data.validation_error);
                             $('#validation-error').attr('hidden', false);
                          
@@ -637,7 +643,7 @@
                 url: url,
                 dataType: "json",
                 data: {
-                    country: country,
+                    country: country[0],
                     customer_type: customer_type
                 },
                 success:function (data) {
@@ -650,13 +656,139 @@
                 }
             });
         }
+         
+        function showCustomerDocuments() {
+            // clear existing doc selected data
+            $('#add-passport-to-loi').val(0);
+            $('#add-trade-license-to-loi').val(0);
+            $('#customer_other_documents').empty();
 
+            let client_id = $('#customer').val();
+            let url = '{{ route('loi.customer-documents') }}';
+            if(client_id.length > 0) {
+                $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    client_id: client_id[0],
+                
+                },
+                 success:function (data){
+                    let otherDocuments = data.customer_documents;
+                    
+                    if(otherDocuments.length > 0 || data.passport_file || data.trade_license_file)
+                        {
+                            $('#customer-files').attr('hidden',false);
+                            if(data.passport_file)
+                            {
+                                let passportUrl = 'storage/app/public/passports/'+data.passport_file;
+                                $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <h6>Passport</h6>
+                                        <iframe src="{{ url('${passportUrl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button"  onclick="addPassportToLOI()" 
+                                        class="btn btn-info btn-sm text-center mt-2 add-passport-LOI">
+                                        Add to LOI </a>
+                                        <button type="button"  hidden onclick="removePassportFromLOI()"
+                                         class="btn btn-danger btn-sm text-center mt-2 remove-passport-LOI">
+                                            Remove From LOI </a>
+                                    </div>
+                                    `);  
+                            }
+                            if(data.trade_license_file)
+                            {
+                                let tradelicenseUrl = 'storage/app/public/tradelicenses/'+ data.trade_license_file;
+                                $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <h6>Trade License</h6>
+                                        <iframe src="{{ url('${tradelicenseUrl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button" onclick="addTradeDocToLOI()" 
+                                        class="btn btn-info btn-sm text-center mt-2 add-trade-license-LOI">
+                                        Add to LOI </a>
+                                        <button type="button" hidden onclick="removeTradeDocFromLOI()"
+                                         class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-LOI">
+                                            Remove From LOI </a>
+                                    </div>
+                                    `); 
+                                
+                            }           
+                            $(otherDocuments.length > 0 )
+                            {
+                                $('.customer-doc-div').append(`<h6 class="text-center mt-2">Other Documents</h6>`);
+                                jQuery.each(otherDocuments, function(key,value){
+                                    let fileurl = 'customer-other-documents/'+value.document;
+                                    let id = value.id;
+                                    $('.customer-doc-div').append(`<div class="col-md-4 col-lg-4 text-center">
+                                        <iframe src="{{ url('${fileurl}')}}"  width="500px;" height="300px;"></iframe>
+                                        <button type="button" id="add-LOI-${id}" onclick="addtoLOI(${id})" class="btn btn-info btn-sm text-center mt-2">
+                                        Add to LOI </button>
+                                       <button type="button" id="remove-LOI-${id}" onclick="removeFromLOI(${id})" hidden class="btn btn-danger btn-sm text-center mt-2">
+                                        Remove From LOI </button>
+                                        </div>
+                                        `);                       
+                                });
+                            }                                   
+                        }
+                        if(otherDocuments.length <= 0 && data.passort_file && data.trade_license_file)
+                        {
+                            $('#customer-files').attr('hidden',true);
+                            $('.customer-doc-div').html();
+                        }                  
+                    }
+                });
+            }
+        }
+           
+        function addtoLOI(id) {
+            customerDocumetIds.push(id);
+            $('#customer_other_documents').empty();
+            $('#add-LOI-'+id).attr('hidden',true);
+            $('#remove-LOI-'+id).attr('hidden', false);
+
+            jQuery.each(customerDocumetIds, function (key, value) {
+                $('#customer_other_documents').append('<option value="' + value + '" >' + value+ '</option>');
+                $("#customer_other_documents option").attr("selected", "selected");
+            });
+           
+               
+        }
+        function removeFromLOI(id) {
+            customerDocumetIds = jQuery.grep(customerDocumetIds, function(value) {
+                return value != id;
+                });
+            $("#customer_other_documents option[value='"+id+"']").remove();
+            $('#add-LOI-'+id).attr('hidden',false);
+            $('#remove-LOI-'+id).attr('hidden', true);
+               
+        }
+        function addPassportToLOI() {
+            $('#add-passport-to-loi').val(1);
+            $('.add-passport-LOI').attr('hidden', true);
+            $('.remove-passport-LOI').attr('hidden', false);
+           
+        }
+        function removePassportFromLOI() {
+            $('#add-passport-to-loi').val(0);
+            $('.add-passport-LOI').attr('hidden', false);
+            $('.remove-passport-LOI').attr('hidden', true);
+          
+        }
+        function addTradeDocToLOI() {
+            $('#add-trade-license-to-loi').val(1);
+            $('.add-trade-license-LOI').attr('hidden', true);
+            $('.remove-trade-license-LOI').attr('hidden', false);
+           
+        }
+        function removeTradeDocFromLOI() {
+            $('#add-trade-license-to-loi').val(0);
+            $('.add-trade-license-LOI').attr('hidden', false);
+            $('.remove-trade-license-LOI').attr('hidden', true);
+        }
         function getModels(index,type) {
             $('.overlay').show();
 
             let dealer = $('#dealer').val();
+            var country = $('#country').val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
             var selectedModelIds = [];
             for(let i=1; i<=totalIndex; i++)
             {
@@ -673,6 +805,7 @@
                     {
                         selectedModelIds: selectedModelIds,
                         dealer:dealer,
+                        country_id:country[0]
                     },
                 dataType : 'json',
                 success: function(data) {
@@ -715,6 +848,7 @@
                 }
             });
         }
+        
 
         var index = 1;
         $('.add-row-btn').click(function() {
@@ -862,6 +996,7 @@
             hideSFX(index, value);
            
         });
+     
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -993,8 +1128,6 @@
                 let currentmodel = $('#model-'+i).val();
                 
                 if(i != index && currentmodel == model[0]) {
-                    console.log(i);
-                    console.log("detach sfx");
                     var currentId = 'sfx-' + i;
                     $('#' + currentId + ' option[value=' + value + ']').detach();       
                 }
@@ -1147,15 +1280,26 @@
             e.preventDefault();
             uniqueCheckSoNumber();
             let isvalidCountryCheck = $('#is-country-validation-error').val();
-            if (formValid == true && isvalidCountryCheck == 0) {
-                if($("#form-create").valid()) {
-                    $('#form-create').unbind('submit').submit();
-                    // alert("submit");
+            let ispassportAdded = $('#add-passport-to-loi').val();
+            let isTradeLicenseAdded = $('#add-trade-license-to-loi').val();
+            let customerOtherDocAddedCount = $('#customer_other_documents option').length;
+            // check the form
+            if(ispassportAdded == 1 || isTradeLicenseAdded == 1 || customerOtherDocAddedCount > 0) {
+                if (formValid == true && isvalidCountryCheck == 0) {
+                    if($("#form-create").valid()) {
+                        $('#form-create').unbind('submit').submit();
+                        // alert("submit");
+                        e.preventDefault();
+                    }
+                }else{
                     e.preventDefault();
                 }
             }else{
+                var confirm = alertify.confirm('Atleast one Customer Document Required! If customer document is not showing please add Customer documents in customer master data',function (e) {
+                }).set({title:"Error !"})
                 e.preventDefault();
             }
+            
         
             // alert(formValid);
            

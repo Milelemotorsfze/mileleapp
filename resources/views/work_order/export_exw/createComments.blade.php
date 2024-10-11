@@ -1,4 +1,8 @@
-<style>
+<script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script>
+
+<!-- Include At.js -->
+<script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script>
+<link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"><style>
     .file-preview {
         position: relative;
         display: flex;
@@ -65,10 +69,17 @@
         previewFiles(this.files, 'file-previews');
     });
     function previewFiles(files, previewContainerId, commentId) {
+        const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf'];
         const previewContainer = document.getElementById(previewContainerId);
         previewContainer.innerHTML = ''; // Clear previous previews
 
         for (const file of files) {
+            // Check if the file type is allowed
+            if (!allowedFileTypes.includes(file.type)) {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                continue;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.createElement('div');
@@ -80,17 +91,37 @@
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     `;
-                } else {
-                    preview.innerHTML = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
+                } else if (file.type === 'application/pdf') {
+                    preview.innerHTML = `
+                        <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    `;
                 }
 
                 previewContainer.appendChild(preview);
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    function viewPDF(src) {
+        const newWindow = window.open();
+        newWindow.document.write(`<embed src="${src}" type="application/pdf" style="width: 100%; height: 100%;">`);
+    }
+
+    function downloadFile(src, filename) {
+        const link = document.createElement('a');
+        link.href = src;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
     function viewImage(src) {
         const newWindow = window.open();
@@ -111,8 +142,33 @@
 
         if (commentText.trim() === '' && commentFiles.length === 0) return;
 
+        // Extract mentioned user IDs using a regular expression
+        const mentionedUserIds = [];
+        const mentionPattern = /@(\w+)/g;
+        let match;
+        while ((match = mentionPattern.exec(commentText)) !== null) {
+            mentionedUserIds.push(match[1]); // Push the user ID or username
+        }
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
+        submitButton.prop('disabled', true);
+
+         // Check file sizes before appending them to FormData
+        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
+        for (const file of commentFiles) { // Changed from filesInput to commentFiles
+            if (file.size > maxFileSize) {
+                alert(`The file ${file.name} exceeds the 2MB size limit.`);
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                return;
+            }
+        }
         const currentDateTime = new Date();
         const formattedDateTime = formatDateTime(currentDateTime);
+        // Assume base URL is available as a constant
+        const baseUrl = '{{env('BASE_URL')}}';
+
+        // Get the authenticated user's image path dynamically or fall back to 'OIP.jpg' if not available
+        const userProfileImage = "{{ Auth::user()->empProfile && Auth::user()->empProfile->image_path ? Auth::user()->empProfile->image_path : 'images/users/OIP.jpg' }}";
 
         const filePreviewsHtml = Array.from(commentFiles).map(file => {
             const reader = new FileReader();
@@ -124,7 +180,17 @@
                                 <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                 <div class="hover-options">
                                     <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                                    <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                                    <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
+                        `);
+                    } else if (file.type === 'application/pdf') {
+                        resolve(`
+                            <div class="file-preview m-1" data-comment-id="${commentIdCounter}">
+                                <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                <div class="hover-options">
+                                    <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                                    <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         `);
@@ -141,8 +207,9 @@
                 <div class="comment mt-2" data-comment-id="${commentIdCounter}" data-parent-id="${parentId || ''}" data-date-time="${formattedDateTime}">
                     <div class="row">
                         <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-                            <img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-                        </div>
+                        <img class="rounded-circle header-profile-user" 
+                        src="${baseUrl}/${userProfileImage}" 
+                        alt="Header Avatar" style="float: left;">                        </div>
                         <div class="col-xxl-11 col-lg-11 col-md-11">
                             <div class="comment-text">${commentText}</div>
                             <div class="d-flex flex-wrap">${filePreviews.join('')}</div>
@@ -189,6 +256,13 @@
             }
 
             commentIdCounter++;
+
+            // Re-enable the submit button after operation is complete
+            submitButton.prop('disabled', false);
+        }).catch(error => {
+            console.error('Error processing files:', error);
+            // Re-enable the submit button in case of an error
+            submitButton.prop('disabled', false);
         });
     }
     function showReplyForm(commentId) {

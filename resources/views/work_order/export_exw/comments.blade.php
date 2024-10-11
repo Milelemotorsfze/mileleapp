@@ -1,3 +1,8 @@
+<script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script>
+
+<!-- Include At.js -->
+<script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script>
+<link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet">
 <style>
     .comment {
         margin-bottom: 20px;
@@ -52,10 +57,19 @@
     .reply-button {
         margin-left:10px;
     }
+    .mention-container {
+        position: relative;
+    }
+    #styled-comment {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        color: transparent; /* Make it invisible to show only the textarea */
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
 </style>
-<!-- <head>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head> -->
 <div class="row">
     <div class="row" id="comments-section">
         
@@ -77,14 +91,23 @@
 </div>
 <script>
     var workOrder = {!! json_encode($workOrder) !!};
+    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; // Define at the global level
+
     document.getElementById('comment-files').addEventListener('change', function() {
         previewFiles(this.files, 'file-previews');
     });
+
     function previewFiles(files, previewContainerId, commentId) {
         const previewContainer = document.getElementById(previewContainerId);
         previewContainer.innerHTML = ''; // Clear previous previews
 
         for (const file of files) {
+            // Check if the file type is allowed
+            if (!allowedFileTypes.includes(file.type)) {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                continue; // Skip this file
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.createElement('div');
@@ -96,11 +119,17 @@
                         <img src="${e.target.result}" alt="${file.name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${e.target.result}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     `;
-                } else {
-                    preview.innerHTML = `<a href="${e.target.result}" target="_blank">${file.name}</a>`;
+                } else if (file.type === 'application/pdf') {
+                    preview.innerHTML = `
+                        <embed src="${e.target.result}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${e.target.result}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${e.target.result}', '${file.name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    `;
                 }
 
                 previewContainer.appendChild(preview);
@@ -115,6 +144,56 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+        // Initialize mentions for the main comment textarea
+        initializeMentions('#new-comment');
+
+        function initializeMentions(selector) {
+            $(selector).atwho({
+                at: "@",
+                data: [], // Empty initially, will be populated via AJAX
+                limit: 10,
+                callbacks: {
+                    remoteFilter: function(query, renderCallback) {
+                        if (query.length === 0) {
+                            renderCallback([]);
+                            return;
+                        }
+                        $.ajax({
+                            url: '/users-search', // Make sure this matches your route
+                            type: 'GET',
+                            data: { query: query },
+                            success: function(response) {
+                                console.log(response); // Check if users array is correct
+                                if (response.users && response.users.length > 0) {
+                                    renderCallback(response.users.map(user => ({
+                                        id: user.id,
+                                        name: user.name || 'Unknown User' // Fallback if name is null
+                                    })));
+                                } else {
+                                    renderCallback([]);
+                                }
+                            },
+                            error: function() {
+                                console.error('Error fetching user data.');
+                                renderCallback([]); // Handle error gracefully
+                            }
+                        });
+                    },
+                    beforeInsert: function(value, $li) {
+                        // Wrap the mention in a custom token or placeholder that will later be styled
+                        const mentionText = value.replace('@', '');
+                        return `@[${mentionText}]`; // Use a special syntax to recognize mentions later
+                    }
+                }
+            });
+        }
+
+        // Set up event listeners for reply forms
+        $('#comments-section').on('click', '.reply-button', function() {
+            const commentId = $(this).closest('.comment').data('comment-id');
+            initializeMentions(`#reply-input-${commentId}`);
+        });
+        
 
         const workOrderId = workOrder.id; // Ensure this value is correctly set
         $.ajax({
@@ -132,7 +211,12 @@
             }
         });
     });
-
+    function updateStyledComment() {
+        let text = $('#new-comment').val();
+        // Replace the special mention syntax with a styled span
+        text = text.replace(/@\[(\w+)\]/g, '<span class="mention" style="color: blue;">@$1</span>');
+        $('#styled-comment').html(text);
+    }
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
         console.log(new_vehicles);
@@ -142,8 +226,8 @@
             return;
         }
 
-        if (text.length > 1000) { // Set an appropriate limit for your application
-            alert('The text field must not be greater than 1000 characters.');
+        if (text.length > 16777215) { // mediumText limit
+            alert('The text is too long.');
             return;
         }
 
@@ -168,7 +252,17 @@
                         <img src="${file.file_data}" alt="${file.file_name}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                         <div class="hover-options">
                             <button onclick="viewImage('${file.file_data}')" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
-                            <button onclick="downloadImage('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download"><i class="fa fa-download" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                `;
+            } else if (file.file_data.startsWith('data:application/pdf')) {
+                return `
+                    <div class="file-preview m-1" data-comment-id="${id}">
+                        <embed src="${file.file_data}" type="application/pdf" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <div class="hover-options">
+                            <button onclick="viewPDF('${file.file_data}')" title="View PDF"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                            <button onclick="downloadFile('${file.file_data}', '${file.file_name}')" title="Download PDF"><i class="fa fa-download" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 `;
@@ -231,7 +325,16 @@
                         : '<td></td>';
                 }
                 // Check for specific values and update the display text accordingly
-                if (item.old_value === 'total_deposit') {
+                if (item.field === 'Sales Person') {
+                    const oldSalesPersonName = item.old_value ? getUserById(item.old_value) : 'Unknown User';
+                    const newSalesPersonName = item.new_value ? getUserById(item.new_value) : 'Unknown User';
+                    oldValueHtml = `<td>${oldSalesPersonName}</td>`;
+                    newValueHtml = `<td>${newSalesPersonName}</td>`;
+                } else if (item.field === 'Is Batch') {
+                    oldValueHtml = `<td>${item.old_value == 1 ? 'Yes' : (item.old_value == 0 ? 'No' : '')}</td>`;
+                    newValueHtml = `<td>${item.new_value == 1 ? 'Yes' : (item.new_value == 0 ? 'No' : '')}</td>`;
+                }
+                else if (item.old_value === 'total_deposit') {
                     oldValueHtml = '<td>Total Deposit</td>';
                 } else if (item.old_value === 'custom_deposit') {
                     oldValueHtml = '<td>Custom Deposit</td>';
@@ -322,7 +425,7 @@
                 const viewMoreUrl = 'javascript:void(0);'; // Prevent default link behavior
 
                 newVehiclesHtml += `
-                    <tr style="border-top:2px solid #d3d3df;">
+                    <tr style="border-top:2px solid #d3d3df; background-color : #f6fafe!important;">
                         <td style="padding-left:5px; font-size:12px!important;">
                             <a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn-removed" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View History">ViewHistory</a>
                             ${item.vehicle.deleted_at == null ? `<a style="font-size:12px!important;" href="${viewMoreUrl}" class="view-more-btn" data-vin="${item.vehicle.vin}" data-id="${item.vehicle_id}" title="View Current Record">CurrentRecord</a>` : ''}
@@ -430,7 +533,7 @@
                 <table class="my-datatable" style="margin-top:10px;margin-bottom:10px;border:1px solid #e9e9ef;">
                     <thead>
                         <tr><th colSpan="19" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; background-color:#e6f1ff!important;">${removed_vehicles.length} vehicles removed</th></tr>
-                        <tr style="border-top:2px solid #d3d3df;">
+                        <tr style="border-top:2px solid #d3d3df;background-color : #f6fafe!important;">
                             <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Action</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">BOE</th>
                             <th style="padding-top:5px;padding-bottom:5px; font-size:12px!important;">VIN</th>
@@ -720,7 +823,15 @@
             <div class="comment mt-2" id="comment-${id}" data-comment-id="${id}" data-parent-id="${parent_id}">
                 <div class="row">
                     <div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
-                        <img class="rounded-circle header-profile-user" src="{{ env('BASE_URL') }}/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+                        <img class="rounded-circle header-profile-user" 
+                            src="${
+                                !commentData.user ? 
+                                    '{{ env('BASE_URL') }}/images/users/3-robot.jpg' : 
+                                    commentData.user.emp_profile && commentData.user.emp_profile.image_path ? 
+                                        '{{ env('BASE_URL') }}/' + commentData.user.emp_profile.image_path : 
+                                        '{{ env('BASE_URL') }}/images/users/OIP.jpg' 
+                            }" 
+                            alt="Header Avatar" style="float: left;padding: 0px!important;">
                     </div>
                     <div class="col-xxl-11 col-lg-11 col-md-11">
                         <div class="comment-text" style="font-size:12px;">
@@ -824,6 +935,18 @@
         });
     }
 
+    function viewPDF(src) {
+        const newWindow = window.open();
+        newWindow.document.write(`<embed src="${src}" type="application/pdf" style="width: 100%; height: 100%;">`);
+    }
+    function downloadFile(src, filename) {
+        const link = document.createElement('a');
+        link.href = src;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     function toggleReadMore(id) {
         const comment = $(`#comment-${id}`);
         const readMoreLink = comment.find('.read-more');
@@ -840,7 +963,6 @@
     }
 
     function addCommentFromInput(parentId = null) {
-        // Get the comment text and file inputs
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
         const filesInput = parentId ? $(`#reply-files-${parentId}`)[0].files : $('#comment-files')[0].files;
 
@@ -850,16 +972,46 @@
             return;
         }
 
+        // Extract mentioned user IDs using a regular expression
+        const mentionedUserIds = [];
+        const mentionPattern = /@(\w+)/g;
+        let match;
+        while ((match = mentionPattern.exec(commentText)) !== null) {
+            mentionedUserIds.push(match[1]); // Push the user ID or username
+        }
+
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
+        submitButton.prop('disabled', true);
+
+        // Check file sizes before appending them to FormData
+        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
+        for (const file of filesInput) {
+            if (file.size > maxFileSize) {
+                alert(`The file ${file.name} exceeds the 2MB size limit.`);
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                return;
+            }
+        }
+
         // Create a FormData object to hold the comment data
         const formData = new FormData();
         formData.append('text', commentText.trim() === '' ? '' : commentText); // Store text as null if empty
         formData.append('parent_id', parentId ? parentId : '');
         formData.append('work_order_id', workOrder.id);
+        formData.append('mentions', JSON.stringify(mentionedUserIds)); // Add mentions as a JSON array
 
         // Append files to the FormData object
-        Array.from(filesInput).forEach(file => {
-            formData.append('files[]', file);
-        });
+        for (const file of filesInput) {
+            if (allowedFileTypes.includes(file.type)) { // Use the globally defined allowedFileTypes
+                formData.append('files[]', file);
+            } else {
+                alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
+                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                return;
+            }
+        }
+
         $.ajax({
             url: '/comments', // Laravel route to handle comment storage
             type: 'POST',
@@ -872,13 +1024,22 @@
             success: function(response) {
                 console.log('Comment added:', response); // Log the response
                 addComment(response);
+                // Re-enable the submit button after successful submission
+                submitButton.prop('disabled', false);
             },
             error: function(error) {
                 console.error('Error adding comment:', error);
+
+                // Check if the error is related to file size
+                if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors['files.0']) {
+                    alert(error.responseJSON.errors['files.0'][0]); // Display the error message
+                }
+
+                // Re-enable the submit button in case of an error
+                submitButton.prop('disabled', false);
             }
         });
     }
-
     function showReplyForm(commentId) {
         $(`#reply-form-${commentId}`).toggle();
          // Add event listener for reply file input
@@ -901,5 +1062,22 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+    function getUserById(userId) {
+        let userName = 'Unknown User';
+        $.ajax({
+            url: `/getUser/${userId}`, // Your route to fetch user by ID
+            type: 'GET',
+            async: false, // Ensure the request completes before returning the result
+            success: function(response) {
+                if (response && response.user) {
+                    userName = response.user.name;
+                }
+            },
+            error: function() {
+                console.error('Error fetching user data.');
+            }
+        });
+        return userName;
     }
 </script>
