@@ -152,7 +152,7 @@
                                     <td>{{$one->gdn_number ?? ''}}</td>  
                                     <td>
                                         @if(!empty($one->delivered_at))
-                                            {{ \Carbon\Carbon::parse($one->delivered_at)->format('d M Y, h:i:s A') }}
+                                            {{ \Carbon\Carbon::parse($one->delivered_at)->format('d M Y') }}
                                         @endif
                                     </td>                                  
                                     <td>
