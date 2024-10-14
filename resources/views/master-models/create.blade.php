@@ -74,7 +74,12 @@
                         </select>
                     </div>
                 </div>
-
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">Model Description</label>
+                        <input type="text" class="form-control" name="model_description" placeholder="Model Description">
+                   </div>
+                </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Amount in USD</label>

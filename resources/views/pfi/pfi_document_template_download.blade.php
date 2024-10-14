@@ -104,8 +104,7 @@
                 </tr>
                 @foreach($pfiItems as $pfiItem)
                     <tr>
-                        <td style="width:200px">HILUX DC 2393CC 2GD-DIESEL 4X4 6P
-                        WORK (LOW) J-DECK 6MT CANVAS </td>
+                        <td style="width:200px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
                         <td>{{ $pfiItem->masterModel->model ?? '' }}</td>
                         <td>{{ $pfiItem->masterModel->sfx ?? '' }}</td>
                         <td style="font-weight:normal">Stock</td>

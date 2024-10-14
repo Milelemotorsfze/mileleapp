@@ -80,11 +80,13 @@ class MasterModelController extends Controller
         }
 
         $html = $builder->columns([
+            ['data' => 'action', 'name' => 'action','title' => 'Action'],
             ['data' => 'DT_RowIndex', 'name' => 'DT_RowIndex','title' => 'S.No', 'orderable' =>  false, 'searchable' => false],
             ['data' => 'steering', 'name' => 'steering','title' => 'Steering'],
             ['data' => 'model', 'name' => 'model','title' => 'Model'],
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],
             ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
+            ['data' => 'model_description', 'name' => 'model_description','title' => 'Model Description'],
             ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
             ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Model Line'],
             ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI Description'],
@@ -95,7 +97,7 @@ class MasterModelController extends Controller
             ['data' => 'created_by', 'name' => 'created_by','title' => 'Created By'],
             ['data' => 'updated_at', 'name' => 'updated_at','title' => 'Updated At'],
             ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
-            ['data' => 'action', 'name' => 'action','title' => 'Action'],
+           
 
         ]);
 
@@ -149,6 +151,7 @@ class MasterModelController extends Controller
         $model->is_transcar = $request->is_transcar ? true : false;
         $model->milele_loi_description = $request->milele_loi_description;
         $model->transcar_loi_description = $request->transcar_loi_description;
+        $model->model_description = $request->model_description;
         $model->created_by = Auth::id();
 
         $model->save();
@@ -217,6 +220,7 @@ class MasterModelController extends Controller
         $model->is_transcar = $request->is_transcar ? true : false;
         $model->milele_loi_description = $request->milele_loi_description;
         $model->transcar_loi_description = $request->transcar_loi_description;
+        $model->model_description = $request->model_description;
         $model->updated_by = Auth::id();
         $model->save();
         (new UserActivityController)->createActivity('Upadated new Master Model.');

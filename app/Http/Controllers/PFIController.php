@@ -471,11 +471,11 @@ class PFIController extends Controller
         $pfi = PFI::find($request->id);
         $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
         $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
+        $fileName = 'MILELE - '.$pfi->pfi_reference_number;
         
         if($request->download == 1) {
             return $pdfFile->download($fileName.'.pdf');
         }else{
-            $fileName = 'MILELE - '.$pfi->pfi_reference_number;
             $filePath = public_path('PFI_document_withoutsign/'.$fileName);
             
             file_put_contents($filePath, $pdfFile->output());
