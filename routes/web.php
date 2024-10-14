@@ -489,6 +489,7 @@ Route::get('/d', function () {
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
+    Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');

@@ -56,6 +56,7 @@
                         </ul>
                     </div>
                 @endif
+               
                 @if (Session::has('error'))
                     <div class="alert alert-danger" >
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>

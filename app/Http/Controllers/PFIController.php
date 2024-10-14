@@ -266,7 +266,6 @@ class PFIController extends Controller
                         $loiItemCode = implode(", ", $LOICodes);   
                     return [
                         'LOI Item Code' => $loiItemCode ?? '',
-                        // 'LOI Status' => $data->letterOfIndentItem->LOI->status ?? '',
                         'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),
                         'PFI Number' => $data->pfi->pfi_reference_number,
                         'Customer Name' => $data->pfi->customer->name ?? '',
@@ -331,8 +330,7 @@ class PFIController extends Controller
      */
     public function create()
     {
-       
-           
+   
         (new UserActivityController)->createActivity('Open PFI Create Page');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -382,9 +380,9 @@ class PFIController extends Controller
         $pfi->client_id = $request->client_id;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
-        $destinationPath = 'PFI_document_withoutsign';
+        $destinationPath = 'PFI_document_withoutsign/';
         // $destination = 'PFI_document_withsign';
-        $fileName = 'MILELE - ('.$request->pfi_reference_number.')';
+        $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
             $file = $request->file('file');
@@ -454,62 +452,42 @@ class PFIController extends Controller
                             $pfiItemRow->save();
                             
                         }
+                        
                     }
         }
-
-        $supplier = Supplier::find($request->supplier_id);
-        if($supplier->supplier == 'AMS' && !$request->has('file')){
-            // return 1;
-            $pfiItems = PfiItem::where('is_parent', true)
-                        ->where('pfi_id', $pfi->id)->get();
-            try{ 
-                $pdfFile = PDF::loadView('pfi.pfi_document_template', compact('pfi','pfiItems'));
-                $filePath = storage_path($destinationPath . $fileName);
-                file_put_contents($filePath, $pdfFile->output());
-                // $file->move($destinationPath, $fileName);
-                $pfi->pfi_document_without_sign = $fileName;
-                $pfi->save();
-
-            }catch (\Exception $e){
-                return $e->getMessage();
-            }
-            // return $pdfFile->stream($pdfFile);
-        }
-
-        // document sealing
-        // if($request->has('file')) {
-        //     try {
-            
-        //         $pdf = new Fpdi();
-        //         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
-    
-        //         for ($i=1; $i <= $pageCount; $i++)
-        //         {
-        //             $pdf->AddPage();
-        //             $tplIdx = $pdf->importPage($i);
-        //             $pdf->useTemplate($tplIdx);
-        //             if($i == $pageCount) {
-        //                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
-        //             }
-        //         }
-    
-        //         $signedFileName = 'signed_'.time().'.'.$extension;
-        //         $directory = public_path('PFI_Document_with_sign');
-        //         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-        //         $pdf->Output($directory.'/'.$signedFileName,'F');
-        //         $pfi->pfi_document_with_sign = $signedFileName;
-        //     }catch (\Exception $e) {
-    
-        //         return redirect()->back()->with('error', $e->getMessage());
-        //     }
-            // $pfi->save();
-        // }
-       
         DB::commit();
 
+        $supplier = Supplier::find($request->supplier_id);
+        if($supplier->supplier == 'AMS' && !$request->has('file')) {
+            return redirect()->route('pfi.pfi-document',['id' => $pfi->id]);
+        }
+
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
+
+       
+    }
+    public function generatePFIDocument(Request $request) {
+
+        $pfi = PFI::find($request->id);
+        $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
+        $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
+        
+        if($request->download == 1) {
+            return $pdfFile->download($fileName.'.pdf');
+        }else{
+            $fileName = 'MILELE - '.$pfi->pfi_reference_number;
+            $filePath = public_path('PFI_document_withoutsign/'.$fileName);
+            
+            file_put_contents($filePath, $pdfFile->output());
+            $pfi->pfi_document_without_sign = $fileName;
+            $pfi->save();
+        }
+
+        return view('pfi.pfi_document_template', compact('pfi','pfiItems'));
+        
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
+
         $pfi = PFI::select('id','pfi_reference_number','created_at')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
                 ->whereYear('created_at', Carbon::now()->year);
@@ -637,7 +615,7 @@ class PFIController extends Controller
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
-
+        $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
             if (File::exists(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign))) {
@@ -646,7 +624,6 @@ class PFIController extends Controller
 
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
-            $fileName = 'MILELE - ('.$request->pfi_reference_number.')';
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
@@ -740,9 +717,14 @@ class PFIController extends Controller
 
         DB::commit();
 
+        $supplier = Supplier::find($request->supplier_id);
+        if($supplier->supplier == 'AMS' && !$request->has('file')){
+            return redirect()->route('pfi.pfi-document',['id' => $pfi->id]);
+        }
+
         return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */
@@ -924,4 +906,34 @@ class PFIController extends Controller
         }
         return response($data);
     }
+
+     // document sealing
+        // if($request->has('file')) {
+        //     try {
+            
+        //         $pdf = new Fpdi();
+        //         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+    
+        //         for ($i=1; $i <= $pageCount; $i++)
+        //         {
+        //             $pdf->AddPage();
+        //             $tplIdx = $pdf->importPage($i);
+        //             $pdf->useTemplate($tplIdx);
+        //             if($i == $pageCount) {
+        //                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
+        //             }
+        //         }
+    
+        //         $signedFileName = 'signed_'.time().'.'.$extension;
+        //         $directory = public_path('PFI_Document_with_sign');
+        //         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        //         $pdf->Output($directory.'/'.$signedFileName,'F');
+        //         $pfi->pfi_document_with_sign = $signedFileName;
+        //     }catch (\Exception $e) {
+    
+        //         return redirect()->back()->with('error', $e->getMessage());
+        //     }
+            // $pfi->save();
+        // }
+
 }

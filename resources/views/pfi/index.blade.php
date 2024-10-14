@@ -23,9 +23,10 @@
                 @if (Session::has('success'))
                     <div class="alert alert-success mt-3" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                        {{ Session::get('success') }}
+                         
                     </div>
                 @endif
+                
             </div>
 
             <div class="card-body">

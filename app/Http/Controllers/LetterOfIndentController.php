@@ -581,7 +581,7 @@ class LetterOfIndentController extends Controller
                         $otherDoc->save();
                     }
                 }
-  $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+                $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
                     compact('letterOfIndent','documents'));
