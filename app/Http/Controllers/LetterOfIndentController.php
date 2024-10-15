@@ -451,7 +451,6 @@ class LetterOfIndentController extends Controller
             $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
 
                 try{ 
-                    
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','width','documents'));
                 }catch (\Exception $e){
@@ -583,7 +582,7 @@ class LetterOfIndentController extends Controller
                         $otherDoc->save();
                     }
                 }
-  $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
+                $documents = $letterOfIndent->LOIDocuments()->orderBy('order','ASC')->get();
                 try{
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.general_download_view',
                     compact('letterOfIndent','documents'));
