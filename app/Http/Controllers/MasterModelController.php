@@ -85,6 +85,8 @@ class MasterModelController extends Controller
             ['data' => 'steering', 'name' => 'steering','title' => 'Steering'],
             ['data' => 'model', 'name' => 'model','title' => 'Model'],
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],
+            ['data' => 'pfi_model', 'name' => 'pfi_model','title' => 'New Model'],
+            ['data' => 'pfi_sfx', 'name' => 'pfi_sfx','title' => 'New SFX'],
             ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
             ['data' => 'model_description', 'name' => 'model_description','title' => 'Model Description'],
             ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
@@ -98,7 +100,6 @@ class MasterModelController extends Controller
             ['data' => 'updated_at', 'name' => 'updated_at','title' => 'Updated At'],
             ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
            
-
         ]);
 
         return view('master-models.index', compact('html'));
@@ -142,6 +143,8 @@ class MasterModelController extends Controller
         $model->steering = $request->steering;
         $model->model = $request->model;
         $model->sfx = $request->sfx;
+        $model->pfi_model = $request->pfi_model;
+        $model->pfi_sfx = $request->pfi_sfx;
         $model->variant_id = $request->variant_id;
         $model->master_model_line_id = $variant->master_model_lines->id ?? '';
         $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;
@@ -211,6 +214,8 @@ class MasterModelController extends Controller
         $model->steering = $request->steering;
         $model->model = $request->model;
         $model->sfx = $request->sfx;
+        $model->pfi_model = $request->pfi_model;
+        $model->pfi_sfx = $request->pfi_sfx;
         $model->variant_id = $request->variant_id;
         $model->master_model_line_id = $variant->master_model_lines->id ?? '';
         $model->amount_uae = $request->amount_uae ? $request->amount_uae : 0;

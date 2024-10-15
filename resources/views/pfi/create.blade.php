@@ -141,7 +141,6 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
-                                                <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Document</label>
                                                     <input type="file" id="file" class="form-control widthinput" name="file">
                                                 </div>

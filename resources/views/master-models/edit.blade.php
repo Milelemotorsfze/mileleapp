@@ -58,6 +58,20 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
+                        <label  class="form-label">New Model</label>
+                        <input type="text" class="form-control" name="pfi_model" placeholder="Enter New Model"
+                         value="{{ $pfi->pfi_model }}">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label  class="form-label">New SFX</label>
+                        <input type="text" class="form-control"  name="pfi_sfx" placeholder="Enter New SFX"
+                        value="{{ $pfi->pfi_sfx }}">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
                             <option value="LHD" {{ $masterModel->steering == "LHD" ? 'selected' : " "}} >LHD</option>
@@ -349,6 +363,7 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
+                   
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{

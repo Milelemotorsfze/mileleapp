@@ -107,7 +107,15 @@ class PFIController extends Controller
                             // $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
                             $item->loi_item_code = implode(",", $LOICodes);  
                         }
-                        return view('pfi.action',compact('pfi','parentPfiItems'));
+                        $newPFIFileName = "";
+                        if($pfi->new_pfi_document_without_sign) {
+                            $filename = $pfi->new_pfi_document_without_sign;
+                            $newPFIFileName =  strstr($filename, '_', true) . ".pdf";
+                        }
+
+                        $oldPFIFileName =  strstr($pfi->pfi_document_without_sign, '_', true) . ".pdf";
+
+                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName'));
                     })
                     ->rawColumns(['action'])
                     ->toJson();
@@ -382,11 +390,11 @@ class PFIController extends Controller
 
         $destinationPath = 'PFI_document_withoutsign/';
         // $destination = 'PFI_document_withsign';
-        $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
+            $fileName = 'MILELE - '.$request->pfi_reference_number."_".time().'.pdf';
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
@@ -459,7 +467,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')) {
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id]);
+            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'NEW']);
         }
 
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
@@ -476,10 +484,27 @@ class PFIController extends Controller
         if($request->download == 1) {
             return $pdfFile->download($fileName.'.pdf');
         }else{
-            $filePath = public_path('PFI_document_withoutsign/'.$fileName);
-            
-            file_put_contents($filePath, $pdfFile->output());
-            $pfi->pfi_document_without_sign = $fileName;
+            $fileName = $fileName."_".time().'.pdf';
+
+            if($request->type == 'EDIT') {
+                $destinationPath = 'New_PFI_document_without_sign';
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+                if (File::exists(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign))) {
+                    File::delete(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign));
+                }
+
+                $filePath = public_path('New_PFI_document_without_sign/'.$fileName);
+                file_put_contents($filePath, $pdfFile->output());
+                $pfi->new_pfi_document_without_sign = $fileName;
+
+            }else{
+
+                $filePath = public_path('PFI_document_without_sign/'.$fileName);
+                file_put_contents($filePath, $pdfFile->output());
+                $pfi->pfi_document_without_sign = $fileName;
+            }
             $pfi->save();
         }
 
@@ -614,14 +639,15 @@ class PFIController extends Controller
         $pfi->client_id = $request->client_id;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
-        $destinationPath = 'PFI_document_withoutsign';
-        $fileName = 'MILELE - '.$request->pfi_reference_number;
+        // $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
-            if (File::exists(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign))) {
-                File::delete(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign));
+            if (File::exists(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign))) {
+                File::delete(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign));
             }
-
+            $destinationPath = 'New_PFI_document_without_sign';
+           
+            $fileName = 'MILELE - '.$request->pfi_reference_number."_".time().'.pdf';
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
             $file->move($destinationPath, $fileName);
@@ -719,7 +745,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')){
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id]);
+            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'EDIT']);
         }
 
         return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');

@@ -105,8 +105,8 @@
                 @foreach($pfiItems as $pfiItem)
                     <tr>
                         <td style="width:200px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
-                        <td>{{ $pfiItem->masterModel->model ?? '' }}</td>
-                        <td>{{ $pfiItem->masterModel->sfx ?? '' }}</td>
+                        <td>{{ $pfiItem->masterModel->pfi_model ?? '' }}</td>
+                        <td>{{ $pfiItem->masterModel->pfi_sfx ?? '' }}</td>
                         <td style="font-weight:normal">Stock</td>
                         <td>{{ $pfiItem->pfi_quantity }}</td>
                         <td style="width:80px">{{ $pfi->currency }} {{ number_format($pfiItem->unit_price)}}</td>
