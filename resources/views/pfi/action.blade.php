@@ -117,11 +117,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="col-lg-12">
-                            <div class="row p-2 justify-content-center">
-                                <div class="col-md-2">
                                 @if($pfi->new_pfi_document_without_sign)
                                     <label class="fw-bold">Old PFI Document</label>
                                 @endif
+                            <div class="row p-2 justify-content-center">
+                                <div class="col-md-2">
+                               
                                 <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
                                     class="btn btn-primary mb-2 text-center" download="{{ $oldPFIFileName }}">
                                     Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>

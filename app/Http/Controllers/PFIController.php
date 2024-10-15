@@ -501,7 +501,7 @@ class PFIController extends Controller
 
             }else{
 
-                $filePath = public_path('PFI_document_without_sign/'.$fileName);
+                $filePath = public_path('PFI_document_withoutsign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
                 $pfi->pfi_document_without_sign = $fileName;
             }
