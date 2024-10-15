@@ -60,14 +60,14 @@
                     <div class="mb-3">
                         <label  class="form-label">New Model</label>
                         <input type="text" class="form-control" name="pfi_model" placeholder="Enter New Model"
-                         value="{{ $pfi->pfi_model }}">
+                         value="{{ $masterModel->pfi_model }}">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">New SFX</label>
                         <input type="text" class="form-control"  name="pfi_sfx" placeholder="Enter New SFX"
-                        value="{{ $pfi->pfi_sfx }}">
+                        value="{{ $masterModel->pfi_sfx }}">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
