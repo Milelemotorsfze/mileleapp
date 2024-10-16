@@ -30,7 +30,6 @@
                                         On Hold
                                     </label>
                                 </div>
-                                <!-- New Status Options -->
                                 <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                                     <input class="form-check-input me-1" type="radio" name="Status" id="StatusPartiallyDelivered" value="Partially Delivered" {{ $workOrder->status == 'Partially Delivered' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="StatusPartiallyDelivered" style="font-size: 14px;">
