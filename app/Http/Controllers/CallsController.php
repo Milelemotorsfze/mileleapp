@@ -69,12 +69,78 @@ class CallsController extends Controller
     }
     public function inprocess()
     {
-        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where('created_at', '>=', Carbon::now()->subMonths(2))->get();     
-        $useractivities =  New UserActivities();
+        if (request()->ajax()) {
+            $data = Calls::where('status', 'Prospecting')
+                ->orWhere('status', 'New Demand')
+                ->orWhere('status', 'Quoted')
+                ->orWhere('status', 'Negotiation')
+                ->where('created_at', '>=', Carbon::now()->subMonths(2))
+                ->get();
+    
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('sales_person', function($row) {
+                    $sales_persons = DB::table('users')->where('id', $row->sales_person)->first();
+                    return $sales_persons ? $sales_persons->name : '';
+                })
+                ->addColumn('brands_models', function($row) {
+                    $leads_models_brands = DB::table('calls_requirement')
+                        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+                        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                        ->where('calls_requirement.lead_id', $row->id)
+                        ->get();
+    
+                    $models_brands_string = '';
+                    foreach ($leads_models_brands as $lead_model_brand) {
+                        $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
+                    }
+                    return rtrim($models_brands_string, ', ');
+                })
+                ->addColumn('lead_source', function($row) {
+                    $leadsource = DB::table('lead_source')->where('id', $row->source)->first();
+                    return $leadsource ? $leadsource->source_name : '';
+                })
+                ->addColumn('remarks_messages', function($row) {
+                    $text = $row->remarks;
+                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                    return str_replace(['<p>', '</p>'], '', strip_tags($remarks));
+                })
+                ->addColumn('sales_person_remarks', function($row) {
+                    $sales_notes = "";
+                    if ($row->status == "Prospecting") {
+                        $result = DB::table('prospectings')->where('calls_id', $row->id)->first();
+                        if ($result) {
+                            $sales_notes = $result->salesnotes;
+                        }
+                    } elseif ($row->status == "New Demand") {
+                        $result = DB::table('demand')->where('calls_id', $row->id)->first();
+                        if ($result) {
+                            $sales_notes = $result->salesnotes;
+                        }
+                    } elseif ($row->status == "Quoted") {
+                        $result = DB::table('quotations')->where('calls_id', $row->id)->first();
+                        if ($result) {
+                            $sales_notes = $result->sales_notes;
+                        }
+                    } else {
+                        $result = DB::table('negotiations')->where('calls_id', $row->id)->first();
+                        if ($result) {
+                            $sales_notes = $result->sales_notes;
+                        }
+                    }
+                    return $sales_notes;
+                })
+                ->rawColumns(['sales_person', 'brands_models', 'lead_source', 'remarks_messages', 'sales_person_remarks'])
+                ->make(true);
+        }
+    
+        $useractivities =  new UserActivities();
         $useractivities->activity = "Open Call & Lead Inprocess Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.inprocess',compact('data'));
+    
+        return view('calls.inprocess');
     }
     public function converted()
     {

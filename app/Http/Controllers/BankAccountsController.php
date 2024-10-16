@@ -29,7 +29,7 @@ class BankAccountsController extends Controller
     $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
         return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
     }, 0);
-    $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+    $suggestedPayments = PurchasedOrderPaidAmounts::whereIn('status', ['Initiated Payment', 'Approved', 'Suggested Payment'])->get();
     $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
         $purchasingOrder = $payment->purchasingOrder;
         if ($purchasingOrder) {

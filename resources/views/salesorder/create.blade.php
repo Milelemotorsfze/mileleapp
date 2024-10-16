@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-check form-check-inline">
-                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}}</label>
+                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}} To Sales Order</label>
                         </div>
                     </div>
                 </div>
@@ -67,16 +67,12 @@
                     <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->document_validity}}</label>
                 </div>
                 </div>
-                @php
-                $user = \Illuminate\Support\Facades\Auth::user();
-                $empProfile = $user->empProfile;
-                @endphp
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Person :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->name }}
+                        {{ $saleperson->name}}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -92,7 +88,7 @@
                         Sales Email ID :
                     </div>
                     <div class="col-sm-6">
-                        {{ Auth::user()->email }}
+                        {{ $saleperson->email }}
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -329,11 +325,15 @@
     </div>
         <hr>
         <div class="row">
-    <h6>Vehicles</h6>
+        @php
+    // Calculate the total number of vehicles
+    $totalVehicles = $quotationItems->sum('quantity');
+@endphp
+    <h6>Vehicles - Total Vehicles ({{ $totalVehicles }})</h6>
     <div class="col-md-12">
         @foreach($quotationItems as $quotationItem)
         <div class="mb-1">
-            <h6>{{ $quotationItem->description }}</h6>
+            <h6>{{ $loop->iteration }} - {{ $quotationItem->description }} - ({{ $quotationItem->quantity }})</h6>
             <div class="row">
                 @for ($i = 0; $i < $quotationItem->quantity; $i++)
                 <div class="col-md-2 mb-3">

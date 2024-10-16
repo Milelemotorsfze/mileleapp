@@ -8,6 +8,7 @@ use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
+use App\Models\ModelHasRoles;
 use Illuminate\Http\Request;
 use App\Models\Quotation;
 use App\Models\Rejection;
@@ -28,6 +29,7 @@ use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Logs;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Response;
 
@@ -40,11 +42,15 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $id = Auth::user()->id;
+        $clients = SalespersonOfClients::with('client')
+        ->where('sales_person_id', $id)
+        ->get();
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         if($hasPermission)
         {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->where('calls.status', 'New')
+    ->whereNull('calls.leadtype')
     ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
     ->select('calls.*')
     ->get();
@@ -54,6 +60,7 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
         ->where('calls.status', 'New')
         ->where('calls.sales_person', $id)
+        ->whereNull('calls.leadtype')
         ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
         ->orderBy('calls.created_by', 'desc')
         ->select('calls.*')
@@ -61,6 +68,27 @@ class DailyleadsController extends Controller
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            if($status === "Closed")
+            {
+                $so = so::select([
+                    'calls.name as customername',
+                    'calls.email',
+                    'calls.phone',
+                    'quotations.created_at',
+                    'quotations.deal_value',
+                    'quotations.sales_notes',
+                    'quotations.file_path',
+                    'users.name',
+                    'so.so_number',
+                    'so.so_date',
+                ])
+                ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
+                ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+                ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
+                ->groupby('so.id')
+                ->get();
+                return DataTables::of($so)->toJson();  
+            }
             if($status === "Preorder")
             {
                 $preorders = PreOrder::select([
@@ -118,6 +146,33 @@ class DailyleadsController extends Controller
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
             }
+            else if($status === "bulkleads")
+            {
+                $bulkleads = calls::select([
+                    'calls.id',
+                    'calls.name',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.location',
+                    'users.name as createdby',
+                    'calls.language',
+                    'master_model_lines.model_line',
+                    'brands.brand_name',
+                    'calls.remarks',
+                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
+                ])
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->where('calls.sales_person', $id)
+                ->whereNotNull('calls.leadtype')
+                ->groupby('calls.id')
+                ->get();
+                return DataTables::of($bulkleads)->toJson();   
+            }
             else
             {
             $searchValue = $request->input('search.value');
@@ -127,11 +182,11 @@ class DailyleadsController extends Controller
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
                 if($hasPermission)
                 {
-                    $data->whereIn('status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
                 }
                 else
                 {
-                    $data->whereIn('status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
                 }
             }
             else
@@ -139,12 +194,12 @@ class DailyleadsController extends Controller
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
                 if($hasPermission)
                 {
-                    $data->where('status', $status)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->orderBy('created_at', 'desc');
                 
                 }
                 else
                 {
-                    $data->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+                    $data->where('calls.status', $status)->whereNull('calls.leadtype')->where('sales_person', $id)->orderBy('created_at', 'desc');
                 }
             }
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
@@ -205,9 +260,11 @@ class DailyleadsController extends Controller
                     DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(quotations.deal_value, ' ', quotations.currency) as ddealvalues"), ('quotations.signature_status as signature_status')
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as ddealvalues"), ('quotations.signature_status as signature_status'),
+                    'users.name as salespersonname',
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -223,7 +280,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y %m %d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect(
@@ -248,7 +305,7 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%Y %m %d'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
                 $data->addSelect(
@@ -262,14 +319,16 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(DATE_FORMAT(lead_closed.date, '%Y %m %d'), '') as cdate"),
                     DB::raw("IFNULL(lead_closed.sales_notes, '') as csalesnotes"),
                     DB::raw("IFNULL(lead_closed.so_id, '') as so_id"),
-                    DB::raw("CONCAT(IFNULL(lead_closed.dealvalues, ''), ' ', IFNULL(lead_closed.currency, '')) as cdealvalues"),
+                    DB::raw("CONCAT(IFNULL(FORMAT(quotations.deal_value, 0), ''), ' ', IFNULL(quotations.currency, '')) as cdealvalues"),
+                    'users.name as salespersonname',
                 );
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
                 $data->leftJoin('so', function ($join) {
                     $join->on('lead_closed.so_id', '=', 'so.id')
                          ->whereNotNull('lead_closed.so_id');
                 });
-                $data->addSelect(DB::raw("IFNULL(so.so_number, '') as so_number"));
+                $data->addSelect('so.so_number');
+                $data->leftJoin('users', 'quotations.created_by', '=', 'users.id');
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
@@ -307,7 +366,7 @@ class DailyleadsController extends Controller
                 ->toJson();
         }
     }
-        return view('dailyleads.index', compact('pendingdata'));
+        return view('dailyleads.index', compact('pendingdata', 'clients'));
     }
     public function create()
     {
@@ -320,8 +379,9 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $salespersonId)
         ->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries'));
+        return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries','sales_persons'));
     }
     /**
      * Store a newly created resource in storage.
@@ -338,6 +398,34 @@ class DailyleadsController extends Controller
         $modelLineIds = json_decode($modelLineIdsRaw, true);
         $modelLineIds = array_map('strval', $modelLineIds);
         }
+        $assignid = $request->input('assignto');
+        $salesPersonId = $assignid ? $assignid : Auth::id();
+        $client = $request->input('client_id');
+        if(!$client)
+        {
+            $date = Carbon::now();
+            $date->setTimezone('Asia/Dubai');
+            $dataValue = '40';
+            $formattedDate = $date->format('Y-m-d H:i:s');
+            $data = [
+                'source' => $dataValue,
+                'type' => $request->input('type'),
+                'sales_person' => $salesPersonId,
+                'remarks' => $request->input('remarks'),
+                'custom_brand_model' => $request->input('custom_brand_model'),
+                'created_at' => $formattedDate,
+                'assign_time' => $formattedDate,
+                'created_by' => Auth::id(),
+                'leadtype' => $request->input('leadtype'),
+                'status' => "New",
+                'priority' => "High",
+                'customer_coming_type' => "Direct From Sales",
+            ];
+            $calls = new Calls($data);
+            $calls->save();
+        }
+        else
+        {
         $client = Clients::find($request->input('client_id'));
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
@@ -348,7 +436,7 @@ class DailyleadsController extends Controller
             'source' => $dataValue,
             'email' => $client->email,
             'type' => $request->input('type'),
-            'sales_person' => Auth::id(),
+            'sales_person' => $salesPersonId,
             'remarks' => $request->input('remarks'),
             'location' => $client->destination,
             'phone' => $client->phone,
@@ -367,6 +455,7 @@ class DailyleadsController extends Controller
         $clientleads->calls_id = $calls->id; 
         $clientleads->clients_id = $client->id;
         $clientleads->save();
+        }
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->where('sales_person', Auth::id())
@@ -385,7 +474,7 @@ class DailyleadsController extends Controller
         $model->save();
         }
         }
-    }
+        }
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,
@@ -722,5 +811,31 @@ public function saveprospecting(Request $request)
     } else {
         return response()->json(['authorized' => false]);
     }
+}
+public function updateCallClient(Request $request)
+{
+    $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'call_id' => 'required|exists:calls,id',
+    ]);
+    $client = Clients::find($request->client_id);
+    if (!$client) {
+        return response()->json(['message' => 'Client not found!'], 404);
+    }
+    $call = Calls::find($request->call_id);
+    if (!$call) {
+        return response()->json(['message' => 'Call not found!'], 404);
+    }
+    $call->name = $client->name;
+    $call->phone = $client->phone;
+    $call->email = $client->email;
+    $call->language = $client->lauguage;
+    $call->location = $client->destination;
+    $call->save();
+    $clientLead = new ClientLeads();
+    $clientLead->clients_id = $request->client_id;
+    $clientLead->calls_id = $request->call_id;
+    $clientLead->save();
+    return response()->json(['message' => 'Client updated successfully!'], 200);
 }
 }

@@ -1,6 +1,13 @@
 @extends('layouts.table')
 <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
 <style>
+    .details-control {
+            cursor: pointer;
+            color: blue;
+        }
+        .details-control:hover {
+            text-decoration: underline;
+        }
     .my-text {
       font-weight: bold;
       font-size: 20px;
@@ -30,6 +37,135 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
+@php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
+        @endphp
+        @if ($hasPermission)
+        
+        <div class="card">
+        <div class="card-body px-0">
+            <div class="table-responsive px-3">
+                <div class="card-header align-items-center">
+                    <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">UAE Vehicle Stock</h4>
+                </div>
+                <table id="vehicleStockTable" class="table table-striped table-bordered">
+                    <thead class="bg-soft-secondary">
+                        <tr>
+                            <th></th> <!-- For the expandable control -->
+                            <th>Model</th>
+                            <th>SFX</th>
+                            <th>Variant Name</th>
+                            <th>Free Stock</th>
+                            <th>Total Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dpdashboarduae as $variant)
+                            <tr>
+                                <td>
+                                    <a href="#" class="expand-row" data-variant-id="{{ $variant->varaints_id }}">+</a>
+                                </td>
+                                    @php
+                                        $modelsfx = DB::table('master_models')->where('variant_id', $variant->varaints_id)->first();
+                                    @endphp
+                                    <td>{{ $modelsfx->model ?? '' }}</td>
+                                    <td>{{ $modelsfx->sfx ?? '' }}</td>
+                                <td>{{ $variant->variant_name }}</td>
+                                <td>
+                                    @php
+                                        $vehicleCount = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('so_id')
+                                            ->whereNull('gdn_id')
+                                            ->where('vehicles.status', 'Approved')
+                                            ->where(function ($query) {
+                                                $query->whereNull('vehicles.reservation_end_date')
+                                                      ->orWhere('vehicles.reservation_end_date', '<', now());
+                                            })
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCount }}
+                                </td>
+                                <td>
+                                    @php
+                                        $vehicleCountfull = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->where('vehicles.status', 'Approved')
+                                            ->whereNull('gdn_id')
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCountfull }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<div class="card">
+    <div class="card-body px-0">
+        <div class="table-responsive px-3">
+            <div class="card-header align-items-center">
+                <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Belgium Vehicle Stock</h4>
+            </div>
+            <table id="vehicleStockTablebelgium" class="table table-striped table-bordered">
+                    <thead class="bg-soft-secondary">
+                        <tr>
+                            <th></th> <!-- For the expandable control -->
+                            <th>Model</th>
+                            <th>SFX</th>
+                            <th>Variant Name</th>
+                            <th>Free Stock</th>
+                            <th>Total Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dpdashboardnon as $variant)
+                            <tr>
+                                <td>
+                                    <a href="#" class="expand-row-belgium" data-variant-id="{{ $variant->varaints_id }}">+</a>
+                                </td>
+                                    @php
+                                        $modelsfx = DB::table('master_models')->where('variant_id', $variant->varaints_id)->first();
+                                    @endphp
+                                    <td>{{ $modelsfx->model ?? '' }}</td>
+                                    <td>{{ $modelsfx->sfx ?? '' }}</td>
+                                <td>{{ $variant->variant_name }}</td>
+                                <td>
+                                    @php
+                                        $vehicleCount = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->whereNull('so_id')
+                                            ->where('vehicles.status', 'Approved')
+                                            ->whereNull('gdn_id')
+                                            ->where(function ($query) {
+                                                $query->whereNull('vehicles.reservation_end_date')
+                                                      ->orWhere('vehicles.reservation_end_date', '<', now());
+                                            })
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCount }}
+                                </td>
+                                <td>
+                                    @php
+                                        $vehicleCountfull = DB::table('vehicles')
+                                            ->where('varaints_id', $variant->varaints_id)
+                                            ->where('vehicles.status', 'Approved')
+                                            ->whereNull('gdn_id')
+                                            ->count();
+                                    @endphp
+                                    {{ $vehicleCountfull }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+@endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('finance-dashboard-summary');
         @endphp
@@ -171,6 +307,176 @@ Procurement
                             <!-- end card body -->
                         </div>
         @endif
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sale-team-dashboard');
+        @endphp
+        @if ($hasPermission)
+        @if ($undersalesleads->isNotEmpty())
+            <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Showroom Sales Person Leads Summary</h4>
+                            </div>
+                                <table id="dtBasicExample2" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                            <tr>
+                                                <th>Sales Person</th>
+                                                <th>Pending Leads</th>
+                                                <th>Response Time</th>
+                                                <th>Prospectings</th>
+                                                <th>Fellow Up</th>
+                                                <th>Quotation Issued</th>
+                                                <th>Rejected</th>
+                                                <th>Sales Order</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @forelse ($undersalesleads as $undersaleslead)
+                                        <tr>
+                                            <td>{{ $undersaleslead->salespersonname }}</td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Pending Leads']) }}">{{ $undersaleslead->lead_count }}</a></td>
+                                            @php
+                                                $responsetime = null;
+                                                $responsetime = DB::table('calls')
+                                                    ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
+                                                    ->where('calls.status', '!=', 'New')
+                                                    ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                    ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                    ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, prospectings.created_at)) as average_response_time'))
+                                                    ->first();
+                                            @endphp
+                                            <td>{{ $responsetime ? number_format($responsetime->average_response_time, 0) . ' Hrs' : 'N/A' }}</td>
+                                            @php
+                                               $openLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->Where('calls.status', '=', 'Prospecting');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Prospecting']) }}">{{ $openLeadsCount }}</a></td>
+                                            @php
+                                               $openLeadsCountfellow = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->where('calls.status', '=', 'Follow Up');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Follow Up']) }}">{{ $openLeadsCountfellow }}</a></td>
+                                            @php
+                                               $closedLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->where('calls.status', '=', 'Closed');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            @php
+                                               $closedLeadsCountrejected = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->Where('calls.status', '=', 'Rejected');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            @php
+                                               $closedLeadsCountquoted = DB::table('calls')
+                                                ->where(function ($query) use ($undersaleslead) {
+                                                    $query->Where('calls.status', '=', 'Quoted');
+                                                })
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->count();
+                                            @endphp
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Quoted']) }}">{{ $closedLeadsCountquoted }}</a></td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Rejected']) }}">{{ $closedLeadsCountrejected }}</a></td>
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Sales Order']) }}">{{ $closedLeadsCount }}</a></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">No pending leads found.</td>
+                                        </tr>
+                                    @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
+                        @endif
+                        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('gp-dashboard');
+            $currentMonth = request()->get('month') ?? now()->format('Y-m');
+        @endphp
+        @if ($hasPermission)
+        @if (!empty($undersalesleads))
+            <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sold Vehicles GP & Commission Summary</h4>
+                            <form id="filterForm" action="{{ route('home') }}" method="GET">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-control" name="month" id="monthSelector" onchange="this.form.submit()">
+                                @for ($i = 0; $i < 12; $i++)
+                                    @php
+                                        $date = now()->startOfMonth()->subMonths($i)->format('Y-m');
+                                        $selected = ($currentMonth === $date) ? 'selected' : '';
+                                    @endphp
+                                    <option value="{{ $date }}" {{ $selected }}>
+                                        {{ now()->startOfMonth()->subMonths($i)->format('F Y') }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                            </div>
+                                <table id="dtBasicExample5" class="table table-striped table-bordered">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                                <th>Sales Person</th>
+                                                <th>Number of Invoices</th>
+                                                <th>Number of Vehicles</th>
+                                                <th>Total Cost Price</th>
+                                                <th>Total Sale Price</th>
+                                                <th>Gross Profit Margin</th>
+                                                <th>Commission Rate</th>
+                                                <th>Total Commission</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach ($commissons as $data)
+                                        <tr>
+            <td><a href="{{ route('salesperson.commissions', ['sales_person_id' => $data->sales_person_id, 'month' => request()->get('month') ?? now()->format('Y-m')]) }}">
+                {{ $data->name }}
+            </a>
+            </td>
+            <td>{{ $data->total_invoices }}</td>
+            <td>{{ $data->total_invoices_items }}</td>
+            <td>{{ number_format($data->total_vehicle_cost, 2) }}</td>
+            <td>{{ number_format($data->total_rate_in_aed, 2) }}</td>
+            <td>{{ number_format($data->total_rate_in_aed - $data->total_vehicle_cost, 2) }}</td>
+            <td>{{ number_format($data->commission_rate, 2) }}%</td>
+            <td>{{ number_format(($data->total_rate_in_aed - $data->total_vehicle_cost) * ($data->commission_rate / 100), 2) }}</td>
+        </tr>
+        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
+                        @endif
 @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         @endphp
@@ -1404,5 +1710,164 @@ $(function() {
 
 
         });
+    </script>
+    <!-- Add JavaScript to handle row expansion -->
+<script>
+$(document).ready(function() {
+    // Initialize DataTables
+    var table = $('#vehicleStockTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "order": [],
+        "columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ]
+    });
+
+    // Handle row expansion
+    $('#vehicleStockTable tbody').on('click', 'a.expand-row', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var variantId = $(this).data('variantId');
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+            $(this).text('+');
+        } else {
+            // Open this row - create a detail row
+            var detailHtml = getDetailRowHtml(variantId);
+            row.child(detailHtml).show();
+            tr.addClass('shown');
+            $(this).text('-');
+        }
+    });
+
+    // Function to get the HTML for the detail row
+    function getDetailRowHtml(variantId) {
+        var detailHtml = '<table class="table table-bordered">' +
+                            '<thead class="bg-light">' +
+                                '<tr>' +
+                                    '<th>Interior Colour</th>' +
+                                    '<th>Exterior Colour</th>' +
+                                    '<th>Free Stock</th>' +
+                                    '<th>Total Stock</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>';
+
+        // Fetch data via an AJAX call or using existing data
+        $.ajax({
+            url: '/vehicle-details-dp',  // Route defined in web.php
+            method: 'GET',
+            data: { variant_id: variantId },
+            async: false, // For simplicity, keep this synchronous
+            success: function(data) {
+                data.details.forEach(function(detail) {
+                    detailHtml += '<tr>' +
+                                    '<td>' + detail.intColourName + '</td>' +
+                                    '<td>' + detail.exColourName + '</td>' +
+                                    '<td>' + detail.freeStock + '</td>' +
+                                    '<td>' + detail.totalStock + '</td>' +
+                                  '</tr>';
+                });
+            }
+        });
+
+        detailHtml += '</tbody></table>';
+
+        return detailHtml;
+    }
+});
+    </script>
+    <script>
+$(document).ready(function() {
+    // Initialize DataTables
+    var table = $('#vehicleStockTablebelgium').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "order": [],
+        "columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ]
+    });
+
+    // Handle row expansion
+    $('#vehicleStockTablebelgium tbody').on('click', 'a.expand-row-belgium', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+        var variantId = $(this).data('variantId');
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+            $(this).text('+');
+        } else {
+            // Open this row - create a detail row
+            var detailHtmlbelgium = getDetailRowHtml(variantId);
+            row.child(detailHtmlbelgium).show();
+            tr.addClass('shown');
+            $(this).text('-');
+        }
+    });
+
+    // Function to get the HTML for the detail row
+    function getDetailRowHtml(variantId) {
+        var detailHtmlbelgium = '<table class="table table-bordered">' +
+                            '<thead class="bg-light">' +
+                                '<tr>' +
+                                    '<th>Interior Colour</th>' +
+                                    '<th>Exterior Colour</th>' +
+                                    '<th>Free Stock</th>' +
+                                    '<th>Total Stock</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>';
+
+        // Fetch data via an AJAX call or using existing data
+        $.ajax({
+            url: '/vehicle-details-dpbelgium',  // Route defined in web.php
+            method: 'GET',
+            data: { variant_id: variantId },
+            async: false, // For simplicity, keep this synchronous
+            success: function(data) {
+                data.details.forEach(function(detailbelgium) {
+                    detailHtmlbelgium += '<tr>' +
+                                    '<td>' + detailbelgium.intColourName + '</td>' +
+                                    '<td>' + detailbelgium.exColourName + '</td>' +
+                                    '<td>' + detailbelgium.freeStock + '</td>' +
+                                    '<td>' + detailbelgium.totalStock + '</td>' +
+                                  '</tr>';
+                });
+            }
+        });
+
+        detailHtmlbelgium += '</tbody></table>';
+
+        return detailHtmlbelgium;
+    }
+});
+document.getElementById('monthSelector').addEventListener('change', function() {
+    const selectedMonth = this.value;
+    const url = document.getElementById('filterForm').action;
+    
+    fetch(`${url}?month=${selectedMonth}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Replace the commission table with the updated data
+        document.getElementById('commissionTable').innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
+});
     </script>
 @endpush

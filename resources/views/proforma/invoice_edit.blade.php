@@ -107,6 +107,7 @@
     border: 1px solid #FFFF00;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    vertical-align: middle;
 }
 .circle-buttonr::before {
     content: 'X';
@@ -607,6 +608,11 @@
                     </div>
                     <div class="col-sm-6">
                     <div class="input-group">
+                    <div class="row" id="single-agent-remove-section" style="display: none;">
+                <button type="button" class="btn btn-danger btn-sm" id="removeSingleAgentButton">
+                x
+            </button>
+        </div>
                         <select name="cb_name" id="cb_name" class="form-control form-control-xs">
                         </select>
                         <div class="input-group-append">
@@ -1421,12 +1427,25 @@
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
         if (selectedAgentId) {
-                        $('.system-code').removeAttr('disabled');
-                    } else {
-                        $('.system-code').attr('disabled', 'disabled');
-                    }
+            $('#single-agent-remove-section').show();
+            $('.system-code').removeAttr('disabled');
+        } else {
+            $('#single-agent-remove-section').hide();
+            $('.system-code').attr('disabled', 'disabled');
+            $('.system-code').val('0').attr('disabled', 'disabled');
+        }
     });
     fetchAgentData();
+    $('#removeSingleAgentButton').click(function () {
+        // Clear the selected agent and CR number
+        $('#cb_name').val('').trigger('change');
+        $('#cb_number').val('');
+        $('#agents_id').val('');
+        $('#selected_cb_name').val('');
+        $('.system-code').val('');
+        // Hide the remove button
+        $('#single-agent-remove-section').hide();
+    });
     function fetchAgentData() {
         $.ajax({
             url: "{{ route('agents.getAgentNames') }}",
@@ -2624,10 +2643,10 @@ $('#shipping_port').select2();
 
                     if(currency == 'USD') {
                         var value = '{{ $aed_to_usd_rate->value }}';
-                        var price = price / parseFloat(value);
+                        var price = price;
                     }else if(currency == 'ERU') {
                         var value = '{{ $aed_to_eru_rate->value }}';
-                        var price = price / parseFloat(value);
+                        var price = price;
                     }
                     return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
                         '    <span id="priceError' +  row['index'] +'" class="price-error invalid-feedback"></span>';

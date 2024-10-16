@@ -84,10 +84,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
                 <div class="row"> 
+                <div class="col-lg-4 col-md-6">
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Lead Type : </label>
+                    <select class="form-control" id="leadtype" name="leadtype" required>
+                    <option value="Normal Deals" data-value="Normal Deals">Normal Deals</option>
+                    <option value="Bulk Deals" data-value="Bulk Deals">Bulk Deals</option>
+                    <option value="Special Orders" data-value="Special Orders">Special Orders</option>
+                    </select>
+                    </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Customer : </label>
                     <select id="client_id" name="client_id" class="form-control">
+                    <option value="" disabled selected>Select an Customer</option>
                         @foreach ($clients as $client)
                             <option value="{{ $client->client->id }}">{{ $client->client->name }}</option>
                         @endforeach
@@ -140,9 +150,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                             </div>
                         </div>
                     </div>
+                    <div class="row">
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
                         {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+                    </div>
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                    @endphp
+                    @if ($hasPermission)
+                    <div class="col-lg-4 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Assign To: </label>
+                    <select id="assignto" name="assignto" class="form-control">
+                    <option value="" disabled selected>Select a Sales Person</option>
+                        @foreach ($sales_persons as $sales_person)
+                        @php
+                            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
+                            $sales_person_name = $sales_person_details->name;
+                        @endphp
+                            <option value="{{ $sales_person->model_id }}">{{ $sales_person_name }}</option>
+                        @endforeach
+                    </select>
+                    </div>
+                    @endif
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
@@ -355,7 +385,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     });
 });
 </script>
-
+<script>
+$(document).ready(function() {
+    function toggleCustomerField() {
+        var leadType = $('#leadtype').val();
+        if (leadType === 'Bulk Deals' || leadType === 'Special Orders') {
+            $('#client_id').parent().hide();
+        } else {
+            $('#client_id').parent().show();
+        }
+    }
+    toggleCustomerField();
+    $('#leadtype').on('change', function() {
+        toggleCustomerField();
+    });
+});
+</script>
+<script>
+    $(document).ready(function() {
+        $('#assignto').select2({
+            placeholder: "Select a Sales Person",
+            allowClear: true
+        });
+    });
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
 @endpush

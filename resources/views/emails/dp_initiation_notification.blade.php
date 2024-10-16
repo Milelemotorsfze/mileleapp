@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Purchase Order Payment Initiation Notification</title>
+    <title>Payment Initiation Notification</title>
     <style>
         body {
             font-family: 'Arial, sans-serif';
@@ -85,7 +85,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Purchase Order Payment Initiation</h1>
+            <h1>Payment Initiation</h1>
         </div>
         <div class="content">
             <p>Dear Team,</p>

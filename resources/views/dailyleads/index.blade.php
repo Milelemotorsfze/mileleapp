@@ -165,7 +165,6 @@ input[type=number]::-webkit-outer-spin-button
       <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
-     
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
@@ -173,8 +172,11 @@ input[type=number]::-webkit-outer-spin-button
       <div class="clearfix"></div>
 <br>
     <ul class="nav nav-pills nav-fill">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
+      </li>
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
@@ -194,16 +196,16 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
-      </li>
+      </li> -->
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
       </li>
     </ul>
   </div>
   <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1">
+      <div class="tab-pane fade show" id="tab1">
       <br>
       <!-- <div class="row">
   <div class="col-lg-1">
@@ -227,6 +229,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Preferred Language</th>
                   <th>Location</th>
                   <th>Remarks & Messages</th>
+                  <th>Created By</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -291,11 +294,17 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
                     @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    $text = $calls->remarks;
+                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                    @endphp
+                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
                     <td>
+                    @php
+                    $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
+                    @endphp
+                    {{ $created_by->name }}
+                  </td>
+                  <td>
                     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
       <i class="fa fa-bars" aria-hidden="true"></i>
@@ -333,6 +342,31 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <!-- Client Selection Modal -->
+<div class="modal fade" id="clientSelectionModal" tabindex="-1" aria-labelledby="clientSelectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clientSelectionModalLabel">Select Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add your client dropdown here, loaded from the database -->
+        <select id="clientDropdown" class="form-control">
+            <option value="">Select Client</option>
+            @foreach($clients as $client)
+                <option value="{{ $client->client->id }}">{{ $client->client->name }}</option>
+            @endforeach
+        </select>
+        <input type="hidden" id="modalCallId" value="">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveClientSelection">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
       <div class="modal fade" id="openfellowupdatemodel" tabindex="-1" aria-labelledby="openfellowupdatemodelLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -921,6 +955,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
                   <th>Qoutation Date</th>
+                  <th>Sales Person</th>
                   <th>Deal Values</th>
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
@@ -967,52 +1002,6 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th>
                   <th>Action</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade show" id="tab6">
-      <br>
-      <!-- <div class="row">
-  <div class="col-lg-1">
-    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
-  </div>
-</div> -->
-        <div class="card-body">
-          <div class="table-responsive">
-            <table id="dtBasicExample6" class="table table-striped table-editable table-edits table" style = "width:100%;">
-            <thead class="bg-soft-secondary">
-                <tr>
-                  <th>Lead Date</th>
-                  <th>Selling Type</th>
-                  <th>Customer Name</th>
-                  <th>Customer Phone</th>
-                  <th>Customer Email</th>
-                  <th>Brands & Models</th>
-                  <th>Custom Model & Brand</th>
-                  <th>Preferred Language</th>
-                  <th>Location</th>
-                  <th>Remarks & Messages</th>
-                  <th>Prospectings Date</th>
-                  <th>Prospectings Notes</th>
-                  <th>Demand Date</th>
-                  <th>Demand Notes</th>
-                  <th>Qoutation Date</th>
-                  <th>Qoutation Values</th>
-                  <th>Qoutation Notes</th>
-                  <th>View Qoutation</th>
-                  <!-- <th>Negotiation Date</th>
-                  <th>Negotiation Values</th>
-                  <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th> -->
-                  <th>Sales Date</th>
-                  <th>Sales Values</th>
-                  <th>Sales Notes</th>
-                  <th>So Number</th>
-                  <th>SO Update</th>
-                  <!-- <th>Booking Vehicles</th> -->
                 </tr>
               </thead>
             </table>
@@ -1117,6 +1106,30 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Followup Time</th>
                   <th>Method</th>
                   <th>Sales Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade show active" id="tab10">
+      <br>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample10" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Lead Date</th>
+                  <th>Selling Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Created By</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -2353,6 +2366,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         return data;
     }
         },
+        { data: 'salespersonname', name: 'users.name' },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
@@ -2672,255 +2686,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
             ]
         });
-       dataTable6 =   $('#dtBasicExample6').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('dailyleads.index', ['status' => 'Closed']) }}",
-            columns: [
-              {
-            data: 'created_at',
-            name: 'created_at',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
-                { data: 'type', name: 'type' },
-                { data: 'name', name: 'name' },
-                // { data: 'brand', name: 'brand' },
-                { data: 'phone', name: 'phone' },
-                { data: 'email', name: 'email' },
-                { data: 'models_brands', name: 'models_brands' },
-                { data: 'custom_brand_model', name: 'custom_brand_model' },
-                { data: 'location', name: 'location' },
-                { data: 'language', name: 'language' },
-                {
-    data: 'remarks',
-    name: 'remarks',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id;
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-            data: 'date',
-            name: 'date',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
-                {
-    data: 'salesnotes',
-    name: 'salesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'salesnotes_' + row.id;
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-            data: 'ddate',
-            name: 'ddate',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
-                {
-    data: 'dsalesnotes',
-    name: 'dsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'dsalesnotes_' + row.id;
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-            data: 'qdate',
-            name: 'qdate',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
-                { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
-                {
-    data: 'qsalesnotes',
-    name: 'qsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'qsalesnotes_' + row.id;
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-    data: 'file_path',
-    name: 'file_path',
-    searchable: false,
-    render: function (data, type, row) {
-        if (data) {
-            return `
-                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
-            `;
-        } else {
-            return '';
-        }
-    }
-},
-//                 { data: 'ndate', name: 'ndate', searchable: false},
-//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-//                 {
-//     data: 'nsalesnotes',
-//     name: 'nsalesnotes',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         const maxLength = 20;
-//         const uniqueId = 'nsalesnotes_' + row.id;
-
-//         if (data && data.length > maxLength) {
-//             const truncatedText = data.substring(0, maxLength);
-//             return `
-//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-//             `;
-//         } else {
-//             return `<span class="remarks-text">${data}</span>`;
-//         }
-//     }
-// },
-// {
-//     data: 'nfile_path',
-//     name: 'nfile_path',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         if (data) {
-//             return `
-//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-//             `;
-//         } else {
-//             return '';
-//         }
-//     }
-// },
-{
-            data: 'cdate',
-            name: 'cdate',
-             render: function (data, type, row) {
-        if (type === 'display' || type === 'filter') {
-            if (!data || !moment(data).isValid()) {
-                return '';
-            }
-            // Convert the date to your desired format
-            return moment(data).format('DD-MMM-YYYY');
-        }
-        return data;
-    }
-        },
-                { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
-                {
-    data: 'csalesnotes',
-    name: 'csalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'csalesnotes_' + row.id;
-
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-                { data: 'so_number', name: 'so_number'},
-              {
-              data: 'id',
-              name: 'id',
-              searchable: false,
-              render: function (data, type, row) {
-              const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-              return `
-              <a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order">
-              <i class="fa fa-window-maximize" aria-hidden="true"></i>
-              </a>`;
-              }
-              },
-            ]
-        });
         dataTable7 =   $('#dtBasicExample7').DataTable({
             processing: true,
             serverSide: true,
@@ -3086,42 +2851,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-//                 { data: 'ndate', name: 'ndate', searchable: false},
-//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-//                 {
-//     data: 'nsalesnotes',
-//     name: 'nsalesnotes',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         const maxLength = 20;
-//         const uniqueId = 'nsalesnotes_' + row.id;
-
-//         if (data && data.length > maxLength) {
-//             const truncatedText = data.substring(0, maxLength);
-//             return `
-//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-//             `;
-//         } else {
-//             return `<span class="remarks-text">${data}</span>`;
-//         }
-//     }
-// },
-// {
-//     data: 'nfile_path',
-//     name: 'nfile_path',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         if (data) {
-//             return `
-//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-//             `;
-//         } else {
-//             return '';
-//         }
-//     }
-// },
 {
             data: 'rdate',
             name: 'rdate',
@@ -3258,6 +2987,73 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 },
     ]
     });
+    dataTable9 = $('#dtBasicExample10').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'bulkleads']) }}",
+    columns: [
+      {
+            data: 'leaddate',
+            name: 'leaddate',
+             render: function (data, type, row) {
+        if (type === 'display' || type === 'filter') {
+            if (!data || !moment(data).isValid()) {
+                return '';
+            }
+            return moment(data).format('DD-MMM-YYYY');
+        }
+        return data;
+    }
+        },
+        { data: 'type', name: 'calls.type' },
+        { data: 'name', name: 'calls.name' },
+        { data: 'phone', name: 'calls.phone' },
+        { data: 'email', name: 'calls.email' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'language', name: 'calls.language' },
+        { data: 'location', name: 'calls.location' },
+        { data: 'remarks', name: 'calls.remarks', render: function(data, type, row) {
+                    return $('<div>').html(data).text();
+                }
+            },
+        { data: 'createdby', name: 'users.name' },
+        {
+    data: 'id',
+    name: 'id',
+    searchable: false,
+    render: function (data, type, row) {
+        const bookingUrl = `{{ url('booking/create') }}/${data}`;
+        const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+
+        // Check if calls.name is null or empty
+        if (!row.name) {
+            // If calls.name is null, show a button that opens a modal for client selection
+            return `
+                <button type="button" class="btn btn-sm btn-warning" onclick="openClientSelectionModal(${data})">
+                    Select Client
+                </button>
+            `;
+        } else {
+            // If calls.name is not null, show the dropdown with the options
+            return `
+                <div class="dropdown">
+                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">FollowUp</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                        <li><a class="dropdown-item" href="${qoutationUrl}">Quotation</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                    </ul>
+                </div>
+            `;
+        }
+    }
+}
+    ]
+    });
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
@@ -3360,6 +3156,55 @@ setInterval(updateRemainingTime, 1000);
         }
     }
   </script>
+   <script>
+        // Global definition of the cancelSO function
+        function cancelSO(id) {
+            if (confirm('Are you sure you want to cancel this Sales Order?')) {
+                window.location.href = `{{ url('salesorder/cancel') }}/${id}`;
+            }
+        }
+        // Function to open the modal and store callId
+function openClientSelectionModal(callId) {
+    // Store callId in hidden input inside modal
+    $('#modalCallId').val(callId);
+    // Show the modal
+    $('#clientSelectionModal').modal('show');
+}
+
+// Handle save button click
+$('#saveClientSelection').on('click', function() {
+    // Get the selected client_id from the dropdown
+    var clientId = $('#clientDropdown').val();
+    // Get the call_id from the hidden input
+    var callId = $('#modalCallId').val();
+
+    // Ensure a client is selected
+    if (clientId === "") {
+        alert("Please select a client.");
+        return;
+    }
+    $.ajax({
+        url: '/update-call-client', // Your route to handle this
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}', // Include CSRF token
+            client_id: clientId,
+            call_id: callId
+        },
+        success: function(response) {
+            // Handle success (e.g., close the modal, show a success message)
+            $('#clientSelectionModal').modal('hide');
+            alert("Client updated successfully!");
+            alertify.success('Customer Detail Updated');
+                    location.reload();
+        },
+        error: function(xhr) {
+            // Handle error (e.g., show an error message)
+            alert("There was an error updating the client.");
+        }
+    });
+});
+    </script>
 @else
     @php
         redirect()->route('home')->send();
