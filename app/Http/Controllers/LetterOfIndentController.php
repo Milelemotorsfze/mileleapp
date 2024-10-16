@@ -121,25 +121,25 @@ class LetterOfIndentController extends Controller
                 })
                 ->editColumn('is_expired', function($query) {
                     $LOI = LetterOfIndent::select('id','is_expired','client_id','date')->find($query->id);
-                    $LOItype = $LOI->client->customertype;
-                    $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-                    if($LOIExpiryCondition && $LOI->is_expired == false) {        
-                        $currentDate = Carbon::now();
-                        $year = $LOIExpiryCondition->expiry_duration_year;
-                        $expiryDate = Carbon::parse($LOI->date)->addYears($year);
-                        // do not make status expired, becasue to know at which status stage it got expired
-                        if($currentDate->gt($expiryDate) == true) {
-                            $LOI->is_expired = true;     
-                            $LOI->expired_date = Carbon::now()->format('Y-m-d');
-                            $LOI->timestamps = false;        
-                            $LOI->save();  
-                        }else{
-                            $LOI->is_expired = false;  
-                            $LOI->expired_date = NULL;  
-                            $LOI->timestamps = false;               
-                            $LOI->save();  
-                        }
-                    }
+                    // $LOItype = $LOI->client->customertype;
+                    // $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
+                    // if($LOIExpiryCondition && $LOI->is_expired == false) {        
+                    //     $currentDate = Carbon::now();
+                    //     $year = $LOIExpiryCondition->expiry_duration_year;
+                    //     $expiryDate = Carbon::parse($LOI->date)->addYears($year);
+                    //     // do not make status expired, becasue to know at which status stage it got expired
+                    //     if($currentDate->gt($expiryDate) == true) {
+                    //         $LOI->is_expired = true;     
+                    //         $LOI->expired_date = Carbon::now()->format('Y-m-d');
+                    //         $LOI->timestamps = false;        
+                    //         $LOI->save();  
+                    //     }else{
+                    //         $LOI->is_expired = false;  
+                    //         $LOI->expired_date = NULL;  
+                    //         $LOI->timestamps = false;               
+                    //         $LOI->save();  
+                    //     }
+                    // }
 
                     if($LOI->is_expired == true) {
                         $msg = 'Expired';
