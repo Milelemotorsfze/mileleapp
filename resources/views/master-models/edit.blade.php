@@ -58,6 +58,20 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
+                        <label  class="form-label">New Model</label>
+                        <input type="text" class="form-control" name="pfi_model" placeholder="Enter New Model"
+                         value="{{ $masterModel->pfi_model }}">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label  class="form-label">New SFX</label>
+                        <input type="text" class="form-control"  name="pfi_sfx" placeholder="Enter New SFX"
+                        value="{{ $masterModel->pfi_sfx }}">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
                             <option value="LHD" {{ $masterModel->steering == "LHD" ? 'selected' : " "}} >LHD</option>
@@ -78,14 +92,23 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
+                        <label class="form-label">Model Description</label>
+                        <input type="text" class="form-control" name="model_description" placeholder="Model Description"
+                         value="{{ $masterModel->model_description }}">
+                   </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in USD</label>
-                        <input type="number" class="form-control"  name="amount_uae" min="0" value="{{ $masterModel->amount_uae }}" placeholder="Amount in USD">
+                        <input type="number" class="form-control"  name="amount_uae" min="0" 
+                        value="{{ $masterModel->amount_uae }}" placeholder="Amount in USD">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in EUR</label>
-                        <input type="number" class="form-control" name="amount_belgium" min="0" value="{{ $masterModel->amount_belgium }}" placeholder="Amount in EUR">
+                        <input type="number" class="form-control" name="amount_belgium" min="0" 
+                        value="{{ $masterModel->amount_belgium }}" placeholder="Amount in EUR">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -340,6 +363,7 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
+                   
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{

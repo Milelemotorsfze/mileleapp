@@ -1157,7 +1157,6 @@
                             $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
 
                         }
-
                     }
                 }
             }
@@ -1166,7 +1165,7 @@
             // check any model year is selected or not
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
             var selectedModels = [];
-            for(let i=1; i<=totalIndex; i++)
+            for(let i=1;i<=totalIndex; i++)
             {
                 var model = $('#model'+i).val();
                 if(model) {

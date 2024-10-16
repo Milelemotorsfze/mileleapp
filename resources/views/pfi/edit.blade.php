@@ -147,7 +147,6 @@
                                             </div>
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
-                                                    <span class="error">* </span>
                                                     <label for="choices-single-default" class="form-label">PFI Document</label>
                                                     <input type="file" id="file" class="form-control widthinput" name="file">
                                                 </div>
@@ -179,8 +178,7 @@
                                     </div>  
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <div id="file-preview">
-                                        <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
-                                   
+                                            <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
                                         </div>
                                     </div>                                  
                                 </div>
@@ -329,6 +327,7 @@
 @endsection
 @push('scripts')
     <script type="text/javascript">
+        let pfiDocument = "{{ $pfi->pfi_document_without_sign }}";
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -407,6 +406,10 @@
                 },
                 
                 file: {
+                    required: function(element) {
+                        return $("#supplier-id").find('option:selected').attr("data-is-MMC") == 1 
+                        && pfiDocument == '';
+                    },
                     extension: "pdf|png|jpg|jpeg|svg",
                     maxsize:5242880 
                 },
