@@ -40,6 +40,8 @@ use Validator;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
+use App\Models\WOBOE;
+use App\Mail\WOBOEStatusMail; 
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -303,7 +305,7 @@ class WorkOrderController extends Controller
                 return false;
             });
         }
-    $datas = $filteredDatas;
+        $datas = $filteredDatas;
         // Return the view with the type, data, applied filters, and unique options for the select filters
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
@@ -315,7 +317,35 @@ class WorkOrderController extends Controller
      */
     public function create()
     {
-        //
+        // $today = Carbon::today();
+
+        // // Get all `WOBOE` records where the 25th day after the `declaration_date` is today or earlier
+        // $boes = WOBOE::where('declaration_date', '<=', $today->subDays(24))
+        //     ->with(['vehicles', 'workOrder.salesPerson'])  // Load vehicles and related salesperson through work order
+        //     ->get();
+
+        // // Filter out vehicles with 'Delivered' status in PHP (as it's an appended attribute)
+        // $filteredBoes = $boes->map(function ($boe) {
+        //     $boe->vehicles = $boe->vehicles->filter(function ($vehicle) {
+        //         return $vehicle->delivery_status !== 'Delivered';  // Only non-delivered vehicles
+        //     });
+        //     return $boe;
+        // })->filter(function ($boe) {
+        //     return $boe->vehicles->isNotEmpty();  // Keep only if there are valid vehicles
+        // });
+
+        // // Send email notifications to each salesperson
+        // foreach ($filteredBoes as $boe) {
+        //     // Access the related salesperson through the work order relationship
+        //     $salesperson = $boe->workOrder->salesPerson;
+
+        //     // Fetch team emails from the .env file
+        //     $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
+        //     $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
+        //     // Send email to the salesperson's email and team emails from .env file
+        //     Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail])
+        //         ->send(new WOBOEStatusMail($boe, $salesperson));
+        // }
     }
 
     /**
