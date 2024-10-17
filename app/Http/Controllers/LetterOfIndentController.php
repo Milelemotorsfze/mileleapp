@@ -857,7 +857,9 @@ class LetterOfIndentController extends Controller
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
                 if($request->is_trade_license_added == 1 ) {
+                    // 
                     if(!$isCustomerTradeLicense) {
+                        // trade license added
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->tradelicense;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -865,7 +867,15 @@ class LetterOfIndentController extends Controller
                         $LoiDocument->save();
                     }
                   
-                }else{
+                }else if($request->is_trade_license_added == 2){
+                    // value 2
+                    // update new passport
+                    info("latest tradelicense => update data");
+                    if($isCustomerTradeLicense) {
+                        $isCustomerTradeLicense->loi_document_file = $customer->tradelicense;
+                        $isCustomerTradeLicense->save();
+                    }                       
+                 }else{
                     LetterOfIndentDocument::where('is_trade_license', true)
                                 ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
