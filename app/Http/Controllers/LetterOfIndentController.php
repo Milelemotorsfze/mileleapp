@@ -45,6 +45,7 @@ class LetterOfIndentController extends Controller
      */
     public function index(Builder $builder, Request $request)
     {
+
         (new UserActivityController)->createActivity('Open LOI Listing Page.');
 
         $tab = $request->tab;

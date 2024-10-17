@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
 use App\Mail\DPEmailNotification;
 use App\Mail\DPrealeasedEmailNotification;
+use App\Mail\EmailNotificationInitiate;
 use App\Models\PurchasingOrderEventsLog;
 use App\Models\PurchasingOrder;
 use App\Models\MasterShippingPorts;
@@ -52,6 +53,14 @@ use App\Models\PurchasedOrderMessages;
 use App\Models\PurchasedOrderReplies;
 use App\Models\Purchasedorderoldplfiles;
 use App\Models\VehiclesSupplierAccountTransaction;
+use App\Models\DepartmentNotifications;
+use App\Mail\EmailNotificationrequest;
+use App\Mail\VINEmailNotification;
+use App\Mail\PurchaseOrderUpdated;
+use App\Mail\ChangeVariantNotification;
+use App\Models\Dnaccess;
+use App\Models\VehicleDn;
+
 
 class PurchasingOrderController extends Controller
 {
@@ -63,15 +72,15 @@ class PurchasingOrderController extends Controller
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
         $totalBalanceAED = $bankaccounts->reduce(function ($carry, $account) use ($exchangeRates) {
             return $carry + ($account->current_balance * $exchangeRates[$account->currency]);
         }, 0);
-        $suggestedPayments = PurchasedOrderPaidAmounts::where('status', 'Suggested Payment')->get();
+        $suggestedPayments = PurchasedOrderPaidAmounts::whereIn('status', ['Initiated Payment', 'Approved', 'Suggested Payment'])->get();
         $suggestedPaymentTotalAED = $suggestedPayments->reduce(function ($carry, $payment) use ($exchangeRates) {
             $purchasingOrder = $payment->purchasingOrder;
             if ($purchasingOrder) {
@@ -81,7 +90,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $useractivities =  New UserActivities();
         $useractivities->activity = "Purchasing Order Index Page View";
         $useractivities->users_id = Auth::id();
@@ -161,15 +172,15 @@ class PurchasingOrderController extends Controller
             ->get();
         }
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filter($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -186,17 +197,19 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filtercancel($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -213,17 +226,19 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterapprovedonly($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -240,7 +255,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -277,15 +294,15 @@ class PurchasingOrderController extends Controller
         ->groupBy('purchasing_order.id')
         ->get();        
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterapproved($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -302,7 +319,9 @@ class PurchasingOrderController extends Controller
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -353,15 +372,15 @@ class PurchasingOrderController extends Controller
             ->groupBy('purchasing_order.id')
             ->get(); 
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterincomings($status)
 {
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -378,7 +397,9 @@ class PurchasingOrderController extends Controller
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -418,15 +439,15 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
     public function filterpayment($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -443,7 +464,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -465,15 +488,15 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpaymentrejectioned($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -490,7 +513,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -512,15 +537,15 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpaymentrel($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -537,7 +562,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -563,15 +590,15 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterintentreq($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -588,7 +615,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -614,15 +643,15 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingrelease($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -639,7 +668,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -665,15 +696,15 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingdebits($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -690,7 +721,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
@@ -713,15 +746,15 @@ else
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+        return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
     }
     public function filterpendingfellow($status)
     {
         $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -738,7 +771,9 @@ else
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
     $userId = auth()->user()->id;
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
@@ -773,15 +808,15 @@ else
         ->groupBy('purchasing_order.id')
         ->get();
     }
-    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+    return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function filterconfirmation($status)
 {
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -798,7 +833,9 @@ public function filterconfirmation($status)
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -831,15 +868,15 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function paymentinitiation($status)
 {
     $bankaccounts = BankAccounts::get();
     $exchangeRates = [
         'USD' => 3.67,
-        'EUR' => 4.20,
-        'JPY' => 0.034,
+        'EUR' => 4.03,
+        'JPY' => 0.023,
         'CAD' => 2.89,
         'AED' => 1
     ];
@@ -856,7 +893,9 @@ public function paymentinitiation($status)
         }
         return $carry;
     }, 0);
+    $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
     $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+    $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -902,7 +941,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
     /**
      * Show the form for creating a new resource.
@@ -1202,7 +1241,7 @@ public function getBrandsAndModelLines(Request $request)
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
-    $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
+    $vehicleslog = Vehicleslog::whereNull('category')->whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
     $vendorstatus = SupplierAccount::where('suppliers_id', $purchasingOrder->vendors_id)
                                ->select('current_balance', 'currency')
@@ -1620,6 +1659,7 @@ public function checkcreatevins(Request $request)
 {
 
     $updatedData = $request->json()->all();
+    $updatedVins = [];
     foreach ($updatedData as $data) {
         $vehicleId = $data['id'];
         $fieldName = $data['name'];
@@ -1643,10 +1683,10 @@ public function checkcreatevins(Request $request)
             }
             info($changes);
             if (!empty($changes)) {
-                // $vehicle->status = 'New Changes'; // Set the vehicle status
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vinChanges = [];
                 foreach ($changes as $field => $change) {
                     $vehicleslog = new Vehicleslog();
                     $vehicleslog->time = $currentDateTime->toTimeString();
@@ -1659,6 +1699,13 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->created_by = auth()->user()->id;
                     $vehicleslog->role = Auth::user()->selectedRole;
                     $vehicleslog->save();
+                    if ($field == 'vin') {
+                        $updatedVins[] = $fieldValue; // Collect updated VINs
+                        $vinChanges[] = [
+                            'old_vin' => $change['old_value'],
+                            'new_vin' => $change['new_value'],
+                        ]; // Store VIN changes
+                    }
                     if ($field == 'int_colour') {
                         $newfield = "Interior Colour";
                         $oldval = ColorCode::find($change['old_value']);
@@ -1737,11 +1784,80 @@ public function checkcreatevins(Request $request)
 
                     $purchasingOrder->status = 'Pending Approval';
                     $purchasingOrder->save();
+                    
                 }
 
             }
         }
     }
+    if (!empty($updatedVins)) {
+        $groupedVehicles = Vehicles::whereIn('vin', $updatedVins)->with([
+            'variant.master_model_lines.brand',
+            'variant.brand',
+            'interior',
+            'exterior'
+        ])->get()->groupBy('purchasing_order_id');
+        foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
+            $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+            if ($purchasingOrder) {
+                $recipients = $purchasingOrder->is_demand_planning_po == 1 
+                ? ['team.logistics@milele.com'] 
+                : ['team.logistics@milele.com', 'abdul@milele.com'];
+                $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+                $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
+                    $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
+                    return [
+                        'brand' => $vehicle->variant->brand->brand_name ?? '',
+                        'model_line' => $vehicle->variant->master_model_lines->model_line ?? '',
+                        'variant' => $vehicle->variant->name ?? '',
+                        'old_vin' => $vinChange['old_vin'] ?? '', // Include old VIN
+                        'new_vin' => $vehicle->vin,
+                        'int_colour' => $vehicle->interior->name ?? '',
+                        'ext_colour' => $vehicle->exterior->name ?? '',
+                    ];
+                })->toArray(); // Ensure it's an array
+                Mail::to($recipients)->send(new VINEmailNotification(
+                    $purchasingOrder->po_number, 
+                    $purchasingOrder->pl_number, 
+                    $orderUrl, 
+                    count($vehicles), 
+                    $vehicleDetails
+                ));
+                // Save notification details to the database
+                $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+              "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+              "Stage: Update The VIN\n" .
+              "Number of Units: " . count($vehicles) . "\n" .
+              "Old VIN: " . ($vinChange['old_vin'] ?? '') . "\n" .
+              "New VIN: " . $vehicle->vin . "\n" .
+              "Order URL: " . $orderUrl;
+                $notification = new DepartmentNotifications();
+                $notification->module = 'Procurement';
+                $notification->type = 'Information';
+                $notification->detail = $detailText;
+                $notification->save();
+                if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 8; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 8; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+            }
+        }
+    }
+
     return response()->json(['message' => 'Data updated successfully']);
 }
 public function purchasingupdateStatus(Request $request)
@@ -3259,12 +3375,15 @@ if ($paymentOrderStatus->isNotEmpty()) {
         }
     }
     $purchasingOrder->status = "Pending Approval";
-
+    $changedFields = [];
     if ($request->hasFile('uploadPL')) {
+        if($purchasingOrder->pl_file_path)
+        {
         $oldpl = New Purchasedorderoldplfiles(); 
         $oldpl->purchasing_order_id = $purchasingOrder->id;
         $oldpl->file_path = $purchasingOrder->pl_file_path;
         $oldpl->save();
+        }
         $description = "The PFI Document is Updated";
         $purchasingordereventsLog = new PurchasingOrderEventsLog();
         $purchasingordereventsLog->event_type = "Update PO PFI Document";
@@ -3288,7 +3407,6 @@ if ($paymentOrderStatus->isNotEmpty()) {
     }
     // Save the purchasing order
     $purchasingOrder->save();
-
     // Log changes
     foreach ($fieldsToUpdate as $field) {
         if ($oldValues[$field] != $purchasingOrder->$field) {
@@ -3330,6 +3448,11 @@ if ($paymentOrderStatus->isNotEmpty()) {
                 $oldValue = $oldport;
                 $newValue = $newport;
             }
+            $changedFields[] = [
+                'field' => ucfirst(str_replace('_', ' ', $field)),
+                'old_value' => $oldValue,
+                'new_value' => $newValue,
+            ];
             $purchasingordereventsLog = new PurchasingOrderEventsLog();
             $purchasingordereventsLog->event_type = "Update PO Basic Details";
             $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
@@ -3341,7 +3464,47 @@ if ($paymentOrderStatus->isNotEmpty()) {
             $purchasingordereventsLog->save();
         }
     }
+    if (!empty($changedFields)) {
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+        $recipients = ['team.dp@milele.com'];
+    }
+    else
+    {
+        $recipients = ['abdul@milele.com'];
+    }
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+    "Stage: " . "Changing Into Purchased Order\n" .
+    "Order URL: " . $orderUrl . "\n\n" .
+    "Changed Fields:\n";
 
+foreach ($changedFields as $changedField) {
+$detailText .= $changedField['field'] . ": From '" . $changedField['old_value'] . "' to '" . $changedField['new_value'] . "'\n";
+}
+// Save the notification
+$notification = new DepartmentNotifications();
+$notification->module = 'Procurement';
+$notification->type = 'Information';
+$notification->detail = $detailText;
+$notification->save();
+if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+}
     return response()->json(['message' => 'Purchase order details updated successfully'], 200);
 }       
         public function pendingvins($status)
@@ -3349,8 +3512,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
     $bankaccounts = BankAccounts::get();
         $exchangeRates = [
             'USD' => 3.67,
-            'EUR' => 4.20,
-            'JPY' => 0.034,
+            'EUR' => 4.03,
+            'JPY' => 0.023,
             'CAD' => 2.89,
             'AED' => 1
         ];
@@ -3367,7 +3530,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
             }
             return $carry;
         }, 0);
+        $suggestedPaymentTotalUSD = $suggestedPaymentTotalAED / 3.67;
         $availableFunds = $totalBalanceAED - $suggestedPaymentTotalAED;
+        $availableFundsUSD = $availableFunds / 3.67;
 $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
@@ -3398,7 +3563,7 @@ else
     ->groupBy('purchasing_order.id')
     ->get();
 }
-return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED'));
+return view('warehouse.index', compact('data', 'availableFunds', 'suggestedPaymentTotalAED', 'availableFundsUSD', 'suggestedPaymentTotalUSD'));
 }
 public function rerequestpayment(Request $request)
 {
@@ -3618,7 +3783,7 @@ public function updatePrices(Request $request)
 
     $conversionRates = [
         'USD' => 3.67,
-        'EUR' => 3.94,
+        'EUR' => 4.03,
         'GBP' => 4.66,
         'JPY' => 0.023,
         'CAD' => 2.69
@@ -3710,7 +3875,6 @@ public function updatePrices(Request $request)
             if(!empty($vehiclesalreadypaid) && !empty($vehicleAlreadyPaidOrRemainingInStatuses)) {
                 $supplierAccount->current_balance += $totalDifference;
                 $supplierAccount->save();
-
                 SupplierAccountTransaction::create([
                     'transaction_type' => $totalDifference > 0 ? 'Debit' : 'Credit',
                     'purchasing_order_id' => $purchasingOrderId,
@@ -3719,16 +3883,61 @@ public function updatePrices(Request $request)
                     'account_currency' => $accountCurrency,
                     'transaction_amount' => abs($totalDifference),
                 ]);
-                if($purchasingOrder->is_demand_planning_po == 1)
-            {
-                $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
-            }
-            else
-            {
-                $recipients = ['abdul@milele.com', 'team.finance@milele.com'];  
-            }
-                Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged));
-            }
+}
+if($purchasingOrder->is_demand_planning_po == 1)
+{
+    $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+}
+else
+{
+    $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+}
+$orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+// Format the detail text including the price changes information
+$detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+"PFI Number: " . $purchasingOrder->pl_number . "\n" .
+"Stage: " . "Price Change\n" .
+"Order URL: " . $orderUrl . "\n\n" .
+"Price Changes:\n";
+
+foreach ($priceChanges as $priceChange) {
+$detailText .= "Vehicle ID: " . $priceChange['vehicle_reference'] .
+     " (VIN: " . $priceChange['Vin'] . ", Variant: " . $priceChange['variant_name'] . "): " .
+     "From '" . number_format($priceChange['old_price'], 2) . "' to '" .
+     number_format($priceChange['new_price'], 2) . "'\n" .
+     "Changed by: " . $priceChange['changed_by'] . "\n";
+}
+
+// Save the notification
+$notification = new DepartmentNotifications();
+$notification->module = 'Procurement';
+$notification->type = 'Information';
+$notification->detail = $detailText;
+$notification->save();
+if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+    Mail::to($recipients)->send(new PriceChangeNotification($purchasingOrder->po_number, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged,$orderUrl));
+
         }
     }
 
@@ -3791,6 +4000,7 @@ public function storeMessages(Request $request)
 }
 public function updateVariants(Request $request)
 {
+    $changedVariants = [];
     $variants = $request->input('variants');
     $purchasingOrderId = $request->input('purchasing_order_id');
     foreach ($variants as $variant) {
@@ -3804,7 +4014,7 @@ public function updateVariants(Request $request)
             $vehicleslog->time = $currentDateTime->toTimeString();
             $vehicleslog->date = $currentDateTime->toDateString();
             $vehicleslog->status = 'Update Vehicles Varaint';
-            $vehicleslog->vehicles_id = $vehicleId;
+            $vehicleslog->vehicles_id = $vehicle->id;
             $vehicleslog->field = "Varaint";
             $vehicleslog->old_value = $vehicle->varaints_id;
             $vehicleslog->new_value = $variant['variant_id'];
@@ -3813,6 +4023,18 @@ public function updateVariants(Request $request)
             $vehicleslog->save();
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
+            // Collect data for the email
+            if($vehicleslog->old_value != $vehicleslog->new_value)
+            {
+            $oldVariantName = Varaint::where('id', $vehicleslog->old_value)->value('name');
+            $newVariantName = Varaint::where('id', $vehicleslog->new_value)->value('name');
+            $changedVariants[] = [
+                'vehicleid' => $vehicle->id,
+                'vin' => $vehicle->vin,
+                'oldvariant' => $oldVariantName,
+                'newvariant' => $newVariantName,
+            ];
+        }
         }
     }
     PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)->delete();
@@ -3827,6 +4049,55 @@ public function updateVariants(Request $request)
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
+    $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+    $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+        $recipients = ['team.dp@milele.com'];
+    }
+    else
+    {
+        $recipients = ['abdul@milele.com']; 
+    }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Stage: " . "Variant Change\n" .
+                  "Order URL: " . $orderUrl . "\n\n" .
+                  "Changed Variants:\n";
+
+    foreach ($changedVariants as $changedVariant) {
+        $detailText .= "Vehicle ID: " . $changedVariant['vehicleid'] . 
+                       " (VIN: " . $changedVariant['vin'] . "): From '" . 
+                       $changedVariant['oldvariant'] . "' to '" . 
+                       $changedVariant['newvariant'] . "'\n";
+    }
+
+    // Save the notification
+    $notification = new DepartmentNotifications();
+    $notification->module = 'Procurement';
+    $notification->type = 'Information';
+    $notification->detail = $detailText;
+    $notification->save();
+    if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+    Mail::to($recipients)->send(new ChangeVariantNotification(
+        $purchasingOrder->po_number,
+        $purchasingOrder->pl_number,
+        $changedVariants, // Correct order
+        $orderUrl
+    ));    
     return response()->json(['success' => true]);
 }
 public function paymentremanings($id)
@@ -4060,7 +4331,6 @@ public function requestAdditionalPayment(Request $request)
             ->where('status', 'Approved')
                 ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
                 ->get();
-        
             return response()->json($vehicles);
         }
         
@@ -4075,6 +4345,7 @@ public function requestAdditionalPayment(Request $request)
     try { // Added try-catch for overall error handling
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
+        $remarks = $request->input('remarks');
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         
         // Get purchase order details
@@ -4095,7 +4366,7 @@ public function requestAdditionalPayment(Request $request)
             }
         }
         
-        $accountCurrency = $supplierAccount->currency;
+        $accountCurrency = $purchaseOrder->currency;
         $transactionType = 'Draft';
         $status = 'Draft';
         $transactionAmount = 0;
@@ -4128,6 +4399,7 @@ public function requestAdditionalPayment(Request $request)
         $supplierAccountTransaction->created_by = $createdBy;
         $supplierAccountTransaction->account_currency = $accountCurrency;
         $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->remarks = $remarks;
         $supplierAccountTransaction->status = $status;
         
         if (!$supplierAccountTransaction->save()) {
@@ -4184,6 +4456,12 @@ public function requestAdditionalPayment(Request $request)
                 }
             }
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Payment Initiation Saved";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+        $purchasingordereventsLog->description = "Payment Inititaion Save By the PO Creator";
+        $purchasingordereventsLog->save();
         return response()->json(['message' => 'Payment details saved successfully'], 200);
     } catch (Exception $e) { // Catch any exception
         return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
@@ -4194,15 +4472,15 @@ public function submitPaymentDetails(Request $request)
     try { // Added try-catch for overall error handling
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
+        $remarks = $request->input('remarks');
+        info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
-        
         // Get purchase order details
         $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
         if (!$purchaseOrder) { // Check if purchase order exists
             return response()->json(['error' => 'Purchase order not found'], 404);
         }
         $supplierAccountId = $purchaseOrder->vendors_id;
-        
         // Check if supplier account exists, if not create a new one
         $supplierAccount = SupplierAccount::where('suppliers_id', $supplierAccountId)->first();
         if (!$supplierAccount) {
@@ -4213,12 +4491,10 @@ public function submitPaymentDetails(Request $request)
                 return response()->json(['error' => 'Failed to create supplier account'], 500);
             }
         }
-        
-        $accountCurrency = $supplierAccount->currency;
+        $accountCurrency = $purchaseOrder->currency;
         $transactionType = 'Initiate Payment Request';
         $status = 'Initiate Payment Request';
         $transactionAmount = 0;
-        
         if ($paymentOption == 'purchasedOrder') {
             $purchasedOrderOption = $request->input('purchasedOrderOption');
             $transactionAmount = $request->input('amount');
@@ -4238,7 +4514,6 @@ public function submitPaymentDetails(Request $request)
                 $transactionAmount += $vehicle['initiatedPrice'];
             }
         }
-        
         // Store in supplier_account_transaction table
         $supplierAccountTransaction = new SupplierAccountTransaction();
         $supplierAccountTransaction->transaction_type = $transactionType;
@@ -4247,12 +4522,12 @@ public function submitPaymentDetails(Request $request)
         $supplierAccountTransaction->created_by = $createdBy;
         $supplierAccountTransaction->account_currency = $accountCurrency;
         $supplierAccountTransaction->transaction_amount = $transactionAmount;
+        $supplierAccountTransaction->remarks = $remarks;
         $supplierAccountTransaction->status = $status;
         
         if (!$supplierAccountTransaction->save()) {
             return response()->json(['error' => 'Failed to save supplier account transaction'], 500);
         }
-        
         $adjustmentAmount = $request->input('adjustmentAmount');
         $vendorpayment = new VendorPaymentAdjustments();
         $vendorpayment->amount = $adjustmentAmount ?: $transactionAmount; // Condensed assignment
@@ -4303,6 +4578,12 @@ public function submitPaymentDetails(Request $request)
                 }
             }
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+        $purchasingordereventsLog->event_type = "Payment Initation";
+        $purchasingordereventsLog->created_by = auth()->user()->id;
+        $purchasingordereventsLog->purchasing_order_id = $purchaseOrderId;
+        $purchasingordereventsLog->description = "Payment Inititaion Request to the Procurement Manager";
+        $purchasingordereventsLog->save();
         return response()->json(['message' => 'Payment details saved successfully'], 200);
     } catch (Exception $e) { // Catch any exception
         return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
@@ -4329,10 +4610,56 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->save();
     }
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'Request For Payment';
         $vehicleTransaction->save();
     }
+    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+    $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+    $currency = $supplierAccountTransaction->account_currency;
+    if($purchasingOrder->is_demand_planning_po == 1)
+    {
+    $recipients = ['team.finance@milele.com'];
+    Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    else
+    {
+        $recipients = ['team.finance@milele.com'];
+    Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+          "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+          "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+          "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+          "Stage: " . "Payment Requested for Initiation\n" .
+          "Number of Units: " . $transactionCount . " Vehicles\n" .
+          "Order URL: " . $orderUrl;
+        $notification = New DepartmentNotifications();
+        $notification->module = 'Procurement';
+        $notification->type = 'Information';
+        $notification->detail = $detailText;
+        $notification->save();
+        if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Payment Inititaion Request to the Procurement Manager";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);  
 }
     public function getVendorAndBalance($purchaseOrderId)
@@ -4373,11 +4700,56 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->save();
     }
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
+    $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
         $vehicleTransaction->status = 'pending';
         $vehicleTransaction->save();
     }
-
+            $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+            $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
+            $currency = $supplierAccountTransaction->account_currency;
+            if($purchasingOrder->is_demand_planning_po == 1)
+            {
+            $recipients = ['team.dp@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            else
+            {
+            $recipients = ['abdul@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                  "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                  "Stage: " . "Payment Initiation\n" .
+                  "Number of Units: " . $transactionCount . " Vehicles\n" .
+                  "Order URL: " . $orderUrl;
+            $notification = New DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
+            if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Procurement Manager Forward Payment Inititaion Request to the Finance Department";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Payment details saved successfully'], 200);
     }
     public function submitPayment(Request $request)
@@ -4408,13 +4780,23 @@ public function submitPaymentDetails(Request $request)
                             "USD" => 3.67,
                             "EUR" => 3.94,
                             "GBP" => 4.67,
-                            "JPY" => 0.023,
+                            "JPY" => 0.025,
                             "AED" => 1,
                             "CAD" => 2.68
                         ];
-                        $conversionRate = $conversionRates[$currency] ?? 1;
-                        $totalcostconverted = $transactionAmount * $conversionRate;
-                        $supplierAccount->current_balance -= $totalcostconverted;
+                        // Check if the currencies are different
+                        if ($purchasingOrder->currency != $supplierAccount->currency) {
+                            // Convert the transactionAmount to the SupplierAccount currency
+                            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+                            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+                            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+                            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+                            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+                        } else {
+                            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+                        }
+                        $supplierAccount->current_balance -= $totalCostConverted;
                         $supplierAccount->save();
                 }
             }
@@ -4441,8 +4823,45 @@ public function submitPaymentDetails(Request $request)
             if($purchasingOrder->is_demand_planning_po == 1)
             {
             $recipients = ['team.dp@milele.com'];
-            Mail::to($recipients)->send(new DPEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
+            else
+            {
+            $recipients = ['abdul@milele.com'];
+            Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+            }
+            $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+                  "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+                  "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+                  "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+                  "Stage: " . "Payment Initiation\n" .
+                  "Number of Units: " . $transactionCount . " Vehicles\n" .
+                  "Order URL: " . $orderUrl;
+            $notification = New DepartmentNotifications();
+            $notification->module = 'Procurement';
+            $notification->type = 'Information';
+            $notification->detail = $detailText;
+            $notification->save();
+            if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initation";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Finance Manager Forward Payment Inititaion Request to the CEO office For Payment Released";
+                $purchasingordereventsLog->save();
             return response()->json(['success' => true, 'message' => 'Payment submitted successfully']);
         } catch (\Exception $e) {
             Log::error('Payment submission failed', ['error' => $e->getMessage()]);
@@ -4482,9 +4901,54 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-    $recipients = ['team.dp@milele.com'];
+        $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
+    else 
+    {
+        $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+    Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
+    }
+    $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
+    "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+    "Payment Amount: " . $supplierAccountTransaction->transaction_amount . "\n" .
+    "Total Amount: " . $purchasingOrder->totalcost . "\n" .
+    "Stage: " . "Payment Released\n" .
+    "Number of Units: " . $transactionCount . " Vehicles\n" .
+    "Order URL: " . $orderUrl;
+    $notification = New DepartmentNotifications();
+    $notification->module = 'Procurement';
+    $notification->type = 'Information';
+    $notification->detail = $detailText;
+    $notification->save();
+    if($purchasingOrder->is_demand_planning_po == 1)
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 4; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                } 
+                else
+                {
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 15; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                    $dnaccess = New Dnaccess();
+                    $dnaccess->master_departments_id = 1; 
+                    $dnaccess->department_notifications_id = $notification->id;
+                    $dnaccess->save();
+                }
+                $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Released";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "CEO office Released Confirmed";
+                $purchasingordereventsLog->save();
     return response()->json(['success' => true, 'transition_id' => $transitionId]);
     }
     public function rejectTransition(Request $request)
@@ -4512,10 +4976,23 @@ public function submitPaymentDetails(Request $request)
                     "AED" => 1,
                     "CAD" => 2.68
                 ];
-                $conversionRate = $conversionRates[$currency] ?? 1;
-                $totalcostconverted = $transactionAmount * $conversionRate;
-                $supplierAccount->current_balance += $totalcostconverted;
-                $supplierAccount->save();
+                // Check if the currencies are different
+        if ($purchasingOrder->currency != $supplierAccount->currency) {
+            // Convert the transactionAmount to the SupplierAccount currency
+            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+        } else {
+            // If the currencies are the same, no conversion is needed
+            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+        }
+
+        // Update the supplier account balance
+        $supplierAccount->current_balance += $totalCostConverted;
+        $supplierAccount->save();
         }
     }
     }
@@ -4534,6 +5011,12 @@ public function submitPaymentDetails(Request $request)
         $vehicleTransaction->status = 'Rejected';
         $vehicleTransaction->save();
     }
+    $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Requested Rejected";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "The Payment Request is Rejected";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Transition rejected successfully.']);
     }
     public function rejectTransitionlinitiate(Request $request)
@@ -4562,6 +5045,12 @@ public function submitPaymentDetails(Request $request)
         $vehicleTransaction->status = 'Rejected';
         $vehicleTransaction->save();
     }
+    $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Initiation Rejected";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "The Payment Initation is being rejected";
+                $purchasingordereventsLog->save();
     return response()->json(['message' => 'Transition rejected successfully.']);
     }
     public function uploadSwiftFile(Request $request)
@@ -4611,10 +5100,23 @@ public function submitPaymentDetails(Request $request)
                         "AED" => 1,
                         "CAD" => 2.68
                     ];
-                    $conversionRate = $conversionRates[$currency] ?? 1;
-                    $totalCostConverted = $transactionAmount * $conversionRate;
-                    $supplierAccount->current_balance += $totalCostConverted;
-                    $supplierAccount->save();
+                    // Check if the currencies are different
+        if ($purchasingOrder->currency != $supplierAccount->currency) {
+            // Convert the transactionAmount to the SupplierAccount currency
+            $purchasingOrderConversionRate = $conversionRates[$purchasingOrder->currency] ?? 1;
+            $supplierAccountConversionRate = $conversionRates[$supplierAccount->currency] ?? 1;
+
+            // Convert the transaction amount from the purchasing order currency to the supplier account currency
+            $transactionAmountInAED = $supplierAccountTransaction->transaction_amount * $purchasingOrderConversionRate; // Convert to base currency (e.g. AED)
+            $totalCostConverted = $transactionAmountInAED / $supplierAccountConversionRate; // Convert from AED to supplier account currency
+        } else {
+            // If the currencies are the same, no conversion is needed
+            $totalCostConverted = $supplierAccountTransaction->transaction_amount;
+        }
+
+        // Update the supplier account balance
+        $supplierAccount->current_balance += $totalCostConverted;
+        $supplierAccount->save();
                 }
             }
             $this->updateRelatedStatuses($transitionId);
@@ -4623,6 +5125,12 @@ public function submitPaymentDetails(Request $request)
         } else {
             return response()->json(['success' => false, 'message' => 'Invalid transition ID or file'], 422);
         }
+        $purchasingordereventsLog = New PurchasingOrderEventsLog();
+                $purchasingordereventsLog->event_type = "Payment Confirmed";
+                $purchasingordereventsLog->created_by = auth()->user()->id;
+                $purchasingordereventsLog->purchasing_order_id = $purchasingOrder->id;
+                $purchasingordereventsLog->description = "Finance Department Update the Swift Copy";
+                $purchasingordereventsLog->save();
     } catch (\Exception $e) {
         Log::error('Payment submission failed', ['error' => $e->getMessage()]);
         return response()->json(['success' => false, 'message' => 'Error submitting payment', 'error' => $e->getMessage()], 500);
@@ -4716,4 +5224,53 @@ public function paymentconfirm(Request $request)
         ->unique('vin');
         return view('test', compact('vins'));
     }
+    // Method to save DN numbers
+    public function saveDnNumbers(Request $request)
+    {
+    $purchasingOrderId = $request->input('purchasingOrderId');
+    $type = $request->input('type');
+    if ($type == 'full') {
+        $dnNumber = $request->input('dnNumber');
+
+        info($vehicleId);
+    } else if ($type == 'vehicle') {
+        $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
+    $batchNumber = 1;
+    foreach ($vehicles as $vehicle) {
+        $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                   ->orderBy('created_at', 'desc')
+                                   ->first();
+        if ($latestVehicleDn) {
+            $batchNumber = $latestVehicleDn->batch + 1;
+            break;
+        }
+    }
+        $vehicleDNData = $request->input('vehicleDNData');
+        foreach ($vehicleDNData as $vehicleData) {
+            $vehicleId = $vehicleData['vehicleId'];
+            $dnNumber = $vehicleData['dnNumber'];
+            if($dnNumber)
+            {
+            $vehicledn = New VehicleDn();
+            $vehicledn->dn_number = $dnNumber;
+            $vehicledn->vehicles_id = $vehicleId;
+            $vehicledn->created_by = Auth::id();
+            $vehicledn->batch = $batchNumber;
+            $vehicledn->save();
+            $vehicle = Vehicles::find($vehicleId);
+            $vehicle->dn_id = $vehicledn->id;
+            $vehicle->save();
+            }
+        }
+    }
+    return response()->json(['success' => true]);
+}
+public function getVehiclesdn($purchaseOrderId) {
+    $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
+    ->where('status', 'Approved')
+    ->whereNull('dn_id')
+        ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
+        ->get();
+    return response()->json($vehicles);
+}
 }

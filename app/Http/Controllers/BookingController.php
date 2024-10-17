@@ -17,6 +17,7 @@ use App\Models\MasterModelLines;
 use App\Models\Varaint;
 use App\Models\Vehicles;
 use App\Models\Quotation;
+use Carbon\Carbon;
 use App\Models\QuotationItem;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -177,7 +178,7 @@ public function store(Request $request)
     $useractivities->activity = "Booking Approval Section View";
     $useractivities->users_id = Auth::id();
     $useractivities->save();
-    $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+    $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('view-all-bookings');
     if ($request->ajax()) {
         $status = $request->input('status');
         $searchValue = $request->input('search.value');
@@ -187,7 +188,9 @@ public function store(Request $request)
         $data = BookingRequest::select([
                 'booking_requests.id',
                 'booking_requests.calls_id',
+                'users.name',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking_requests.days',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -206,12 +209,13 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status);
-            if ($hasEditSOPermission) {
+            if (!$hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
             if (!empty($searchValue)) {
@@ -242,8 +246,10 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'users.name',
                 'brands.brand_name',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -261,14 +267,15 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->whereNull('vehicles.so_id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '>=', now());
-            if ($hasEditSOPermission) {
+            if (!$hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
             if (!empty($searchValue)) {
@@ -300,7 +307,9 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
+               'users.name',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -319,14 +328,15 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '>=', now())
             ->whereNotNull('vehicles.so_id');
-            if ($hasEditSOPermission) {
+            if (!$hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
             if (!empty($searchValue)) {
@@ -358,7 +368,9 @@ public function store(Request $request)
                 'booking.id',
                 DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking.calls_id',
+                'users.name',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
                 'booking_requests.etd',
@@ -377,13 +389,14 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-            ->leftJoin('users', 'booking.created_by', '=', 'users.id')
+            ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '<', now());
-            if ($hasEditSOPermission) {
+            if (!$hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
             if (!empty($searchValue)) {
@@ -415,7 +428,9 @@ public function store(Request $request)
                 'booking_requests.id',
                 'booking_requests.calls_id',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
+                DB::raw("IFNULL(quotations.file_path, '') as file_path"),
                 'booking_requests.days',
+                'users.name',
                 'booking_requests.reason',
                 'vehicles.vin',
                 'booking_requests.bookingnotes',
@@ -434,12 +449,13 @@ public function store(Request $request)
             ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
             ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('quotations', 'booking_requests.calls_id', '=', 'quotations.calls_id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking_requests.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
             ->where('booking_requests.status', $status);
-            if ($hasEditSOPermission) {
+            if (!$hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
             if (!empty($searchValue)) {
@@ -609,5 +625,63 @@ public function approval(Request $request)
     $query->whereNull('vehicles.gdn_id');
     $availableVehicles = $query->get();
     return response()->json($availableVehicles);
-    }    
+    }
+    public function storedirect(Request $request)
+    {
+        info("waqar");
+    $validatedData = $request->validate([
+        'vehicle_id' => 'required|exists:vehicles,id',
+        'booking_start_date' => 'required|date',
+        'booking_end_date' => 'required|date|after_or_equal:booking_start_date',
+        'salesperson' => 'required|exists:users,id',
+        'remarks' => 'nullable|string',
+    ]);
+    $days = Carbon::parse($validatedData['booking_start_date'])->diffInDays(Carbon::parse($validatedData['booking_end_date']));
+    
+    $bookingRequest = new BookingRequest();
+    $bookingRequest->date = now();
+    $bookingRequest->vehicle_id = $validatedData['vehicle_id'];
+    $bookingRequest->created_by = $validatedData['salesperson'];
+    $bookingRequest->status = 'Approved';
+    $bookingRequest->process_by = Auth::id(); // Assuming you meant 'processed_by'
+    $bookingRequest->process_date = now();
+    $bookingRequest->days = $days;
+    $bookingRequest->bookingnotes = $validatedData['remarks'];
+    $bookingRequest->save();
+    $booking = new Booking();
+    $booking->date = now();
+    $booking->booking_start_date = $validatedData['booking_start_date'];
+    $booking->booking_end_date = $validatedData['booking_end_date'];
+    $booking->vehicle_id = $validatedData['vehicle_id'];
+    $booking->booking_requests_id = $bookingRequest->id;
+    $booking->sales_person_id = $validatedData['salesperson'];
+    $booking->save();
+    $vehicle = Vehicles::find($validatedData['vehicle_id']);
+    if ($vehicle) {
+        $vehicle->reservation_start_date = $validatedData['booking_start_date'];
+        $vehicle->reservation_end_date = $validatedData['booking_end_date'];
+        $vehicle->booking_person_id = $validatedData['salesperson'];
+        $vehicle->save();
+    }
+    return redirect()->route('vehicles.availablevehicles', ['status' => 'Available Stock']);
+    }
+    public function canceling(Request $request)
+    {
+        $vehicle_id = $request->input('vehicle_id');
+        $bookingrequest = BookingRequest::where('vehicle_id', $vehicle_id)->first();
+        $booking = Booking::where('vehicle_id', $vehicle_id)->first();
+        if ($bookingrequest) {
+            $booking->delete();
+            $bookingrequest->status = 'Rejected';
+            $bookingrequest->save();
+            $vehicle = Vehicles::find($vehicle_id);
+            $vehicle->reservation_start_date = Null;
+            $vehicle->reservation_end_date = Null;
+            $vehicle->booking_person_id = Null;
+            $vehicle->save();
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Booking not found']);
+        }
+    }
     }

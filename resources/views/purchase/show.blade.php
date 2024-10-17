@@ -1,9 +1,11 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    
    .select2-container {
       z-index: 2050; /* Adjust this value as needed */
       width: 100% !important;
+      min-width: 200px;
     }
     .select2-selection {
       width: 100% !important;
@@ -152,6 +154,55 @@
 </style>
 @section('content')
 <!-- Modal Structure -->
+<div class="modal fade" id="addDNModalUnique" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDNModalUniqueLabel">Add DN Numbers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Dropdown to select Full PO or Individual Vehicles -->
+                <div class="mb-3">
+                    <label for="dnSelection" class="form-label">Select Option</label>
+                    <select id="dnSelection" class="form-select">
+                        <option value="full">Full PO</option>
+                        <option value="vehicle">Select Vehicles Individually</option>
+                    </select>
+                </div>
+
+                <!-- Full PO Input Field (Initially Hidden) -->
+                <div id="fullPOInput" class="mb-3 d-none">
+                    <label for="dnNumberFullPO" class="form-label">DN Number</label>
+                    <input type="text" id="dnNumberFullPO" class="form-control">
+                </div>
+
+                <!-- Vehicles Table (Initially Hidden) -->
+                <div id="vehicleTabledn" class="table-responsive d-none">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Vehicle ID</th>
+                                <th>Model</th>
+                                <th>Variant</th>
+                                <th>VIN</th>
+                                <th>DN Number</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicleTableBodydn">
+                            <!-- Vehicle rows will be inserted here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveDNButton">Save DN Numbers</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Structure -->
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -270,6 +321,10 @@
                             <!-- Rows will be populated dynamically -->
                         </tbody>
                     </table>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="remarks">Remarks:</label>
+                    <textarea id="remarks" name="remarks" class="form-control" rows="4" placeholder="Enter any remarks here..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1532,11 +1587,12 @@
                                 <th id="variants_detail">Variants Detail</th>
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
-                                <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
-                                <th>Engine Number</th>
+                                <th style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
+                                <th>Engine Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
+                                <th>Production Date</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1607,7 +1663,7 @@
                             @if($vehicles->grn_id === null)
 							@if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1619,7 +1675,7 @@
                                 </select>
                             </td>
                             <td class="editable-field int_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1630,13 +1686,14 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1648,7 +1705,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1659,14 +1716,15 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                <select name="ex_colour[]" class="form-control ex-colour-select" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
                                     @foreach ($exColours as $id => $exColour)
                                         @if ($id == $vehicles->ex_colour)
@@ -1678,7 +1736,7 @@
                                 </select>
                             </td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                <select name="int_colour[]" class="form-control int-colour-select" placeholder="Interior Color" disabled>
                                     <option value="">Interior Color</option>
                                     @foreach ($intColours as $id => $intColour)
                                         @if ($id == $vehicles->int_colour)
@@ -1689,10 +1747,11 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
 							@endif
                             @endif
                             @php
@@ -1723,10 +1782,11 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ $vehicles->vin }}</td>
+                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
+                                <td>{{ $vehicles->ppmmyyy }}</td>
                             @endif
                             <td>
                             @if($vehicles->status ==="Approved")
@@ -2086,6 +2146,18 @@
                     <h4 class="card-title">Cancel Vehicle's Details</h4>
                 </div>
                 <div class="card-body">
+                <ul class="nav nav-tabs" id="vehicleTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="cancel-vehicle-tab" data-bs-toggle="tab" href="#cancel-vehicle" role="tab" aria-controls="cancel-vehicle" aria-selected="true">Cancel Vehicle's Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="dn-vehicle-tab" data-bs-toggle="tab" href="#dn-vehicle" role="tab" aria-controls="dn-vehicle" aria-selected="false">DN Vehicles</a>
+            </li>
+        </ul>
+<!-- Modal Structure -->
+        <div class="tab-content mt-3">
+            <!-- Cancel Vehicle's Details Tab -->
+            <div class="tab-pane fade show active" id="cancel-vehicle" role="tabpanel" aria-labelledby="cancel-vehicle-tab">
                     <div class="table-responsive" >
                         <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
@@ -2146,6 +2218,7 @@
                           <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
                           <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
+                          <td>{{ $vehiclesdel->ppmmyyy ? \Carbon\Carbon::parse($vehiclesdel->ppmmyyy)->format('d-M-Y') : '' }}</td>
                           <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
                          <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
                                 </tr>
@@ -2153,8 +2226,35 @@
                     </tbody>
                     </table>
                     </div>
-                </div>
+                    </div>
+                    <div class="tab-pane fade" id="dn-vehicle" role="tabpanel" aria-labelledby="dn-vehicle-tab">
+                    <div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div></div> <!-- Empty div to take up space on the left -->
+        <a href="#" class="btn btn-sm btn-success adddnnumberbutton-btn" data-id="{{ $purchasingOrder->id }}" data-bs-toggle="modal" data-bs-target="#addDNModalUnique">Add New DN Numbers</a>
+    </div>
+    <div class="table-responsive">
+                        <table id="dtBasicExample10" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Ref No</th>
+                                <th>Brand</th>
+                                <th>Model Line</th>
+                                <th>Variant</th>
+                                <th>Exterior Colour</th>
+                                <th>Interior Colour</th>
+                                <th>VIN</th>
+                                <th>DN Number</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
             </div>
+        </div>
+    </div>
+</div>
             @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('purchased-order-transition-view');
   @endphp
@@ -2345,6 +2445,8 @@
                                             Payment Status
                                         @elseif($vehicleslog->field === "estimation_date")
                                             Estimated Date
+                                            @elseif($vehicleslog->field === "ppmmyyy")
+                                            Production Month
                                         @elseif($vehicleslog->field === "territory")
                                             Territory
                                         @elseif($vehicleslog->field === "vin")
@@ -2363,6 +2465,12 @@
                                         <td>{{$colourold}}</td>
                                         <td>{{$colournew}}</td>
                                     @elseif($vehicleslog->field === "estimation_date")
+                                        @if($vehicleslog->old_value)
+                                            <td>{{ date('d-M-Y', strtotime($vehicleslog->old_value)) }}</td>
+                                        @else
+                                            <td></td>
+                                        @endif
+                                        @elseif($vehicleslog->field === "ppmmyyy")
                                         @if($vehicleslog->old_value)
                                             <td>{{ date('d-M-Y', strtotime($vehicleslog->old_value)) }}</td>
                                         @else
@@ -2528,7 +2636,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered">
+                        <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
                             <tr>
                                 <th>Date</th>
@@ -2781,15 +2889,25 @@
                         selectElement.removeAttribute('disabled');
                     }
                     const isEstimationDateColumn = field.classList.contains('estimation_date');
+                    const isPpmmyyyDateColumn = field.classList.contains('ppmmyyy');
                     const fieldValue = field.innerText.trim();
                     const isNullValue = fieldValue === '';
-                    if (isNullValue && !isEstimationDateColumn) {
+                    if (isNullValue && !isEstimationDateColumn && !isPpmmyyyDateColumn) {
                         return;
                     }
                     if (isEstimationDateColumn) {
                         const inputField = document.createElement('input');
                         inputField.type = 'date';
                         inputField.name = 'oldestimated_arrival[]';
+                        inputField.value = fieldValue;
+                        inputField.classList.add('form-control');
+                        field.innerHTML = '';
+                        field.appendChild(inputField);
+                    }
+                    if (isPpmmyyyDateColumn) {
+                        const inputField = document.createElement('input');
+                        inputField.type = 'date';
+                        inputField.name = 'ppmmyyy[]';  // Adjust this name as needed
                         inputField.value = fieldValue;
                         inputField.classList.add('form-control');
                         field.innerHTML = '';
@@ -4432,7 +4550,10 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                     method: 'GET',
                     success: function(response) {
                         if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
-                            vehicleTable = $('#vehicleTable').DataTable();
+                            vehicleTable = $('#vehicleTable').DataTable({
+            "pageLength": 10, // This will display all rows by default
+            "lengthMenu": [[-1, 10, 25, 50, 100], ["All", 10, 25, 50, 100]] // Adding "All" option in the length menu
+        });
                         } else {
                             vehicleTable.clear().draw();
                         }
@@ -4467,7 +4588,10 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
                         });
                         $('#vehicleTableContainer').show();
                         if (!$.fn.DataTable.isDataTable('#vehicleTable')) {
-                            vehicleTable = $('#vehicleTable').DataTable();
+                                    vehicleTable = $('#vehicleTable').DataTable({
+            "pageLength": 10, // This will display all rows by default
+            "lengthMenu": [[-1, 10, 25, 50, 100], ["All", 10, 25, 50, 100]] // Adding "All" option in the length menu
+        });
                         }
                     }
                 });
@@ -4585,6 +4709,7 @@ document.getElementById('fileUploadFormadditional').addEventListener('submit', f
         const data = {
             paymentOption: paymentOption,
             purchaseOrderId: purchaseOrderId,
+            remarks: $('#remarks').val(),
             adjustmentAmount: $('#adjustmentAmount').val()
         };
 
@@ -4892,5 +5017,141 @@ $(document).ready(function() {
         });
     });
 });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dnSelection = document.getElementById('dnSelection');
+    const fullPOInput = document.getElementById('fullPOInput');
+    const vehicleTabledn = document.getElementById('vehicleTabledn');
+    const vehicleTableBodydn = document.getElementById('vehicleTableBodydn');
+    const saveDNButton = document.getElementById('saveDNButton');
+    
+    dnSelection.addEventListener('change', function () {
+        if (dnSelection.value === 'full') {
+            fullPOInput.classList.remove('d-none');
+            vehicleTabledn.classList.add('d-none');
+        } else {
+            fullPOInput.classList.add('d-none');
+            vehicleTabledn.classList.remove('d-none');
+            // Fetch vehicle data from server using the existing route
+            const purchasingOrderId = "{{ $purchasingOrder->id }}"; // Ensure this variable is correctly populated in your Blade template
+
+            fetch(`/getVehicles/${purchasingOrderId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear existing table data
+                    vehicleTableBodydn.innerHTML = '';
+
+                    // Populate table with vehicle data
+                    data.forEach(vehicle => {
+                        const vin = vehicle.vin ? vehicle.vin : ''; // Check if VIN is null, and if so, display as blank
+                        const row = `<tr>
+                            <td>${vehicle.id}</td>
+                            <td>${vehicle.variant.master_model_lines.model_line}</td>
+                            <td>${vehicle.variant.name}</td>
+                            <td>${vin}</td>
+                            <td><input type="text" class="form-control dn-number-input" data-vehicle-id="${vehicle.id}"></td>
+                        </tr>`;
+                        vehicleTableBodydn.insertAdjacentHTML('beforeend', row);
+                    });
+                    console.log('Vehicle table body:', vehicleTableBodydn.innerHTML);
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicle data:', error);
+                });
+        }
+    });
+
+    saveDNButton.addEventListener('click', function () {
+        const purchasingOrderId = "{{ $purchasingOrder->id }}"; // Ensure this variable is correctly populated in your Blade template
+
+        if (dnSelection.value === 'full') {
+            const dnNumberFullPO = document.getElementById('dnNumberFullPO').value;
+
+            // Send Full PO DN Number to controller
+            fetch('/save-dn-numbers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    purchasingOrderId: purchasingOrderId,
+                    dnNumber: dnNumberFullPO,
+                    type: 'full'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle success response
+                console.log('DN number saved successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error saving DN number:', error);
+            });
+        } else {
+            const vehicleInputs = document.querySelectorAll('.dn-number-input');
+            const vehicleDNData = [];
+
+            vehicleInputs.forEach(input => {
+                const vehicleId = input.getAttribute('data-vehicle-id');
+                const dnNumber = input.value;
+                vehicleDNData.push({ vehicleId: vehicleId, dnNumber: dnNumber });
+            });
+
+            // Send Vehicle DN Numbers to controller
+            fetch('/save-dn-numbers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    purchasingOrderId: purchasingOrderId,
+                    vehicleDNData: vehicleDNData,
+                    type: 'vehicle'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Handle success response
+                console.log('Vehicle DN numbers saved successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error saving DN numbers:', error);
+            });
+        }
+    });
+});
+</script>
+<script>
+    $(document).ready(function() {
+        $('.ex-colour-select').select2({
+            placeholder: 'Exterior Color',
+            allowClear: true,
+            width: 'resolve'  // This tells Select2 to inherit the width from the CSS or element itself
+        });
+
+        $('.int-colour-select').select2({
+            placeholder: 'Interior Color',
+            allowClear: true,
+            width: 'resolve'  // Adjust the width dynamically or apply your custom width
+        });
+    });
 </script>
 @endsection

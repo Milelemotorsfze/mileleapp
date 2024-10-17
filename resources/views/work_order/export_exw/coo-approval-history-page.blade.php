@@ -18,6 +18,30 @@
             padding: 10px;
             margin-top: -1px;
         }
+        .veh-table th {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the table cells */
+.veh-table td {
+    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
+    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
+    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
+    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
+    padding: 3px!important; /* Add padding for better readability */
+    text-align: left; /* Align text to the left */
+}
+
+/* Style for the entire table */
+.veh-table {
+    border-collapse: collapse; /* Ensure borders do not double */
+    width: 100%; /* Make the table take up the full width */
+}
     </style>
 </head>
 @section('content')
@@ -89,7 +113,11 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $approval->created_at->format('d M Y, H:i:s') ?? '' }}</td>
                                     <td>
-                                        <label class="badge @if($approval->status == 'pending') badge-soft-info @elseif($approval->status == 'approved') badge-soft-success @elseif($approval->status == 'rejected') badge-soft-danger @endif">{{ $approval->status ?? ''}}</label>
+                                    @if($approval->status == 'pending' && $approval->workOrder->can_show_coo_approval == 'yes')
+                                        <label class="badge @if($approval->status == 'pending') badge-soft-info @endif">{{ $approval->status ?? ''}}</label>
+                                    @elseif($approval->status == 'approved' || $approval->status == 'rejected')                                        
+                                        <label class="badge @if($approval->status == 'approved') badge-soft-success @elseif($approval->status == 'rejected') badge-soft-danger @endif">{{ $approval->status ?? ''}}</label>
+                                    @endif
                                     </td>
                                     <td>@if($approval->action_at != '')
                                             {{ \Carbon\Carbon::parse($approval->action_at)->format('d M Y, H:i:s') }}
@@ -99,7 +127,7 @@
                                     <td>{{ $approval->user->name ?? '' }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-primary view-details-btn" data-id="{{ $approval->id }}">Details</button>
-                                        @if($approval->status == 'pending')
+                                        @if($approval->status == 'pending' && $approval->workOrder->can_show_coo_approval == 'yes')
                                             <a title="COO Approval" style="margin-top:0px;" class="btn btn-sm btn-info" 
                                             data-bs-toggle="modal" data-bs-target="#financeApprovalModal_{{$approval->id}}">
                                                 <i class="fas fa-hourglass-start" title="COO Approval"></i> Approval
@@ -138,7 +166,7 @@
                                 $sortedHistories = $approval->recordHistories->sortBy('field');
                                 @endphp
                                     <td colspan="7">
-                                        <table style="font-size:12px!important;">
+                                        <table style="font-size:12px!important;" class="veh-table">
                                             <tr>
                                                 <th>BOE</th>
                                                 <th>VIN</th>

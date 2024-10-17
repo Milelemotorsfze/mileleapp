@@ -13,14 +13,16 @@ class PriceChangeNotification extends Mailable
 {
     use Queueable, SerializesModels;
     public $ponumber;
+    public $orderUrl;
     public $orderCurrency;
     public $priceChanges;
     public $totalAmountOfChanges;
     public $totalVehiclesChanged;
 
-    public function __construct($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged)
+    public function __construct($ponumber, $orderCurrency, $priceChanges, $totalAmountOfChanges, $totalVehiclesChanged, $orderUrl)
     {
         $this->ponumber = $ponumber;
+        $this->orderUrl = $orderUrl;
         $this->orderCurrency = $orderCurrency;
         $this->priceChanges = $priceChanges;
         $this->totalAmountOfChanges = $totalAmountOfChanges;
@@ -29,11 +31,13 @@ class PriceChangeNotification extends Mailable
 
     public function build()
     {
-        return $this->view('emails.price_change_notification')
+        return $this->subject('PO # ' . $this->ponumber . ' Status Update')
+                    ->view('emails.price_change_notification')
                     ->with([
                         'ponumber' => $this->ponumber,
                         'orderCurrency' => $this->orderCurrency,
                         'priceChanges' => $this->priceChanges,
+                        'orderUrl' => $this->orderUrl,
                         'totalAmountOfChanges' => $this->totalAmountOfChanges,
                         'totalVehiclesChanged' => $this->totalVehiclesChanged,
                     ]);

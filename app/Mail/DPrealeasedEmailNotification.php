@@ -39,7 +39,7 @@ class DPrealeasedEmailNotification extends Mailable
 
     public function build()
     {
-        return $this->subject('Purchase Order Payment Released')
+        return $this->subject('PO # ' . $this->ponumber . ' Status Update')
                     ->view('emails.dp_released_notification')
                     ->with([
                         'ponumber' => $this->ponumber,
