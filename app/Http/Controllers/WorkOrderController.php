@@ -2455,12 +2455,14 @@ class WorkOrderController extends Controller
         }
         else {
             try {
-                $wo = WorkOrder::where('wo_number',$request->wo_number);
+                $wo = WorkOrder::where('wo_number', $request->wo_number);
                 if($request->id != NULL || $request->id != '') { 
-                    $wo = $wo->whereNot('id',$request->id);
+                    $wo = $wo->where('id','!=',$request->id);
                 }
-                $wo =$wo->get();
-                if(count($wo) > 0) {
+                $wo = $wo->get()->filter(function($item) {
+                    return $item->status != 'Cancelled';  // Filter out records where status is 'Cancelled'
+                });
+                if($wo->count() > 0) {
                     return false;
                 }
                 else {
