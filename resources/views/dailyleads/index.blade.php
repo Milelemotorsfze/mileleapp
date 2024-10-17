@@ -230,7 +230,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Location</th>
                   <th>Remarks & Messages</th>
                   <th>Created By</th>
-                  <th>Action</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
               <tbody>
@@ -250,7 +250,7 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td id="remaining-time-{{ $key }}" data-assign-time="{{ $calls->assign_time }}"></td>
                     <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>
+                    <td><a href="{{ route('calls.leaddetailpage', $calls->id) }}">{{ $calls->name ?? '(Sample)' }}</a></td>
                     <td>
                     <div class="dropdown">
                     <a href="#" role="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -305,7 +305,11 @@ input[type=number]::-webkit-outer-spin-button
                     {{ $created_by->name }}
                   </td>
                   <td>
-                    <div class="dropdown">
+                  @php
+                    $assigned_by = DB::table('users')->where('users.id', $calls->sales_person)->first();
+                    @endphp
+                    {{ $assigned_by->name }}
+                    <!-- <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
@@ -314,7 +318,7 @@ input[type=number]::-webkit-outer-spin-button
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'prospecting')">Prospecting</a></li>
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'uniqueInquiry')">Unique Inquiry / Demand</a></li>
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'quotation')">Quotation</a></li>
-    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li> -->
     <!-- <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li> -->
@@ -326,8 +330,8 @@ input[type=number]::-webkit-outer-spin-button
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li> -->
-    </ul>
-  </div>
+    <!-- </ul>
+  </div> -->
                     </td>
                     </td>
                   </tr>
@@ -888,7 +892,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Inquiry Date</th>
                   <th>Inquiry Notes</th>
                   <th>Purchaser Remarks</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -921,7 +926,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -960,6 +966,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
                   <th>Signature Status</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -1001,7 +1009,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Deal Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -1072,6 +1081,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th> -->
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                   <th>Reject Date</th>
                   <th>Reject Reason</th>
                   <th>Reject Notes</th>
@@ -1106,7 +1117,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Followup Time</th>
                   <th>Method</th>
                   <th>Sales Notes</th>
-                  <th>Action</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -2058,42 +2069,44 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                      if (row.ddate && row.ddate !== '') {
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                    }
-                    else
-                  {
-                    return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                  }
-                  }
-                },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
+                // {
+                //     data: 'id',
+                //     name: 'id',
+                //     searchable: false,
+                //     render: function (data, type, row) {
+                //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                //       if (row.ddate && row.ddate !== '') {
+                //         return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //     }
+                //     else
+                //   {
+                //     return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                 <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                //                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //   }
+                //   }
+                // },
             ],
             columnDefs: [
               { type: 'date', targets: [0] }
@@ -2215,25 +2228,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                    }
-                },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
+                // {
+                //     data: 'id',
+                //     name: 'id',
+                //     searchable: false,
+                //     render: function (data, type, row) {
+                //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                //         return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //     }
+                // },
             ]
         });
        dataTable4 = $('#dtBasicExample4').DataTable({
@@ -2413,6 +2428,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                     }
                 }
             },
+            { data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
             {
     data: 'id',
     name: 'id',
@@ -2851,6 +2868,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
 {
             data: 'rdate',
             name: 'rdate',
@@ -2963,28 +2982,29 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
         { data: 'sales_notes', name: 'fellow_up.sales_notes' },
-        {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                  }
-                },
+        // {
+        //             data: 'id',
+        //             name: 'id',
+        //             searchable: false,
+        //             render: function (data, type, row) {
+        //               const bookingUrl = `{{ url('booking/create') }}/${data}`;
+        //               const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+        //                 return `
+        //                     <div class="dropdown">
+        //                         <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+        //                             <i class="fa fa-bars" aria-hidden="true"></i>
+        //                         </button>
+        //                         <ul class="dropdown-menu dropdown-menu-end">
+        //                         <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+        //                             <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+        //                         </ul>
+        //                     </div>`;
+        //           }
+        //         }, 
+                { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
     dataTable9 = $('#dtBasicExample10').DataTable({

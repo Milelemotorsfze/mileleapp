@@ -1036,5 +1036,6 @@ Route::get('/d', function () {
     Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
     Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
     Route::post('/update-call-client', [DailyleadsController::class, 'updateCallClient'])->name('update-call-client');
+    Route::get('/callsdeatilspage/{id}', [DailyleadsController::class, 'leaddetailpage'])->name('calls.leaddetailpage');
 });
 
