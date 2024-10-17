@@ -26,6 +26,7 @@ class Calls extends Model
         'priority',
         'custom_brand_model',
         'created_at',
+        'leadtype',
         'customer_coming_type',
     ];
     public $timestamps = false;
