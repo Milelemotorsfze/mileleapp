@@ -53,7 +53,8 @@
                         <input type="text" class="form-control" id="gdnNumber_{{$vehicle->id}}" name="gdn_number" style="font-size: 14px;">
 
                         <label for="deliveredAt_{{$vehicle->id}}" class="form-label mt-3" style="font-size: 14px;">Delivered At:</label>
-                        <input type="datetime-local" class="form-control" id="deliveredAt_{{$vehicle->id}}" name="delivered_at" min="{{ now()->format('Y-m-d\TH:i') }}" style="font-size: 14px;">
+
+                        <input type="date" class="form-control" id="deliveredAt_{{$vehicle->id}}" name="delivered_at" style="font-size: 14px;">
                     </div>
 
                     <!-- Delivered With Docs Hold: Docs Delivery Date -->

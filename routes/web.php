@@ -440,7 +440,7 @@ Route::get('/d', function () {
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'show','store','edit','update'
+        'show','store','edit','update','create'
     ]);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
@@ -527,6 +527,7 @@ Route::get('/d', function () {
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
+    Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');

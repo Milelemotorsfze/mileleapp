@@ -18,14 +18,32 @@
                     @endif
                 @endcan
                 <a  class="btn btn-sm btn-primary float-end"  style="margin-right:5px;" href="{{ route('pfi-item.list') }}" title="PFI Item Lists" >
-                    
                 <i class="fa fa-table" aria-hidden="true"></i>  View PFI Items</a>
-                @if (Session::has('success'))
-                    <div class="alert alert-success mt-3" id="success-alert">
-                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                        {{ Session::get('success') }}
-                    </div>
-                @endif
+                
+                @if (count($errors) > 0)
+                        <div class="alert alert-danger mt-3 mb-0">
+                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                            <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if (Session::has('error'))
+                        <div class="alert alert-danger mt-3 mb-0" >
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                            {{ Session::get('error') }}
+                        </div>
+                    @endif
+                    @if (Session::has('success'))
+                        <div class="alert alert-success mt-3 mb-0" id="success-alert">
+                            <button type="button" class="btn-close p-0 close " data-dismiss="alert">x</button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
+                
             </div>
 
             <div class="card-body">

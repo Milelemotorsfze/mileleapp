@@ -3631,19 +3631,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             // Format batch number as B01, B02, ..., B09, B10, etc.
             let formattedBatchNumber = batchNumber.padStart(2, '0');
 
-            // Construct the WO Number with batch information
-            WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
+		// Construct the WO Number with batch information
+		WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
         } else {
             // Construct the WO Number with "-SB" when the batch is not checked
             WONumber = "WO-" + numberPart + "-SW";
         }
     }
-    
-    // Set the WO Number field
-    document.getElementById('wo_number').value = WONumber;
-}
 
-
+		// Set the WO Number field
+		document.getElementById('wo_number').value = WONumber;
+	}
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 

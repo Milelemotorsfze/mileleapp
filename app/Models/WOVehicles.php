@@ -38,6 +38,7 @@ class WOVehicles extends Model
         'deleted_by',
         'deposit_received',
         'deleted_comment_id',
+        'wo_boe_id',
     ];
     protected $appends = [
         'certification_per_vin_name',
