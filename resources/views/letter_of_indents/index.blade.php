@@ -65,9 +65,12 @@
                    <li class="nav-item">
                         <a class="nav-link active" data-bs-toggle="pill" href="#new-LOI">New LOI</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-ttc-approval-LOI">Waiting For TTC Approval</a>
+                    </li>
                    <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Approval</a>
-                    </li> 
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>
                     </li> 
@@ -81,7 +84,7 @@
                             <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>Action</th>
-                                    <th>Send Supplier Approval</th>
+                                    <th>Send For Approval</th>
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
@@ -109,6 +112,38 @@
                     </div>
                     <div class="tab-pane fade table-responsive" id="waiting-for-approval-LOI">
                         <table class="table table-bordered  table-striped table-editable table-edits table table-condensed waiting-for-approval-table" style = "width:100%;">
+                            <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Status Update</th>
+                                    <th>S.No</th>
+                                    <th>LOI Number</th>
+                                    <th>LOI Date</th>
+                                    <th>Cutsomer Name</th>
+                                    <th>Customer Type</th>
+                                    <th>Country</th>
+                                    <th>Category</th>
+                                    <th>Dealers</th>
+                                    <th>So Number</th>
+                                    <th>Sales Person</th>
+                                    <th>Status</th>
+                                    <th>Is Expired</th>
+                                    <th>LOI Quantity</th>
+                                    <th>Utilized Quantity</th>
+                                    <th>LOI Templates</th>
+                                    <th>Comments</th>
+                                    <th>Created By</th>
+                                    <th>Created At</th>
+                                    <th>Updated By</th>
+                                    <th>Updated At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>                      
+                    </div>
+                    <div class="tab-pane fade table-responsive" id="waiting-for-ttc-approval-LOI">
+                        <table class="table table-bordered table-striped table-editable table-edits table table-condensed waiting-for-ttc-approval-table" style = "width:100%;">
                             <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>Action</th>
@@ -243,7 +278,38 @@
         ]
         
      });
-        var table3 = $('.supplier-response-table').DataTable({
+     var table3 = $('.waiting-for-ttc-approval-table').DataTable({
+            searching:true,
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('letter-of-indents.index', ['tab' => 'WAITING_FOR_TTC_APPROVAL']) }}",
+        columns: [
+            {'data': 'action', name: 'action', orderable: false, searchable: false},
+            {'data' : 'approval_button', 'name': 'approval_button', orderable: false, searchable: false },    
+            { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex','title' : 'S.NO:', orderable: false, searchable: false },
+            {'data' : 'uuid', 'name' : 'uuid'},
+            {'data' : 'date', 'name' : 'date' },
+            {'data' : 'client.name', 'name' : 'client.name'},
+            {'data' : 'client.customertype', 'name': 'client.customertype' },         
+            {'data' : 'country.name', 'name': 'country.name' },         
+            {'data' : 'category', 'name': 'category' },        
+            {'data' : 'dealers', 'name': 'dealers' },        
+            {'data' : 'so_number', 'name': 'soNumbers.so_number' },  
+            {'data' : 'sales_person_id', 'name': 'salesPerson.name' },        
+            {'data' : 'submission_status', 'name': 'submission_status' },        
+            {'data' : 'is_expired', 'name': 'is_expired' },   
+            {'data' : 'loi_quantity', 'name': 'loi_quantity' }, 
+            {'data' : 'utilized_quantity', 'name': 'utilized_quantity' },    
+            {'data' : 'loi_templates', 'name': 'loi_templates' },
+            {'data' : 'comments', 'name': 'comments' },      
+            {'data' : 'created_by', 'name': 'createdBy.name' },       
+            {'data' : 'created_at', 'name': 'created_at' },        
+            {'data' : 'updated_by', 'name': 'updatedBy.name' },        
+            {'data' : 'updated_at', 'name': 'updated_at' },  
+        ]
+        
+     });
+        var table4 = $('.supplier-response-table').DataTable({
             searching:true,
             processing: true,
             serverSide: true,

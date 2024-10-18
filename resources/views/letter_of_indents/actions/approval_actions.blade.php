@@ -12,12 +12,23 @@
                         @endphp
                         @if ($hasPermission)
                         <li>
+                            @if($letterOfIndent->is_ttc_approval_required == 1) 
                             <button type="button" data-id="{{ $letterOfIndent->id }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
-                            data-url="{{ route('letter-of-indent.request-supplier-approval') }}"
-                                    class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>              
+                                data-url="{{ route('letter-of-indent.request-approval') }}"  data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL }}"
+                                    class="btn btn-warning btn-sm btn-request-ttc-approval" title="Send For TTC Approval">Request TTC Approval</button>              
+                            @else
+                                <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}"
+                                data-url="{{ route('letter-of-indent.request-approval') }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                                    class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Request Supplier Approval </button>              
+                            @endif
                         </li>
                         @endif
                     @endcan
+                @elseif($type == 'WAITING_FOR_TTC_APPROVAL')
+                
+                    <!-- <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}"
+                        data-url="{{ route('letter-of-indent.request-approval') }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                            class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Request Supplier Approval </button>               -->
                 @elseif($type == 'WAITING_FOR_APPROVAL')
                     @can('loi-status-update')
                         @php
@@ -264,9 +275,39 @@
         </div>
     </div>
      <script>
+        
+        $('.btn-request-ttc-approval').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            let status =  $(this).attr('data-status');
+           
+            var confirm = alertify.confirm('Are you sure you want to send this LOI for TTC Approval?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status:status,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table = $('.new-LOI-table').DataTable();
+                            table.ajax.reload();
+                            var table1 = $('.waiting-for-approval-table').DataTable();
+                            table1.ajax.reload();
+                            alertify.success('TTC Approval Request Send Successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Confirm ?"})
+        });
+      
          $('.btn-request-supplier-approval').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
+            let status =  $(this).attr('data-status');
            
             var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
                 if (e) {
@@ -276,6 +317,7 @@
                         dataType: "json",
                         data: {
                             id: id,
+                            status,status,
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
@@ -283,11 +325,11 @@
                             table.ajax.reload();
                             var table1 = $('.waiting-for-approval-table').DataTable();
                             table1.ajax.reload();
-                            alertify.success('Approval Request Send Successfully.');
+                            alertify.success('Supplier Approval Request Send Successfully.');
                         }
                     });
                 }
-            }).set({title:"Delete Item"})
+            }).set({title:"Confirm ?"})
         });
       
         function approve(id){
