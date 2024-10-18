@@ -878,7 +878,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                     });
 
                     // Hide the column if all cells are empty
-                    if (allEmpty) {
+                    if (
+						
+					) {
                         column.visible(false);
                     }
                 });
