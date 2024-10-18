@@ -363,7 +363,6 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
-                    console.log(data);
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{
