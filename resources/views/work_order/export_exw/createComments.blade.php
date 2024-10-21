@@ -1,5 +1,5 @@
 <!-- <link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"> -->
-<link href="{{ asset('css/custom/jquery.atwho.min.jquery.atwho.css') }}" rel="stylesheet">
+<link href="{{ asset('css/custom/jquery.atwho.css') }}" rel="stylesheet">
 <!-- <script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script> -->
 <script src="{{ asset('js/custom/jquery.caret.js') }}"></script>
 <!-- Include At.js -->

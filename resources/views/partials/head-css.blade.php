@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="{{ asset('css/custom/default.min.css') }}"/>
 <!-- CHANGE CDN TO LOCAL PATH --><!-- add new css/custom/intlTelInput.min.css -->
 <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/> -->
-<link rel="stylesheet" href="{{ asset('css/custom/intlTelInput.min.css') }}"/>
+<!-- <link rel="stylesheet" href="{{ asset('css/custom/intlTelInput.min.css') }}"/> -->
 <!-- CHANGE CDN TO LOCAL PATH --><!-- add new css/custom/scroller.dataTables.min.css -->
 <!-- <link href="https://cdn.datatables.net/scroller/2.2.0/css/scroller.dataTables.min.css" rel="stylesheet"/> -->
 <link rel="stylesheet" href="{{ asset('css/custom/scroller.dataTables.min.css') }}"/>
