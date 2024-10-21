@@ -2,8 +2,8 @@
 <head>
     <meta charset="UTF-8">
     <!-- Load jQuery before DataTables -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script> -->
     <style>
         .select2-container {
             width: 100% !important;
@@ -179,12 +179,12 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-<script type="text/javascript">
+<!-- <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script> -->
+<!-- <script type="text/javascript">
     $(document).ready(function() {
         
     });
-</script>
+</script> -->
 </body>
 @endsection
