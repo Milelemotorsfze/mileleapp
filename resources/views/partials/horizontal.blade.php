@@ -231,7 +231,17 @@
                                             </div>
                                         </div>
                                         @endif
-
+                                        
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penalty-report']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('getVehiclePenaltyReport')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Penalty Report</span>
+                                            </a>
+                                        </div>
+                                        @endif
                                     </div>
                                 </li>
                                 @endif

@@ -4,6 +4,7 @@
         @include('partials/head-css')
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
+        <script src="{{ asset('js/custom/intlTelInput.min.js') }}"></script>
         <!-- CHANGE CDN TO LOCAL PATH --><!-- add new js/custom/ckeditor.js -->
         <!-- <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script> -->
         <script src="{{ asset('js/custom/ckeditor.js') }}"></script>
@@ -14,6 +15,7 @@
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script> -->
 		<script src="{{ asset('js/custom/jquery.validate.min.js') }}"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script> -->
+
         <style>
      /* .modal-content {
             position:fixed;
