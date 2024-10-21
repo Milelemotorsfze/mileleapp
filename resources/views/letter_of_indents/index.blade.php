@@ -69,7 +69,7 @@
                         <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-ttc-approval-LOI">Waiting For TTC Approval</a>
                     </li>
                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Approval</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Supplier Approval</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>

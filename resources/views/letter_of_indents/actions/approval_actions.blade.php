@@ -26,9 +26,9 @@
                     @endcan
                 @elseif($type == 'WAITING_FOR_TTC_APPROVAL')
                 
-                    <!-- <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}"
+                    <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}"
                         data-url="{{ route('letter-of-indent.request-approval') }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
-                            class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Request Supplier Approval </button>               -->
+                            class="btn btn-primary btn-sm btn-request-supplier-approval" title="TTC Approval">Approve </button>     
                 @elseif($type == 'WAITING_FOR_APPROVAL')
                     @can('loi-status-update')
                         @php
