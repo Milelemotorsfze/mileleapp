@@ -2,9 +2,14 @@
 <html lang="en">
     <head>
     @include('partials/head-css')
-    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+        <!-- CHANGE CDN TO LOCAL PATH --> <!-- INCLUDE THE EXISTING jquery.min.js --> 
+    	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+        <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script>
+        <!-- CHANGE CDN TO LOCAL PATH --> <!-- add new js/custom/jquery.validate.min.js --> 
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script> -->
+		<script src="{{ asset('js/custom/jquery.validate.min.js') }}"></script>
+        <!-- CHANGE CDN TO LOCAL PATH --> <!-- remove from here because 4.1.0 is already included in vendor-scripts --> 
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script> -->
         <meta charset="utf-8">
         <!-- <meta name="csrf-token" content="content"> -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
