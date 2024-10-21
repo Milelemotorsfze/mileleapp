@@ -1,8 +1,10 @@
-<script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script>
-
+<!-- <link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"> -->
+<link href="{{ asset('css/custom/jquery.atwho.css') }}" rel="stylesheet">
+<!-- <script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script> -->
+<script src="{{ asset('js/custom/jquery.caret.js') }}"></script>
 <!-- Include At.js -->
-<script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script>
-<link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet">
+<!-- <script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script> -->
+<script src="{{ asset('js/custom/jquery.atwho.min.js') }}"></script>
 <style>
     .comment {
         margin-bottom: 20px;
