@@ -32,7 +32,15 @@ class WOBOEStatusMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Reminder: Export Documents Expiry for Work Order BOE')
-                    ->view('emails.wo_boe_status');
+        // Dynamically build the subject line using PHP
+        $subject = 'Reminder: Export Documents Expiry for ' . ($this->boe->boe ?? $this->boe->workOrder->wo_number ?? 'Work Order BOE');
+
+        // Pass the `boe` object and `salesperson` object to the view
+        return $this->subject($subject)
+                    ->view('work_order.emails.wo_boe_status')
+                    ->with([
+                        'boe' => $this->boe,
+                        'salesperson' => $this->salesperson,
+                    ]);
     }
 }

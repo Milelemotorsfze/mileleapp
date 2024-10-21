@@ -23,7 +23,18 @@ class WOBOE extends Model
     {
         return $this->hasOne(WorkOrder::class,'id','wo_id');
     }
-    // 753159
+    public function vehicles()
+    {
+        return $this->hasMany(WOVehicles::class, 'work_order_id', 'wo_id')
+            ->where(function($query) {
+                $query->where('boe_number', $this->boe_number)
+                      ->orWhere(function($query) {
+                          if ($this->boe_number == 1) {
+                              $query->where('boe_number', 0);
+                          }
+                      });
+            });
+    }
 
     
 }

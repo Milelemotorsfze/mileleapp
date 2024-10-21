@@ -23,15 +23,32 @@ class SendWOBOEStatusEmail extends Command
     {
         $today = Carbon::today();
 
-        // Get all records where the 25th day after the declaration date is today or earlier
-        $boes = WOBOE::where('declaration_date', '<=', $today->subDays(25))->get();
+        // Get all `WOBOE` records where the 25th day after the `declaration_date` is today or earlier
+        $boes = WOBOE::where('declaration_date', '<=', $today->subDays(24))
+            ->with(['vehicles', 'workOrder.salesPerson'])  // Load vehicles and related salesperson through work order
+            ->get();
 
-        foreach ($boes as $boe) {
-            // Assuming each BOE is associated with a salesperson, fetch the salesperson
-            $salesperson = Salesperson::where('wo_id', $boe->wo_id)->first(); // Example relationship
-            
-            // Send the email to the salesperson or default to a specific email
-            Mail::to('rejitha.rajendran@milele.com')//$salesperson->email ?? 
+        // Filter out vehicles with 'Delivered' status in PHP (as it's an appended attribute)
+        $filteredBoes = $boes->map(function ($boe) {
+            $boe->vehicles = $boe->vehicles->filter(function ($vehicle) {
+                return $vehicle->delivery_status !== 'Delivered';  // Only non-delivered vehicles
+            });
+            return $boe;
+        })->filter(function ($boe) {
+            return $boe->vehicles->isNotEmpty();  // Keep only if there are valid vehicles
+        });
+
+        // Send email notifications to each salesperson
+        foreach ($filteredBoes as $boe) {
+            // Access the related salesperson through the work order relationship
+            $salesperson = $boe->workOrder->salesPerson;
+
+            // Fetch team emails from the .env file
+            $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
+            $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
+            $developerEmail = env('DEVELOPER_EMAIL');
+            // Send email to the salesperson's email and team emails from .env file
+            Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail,$developerEmail])
                 ->send(new WOBOEStatusMail($boe, $salesperson));
         }
 
