@@ -139,10 +139,6 @@
         color: white;
     }
 
-    .step.disqualified::before {
-        border-right-color: #dc3545;
-    }
-
     .step.disqualified::after {
         border-left-color: #dc3545;
     }
