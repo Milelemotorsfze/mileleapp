@@ -116,7 +116,9 @@
 
     // Ensure that the fields are shown/hidden correctly when the modal is opened
     document.addEventListener('DOMContentLoaded', function() {
-        toggleDeclarationFields(); // Trigger field visibility check based on pre-selected status
+        $('#updateDocStatusModal').on('shown.bs.modal', function () {
+            toggleDeclarationFields(); // Trigger field visibility check based on pre-selected status when modal is shown
+        });
     });
 
     // Event listener for radio button changes

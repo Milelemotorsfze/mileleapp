@@ -1721,9 +1721,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 @endif
 <!-- <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script> -->
-<script type="text/javascript">
+<!-- <script type="text/javascript">
     $(document).ready(function () { 
 		// $('.my-datatable').DataTable();
     });
-</script>
+</script> -->
 @endsection
