@@ -30,6 +30,24 @@
                                         On Hold
                                     </label>
                                 </div>
+                                <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                                    <input class="form-check-input me-1" type="radio" name="Status" id="StatusPartiallyDelivered" value="Partially Delivered" {{ $workOrder->status == 'Partially Delivered' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="StatusPartiallyDelivered" style="font-size: 14px;">
+                                        Partially Delivered
+                                    </label>
+                                </div>
+                                <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                                    <input class="form-check-input me-1" type="radio" name="Status" id="StatusSucceeded" value="Succeeded" {{ $workOrder->status == 'Succeeded' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="StatusSucceeded" style="font-size: 14px;">
+                                        Succeeded
+                                    </label>
+                                </div>
+                                <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                                    <input class="form-check-input me-1" type="radio" name="Status" id="StatusCancelled" value="Cancelled" {{ $workOrder->status == 'Cancelled' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="StatusCancelled" style="font-size: 14px;">
+                                        Cancelled
+                                    </label>
+                                </div>
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="woStatus" class="form-label">Add Comment:</label>

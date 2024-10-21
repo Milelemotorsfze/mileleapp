@@ -10,16 +10,22 @@ use Carbon\Carbon;
 use Exception;
 use App\Models\WoDocsStatus;
 use App\Models\WorkOrder;
+use App\Models\WOBOE;
 
 class WoDocsStatusController extends Controller
 {
     public function updateDocStatus(Request $request)
-    {
+    {   
         // Validate the incoming request data
         $validatedData = $request->validate([
             'workOrderId' => 'required|exists:work_orders,id',
             'status' => 'required|in:Not Initiated,In Progress,Ready',
             'comment' => 'nullable|string',
+            'boeData' => 'nullable|array', // BOE data is optional
+            'boeData.*.boe_number' => 'string|nullable', // BOE number should be a string
+            'boeData.*.boe' => 'string|nullable', // BOE field should be a string
+            'boeData.*.declaration_number' => 'nullable|digits:13', // 13 digits, optional
+            'boeData.*.declaration_date' => 'nullable|date', // Valid date, optional
         ]);
 
         // Always create a new wo_docs_status record
@@ -30,13 +36,43 @@ class WoDocsStatusController extends Controller
             'doc_status_changed_by' => Auth::id(), // Set the ID of the authenticated user
             'doc_status_changed_at' => now(), // Set the current timestamp
         ]);
+        // Handle the BOE data if it exists
+        if (!empty($validatedData['boeData'])) {
+            foreach ($validatedData['boeData'] as $boeEntry) {
+                // Check if the record already exists
+                $existingBoe = WOBOE::where('wo_id', $validatedData['workOrderId'])
+                                    ->where('boe_number', $boeEntry['boe_number'] ?? null) // Safely access boe_number
+                                    ->first();
+
+                if ($existingBoe) {
+                    // Update existing BOE record
+                    $existingBoe->update([
+                        'boe' => $boeEntry['boe'] ?? null, // Safely access 'boe' with null fallback
+                        'declaration_number' => $boeEntry['declaration_number'] ?? null,
+                        'declaration_date' => $boeEntry['declaration_date'] ?? null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                } else {
+                    // Create a new BOE record
+                    WOBOE::create([
+                        'wo_id' => $validatedData['workOrderId'],
+                        'boe_number' => $boeEntry['boe_number'] ?? null, // Safely access 'boe_number'
+                        'boe' => $boeEntry['boe'] ?? null, // Safely access 'boe'
+                        'declaration_number' => $boeEntry['declaration_number'] ?? null,
+                        'declaration_date' => $boeEntry['declaration_date'] ?? null,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ]);
+                }
+            }
+        }
         // Fetch the work order vehicle
         $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
 
         // Only send an email if the status is "Ready"
         if ($validatedData['status'] === 'Ready') {
-            // Prepare email template details
-            $template = [
+             // Prepare email template details
+             $template = [
                 'from' => 'no-reply@milele.com',
                 'from_name' => 'Milele Matrix',
             ];
@@ -56,19 +92,23 @@ class WoDocsStatusController extends Controller
             $statusLogLink = env('BASE_URL') . '/wo-doc-status-history/' . $workOrder->id;
 
             // Retrieve and validate email addresses from .env
-            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
-            $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            // $customerEmail = filter_var($workOrder->customer_email, FILTER_VALIDATE_EMAIL);
+            $customerEmail = '';
+            // Get all users with 'can_send_wo_email' set to 'yes'
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
-                'managementEmail' => $managementEmail,
                 'operationsEmail' => $operationsEmail,
                 'createdByEmail' => $createdByEmail,
                 'salesPersonEmail' => $salesPersonEmail,
                 'customerEmail' => $customerEmail,
+                'managementEmails' => implode(', ', $managementEmails),
             ]);
 
             // Check if the salesPerson exists before trying to access properties
@@ -79,8 +119,8 @@ class WoDocsStatusController extends Controller
                     && $workOrder->salesPerson->is_management === 'No';
             }
 
-            // Initialize recipient list
-            $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
+            // Initialize recipient list with operations email and management emails from the database
+            $recipients = array_filter(array_merge([$operationsEmail, $createdByEmail], $managementEmails));
 
             // Add salesPersonEmail only if the condition is met
             if ($shouldSendToSalesPerson && $salesPersonEmail) {
@@ -92,14 +132,17 @@ class WoDocsStatusController extends Controller
                 $recipients[] = $customerEmail;
             }
 
-            // Log and handle invalid email addresses
-            if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
-                \Log::error('Invalid email addresses provided:', [
-                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+            // Log and handle invalid email addresses for operations and createdByEmail (skip email if missing)
+            if (!$operationsEmail || !$createdByEmail) {
+                \Log::error('Invalid or missing email addresses:', [
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                     'createdByEmail' => $createdByEmail,
                 ]);
-                throw new \Exception('One or more email addresses are invalid.');
+            }
+            // If no valid recipients, skip sending the email but don't stop execution
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for Work Order: ' . $workOrder->wo_number);
+                return;
             }
             // Determine if the email is being sent to the customer
             $isCustomerEmail = in_array($customerEmail, $recipients);
@@ -114,6 +157,8 @@ class WoDocsStatusController extends Controller
                 'status' => $statusName,
                 'datetime' => Carbon::now(),
                 'isCustomerEmail' => $isCustomerEmail,  // Pass this flag to the email template
+                'declarationNumber' => $validatedData['declarationNumber'] ?? 'N/A', // Pass Declaration Number
+                'declarationDate' => $validatedData['declarationDate'] ?? 'N/A', // Pass Declaration Date
             ], function ($message) use ($subject, $recipients, $template) {
                 $message->from($template['from'], $template['from_name'])
                         ->to($recipients)
@@ -123,7 +168,7 @@ class WoDocsStatusController extends Controller
 
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $woDocStatus]);
-    }
+    }  
     public function docStatusHistory($id)
     {
         $data = WoDocsStatus::where('wo_id', $id)->orderBy('doc_status_changed_at','DESC')->get();

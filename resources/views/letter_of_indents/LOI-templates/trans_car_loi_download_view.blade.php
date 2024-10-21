@@ -148,8 +148,14 @@
     @if($letterOfIndent->LOIDocuments->count() > 0)
         <div class="page_break"></div>
         <div class="row">
-            @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
-            <img src="{{ public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  class="mt-2">
+            @foreach($documents as $document) 
+                @if($document->is_passport == 1) 
+                    <img src="{{ public_path('storage/app/public/passports/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+                @elseif($document->is_trade_license == 1)
+                    <img src="{{ public_path('storage/app/public/tradelicenses/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+                @else
+                    <img src="{{ public_path('customer-other-documents/'.$document->loi_document_file) }}" class="mt-2"></iframe>
+                @endif
             @endforeach
         </div>
     @endif

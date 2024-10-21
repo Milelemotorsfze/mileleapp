@@ -64,22 +64,25 @@ class WoPDIStatusController extends Controller
             // Retrieve the authenticated user's name
             $authUserName = auth()->user()->name;
 
-            // Define a quick access link (adjust the route as needed)
+            // Define quick access links
             $accessLink = env('BASE_URL') . '/work-order/' . $workOrder->id;
             $statusLogLink = env('BASE_URL') . '/vehicle-pdi-status-log/' . $woVehicle->id;
 
             // Retrieve and validate email addresses from .env
-            $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
             $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
             $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
+            // Get all users with 'can_send_wo_email' set to 'yes' from the database
+            $managementEmails = \App\Models\User::where('can_send_wo_email', 'yes')->pluck('email')->filter(function($email) {
+                return filter_var($email, FILTER_VALIDATE_EMAIL);
+            })->toArray();
 
             // Log email addresses to help with debugging
             \Log::info('Email Recipients:', [
-                'managementEmail' => $managementEmail,
                 'operationsEmail' => $operationsEmail,
                 'createdByEmail' => $createdByEmail,
                 'salesPersonEmail' => $salesPersonEmail,
+                'managementEmails' => implode(', ', $managementEmails),
             ]);
 
             // Check if the salesPerson exists before trying to access properties
@@ -90,22 +93,25 @@ class WoPDIStatusController extends Controller
                     && $workOrder->salesPerson->is_management === 'No';
             }
 
-            // Initialize recipient list
-            $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
+            // Initialize recipient list with operations email and management emails from the database
+            $recipients = array_filter(array_merge([$operationsEmail, $createdByEmail], $managementEmails));
 
             // Add salesPersonEmail only if the condition is met
             if ($shouldSendToSalesPerson && $salesPersonEmail) {
                 $recipients[] = $salesPersonEmail;
             }
 
-            // Log and handle invalid email addresses
-            if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
-                \Log::error('Invalid email addresses provided:', [
-                    'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
+            // Log and handle invalid email addresses (but do not throw an exception, just log)
+            if (!$operationsEmail || !$createdByEmail) {
+                \Log::error('Invalid or missing email addresses:', [
                     'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
                     'createdByEmail' => $createdByEmail,
                 ]);
-                throw new \Exception('One or more email addresses are invalid.');
+            }
+            // If no valid recipients, skip sending the email but don't stop execution
+            if (empty($recipients)) {
+                \Log::info('No valid recipients found. Skipping email sending for Vehicle VIN: ' . $woVehicle->vin . ' under Work Order: ' . $workOrder->wo_number);
+                return;
             }
 
             // Send email using a Blade template

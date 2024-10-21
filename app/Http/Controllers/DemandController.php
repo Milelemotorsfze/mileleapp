@@ -7,6 +7,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
+use App\Models\LoiCountryCriteria;
 use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use App\Models\Varaint;
@@ -183,7 +184,17 @@ class DemandController extends Controller
         }else{
             $data = MasterModel::where('is_milele', true);
         }
+        // Hand Drive of Countries Check
 
+        if($request->country_id) {
+           $isCountryExist = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)
+                                ->where('country_id', $request->country_id)->first();
+           if($isCountryExist) {
+            if($isCountryExist->steering) {
+                $data = $data->where('steering', $isCountryExist->steering); 
+            }
+           }                     
+        }
         if($request->selectedModelIds) {
             $restrictedModelIds = [];
             foreach($request->selectedModelIds as $selectedModelId){

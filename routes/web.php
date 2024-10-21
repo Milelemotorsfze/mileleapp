@@ -121,6 +121,9 @@ use App\Http\Controllers\LOIItemController;
 use App\Http\Controllers\BanksController;
 use App\Http\Controllers\DepartmentNotificationsController;
 use App\Http\Controllers\AccessController;
+use App\Http\Controllers\AchievementCertificateController;
+use App\Http\Controllers\LetterRequestController;
+use App\Http\Controllers\SalaryCertificateController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
@@ -437,7 +440,7 @@ Route::get('/d', function () {
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'show','store','edit','update'
+        'show','store','edit','update','create'
     ]);
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
@@ -454,6 +457,8 @@ Route::get('/d', function () {
         Route::post('work-order/finance-approval', 'financeApproval')->name('work-order.finance-approval');
         Route::post('work-order/coe-office-approval', 'coeOfficeApproval')->name('work-order.coe-office-approval');
         Route::post('work-order/revert-sales-approval', 'revertSalesApproval')->name('work-order.revert-sales-approval');
+        Route::post('/save-filters', 'saveFilters')->name('save.filters');
+        Route::post('/check-so-number', 'checkSONumber')->name('wo.checkSONumber');
     });
     Route::controller(WoDocsStatusController::class)->group(function(){
         Route::post('/update-wo-doc-status', 'updateDocStatus')->name('wo.updateDocStatus');
@@ -466,6 +471,7 @@ Route::get('/d', function () {
     Route::controller(WoVehicleController::class)->group(function(){
         Route::post('/update-vehicle-modification-status', 'updateVehModiStatus')->name('wo.updateVehModiStatus');
         Route::get('/vehicle-modification-status-log/{id}', 'vehModiStatusHistory')->name('vehModiStatusHistory');
+        Route::post('/fetch-boe-number', 'fetchBoeNumber')->name('fetch.boe_number');
     }); 
     Route::controller(WoPDIStatusController::class)->group(function(){
         Route::post('/update-vehicle-pdi-status', 'updateVehPdiStatus')->name('wo.updateVehPdiStatus');
@@ -512,20 +518,25 @@ Route::get('/d', function () {
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
     Route::resource('letter-of-indent-items', LOIItemController::class);
+    
     Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
                 ->name('letter-of-indents.status-update'); 
     Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
     ->name('letter-of-indents.loi-expiry-status-update'); 
+    Route::get('loi/get-customer-documents', [LetterOfIndentController::class,'getCustomerDocuments'])->name('loi.customer-documents');
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
+    Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
     Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
-    Route::get('pfi-item/get-master-models', [PFIController::class,'getChildModels'])->name('pfi-item.master-models');
+    Route::get('pfi-item/get-models', [PFIController::class,'getModels'])->name('pfi-item.models');
+    Route::get('pfi-item/get-master-models', [PFIController::class,'getMasterModel'])->name('pfi-item.master-model-ids');
+    Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
@@ -660,7 +671,36 @@ Route::get('/d', function () {
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
+    // Salary Certificate Routes
+    Route::prefix('employee-relation/salary-certificate')->group(function () {
+        Route::get('/create', [SalaryCertificateController::class, 'create'])->name('employeeRelation.salaryCertificate.create');
+        Route::post('/store', [SalaryCertificateController::class, 'store'])->name('employeeRelation.salaryCertificate.store');
+        Route::get('/index', [SalaryCertificateController::class, 'index'])->name('employeeRelation.salaryCertificate.index');
+        Route::get('/{id}/generate', [SalaryCertificateController::class, 'generateSalaryCertificate'])->name('employeeRelation.salaryCertificate.generateSalaryCertificate');
 
+        Route::get('/{id}/show', [SalaryCertificateController::class, 'show'])->name('employeeRelation.salaryCertificate.show');
+        Route::get('/{id}/edit', [SalaryCertificateController::class, 'edit'])->name('employeeRelation.salaryCertificate.edit');
+        Route::post('/{id}/update', [SalaryCertificateController::class, 'update'])->name('employeeRelation.salaryCertificate.update');
+        Route::get('/{id}', [SalaryCertificateController::class, 'downloadCertificate'])->name('employeeRelation.salaryCertificate.downloadCertificate');
+    });
+
+    // Achievement Certificate Routes
+    Route::prefix('employee-relation/achievement-certificate')->group(function () {
+        Route::get('/create', [AchievementCertificateController::class, 'create'])->name('employeeRelation.achievementCertificate.create');
+        Route::post('/store', [AchievementCertificateController::class, 'store'])->name('employeeRelation.achievementCertificate.store');
+        Route::get('/index', [AchievementCertificateController::class, 'index'])->name('employeeRelation.achievementCertificate.index');
+        Route::get('/{id}/show', [AchievementCertificateController::class, 'show'])->name('employeeRelation.achievementCertificate.show');
+        Route::post('/{id}/update', [AchievementCertificateController::class, 'update'])->name('employeeRelation.achievementCertificate.update');
+    });
+
+    // Letter Request Routes
+    Route::prefix('employee-relation/letter-request')->group(function () {
+        Route::get('/create', [LetterRequestController::class, 'create'])->name('employeeRelation.letterRequest.create');
+        Route::post('/store', [LetterRequestController::class, 'store'])->name('employeeRelation.letterRequest.store');
+        Route::get('/index', [LetterRequestController::class, 'index'])->name('employeeRelation.letterRequest.index');
+        Route::get('/{id}/show', [LetterRequestController::class, 'show'])->name('employeeRelation.letterRequest.show');
+        Route::post('/{id}/update', [LetterRequestController::class, 'update'])->name('employeeRelation.letterRequest.update');
+    });
     //WareHouse
     Route::resource('purchasing-order', PurchasingOrderController::class);
     Route::resource('Vehicles', VehiclesController::class);
@@ -1038,4 +1078,3 @@ Route::get('/d', function () {
     Route::post('/update-call-client', [DailyleadsController::class, 'updateCallClient'])->name('update-call-client');
     Route::get('/callsdeatilspage/{id}', [DailyleadsController::class, 'leaddetailpage'])->name('calls.leaddetailpage');
 });
-

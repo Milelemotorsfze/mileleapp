@@ -20,7 +20,11 @@
 </head>
 <body>
     <p>Dear Team,</p>
-    <p>SO amount section data for the following work order has been updated:</p>
+    @if($hasEditConfirmedPermission)
+        <p>SO amount section data for the following work order has been updated by system administrator ({{ $authUserName }} - {{ $authUserEmail }}).</p>
+    @else
+        <p>SO amount section data for the following work order has been updated:</p>
+    @endif
     <p>
         <strong>Work Order Number:</strong> {{ $workOrder->wo_number }}<br>
         <strong>Customer Name:</strong> {{ $workOrder->customer_name ?? 'Unknown Customer' }}<br>

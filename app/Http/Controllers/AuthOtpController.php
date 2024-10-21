@@ -43,39 +43,39 @@ class AuthOtpController extends Controller
                 $userCurrentBrowser = Agent::browser();
                 $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
                     ->orderBy('id','DESC')->first();
-                info($userLastOtpVerified);
+                // info($userLastOtpVerified);
                 // check opt table has entry
                 if($userLastOtpVerified) {
                     $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
                     // check the mac address change to check whether the device is changed or not
 //                    if($latestLoginActivity->mac_address == $userMacAdress ) {
-                        info("mac address same");
-                        info($latestLoginActivity);
+                        // info("mac address same");
+                        // info($latestLoginActivity);
                     if($latestLoginActivity) {
-                        info("last login activity is there");
+                        // info("last login activity is there");
 //                        if($latestLoginActivity->mac_address == $userMacAdress ) {
                         // check the platform same or not
                         if (Agent::isPhone() == 'phone') {
-                            info("logged in phone");
+                            // info("logged in phone");
                             $userDevice = 'phone';
                         } elseif (Agent::isTablet() == 'tablet') {
-                            info("logged in tablet");
+                            // info("logged in tablet");
                             $userDevice = 'tablet';
                         } elseif (Agent::isDesktop() == 'desktop') {
-                            info("logged in tablet");
+                            // info("logged in tablet");
                             $userDevice = 'desktop';
                         }
 //                        info("mac address same");
                         if ($latestLoginActivity->device_name == $userDevice) {
-                            info("device matching");
+                            // info("device matching");
                             if ($latestLoginActivity->browser_name == $userCurrentBrowser) {
-                                info("browser name same");
+                                // info("browser name same");
 
                                 $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
-                                info($userLastOtpVerifiedDate);
+                                // info($userLastOtpVerifiedDate);
                                 $currentDate = Carbon::now();
                                 if ($currentDate->isBefore($userLastOtpVerifiedDate)) {
-                                    info("expiration  date NOT reached");
+                                    // info("expiration  date NOT reached");
 
                                     $request['user_id'] = $user->id;
                                     return (app('App\Http\Controllers\Auth\LoginController')->login($request));

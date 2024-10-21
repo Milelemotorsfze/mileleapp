@@ -102,10 +102,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 <div class="card-header">
 	<h4 class="card-title form-label">@if(isset($workOrder) && $workOrder->type == 'export_exw') Export EXW @elseif(isset($workOrder) && $workOrder->type == 'export_cnf') Export CNF @elseif(isset($workOrder) && $workOrder->type == 'local_sale') Local Sale @endif Work Order Details</h4>
     <div class="col-12 d-flex flex-wrap float-end">
-        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->status == 'Active') badge-soft-success @elseif($workOrder->status == 'On Hold') badge-soft-info @endif"><strong>{{ strtoupper($workOrder->status) ?? '' }}</strong></label>
+        <label style="font-size: 119%; margin-right:3px;" class="float-end badge 
+            @if($workOrder->status == 'On Hold') badge-soft-warning
+            @elseif($workOrder->status == 'Active') badge-soft-success
+            @elseif($workOrder->status == 'Cancelled') badge-soft-danger
+            @elseif($workOrder->status == 'Succeeded') badge-soft-primary
+            @elseif($workOrder->status == 'Partially Delivered') badge-soft-info
+            @endif">
+            <strong>{{ strtoupper($workOrder->status) ?? ''}}</strong>
+        </label>
         <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">SALES SUPPORT : <strong>{{ strtoupper($workOrder->sales_support_data_confirmation) ?? ''}}</strong></label>
-        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">FINANCE : <strong>{{ strtoupper($workOrder->finance_approval_status) ?? ''}}</strong></label>
-        <label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO OFFICE : <strong>{{ strtoupper($workOrder->coo_approval_status) ?? ''}}</strong></label>
+        @if($workOrder->can_show_fin_approval == 'yes')<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">FINANCE : <strong>{{ strtoupper($workOrder->finance_approval_status) ?? ''}}</strong></label>@endif
+        @if($workOrder->can_show_coo_approval == 'yes')<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO OFFICE : <strong>{{ strtoupper($workOrder->coo_approval_status) ?? ''}}</strong></label>@endif
         @if(isset($workOrder))
             @if($workOrder->sales_support_data_confirmation_at != '' && 
                 $workOrder->finance_approval_status == 'Approved' && 
@@ -156,7 +164,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
         @include('work_order.export_exw.approvals')
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-        $isDisabled = isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '';
+        $hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+		$isDisabled = !$hasEditConfirmedPermission && isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '';
         @endphp
         @if ($hasPermission)
         <a title="Edit" class="btn btn-sm btn-info me-2 {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $workOrder->id ?? '') }}">
@@ -214,7 +223,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
                             <div class="col-lg-2 col-md-2 col-sm-6 col-12">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">{{ $workOrder->batch ?? '' }}</span></center>
+                                    <center><label for="choices-single-default" class="form-label"> <strong> Batch </strong></label> : <span class="data-font">@if($workOrder->is_batch == 0) Single @else {{$workOrder->batch ?? ''}} @endif</span></center>
                                 </div>
                             </div>
                         @endif
@@ -362,8 +371,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Delivery Advise </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{ $workOrder->delivery_advise ?? '' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Transfer Of Ownership </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{ $workOrder->showroom_transfer ?? '' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 @endif 
+                                                @if(isset($type) && $type == 'export_cnf')
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Cross Trade </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{ $workOrder->cross_trade ?? '' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                                 @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                                <label for="choices-single-default" class="form-label"> Temporary Exit </label>
+                                                            </div>
+                                                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                                <span class="data-font">{{ $workOrder->temporary_exit ?? '' }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-12">
                                                         <div class="row">
                                                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
@@ -727,7 +778,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <label for="choices-single-default" class="form-label"> Total Number Of BOE:</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span class="data-font">@if($workOrder->total_number_of_boe == 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
+                                                            <span class="data-font">@if($workOrder->total_number_of_boe != 0){{$workOrder->total_number_of_boe ?? ''}}@endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1007,6 +1058,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     </div>
                                                 @endif
                                             </div>  
+                                            <div class="row">
+                                                @if(isset($workOrder->boe) && count($workOrder->boe) > 0)
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                                        <table class="table table-striped table-editable table-edits table-condensed">
+                                                            <thead style="background-color: #e6f1ff">
+                                                                <tr>
+                                                                    <th>BOE Number</th>
+                                                                    <th>Declaration Number</th>
+                                                                    <th>Declaration date</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($workOrder->boe as $one)
+                                                                    <tr>
+                                                                        <td>{{ $one->boe ?? '' }}</td>
+                                                                        <td>{{ $one->declaration_number ?? ''}}</td>
+                                                                        <td>@if($one->declaration_date != ''){{\Carbon\Carbon::parse($one->declaration_date)->format('d M Y') ?? ''}}@endif</td>                               
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1031,7 +1106,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                     <th>Variant</th>
                                                     <th>Engine</th>
                                                     <th>Model Description</th>
+                                                    @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-modal-year']);
+                                                    @endphp
+                                                    @if ($hasPermission)
                                                     <th>Model Year</th>
+                                                    @endif
                                                     <th>Document Model Year</th>
                                                     <th>Steering</th>
                                                     <th>Exterior Colour</th>
@@ -1141,7 +1221,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         <td>{{$vehicle->variant ?? 'NA'}}</td>
                                                         <td>{{$vehicle->engine ?? 'NA'}}</td>
                                                         <td>{{$vehicle->model_description ?? 'NA'}}</td>
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-modal-year']);
+                                                        @endphp
+                                                        @if ($hasPermission)
                                                         <td>{{$vehicle->model_year ?? 'NA'}}</td>
+                                                        @endif
                                                         <td>{{$vehicle->model_year_to_mention_on_documents ?? 'NA'}}</td>
                                                         <td>{{$vehicle->steering ?? 'NA'}}</td>
                                                         <td>{{$vehicle->exterior_colour ?? 'NA'}}</td>
@@ -1312,24 +1397,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                         $badgeClass = 'badge-soft-warning';
                                                                     }
                                                                 @endphp
-                                                                <label style="font-size: 70%; margin-right:3px;" class="float-end badge {{ $badgeClass }}">
-                                                                    DELIVERY : <strong>{{ strtoupper($vehicle->delivery_status) ?? '' }}</strong>
-                                                                </label>
-                                                                
+                                                                <label style="font-size: 70%; margin-right: 3px;" class="float-end badge {{ $badgeClass }}">
+                                                                    DELIVERY : 
+                                                                    <strong>
+                                                                        @if(strtoupper($vehicle->delivery_status) == 'DELIVERED')
+                                                                            DELIVERED WITH DOCUMENTS
+                                                                        @elseif(strtoupper($vehicle->delivery_status) == 'DELIVERED WITH DOCS HOLD')
+                                                                            DELIVERED/DOCUMENTS HOLD
+                                                                        @else
+                                                                            {{ strtoupper($vehicle->delivery_status) ?? '' }}
+                                                                        @endif
+                                                                    </strong>
+                                                                </label>                                                           
                                                             </td>
                                                             @if($vehicle->delivery_status == 'Ready')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->delivery_at))
-                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivery_at)->format('d M Y, h:i:s A') }}
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivery_at)->format('d M Y') }}
                                                                     @endif
                                                                 </td> 
                                                                 <td colspan="3">Location : {{ $vehicle->latestDeliveryStatus->locationName->name ?? '' }}</td>
 
                                                             @elseif($vehicle->delivery_status == 'Delivered') 
                                                                 
-                                                                    <td colspan="5">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
+                                                                    <td colspan="2">GDN Number : {{ $vehicle->latestDeliveryStatus->gdn_number ?? '' }}</td>
+                                                                    <td colspan="3">Delivered At : @if(!empty($vehicle->latestDeliveryStatus->delivered_at)){{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->delivered_at)->format('d M Y') }}@endif</td>
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold')
                                                                 <td colspan="3">Delivery At : @if(!empty($vehicle->latestDeliveryStatus->doc_delivery_date))
-                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y, h:i:s A') }}
+                                                                        {{ \Carbon\Carbon::parse($vehicle->latestDeliveryStatus->doc_delivery_date)->format('d M Y') }}
                                                                     @endif
                                                                 </td> 
                                                             @endif
@@ -1338,7 +1432,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     @if($vehicle->delivery_status == 'Ready') 
                                                                         8
                                                                     @elseif($vehicle->delivery_status == 'Delivered') 
-                                                                        9
+                                                                        8
                                                                     @elseif($vehicle->delivery_status == 'On Hold') 
                                                                         13
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 
@@ -1348,7 +1442,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                                     @if($vehicle->delivery_status == 'Ready') 
                                                                         7
                                                                     @elseif($vehicle->delivery_status == 'Delivered')
-                                                                        8
+                                                                        7
                                                                     @elseif($vehicle->delivery_status == 'On Hold') 
                                                                         12
                                                                     @elseif($vehicle->delivery_status == 'Delivered With Docs Hold') 

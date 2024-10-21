@@ -193,10 +193,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	@endif
 	<div class="col-12 d-flex flex-wrap float-end">
 		@if(isset($workOrder))
-			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->status == 'Active') badge-soft-success @elseif($workOrder->status == 'On Hold') badge-soft-info @endif"><strong>{{ strtoupper($workOrder->status) ?? '' }}</strong></label>
+			<label style="font-size: 119%; margin-right:3px;" class="float-end badge 
+				@if($workOrder->status == 'On Hold') badge-soft-warning
+				@elseif($workOrder->status == 'Active') badge-soft-success
+				@elseif($workOrder->status == 'Cancelled') badge-soft-danger
+				@elseif($workOrder->status == 'Succeeded') badge-soft-primary
+				@elseif($workOrder->status == 'Partially Delivered') badge-soft-info
+				@endif">
+				<strong>{{ strtoupper($workOrder->status) ?? '' }}</strong>
+			</label>
 			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($workOrder->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif">SALES SUPPORT : <strong>{{ strtoupper($workOrder->sales_support_data_confirmation) ?? ''}}</strong></label>
-			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">FINANCE : <strong>{{ strtoupper($workOrder->finance_approval_status) ?? ''}}</strong></label>
-			<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO OFFICE : <strong>{{ strtoupper($workOrder->coo_approval_status) ?? ''}}</strong></label>
+			@if($workOrder->can_show_fin_approval == 'yes')<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->finance_approval_status == 'Pending') badge-soft-info @elseif($workOrder->finance_approval_status == 'Approved') badge-soft-success @elseif($workOrder->finance_approval_status == 'Rejected') badge-soft-danger @endif">FINANCE : <strong>{{ strtoupper($workOrder->finance_approval_status) ?? ''}}</strong></label>@endif
+			@if($workOrder->can_show_coo_approval == 'yes')<label style="font-size: 119%; margin-right:3px;" class="float-end badge @if($workOrder->coo_approval_status == 'Pending') badge-soft-info @elseif($workOrder->coo_approval_status == 'Approved') badge-soft-success @elseif($workOrder->coo_approval_status == 'Rejected') badge-soft-danger @endif">COO OFFICE : <strong>{{ strtoupper($workOrder->coo_approval_status) ?? ''}}</strong></label>@endif
 		@endif
 		@if(isset($workOrder))
             @if($workOrder->sales_support_data_confirmation_at != '' && 
@@ -287,19 +295,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<span class="error">* </span>
 						<label for="so_number" class="col-form-label text-md-end">{{ __('SO Number') }}</label>
 						<input id="so_number" name="so_number" type="text" class="form-control widthinput @error('so_number') is-invalid @enderror" placeholder="Enter SO Number"
-							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="setWo()">
+							value="{{ isset($workOrder) ? $workOrder->so_number : 'SO-00' }}" autocomplete="so_number" onkeyup="isSOExist()">
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
 					<div class="col-xxl-1 col-lg-2 col-md-2">
 						<label for="is_batch" class="col-form-label text-md-end">Is Batch ?</label></br>
 						<input type="checkbox" id="is_batch" name="is_batch" value="yes" class="custom-checkbox @error('is_batch') is-invalid @enderror" 
-							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()">				
+							autocomplete="is_batch" @if(isset($workOrder) && $workOrder->is_batch == 1) checked @endif onchange="toggleBatchDropdown()"
+							@if(isset($canDisableBatch) && $canDisableBatch == true) disabled @endif>				
 					</div>
 					<div class="col-xxl-2 col-lg-4 col-md-4 select-button-main-div">
 						<div id="batchDropdownSection" class="dropdown-option-div" style="display: @if(isset($workOrder) && $workOrder->is_batch == 1) block @else none @endif;">							
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
-							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()">
+							<select name="batch" id="batch" class="form-control widthinput" autofocus onchange="setWo()" @if(isset($canDisableBatch) && $canDisableBatch == true) disabled @endif>
 								<option value="">Choose Batch</option>
 								@for ($i = 1; $i <= 50; $i++)
 									<option value="Batch {{ $i }}" {{ isset($workOrder) && $workOrder->batch == "Batch $i" ? 'selected' : '' }}>Batch {{ $i }}</option>
@@ -414,36 +423,65 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
-						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
-						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
-							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
-							value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
-							<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
+							<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
+							<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
+								is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
+								value="" autocomplete="freight_agent_contact_number[full]" autofocus onkeyup="sanitizeNumberInput(this)">
+								<input type="hidden" id="freight_agent_contact_number_full" name="freight_agent_contact_number[full]" value="{{ isset($workOrder) ? $workOrder->freight_agent_contact_number : '' }}">
+						</div>
 					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<div class="row">
+							<div class="col-xxl-6 col-lg-6 col-md-6">
+								<label for="delivery_advise" class="col-form-label text-md-end">Delivery Advise</label></br>
+								<input type="checkbox" id="delivery_advise" name="delivery_advise" value="yes" class="custom-checkbox @error('delivery_advise') is-invalid @enderror" autocomplete="delivery_advise"
+									@if(isset($workOrder) && $workOrder->delivery_advise == 'yes') checked @endif>
+							</div>
+							<div class="col-xxl-6 col-lg-6 col-md-6">
+								<label for="showroom_transfer" class="col-form-label text-md-end">Transfer Of Ownership</label></br>
+								<input type="checkbox" id="showroom_transfer" name="showroom_transfer" value="yes" class="custom-checkbox @error('showroom_transfer') is-invalid @enderror" autocomplete="showroom_transfer"
+									@if(isset($workOrder) && $workOrder->showroom_transfer == 'yes') checked @endif>
+							</div>
+						</div>
+					</div>
+					@endif
+					@if(isset($type) && $type == 'export_cnf')
+					<div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="cross_trade" class="col-form-label text-md-end">Cross Trade</label></br>
+						<input type="checkbox" id="cross_trade" name="cross_trade" value="yes" class="custom-checkbox @error('cross_trade') is-invalid @enderror" autocomplete="cross_trade"
+								@if(isset($workOrder) && $workOrder->cross_trade == 'yes') checked @endif>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="temporary_exit" class="col-form-label text-md-end">Temporary Exit</label></br>
+						<input type="checkbox" id="temporary_exit" name="temporary_exit" value="yes" class="custom-checkbox @error('temporary_exit') is-invalid @enderror" autocomplete="temporary_exit"
+								@if(isset($workOrder) && $workOrder->temporary_exit == 'yes') checked @endif>
+					</div>
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
 							name="port_of_loading" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Port of Loading" value="{{ isset($workOrder) ? $workOrder->port_of_loading : '' }}" autocomplete="port_of_loading" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-2 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
 							name="port_of_discharge" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Port of Discharge" value="{{ isset($workOrder) ? $workOrder->port_of_discharge : '' }}" autocomplete="port_of_discharge" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-                        <span class="error">* </span>
+
+					<div class="{{ in_array($type, ['export_exw', 'export_cnf']) ? 'col-xxl-3 col-lg-6 col-md-6' : 'col-xxl-4 col-lg-6 col-md-6' }}">
+						<span class="error">* </span>
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
 							name="final_destination" onkeyup="sanitizeInput(this)"
 							placeholder="Enter Final Destination" value="{{ isset($workOrder) ? $workOrder->final_destination : '' }}" autocomplete="final_destination" autofocus>
 					</div>
+
 					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
@@ -1193,6 +1231,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		});	
 	}
 	$(document).ready(function () { 
+		$.ajaxSetup({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			}
+		});
 		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
 			  // Trigger a click on the submit button of the form
@@ -1783,17 +1826,24 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 		
 		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
-			// Select all input, select, and textarea elements and disable them
-			var elements = document.querySelectorAll('#WOForm #submit');
-			// #WOForm input, #WOForm select, #WOForm textarea, 
-			elements.forEach(function(element) {
-				element.disabled = true;
-			});
-			// Also disable the submit button with ID "submit-from-top"
-			var submitFromTopButton = document.getElementById('submit-from-top');
-			if (submitFromTopButton) {
-				submitFromTopButton.disabled = true;
-				submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+			// Inject the PHP check for the permission into JavaScript
+			var hasEditConfirmedPermission = <?php echo json_encode(Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order'])); ?>;			
+			// Determine if the form should be disabled
+			var isDisabled = !hasEditConfirmedPermission;
+			// If the user doesn't have permission and sales support data confirmation exists, disable the form
+			if (isDisabled) {
+				// Select all input, select, and textarea elements and disable them
+				var elements = document.querySelectorAll('#WOForm #submit');
+				// #WOForm input, #WOForm select, #WOForm textarea, 
+				elements.forEach(function(element) {
+					element.disabled = true;
+				});
+				// Also disable the submit button with ID "submit-from-top"
+				var submitFromTopButton = document.getElementById('submit-from-top');
+				if (submitFromTopButton) {
+					submitFromTopButton.disabled = true;
+					submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+				}
 			}
 		}
 		// Initialize mentions for the main comment textarea
@@ -2292,6 +2342,14 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#enduser_passport').prop('disabled', false).trigger('change');	
 				$('#enduser_contract').prop('disabled', false).trigger('change');	
 				$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
+				const isBatchElement = document.getElementById('is_batch');
+				if (isBatchElement) {
+				isBatchElement.disabled = false;
+				}
+				const batchElement = document.getElementById('batch');
+				if (batchElement) {
+				batchElement.disabled = false;
+				}
 				var table = document.getElementById('myTable');
 				if (table) {
 					var selects = table.querySelectorAll('select');
@@ -3442,14 +3500,95 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
         }
 	// CUSTOMER DETAILS SECTION END
-
+	function isSOExist() { console.log('inside isSOExist');
+		var SONumber = $('#so_number').val().trim();
+		var editWoId = '';
+		if(workOrder != null) {
+			editWoId = workOrder.id;
+		}
+		console.log("isEdit is - "+editWoId);
+		var selectedBatch = '';
+		// Ensure 'batch' exists before accessing its value
+		if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
+			selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
+		}
+		
+		if (SONumber === '') { // Check if SO Number is empty
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		// Step 1: Split the string to get the part after "SO-"
+		let parts = SONumber.split("SO-");
+		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		// Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
+		let numberPart = parts[1];
+		if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
+			document.getElementById('wo_number').value = ''; // Clear the WO Number field
+			return; // Exit the function
+		}
+		
+		if (type === 'local_sale') {
+			setWo();
+		} else {
+			$.ajax({
+				url: '/check-so-number',
+				method: 'POST',
+				data: {
+					_token: $('meta[name="csrf-token"]').attr('content'), // Add CSRF token
+					so_number: SONumber,
+					work_order_id: editWoId ? editWoId : null // If in edit mode, pass the work_order_id
+				},
+				success: function(response) { 
+					if (response.exists) { 
+						if(response.is_batch == '1') {
+							document.getElementById('is_batch').checked = true;
+							if(response.largest_batch != 0) {
+								if(workOrder != null && workOrder.so_number == SONumber) {
+									NextNum = response.largest_batch;
+								} else {
+									NextNum = response.largest_batch + 1;
+								}
+								document.getElementById('batch').value = "Batch "+NextNum; 
+								document.getElementById('batchDropdownSection').style.display = 'block'; 																							 
+							}
+							isBatchChecked = true;
+						} else {
+							document.getElementById('is_batch').checked = false;
+							document.getElementById('batch').value = null;  
+							document.getElementById('batchDropdownSection').style.display = 'none'; 
+							isBatchChecked = false;
+						} 
+						setWo();
+						document.getElementById('is_batch').disabled = true; 
+						document.getElementById('batch').disabled = true;  
+					} else {
+						document.getElementById('batch').value = null;    
+						document.getElementById('is_batch').checked = false;
+						document.getElementById('batchDropdownSection').style.display = 'none';
+						isBatchChecked = false;
+						setWo();
+						document.getElementById('is_batch').disabled = false; 
+						document.getElementById('batch').disabled = false;  
+					}
+				},
+				error: function(xhr) {
+					console.error(xhr.responseText); // Log errors
+				} 
+			}); 
+		}
+	}
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
     var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
     var selectedBatch = '';
     
     if (type == 'export_exw' || type == 'export_cnf') {
-        selectedBatch = $('#batch').val().trim(); // Get the value of the batch and trim any whitespace
+        selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
     }
     
     if (SONumber === '') { // Check if SO Number is empty
@@ -3480,7 +3619,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
     } else {
         if (isBatchChecked) {
             // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
-            let batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+            let batchNumber = '';
+			if (selectedBatch && typeof selectedBatch === 'string') {
+				batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+			}
             if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
                 document.getElementById('wo_number').value = ''; // Clear the WO Number field
                 return; // Exit the function
@@ -3489,19 +3631,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             // Format batch number as B01, B02, ..., B09, B10, etc.
             let formattedBatchNumber = batchNumber.padStart(2, '0');
 
-            // Construct the WO Number with batch information
-            WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
+		// Construct the WO Number with batch information
+		WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
         } else {
             // Construct the WO Number with "-SB" when the batch is not checked
             WONumber = "WO-" + numberPart + "-SW";
         }
     }
-    
-    // Set the WO Number field
-    document.getElementById('wo_number').value = WONumber;
-}
 
-
+		// Set the WO Number field
+		document.getElementById('wo_number').value = WONumber;
+	}
 
 	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 

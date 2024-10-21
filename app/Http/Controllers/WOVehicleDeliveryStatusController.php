@@ -17,6 +17,7 @@ class WOVehicleDeliveryStatusController extends Controller
 {
     public function updateVehDeliveryStatus(Request $request)
     {
+        // Validate the incoming request data
         $validatedData = $request->validate([
             'woVehicleId' => 'required|exists:w_o_vehicles,id',
             'status' => 'required|in:On Hold,Ready,Delivered,Delivered With Docs Hold',
@@ -24,6 +25,7 @@ class WOVehicleDeliveryStatusController extends Controller
             'doc_delivery_date' => 'nullable|date',
             'delivery_at' => 'nullable|date',
             'gdn_number' => 'nullable|string',
+            'delivered_at' => 'nullable|date',
             'location' => 'nullable|exists:master_office_locations,id', // Ensure it references a valid location
         ]);
 
@@ -36,6 +38,7 @@ class WOVehicleDeliveryStatusController extends Controller
             'doc_delivery_date' => $validatedData['doc_delivery_date'] ?? null,
             'delivery_at' => $validatedData['delivery_at'] ?? null,
             'gdn_number' => $validatedData['gdn_number'] ?? null,
+            'delivered_at' => $validatedData['delivered_at'] ?? null,
             'location' => $validatedData['location'] ?? null,
         ]);
 
@@ -43,18 +46,31 @@ class WOVehicleDeliveryStatusController extends Controller
         $woVehicle = WOVehicles::findOrFail($validatedData['woVehicleId']);
         $workOrder = $woVehicle->workOrder;
 
-        // Define recipient emails based on status
-        $recipients = [];
-        $managementEmail = filter_var(env('MANAGEMENT_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
-        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL) ?: 'no-reply@milele.com';
+        // Retrieve email addresses from the users table where can_send_wo_email is true
+        $managementEmails = \App\Models\User::where('can_send_wo_email', true)->pluck('email')->filter(function($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        })->toArray();
+        // Retrieve and validate other recipients' emails
+        $operationsEmail = filter_var(env('OPERATIONS_TEAM_EMAIL'), FILTER_VALIDATE_EMAIL);
         $createdByEmail = filter_var(optional($workOrder->CreatedBy)->email, FILTER_VALIDATE_EMAIL);
         $salesPersonEmail = filter_var(optional($workOrder->salesPerson)->email, FILTER_VALIDATE_EMAIL);
-        $customerEmail = filter_var($workOrder->customer_email ?? null, FILTER_VALIDATE_EMAIL); // Assume work order has customer email
-
-        // Basic recipient list (management, operations, and created by user)
-        $recipients = [$managementEmail, $operationsEmail, $createdByEmail];
-
-        // Add sales person to the recipient list if the condition is met
+        // $customerEmail = filter_var($workOrder->customer_email ?? null, FILTER_VALIDATE_EMAIL);
+        $customerEmail = '';
+        // Log email recipients for debugging
+        \Log::info('Email Recipients:', [
+            'managementEmails' => $managementEmails,
+            'operationsEmail' => $operationsEmail,
+            'createdByEmail' => $createdByEmail,
+            'salesPersonEmail' => $salesPersonEmail,
+            'customerEmail' => $customerEmail,
+        ]);
+        // Initialize recipient list with management emails from the database and operations email
+        $recipients = array_filter(array_merge($managementEmails, [$operationsEmail]));
+        // Add createdByEmail if valid
+        if ($createdByEmail) {
+            $recipients[] = $createdByEmail;
+        }
+        // Add salesPersonEmail if it meets the condition
         if ($workOrder->salesPerson && $salesPersonEmail && $createdByEmail !== $salesPersonEmail) {
             $recipients[] = $salesPersonEmail;
         }
@@ -64,23 +80,10 @@ class WOVehicleDeliveryStatusController extends Controller
             $recipients[] = $customerEmail;
         }
 
-        // Log email recipients for debugging
-        \Log::info('Email Recipients:', [
-            'managementEmail' => $managementEmail,
-            'operationsEmail' => $operationsEmail,
-            'createdByEmail' => $createdByEmail,
-            'salesPersonEmail' => $salesPersonEmail,
-            'customerEmail' => $customerEmail,
-        ]);
-
-        // Handle invalid email addresses
-        if (!$managementEmail || !$operationsEmail || !$createdByEmail) {
-            \Log::error('Invalid email addresses provided:', [
-                'managementEmail' => env('MANAGEMENT_TEAM_EMAIL'),
-                'operationsEmail' => env('OPERATIONS_TEAM_EMAIL'),
-                'createdByEmail' => $createdByEmail,
-            ]);
-            throw new \Exception('One or more email addresses are invalid.');
+        // If no valid recipients, skip sending the email and log the issue
+        if (empty($recipients)) {
+            \Log::info('No valid recipients found. Skipping email sending for WO-' . $workOrder->wo_number);
+            return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);
         }
 
         // Prepare the email subject based on status
@@ -105,7 +108,7 @@ class WOVehicleDeliveryStatusController extends Controller
             'status' => $statusName,
             'datetime' => Carbon::now(),
             'statusTracking' => $statusTracking,
-            'isCustomerEmail' => $validatedData['status'] === 'Ready' ? true : false, // To control the view for customer email
+            'isCustomerEmail' => $validatedData['status'] === 'Ready', // To control the view for customer email
         ], function ($message) use ($subject, $recipients) {
             $message->from('no-reply@milele.com', 'Milele Matrix')
                     ->to($recipients)
@@ -115,6 +118,7 @@ class WOVehicleDeliveryStatusController extends Controller
         // Return a JSON response indicating success
         return response()->json(['message' => 'Status updated successfully', 'data' => $statusTracking]);
     }
+
 
     public function vehDeliveryStatusHistory($woVehicleId)
     {

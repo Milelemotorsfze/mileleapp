@@ -38,6 +38,7 @@ class WOVehicles extends Model
         'deleted_by',
         'deposit_received',
         'deleted_comment_id',
+        'wo_boe_id',
     ];
     protected $appends = [
         'certification_per_vin_name',
@@ -68,9 +69,12 @@ class WOVehicles extends Model
         return $certification;
     }
     public function getModificationStatusAttribute() {
-        // Set default status to 'Not Initiated'
-        $status = 'Not Initiated';
-    
+        // if($this->sales_support_data_confirmation_at != '' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved') {
+            $status = 'Not Initiated';
+        // }
+        // else {
+        //     $status = 'Blank';
+        // }
         // Get the latest modification status from the database
         $data = WOVehicleStatus::where('w_o_vehicle_id', $this->id)
                                 ->orderBy('created_at', 'DESC')
