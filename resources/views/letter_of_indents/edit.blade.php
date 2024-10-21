@@ -214,7 +214,7 @@
                                     <!-- consider the LOI selected customer passport or any doc and current passport or any doc, it may differ -->
                                 @if($isCustomerPassport)
                                 
-                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
                                         <h6> Passport </h6>
                                         <iframe src="{{ url('storage/app/public/passports/'.$isCustomerPassport->loi_document_file) }}"></iframe>
                                         <button type="button" hidden id="add-old-passport" class="btn btn-info btn-sm text-center mt-2 add-passport-button"
@@ -226,7 +226,7 @@
                                     </div>
                                     @if($isCustomerPassport->loi_document_file != $letterOfIndent->client->passport)
                                     
-                                        <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
                                             <h6> Latest Passport </h6>
                                             <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
                                             <button type="button" id="add-new-passport" onclick="addLatestPassportToLOI()" class="btn btn-info btn-sm text-center mt-2">
@@ -235,7 +235,7 @@
                                         </div> 
                                     @endif
                                 @elseif($letterOfIndent->client->passport)          
-                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
                                         <h6> Passport </h6>
                                         <iframe src="{{ url('storage/app/public/passports/'.$letterOfIndent->client->passport) }}"></iframe>
                                         <button type="button" onclick="addPassportToLOI()" class="btn btn-info btn-sm text-center mt-2 add-passport-button">
@@ -245,16 +245,26 @@
                                     </div>  
                                 @endif
                                 @if($isCustomerTradeLicense)  
-                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
                                         <h6> Trade License </h6>
                                         <iframe src="{{ url('storage/app/public/tradelicenses/'.$isCustomerTradeLicense->loi_document_file) }}"></iframe>
-                                        <button type="button" hidden onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
+                                        <button type="button" hidden  id="add-old-trade-license" onclick="addTradeDocToLOI()" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button">
                                         Add to LOI </button>    
-                                        <button type="button" onclick="removeTradeDocFromLOI()"  class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
+                                        <button type="button" onclick="removeTradeDocFromLOI()"  id="remove-old-trade-license" class="btn btn-danger btn-sm text-center mt-2 remove-trade-license-button">
                                         Remove From LOI </button>
                                     </div>
+                                @if($isCustomerTradeLicense->loi_document_file != $letterOfIndent->client->tradelicense)
+                                
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
+                                        <h6> Latest Trade License </h6>
+                                        <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
+                                        <button type="button" id="add-new-trade-license" onclick="addLatestTradeLicenseToLOI()" class="btn btn-info btn-sm text-center mt-2">
+                                            Add to LOI </button>
+                                        <button type="button" id="remove-new-trade-license" hidden onclick="removeLatestTradeLicenseToLOI()" class="btn btn-danger btn-sm text-center mt-2">                                        Remove From LOI </button>               
+                                    </div> 
+                                @endif
                                 @elseif($letterOfIndent->client->tradelicense)
-                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 text-center mb-2">
                                         <h6> Trade License  </h6>
                                         <iframe src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndent->client->tradelicense) }}"></iframe>
                                         <button type="button" class="btn btn-info btn-sm text-center mt-2 add-trade-license-button"
@@ -432,7 +442,7 @@
                     <select name="customer_other_documents_Ids[]" id="added-customer-docs" hidden="hidden" multiple>
                     </select>
                     <input type="hidden" value="{{ $isCustomerPassport ? 1 : 0 }}" current-data="{{ $isCustomerPassport ? 1 : 0 }}" name="is_passport_added" id="add-passport-to-loi">
-                    <input type="hidden" value="{{ $isCustomerTradeLicense ? 1 : 0 }}" name="is_trade_license_added" id="add-trade-license-to-loi">
+                    <input type="hidden" value="{{ $isCustomerTradeLicense ? 1 : 0 }}" current-data="{{ $isCustomerTradeLicense ? 1 : 0 }}"  name="is_trade_license_added" id="add-trade-license-to-loi">
                     
                     <!-- <input type="hidden" id="other-document-count" value="{{ $customerOtherDocAdded->count() }}" > -->
                     <div class="col-12 text-center">
@@ -815,7 +825,35 @@
                     }
                   }
             }
+            function addLatestTradeLicenseToLOI() {
+                var confirm = alertify.confirm('Are you sure ?  while adding latest tradeLicense the old tradeLicense will remove by default',function (e) {
+                   // if value 2 remove old passport and add latest passport for the loi
+                //    if value 1 chcek passport is alredy existing or not , if not existing create new loi document
+                // if value 0 remove all the passport
+                    $('#add-trade-license-to-loi').val(2);
+                    $('#add-old-trade-license').addClass('disabled');
+                    $('#remove-old-trade-license').addClass('disabled');
 
+                    $('#add-new-trade-license').attr('hidden', true);
+                    $('#remove-new-trade-license').attr('hidden', false);
+
+                }).set({title:"Alert !"})
+            }
+            function removeLatestTradeLicenseToLOI() {
+                var confirm = alertify.confirm('Are you sure ? while removing latest tradeLicense the old tradeLicense will add by default!',function (e) {
+                   // if value 2 remove old passport and add latest passport for the loi
+                //    if value 1 chcek passport is alredy existing or not , if not existing create new loi document
+                // if value 0 remove all the passport
+                    let value =$('#add-trade-license-to-loi').attr("current-data");
+                    $('#add-trade-license-to-loi').val(value);
+                    $('#add-old-trade-license').removeClass('disabled');
+                    $('#remove-old-trade-license').removeClass('disabled');
+
+                    $('#add-new-trade-license').attr('hidden', false);
+                    $('#remove-new-trade-license').attr('hidden', true);
+
+                }).set({title:"Alert !"})
+            }
             function addLatestPassportToLOI() {
                 var confirm = alertify.confirm('Are you sure ?  while adding latest passport the old passport will remove by default',function (e) {
                    // if value 2 remove old passport and add latest passport for the loi
@@ -830,9 +868,8 @@
 
                 }).set({title:"Alert !"})
                
-                // let type = 'add';
-                // updateDocumentCount(type);
             }
+            
             function removeLatestPassportToLOI() {
                 var confirm = alertify.confirm('Are you sure ? while removing latest passport the old passport will add by default!',function (e) {
                    // if value 2 remove old passport and add latest passport for the loi
