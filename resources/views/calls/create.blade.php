@@ -111,15 +111,15 @@ input[type=number]::-webkit-outer-spin-button {
                     </datalist>
                     </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
-    <datalist id="laList">
-    @foreach ($Language as $language)
-        <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
-    @endforeach
-    </datalist>
-</div>
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
+                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
+                    <datalist id="laList">
+                    @foreach ($Language as $language)
+                        <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
+                    @endforeach
+                    </datalist>
+                </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>

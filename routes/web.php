@@ -124,6 +124,8 @@ use App\Http\Controllers\AccessController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
+use App\Http\Controllers\LeadChatController;
+
 
 /*
 /*
@@ -1037,5 +1039,11 @@ Route::get('/d', function () {
     Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
     Route::post('/update-call-client', [DailyleadsController::class, 'updateCallClient'])->name('update-call-client');
     Route::get('/callsdeatilspage/{id}', [DailyleadsController::class, 'leaddetailpage'])->name('calls.leaddetailpage');
+    Route::post('/leads/update', [DailyleadsController::class, 'leaddeupdate'])->name('calls.leaddeupdate');
+    Route::post('/add-model-line', [DailyleadsController::class, 'addModelLine']);
+    Route::post('/remove-model-line/{id}', [DailyleadsController::class, 'removeModelLine']);
+    Route::post('/messages', [DailyleadsController::class, 'storeMessages']);
+    Route::post('/replies', [DailyleadsController::class, 'storeReply']);
+    Route::get('/messages/{leadid}', [DailyleadsController::class, 'indexmessages']);
 });
 

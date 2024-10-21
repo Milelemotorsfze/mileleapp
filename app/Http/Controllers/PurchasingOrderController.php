@@ -3964,7 +3964,6 @@ public function storeMessages(Request $request)
             'user_id' => auth()->id(),
             'message' => $request->message
         ]);
-
         return response()->json($message->load('user'));
     }
     public function storeReply(Request $request)

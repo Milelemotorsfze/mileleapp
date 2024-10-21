@@ -11,6 +11,7 @@ use App\Models\CallsRequirement;
 use App\Models\ModelHasRoles;
 use Illuminate\Http\Request;
 use App\Models\Quotation;
+use App\Models\Language;
 use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\LeadSource;
@@ -23,6 +24,8 @@ use App\Models\Salesdemand;
 use App\Models\SalespersonOfClients;
 use App\Models\Negotiation;
 use App\Models\Booking;
+use App\Models\LeadChat;
+use App\Models\LeadChatReply;
 use App\Models\Clients;
 use App\Models\ClientLeads;
 use Carbon\Carbon;
@@ -860,6 +863,69 @@ public function updateCallClient(Request $request)
 public function leaddetailpage($id)
 {
     $lead = Calls::find($id);
-    return view('dailyleads.leads', compact('lead'));
+    $languages = Language::all();
+    $countries = CountryListFacade::getList('en');
+    $requirements = CallsRequirement::where('lead_id', $id)->with(['masterModelLine.brand'])->get();
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements'));
 }
+public function leaddeupdate(Request $request)
+{
+    $request->validate([
+        'field' => 'required|string',
+        'value' => 'required',
+        'lead_id' => 'required|exists:calls,id',
+    ]);
+    $lead = Calls::find($request->lead_id);
+    $lead->{$request->field} = $request->value;
+    $lead->save();
+    return response()->json(['success' => true]);
 }
+public function addModelLine(Request $request)
+{
+    // Validate and store the new model line
+    $requirement = CallsRequirement::create([
+        'lead_id' => $request->lead_id,
+        'brand' => $request->brand,
+        'model_line' => $request->model_line,
+    ]);
+
+    // Return the newly created model line as a response
+    return response()->json($requirement);
+}
+
+public function removeModelLine($id)
+{
+    // Find and delete the model line
+    $requirement = CallsRequirement::find($id);
+    $requirement->delete();
+    return response()->json(['success' => true]);
+}
+public function storeMessages(Request $request)
+    {
+        $message = LeadChat::create([
+            'lead_id' => $request->leadid,
+            'user_id' => auth()->id(),
+            'message' => $request->message
+        ]);
+        return response()->json($message->load('user'));
+    }
+    public function storeReply(Request $request)
+    {
+        $reply = LeadChatReply::create([
+            'chat_id' => $request->message_id,
+            'user_id' => auth()->id(),
+            'reply' => $request->reply
+        ]);
+
+        return response()->json($reply->load('user'));
+    }
+    public function indexmessages($leadid)
+    {
+        $messages = LeadChat::where('lead_id', $leadid)
+                            ->with('user', 'replies.user')
+                            ->get();
+
+        return response()->json($messages);
+    }
+}
+
