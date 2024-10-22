@@ -1,5 +1,4 @@
 <head>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
     <style>
         .select2-container {
             width: 100% !important;
@@ -125,14 +124,11 @@
         </table>
     </div>
 </div>
-<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 
 <script type="text/javascript">
      $(document).ready(function() {
-       // Initialize an empty Set to store unique VINs
        const uniqueVins = new Set();
 
-        // Loop through each element with the class 'vin-class' to extract VINs
         $('.vin-class').each(function() {
             const vin = $(this).text().trim();
             if (vin) {
@@ -140,32 +136,26 @@
             }
         });
 
-        // Convert the Set to an array and sort it
         const sortedVins = Array.from(uniqueVins).sort();
 
-        // Populate the dropdown with the sorted unique VINs
         sortedVins.forEach(function(vin) {
             $('#vin-filter').append(new Option(vin, vin));
         });
 
-        // Initialize Select2 on the #vin-filter element
         $('#vin-filter').select2({
             placeholder: 'Select VIN',
             allowClear: true
         });
 
-        // Event handler for the change event of the dropdown
         $('#vin-filter').on('change', function() {
             const selectedVins = $(this).val();
             
             if (selectedVins && selectedVins.length > 0) {
-                // Show rows with the selected VINs and their service breakdown
                 $('.vehicle-row, .service-breakdown').hide();
                 selectedVins.forEach(function(vin) {
                     $(`.vehicle-row[data-vin="${vin}"], .service-breakdown[data-vin="${vin}"]`).show();
                 });
             } else {
-                // Show all rows if no VIN is selected
                 $('.vehicle-row, .service-breakdown').show();
             }
         });

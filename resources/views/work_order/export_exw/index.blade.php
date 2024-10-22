@@ -1,37 +1,30 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-<!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script> -->
 <style>
-	/* Tooltip container */
 	.tooltip-container {
 		position: relative;
 		display: inline-block;
 		cursor: pointer;
 	}
-
-	/* Tooltip text */
 	.tooltip-text {
 		visibility: hidden;
-		width: 300px; /* Adjust width as needed */
-		background-color: #e1efff; /* Light blue background */
+		width: 300px; 
+		background-color: #e1efff; 
 		color: #000;
 		text-align: left;
 		border-radius: 5px;
 		padding: 10px;
 		position: absolute;
 		z-index: 1;
-		right: -320px; /* Position to the right of the status label */
+		right: -320px; 
 		top: 50%;
 		transform: translateY(-50%);
-		border: 1px solid #99c2ff; /* Border color for the tooltip */
+		border: 1px solid #99c2ff; 
 		font-size: 14px;
 		opacity: 0;
 		transition: opacity 0.3s ease-in-out;
 		box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
 	}
-
-	/* Tooltip header styling */
 	.tooltip-header {
 		font-weight: bold;
 		background-color: #b4d2f7;
@@ -39,19 +32,14 @@
 		border-bottom: 1px solid #99c2ff;
 		text-align: center;
 	}
-
-	/* Tooltip body */
 	.tooltip-body {
 		padding: 10px;
-		white-space: pre-line; /* Ensures the text breaks into multiple lines */
+		white-space: pre-line; 
 	}
-
-	/* Show the tooltip text on hover */
 	.tooltip-container:hover .tooltip-text {
 		visibility: visible;
 		opacity: 1;
 	}
-
 	.btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;
@@ -63,57 +51,70 @@
 		font-size:12px!important;
 	}
 	.form-label {
-	margin-top: 0.5rem;
+		margin-top: 0.5rem;
 	}
 	.iti {
-	width: 100%;
+		width: 100%;
 	}
 	.texttransform {
-	text-transform: capitalize;
+		text-transform: capitalize;
 	}
 	.light {
-	background-color:#e6e6e6!important;
-	font-weight: 700!important;
+		background-color:#e6e6e6!important;
+		font-weight: 700!important;
 	}
 	.dark {
-	background-color:#d9d9d9!important;
-	font-weight: 700!important;
+		background-color:#d9d9d9!important;
+		font-weight: 700!important;
 	}
 	.paragraph-class {
-	color: red;
-	font-size:11px;
+		color: red;
+		font-size:11px;
 	}
 	.other-error {
-	color: red;
+		color: red;
 	}
 </style>
 @section('content')
 <div class="card-header">
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
+		$canViewWOList = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list',
+			'list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo',
+			'view-current-user-local-sale-wo-list','list-lto-wo']);
+		$canCreateWO = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo',
+			'create-local-sale-wo']);
+		$canViewWODetails = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details',
+			'export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
+		$caneditWO = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order',
+			'edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order',
+			'edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
+		$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+		$canViewFinLog = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+		$canViewCOOLog = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+		$canChangeDocStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
+		$canViewDocLog = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
+		$canChangeWOStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
+		$canViewWOStatusLog = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
 	@endphp
-	@if ($hasPermission)
+	@if ($canViewWOList)
 	<h4 class="card-title">
     @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @elseif(isset($type) && $type == 'all') All @elseif(isset($type) && $type == 'status_report') Status Report - @endif Work Order Info
 	</h4>
 	@endif
-	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo']);
-	@endphp
-	@if ($hasPermission)
+	@if ($canCreateWO)
 		@if(isset($type) && ($type == 'all' || $type == 'status_report'))
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','local_sale')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
 		</a>
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_cnf')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Export CNF Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Export CNF Work Order 
 		</a>
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_exw')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
 		</a>
 		@elseif(isset($type) && ($type != 'all' || $type != 'status_report'))
 			<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
-			<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
+				<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
 			</a>
 		@endif
 	@endif
@@ -123,7 +124,7 @@
 		<button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
 		<ul>
 			@foreach ($errors->all() as $error)
-			<li>{{ $error }}</li>
+				<li>{{ $error }}</li>
 			@endforeach
 		</ul>
 	</div>
@@ -141,10 +142,7 @@
 	</div>
 	@endif
 </div>
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
-@endphp
-@if ($hasPermission)
+@if ($canViewWOList)
 <div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
 			<div class="row">
@@ -410,10 +408,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-start">
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
-                                        @endphp
-                                        @if ($hasPermission)
+                                        @if ($canViewWODetails)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i> View Details
@@ -422,22 +417,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         @endif
 
 										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-										$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
 										$isDisabled = !$hasEditConfirmedPermission && $data->sales_support_data_confirmation_at != '';
 										@endphp
-                                        @if ($hasPermission)
+                                        @if ($caneditWO)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $data->id ?? '') }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
 										@endif
-
-										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
-                                        @endphp
-                                        @if ($hasPermission)
+                                        @if ($canViewFinLog)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Finance Approval History" class="btn btn-sm btn-info" href="{{route('fetchFinanceApprovalHistory',$data->id)}}">
                                             <i class="fa fa-history" aria-hidden="true"></i> 
@@ -446,10 +435,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         </li>
 										@endif
 
-										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
-                                        @endphp
-                                        @if ($hasPermission)
+										
+                                        @if ($canViewCOOLog)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="COO Office Approval History" class="btn btn-sm btn-info" href="{{route('fetchCooApprovalHistory',$data->id)}}">
                                             <i class="fa fa-history" aria-hidden="true"></i> COO Approval Log
@@ -459,19 +446,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 										@if($data->sales_support_data_confirmation_at != '' && 
 											$data->finance_approval_status == 'Approved' && 
 											$data->coo_approval_status == 'Approved')
-											@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
-											@endphp
-											@if ($hasPermission)
+											
+											@if ($canChangeDocStatus)
 												<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateDocStatusModal_{{$data->id}}">
 													<i class="fa fa-file" aria-hidden="true"></i> Update Doc Status
 												</a>
 											@endif
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canViewDocLog)
 											<li>
 												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
 													href="{{route('docStatusHistory',$data->id)}}">
@@ -479,18 +462,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 												</a>
 											</li>
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canChangeWOStatus)
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateStatusModal_{{$data->id}}">
 												<i class="fa fa-file" aria-hidden="true"></i> Update Status
 											</a>
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canViewWOStatusLog)
 											<li>
 												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
 													href="{{route('woStatusHistory',$data->id)}}">
@@ -542,7 +521,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 											<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
 										</label>
 										@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
-											<!-- Tooltip structure with "Remarks" as a title -->
 											<div class="tooltip-text">
 												<div class="tooltip-header">Remarks</div>
 												<div class="tooltip-body">
@@ -821,7 +799,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 		$('#apply-filters').on('click', function(e) {
 			e.preventDefault();
 
-			// Capture selected filter inputs
 			let filterData = {
 				status_filter: $('#status-filter').val(),
 				sales_support_filter: $('#sales-support-filter').val(),
@@ -832,12 +809,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				pdi_filter: $('#pdi-filter').val(),
 				delivery_filter: $('#delivery-filter').val(),
 				type: "{{ isset($type) ? $type : '' }}",
-				_token: '{{ csrf_token() }}' // Laravel CSRF protection
+				_token: '{{ csrf_token() }}' 
 			};
 
-			// Send the data to the backend via AJAX
 			$.post("{{ route('save.filters') }}", filterData, function(response) {
-				// On success, reload the page with the filters applied
 				window.location.href = "{{ route('work-order.index', '') }}/" + filterData.type;
 			}).fail(function() {
 				alert("Failed to apply filters. Please try again.");
@@ -845,39 +820,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 		});
 
 		$('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
-			// Get the `data-id` attribute of the row or use the associated `id` for redirection
 			let row = $(this).closest('tr');
-			let workOrderId = row.data('id'); // Assuming your row has a data-id attribute
+			let workOrderId = row.data('id'); 
 
 			if (workOrderId) {
-				// Redirect to the "show details" page for that work order
 				window.location.href = `/work-order/${workOrderId}`;
 			}
 		});
-        // Initialize DataTable with default 100 entries
         var table = $('.my-datatable').DataTable({
-            "pageLength": 100, // Set the default number of entries to display
-            "lengthMenu": [10, 25, 50, 100, 200], // Options for number of entries per page
-            "order": [], // Disable initial sorting if you don't want any column sorted on load
+            "pageLength": 100, 
+            "lengthMenu": [10, 25, 50, 100, 200], 
+            "order": [], 
             "columnDefs": [{
-                "targets": 'no-sort', // Apply 'no-sort' class to columns you want unsorted by default
+                "targets": 'no-sort', 
                 "orderable": false,
             }],
             "initComplete": function(settings, json) {
-                // Loop through each column
                 this.api().columns().every(function() {
                     var column = this;
                     var allEmpty = true;
 
-                    // Check if all cells in the column are empty in the current page
                     column.data().each(function(data, index) {
                         if (data && $.trim(data) !== '') {
                             allEmpty = false;
-                            return false; // Break out of the loop
+                            return false; 
                         }
                     });
 
-                    // Hide the column if all cells are empty
                     if (allEmpty) {
                         column.visible(false);
                     }
@@ -885,12 +854,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
             }
         });
     });
-    // Setup AJAX with CSRF token
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 </script>
-
 @endpush

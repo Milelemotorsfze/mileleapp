@@ -8,20 +8,18 @@
             margin-bottom: 20px;
         }
         .reply {
-            margin-left: 30px; /* Indent replies by 40px */
+            margin-left: 30px; 
             margin-top: 10px;
         }
         .reply-button {
             margin-top: 10px;
         }
         .replies {
-            margin-left: 30px; /* Indent nested replies by 40px */
+            margin-left: 30px; 
         }
 	.texttransform {
 	text-transform: capitalize;
 	}
-	/* element.style {
-	} */
 	.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
 	width: 99%;
 	border: 1px solid #4ba6ef !important;
@@ -49,49 +47,39 @@
 		-webkit-box-shadow: inset 0 0 0 0px var(--bs-table-accent-bg)!important;
 	}
     table {
-        /* border-collapse: collapse; */
         width: 100%;
     }
     th {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
 	td {
 		font-size:12px!important;
-		/* font-size:15px!important; */
 	}
-    /* table.dataTable {
-        border-collapse: none!important;
-    } */
-
-/* Style for the table headers */
 .my-datatable th {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
-    padding: 2px; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef; 
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 2px; 
+    text-align: left; 
 }
 
-/* Style for the table cells */
 .my-datatable td {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
-    padding: 2px; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef; 
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 2px; 
+    text-align: left; 
 }
 
-/* Style for the entire table */
 .my-datatable {
-    border-collapse: collapse; /* Ensure borders do not double */
-    width: 100%; /* Make the table take up the full width */
+    border-collapse: collapse; 
+    width: 100%; 
 }
 
 .custom-border-top {
-    border-top: 2px solid #b3b3b3; /* Add a custom top border to rows with this class */
+    border-top: 2px solid #b3b3b3; 
 }
 </style>
 @section('content')
@@ -120,7 +108,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                 $workOrder->coo_approval_status == 'Approved') 
 
                 @php
-                    // Determine the badge class based on docs_status
                     $badgeClass = '';
                     if ($workOrder->docs_status == 'In Progress') {
                         $badgeClass = 'badge-soft-info';
@@ -130,7 +117,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                         $badgeClass = 'badge-soft-danger';
                     }
 
-                    // Determine the label text based on docs_status
                     $labelText = '';
                     if ($workOrder->docs_status == 'In Progress' || $workOrder->docs_status == 'Not Initiated') {
                         $labelText = 'Documentation :';
@@ -240,9 +226,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                             <li class="nav-item">
                                 <a class="nav-link active form-label" data-bs-toggle="pill" href="#general-info"> General and Vehicles-Addons Info</a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link form-label" data-bs-toggle="pill" href="#vehicles_addons"> Vehicles & Addons</a>
-                            </li> -->
                             <li class="nav-item">
                                 <a class="nav-link form-label" data-bs-toggle="pill" href="#documents"> Documents</a>
                             </li>
@@ -1086,8 +1069,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                     </div>
                                 </div>
                             </div>
-                        <!-- </div> -->
-                        <!-- <div class="tab-pane fade" id="vehicles_addons"> -->
                             <div class="card">
                                 <div class="card-header" style="background-color : #e8f3fd!important;">
                                     <h4 class="card-title">
@@ -1259,7 +1240,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <td></td>
                                                             <td>
                                                                 @php
-                                                                    // Determine the badge class based on modification_status
                                                                     $badgeClass = '';
                                                                     if ($vehicle->modification_status == 'Initiated') {
                                                                         $badgeClass = 'badge-soft-info';
@@ -1318,7 +1298,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <td></td>
                                                             <td>
                                                                 @php
-                                                                    // Determine the badge class based on pdi_status
                                                                     $badgeClass = '';
                                                                     if ($vehicle->pdi_status == 'Scheduled') {
                                                                         $badgeClass = 'badge-soft-info';
@@ -1385,7 +1364,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                             <td></td>
                                                             <td>
                                                                 @php
-                                                                    // Determine the badge class based on delivery_status
                                                                     $badgeClass = '';
                                                                     if ($vehicle->delivery_status == 'Ready') {
                                                                         $badgeClass = 'badge-soft-info';
@@ -1719,11 +1697,4 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-<!-- <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script> -->
-<!-- <script type="text/javascript">
-    $(document).ready(function () { 
-		// $('.my-datatable').DataTable();
-    });
-</script> -->
 @endsection
