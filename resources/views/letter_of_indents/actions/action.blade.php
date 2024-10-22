@@ -29,7 +29,7 @@
         </li>
         @endif
     @endcan
-    @if($type !== 'SUPPLIER_RESPONSE')
+    @if($type != 'SUPPLIER_RESPONSE' && $type !='WAITING_FOR_TTC_APPROVAL')
         @can('LOI-edit')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');

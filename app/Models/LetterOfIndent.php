@@ -30,7 +30,7 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_EXPIRED = "Expired";
 
     // delete total loi qty when po section live.
-    protected $appends = [
+    protected $appends = [  
         'total_loi_quantity',
     ];
 

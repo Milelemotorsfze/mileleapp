@@ -45,7 +45,6 @@ class LetterOfIndentController extends Controller
      */
     public function index(Builder $builder, Request $request)
     {
-
         (new UserActivityController)->createActivity('Open LOI Listing Page.');
 
         $tab = $request->tab;
@@ -77,7 +76,9 @@ class LetterOfIndentController extends Controller
                 $data = $data->where('submission_status', LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL);
 
             }else if($request->tab == 'SUPPLIER_RESPONSE'){
-                    $data = $data->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED]);
+                    $data = $data->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,
+                    LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED,LetterOfIndent::LOI_STATUS_TTC_APPROVED,
+                    LetterOfIndent::LOI_STATUS_TTC_REJECTED]);
             }
             
         if (request()->ajax()) {
@@ -166,6 +167,12 @@ class LetterOfIndentController extends Controller
                             return '<button class="btn btn-sm btn-success">'.$msg.'</button>';
                         }else if($query->submission_status == LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED){
                             $msg = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+                            return '<button class="btn btn-sm btn-danger">'.$msg.'</button>';
+                        }else if($query->submission_status == LetterOfIndent::LOI_STATUS_TTC_APPROVED){
+                            $msg = LetterOfIndent::LOI_STATUS_TTC_APPROVED;
+                            return '<button class="btn btn-sm btn-success">'.$msg.'</button>';
+                        }else if($query->submission_status == LetterOfIndent::LOI_STATUS_TTC_REJECTED){
+                            $msg = LetterOfIndent::LOI_STATUS_TTC_REJECTED;
                             return '<button class="btn btn-sm btn-danger">'.$msg.'</button>';
                         }
                     }
@@ -897,6 +904,7 @@ class LetterOfIndentController extends Controller
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();
                 $updatedRows = [];
                 $quantities = $request->quantity;
+                $isTTCApprovalRequired = 0;
                 foreach ($quantities as $key => $quantity) {
                     $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
@@ -904,6 +912,28 @@ class LetterOfIndentController extends Controller
 
                     if($masterModel) 
                     {
+                        if($isTTCApprovalRequired == 0) {
+                            $possibleMasterModels = MasterModel::where('sfx', $request->sfx[$key])
+                                                ->where('model', $request->models[$key])->pluck('id');
+                                                info("possible models");
+                                                info($possibleMasterModels);
+                            $country_id = $LOI->country_id;
+                            $TTCApprovalModels =  MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
+                                                        $query->where('country_id', $country_id);
+                                                    })->pluck('id')->toArray();
+                                                    info("ttc models");
+                                             
+                                                    info($TTCApprovalModels);
+                            foreach($possibleMasterModels as $possibleMasterModel) {
+                                if(in_array($possibleMasterModel, $TTCApprovalModels)) {
+                                    info("model matched found");
+                                    $isTTCApprovalRequired = 1;
+                                    $LOI->is_ttc_approval_required = true;
+                                    $LOI->save();
+                                    break;
+                                }
+                            }
+                        }
                         $isItemExist = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
                                 ->whereIn('master_model_id', $masterModel)                      
                                 ->first();
@@ -985,7 +1015,12 @@ class LetterOfIndentController extends Controller
     }
     public function RequestApproval(Request $request)
     {
-     (new UserActivityController)->createActivity('Requested for Approval of LOI.');
+        if($request->type) {
+            (new UserActivityController)->createActivity('LOI (ttc approval)'. $request->type .'Successfully.');
+
+        }else{
+            (new UserActivityController)->createActivity('Requested for Supplier Approval of LOI.');
+        }
       
       $LOI = LetterOfIndent::find($request->id);
 
@@ -998,22 +1033,31 @@ class LetterOfIndentController extends Controller
 
     }
     public function supplierApproval(Request $request) {
-        (new UserActivityController)->createActivity('Supplier Approved successfully.');
     
         $LOI = LetterOfIndent::find($request->id);
         DB::beginTransaction();
 
+        $msg = '';
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
-            $msg = 'Rejected';
+            (new UserActivityController)->createActivity('Supplier Rejected successfully.');
 
         }elseif ($request->status == 'APPROVE') {
-            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-            $msg = 'Approved';
+            (new UserActivityController)->createActivity('Supplier Approved successfully.');
+    
+            if($LOI->is_ttc_approval_required == 1) {
+                $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
+                $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
+                $msg = 'LOI Status Changed to Waiting for TTC Approval';
+
+            }else{
+                $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+                $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+            }
 
         }
+        info($msg);
         $LOI->review = $request->review;
         $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->updated_by = Auth::id();

@@ -65,16 +65,15 @@
                    <li class="nav-item">
                         <a class="nav-link active" data-bs-toggle="pill" href="#new-LOI">New LOI</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-ttc-approval-LOI">Waiting For TTC Approval</a>
-                    </li>
                    <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Supplier Approval</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="pill" href="#waiting-for-ttc-approval-LOI">Waiting For TTC Approval</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>
                     </li> 
-                   
                 </ul>
             </div>
             <div class="tab-content">
@@ -84,7 +83,7 @@
                             <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>Action</th>
-                                    <th>Send For Approval</th>
+                                    <th>Send For Supplier Approval</th>
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
@@ -143,7 +142,7 @@
                         </table>                      
                     </div>
                     <div class="tab-pane fade table-responsive" id="waiting-for-ttc-approval-LOI">
-                        <table class="table table-bordered table-striped table-editable table-edits table table-condensed waiting-for-ttc-approval-table" style = "width:100%;">
+                        <table class="table table-bordered table-striped table-editable table-edits table table-condensed waiting-for-ttc-approval-table" style ="width:100%;">
                             <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>Action</th>
