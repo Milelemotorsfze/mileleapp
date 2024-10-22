@@ -71,7 +71,6 @@
 </div>
 <script type="text/javascript">
 (function() {
-    // Function to submit the PDI status
     window.submitVehPdiStatus = function(woVehicleId, woNumber, vin) {
         const selectedStatusElement = document.querySelector(`#updatevehPDIStatusModal_${woVehicleId} input[name="vehPdiStatus_${woVehicleId}"]:checked`);
         
@@ -85,28 +84,23 @@
         const qcInspectionFailed = document.querySelector(`#qcFailed_${woVehicleId}`)?.checked || false;
         const qcInspectionRemarks = document.getElementById(`qcRemarks_${woVehicleId}`)?.value || '';
 
-        // Validate for PDI Scheduled
         if (selectedStatus === 'Scheduled' && !pdiScheduledAt) {
             alertify.error('Please provide a valid PDI scheduled time.');
             return;
         }
 
-        // Validate QC Inspection Remarks if failed
         if (selectedStatus === 'Completed' && qcInspectionFailed && !qcInspectionRemarks) {
             alertify.error('Please provide QC inspection remarks for a failed inspection.');
             return;
         }
-        // Determine the passed_status based on the selected status and QC inspection
         const passedStatus = selectedStatus === 'Completed' && qcInspectionFailed ? 'Failed' : (selectedStatus === 'Completed' ? 'Passed' : null);
 
-        // Display the confirmation dialog
         alertify.confirm(
             'Confirmation Required',
             `Are you sure you want to update the pdi status of vehicle ${vin} in work order ${woNumber} to ${selectedStatus}?`,
             function() {
                 const comment = document.getElementById(`pdiComment_${woVehicleId}`).value;
 
-                // Perform the AJAX request to update the status
                 $.ajax({
                     url: '/update-vehicle-pdi-status',
                     method: 'POST',
@@ -135,7 +129,6 @@
         );
     };
 
-    // Show/hide fields based on the selected status
     document.querySelectorAll(`input[name="vehPdiStatus_{{$vehicle->id}}"]`).forEach(function(input) {
         input.addEventListener('change', function() {
             const selectedStatus = this.value;
@@ -143,18 +136,15 @@
             const qcInspectionSection = document.getElementById(`qcInspectionSection_{{$vehicle->id}}`);
             const qcRemarksSection = document.getElementById(`qcRemarksSection_{{$vehicle->id}}`);
 
-            // Show PDI Scheduled Time if status is "Scheduled"
             if (selectedStatus === 'Scheduled') {
                 pdiScheduledSection.style.display = 'block';
             } else {
                 pdiScheduledSection.style.display = 'none';
             }
 
-            // Show QC Inspection fields if status is "Completed"
             if (selectedStatus === 'Completed') {
                 qcInspectionSection.style.display = 'block';
 
-                // Show QC Remarks if "Failed" is selected
                 document.querySelectorAll(`input[name="qc_inspection_{{$vehicle->id}}"]`).forEach(function(qcInput) {
                     qcInput.addEventListener('change', function() {
                         const qcStatus = this.value;
@@ -165,7 +155,6 @@
                         }
                     });
 
-                    // Trigger change event if "Failed" is pre-selected
                     if (qcInput.checked && qcInput.value === 'Failed') {
                         qcRemarksSection.style.display = 'block';
                     } else {
@@ -179,7 +168,6 @@
         });
     });
 
-    // Check for a pre-selected radio button and trigger the change event
     const initialSelectedRadio = document.querySelector(`input[name="vehPdiStatus_{{$vehicle->id}}"]:checked`);
     if (initialSelectedRadio) {
         initialSelectedRadio.dispatchEvent(new Event('change'));

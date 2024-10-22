@@ -1,23 +1,19 @@
-<!-- <link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"> -->
 <link href="{{ asset('css/custom/jquery.atwho.css') }}" rel="stylesheet">
-<!-- <script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script> -->
 <script src="{{ asset('js/custom/jquery.caret.js') }}"></script>
-<!-- Include At.js -->
-<!-- <script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script> -->
 <script src="{{ asset('js/custom/jquery.atwho.min.js') }}"></script>
 <style>
     .comment {
         margin-bottom: 20px;
     }
     .reply {
-        margin-left: 30px; /* Indent replies by 40px */
+        margin-left: 30px;
         margin-top: 10px;
     }
     .reply-button {
         margin-top: 0px;
     }
     .replies {
-        margin-left: 30px; /* Indent nested replies by 40px */
+        margin-left: 30px; 
     }
     .file-preview {
         position: relative;
@@ -67,7 +63,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        color: transparent; /* Make it invisible to show only the textarea */
+        color: transparent; 
         white-space: pre-wrap;
         word-wrap: break-word;
     }
@@ -93,7 +89,7 @@
 </div>
 <script>
     var workOrder = {!! json_encode($workOrder) !!};
-    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; // Define at the global level
+    const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']; 
 
     document.getElementById('comment-files').addEventListener('change', function() {
         previewFiles(this.files, 'file-previews');
@@ -101,20 +97,19 @@
 
     function previewFiles(files, previewContainerId, commentId) {
         const previewContainer = document.getElementById(previewContainerId);
-        previewContainer.innerHTML = ''; // Clear previous previews
+        previewContainer.innerHTML = ''; 
 
         for (const file of files) {
-            // Check if the file type is allowed
             if (!allowedFileTypes.includes(file.type)) {
                 alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
-                continue; // Skip this file
+                continue; 
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.createElement('div');
                 preview.classList.add('file-preview', 'm-1');
-                preview.dataset.commentId = commentId; // Add commentId as a data attribute
+                preview.dataset.commentId = commentId; 
 
                 if (file.type.startsWith('image/')) {
                     preview.innerHTML = `
@@ -140,19 +135,17 @@
         }
     }
     $(document).ready(function() {
-        // Set up AJAX to include the CSRF token in the request headers
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        // Initialize mentions for the main comment textarea
         initializeMentions('#new-comment');
 
         function initializeMentions(selector) {
             $(selector).atwho({
                 at: "@",
-                data: [], // Empty initially, will be populated via AJAX
+                data: [], 
                 limit: 10,
                 callbacks: {
                     remoteFilter: function(query, renderCallback) {
@@ -161,15 +154,15 @@
                             return;
                         }
                         $.ajax({
-                            url: '/users-search', // Make sure this matches your route
+                            url: '/users-search', 
                             type: 'GET',
                             data: { query: query },
                             success: function(response) {
-                                console.log(response); // Check if users array is correct
+                                console.log(response); 
                                 if (response.users && response.users.length > 0) {
                                     renderCallback(response.users.map(user => ({
                                         id: user.id,
-                                        name: user.name || 'Unknown User' // Fallback if name is null
+                                        name: user.name || 'Unknown User' 
                                     })));
                                 } else {
                                     renderCallback([]);
@@ -177,33 +170,31 @@
                             },
                             error: function() {
                                 console.error('Error fetching user data.');
-                                renderCallback([]); // Handle error gracefully
+                                renderCallback([]); 
                             }
                         });
                     },
                     beforeInsert: function(value, $li) {
-                        // Wrap the mention in a custom token or placeholder that will later be styled
                         const mentionText = value.replace('@', '');
-                        return `@[${mentionText}]`; // Use a special syntax to recognize mentions later
+                        return `@[${mentionText}]`; 
                     }
                 }
             });
         }
 
-        // Set up event listeners for reply forms
         $('#comments-section').on('click', '.reply-button', function() {
             const commentId = $(this).closest('.comment').data('comment-id');
             initializeMentions(`#reply-input-${commentId}`);
         });
         
 
-        const workOrderId = workOrder.id; // Ensure this value is correctly set
+        const workOrderId = workOrder.id; 
         $.ajax({
-            url: `/comments/${workOrderId}`, // Endpoint to fetch all comments for the work order
+            url: `/comments/${workOrderId}`, 
             type: 'GET',
             success: function(response) {
                 if (response && response.comments) {
-                    renderComments(response.comments); // Assuming the response contains an array of comments
+                    renderComments(response.comments); 
                 } else {
                     console.error('Unexpected response structure:', response);
                 }
@@ -215,20 +206,18 @@
     });
     function updateStyledComment() {
         let text = $('#new-comment').val();
-        // Replace the special mention syntax with a styled span
         text = text.replace(/@\[(\w+)\]/g, '<span class="mention" style="color: blue;">@$1</span>');
         $('#styled-comment').html(text);
     }
     function addComment(commentData = {}) {
         const { text = '', parent_id = null, id = null, created_at = new Date().toISOString(), files = [], wo_histories = [], new_vehicles = [], removed_vehicles = [], updated_vehicles = [] } = commentData;
         console.log(new_vehicles);
-        // Check for invalid comment data
         if (!id || (text === '' && files.length === 0)) {
             console.error('Invalid comment data:', commentData);
             return;
         }
 
-        if (text.length > 16777215) { // mediumText limit
+        if (text.length > 16777215) { 
             alert('The text is too long.');
             return;
         }
@@ -273,7 +262,6 @@
             }
         }).join('');
 
-        // Process wo_histories for additional divs
         let historiesHtml = '';
 
         const baseUrl = '{{env('BASE_URL')}}';
@@ -326,7 +314,6 @@
                         </td>`
                         : '<td></td>';
                 }
-                // Check for specific values and update the display text accordingly
                 if (item.field === 'Sales Person') {
                     const oldSalesPersonName = item.old_value ? getUserById(item.old_value) : 'Unknown User';
                     const newSalesPersonName = item.new_value ? getUserById(item.new_value) : 'Unknown User';
@@ -397,13 +384,11 @@
                     <tbody>
             `;
             orderedNewVehicles.forEach(item => {
-                // Helper function to find new_value for a specific field_name
                 const getFieldValue = (field_name, default_value) => {
                     const detail = item.record_histories.find(detail => detail.field_name === field_name);
                     return detail ? detail.new_value : (item.vehicle[field_name] || default_value);
                 };
 
-                // Initialize each constant with an empty string
                 const boeValue = getFieldValue('boe_number', '');
                 const brandValue = getFieldValue('brand', '');
                 const variantValue = getFieldValue('variant', '');
@@ -424,7 +409,7 @@
                 const modificationOrJobsToPerformPerVinValue = getFieldValue('modification_or_jobs_to_perform_per_vin', '');
                 const specialRequestOrRemarksValue = getFieldValue('special_request_or_remarks', '');
 
-                const viewMoreUrl = 'javascript:void(0);'; // Prevent default link behavior
+                const viewMoreUrl = 'javascript:void(0);'; 
 
                 newVehiclesHtml += `
                     <tr style="border-top:2px solid #d3d3df; background-color : #f6fafe!important;">
@@ -462,9 +447,7 @@
                         <td colspan="15">${specialRequestOrRemarksValue}</td>
                     </tr>
                 `;
-                // Add Service Breakdown section if there are store_mapping_addons
                 if (item.store_mapping_addons && item.store_mapping_addons.length > 0) {
-                    // Sort the addons by addon_code in ascending order
                     const sortedAddons = item.store_mapping_addons.sort((a, b) => {
                         if (a.addon.addon_code < b.addon.addon_code) return -1;
                         if (a.addon.addon_code > b.addon.addon_code) return 1;
@@ -484,13 +467,11 @@
                         const addon = addonMapping.addon;
                         const recordHistories = addonMapping.record_histories || [];
 
-                        // Initialize addon field values
                         let addonCode = 'NA';
                         let addonName = 'NA';
                         let addonQuantity = 'NA';
                         let addonDescription = 'NA';
 
-                        // Loop through record histories to get field values
                         recordHistories.forEach(history => {
                             switch(history.field_name) {
                                 case 'addon_code':
@@ -526,7 +507,6 @@
             `;        
         }
 
-        // Process removed_vehicles for additional divs
         let removedVehiclesHtml = '';
         if (removed_vehicles.length >= 1) {
             const orderedRemovedVehicles = removed_vehicles.sort((a, b) => a.vin.localeCompare(b.vin));
@@ -560,7 +540,7 @@
                     <tbody>
             `;
             orderedRemovedVehicles.forEach(item => {
-                const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
+                const viewMoreUrl = `javascript:void(0);`; 
 
                 removedVehiclesHtml += `
                     <tr style="border:1px solid #e9e9ef;">
@@ -605,7 +585,6 @@
             `;        
         }
 
-        // Process updated_vehicles for additional divs
         let updatedVehiclesHtml = '';
         if (updated_vehicles.length >= 1) {
             const validUpdatedVehicles = updated_vehicles.filter(item => item && item.vehicle && item.vehicle.vin);
@@ -624,8 +603,7 @@
             `;
 
             orderedUpdatedVehicles.forEach(item => {
-                const viewMoreUrl = `javascript:void(0);`; // Prevent default link behavior
-                // Add a row for the vehicle's VIN
+                const viewMoreUrl = `javascript:void(0);`; 
                 updatedVehiclesHtml += `
                     <tr>
                         <th colSpan="4" style="padding-left:5px!important;font-size:12px!important;padding-top:5px;padding-bottom:5px; border-top:2px solid #e1e1ea;">
@@ -635,7 +613,7 @@
                     </tr>
                 `;
 
-                if (item.record_histories.length > 0) { // Check if there are record histories
+                if (item.record_histories.length > 0) { 
                     updatedVehiclesHtml += `
                         <tr style="border-width: 1;">
                             <th style="padding-top:5px;padding-bottom:5px;padding-left:5px; font-size:12px!important;">Field</th>
@@ -645,10 +623,8 @@
                         </tr>
                     `;
 
-                    // Sort the record_histories by field name in ascending order
                     const sortedDetails = item.record_histories.sort((a, b) => a.field.localeCompare(b.field));
 
-                    // Helper function to get the certification description
                     const getCertificationDescription = (value) => {
                         switch(value) {
                             case 'rta_without_number_plate':
@@ -664,16 +640,14 @@
                             case 'eaa_inspection':
                                 return 'EAA Inspection';
                             default:
-                                return value || ''; // Return empty string if value is null or undefined
+                                return value || ''; 
                         }
                     };
 
-                    // Loop through each sorted record_history and create table rows
                     sortedDetails.forEach(detail => {
                         let oldValue = detail.old_value !== null && detail.old_value !== undefined ? detail.old_value : '';
                         let newValue = detail.new_value !== null && detail.new_value !== undefined ? detail.new_value : '';
 
-                        // If the field is "Certification Per VIN", replace the values
                         if (detail.field === 'Certification Per VIN') {
                             oldValue = getCertificationDescription(detail.old_value);
                             newValue = getCertificationDescription(detail.new_value);
@@ -689,9 +663,7 @@
                         `;
                     });
                 }
-                // Add Service Breakdown section if there are store_mapping_addons
                 if (item.store_mapping_addons && item.store_mapping_addons.length > 0) {
-                    // Sort the addons by addon_code in ascending order
                     const sortedAddons = item.store_mapping_addons.sort((a, b) => {
                         if (a.addon.addon_code < b.addon.addon_code) return -1;
                         if (a.addon.addon_code > b.addon.addon_code) return 1;
@@ -713,12 +685,10 @@
                         const addon = addonMapping.addon;
                         const recordHistories = addonMapping.record_histories || [];
 
-                        // Initialize addon field values
                         let addonCode = '';
                         let addonQuantity = '';
                         let addonDescription = '';
 
-                        // Loop through record histories to get field values
                         recordHistories.forEach(history => {
                             switch(history.field_name) {
                                 case 'addon_code':
@@ -742,9 +712,7 @@
                         `;
                     });
                 }
-                // Service breakdown removed section
                 if(item.delete_mapping_addons && item.delete_mapping_addons.length > 0) {
-                    // Sort the addons by addon_code in ascending order
                     const sortedAddons = item.delete_mapping_addons.sort((a, b) => {
                         if (a.addon.addon_code < b.addon.addon_code) return -1;
                         if (a.addon.addon_code > b.addon.addon_code) return 1;
@@ -765,7 +733,6 @@
                     sortedAddons.forEach(addonMapping => {
                         const addon = addonMapping.addon;
 
-                        // Initialize addon field values
                         let addonCode = addon.addon_code || '';
                         let addonQuantity = addon.addon_quantity || '';
                         let addonDescription = addon.addon_description || '';
@@ -779,7 +746,6 @@
                         `;
                     });
                 }
-                // Service Breakdown updated Section
                 if(item.update_mapping_addons && item.update_mapping_addons.length > 0) {
                     const orderedAddons = item.update_mapping_addons.sort((a, b) => a.addon.addon_code.localeCompare(b.addon.addon_code));
 
@@ -891,7 +857,6 @@
             $(`#reply-form-${parent_id}`).hide();
         }
 
-        // Add event listeners to the "View More" buttons vehicles
         document.querySelectorAll('.view-more-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const vin = this.getAttribute('data-vin');
@@ -902,22 +867,18 @@
                 }
             });
         });
-       // Add event listeners to the "View More" buttons for removed vehicles
         document.querySelectorAll('.view-more-btn-removed').forEach(button => {
             button.addEventListener('click', function() {
-                // Remove active class from WO Data History tab
                 const woDataHistoryTabLink = document.querySelector('a[href="#wo_data_history"]');
                 if (woDataHistoryTabLink) {
                     woDataHistoryTabLink.classList.remove('active');
                 }
 
-                // Add active class to WO Vehicle Data History tab
                 const woVehicleDataHistoryTabLink = document.querySelector('a[href="#wo_vehicle_data_history"]');
                 if (woVehicleDataHistoryTabLink) {
                     woVehicleDataHistoryTabLink.classList.add('active');
                 }
 
-                // Add show active classes for the id="wo_vehicle_data_history" tab content
                 const woVehicleDataHistoryTab = document.getElementById('wo_vehicle_data_history');
                 if (woVehicleDataHistoryTab) {
                     woVehicleDataHistoryTab.classList.add('show', 'active');
@@ -926,7 +887,6 @@
                 if (woDataHistoryTab) {
                     woDataHistoryTab.classList.remove('show', 'active');
                 }            
-                // Scroll to the target row in the table
                 const id = this.getAttribute('data-id');
                 const targetRow = document.querySelector(`#myVehAddonTable .vehicle-row[data-id="${id}"]`);
 
@@ -968,54 +928,48 @@
         const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
         const filesInput = parentId ? $(`#reply-files-${parentId}`)[0].files : $('#comment-files')[0].files;
 
-        // Check if comment text is empty and no files are attached
         if (commentText.trim() === '' && filesInput.length === 0) {
             console.error('Cannot add an empty comment without files.');
             return;
         }
 
-        // Extract mentioned user IDs using a regular expression
         const mentionedUserIds = [];
         const mentionPattern = /@(\w+)/g;
         let match;
         while ((match = mentionPattern.exec(commentText)) !== null) {
-            mentionedUserIds.push(match[1]); // Push the user ID or username
+            mentionedUserIds.push(match[1]);
         }
 
-        // Disable the submit button to prevent multiple submissions
         const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
         submitButton.prop('disabled', true);
 
-        // Check file sizes before appending them to FormData
-        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
+        const maxFileSize = 2048 * 1024; 
         for (const file of filesInput) {
             if (file.size > maxFileSize) {
                 alert(`The file ${file.name} exceeds the 2MB size limit.`);
-                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                submitButton.prop('disabled', false); 
                 return;
             }
         }
 
-        // Create a FormData object to hold the comment data
         const formData = new FormData();
-        formData.append('text', commentText.trim() === '' ? '' : commentText); // Store text as null if empty
+        formData.append('text', commentText.trim() === '' ? '' : commentText); 
         formData.append('parent_id', parentId ? parentId : '');
         formData.append('work_order_id', workOrder.id);
-        formData.append('mentions', JSON.stringify(mentionedUserIds)); // Add mentions as a JSON array
+        formData.append('mentions', JSON.stringify(mentionedUserIds)); 
 
-        // Append files to the FormData object
         for (const file of filesInput) {
-            if (allowedFileTypes.includes(file.type)) { // Use the globally defined allowedFileTypes
+            if (allowedFileTypes.includes(file.type)) { 
                 formData.append('files[]', file);
             } else {
                 alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
-                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                submitButton.prop('disabled', false); 
                 return;
             }
         }
 
         $.ajax({
-            url: '/comments', // Laravel route to handle comment storage
+            url: '/comments', 
             type: 'POST',
             data: formData,
             processData: false,
@@ -1024,27 +978,23 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                console.log('Comment added:', response); // Log the response
+                console.log('Comment added:', response); 
                 addComment(response);
-                // Re-enable the submit button after successful submission
                 submitButton.prop('disabled', false);
             },
             error: function(error) {
                 console.error('Error adding comment:', error);
 
-                // Check if the error is related to file size
                 if (error.responseJSON && error.responseJSON.errors && error.responseJSON.errors['files.0']) {
-                    alert(error.responseJSON.errors['files.0'][0]); // Display the error message
+                    alert(error.responseJSON.errors['files.0'][0]); 
                 }
 
-                // Re-enable the submit button in case of an error
                 submitButton.prop('disabled', false);
             }
         });
     }
     function showReplyForm(commentId) {
         $(`#reply-form-${commentId}`).toggle();
-         // Add event listener for reply file input
          $(`#reply-files-${commentId}`).off('change').on('change', function() {
             previewFiles(this.files, `reply-previews-${commentId}`);
         });
@@ -1068,9 +1018,9 @@
     function getUserById(userId) {
         let userName = 'Unknown User';
         $.ajax({
-            url: `/getUser/${userId}`, // Your route to fetch user by ID
+            url: `/getUser/${userId}`, 
             type: 'GET',
-            async: false, // Ensure the request completes before returning the result
+            async: false, 
             success: function(response) {
                 if (response && response.user) {
                     userName = response.user.name;

@@ -1,9 +1,6 @@
 @extends('layouts.main')
 <head>
     <meta charset="UTF-8">
-    <!-- Load jQuery before DataTables -->
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-    <!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script> -->
     <style>
         .select2-container {
             width: 100% !important;
@@ -19,28 +16,27 @@
             margin-top: -1px;
         }
         .veh-table th {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
-    padding: 3px!important; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef;
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 3px!important; 
+    text-align: left; 
 }
 
-/* Style for the table cells */
+
 .veh-table td {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
-    padding: 3px!important; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef; 
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 3px!important; 
+    text-align: left; 
 }
 
-/* Style for the entire table */
 .veh-table {
-    border-collapse: collapse; /* Ensure borders do not double */
-    width: 100%; /* Make the table take up the full width */
+    border-collapse: collapse; 
+    width: 100%; 
 }
     </style>
 </head>
@@ -132,7 +128,6 @@
                                             data-bs-toggle="modal" data-bs-target="#financeApprovalModal_{{$approval->id}}">
                                                 <i class="fas fa-hourglass-start" title="COO Approval"></i> Approval
                                             </a>
-                                            <!-- Modal -->
                                             <div class="modal fade" id="financeApprovalModal_{{$approval->id}}" tabindex="-1" aria-labelledby="financeApprovalModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
