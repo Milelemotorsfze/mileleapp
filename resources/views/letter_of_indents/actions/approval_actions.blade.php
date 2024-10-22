@@ -366,8 +366,6 @@
                                 },
                                 success: function (response)
                                 {
-                                    console.log(response);
-                                    alert(response);
                                     var table1 = $('.waiting-for-approval-table').DataTable();
                                         table1.ajax.reload();
                                     var table2 = $('.waiting-for-ttc-approval-table').DataTable();
@@ -375,7 +373,6 @@
                                     var table3 = $('.supplier-response-table').DataTable();
                                         table3.ajax.reload();
                                     alertify.success('Supplier Approved successfully.'+response);
-
                                     },
                                     error: function (error) {
                                     console.error(error);

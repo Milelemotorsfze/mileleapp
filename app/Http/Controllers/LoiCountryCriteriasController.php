@@ -100,21 +100,10 @@ class LoiCountryCriteriasController extends Controller
 
         if($request->ttc_approval_models) {
             foreach($request->ttc_approval_models as $value) {
-                $masterModel = MasterModel::find($value);
                 $TTCAprovalModel = new CountryTTCApprovalModel();
                 $TTCAprovalModel->master_model_id = $value;
                 $TTCAprovalModel->country_id = $request->country_id;
                 $TTCAprovalModel->save();
-                $possibleMasterModels = MasterModel::where('model', $masterModel->model)->pluck('id');
-                // get the loi which exit these models
-                $letterOfIndents = LetterOfIndent::whereHas('letterOfIndentItems', function($query)use($possibleMasterModels, $request){
-                                        $query->whereIn('master_model_id', $possibleMasterModels);
-                                    })
-                                    ->where('country_id', $request->country_id)
-                                    ->whereIn('submission_status', [ LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL,
-                                            LetterOfIndent::LOI_STATUS_NEW])
-                                    ->update(['is_ttc_approval_required' => 1]);
-
             }
             
         }
@@ -205,22 +194,11 @@ class LoiCountryCriteriasController extends Controller
         if($request->ttc_approval_models) {
             $TTCApprovalModels = CountryTTCApprovalModel::where('country_id', $loiCountryCriteria->country_id)->delete();
             foreach($request->ttc_approval_models as $value) {
-                $masterModel = MasterModel::find($value);
-
                 $TTCAprovalModel = new CountryTTCApprovalModel();
                 $TTCAprovalModel->master_model_id = $value;
                 $TTCAprovalModel->country_id = $request->country_id;
                 $TTCAprovalModel->save();
 
-                $possibleMasterModels = MasterModel::where('model', $masterModel->model)->pluck('id')->toArray();
-                // get the loi which exit these models
-                $letterOfIndents = LetterOfIndent::whereHas('letterOfIndentItems', function($query)use($possibleMasterModels, $request){
-                                        $query->whereIn('master_model_id', $possibleMasterModels);
-                                    })
-                                    ->where('country_id', $request->country_id)
-                                    ->whereIn('submission_status', [ LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL,
-                                        LetterOfIndent::LOI_STATUS_NEW])
-                                    ->update(['is_ttc_approval_required' => 1]);
             }
         }
         (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
