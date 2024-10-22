@@ -108,16 +108,7 @@
                                     <option value="RHD"> RHD </option>
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">TTC Approval Models </label>
-                                    <select class="form-control widthinput" multiple name="ttc_approval_models[]" id="ttc_approval_models" autofocus>
-                                        @foreach($models as $model)
-                                            <option value="{{ $model->id }}"> {{ $model->model }} </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                            
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
@@ -133,6 +124,18 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">TTC Approval Models </label>
+                                    <select class="form-control widthinput" multiple name="ttc_approval_models[]" id="ttc_approval_models" autofocus>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->id }}"> {{ $model->model }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>  
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary mt-4">Submit</button>
                             </div>

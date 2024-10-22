@@ -182,7 +182,7 @@ class LetterOfIndentController extends Controller
                     $type = $request->tab;
                    
                     $letterOfIndent = LetterOfIndent::select('id','is_expired','client_id','category','date','submission_status',
-                    'country_id','is_ttc_approval_required')->find($query->id);
+                    'country_id')->find($query->id);
                     return view('letter_of_indents.actions.approval_actions',compact('letterOfIndent','type'));
                 })
                 ->addColumn('action', function($query,Request $request) {
@@ -321,7 +321,7 @@ class LetterOfIndentController extends Controller
             }
             
             $quantities = $request->quantity;
-            $isTTCApprovalRequired = 0;
+            // $isTTCApprovalRequired = 0;
 
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
@@ -330,28 +330,6 @@ class LetterOfIndentController extends Controller
                     ->first();
                 
                 if($masterModel) {
-                    if($isTTCApprovalRequired == 0) {
-                        $possibleMasterModels = MasterModel::where('model', $request->models[$key])->pluck('id');
-                                            info("possible models");
-                                            info($possibleMasterModels);
-                        $country_id = $LOI->country_id;
-                        $TTCApprovalModels =  MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
-                                                    $query->where('country_id', $country_id);
-                                                })->pluck('id')->toArray();
-                                                info("ttc models");
-                                         
-                                                info($TTCApprovalModels);
-                        foreach($possibleMasterModels as $possibleMasterModel) {
-                            if(in_array($possibleMasterModel, $TTCApprovalModels)) {
-                                info("model matched found");
-                                $isTTCApprovalRequired = 1;
-                                $LOI->is_ttc_approval_required = true;
-                                $LOI->save();
-                                break;
-                            }
-                        }
-                    }
-                   
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
                     $length = 6;
                     $offset = 2;
@@ -903,7 +881,6 @@ class LetterOfIndentController extends Controller
                 $alreadyAddedRows = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)->pluck('id')->toArray();
                 $updatedRows = [];
                 $quantities = $request->quantity;
-                $isTTCApprovalRequired = 0;
                 foreach ($quantities as $key => $quantity) {
                     $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
@@ -911,27 +888,6 @@ class LetterOfIndentController extends Controller
 
                     if($masterModel) 
                     {
-                        if($isTTCApprovalRequired == 0) {
-                            $possibleMasterModels = MasterModel::where('model', $request->models[$key])->pluck('id');
-                                                info("possible models");
-                                                info($possibleMasterModels);
-                            $country_id = $LOI->country_id;
-                            $TTCApprovalModels =  MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
-                                                        $query->where('country_id', $country_id);
-                                                    })->pluck('id')->toArray();
-                                                    info("ttc models");
-                                             
-                                                    info($TTCApprovalModels);
-                            foreach($possibleMasterModels as $possibleMasterModel) {
-                                if(in_array($possibleMasterModel, $TTCApprovalModels)) {
-                                    info("model matched found");
-                                    $isTTCApprovalRequired = 1;
-                                    $LOI->is_ttc_approval_required = true;
-                                    $LOI->save();
-                                    break;
-                                }
-                            }
-                        }
                         $isItemExist = LetterOfIndentItem::where('letter_of_indent_id', $LOI->id)
                                 ->whereIn('master_model_id', $masterModel)                      
                                 ->first();
@@ -1043,8 +999,26 @@ class LetterOfIndentController extends Controller
 
         }elseif ($request->status == 'APPROVE') {
             (new UserActivityController)->createActivity('Supplier Approved successfully.');
-    
-            if($LOI->is_ttc_approval_required == 1) {
+
+            // get LOI Items 
+
+            $loiModels =  MasterModel::whereHas('loiItems', function($query)use($request){
+                                $query->where('letter_of_indent_id', $request->id);
+                            })->pluck('model')->toArray();
+            $possibleMasterModels = MasterModel::whereIn('model', $loiModels)->pluck('id')->toArray();
+            $isTTCApprovalRequired = 0;
+            $country_id = $LOI->country_id;
+            $TTCApprovalModels =  MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
+                                $query->where('country_id', $country_id);
+                            })->pluck('id')->toArray();
+                    
+            foreach($possibleMasterModels as $possibleMasterModel) {
+            if(in_array($possibleMasterModel, $TTCApprovalModels)) {
+                    $isTTCApprovalRequired = 1;
+                    break;
+                }
+            }
+            if($isTTCApprovalRequired == 1) {
                 $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
                 $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
                 $msg = 'LOI Status Changed to Waiting for TTC Approval';
