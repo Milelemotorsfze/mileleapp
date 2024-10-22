@@ -110,6 +110,16 @@
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">TTC Approval Models </label>
+                                    <select class="form-control widthinput" multiple name="ttc_approval_models[]" id="ttc_approval_models" autofocus>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->id }}"> {{ $model->model }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
                                     <textarea cols="25" rows="5"  class="form-control" name="comment"> {{ old('comment') }} </textarea>
                                 </div>
@@ -171,15 +181,18 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
-        // $("#form-create").validate({
-        //     ignore: [],
-        //     rules: {
-        //         brand_name: {
-        //             required: true,
-        //             maxlength:255
-        //         },
-        //     },
-        // });
+        $('#ttc_approval_models').select2({
+            placeholder : 'Select Model',
+            allowClear: true,
+        });
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                country_id: {
+                    required: true,
+                },
+            },
+        });
     </script>
 @endpush
 

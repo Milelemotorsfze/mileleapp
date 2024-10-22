@@ -514,8 +514,10 @@ Route::get('/d', function () {
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
-    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
-        ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
+        ->name('letter-of-indent.request-approval');
+    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
+    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
