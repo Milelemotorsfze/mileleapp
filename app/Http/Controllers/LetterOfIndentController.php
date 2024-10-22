@@ -331,8 +331,7 @@ class LetterOfIndentController extends Controller
                 
                 if($masterModel) {
                     if($isTTCApprovalRequired == 0) {
-                        $possibleMasterModels = MasterModel::where('sfx', $request->sfx[$key])
-                                            ->where('model', $request->models[$key])->pluck('id');
+                        $possibleMasterModels = MasterModel::where('model', $request->models[$key])->pluck('id');
                                             info("possible models");
                                             info($possibleMasterModels);
                         $country_id = $LOI->country_id;
@@ -913,8 +912,7 @@ class LetterOfIndentController extends Controller
                     if($masterModel) 
                     {
                         if($isTTCApprovalRequired == 0) {
-                            $possibleMasterModels = MasterModel::where('sfx', $request->sfx[$key])
-                                                ->where('model', $request->models[$key])->pluck('id');
+                            $possibleMasterModels = MasterModel::where('model', $request->models[$key])->pluck('id');
                                                 info("possible models");
                                                 info($possibleMasterModels);
                             $country_id = $LOI->country_id;

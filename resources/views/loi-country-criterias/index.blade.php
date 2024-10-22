@@ -1,8 +1,6 @@
 @extends('layouts.table')
 @section('content')
-<style>
-    
-</style>
+
     @can('loi-restricted-country-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
@@ -48,7 +46,7 @@
                             <th>S.NO:</th>
                             <th>Country</th>
                             <th>Steering</th>
-                            <th>TTC Approval Model</th>
+                            <!-- <th>TTC Approval Model</th> -->
                             <th>Is LOI Restricted</th>
                             <th>Restricted Model Lines</th>
                             <th>Allowed Model Lines</th>
@@ -102,11 +100,16 @@
                                                 <i class="fa fa-trash"></i></button>
                                         @endif
                                     @endcan
+                                    @if ($loiCountryCriteria->ttc_models)
+                                        <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+                                        title="View TTC Approval Required Models" data-bs-toggle="modal" data-bs-target="#view-ttc-approval-models-{{$loiCountryCriteria->id}}">
+                                            <i class="fa fa-list"></i> View TTC Models
+                                        </button>
+                                    @endif
                                 </td>  
                                 <td> {{ ++$i }}</td>                              
                                 <td>{{ $loiCountryCriteria->country->name ?? '' }}</td>
                                 <td>{{ $loiCountryCriteria->steering }} </td>
-                                <td>{{ implode(", ",$loiCountryCriteria->ttc_models)  ?? '' }} </td>
                                 <td>  @if($loiCountryCriteria->is_loi_restricted == true) Yes @else No @endif  </td>
                                 <td>{{ implode(", ",$loiCountryCriteria->restricted_model_lines)  ?? '' }}</td>
                                 <td>{{ implode(", ",$loiCountryCriteria->allowed_model_lines)  ?? '' }}</td>
@@ -120,7 +123,37 @@
                                 <td>{{ $loiCountryCriteria->createdBy->name ?? '' }} </td>     
                                 <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->updated_at)->format('d M Y')  }}</td>
                                 <td>  {{ $loiCountryCriteria->updatedBy->name ?? '' }}</td>
-                                                        
+
+                                 <!-- To View TTC  Models -->
+                                <div class="modal fade" id="view-ttc-approval-models-{{$loiCountryCriteria->id}}" tabindex="-1" 
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">TTC Approval Required Models</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body pl-2 pr-2" style="font-size:12px; overflow-y: auto;max-height: 300px;">
+                                            @php
+                                                $chunks = array_chunk($loiCountryCriteria->ttc_models, 3);
+                                             @endphp
+
+                                        <div class="row">
+                                            @foreach($chunks as $chunk)
+                                                <div class="col-md-3 col-lg-3 col-sm-12">
+                                                    <ul>
+                                                        @foreach($chunk as $model)
+                                                            <li>{{ $model }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
                             </tr>
                         @endforeach
                         </tbody>
