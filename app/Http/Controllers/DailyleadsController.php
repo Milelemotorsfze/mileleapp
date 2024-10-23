@@ -936,15 +936,8 @@ public function storeMessages(Request $request)
     }
     
     public function getTrimAndVariants($modelLineId) {
-        // Fetch unique model_detail (trim) values from the variants table based on model_line_id
-        $uniqueTrims = Varaint::where('master_model_lines_id', $modelLineId)
-                                ->select('model_detail') // Assuming model_detail is the column storing trim
-                                ->distinct() // Fetch only unique values
-                                ->get();
-    
-        // Fetch all variants related to the selected model line
+        $uniqueTrims = Varaint::where('master_model_lines_id', $modelLineId)->groupby('model_detail')->get();             
         $variants = Varaint::where('master_model_lines_id', $modelLineId)->get();
-    
         return response()->json([
             'trims' => $uniqueTrims,
             'variants' => $variants,

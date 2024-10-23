@@ -592,7 +592,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         <!-- Submit button in a new row -->
         <div class="form-row mt-3">
             <div class="col-md-12">
-                <button type="submit" class="btn btn-primary btn-block">Add Vehicle</button>
+                <button type="submit" class="btn btn-primary btn-block">Add Vehicles</button>
             </div>
         </div>
     </form>
@@ -1131,28 +1131,19 @@ $(document).ready(function() {
             });
         }
     });
-
-    // When model line is selected, fetch trims and variants via AJAX
     $('#model_line').on('change', function() {
         var modelLineId = $(this).val();
-
         if (modelLineId) {
-            // Enable the trim and variant dropdowns
             $('#trim').removeAttr('disabled').html('<option value="" disabled selected>Loading...</option>');
             $('#variant').removeAttr('disabled').html('<option value="" disabled selected>Loading...</option>');
-
-            // Fetch trims and variants based on the selected model line
             $.ajax({
-                url: '/get-trim-variants/' + modelLineId, // Define the route in your controller
+                url: '/get-trim-variants/' + modelLineId,
                 type: 'GET',
                 success: function(data) {
-                    // Populate trims (unique model_detail values)
                     $('#trim').html('<option value="" disabled selected>Select Trim</option>');
                     $.each(data.trims, function(index, trim) {
                         $('#trim').append('<option value="' + trim.model_detail + '">' + trim.model_detail + '</option>');
                     });
-
-                    // Populate variants
                     $('#variant').html('<option value="" disabled selected>Select Variant</option>');
                     $.each(data.variants, function(index, variant) {
                         $('#variant').append('<option value="' + variant.id + '">' + variant.name + '</option>');
