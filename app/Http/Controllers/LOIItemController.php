@@ -152,7 +152,7 @@ class LOIItemController extends Controller
                 }
                 if(!empty($request->status)) {
                     $data->whereHas('LOI',function($query) use($request) {
-                        $query->where('status', $request->status);
+                        $query->whereIn('status', $request->status);
                     });
                 }
                 if(!empty($request->so_number)) {
@@ -286,7 +286,13 @@ class LOIItemController extends Controller
                          return  '<button class="btn btn-sm btn-success">'.LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED.'</button>';
                      }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED) {
                          return  '<button class="btn btn-sm btn-danger">'.LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED.'</button>';
-                     }else{
+                     }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL) {
+                        return  '<button class="btn btn-sm btn-warning">'.LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL.'</button>';
+                    }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_TTC_APPROVED) {
+                        return  '<button class="btn btn-sm btn-primary">'.LetterOfIndent::LOI_STATUS_TTC_APPROVED.'</button>';
+                    }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_TTC_REJECTED) {
+                        return  '<button class="btn btn-sm btn-danger">'.LetterOfIndent::LOI_STATUS_TTC_REJECTED.'</button>';
+                    }else{
                         return $query->LOI->status;
                      }                                       
                  })

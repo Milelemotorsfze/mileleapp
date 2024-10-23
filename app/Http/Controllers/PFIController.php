@@ -808,7 +808,8 @@ class PFIController extends Controller
                         $query->select('client_id','status','id','is_expired','country_id')
                         ->where('client_id', $request->client_id)
                         ->where('country_id', $request->country_id)
-                        ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
+                        ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED,
+                            LetterOfIndent::LOI_STATUS_TTC_APPROVED,LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL])
                         ->where('is_expired', false);
                 });
                 
