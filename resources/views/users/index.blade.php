@@ -89,6 +89,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Can Send WO Email</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -113,6 +114,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->can_send_wo_email ?? '' }}
                      </td>
                      <td>
                         @can('user-view')
@@ -203,6 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Can Send WO Email</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -227,6 +232,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      </td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->can_send_wo_email ?? '' }}
                      </td>
                      <td>
                      @php
@@ -332,6 +340,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Role</th>
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
+                     <th>Can Send WO Email</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -352,6 +361,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <td><label class="badge badge-soft-danger">{{ $user->status }}</label></td>
                      <td>
                         {{ $user->is_sales_rep ?? '' }}
+                     </td>
+                     <td>
+                        {{ $user->can_send_wo_email ?? '' }}
                      </td>
                      <td>
                         @can('user-view')
@@ -447,6 +459,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <th>Role</th>
                         <th>Status</th>
                         <th>Is Sales Rep.</th>
+                        <th>Can Send WO Email</th>
                         <th>Action</th>
                      </tr>
                   </thead>
@@ -466,6 +479,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         </td>
                         <td><label class="badge badge-soft-danger">deleted</label></td>
                         <td>{{ $user->is_sales_rep ?? '' }}</td>
+                        <td>
+                        {{ $user->can_send_wo_email ?? '' }}
+                     </td>
                         <td>
                            @can('user-view')
                            @php

@@ -177,9 +177,16 @@
                         <div class="row p-2">
                             @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
                                 <div class="d-flex">
+                                  
                                     <div class="col-lg-12">
                                         <div class="row p-2">
-                                            <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                        @if($letterOfIndentDocument->is_passport)
+                                            <embed src="{{ url('storage/app/public/passports/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                        @elseif($letterOfIndentDocument->is_trade_license)
+                                            <embed src="{{ url('storage/app/public/tradelicenses/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                        @else
+                                            <embed src="{{ url('customer-other-documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                        @endif
                                         </div>
                                     </div>
                                 </div>

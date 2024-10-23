@@ -95,6 +95,28 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                 <label for="choices-single-default" class="form-label"><strong>WO Number</strong></label> : {{$workOrder->wo_number ?? ''}}             
             </div>
+            @if(isset($workOrder->boe) && count($workOrder->boe) > 0)
+                <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                    <table class="table table-striped table-editable table-edits table-condensed my-datatableclass">
+                        <thead style="background-color: #e6f1ff">
+                            <tr>
+                                <th>BOE Number</th>
+                                <th>Declaration Number</th>
+                                <th>Declaration date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($workOrder->boe as $one)
+                                <tr>
+                                    <td>{{ $one->boe ?? '' }}</td>
+                                    <td>{{ $one->declaration_number ?? ''}}</td>
+                                    <td>@if($one->declaration_date != ''){{\Carbon\Carbon::parse($one->declaration_date)->format('d M Y') ?? ''}}@endif</td>                               
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
         <div class="row mt-1">
             <div class="table-responsive">

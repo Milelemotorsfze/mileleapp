@@ -14,6 +14,10 @@ class WorkOrder extends Model
         'type',
         'date',
         'so_number',
+        'temporary_exit',
+        'delivery_advise',
+        'showroom_transfer',
+        'cross_trade',
         'is_batch',
         'batch',
         'wo_number',
@@ -99,7 +103,10 @@ class WorkOrder extends Model
     protected $appends = [
         'status',
         'sales_support_data_confirmation',
+        'can_revert_confirmation',
         'finance_approval_status',
+        'can_show_fin_approval',
+        'can_show_coo_approval',
         'coo_approval_status',
         'docs_status',
         'total_number_of_boe',
@@ -110,15 +117,18 @@ class WorkOrder extends Model
         'vehicles_not_initiated_count',
         'vehicles_completed_count',
         'vehicles_modification_summary',
+        'is_modification_initial_stage',
         'pdi_scheduled_count',
         'pdi_not_initiated_count',
         'pdi_completed_count',
         'pdi_summary',
+        'is_pdi_initial_stage',
         'delivery_ready_count',
         'delivery_on_hold_count',
         'delivery_delivered_count',
         'delivery_delivered_with_docs_hold_count',
         'delivery_summary',
+        'is_delivery_initial_stage',
     ];
     public function getStatusAttribute() {
         $status = '';
@@ -144,6 +154,15 @@ class WorkOrder extends Model
         }
         return $status;
     }
+    public function getCanRevertConfirmationAttribute() {
+        $canRevert = 'yes';
+        if(($this->sales_support_data_confirmation == 'Confirmed' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved')
+            && (($this->docs_status != 'Blank' && $this->docs_status != 'Not Initiated') || $this->is_modification_initial_stage == 'no' 
+                || $this->is_pdi_initial_stage == 'no' || $this->is_delivery_initial_stage == 'no')) {
+                $canRevert = 'no';
+            }
+        return $canRevert;
+    }
     public function getFinanceApprovalStatusAttribute() {
         $status = '';
         $data = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
@@ -155,6 +174,24 @@ class WorkOrder extends Model
             $status = 'Rejected';
         }
         return $status;
+    }
+    public function getCanShowFinApprovalAttribute() {
+        $canShowFinApproval = 'yes';
+        $current = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
+        $first = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','ASC')->first();
+        if(isset($current) && isset($first) && $current->id == $first->id && $this->sales_support_data_confirmation_at == '' && $current->status == 'pending') {
+            $canShowFinApproval = 'no';
+        }
+        return $canShowFinApproval;
+    }
+    public function getCanShowCOOApprovalAttribute() {
+        $canShowCOOApproval = 'yes';
+        $current = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
+        $first = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','ASC')->first();
+        if((isset($current) && isset($first) && $current->id == $first->id) && ($this->sales_support_data_confirmation_at == '' || $this->finance_approval_status != 'Approved') && $current->status == 'pending') {
+            $canShowCOOApproval = 'no';
+        }
+        return $canShowCOOApproval;
     }
     public function getCooApprovalStatusAttribute() {
         $status = '';
@@ -169,7 +206,12 @@ class WorkOrder extends Model
         return $status;
     }
     public function getDocsStatusAttribute() {
-        $status = 'Not Initiated';
+        if($this->sales_support_data_confirmation_at != '' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved') {
+            $status = 'Not Initiated';
+        }
+        else {
+            $status = 'Blank';
+        }
         
         // Fetch the most recent record for the current work order
         $data = WoDocsStatus::where('wo_id', $this->id)
@@ -293,7 +335,13 @@ class WorkOrder extends Model
             return implode(' & ', $parts);
         }
     }
-
+    public function getIsModificationInitialStageAttribute() {
+        $isModificationInitialStage = 'yes';
+        if($this->vehicles_completed_count > 0 || $this->vehicles_initiated_count > 0) {
+            $isModificationInitialStage = 'no';
+        }
+        return $isModificationInitialStage;
+    }
     // Attribute to get the count of pdi "Scheduled" vehicles
     public function getPDIScheduledCountAttribute()
     {
@@ -337,6 +385,13 @@ class WorkOrder extends Model
             return 'NO DATA AVAILABLE';
         }
     }
+    public function getIsPDIInitialStageAttribute() {
+        $isPDIInitialStage = 'yes';
+        if($this->pdi_scheduled_count > 0 || $this->pdi_completed_count > 0) {
+            $isPDIInitialStage = 'no';
+        }
+        return $isPDIInitialStage;
+    }
     // Attribute to get the count of delivery "Ready" vehicles
     public function getDeliveryReadyCountAttribute()
     {
@@ -359,23 +414,23 @@ class WorkOrder extends Model
     {
         return $this->vehicles->where('delivery_status', 'Delivered With Docs Hold')->count();
     }
-   // Attribute to get the modification status summary for the work order
+    // Attribute to get the modification status summary for the work order
     public function getDeliverySummaryAttribute()
     {
-        $deliveredCount = $this->delivery_delivered_count;
+        $deliveredCount = $this->delivery_delivered_count; 
         $readyCount = $this->delivery_ready_count;
         $onHoldCount = $this->delivery_on_hold_count;
-        $deliveredWithDocsHoldCount = $this->delivery_with_docs_hold_count;
+        $deliveredWithDocsHoldCount = $this->delivery_delivered_with_docs_hold_count;
 
         // Logic to determine the summary status
         if ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return 'DELIVERED';
+            return 'DELIVERED WITH DOCUMENTS';
         } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$readyCount} READY";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY";
         } elseif ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS& {$onHoldCount} ON HOLD";
         } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$readyCount} READY & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY & {$onHoldCount} ON HOLD";
         } elseif ($readyCount > 0 && $deliveredCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
             return 'READY';
         } elseif ($readyCount > 0 && $onHoldCount > 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
@@ -383,18 +438,24 @@ class WorkOrder extends Model
         } elseif ($onHoldCount > 0 && $readyCount == 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
             return 'ON HOLD';
         } elseif ($deliveredWithDocsHoldCount > 0 && $deliveredCount == 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return 'DELIVERED WITH DOCS HOLD';
+            return 'DELIVERED/DOCUMENTS HOLD';
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD";
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY";
         } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount > 0) {
-            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} WITH DOCS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
+            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
         } else {
             return 'NO DATA AVAILABLE';
         }
     }
-
+    public function getIsDeliveryInitialStageAttribute() {
+        $isDeliveryInitialStage = 'yes';
+        if($this->delivery_ready_count > 0 || $this->delivery_delivered_count > 0 || $this->delivery_delivered_with_docs_hold_count > 0) {
+            $isDeliveryInitialStage = 'no';
+        }
+        return $isDeliveryInitialStage;
+    }
     public function CreatedBy()
     {
         return $this->hasOne(User::class,'id','created_by');
@@ -439,6 +500,10 @@ class WorkOrder extends Model
     {
         return $this->hasMany(WORecordHistory::class,'work_order_id','id');
     }
+    public function boe()
+    {
+        return $this->hasMany(WOBOE::class,'wo_id','id');
+    }
     public function financePendingApproval() {
         return $this->hasOne(WOApprovals::class)
             ->where('type', 'finance')
@@ -456,6 +521,18 @@ class WorkOrder extends Model
             ->whereIn('status', ['approved', 'rejected'])
             ->latestOfMany('action_at');
     }
+    public function latestFinance()
+    {
+        return $this->hasOne(WOApprovals::class)
+                    ->where('type', 'finance')  // Filter for finance type
+                    ->orderBy('updated_at', 'DESC');  // Get the latest based on updated_at
+    }
+    public function latestCOO()
+    {
+        return $this->hasOne(WOApprovals::class)
+                    ->where('type', 'coo')  // Filter for coo type
+                    ->orderBy('updated_at', 'DESC');  // Get the latest based on updated_at
+    }
     public function latestCooPendingApproval()
     {
         return $this->hasOne(WOApprovals::class)
@@ -467,6 +544,11 @@ class WorkOrder extends Model
     {
         return $this->hasOne(WoDocsStatus::class, 'wo_id') // Explicitly define the foreign key here
             ->latestOfMany('doc_status_changed_at');  // Sort by the date field
+    }
+    public function latestDocs()
+    {
+        return $this->hasOne(WoDocsStatus::class, 'wo_id')  // Specify the correct foreign key here
+                    ->orderBy('doc_status_changed_at', 'DESC');  // Get the latest based on doc_status_changed_at
     }
     public function latestStatus()
     {

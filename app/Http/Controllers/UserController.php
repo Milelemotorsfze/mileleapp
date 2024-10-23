@@ -69,9 +69,10 @@ namespace App\Http\Controllers;
             $user->status = 'active';
             $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
             $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
+            $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
             $user->selected_role = $request->roles[0];
             $user->save();
-            $empProfile = new Profile();
+            $empProfile = new EmployeeProfile();
             $empProfile->user_id = $user->id;
             $empProfile->first_name = $request->input('name');
             $empProfile->company_number = $request->input('phone');
@@ -160,10 +161,12 @@ namespace App\Http\Controllers;
     $user->email = $request->input('email');
     $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
     $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
+    $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
     $user->selected_role = $request->roles[0];
     $user->save();
 
-    $empProfile = $user->empProfile;
+    $empProfile = $user->empProfile ?? new EmployeeProfile();
+    $empProfile->user_id = $user->id; // Ensure the relationship is set
     $empProfile->first_name = $request->input('name');
     $empProfile->company_number = $request->input('phone');
     $empProfile->department_id = $request->input('department');
@@ -172,7 +175,6 @@ namespace App\Http\Controllers;
         $image = $request->file('user_image');
         $imageName = time().'.'.$image->getClientOriginalExtension();
         $image->move(public_path('images/users'), $imageName);
-        // Save the image path to the user's record
         $empProfile->image_path = 'images/users/'.$imageName;
     }
     $empProfile->save();

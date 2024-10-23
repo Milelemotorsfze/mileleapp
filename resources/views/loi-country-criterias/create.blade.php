@@ -102,6 +102,13 @@
                                 </select>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Steering </label>
+                                <select class="form-control widthinput" multiple name="steering" id="steering" autofocus>
+                                    <option value="LHD">LHD</option>
+                                    <option value="RHD"> RHD </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
                                     <textarea cols="25" rows="5"  class="form-control" name="comment"> {{ old('comment') }} </textarea>
@@ -131,6 +138,11 @@
     <script>
         $('#country').select2({
             placeholder : 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#steering').select2({
+            placeholder : 'Select Steering',
             allowClear: true,
             maximumSelectionLength: 1
         });

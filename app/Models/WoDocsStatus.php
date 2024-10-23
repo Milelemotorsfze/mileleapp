@@ -15,6 +15,8 @@ class WoDocsStatus extends Model
         'documentation_comment',
         'doc_status_changed_by',
         'doc_status_changed_at',
+        'declaration_number',
+        'declaration_date',
     ];
     protected $casts = [
         'doc_status_changed_at' => 'datetime',

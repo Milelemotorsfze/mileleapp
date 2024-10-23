@@ -19,6 +19,7 @@ class WOVehicleDeliveryStatus extends Model
         'location',
         'gdn_number',
         'delivery_at',
+        'delivered_at',
         'doc_delivery_date',
     ];
 

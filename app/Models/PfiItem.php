@@ -22,5 +22,9 @@ class PfiItem extends Model
     {
         return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
+    public function ChildPfiItems() {
+
+        return $this->hasMany(PfiItem::class,'parent_pfi_item_id','id')->where('is_parent', false);
+    }
     
 }
