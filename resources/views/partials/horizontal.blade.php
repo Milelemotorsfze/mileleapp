@@ -12,6 +12,19 @@
       border-radius: 50%;
       padding: 0.3rem 0.6rem;
     }
+    .logo-img {
+    width: auto;
+    height: 40px; /* or adjust this to your preferred height */
+    max-width: 100%;
+    object-fit: contain; /* Ensures the image doesn't stretch */
+}
+@supports (-webkit-touch-callout: none) {
+    .logo-img {
+        width: auto;
+        height: 40px;
+        object-fit: contain;
+    }
+}
     .badge-notificationing {
       top: 0;
       right: 0;
@@ -106,7 +119,7 @@
             </button>
             <div class="d-none d-lg-block">
                 <div class="dropdown d-inline-block align-items-center" style="position: absolute; left: 13px; top:7px; z-index: 500;">
-                    <img src="{{ asset('logo.png') }}" width="20" height="40" alt="Logo" class="mx-auto">
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="mx-auto logo-img">
                 </div>
             </div>
 
