@@ -4,117 +4,139 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style>
     .comments-header {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    z-index: 10;
-    border-bottom: 1px solid #dee2e6;
-}
-.fixed-height {
-    height: 280px;
-    overflow-y: auto;
-    border: 1px solid #dee2e6;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 0.25rem;
-}
-.message-card, .message-reply {
-    margin-bottom: 1rem;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-}
-.message-card .card-body, .message-reply {
-    padding: 1rem;
-}
-.message-reply {
-    margin-left: 3rem;
-    margin-top: 0.5rem;
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    padding: 0.5rem;
-}
-.reply-input {
-    margin-left: 3rem;
-    margin-top: 0.5rem;
-    position: relative;
-}
-.avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-.avatar-small {
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-}
-.user-info {
-    display: flex;
-    align-items: center;
-}
-.user-name {
-    margin-left: 5px;
-}
-.send-icon {
-    position: absolute;
-    right: 1px;
-    bottom: 2px;
-    border: none;
-    background: none;
-    font-size: 0.1rem;
-    color: #28a745;
-    cursor: pointer;
-}
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        z-index: 10;
+        border-bottom: 1px solid #dee2e6;
+    }
 
-.send-icongt {
-    position: absolute;
-    right: 1px;
-    bottom: 1px;
-    border: none;
-    background: none;
-    font-size: 0.01rem;
-    color: #28a745;
-    cursor: pointer;
-}
-.message-input-wrapper, .reply-input-wrapper {
-    position: relative;
-}
+    .fixed-height {
+        height: 280px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+    }
 
-.message-input-wrapper textarea, .reply-input-wrapper textarea {
-    padding-right: 40px;
-    width: 100%;
-    box-sizing: border-box;
-}
+    .message-card,
+    .message-reply {
+        margin-bottom: 1rem;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+
+    .message-card .card-body,
+    .message-reply {
+        padding: 1rem;
+    }
+
+    .message-reply {
+        margin-left: 3rem;
+        margin-top: 0.5rem;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.5rem;
+    }
+
+    .reply-input {
+        margin-left: 3rem;
+        margin-top: 0.5rem;
+        position: relative;
+    }
+
+    .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .avatar-small {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-name {
+        margin-left: 5px;
+    }
+
+    .send-icon {
+        position: absolute;
+        right: 1px;
+        bottom: 2px;
+        border: none;
+        background: none;
+        font-size: 0.1rem;
+        color: #28a745;
+        cursor: pointer;
+    }
+
+    .send-icongt {
+        position: absolute;
+        right: 1px;
+        bottom: 1px;
+        border: none;
+        background: none;
+        font-size: 0.01rem;
+        color: #28a745;
+        cursor: pointer;
+    }
+
+    .message-input-wrapper,
+    .reply-input-wrapper {
+        position: relative;
+    }
+
+    .message-input-wrapper textarea,
+    .reply-input-wrapper textarea {
+        padding-right: 40px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .btn-danger {
-    position: relative;
-    z-index: 10;
-}
+        position: relative;
+        z-index: 10;
+    }
+
     .editing {
         background-color: white !important;
-        border: 1px solid black  !important;
+        border: 1px solid black !important;
     }
+
     .short-text {
         display: none;
     }
+
     .upernac {
-        margin-top: 1.8rem!important;
+        margin-top: 1.8rem !important;
     }
+
     .float-middle {
         float: none;
         display: block;
         margin: 0 auto;
     }
+
     .badge-large {
         font-size: 20px !important;
     }
+
     .bar {
         background-color: #778899;
         height: 30px;
@@ -125,145 +147,11 @@
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
     .row-space {
         margin-bottom: 10px;
     }
-/* Full-width container for the progress bar */
-.progress-bar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-    margin: 20px 0;
-}
 
-/* Container for the steps */
-.steps-container {
-    display: flex;
-    flex-grow: 1;
-    width: 100%;
-}
-
-/* Single step (arrow-shaped) */
-.step {
-    display: inline-block;
-    position: relative;
-    padding: 10px 10px; /* Reduced padding for smaller height */
-    background-color: #f0f0f0;
-    color: #333;
-    font-weight: bold;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.3s ease;
-    flex: 1;
-    border-right: 1px solid white; /* Separator between steps */
-    cursor: pointer;
-}
-
-/* Left and right arrows for each step */
-.step::before,
-.step::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    width: 0;
-    height: 0;
-    border-top: 25px solid transparent; /* Reduced height for arrows */
-    border-bottom: 25px solid transparent;
-}
-
-/* Left arrow (before the step) */
-.step::before {
-    left: -10px;
-    border-right: 10px solid #f0f0f0;
-}
-
-/* Right arrow (after the step) */
-.step::after {
-    right: -10px;
-    border-left: 10px solid #f0f0f0;
-}
-
-/* First step (no left arrow) */
-.step:first-child::before {
-    display: none;
-}
-
-/* Hover effect */
-.step:hover {
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-}
-
-.step:hover::before {
-    border-right-color: #007bff;
-}
-
-.step:hover::after {
-    border-left-color: #007bff;
-}
-
-/* Active step (current step) */
-.step.active {
-    background-color: #007bff;
-    color: white;
-}
-
-.step.active::before {
-    border-right-color: #007bff;
-}
-
-.step.active::after {
-    border-left-color: #007bff;
-}
-
-/* Completed step (marked as done) */
-.step.completed {
-    background-color: #28a745;
-    color: white;
-}
-
-.step.completed::before {
-    border-right-color: #28a745;
-}
-
-.step.completed::after {
-    border-left-color: #28a745;
-}
-
-/* Disqualified step */
-.step.disqualified {
-    background-color: #dc3545; /* Red color for disqualified */
-    color: white;
-}
-
-.step.disqualified::before {
-    border-right-color: #dc3545;
-}
-
-.step.disqualified::after {
-    border-left-color: #dc3545;
-}
-
-/* Mark Status as Complete button */
-.completion-button {
-    margin-left: 20px;
-}
-
-.completion-button .btn {
-    font-size: 16px;
-    padding: 10px 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .step {
-        padding: 8px 20px;
-        font-size: 12px;
-    /* Full-width container for the progress bar */
     .progress-bar-container {
         display: flex;
         justify-content: space-between;
@@ -339,10 +227,6 @@
         cursor: pointer;
     }
 
-    /* .step:hover::before {
-        border-right-color: #007bff;
-    } */
-
     .step:hover::after {
         border-left-color: #007bff;
     }
@@ -400,10 +284,6 @@
         background-color: #dc3545;
         /* Red color for disqualified */
         color: white;
-    }
-
-    .step.disqualified::before {
-        border-right-color: #dc3545;
     }
 
     .step.disqualified::after {
@@ -645,6 +525,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                         <div>
                             <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
                             <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
+                            <p class="card-text text-muted"><strong>Trim:</strong> {{ $requirement->model_line }}</p>
+                                <p class="card-text text-muted"><strong>Variant:</strong> {{ $requirement->model_line }}</p>
                         </div>
                         <button class="btn btn-danger btn-sm" onclick="removeModelLine({{ $requirement->id }})">
                             <i class="fas fa-trash-alt"></i> Remove
@@ -655,22 +537,66 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         @endforeach
     </div>
 </div>
-    <!-- Form to add a new model line -->
-    <div class="add-model-line mt-4">
-        <h6>Add More Model Line</h6>
-        <form id="addModelLineForm">
-            <input type="hidden" name="lead_id" value="{{ $lead->id }}">
-            <div class="form-group">
+<div class="add-model-line mt-4">
+    <h6>Add More Model Line</h6>
+    <form id="addModelLineForm">
+        <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+
+        <!-- One row for all inputs: Brand, Model Line, Trim, and Variant -->
+        <div class="row">
+            <!-- Brand input -->
+            <div class="col-md-3">
                 <label for="brand">Brand</label>
-                <input type="text" name="brand" class="form-control" id="brand" placeholder="Enter brand" required>
+                <select name="brand" class="form-control" id="brand" required>
+                    <option value="" disabled selected>Select Brand</option>
+                    @foreach($brands as $brand)
+                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                    @endforeach
+                </select>
             </div>
-            <div class="form-group">
+
+            <!-- Model Line input -->
+            <div class="col-md-3">
                 <label for="model_line">Model Line</label>
-                <input type="text" name="model_line" class="form-control" id="model_line" placeholder="Enter model line" required>
+                <select name="model_line" class="form-control" id="model_line" required disabled>
+                    <option value="" disabled selected>Select Model Line</option>
+                </select>
             </div>
-            <button type="submit" class="btn btn-primary">Add Model Line</button>
-        </form>
+
+            <!-- Trim dropdown -->
+            <div class="col-md-3">
+                <label for="trim">Trim</label>
+                <select name="trim" class="form-control" id="trim" required disabled>
+                    <option value="" disabled selected>Select Trim</option>
+                </select>
+            </div>
+
+            <!-- Variant dropdown -->
+            <div class="col-md-3">
+                <label for="variant">Variant</label>
+                <select name="variant" class="form-control" id="variant" required disabled>
+                    <option value="" disabled selected>Select Variant</option>
+                </select>
+            </div>
+            <div class="col-md-3 mt-4">
+        <label for="asking_price">Asking Price</label>
+        <input type="number" name="asking_price" class="form-control" id="asking_price" placeholder="Enter asking price" required>
     </div>
+
+    <!-- Offer Price input -->
+    <div class="col-md-3 mt-4">
+        <label for="offer_price">Offer Price</label>
+        <input type="number" name="offer_price" class="form-control" id="offer_price" placeholder="Enter offer price" required>
+    </div>
+        </div>
+        <!-- Submit button in a new row -->
+        <div class="form-row mt-3">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary btn-block">Add Vehicle</button>
+            </div>
+        </div>
+    </form>
+</div>
 </div>
                 <!-- Documents & Files tab -->
                 <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
@@ -708,14 +634,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                     <li class="nav-item">
                                         <a class="nav-link" id="task-tab" data-toggle="pill" href="#task-content" role="tab">Task</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="event-tab" data-toggle="pill" href="#event-content" role="tab">Event</a>
-                                    </li>
                                 </ul>
                                 <div class="tab-content mt-3" id="activity-inner-tabs-content">
                                     <div class="tab-pane fade show active" id="logcall-content" role="tabpanel">
                                         <div class="form-group">
-                                            <label for="logCall">Log a Call</label>
+                                            <label for="logCall">Log a Conversation</label>
                                             <textarea class="form-control" id="logCall" rows="3" placeholder="Recap your call..."></textarea>
                                             <button class="btn btn-primary mt-2">Add</button>
                                         </div>
@@ -726,14 +649,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                             <label for="task">Create a Task</label>
                                             <textarea class="form-control" id="task" rows="3" placeholder="Describe your task..."></textarea>
                                             <button class="btn btn-primary mt-2">Add Task</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="tab-pane fade" id="event-content" role="tabpanel">
-                                        <div class="form-group">
-                                            <label for="event">Schedule an Event</label>
-                                            <textarea class="form-control" id="event" rows="3" placeholder="Describe your event..."></textarea>
-                                            <button class="btn btn-primary mt-2">Schedule Event</button>
                                         </div>
                                     </div>
                                 </div>
@@ -793,14 +708,6 @@ redirect()->route('home')->send();
             document.querySelector('.step:last-child').classList.add('disqualified'); // Mark Converted as red
             document.getElementById('completeButton').disabled = true; // Disable button
         }
-
-        // Update button text based on the step
-        // const button = document.getElementById('completeButton');
-        // if (currentStep === 6) {
-        //     button.textContent = 'Mark as Done';
-        // } else {
-        //     button.textContent = 'Continue';
-        // }
     }
 
     // Function to send the status update to the server
@@ -888,8 +795,6 @@ redirect()->route('home')->send();
     } else {
         button.textContent = 'Continue';
     }
-}
-
 // Function to send the status update to the server
 function markAsDone(leadId) {
     // Determine the new status based on the current step
@@ -934,42 +839,53 @@ function markAsDone(leadId) {
 <script>
 $(document).ready(function() {
     $('.edit-btn').on('click', function() {
-        var td = $(this).closest('tr').find('td').first();
-        var field = td.data('field');
-        var currentValue = td.text().trim();
-        if (td.find('select').length === 0) {
-            if (field === 'priority') {
-                var dropdown = `
-                    <select class="form-control">
-                        <option value="Hot" ${currentValue === 'Hot' ? 'selected' : ''}>Hot</option>
-                        <option value="Normal" ${currentValue === 'Normal' ? 'selected' : ''}>Normal</option>
-                        <option value="Low" ${currentValue === 'Low' ? 'selected' : ''}>Low</option>
-                        <option value="Regular" ${currentValue === 'Regular' ? 'selected' : ''}>Regular</option>
-                        <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
-                    </select>`;
-                td.html(dropdown);
-                $(this).html('<i class="fas fa-save"></i>');
-            }
-            else if (field === 'language') {
-                var dropdown = '<select class="form-control">';
-                @foreach($languages as $language)
-                    dropdown += `<option value="{{ $language->name }}" ${currentValue === '{{ $language->name }}' ? 'selected' : ''}>{{ $language->name }}</option>`;
-                @endforeach
-                dropdown += '</select>';
-                td.html(dropdown);
-                $(this).html('<i class="fas fa-save"></i>');
-            }
-            else if (field === 'location') {
-                var dropdown = '<select class="form-control">';
-                @foreach($countries as $code => $name)
-                    dropdown += `<option value="{{ $name }}" ${currentValue === '{{ $name }}' ? 'selected' : ''}>{{ $name }}</option>`;
-                @endforeach
-                dropdown += '</select>';
-                td.html(dropdown);
-                $(this).html('<i class="fas fa-save"></i>');
-            }
+    var td = $(this).closest('tr').find('td').first();
+    var field = td.data('field');
+    var currentValue = td.text().trim();
+
+    if (td.find('select').length === 0 && td.find('input').length === 0) {
+        if (field === 'priority') {
+            var dropdown = `
+                <select class="form-control">
+                    <option value="Hot" ${currentValue === 'Hot' ? 'selected' : ''}>Hot</option>
+                    <option value="Normal" ${currentValue === 'Normal' ? 'selected' : ''}>Normal</option>
+                    <option value="Low" ${currentValue === 'Low' ? 'selected' : ''}>Low</option>
+                    <option value="Regular" ${currentValue === 'Regular' ? 'selected' : ''}>Regular</option>
+                    <option value="High" ${currentValue === 'High' ? 'selected' : ''}>High</option>
+                </select>`;
+            td.html(dropdown);
+            $(this).html('<i class="fas fa-save"></i>');
+        } else if (field === 'language') {
+            var dropdown = '<select class="form-control">';
+            @foreach($languages as $language)
+            dropdown += `<option value="{{ $language->name }}" ${currentValue === '{{ $language->name }}' ? 'selected' : ''}>{{ $language->name }}</option>`;
+            @endforeach
+            dropdown += '</select>';
+            td.html(dropdown);
+            $(this).html('<i class="fas fa-save"></i>');
+        } else if (field === 'location') {
+            var dropdown = '<select class="form-control">';
+            @foreach($countries as $code => $name)
+            dropdown += `<option value="{{ $name }}" ${currentValue === '{{ $name }}' ? 'selected' : ''}>{{ $name }}</option>`;
+            @endforeach
+            dropdown += '</select>';
+            td.html(dropdown);
+            $(this).html('<i class="fas fa-save"></i>');
         } else {
-            var newValue = td.find('select').val();
+            var currentValue = td.text().trim();
+            td.html('<input type="text" class="form-control" value="' + currentValue + '">');
+            $(this).html('<i class="fas fa-save"></i>'); // Change icon to save
+        }
+    } else {
+        var newValue;
+        
+        if (td.find('select').length > 0) {
+            newValue = td.find('select').val();
+        } else if (td.find('input').length > 0) {
+            newValue = td.find('input').val().trim();
+        }
+
+        if (newValue !== '') {
             $.ajax({
                 url: '/leads/update',
                 type: 'POST',
@@ -987,8 +903,11 @@ $(document).ready(function() {
                     console.log('Error:', xhr.responseText);
                 }
             });
+        } else {
+            console.log('Input is empty');
         }
-    });
+    }
+});
 });
 // Function to remove model line
 function removeModelLine(requirementId) {
@@ -1187,6 +1106,61 @@ $(document).ready(function() {
         sendReply(messageId);
     });
     loadMessages();
+});
+</script>
+<script>
+$(document).ready(function() {
+    // When brand is selected, fetch model lines via AJAX
+    $('#brand').on('change', function() {
+        var brandId = $(this).val();
+        
+        if (brandId) {
+            // Enable the model line dropdown
+            $('#model_line').removeAttr('disabled').html('<option value="" disabled selected>Loading...</option>');
+
+            // Fetch model lines based on the selected brand
+            $.ajax({
+                url: '/get-model-lines/' + brandId, // Define the route in your controller
+                type: 'GET',
+                success: function(data) {
+                    $('#model_line').html('<option value="" disabled selected>Select Model Line</option>');
+                    $.each(data, function(index, modelLine) {
+                        $('#model_line').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
+                    });
+                }
+            });
+        }
+    });
+
+    // When model line is selected, fetch trims and variants via AJAX
+    $('#model_line').on('change', function() {
+        var modelLineId = $(this).val();
+
+        if (modelLineId) {
+            // Enable the trim and variant dropdowns
+            $('#trim').removeAttr('disabled').html('<option value="" disabled selected>Loading...</option>');
+            $('#variant').removeAttr('disabled').html('<option value="" disabled selected>Loading...</option>');
+
+            // Fetch trims and variants based on the selected model line
+            $.ajax({
+                url: '/get-trim-variants/' + modelLineId, // Define the route in your controller
+                type: 'GET',
+                success: function(data) {
+                    // Populate trims (unique model_detail values)
+                    $('#trim').html('<option value="" disabled selected>Select Trim</option>');
+                    $.each(data.trims, function(index, trim) {
+                        $('#trim').append('<option value="' + trim.model_detail + '">' + trim.model_detail + '</option>');
+                    });
+
+                    // Populate variants
+                    $('#variant').html('<option value="" disabled selected>Select Variant</option>');
+                    $.each(data.variants, function(index, variant) {
+                        $('#variant').append('<option value="' + variant.id + '">' + variant.name + '</option>');
+                    });
+                }
+            });
+        }
+    });
 });
 </script>
 @endsection

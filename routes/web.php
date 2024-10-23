@@ -1091,4 +1091,6 @@ Route::get('/d', function () {
     Route::post('/messages', [DailyleadsController::class, 'storeMessages']);
     Route::post('/replies', [DailyleadsController::class, 'storeReply']);
     Route::get('/messages/{leadid}', [DailyleadsController::class, 'indexmessages']);
+    Route::get('/get-model-lines/{brandId}', [DailyleadsController::class, 'getModelLines']);
+    Route::get('/get-trim-variants/{modelLineId}', [DailyleadsController::class, 'getTrimAndVariants']);
 });

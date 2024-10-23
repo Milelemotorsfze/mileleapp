@@ -14,6 +14,7 @@ use App\Models\Quotation;
 use App\Models\Language;
 use App\Models\Rejection;
 use App\Models\Closed;
+use App\Models\Varaint;
 use App\Models\LeadSource;
 use App\Models\Brand;
 use App\Models\Fellowup;
@@ -866,7 +867,9 @@ public function leaddetailpage($id)
     $languages = Language::all();
     $countries = CountryListFacade::getList('en');
     $requirements = CallsRequirement::where('lead_id', $id)->with(['masterModelLine.brand'])->get();
-    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements'));
+    $brands = Brand::all();
+    $mastermodellines = MasterModelLines::all();
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines'));
 }
 public function leaddeupdate(Request $request)
 {
@@ -926,6 +929,26 @@ public function storeMessages(Request $request)
                             ->get();
 
         return response()->json($messages);
+    }
+    public function getModelLines($brandId) {
+        $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
+        return response()->json($modelLines);
+    }
+    
+    public function getTrimAndVariants($modelLineId) {
+        // Fetch unique model_detail (trim) values from the variants table based on model_line_id
+        $uniqueTrims = Varaint::where('master_model_lines_id', $modelLineId)
+                                ->select('model_detail') // Assuming model_detail is the column storing trim
+                                ->distinct() // Fetch only unique values
+                                ->get();
+    
+        // Fetch all variants related to the selected model line
+        $variants = Varaint::where('master_model_lines_id', $modelLineId)->get();
+    
+        return response()->json([
+            'trims' => $uniqueTrims,
+            'variants' => $variants,
+        ]);
     }
 }
 
