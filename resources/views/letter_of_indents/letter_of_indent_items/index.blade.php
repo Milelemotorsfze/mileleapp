@@ -200,9 +200,12 @@
                                     <select class="small-width" id="status" onchange="reload()" multiple>
                                        <option></option>
                                        <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_NEW }}">New</option>
+                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL }}">Waiting For TTC Approval</option>  
                                        <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}">Waiting For Approval</option>  
-                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED }}">Approved By Supplier</option>  
-                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED }}">Rejected By Supplier</option>  
+                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED }}">Approved By Supplier</option>
+                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_TTC_APPROVED }}">TTC Approved</option>    
+                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED }}">Rejected By Supplier</option> 
+                                       <option value="{{ \App\Models\LetterOfIndent::LOI_STATUS_TTC_REJECTED }}">TTC Rejected</option>   
                                     </select>
                                 </th>   
                                 <th>
@@ -378,7 +381,7 @@
         });
         $('#status').select2({
             placeholder: "Status",
-            maximumSelectionLength: 1
+            // maximumSelectionLength: 1
         });
        
     </script>
