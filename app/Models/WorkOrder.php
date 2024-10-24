@@ -206,8 +206,7 @@ class WorkOrder extends Model
                             ->where('type', 'coo')
                             ->orderBy('id', 'DESC')
                             ->first();
-
-        if (!$data) {
+        if (!$data || $this->can_show_coo_approval !== 'yes') {
             return '';
         }
 

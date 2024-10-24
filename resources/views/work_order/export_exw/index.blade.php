@@ -147,7 +147,7 @@
 		<div class="card-body">
 			<div class="row">
 				<input type="hidden" name="type" value={{$type ?? ''}}>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
 					<div class="dropdown-option-div">
 						<label for="status-filter" class="col-form-label text-md-end">{{ __('Status') }}</label>
 						<select name="status-filter" id="status-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -162,7 +162,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
 					<div class="dropdown-option-div">
 						<label for="sales-support-filter" class="col-form-label text-md-end">{{ __('Data Confirmation') }}</label>
 						<select name="sales_support_filter" id="sales-support-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -178,7 +178,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
 					<div class="dropdown-option-div">
 						<label for="finance-approval-filter" class="col-form-label text-md-end">{{ __('Fin. Approval') }}</label>
 						<select name="finance-approval-filter" id="finance-approval-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -194,7 +194,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div" hidden>
 					<div class="dropdown-option-div">
 						<label for="coo-approval-filter" class="col-form-label text-md-end">{{ __('COO Approval') }}</label>
 						<select name="coo-approval-filter" id="coo-approval-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -210,7 +210,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div" hidden>
 					<div class="dropdown-option-div">
 						<label for="docs-status-filter" class="col-form-label text-md-end">{{ __('Documentation') }}</label>
 						<select name="docs-status-filter" id="docs-status-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -270,7 +270,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="apply-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="apply-filter-div">
 					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
 						Save & Apply Filters
 					</button>
@@ -399,7 +399,6 @@
 						</tr>
 					</thead>
 					<tbody>
-						<div hidden>{{$i=0;}}</div>
 						@foreach ($datas as $key => $data)
 						<tr data-id="{{$data->id ?? ''}}">
                             <td class="no-click">
@@ -482,7 +481,7 @@
 								@include('work_order.export_exw.doc_status_update')   
 								@include('work_order.export_exw.status_update')                   
                             </td>
-							<td>{{ ++$i }}</td>
+							<td>{{ $datas->firstItem() + $loop->index }}</td>
 							@if(isset($type) && ($type == 'all'|| $type == 'all' || $type == 'status_report'))	
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
@@ -508,7 +507,7 @@
 									<strong>{{ strtoupper($confirmationStatus) }}</strong>
 								</label>
 							</td>							
-							<td>
+							<td>{{$data->finance_approval_status ?? 'xs'}}
 								@if($data->can_show_fin_approval === 'yes')
 									@php
 										$financeStatus = $data->finance_approval_status;
@@ -524,7 +523,7 @@
 									</label>
 								@endif
 							</td>							
-							<td>
+							<td>{{$data->coo_approval_status ?? 'no'}}
 								@if($data->can_show_coo_approval === 'yes')
 									@php
 										$cooStatus = $data->coo_approval_status;
@@ -822,6 +821,9 @@
 						@endforeach
 					</tbody>
 				</table>
+				<div class="d-flex justify-content-center mt-4">
+					{{ $datas->links() }}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -912,6 +914,9 @@
                 "targets": 'no-sort', 
                 "orderable": false,
             }],
+			"paging": false,          // Disable pagination
+			"info": false,            // Disable the "Showing X to Y of Z entries"
+			"lengthChange": false,    // Disable the "Show N entries"
             "initComplete": function(settings, json) {
                 this.api().columns().every(function() {
                     var column = this;
