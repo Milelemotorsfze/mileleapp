@@ -197,7 +197,8 @@ class WorkOrderController extends Controller
         $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
         $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
         $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
-        $datas = WorkOrder::when($type !== 'all' && $type !== 'status_report', function ($query) use ($type) {
+        $datas = WorkOrder::query()
+        ->when($type !== 'all' && $type !== 'status_report', function ($query) use ($type) {
             return $query->where('type', $type);
         })
         ->when($hasLimitedAccess, function ($query) use ($authId) {
@@ -205,14 +206,14 @@ class WorkOrderController extends Controller
         })
         ->when($filters, function ($query) use ($filters) {
             // Apply status filter
-            if (isset($filters['status_filter']) && !empty($filters['status_filter'])) {
+            if (!empty($filters['status_filter'])) {
                 $query->whereHas('latestStatus', function ($q) use ($filters) {
                     $q->whereIn('status', $filters['status_filter']);
                 });
             }
     
             // Apply sales support filter
-            if (isset($filters['sales_support_filter']) && !empty($filters['sales_support_filter'])) {
+            if (!empty($filters['sales_support_filter'])) {
                 $query->where(function ($q1) use ($filters) {
                     if (in_array('Confirmed', $filters['sales_support_filter'])) {
                         $q1->orWhereNotNull('sales_support_data_confirmation_at');
@@ -223,90 +224,23 @@ class WorkOrderController extends Controller
                 });
             }
     
+            // Apply finance approval filter
+            if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
+                $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
+                $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);
+    
+                $query->whereHas('latestFinance', function ($q) use ($normalizedFinanceApprovalFilter) {
+                    $q->whereIn(\DB::raw('lower(status)'), $normalizedFinanceApprovalFilter);
+                });
+    
+                if ($includeBlank) {
+                    $query->orWhereDoesntHave('latestFinance');  // Handle the 'Blank' case for missing finance approvals
+                }
+            }
         })
-        ->with('latestFinance','latestDocs','boe')  // Eager-load the latest finance approval
+        ->with(['latestFinance', 'latestDocs', 'boe', 'vehicles'])
         ->latest()
-        ->get();
-        $filteredDatas = $datas;
-        if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
-            // Normalize the status filter array to lowercase
-            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
-        
-            // Check if 'Blank' is in the filter (case-insensitive)
-            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);
-        
-            // Filter datas where either latestFinance status is in $filters['finance_approval_filter'] or latestFinance is null (if 'Blank' is included)
-            $filteredDatas = $datas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
-                if ($includeBlank && !$data->latestFinance) {
-                    // Include data where latestFinance is null if 'Blank' is selected
-                    return true;
-                }
-        
-                // Otherwise, filter based on the latestFinance status
-                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter);
-            });
-        }
-        
-        if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
-            // Normalize the status filter array to lowercase
-            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
-            
-            // Check if 'Blank' is in the filter (case-insensitive)
-            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);
-        
-            // Filter datas where either latestCOO status is in $filters['coo_approval_filter'] or latestCOO is null (if 'Blank' is included)
-            $filteredDatas = $datas->filter(function ($data) use ($normalizedCOOApprovalFilter, $includeBlankCOO) {
-                if ($includeBlankCOO && !$data->latestCOO) {
-                    // Include data where latestCOO is null if 'Blank' is selected
-                    return true;
-                }
-        
-                // Otherwise, filter based on the latestCOO status
-                return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter);
-            });
-        }
-        if (isset($filters['docs_status_filter']) && !empty($filters['docs_status_filter'])) {
-            // Use the docs status filter directly
-            $docsStatusFilter = $filters['docs_status_filter'];
-        
-            // Check if 'Blank' is in the filter
-            $includeBlankDocs = in_array('Blank', $docsStatusFilter);
-            // Filter datas where either docs_status is in $filters['docs_status_filter'] or docs_status is 'Not Initiated' (if 'Blank' is included)
-            $filteredDatas = $datas->filter(function ($data) use ($docsStatusFilter, $includeBlankDocs) {
-                return in_array($data->docs_status, $docsStatusFilter);
-            });
-        
-            // Optionally convert filtered results to array
-            // $filteredDatas = $filteredDatas->values()->toArray();
-        }
-        if (isset($filters['modification_filter']) && !empty($filters['modification_filter'])) {
-            // Use the modification filter directly
-            $modificationFilter = $filters['modification_filter'];
-        
-            // Check if 'Blank' is in the filter
-            $includeBlankModi = in_array('Blank', $modificationFilter);
-        
-            // Filter work orders where at least one vehicle's modification_status matches the filter
-            $filteredDatas = $datas->filter(function ($data) use ($modificationFilter, $includeBlankModi) {
-                // Loop through each vehicle for the current work order
-                foreach ($data->vehicles as $vehicle) {
-                    // If 'Blank' is in the filter and the modification status is 'Not Initiated', include the work order
-                    if ($includeBlankModi && $vehicle->modification_status === 'Not Initiated') {
-                        return true;
-                    }
-        
-                    // If any vehicle's modification_status is in the modificationFilter, include the work order
-                    if (in_array($vehicle->modification_status, $modificationFilter)) {
-                        return true;
-                    }
-                }
-        
-                // If no vehicle matches the filter, exclude the work order
-                return false;
-            });
-        }
-        $datas = $filteredDatas;
-        // Return the view with the type, data, applied filters, and unique options for the select filters
+        ->paginate(100);
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
