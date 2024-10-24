@@ -507,7 +507,7 @@
 									<strong>{{ strtoupper($confirmationStatus) }}</strong>
 								</label>
 							</td>							
-							<td>{{$data->finance_approval_status ?? 'xs'}}
+							<td>
 								@if($data->can_show_fin_approval === 'yes')
 									@php
 										$financeStatus = $data->finance_approval_status;
@@ -523,7 +523,7 @@
 									</label>
 								@endif
 							</td>							
-							<td>{{$data->coo_approval_status ?? 'no'}}
+							<td>
 								@if($data->can_show_coo_approval === 'yes')
 									@php
 										$cooStatus = $data->coo_approval_status;
