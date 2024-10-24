@@ -240,7 +240,7 @@ class WorkOrderController extends Controller
         })
         ->with(['latestFinance', 'latestDocs', 'boe', 'vehicles'])
         ->latest()
-        ->paginate(20);
+        ->paginate(100);
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
