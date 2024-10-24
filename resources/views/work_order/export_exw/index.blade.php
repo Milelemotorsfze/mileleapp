@@ -487,40 +487,78 @@
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
 							<td>
-								<label class="badge 
-									@if($data->status == 'On Hold') badge-soft-warning
-									@elseif($data->status == 'Active') badge-soft-success
-									@elseif($data->status == 'Cancelled') badge-soft-danger
-									@elseif($data->status == 'Succeeded') badge-soft-primary
-									@elseif($data->status == 'Partially Delivered') badge-soft-info
-									@endif">
-									<strong>{{ strtoupper($data->status) ?? ''}}</strong>
-								</label>
+								@if($data->latestStatus)
+									<label class="badge 
+										@if($data->latestStatus->status == 'On Hold') badge-soft-warning
+										@elseif($data->latestStatus->status == 'Active') badge-soft-success
+										@elseif($data->latestStatus->status == 'Cancelled') badge-soft-danger
+										@elseif($data->latestStatus->status == 'Succeeded') badge-soft-primary
+										@elseif($data->latestStatus->status == 'Partially Delivered') badge-soft-info
+										@endif">
+										<strong>{{ strtoupper($data->latestStatus->status) }}</strong>
+									</label>
+								@endif
 							</td>
-							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif"><strong>{{ strtoupper($data->sales_support_data_confirmation) ?? ''}}</strong></label></td>
-							<td>@if($data->can_show_fin_approval == 'yes')<label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->finance_approval_status) ?? ''}}</strong></label>@endif</td>
-							<td>@if($data->can_show_coo_approval == 'yes')<label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->coo_approval_status) ?? ''}}</strong></label>@endif</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && 
-									$data->finance_approval_status == 'Approved' && 
-									$data->coo_approval_status == 'Approved') 
+								@php
+									$confirmationStatus = $data->sales_support_data_confirmation_at ? 'Confirmed' : 'Not Confirmed';
+									$badgeClass = $confirmationStatus == 'Confirmed' ? 'badge-soft-success' : 'badge-soft-danger';
+								@endphp
+								<label class="badge {{ $badgeClass }}">
+									<strong>{{ strtoupper($confirmationStatus) }}</strong>
+								</label>
+							</td>							
+							<td>
+								@if($data->can_show_fin_approval === 'yes')
+									@php
+										$financeStatus = $data->finance_approval_status;
+										$badgeClass = match ($financeStatus) {
+											'Pending' => 'badge-soft-info',
+											'Approved' => 'badge-soft-success',
+											'Rejected' => 'badge-soft-danger',
+											default => '',
+										};
+									@endphp
+									<label class="badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($financeStatus) }}</strong>
+									</label>
+								@endif
+							</td>							
+							<td>
+								@if($data->can_show_coo_approval === 'yes')
+									@php
+										$cooStatus = $data->coo_approval_status;
+										$badgeClass = match ($cooStatus) {
+											'Pending' => 'badge-soft-info',
+											'Approved' => 'badge-soft-success',
+											'Rejected' => 'badge-soft-danger',
+											default => '',
+										};
+									@endphp
+									<label class="badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($cooStatus) }}</strong>
+									</label>
+								@endif
+							</td>							
+							<td>
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved') 
 
 									@php
-										$badgeClass = '';
-										if ($data->docs_status == 'In Progress') {
-											$badgeClass = 'badge-soft-info';
-										} elseif ($data->docs_status == 'Ready') {
-											$badgeClass = 'badge-soft-success';
-										} elseif ($data->docs_status == 'Not Initiated') {
-											$badgeClass = 'badge-soft-danger';
-										}
+										$badgeClass = match ($data->docs_status) {
+											'In Progress' => 'badge-soft-info',
+											'Ready' => 'badge-soft-success',
+											'Not Initiated' => 'badge-soft-danger',
+											default => '',
+										};
 									@endphp
 
 									<div class="tooltip-container">
 										<label class="badge {{ $badgeClass }} docs-status">
-											<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
+											<strong>{{ strtoupper($data->docs_status) }}</strong>
 										</label>
-										@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
+										@if($data->latestDocsStatus && $data->latestDocsStatus->documentation_comment)
 											<div class="tooltip-text">
 												<div class="tooltip-header">Remarks</div>
 												<div class="tooltip-body">
@@ -531,25 +569,64 @@
 									</div>
 								@endif
 							</td>
+
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
-									<label class="float-end badge @if($data->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($data->vehicles_modification_summary == 'NO MODIFICATIONS') badge-soft-warning  @elseif($data->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->vehicles_modification_summary ?? ''}}</strong>
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+									
+									@php
+										$badgeClass = match($data->vehicles_modification_summary) {
+											'INITIATED' => 'badge-soft-info',
+											'NO MODIFICATIONS' => 'badge-soft-warning',
+											'NOT INITIATED' => 'badge-soft-danger',
+											'COMPLETED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->vehicles_modification_summary) }}</strong>
 									</label>
 								@endif
 							</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
-									<label class="float-end badge @if($data->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($data->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->pdi_summary ?? ''}}</strong>
-									</label>     
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+
+									@php
+										$badgeClass = match($data->pdi_summary) {
+											'SCHEDULED' => 'badge-soft-info',
+											'NOT INITIATED' => 'badge-soft-danger',
+											'COMPLETED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->pdi_summary ?? '') }}</strong>
+									</label>
 								@endif
 							</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
-									<label class="float-end badge @if($data->delivery_summary == 'READY') badge-soft-info @elseif($data->delivery_summary == 'ON HOLD') badge-soft-danger @elseif($data->delivery_summary == 'DELIVERED WITH DOCS HOLD') badge-soft-warning @elseif($data->delivery_summary == 'DELIVERED ') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->delivery_summary ?? ''}}</strong>
-									</label>     
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+
+									@php
+										$badgeClass = match($data->delivery_summary) {
+											'READY' => 'badge-soft-info',
+											'ON HOLD' => 'badge-soft-danger',
+											'DELIVERED WITH DOCS HOLD' => 'badge-soft-warning',
+											'DELIVERED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->delivery_summary ?? '') }}</strong>
+									</label>
 								@endif
 							</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>

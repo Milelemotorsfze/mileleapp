@@ -163,66 +163,103 @@ class WorkOrder extends Model
             }
         return $canRevert;
     }
-    public function getFinanceApprovalStatusAttribute() {
-        $status = '';
-        $data = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
-        if($data && $data->status == 'pending') {
-            $status = 'Pending';
-        } else if($data && $data->status == 'approved') {
-            $status = 'Approved';
-        }else if($data && $data->status == 'rejected') {
-            $status = 'Rejected';
+    public function getFinanceApprovalStatusAttribute()
+    {
+        $data = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'finance')
+                            ->orderBy('id', 'DESC')
+                            ->first();
+
+        if (!$data) {
+            return '';
         }
-        return $status;
+
+        return match ($data->status) {
+            'pending' => 'Pending',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            default => '',
+        };
     }
-    public function getCanShowFinApprovalAttribute() {
+
+    public function getCanShowFinApprovalAttribute()
+    {
         $canShowFinApproval = 'yes';
-        $current = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','DESC')->first();
-        $first = WOApprovals::where('work_order_id',$this->id)->where('type','finance')->orderBy('id','ASC')->first();
-        if(isset($current) && isset($first) && $current->id == $first->id && $this->sales_support_data_confirmation_at == '' && $current->status == 'pending') {
+        $current = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'finance')
+                            ->orderBy('id', 'DESC')
+                            ->first();
+        $first = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'finance')
+                            ->orderBy('id', 'ASC')
+                            ->first();
+
+        if (isset($current) && isset($first) && $current->id == $first->id && $this->sales_support_data_confirmation_at == '' && $current->status == 'pending') {
             $canShowFinApproval = 'no';
         }
+
         return $canShowFinApproval;
     }
-    public function getCanShowCOOApprovalAttribute() {
+    public function getCooApprovalStatusAttribute()
+    {
+        $data = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'coo')
+                            ->orderBy('id', 'DESC')
+                            ->first();
+
+        if (!$data) {
+            return '';
+        }
+
+        return match ($data->status) {
+            'pending' => 'Pending',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            default => '',
+        };
+    }
+
+    // Determine if COO approval should be shown
+    public function getCanShowCOOApprovalAttribute()
+    {
         $canShowCOOApproval = 'yes';
-        $current = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
-        $first = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','ASC')->first();
-        if((isset($current) && isset($first) && $current->id == $first->id) && ($this->sales_support_data_confirmation_at == '' || $this->finance_approval_status != 'Approved') && $current->status == 'pending') {
+        $current = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'coo')
+                            ->orderBy('id', 'DESC')
+                            ->first();
+        $first = WOApprovals::where('work_order_id', $this->id)
+                            ->where('type', 'coo')
+                            ->orderBy('id', 'ASC')
+                            ->first();
+
+        if (isset($current) && isset($first) && $current->id == $first->id 
+            && ($this->sales_support_data_confirmation_at == '' || $this->finance_approval_status != 'Approved')
+            && $current->status == 'pending') {
             $canShowCOOApproval = 'no';
         }
+
         return $canShowCOOApproval;
     }
-    public function getCooApprovalStatusAttribute() {
-        $status = '';
-        $data = WOApprovals::where('work_order_id',$this->id)->where('type','coo')->orderBy('id','DESC')->first();
-        if($data && $data->status == 'pending') {
-            $status = 'Pending';
-        } else if($data && $data->status == 'approved') {
-            $status = 'Approved';
-        }else if($data && $data->status == 'rejected') {
-            $status = 'Rejected';
-        }
-        return $status;
-    }
-    public function getDocsStatusAttribute() {
-        if($this->sales_support_data_confirmation_at != '' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved') {
+    public function getDocsStatusAttribute()
+    {
+        $status = 'Blank';  // Default status if conditions are not met
+
+        if ($this->sales_support_data_confirmation_at && 
+            $this->finance_approval_status === 'Approved' && 
+            $this->coo_approval_status === 'Approved') {
             $status = 'Not Initiated';
         }
-        else {
-            $status = 'Blank';
-        }
-        
+
         // Fetch the most recent record for the current work order
         $data = WoDocsStatus::where('wo_id', $this->id)
-            ->orderBy('doc_status_changed_at', 'DESC')
-            ->first();
-        
+                            ->orderBy('doc_status_changed_at', 'DESC')
+                            ->first();
+
         // If data exists, update the status to the latest one
         if ($data) {
             $status = $data->is_docs_ready;
         }
-    
+
         return $status;
     }
     public function getTotalNumberOfBOEAttribute() {
@@ -284,57 +321,53 @@ class WorkOrder extends Model
         $completedCount = $this->vehicles_completed_count;
         $initiatedCount = $this->vehicles_initiated_count;
         $notInitiatedCount = $this->vehicles_not_initiated_count;
-
+    
         // Get the total number of vehicles related to the work order
         $totalVehiclesCount = $this->vehicles()->count();
-
-        // Special case: if the sum of COMPLETED and NO MODIFICATIONS equals the total vehicle count, return 'COMPLETED'
-        if ($noModificationsCount == $totalVehiclesCount) { 
+    
+        // Special case: if all vehicles have no modifications
+        if ($noModificationsCount == $totalVehiclesCount) {
             return 'NO MODIFICATIONS';
         }
-        else if (($completedCount + $noModificationsCount) == $totalVehiclesCount) { 
+    
+        // Special case: if all vehicles are either completed or have no modifications
+        if (($completedCount + $noModificationsCount) == $totalVehiclesCount) {
             return 'COMPLETED';
         }
-        else {
-            // Check if only one status is present and return the status without a count
-            if ($completedCount > 0 && $initiatedCount == 0 && $notInitiatedCount == 0 && $noModificationsCount == 0) {
-                return 'COMPLETED';
-            }
-            if ($noModificationsCount > 0 && $completedCount == 0 && $initiatedCount == 0 && $notInitiatedCount == 0) {
-                return 'NO MODIFICATIONS';
-            }
-            if ($initiatedCount > 0 && $completedCount == 0 && $notInitiatedCount == 0 && $noModificationsCount == 0) {
-                return 'INITIATED';
-            }
-            if ($notInitiatedCount > 0 && $completedCount == 0 && $initiatedCount == 0 && $noModificationsCount == 0) {
-                return 'NOT INITIATED';
-            }
-
-            // If there are no counts, return 'NO DATA AVAILABLE'
-            if ($completedCount == 0 && $initiatedCount == 0 && $notInitiatedCount == 0 && $noModificationsCount == 0) {
-                return 'NO DATA AVAILABLE';
-            }
-
-            // Initialize parts of the message with counts, only if multiple statuses are present
-            $parts = [];
-
-            if ($completedCount > 0) {
-                $parts[] = "{$completedCount} COMPLETED";
-            }
-            if ($initiatedCount > 0) {
-                $parts[] = "{$initiatedCount} INITIATED";
-            }
-            if ($notInitiatedCount > 0) {
-                $parts[] = "{$notInitiatedCount} NOT INITIATED";
-            }
-            if ($noModificationsCount > 0) {
-                $parts[] = "{$noModificationsCount} NO MODIFICATIONS";
-            }
-
-            // Concatenate the parts with ' & ' and return
-            return implode(' & ', $parts);
+    
+        // Check for single status
+        if ($completedCount > 0 && !$initiatedCount && !$notInitiatedCount && !$noModificationsCount) {
+            return 'COMPLETED';
         }
+        if ($noModificationsCount > 0 && !$completedCount && !$initiatedCount && !$notInitiatedCount) {
+            return 'NO MODIFICATIONS';
+        }
+        if ($initiatedCount > 0 && !$completedCount && !$notInitiatedCount && !$noModificationsCount) {
+            return 'INITIATED';
+        }
+        if ($notInitiatedCount > 0 && !$completedCount && !$initiatedCount && !$noModificationsCount) {
+            return 'NOT INITIATED';
+        }
+    
+        // If no specific status applies, return the combined summary
+        $parts = [];
+        if ($completedCount > 0) {
+            $parts[] = "{$completedCount} COMPLETED";
+        }
+        if ($initiatedCount > 0) {
+            $parts[] = "{$initiatedCount} INITIATED";
+        }
+        if ($notInitiatedCount > 0) {
+            $parts[] = "{$notInitiatedCount} NOT INITIATED";
+        }
+        if ($noModificationsCount > 0) {
+            $parts[] = "{$noModificationsCount} NO MODIFICATIONS";
+        }
+    
+        // Return the concatenated summary
+        return implode(' & ', $parts);
     }
+    
     public function getIsModificationInitialStageAttribute() {
         $isModificationInitialStage = 'yes';
         if($this->vehicles_completed_count > 0 || $this->vehicles_initiated_count > 0) {
@@ -360,7 +393,6 @@ class WorkOrder extends Model
         return $this->vehicles->where('pdi_status', 'Completed')->count();
     }
 
-    // Attribute to get the modification status summary for the work order
     public function getPDISummaryAttribute()
     {
         $completedCount = $this->pdi_completed_count;
@@ -369,21 +401,33 @@ class WorkOrder extends Model
 
         if ($completedCount > 0 && $scheduledCount == 0 && $notInitiatedCount == 0) {
             return 'COMPLETED';
-        } elseif ($completedCount > 0 && $scheduledCount > 0 && $notInitiatedCount == 0) {
-            return "{$completedCount} COMPLETED & {$scheduledCount} SCHEDULED";
-        } elseif ($completedCount > 0 && $scheduledCount == 0 && $notInitiatedCount > 0) {
-            return "{$completedCount} COMPLETED & {$notInitiatedCount} NOT INITIATED";
-        } elseif ($completedCount > 0 && $scheduledCount > 0 && $notInitiatedCount > 0) {
-            return "{$completedCount} COMPLETED & {$scheduledCount} SCHEDULED & {$notInitiatedCount} NOT INITIATED";
-        } elseif ($scheduledCount > 0 && $completedCount == 0 && $notInitiatedCount == 0) {
-            return 'SCHEDULED';
-        } elseif ($scheduledCount > 0 && $notInitiatedCount > 0 && $completedCount == 0) {
-            return "{$scheduledCount} SCHEDULED & {$notInitiatedCount} NOT INITIATED";
-        } elseif ($notInitiatedCount > 0 && $scheduledCount == 0 && $completedCount == 0) {
-            return 'NOT INITIATED';
-        } else {
-            return 'NO DATA AVAILABLE';
         }
+
+        if ($completedCount > 0 && $scheduledCount > 0 && $notInitiatedCount == 0) {
+            return "{$completedCount} COMPLETED & {$scheduledCount} SCHEDULED";
+        }
+
+        if ($completedCount > 0 && $scheduledCount == 0 && $notInitiatedCount > 0) {
+            return "{$completedCount} COMPLETED & {$notInitiatedCount} NOT INITIATED";
+        }
+
+        if ($completedCount > 0 && $scheduledCount > 0 && $notInitiatedCount > 0) {
+            return "{$completedCount} COMPLETED & {$scheduledCount} SCHEDULED & {$notInitiatedCount} NOT INITIATED";
+        }
+
+        if ($scheduledCount > 0 && $completedCount == 0 && $notInitiatedCount == 0) {
+            return 'SCHEDULED';
+        }
+
+        if ($scheduledCount > 0 && $notInitiatedCount > 0 && $completedCount == 0) {
+            return "{$scheduledCount} SCHEDULED & {$notInitiatedCount} NOT INITIATED";
+        }
+
+        if ($notInitiatedCount > 0 && $scheduledCount == 0 && $completedCount == 0) {
+            return 'NOT INITIATED';
+        }
+
+        return 'NO DATA AVAILABLE';
     }
     public function getIsPDIInitialStageAttribute() {
         $isPDIInitialStage = 'yes';
@@ -414,40 +458,58 @@ class WorkOrder extends Model
     {
         return $this->vehicles->where('delivery_status', 'Delivered With Docs Hold')->count();
     }
-    // Attribute to get the modification status summary for the work order
     public function getDeliverySummaryAttribute()
     {
-        $deliveredCount = $this->delivery_delivered_count; 
+        $deliveredCount = $this->delivery_delivered_count;
         $readyCount = $this->delivery_ready_count;
         $onHoldCount = $this->delivery_on_hold_count;
         $deliveredWithDocsHoldCount = $this->delivery_delivered_with_docs_hold_count;
 
-        // Logic to determine the summary status
         if ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
             return 'DELIVERED WITH DOCUMENTS';
-        } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY";
-        } elseif ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS& {$onHoldCount} ON HOLD";
-        } elseif ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$readyCount} READY & {$onHoldCount} ON HOLD";
-        } elseif ($readyCount > 0 && $deliveredCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return 'READY';
-        } elseif ($readyCount > 0 && $onHoldCount > 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return "{$readyCount} READY & {$onHoldCount} ON HOLD";
-        } elseif ($onHoldCount > 0 && $readyCount == 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
-            return 'ON HOLD';
-        } elseif ($deliveredWithDocsHoldCount > 0 && $deliveredCount == 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return 'DELIVERED/DOCUMENTS HOLD';
-        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount == 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD";
-        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount == 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY";
-        } elseif ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount > 0) {
-            return "{$deliveredCount} DELIVERED WITH DOCUMENTS & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
-        } else {
-            return 'NO DATA AVAILABLE';
         }
+
+        if ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$readyCount} READY";
+        }
+
+        if ($deliveredCount > 0 && $readyCount == 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$onHoldCount} ON HOLD";
+        }
+
+        if ($deliveredCount > 0 && $readyCount > 0 && $onHoldCount > 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$readyCount} READY & {$onHoldCount} ON HOLD";
+        }
+
+        if ($readyCount > 0 && $deliveredCount == 0 && $onHoldCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return 'READY';
+        }
+
+        if ($readyCount > 0 && $onHoldCount > 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return "{$readyCount} READY & {$onHoldCount} ON HOLD";
+        }
+
+        if ($onHoldCount > 0 && $readyCount == 0 && $deliveredCount == 0 && $deliveredWithDocsHoldCount == 0) {
+            return 'ON HOLD';
+        }
+
+        if ($deliveredWithDocsHoldCount > 0 && $deliveredCount == 0 && $readyCount == 0 && $onHoldCount == 0) {
+            return 'DELIVERED/DOCUMENTS HOLD';
+        }
+
+        if ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount == 0 && $onHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD";
+        }
+
+        if ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount == 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY";
+        }
+
+        if ($deliveredCount > 0 && $deliveredWithDocsHoldCount > 0 && $readyCount > 0 && $onHoldCount > 0) {
+            return "{$deliveredCount} DELIVERED & {$deliveredWithDocsHoldCount} DELIVERED/DOCUMENTS HOLD & {$readyCount} READY & {$onHoldCount} ON HOLD";
+        }
+
+        return 'NO DATA AVAILABLE';
     }
     public function getIsDeliveryInitialStageAttribute() {
         $isDeliveryInitialStage = 'yes';
@@ -542,8 +604,8 @@ class WorkOrder extends Model
     }
     public function latestDocsStatus()
     {
-        return $this->hasOne(WoDocsStatus::class, 'wo_id') // Explicitly define the foreign key here
-            ->latestOfMany('doc_status_changed_at');  // Sort by the date field
+        return $this->hasOne(WoDocsStatus::class, 'wo_id')
+                    ->latestOfMany('doc_status_changed_at');
     }
     public function latestDocs()
     {
@@ -552,7 +614,7 @@ class WorkOrder extends Model
     }
     public function latestStatus()
     {
-        return $this->hasOne(WoStatus::class, 'wo_id') // Explicitly define the foreign key here
-            ->latestOfMany('status_changed_at');  // Sort by the date field
+        return $this->hasOne(WoStatus::class, 'wo_id')
+            ->latestOfMany('status_changed_at'); 
     }
 }
