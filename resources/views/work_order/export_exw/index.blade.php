@@ -1,37 +1,30 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
-	/* Tooltip container */
 	.tooltip-container {
 		position: relative;
 		display: inline-block;
 		cursor: pointer;
 	}
-
-	/* Tooltip text */
 	.tooltip-text {
 		visibility: hidden;
-		width: 300px; /* Adjust width as needed */
-		background-color: #e1efff; /* Light blue background */
+		width: 300px; 
+		background-color: #e1efff; 
 		color: #000;
 		text-align: left;
 		border-radius: 5px;
 		padding: 10px;
 		position: absolute;
 		z-index: 1;
-		right: -320px; /* Position to the right of the status label */
+		right: -320px; 
 		top: 50%;
 		transform: translateY(-50%);
-		border: 1px solid #99c2ff; /* Border color for the tooltip */
+		border: 1px solid #99c2ff; 
 		font-size: 14px;
 		opacity: 0;
 		transition: opacity 0.3s ease-in-out;
 		box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
 	}
-
-	/* Tooltip header styling */
 	.tooltip-header {
 		font-weight: bold;
 		background-color: #b4d2f7;
@@ -39,19 +32,14 @@
 		border-bottom: 1px solid #99c2ff;
 		text-align: center;
 	}
-
-	/* Tooltip body */
 	.tooltip-body {
 		padding: 10px;
-		white-space: pre-line; /* Ensures the text breaks into multiple lines */
+		white-space: pre-line; 
 	}
-
-	/* Show the tooltip text on hover */
 	.tooltip-container:hover .tooltip-text {
 		visibility: visible;
 		opacity: 1;
 	}
-
 	.btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;
@@ -63,57 +51,70 @@
 		font-size:12px!important;
 	}
 	.form-label {
-	margin-top: 0.5rem;
+		margin-top: 0.5rem;
 	}
 	.iti {
-	width: 100%;
+		width: 100%;
 	}
 	.texttransform {
-	text-transform: capitalize;
+		text-transform: capitalize;
 	}
 	.light {
-	background-color:#e6e6e6!important;
-	font-weight: 700!important;
+		background-color:#e6e6e6!important;
+		font-weight: 700!important;
 	}
 	.dark {
-	background-color:#d9d9d9!important;
-	font-weight: 700!important;
+		background-color:#d9d9d9!important;
+		font-weight: 700!important;
 	}
 	.paragraph-class {
-	color: red;
-	font-size:11px;
+		color: red;
+		font-size:11px;
 	}
 	.other-error {
-	color: red;
+		color: red;
 	}
 </style>
 @section('content')
 <div class="card-header">
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
+		$canViewWOList = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list',
+			'list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo',
+			'view-current-user-local-sale-wo-list','list-lto-wo']);
+		$canCreateWO = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo',
+			'create-local-sale-wo']);
+		$canViewWODetails = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details',
+			'export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
+		$caneditWO = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order',
+			'edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order',
+			'edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
+		$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
+		$canViewFinLog = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
+		$canViewCOOLog = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
+		$canChangeDocStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
+		$canViewDocLog = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
+		$canChangeWOStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
+		$canViewWOStatusLog = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
 	@endphp
-	@if ($hasPermission)
+	@if ($canViewWOList)
 	<h4 class="card-title">
     @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @elseif(isset($type) && $type == 'all') All @elseif(isset($type) && $type == 'status_report') Status Report - @endif Work Order Info
 	</h4>
 	@endif
-	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo']);
-	@endphp
-	@if ($hasPermission)
+	@if ($canCreateWO)
 		@if(isset($type) && ($type == 'all' || $type == 'status_report'))
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','local_sale')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Local Sale Work Order 
 		</a>
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_cnf')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Export CNF Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Export CNF Work Order 
 		</a>
 		<a style="float: right;" class="btn btn-sm btn-success me-1" href="{{route('work-order-create.create','export_exw')}}">
-		<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
+			<i class="fa fa-plus" aria-hidden="true"></i> New Export EXW Work Order 
 		</a>
 		@elseif(isset($type) && ($type != 'all' || $type != 'status_report'))
 			<a style="float: right;" class="btn btn-sm btn-success" href="{{route('work-order-create.create',$type)}}">
-			<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
+				<i class="fa fa-plus" aria-hidden="true"></i> New @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order 
 			</a>
 		@endif
 	@endif
@@ -123,7 +124,7 @@
 		<button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
 		<ul>
 			@foreach ($errors->all() as $error)
-			<li>{{ $error }}</li>
+				<li>{{ $error }}</li>
 			@endforeach
 		</ul>
 	</div>
@@ -141,15 +142,12 @@
 	</div>
 	@endif
 </div>
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list','list-lto-wo']);
-@endphp
-@if ($hasPermission)
+@if ($canViewWOList)
 <div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
 			<div class="row">
 				<input type="hidden" name="type" value={{$type ?? ''}}>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="status-filter-div">
 					<div class="dropdown-option-div">
 						<label for="status-filter" class="col-form-label text-md-end">{{ __('Status') }}</label>
 						<select name="status-filter" id="status-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -164,7 +162,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="sales-support-filter-div">
 					<div class="dropdown-option-div">
 						<label for="sales-support-filter" class="col-form-label text-md-end">{{ __('Data Confirmation') }}</label>
 						<select name="sales_support_filter" id="sales-support-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -180,7 +178,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="finance-approval-filter-div">
 					<div class="dropdown-option-div">
 						<label for="finance-approval-filter" class="col-form-label text-md-end">{{ __('Fin. Approval') }}</label>
 						<select name="finance-approval-filter" id="finance-approval-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -196,7 +194,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="coo-approval-filter-div" hidden>
 					<div class="dropdown-option-div">
 						<label for="coo-approval-filter" class="col-form-label text-md-end">{{ __('COO Approval') }}</label>
 						<select name="coo-approval-filter" id="coo-approval-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -212,7 +210,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="docs-status-filter-div" hidden>
 					<div class="dropdown-option-div">
 						<label for="docs-status-filter" class="col-form-label text-md-end">{{ __('Documentation') }}</label>
 						<select name="docs-status-filter" id="docs-status-filter" multiple="true" class="form-control widthinput" autofocus>
@@ -272,7 +270,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</select>
 					</div>
 				</div>
-				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div" id="apply-filter-div">
+				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div" id="apply-filter-div">
 					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
 						Save & Apply Filters
 					</button>
@@ -401,7 +399,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						</tr>
 					</thead>
 					<tbody>
-						<div hidden>{{$i=0;}}</div>
 						@foreach ($datas as $key => $data)
 						<tr data-id="{{$data->id ?? ''}}">
                             <td class="no-click">
@@ -410,10 +407,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-start">
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
-                                        @endphp
-                                        @if ($hasPermission)
+                                        @if ($canViewWODetails)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->id ?? '')}}">
                                             <i class="fa fa-eye" aria-hidden="true"></i> View Details
@@ -422,22 +416,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         @endif
 
 										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-export-exw-work-order','edit-current-user-export-exw-work-order','edit-current-user-export-cnf-work-order','edit-all-export-cnf-work-order','edit-all-local-sale-work-order','edit-current-user-local-sale-work-order']);
-										$hasEditConfirmedPermission = Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order']);
 										$isDisabled = !$hasEditConfirmedPermission && $data->sales_support_data_confirmation_at != '';
 										@endphp
-                                        @if ($hasPermission)
+                                        @if ($caneditWO)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info {{ $isDisabled ? 'disabled' : '' }}" href="{{ $isDisabled ? 'javascript:void(0);' : route('work-order.edit', $data->id ?? '') }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
 										@endif
-
-										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-finance-approval-history']);
-                                        @endphp
-                                        @if ($hasPermission)
+                                        @if ($canViewFinLog)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Finance Approval History" class="btn btn-sm btn-info" href="{{route('fetchFinanceApprovalHistory',$data->id)}}">
                                             <i class="fa fa-history" aria-hidden="true"></i> 
@@ -446,10 +434,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
                                         </li>
 										@endif
 
-										@php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-coo-approval-history']);
-                                        @endphp
-                                        @if ($hasPermission)
+										
+                                        @if ($canViewCOOLog)
                                         <li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="COO Office Approval History" class="btn btn-sm btn-info" href="{{route('fetchCooApprovalHistory',$data->id)}}">
                                             <i class="fa fa-history" aria-hidden="true"></i> COO Approval Log
@@ -459,19 +445,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 										@if($data->sales_support_data_confirmation_at != '' && 
 											$data->finance_approval_status == 'Approved' && 
 											$data->coo_approval_status == 'Approved')
-											@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-documentation-status']);
-											@endphp
-											@if ($hasPermission)
+											
+											@if ($canChangeDocStatus)
 												<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateDocStatusModal_{{$data->id}}">
 													<i class="fa fa-file" aria-hidden="true"></i> Update Doc Status
 												</a>
 											@endif
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canViewDocLog)
 											<li>
 												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
 													href="{{route('docStatusHistory',$data->id)}}">
@@ -479,18 +461,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 												</a>
 											</li>
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canChangeWOStatus)
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateStatusModal_{{$data->id}}">
 												<i class="fa fa-file" aria-hidden="true"></i> Update Status
 											</a>
 										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
-										@endphp
-										@if ($hasPermission)
+										
+										@if ($canViewWOStatusLog)
 											<li>
 												<a class="me-2 btn btn-sm btn-info" style="width:100%; margin-top:2px; margin-bottom:2px;"
 													href="{{route('woStatusHistory',$data->id)}}">
@@ -503,46 +481,83 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 								@include('work_order.export_exw.doc_status_update')   
 								@include('work_order.export_exw.status_update')                   
                             </td>
-							<td>{{ ++$i }}</td>
+							<td>{{ $datas->firstItem() + $loop->index }}</td>
 							@if(isset($type) && ($type == 'all'|| $type == 'all' || $type == 'status_report'))	
 							<td>{{ $data->type_name ?? '' }}</td>
 							@endif
 							<td>
-								<label class="badge 
-									@if($data->status == 'On Hold') badge-soft-warning
-									@elseif($data->status == 'Active') badge-soft-success
-									@elseif($data->status == 'Cancelled') badge-soft-danger
-									@elseif($data->status == 'Succeeded') badge-soft-primary
-									@elseif($data->status == 'Partially Delivered') badge-soft-info
-									@endif">
-									<strong>{{ strtoupper($data->status) ?? ''}}</strong>
-								</label>
+								@if($data->latestStatus)
+									<label class="badge 
+										@if($data->latestStatus->status == 'On Hold') badge-soft-warning
+										@elseif($data->latestStatus->status == 'Active') badge-soft-success
+										@elseif($data->latestStatus->status == 'Cancelled') badge-soft-danger
+										@elseif($data->latestStatus->status == 'Succeeded') badge-soft-primary
+										@elseif($data->latestStatus->status == 'Partially Delivered') badge-soft-info
+										@endif">
+										<strong>{{ strtoupper($data->latestStatus->status) }}</strong>
+									</label>
+								@endif
 							</td>
-							<td><label class="badge @if($data->sales_support_data_confirmation == 'Confirmed') badge-soft-success @elseif($data->sales_support_data_confirmation == 'Not Confirmed') badge-soft-danger @endif"><strong>{{ strtoupper($data->sales_support_data_confirmation) ?? ''}}</strong></label></td>
-							<td>@if($data->can_show_fin_approval == 'yes')<label class="badge @if($data->finance_approval_status == 'Pending') badge-soft-info @elseif($data->finance_approval_status == 'Approved') badge-soft-success @elseif($data->finance_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->finance_approval_status) ?? ''}}</strong></label>@endif</td>
-							<td>@if($data->can_show_coo_approval == 'yes')<label class="badge @if($data->coo_approval_status == 'Pending') badge-soft-info @elseif($data->coo_approval_status == 'Approved') badge-soft-success @elseif($data->coo_approval_status == 'Rejected') badge-soft-danger @endif"><strong>{{ strtoupper($data->coo_approval_status) ?? ''}}</strong></label>@endif</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && 
-									$data->finance_approval_status == 'Approved' && 
-									$data->coo_approval_status == 'Approved') 
+								@php
+									$confirmationStatus = $data->sales_support_data_confirmation_at ? 'Confirmed' : 'Not Confirmed';
+									$badgeClass = $confirmationStatus == 'Confirmed' ? 'badge-soft-success' : 'badge-soft-danger';
+								@endphp
+								<label class="badge {{ $badgeClass }}">
+									<strong>{{ strtoupper($confirmationStatus) }}</strong>
+								</label>
+							</td>							
+							<td>
+								@if($data->can_show_fin_approval === 'yes')
+									@php
+										$financeStatus = $data->finance_approval_status;
+										$badgeClass = match ($financeStatus) {
+											'Pending' => 'badge-soft-info',
+											'Approved' => 'badge-soft-success',
+											'Rejected' => 'badge-soft-danger',
+											default => '',
+										};
+									@endphp
+									<label class="badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($financeStatus) }}</strong>
+									</label>
+								@endif
+							</td>							
+							<td>
+								@if($data->can_show_coo_approval === 'yes')
+									@php
+										$cooStatus = $data->coo_approval_status;
+										$badgeClass = match ($cooStatus) {
+											'Pending' => 'badge-soft-info',
+											'Approved' => 'badge-soft-success',
+											'Rejected' => 'badge-soft-danger',
+											default => '',
+										};
+									@endphp
+									<label class="badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($cooStatus) }}</strong>
+									</label>
+								@endif
+							</td>							
+							<td>
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved') 
 
 									@php
-										$badgeClass = '';
-										if ($data->docs_status == 'In Progress') {
-											$badgeClass = 'badge-soft-info';
-										} elseif ($data->docs_status == 'Ready') {
-											$badgeClass = 'badge-soft-success';
-										} elseif ($data->docs_status == 'Not Initiated') {
-											$badgeClass = 'badge-soft-danger';
-										}
+										$badgeClass = match ($data->docs_status) {
+											'In Progress' => 'badge-soft-info',
+											'Ready' => 'badge-soft-success',
+											'Not Initiated' => 'badge-soft-danger',
+											default => '',
+										};
 									@endphp
 
 									<div class="tooltip-container">
 										<label class="badge {{ $badgeClass }} docs-status">
-											<strong>{{ strtoupper($data->docs_status) ?? '' }}</strong>
+											<strong>{{ strtoupper($data->docs_status) }}</strong>
 										</label>
-										@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
-											<!-- Tooltip structure with "Remarks" as a title -->
+										@if($data->latestDocsStatus && $data->latestDocsStatus->documentation_comment)
 											<div class="tooltip-text">
 												<div class="tooltip-header">Remarks</div>
 												<div class="tooltip-body">
@@ -553,25 +568,64 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 									</div>
 								@endif
 							</td>
+
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
-									<label class="float-end badge @if($data->vehicles_modification_summary == 'INITIATED') badge-soft-info @elseif($data->vehicles_modification_summary == 'NO MODIFICATIONS') badge-soft-warning  @elseif($data->vehicles_modification_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->vehicles_modification_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->vehicles_modification_summary ?? ''}}</strong>
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+									
+									@php
+										$badgeClass = match($data->vehicles_modification_summary) {
+											'INITIATED' => 'badge-soft-info',
+											'NO MODIFICATIONS' => 'badge-soft-warning',
+											'NOT INITIATED' => 'badge-soft-danger',
+											'COMPLETED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->vehicles_modification_summary) }}</strong>
 									</label>
 								@endif
 							</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
-									<label class="float-end badge @if($data->pdi_summary == 'SCHEDULED') badge-soft-info @elseif($data->pdi_summary == 'NOT INITIATED') badge-soft-danger @elseif($data->pdi_summary == 'COMPLETED') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->pdi_summary ?? ''}}</strong>
-									</label>     
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+
+									@php
+										$badgeClass = match($data->pdi_summary) {
+											'SCHEDULED' => 'badge-soft-info',
+											'NOT INITIATED' => 'badge-soft-danger',
+											'COMPLETED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->pdi_summary ?? '') }}</strong>
+									</label>
 								@endif
 							</td>
 							<td>
-								@if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved') 
-									<label class="float-end badge @if($data->delivery_summary == 'READY') badge-soft-info @elseif($data->delivery_summary == 'ON HOLD') badge-soft-danger @elseif($data->delivery_summary == 'DELIVERED WITH DOCS HOLD') badge-soft-warning @elseif($data->delivery_summary == 'DELIVERED ') badge-soft-success @else badge-soft-dark @endif">
-										<strong>{{ $data->delivery_summary ?? ''}}</strong>
-									</label>     
+								@if($data->sales_support_data_confirmation_at && 
+									$data->finance_approval_status === 'Approved' && 
+									$data->coo_approval_status === 'Approved')
+
+									@php
+										$badgeClass = match($data->delivery_summary) {
+											'READY' => 'badge-soft-info',
+											'ON HOLD' => 'badge-soft-danger',
+											'DELIVERED WITH DOCS HOLD' => 'badge-soft-warning',
+											'DELIVERED' => 'badge-soft-success',
+											default => 'badge-soft-dark',
+										};
+									@endphp
+
+									<label class="float-end badge {{ $badgeClass }}">
+										<strong>{{ strtoupper($data->delivery_summary ?? '') }}</strong>
+									</label>
 								@endif
 							</td>
 							<td>{{$data->salesPerson->name ?? ''}}</td>
@@ -582,177 +636,177 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 							    <td>@if($data->is_batch == 0) Single @else {{$data->batch ?? ''}} @endif</td>	
                             @endif	
 							@if(isset($type) && $type != 'status_report')					
-							<td>{{$data->customer_name ?? ''}}</td>
-							<td class="no-click">{{$data->customer_email ?? ''}}</td>
-							<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
-							<td>{{$data->customer_address ?? ''}}</td>
-							<td>{{$data->customer_representative_name ?? ''}}</td>
-							<td class="no-click">{{$data->customer_representative_email ?? ''}}</td>
-							<td class="no-click">{{$data->customer_representative_contact ?? ''}}</td>	
-                            @if(isset($type) && $type == 'export_exw'|| $type == 'all')													
-                                <td>{{$data->freight_agent_name ?? ''}}</td>
-                                <td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
-                                <td class="no-click">{{$data->freight_agent_contact_number ?? ''}}</td>
-								<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
-								<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
-                            @endif
-							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
-								<td>@if($data->type == 'export_cnf'){{ $data->cross_trade ?? '' }}@endif</td>
-							@endif
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
-								<td>@if($data->type == 'export_exw' || $data->type == 'export_cnf'){{ $data->temporary_exit ?? '' }}@endif</td>
-                                <td>{{$data->port_of_loading ?? ''}}</td>
-                                <td>{{$data->port_of_discharge ?? ''}}</td>
-                                <td>{{$data->final_destination ?? ''}}</td>
-                                <td>{{$data->transport_type ?? ''}}</td>
-                                <td>
-									@if($data->transport_type == 'air' || $data->transport_type == 'sea')
-										@if($data->brn_file)
-											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
-												<button class="btn btn-primary mb-1 btn-style">View</button>
-											</a>
-											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
-												<button class="btn btn-info btn-style">Download</button>
-											</a>
+								<td>{{$data->customer_name ?? ''}}</td>
+								<td class="no-click">{{$data->customer_email ?? ''}}</td>
+								<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
+								<td>{{$data->customer_address ?? ''}}</td>
+								<td>{{$data->customer_representative_name ?? ''}}</td>
+								<td class="no-click">{{$data->customer_representative_email ?? ''}}</td>
+								<td class="no-click">{{$data->customer_representative_contact ?? ''}}</td>	
+								@if(isset($type) && $type == 'export_exw'|| $type == 'all')													
+									<td>{{$data->freight_agent_name ?? ''}}</td>
+									<td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
+									<td class="no-click">{{$data->freight_agent_contact_number ?? ''}}</td>
+									<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
+									<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
+								@endif
+								@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
+									<td>@if($data->type == 'export_cnf'){{ $data->cross_trade ?? '' }}@endif</td>
+								@endif
+								@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
+									<td>@if($data->type == 'export_exw' || $data->type == 'export_cnf'){{ $data->temporary_exit ?? '' }}@endif</td>
+									<td>{{$data->port_of_loading ?? ''}}</td>
+									<td>{{$data->port_of_discharge ?? ''}}</td>
+									<td>{{$data->final_destination ?? ''}}</td>
+									<td>{{$data->transport_type ?? ''}}</td>
+									<td>
+										@if($data->transport_type == 'air' || $data->transport_type == 'sea')
+											@if($data->brn_file)
+												<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
+													<button class="btn btn-primary mb-1 btn-style">View</button>
+												</a>
+												<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
+													<button class="btn btn-info btn-style">Download</button>
+												</a>
+											@endif
 										@endif
+									</td>
+									<td>
+										@if($data->transport_type == 'air')
+											{{$data->airline ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->shipping_line ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->trailer_number_plate ?? ''}}
+										@endif									
+									</td>
+									<td>
+										@if($data->transport_type == 'air')
+											{{$data->airway_bill ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->container_number ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transportation_company ?? ''}}
+										@endif
+									</td>
+									<td class="@if($data->transport_type == 'road') no-click @endif">
+										@if($data->transport_type == 'air')
+											{{$data->airway_details ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->forward_import_code ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transporting_driver_contact_number ?? ''}}
+										@endif
+									</td>
+									<td>
+										@if($data->transport_type == 'sea')
+											{{$data->brn ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transportation_company_details ?? ''}}
+										@endif
+									</td>
+								@endif
+								<td>{{$data->so_vehicle_quantity ?? ''}}</td>
+								<td>
+									@if($data->so_total_amount != 0.00 || $data->amount_received != 0.00 || $data->balance_amount != 0.00)
+									{{$data->currency ?? ''}}
 									@endif
 								</td>
-                                <td>
-									@if($data->transport_type == 'air')
-										{{$data->airline ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->shipping_line ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->trailer_number_plate ?? ''}}
-									@endif									
-								</td>
-                                <td>
-									@if($data->transport_type == 'air')
-										{{$data->airway_bill ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->container_number ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transportation_company ?? ''}}
+								<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
+								<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
+								<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
+								<td>{{$data->delivery_location ?? ''}}</td>
+								<td>{{$data->delivery_contact_person ?? ''}}</td>
+								<td class="no-click">{{$data->delivery_contact_person_number ?? ''}}</td>
+								<td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
+								@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
+									<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
+									<td>{{$data->bill_of_loading_details ?? ''}}</td>
+									<td>{{$data->shipper ?? ''}}</td>
+									<td>{{$data->consignee ?? ''}}</td>
+									<td>{{$data->notify_party ?? ''}}</td>
+									<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
+								@endif
+								<td>
+									@if($data->signed_pfi)
+										<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                                <td class="@if($data->transport_type == 'road') no-click @endif">
-									@if($data->transport_type == 'air')
-										{{$data->airway_details ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->forward_import_code ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transporting_driver_contact_number ?? ''}}
+								<td>
+									@if($data->signed_contract)
+										<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                                <td>
-									@if($data->transport_type == 'sea')
-										{{$data->brn ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transportation_company_details ?? ''}}
+								<td>
+									@if($data->payment_receipts)
+										<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                            @endif
-                            <td>{{$data->so_vehicle_quantity ?? ''}}</td>
-							<td>
-								@if($data->so_total_amount != 0.00 || $data->amount_received != 0.00 || $data->balance_amount != 0.00)
-								{{$data->currency ?? ''}}
-								@endif
-							</td>
-							<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
-							<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
-							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
-							<td>{{$data->delivery_location ?? ''}}</td>
-							<td>{{$data->delivery_contact_person ?? ''}}</td>
-							<td class="no-click">{{$data->delivery_contact_person_number ?? ''}}</td>
-                            <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
-							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
-								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
-								<td>{{$data->bill_of_loading_details ?? ''}}</td>
-								<td>{{$data->shipper ?? ''}}</td>
-								<td>{{$data->consignee ?? ''}}</td>
-								<td>{{$data->notify_party ?? ''}}</td>
-								<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
-							@endif
-                            <td>
-								@if($data->signed_pfi)
-									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->signed_contract)
-									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->payment_receipts)
-									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->noc)
-									<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/noc/' . $data->noc) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->enduser_trade_license)
-									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->enduser_passport)
-									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-                            <td>
-								@if($data->enduser_contract)
-									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->vehicle_handover_person_id)
-									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
+								<td>
+									@if($data->noc)
+										<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/noc/' . $data->noc) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_trade_license)
+										<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_passport)
+										<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_contract)
+										<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->vehicle_handover_person_id)
+										<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
 							@endif
 							<td>{{$data->CreatedBy->name ?? ''}}</td>
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}@endif</td>
@@ -767,6 +821,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 						@endforeach
 					</tbody>
 				</table>
+				<div class="d-flex justify-content-center mt-4">
+					{{ $datas->links() }}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -821,7 +878,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 		$('#apply-filters').on('click', function(e) {
 			e.preventDefault();
 
-			// Capture selected filter inputs
 			let filterData = {
 				status_filter: $('#status-filter').val(),
 				sales_support_filter: $('#sales-support-filter').val(),
@@ -832,12 +888,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 				pdi_filter: $('#pdi-filter').val(),
 				delivery_filter: $('#delivery-filter').val(),
 				type: "{{ isset($type) ? $type : '' }}",
-				_token: '{{ csrf_token() }}' // Laravel CSRF protection
+				_token: '{{ csrf_token() }}' 
 			};
 
-			// Send the data to the backend via AJAX
 			$.post("{{ route('save.filters') }}", filterData, function(response) {
-				// On success, reload the page with the filters applied
 				window.location.href = "{{ route('work-order.index', '') }}/" + filterData.type;
 			}).fail(function() {
 				alert("Failed to apply filters. Please try again.");
@@ -845,39 +899,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
 		});
 
 		$('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
-			// Get the `data-id` attribute of the row or use the associated `id` for redirection
 			let row = $(this).closest('tr');
-			let workOrderId = row.data('id'); // Assuming your row has a data-id attribute
+			let workOrderId = row.data('id'); 
 
 			if (workOrderId) {
-				// Redirect to the "show details" page for that work order
 				window.location.href = `/work-order/${workOrderId}`;
 			}
 		});
-        // Initialize DataTable with default 100 entries
         var table = $('.my-datatable').DataTable({
-            "pageLength": 100, // Set the default number of entries to display
-            "lengthMenu": [10, 25, 50, 100, 200], // Options for number of entries per page
-            "order": [], // Disable initial sorting if you don't want any column sorted on load
+            "pageLength": 100, 
+            "lengthMenu": [10, 25, 50, 100, 200], 
+            "order": [], 
             "columnDefs": [{
-                "targets": 'no-sort', // Apply 'no-sort' class to columns you want unsorted by default
+                "targets": 'no-sort', 
                 "orderable": false,
             }],
+			"paging": false,          // Disable pagination
+			"info": false,            // Disable the "Showing X to Y of Z entries"
+			"lengthChange": false,    // Disable the "Show N entries"
             "initComplete": function(settings, json) {
-                // Loop through each column
                 this.api().columns().every(function() {
                     var column = this;
                     var allEmpty = true;
 
-                    // Check if all cells in the column are empty in the current page
                     column.data().each(function(data, index) {
                         if (data && $.trim(data) !== '') {
                             allEmpty = false;
-                            return false; // Break out of the loop
+                            return false; 
                         }
                     });
 
-                    // Hide the column if all cells are empty
                     if (allEmpty) {
                         column.visible(false);
                     }
@@ -885,12 +936,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-export-exw-wo
             }
         });
     });
-    // Setup AJAX with CSRF token
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 </script>
-
 @endpush

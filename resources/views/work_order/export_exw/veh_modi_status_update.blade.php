@@ -32,19 +32,16 @@
                         </div>
                     </div>
                     
-                    <!-- Expected Completion Date and Time (Only for "Initiated") -->
                     <div class="mb-3 mt-3" id="expectedCompletionSection_{{$vehicle->id}}" style="display: none;">
                         <label for="expectedCompletion_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">Expected Completion Date and Time:</label>
                         <input type="datetime-local" class="form-control" id="expectedCompletion_{{$vehicle->id}}" name="expectedCompletion" style="font-size: 14px;">
                     </div>
 
-                    <!-- Current Vehicle Location (Only for "Initiated") -->
                     <div class="mb-3" id="currentVehicleLocationSection_{{$vehicle->id}}" style="display: none;">
                         <label for="currentVehicleLocation_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">Current Vehicle Location:</label>
                         <textarea class="form-control" id="currentVehicleLocation_{{$vehicle->id}}" name="currentVehicleLocation" rows="2" style="font-size: 14px;"></textarea>
                     </div>
 
-                    <!-- Vehicle Available Location (Only for "Completed") -->
                     <div class="mb-3" id="vehicleAvailableLocationSection_{{$vehicle->id}}" style="display: none;">
                         <label for="vehicleAvailableLocation_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">Vehicle Available Location:</label>
                         <select class="form-control" id="vehicleAvailableLocation_{{$vehicle->id}}" name="vehicleAvailableLocation" style="font-size: 14px;">
@@ -70,12 +67,9 @@
 </div>
 <script type="text/javascript">
 (function() {
-    // Attach the submitVehModiStatus function to the global window object
     window.submitVehModiStatus = function(woVehicleId, woNumber, vin) {
-        // Get the selected status
         const selectedStatusElement = document.querySelector(`#updatevehModiStatusModal_${woVehicleId} input[name="vehModiStatus_${woVehicleId}"]:checked`);
 
-        // Check if a status has been selected
         if (!selectedStatusElement) {
             alertify.error('Please select a status before submitting.');
             return;
@@ -83,7 +77,6 @@
 
         const selectedStatus = selectedStatusElement.value;
 
-        // If the selected status is "Initiated", validate the expected completion date and time
         if (selectedStatus === 'Initiated') {
             const expectedCompletion = document.getElementById(`expectedCompletion_${woVehicleId}`).value;
             
@@ -91,7 +84,6 @@
                 const selectedDateTime = new Date(expectedCompletion);
                 const currentDateTime = new Date();
 
-                // Check if the selected date and time is in the past
                 if (selectedDateTime < currentDateTime) {
                     alertify.error('Expected completion date and time must be greater than or equal to the current date and time.');
                     return;
@@ -102,17 +94,15 @@
             }
         }
 
-        // Display the confirmation dialog
         alertify.confirm(
             'Confirmation Required',
             `Are you sure you want to update the modification status of vehicle ${vin} in work order ${woNumber} to ${selectedStatus}?"`,
-            function() { // If the user clicks "OK"
+            function() { 
                 const comment = document.getElementById(`Comment_${woVehicleId}`).value;
                 const expectedCompletion = document.getElementById(`expectedCompletion_${woVehicleId}`).value;
                 const currentVehicleLocation = document.getElementById(`currentVehicleLocation_${woVehicleId}`).value;
                 const vehicleAvailableLocation = document.getElementById(`vehicleAvailableLocation_${woVehicleId}`).value;
 
-                // Perform the AJAX request to update the status
                 $.ajax({
                     url: '/update-vehicle-modification-status',
                     method: 'POST',
@@ -135,13 +125,12 @@
                     }
                 });
             },
-            function() { // If the user clicks "Cancel"
+            function() { 
                 alertify.error('Action canceled');
             }
         );
     };
 
-    // Show/hide fields based on the selected status
     document.querySelectorAll(`input[name="vehModiStatus_{{$vehicle->id}}"]`).forEach(function(input) {
         input.addEventListener('change', function() {
             const selectedStatus = this.value;
@@ -149,7 +138,6 @@
             const currentVehicleLocationSection = document.getElementById(`currentVehicleLocationSection_{{$vehicle->id}}`);
             const vehicleAvailableLocationSection = document.getElementById(`vehicleAvailableLocationSection_{{$vehicle->id}}`);
 
-            // Show fields based on the selected status
             if (selectedStatus === 'Initiated') {
                 expectedCompletionSection.style.display = 'block';
                 currentVehicleLocationSection.style.display = 'block';
@@ -159,7 +147,6 @@
                 currentVehicleLocationSection.style.display = 'none';
                 vehicleAvailableLocationSection.style.display = 'block';
             } else {
-                // Hide all conditional sections for other statuses
                 expectedCompletionSection.style.display = 'none';
                 currentVehicleLocationSection.style.display = 'none';
                 vehicleAvailableLocationSection.style.display = 'none';
@@ -167,7 +154,6 @@
         });
     });
 
-    // Check for a pre-selected radio button and trigger the change event
     const initialSelectedRadio = document.querySelector(`input[name="vehModiStatus_{{$vehicle->id}}"]:checked`);
     if (initialSelectedRadio) {
         initialSelectedRadio.dispatchEvent(new Event('change'));

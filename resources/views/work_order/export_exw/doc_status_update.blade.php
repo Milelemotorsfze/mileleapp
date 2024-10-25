@@ -1,6 +1,6 @@
 @if(isset($data))
 <div class="modal fade" id="updateDocStatusModal_{{$data->id}}" tabindex="-1" aria-labelledby="updateDocStatusModalLabel_{{$data->id}}" aria-hidden="true">
-    <div class="modal-dialog modal-lg"> <!-- Add modal-dialog here -->
+    <div class="modal-dialog modal-lg"> 
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="updateDocStatusModalLabel_{{$data->id}}">Update Documentation Status for {{$data->wo_number ?? ''}}</h5>
@@ -34,7 +34,6 @@
                         <span id="docCommentError_{{$data->id}}" class="text-danger"></span>
                     </div>
 
-                    <!-- BOE Fields -->
                     <div id="boeFields_{{$data->id}}" style="display: none;">
                         @php
                             $boeCount = $data->total_number_of_boe == 0 ? 1 : $data->total_number_of_boe;
@@ -78,10 +77,8 @@
 @if($data->sales_support_data_confirmation_at != '' && $data->finance_approval_status == 'Approved' && $data->coo_approval_status == 'Approved')
 <script type="text/javascript">
     function toggleFields_{{$data->id}}() {
-        // Try to get the selected radio button
         const selectedStatusInput = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked');
 
-        // Check if the selected radio input exists
         if (selectedStatusInput) {
             const selectedStatus = selectedStatusInput.value;
             const boeFields = document.getElementById('boeFields_{{$data->id}}');
@@ -98,26 +95,25 @@
 
 
     document.addEventListener('DOMContentLoaded', function() {
-        toggleFields_{{$data->id}}(); // Ensure fields are toggled correctly on page load
+        toggleFields_{{$data->id}}(); 
     });
     document.querySelectorAll('input[name="docStatus_{{$data->id}}"]').forEach((radio) => {
         radio.addEventListener('change', toggleFields_{{$data->id}});
     });
 
-    function submitDocStatus(workOrderId, woNumber) {
+    function submiDtocStatus(workOrderId, woNumber) {
         document.querySelectorAll('.text-danger').forEach(function(span) {
-            span.textContent = ''; // Clear all error messages
+            span.textContent = ''; 
         });
         const selectedStatus = document.querySelector('#updateDocStatusModal_' + workOrderId + ' input[name="docStatus_' + workOrderId + '"]:checked');
         if (!selectedStatus) {
             alertify.error('Please select a documentation status.');
-            return; // Exit if no status is selected
+            return; 
         }
-        let valid = true; // Assume form is valid
+        let valid = true; 
         if (selectedStatus.value === 'Ready') {
             document.querySelectorAll('.boe-set').forEach((boeSet, index) => {
                 const declarationNumberField = document.getElementById('declarationNumber_'+workOrderId+'_' + index);
-                // console.log()
                 if (declarationNumberField) {
                     const declarationNumber = declarationNumberField.value; 
                     if (declarationNumber && (!/^\d{13}$/.test(declarationNumber) || parseInt(declarationNumber) <= 0)) {
@@ -128,7 +124,7 @@
             });
         }
         if (!valid) {
-            return; // Stop submission if validation fails
+            return; 
         }
         const boeData = [];
         document.querySelectorAll('.boe-set').forEach((boeSet, index) => {
@@ -139,21 +135,20 @@
             
             if (boeNumberField && declarationNumberField && declarationDateField) {
                 boeData.push({                    
-                    boe_number: boeField.value,  // BOE Number
-                    boe: boeNumberField.value,  // BOE Number
-                    declaration_number: declarationNumberField.value,  // Declaration Number (if provided)
-                    declaration_date: declarationDateField.value  // Declaration Date
+                    boe_number: boeField.value,  
+                    boe: boeNumberField.value,  
+                    declaration_number: declarationNumberField.value,  
+                    declaration_date: declarationDateField.value  
                 });
             }
         });
 
         const comment = document.getElementById('docComment_' + workOrderId).value;
 
-        // Display confirmation dialog
         alertify.confirm(
             'Confirmation Required',
             `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus.value}?`,
-            function() { // If the user clicks "OK"
+            function() { 
                 $.ajax({
                     url: '/update-wo-doc-status',
                     method: 'POST',
@@ -167,14 +162,14 @@
                     success: function(response) {
                         alertify.success(response.message);
                         $('#updateDocStatusModal_' + workOrderId).modal('hide');
-                        location.reload(); // Reload the page after success
+                        location.reload(); 
                     },
                     error: function(xhr) {
                         alertify.error('Failed to update status');
                     }
                 });
             },
-            function() { // If the user clicks "Cancel"
+            function() { 
                 alertify.error('Action canceled');
             }
         );

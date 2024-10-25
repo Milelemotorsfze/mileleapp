@@ -1,11 +1,8 @@
 <head>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{asset('css/custom/daterangepicker.css')}}" />
+    <script type="text/javascript" src="{{asset('js/custom/moment.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/custom/daterangepicker.min.js')}}"></script>
     <style>
         .select2-container {
             width: 100% !important;
@@ -18,7 +15,6 @@
 <body>
 <div class="row mt-1">
     <div class="table-responsive">
-        <!-- Clear All Filters Button -->
         <button id="clear-filters" class="btn btn-info btn-sm mb-3">Clear All Filters</button>
 
         <table class="table table-striped table-editable table-edits table-condensed my-datatableclass">
@@ -35,17 +31,14 @@
                     <th><input type="text" id="date-time-filter" placeholder="Search Date & Time" class="column-filter form-control" /></th>
                     <th>
                         <select class="column-filter form-control" id="user-filter" multiple="multiple">
-                            <!-- Options will be populated by JS -->
                         </select>
                     </th>
                     <th>
                         <select class="column-filter form-control" id="type-filter" multiple="multiple">
-                            <!-- Options will be populated by JS -->
                         </select>
                     </th>
                     <th>
                         <select class="column-filter form-control" id="field-filter" multiple="multiple">
-                            <!-- Options will be populated by JS -->
                         </select>
                     </th>
                     <th><input type="text" placeholder="Search Old Value" class="column-filter form-control" /></th>
@@ -120,12 +113,10 @@
             placeholder: "Select User",
         });
 
-        // Initialize DataTable with column filters
         var table = $('.my-datatableclass').DataTable();
 
-        // Initialize date and time range picker
         $('#date-time-filter').daterangepicker({
-            autoUpdateInput: false,  // Do not auto-update the input with the selected range
+            autoUpdateInput: false,  
             timePicker: true,
             timePickerIncrement: 30,
             locale: {
@@ -134,13 +125,11 @@
             }
         });
 
-        // Apply the date range filter on user selection
         $('#date-time-filter').on('apply.daterangepicker', function(ev, picker) {
             $(this).val(picker.startDate.format('MM/DD/YYYY hh:mm A') + ' - ' + picker.endDate.format('MM/DD/YYYY hh:mm A'));
             table.draw();
         });
 
-        // Clear the date range filter
         $('#date-time-filter').on('cancel.daterangepicker', function(ev, picker) {
             $(this).val('');
             // picker.setStartDate(moment().startOf('day'));
@@ -148,7 +137,6 @@
             table.draw();
         });
 
-        // Custom filtering function for date and time range
         $.fn.dataTable.ext.search.push(
             function(settings, data, dataIndex) {
                 var min = $('#date-time-filter').data('daterangepicker').startDate;
@@ -161,41 +149,34 @@
             }
         );
 
-        // Get unique user names for the dropdown filter
-        var userColumnIndex = 1; // Index of the User column
+        var userColumnIndex = 1; 
         table.column(userColumnIndex).data().unique().sort().each(function (d, j) {
             $('#user-filter').append('<option value="' + d + '">' + d + '</option>')
         });
 
-        // Initialize Select2 for the user filter
         $('#user-filter').select2({
             placeholder: "Select User",
             allowClear: true
         });
 
-        // Get unique types for the multi-select dropdown filter
-        var typeColumnIndex = 2; // Index of the Type column
+        var typeColumnIndex = 2; 
         table.column(typeColumnIndex).data().unique().sort().each(function (d, j) {
             $('#type-filter').append('<option value="' + d + '">' + d + '</option>')
         });
 
-        // Initialize Select2 for the type filter
         $('#type-filter').select2({
             placeholder: "Select Type",
             allowClear: true
         });
-        // Get unique field names for the multi-select dropdown filter
-        var fieldColumnIndex = 3; // Index of the Field column
+        var fieldColumnIndex = 3; 
         table.column(fieldColumnIndex).data().unique().sort().each(function (d, j) {
             $('#field-filter').append('<option value="' + d + '">' + d + '</option>')
         });
 
-        // Initialize Select2 for the field filter
         $('#field-filter').select2({
             placeholder: "Select Field",
             allowClear: true
         });
-        // Apply the search
         table.columns().every(function () {
             var that = this;
 
@@ -212,21 +193,16 @@
             });
         });
 
-        // Clear all filters on button click
         $('#clear-filters').click(function() {
-            // Clear text inputs
             $('.column-filter').val('').trigger('change');
-            // Clear Select2 dropdowns
             $('#user-filter').val(null).trigger('change');
             $('#type-filter').val(null).trigger('change');
             $('#field-filter').val(null).trigger('change');
-            // Clear date range picker
             $('#date-time-filter').val('');
             // $('#date-time-filter').data('daterangepicker').setStartDate(moment().startOf('day'));
             // $('#date-time-filter').data('daterangepicker').setEndDate(moment().endOf('day'));
             $('#date-time-filter').trigger('cancel.daterangepicker');
 
-            // Redraw the table
             table.search('').columns().search('').draw();
         });
     });

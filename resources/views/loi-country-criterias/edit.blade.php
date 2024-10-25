@@ -117,6 +117,7 @@
                                     <option value="RHD" {{ $loiCountryCriteria->steering == 'RHD' ? 'selected' : '' }}>RHD </option>
                                 </select>
                             </div>
+                           
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
@@ -131,6 +132,18 @@
                                     <label class="form-check-label" for="is_loi_restricted">
                                         Is LOI Restricted ?
                                     </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">TTC Approval Models </label>
+                                    <select class="form-control widthinput" multiple name="ttc_approval_models[]" id="ttc_approval_models" autofocus>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->id }}"   {{ (in_array ($model->id, $TTCApprovalModels)) ? 'selected' : ''  }}> {{ $model->model }} </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-12 text-center">
@@ -181,12 +194,15 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
+        $('#ttc_approval_models').select2({
+            placeholder : 'Select Model',
+            allowClear: true,
+        });
         $("#form-create").validate({
             ignore: [],
             rules: {
-                brand_name: {
+                country_id: {
                     required: true,
-                    maxlength:255
                 },
             },
         });

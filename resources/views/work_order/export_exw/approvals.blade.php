@@ -1,4 +1,3 @@
-<!-- wo status -->
 @include('work_order.export_exw.update_status')
 @if(isset($workOrder))
 	@php
@@ -11,7 +10,6 @@
 		</a>
 	@endif
 @endif
-<!-- wo status -->
 @if(isset($workOrder) && $workOrder->sales_support_data_confirmation_at != '' && $workOrder->can_revert_confirmation == 'yes')
 	<a title="Revert Sales Support Data Confirmation" class="me-2 btn btn-sm btn-info revert-btn-sales-approval" data-id="{{ $workOrder->id }}">
 		<i class="fas fa-hourglass-start" title="Revert Sales Support Data Confirmation"></i> Revert Sales Support Data Confirmation
@@ -30,7 +28,6 @@
 			<i class="fas fa-hourglass-start" title="Finance Approval"></i> Fin. Approval
 		</a>
 	@endif
-    <!-- Modal -->
     <div class="modal fade" id="financeApprovalModal" tabindex="-1" aria-labelledby="financeApprovalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -80,7 +77,6 @@
 			<i class="fas fa-hourglass-start" title="COO Office Approval"></i> COO Office Approval
 		</a>
 	@endif
-    <!-- Modal -->
     <div class="modal fade" id="cooApprovalModal" tabindex="-1" aria-labelledby="cooApprovalModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -108,14 +104,12 @@
     </div>
 @endif
 
-<!-- Modal -->
 <div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="approvalModalLabel">COO Office Direct Approval</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <!-- <span aria-hidden="true">&times;</span> -->
             </button>
         </div>
         <div class="modal-body">
@@ -125,7 +119,6 @@
             </div>
         </div>
         <div class="modal-footer">
-            <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
             <button type="button" class="btn btn-primary" id="submitApproval">Submit</button>
         </div>
         </div>
@@ -145,7 +138,6 @@
 @endif
 @endif
 
-<!-- Documentation Status by Logistics -->
 @include('work_order.export_exw.doc_approval')
 @if(isset($workOrder))
 	@if($workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approval_status == 'Approved' && $workOrder->coo_approval_status == 'Approved')

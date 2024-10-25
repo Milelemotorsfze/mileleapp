@@ -42,11 +42,14 @@ class CheckLOIExpiry extends Command
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
                     $letterOfIndent->timestamps = false;        
                     $letterOfIndent->save();  
+                    info($letterOfIndent);
+
                 }else{
                     $letterOfIndent->is_expired = false;  
                     $letterOfIndent->expired_date = NULL;  
                     $letterOfIndent->timestamps = false;               
                     $letterOfIndent->save();  
+                    info($letterOfIndent);
                 }
             }
 

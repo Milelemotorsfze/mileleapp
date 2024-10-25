@@ -32,6 +32,7 @@ use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
+use App\Http\Controllers\VehiclePenaltyController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -481,6 +482,11 @@ Route::get('/d', function () {
         Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
+    Route::controller(VehiclePenaltyController::class)->group(function(){
+        Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
+        Route::post('/vehicle-penalty-store', 'store')->name('penalty.store');
+    }); 
+    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -508,8 +514,10 @@ Route::get('/d', function () {
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
-    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
-        ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
+        ->name('letter-of-indent.request-approval');
+    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
+    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 

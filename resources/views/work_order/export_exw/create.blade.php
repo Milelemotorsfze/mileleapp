@@ -1,11 +1,10 @@
 @extends('layouts.main')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+
 <style>
 	.custom-checkbox {
-		width: 30px;   /* Set the width */
-		height: 30px;  /* Set the height */
-		border: 1px solid #ced4da!important; /* Set the border color */
+		width: 30px;   
+		height: 30px;  
+		border: 1px solid #ced4da!important; 
 	}
 	#overlay {
 		position: fixed;
@@ -132,30 +131,27 @@
     .select2-container {
         width: 100% !important;
     }
-	/* Style for the table headers */
 .my-datatable th {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each header cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each header cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each header cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each header cell */
-    padding: 3px!important; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef; 
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 3px!important; 
+    text-align: left; 
 }
 
-/* Style for the table cells */
 .my-datatable td {
-    border-left: 1px solid #e9e9ef; /* Add a left border to each cell */
-    border-right: 1px solid #e9e9ef; /* Add a right border to each cell */
-    border-top: 1px solid #e9e9ef; /* Add a top border to each cell */
-    border-bottom: 1px solid #e9e9ef; /* Add a bottom border to each cell */
-    padding: 3px!important; /* Add padding for better readability */
-    text-align: left; /* Align text to the left */
+    border-left: 1px solid #e9e9ef; 
+    border-right: 1px solid #e9e9ef; 
+    border-top: 1px solid #e9e9ef; 
+    border-bottom: 1px solid #e9e9ef; 
+    padding: 3px!important; 
+    text-align: left; 
 }
 
-/* Style for the entire table */
 .my-datatable {
-    border-collapse: collapse; /* Ensure borders do not double */
-    width: 100%; /* Make the table take up the full width */
+    border-collapse: collapse; 
+    width: 100%; 
 }
 	.mention-container {
         position: relative;
@@ -165,7 +161,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        color: transparent; /* Make it invisible to show only the textarea */
+        color: transparent; 
         white-space: pre-wrap;
         word-wrap: break-word;
     }
@@ -212,7 +208,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                 $workOrder->coo_approval_status == 'Approved') 
 
                 @php
-                    // Determine the badge class based on docs_status
                     $badgeClass = '';
                     if ($workOrder->docs_status == 'In Progress') {
                         $badgeClass = 'badge-soft-info';
@@ -222,7 +217,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                         $badgeClass = 'badge-soft-danger';
                     }
 
-                    // Determine the label text based on docs_status
                     $labelText = '';
                     if ($workOrder->docs_status == 'In Progress' || $workOrder->docs_status == 'Not Initiated') {
                         $labelText = 'Documentation : ';
@@ -1168,9 +1162,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 @endphp
 <script type="text/javascript">
 	
-	// Declare commentIdCounter only once
 	let commentIdCounter = 1;
-    // $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = JSON.parse('{!! addslashes($vinsJson) !!}');
 	var customerCount =  $("#customerCount").val();
@@ -1183,9 +1175,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	var selectedCustomerEmail = '';
 	var selectedCustomerContact = '';
 	var selectedCustomerAddress = '';
-	let isBatchChecked = false; // Initialize the variable to store the checked state
+	let isBatchChecked = false; 
 	var onChangeSelectedVins = [];
-	// Global variable to store VINs when BOE number is null
 	var vinWithoutBoe = [];
 	var authUserPermission = @json($allfieldPermission ? 'true' : 'false');
 	@if(isset($workOrder))
@@ -1194,7 +1185,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
         var workOrder = null;
     @endif
 
-	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
+	const mentions = ["@Alice", "@Bob", "@Charlie"]; 
 	var input = document.querySelector("#customer_company_number");
 	var iti = window.intlTelInput(document.querySelector("#customer_company_number"), {
 		separateDialCode: true,
@@ -1238,10 +1229,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		});
 		console.log('Is vins an array:', Array.isArray(vins));
 		document.getElementById('submit-from-top').addEventListener('click', function() { 
-			  // Trigger a click on the submit button of the form
 			  document.getElementById('submit').click();
 		});
-		// SELECT 2 START
 			$('#sales_person_id').select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
@@ -1322,30 +1311,24 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				if (workOrder != null && workOrder.vehicles && workOrder.vehicles.length == 1) {
 					$("#boe-div").hide();
 				}
-				// Initialize an object to track VINs by BOE number
 				var boeVins = {};
-				var allVins = []; // Array to keep track of all VINs
+				var allVins = []; 
 
 				for (var i = 0; i < workOrder.vehicles.length; i++) {
 					drawTableRow(workOrder.vehicles[i]);
 
-					// Find the option and disable it in the vin_multiple dropdown
 					$("#vin_multiple").find('option[value="' + workOrder.vehicles[i].vin + '"]').prop('disabled', true);
 
-					// Refresh the select2 control
 					$("#vin_multiple").trigger('change.select2');
 
 					addedVins.push(workOrder.vehicles[i].vin);
-					allVins.push(workOrder.vehicles[i].vin); // Track all VINs
+					allVins.push(workOrder.vehicles[i].vin); 
 
-					// Handle the deposit_aganist_vehicle dropdown
 					var $depositSelect = $("#deposit_aganist_vehicle");
 					if (workOrder.vehicles[i].deposit_received == 'yes') {
-						// Add the VIN as a selected option
 						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, true, true);
 						$depositSelect.append(newOption).trigger('change');
 					} else {
-						// Add the VIN as an unselected option
 						var newOption = new Option(workOrder.vehicles[i].vin, workOrder.vehicles[i].vin, false, false);
 						$depositSelect.append(newOption).trigger('change');
 					}
@@ -1358,7 +1341,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						boeVins[boeNumber].push(workOrder.vehicles[i].vin);
 					}
 					else {
-						// Collect the workOrder.vehicles[i].vin in the global variable
 						vinWithoutBoe.push(workOrder.vehicles[i].vin);
 					}
 				}
@@ -1366,45 +1348,37 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				allVins.forEach(function(vin) { 
 					var newBoeOption = new Option(vin, vin, false, false);
 				});
-				// Add rows for each BOE number and set the corresponding VINs
 				Object.keys(boeVins).forEach(function (boeNumber) {
 					addChild();
 					var index = $(".form_field_outer").find(".form_field_outer_row").length;
 					var $boeSelect = $(`#boe_vin_${index}`);
 					$boeSelect.append(newBoeOption);
 
-					// Set the corresponding VINs for this BOE as selected
 					boeVins[boeNumber].forEach(function(vin) {
 						$boeSelect.find('option[value="' + vin + '"]').prop('selected', true);
 					});
 
-					// Refresh the select2 control
 					$boeSelect.trigger('change');
 				});
 
-				// Disable options in each BOE select2 if they are selected in at least one dropdown
 				$(".form_field_outer").find(".form_field_outer_row select").each(function() {
 					var $select = $(this);
 					var selectedVins = [];
 
-					// Collect selected VINs in this select element
 					$select.find('option:selected').each(function() {
 						selectedVins.push($(this).val());
 					});
 
-					// Disable options that are selected in other dropdowns
 					allVins.forEach(function(vin) {
-						if (selectedVins.indexOf(vin) === -1) { // Don't disable the option if it's selected in this dropdown
+						if (selectedVins.indexOf(vin) === -1) { 
 							$select.find('option[value="' + vin + '"]').prop('disabled', true);
 						}
 					});
-					// Enable VINs from the global variable (vinWithoutBoe) in all dropdowns
 					vinWithoutBoe.forEach(function(vin) {
 						$select.find('option[value="' + vin + '"]').prop('disabled', false);
 					});
 					$select.trigger('change.select2');
 				});
-				// write code here to enable the collected workOrder.vehicles[i].vin in the above for all $(".form_field_outer").find(".form_field_outer_row select").each(function() {
 				if (authUserPermission === 'true') {
 					var table = document.getElementById('myTable');
 					if (table) {
@@ -1449,11 +1423,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				maximumSelectionLength: 1,
 				placeholder:"Select User",
 			});
-		// SELECT 2 END
-
-		// INTEL INPUT START
-			
-			// Function to set customer relations
 			function setCustomerRelations(selectedCustomerUniqueId) {
 				$('#customer_address').val('');
 				$('#customer_email').val('');
@@ -1469,19 +1438,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							}
 							if (customers[i].customer_company_number != null) { 
 								var fullPhoneNumber = customers[i].customer_company_number ? customers[i].customer_company_number.replace(/\s+/g, '') : '';
-								// Use intlTelInput instance to set the full phone number without spaces
 								iti.setNumber(fullPhoneNumber);
-								// Call sanitizeNumberInput on the current input
 								sanitizeNumberInput(input);
 							}
 						}
 					}
 				}
 			}
-			
-		// INTEL INPUT END
-
-		// TRANSPORT TYPE ONCHANGE START
 			$('.transport_type').click(function() {
 				if($(this).val() == 'air') {
 					airRelation();
@@ -1494,7 +1457,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			});
 
-			// TRANSPORT TYPE AIR RELATED DATA
 			function airRelation() {
 				$("#airline-div").show();
 				$('#airline').select2({
@@ -1514,7 +1476,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$("#airway-details-div").show();
 				$("#transportation-company-details-div").hide();
 			}
-			// TRANSPORT TYPE SEA RELATED DATA
 			function seaRelation() {
 				$("#airline-div").hide();
 				$("#airway-bill-div").hide();
@@ -1529,7 +1490,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$("#airway-details-div").hide();
 				$("#transportation-company-details-div").hide();
 			}
-			// TRANSPORT TYPE ROAD RELATED DATA
 			function roadRelation() {
 				$("#airline-div").hide();
 				$("#airway-bill-div").hide();
@@ -1544,18 +1504,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$("#airway-details-div").hide();
 				$("#transportation-company-details-div").show();
 			}
-		// TRANSPORT TYPE ONCHANGE END
-
-		// CUSTOMER NAME ONCHANGE START
-			 // Handle customer name change
 			 $('#customer_name').on('change', function() { 
-				// var selectedCustomerName = $(this).val(); 
 				var selectedCustomerUniqueId = $('#customer_name option:selected').data('id');
 				setCustomerRelations(selectedCustomerUniqueId);
 			});
-		// CUSTOMER NAME ONCHANGE END
-
-		// DEPOSIT RECEIVED AS ONCHANGE START
 			$('.deposit_received_as').click(function() { 
 				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
 				if (selectedDepositReceivedValue == 'total_deposit') {
@@ -1570,10 +1522,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 				setDepositBalance();
 			});
-		// DEPOSIT RECEIVED AS ONCHANGE END
-
-		// BOE DYNAMICALLY ADD AND REMOVE START
-			// Event listener to add new form fields
 			$("body").on("click", ".add_new_frm_field_btn", function () {
 				addChild();
 			});
@@ -1601,22 +1549,19 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					if ($(this).val() === null || $(this).val().length === 0) {
 						isValid = false;
 						alert("Please select addon.");
-						return false; // Break out of the loop
+						return false; 
 					}
 				});
 				return isValid;
 			}
-			// Event listener to remove form fields and reset indexes
 			$("body").on("click", ".remove_node_btn_frm_field", function () {
 				var row = $(this).closest(".form_field_outer_row");
 				var selectElement = row.find('.dynamicselect2');
 
-				// Destroy Select2 instance before removing the row
 				if (selectElement.data('select2')) {
 					selectElement.select2('destroy');
 				}
 
-				// Enable the VIN options before removing the row
 				var selectedVINs = selectElement.val(); 
 				if (selectedVINs) {
 					selectedVINs.forEach(function(vin) {
@@ -1628,27 +1573,22 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				resetIndexes();
 			});
 			
-			// Event delegation for dynamically added elements
 			$(document).on('click', '.remove_node_btn_frm_field_addon', function () {
 				$(this).closest('.addon_input_outer_row').remove();
-				disableAddonSelectedOptions(); // Re-check disabled options after removing a row
+				disableAddonSelectedOptions(); 
 				resetRowIndexes();
 			});
-			// Event listener to handle change event for .dynamicselect2
 			$("body").on("change", ".dynamicselect2", function () {
 				disableSelectedOptions();
 			});
-			// Add change event listener for dynamically added .addondynamicselect2 elements
 			$(document).on('change', '.addondynamicselect2', function() {
 				disableAddonSelectedOptions();
 			});
 			
-		// BOE DYNAMICALLY ADD AND REMOVE END
 
 
-		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS START
 			$('#vin_multiple').on('change', function() {
-				onChangeSelectedVins = $(this).val(); // Get selected VINs
+				onChangeSelectedVins = $(this).val(); 
 				var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 				if (onChangeSelectedVins && onChangeSelectedVins.length > 0) {
 					// if(index == 1) {
@@ -1659,13 +1599,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					// }
 					
 				} else {
-					// Clear addons dropdown if no VINs are selected
 					$('#addons').empty().trigger('change');
 				}
 			});
-		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS END
-
-        // SHOW FILE UPLOAD DATA START
             const fileInputBRNFile = document.querySelector("#brn_file");            
 			const fileInputSignedPFI = document.querySelector("#signed_pfi");
 			const fileInputSignedContract = document.querySelector("#signed_contract");            
@@ -1813,7 +1749,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 iframe.src = objectUrl;
                 previewFileVehicleHandoverPersonID.appendChild(iframe);
 			});
-        // SHOW FILE UPLOAD DATA END
 
 		$(document.body).on('select2:select', ".dynamicselectaddon", function (e) {
             var dataId = $(this).attr('data-parant');
@@ -1826,33 +1761,26 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 		
 		if(workOrder != null && workOrder.sales_support_data_confirmation_at != null) {
-			// Inject the PHP check for the permission into JavaScript
 			var hasEditConfirmedPermission = <?php echo json_encode(Auth::user()->hasPermissionForSelectedRole(['edit-confirmed-work-order'])); ?>;			
-			// Determine if the form should be disabled
 			var isDisabled = !hasEditConfirmedPermission;
-			// If the user doesn't have permission and sales support data confirmation exists, disable the form
 			if (isDisabled) {
-				// Select all input, select, and textarea elements and disable them
 				var elements = document.querySelectorAll('#WOForm #submit');
-				// #WOForm input, #WOForm select, #WOForm textarea, 
 				elements.forEach(function(element) {
 					element.disabled = true;
 				});
-				// Also disable the submit button with ID "submit-from-top"
 				var submitFromTopButton = document.getElementById('submit-from-top');
 				if (submitFromTopButton) {
 					submitFromTopButton.disabled = true;
-					submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+					submitFromTopButton.classList.add('disabled'); 
 				}
 			}
 		}
-		// Initialize mentions for the main comment textarea
         initializeMentions('#new-comment');
 
         function initializeMentions(selector) {
             $(selector).atwho({
                 at: "@",
-                data: [], // Empty initially, will be populated via AJAX
+                data: [], 
                 limit: 10,
                 callbacks: {
                     remoteFilter: function(query, renderCallback) {
@@ -1861,15 +1789,15 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                             return;
                         }
                         $.ajax({
-                            url: '/users-search', // Make sure this matches your route
+                            url: '/users-search', 
                             type: 'GET',
                             data: { query: query },
                             success: function(response) {
-                                console.log(response); // Check if users array is correct
+                                console.log(response); 
                                 if (response.users && response.users.length > 0) {
                                     renderCallback(response.users.map(user => ({
                                         id: user.id,
-                                        name: user.name || 'Unknown User' // Fallback if name is null
+                                        name: user.name || 'Unknown User' 
                                     })));
                                 } else {
                                     renderCallback([]);
@@ -1877,70 +1805,57 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                             },
                             error: function() {
                                 console.error('Error fetching user data.');
-                                renderCallback([]); // Handle error gracefully
+                                renderCallback([]); 
                             }
                         });
                     },
                     beforeInsert: function(value, $li) {
-                        // Wrap the mention in a custom token or placeholder that will later be styled
                         const mentionText = value.replace('@', '');
-                        return `@[${mentionText}]`; // Use a special syntax to recognize mentions later
+                        return `@[${mentionText}]`; 
                     }
                 }
             });
         }
 
-        // Set up event listeners for reply forms
         $('#comments-section').on('click', '.reply-button', function() {
             const commentId = $(this).closest('.comment').data('comment-id');
             initializeMentions(`#reply-input-${commentId}`);
         });
 	});
-	// Function to set the minimum date to today's date
 	document.addEventListener("DOMContentLoaded", function() {
-		var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+		var today = new Date().toISOString().split('T')[0]; 
 		document.getElementById("delivery_date").setAttribute("min", today);
 	});
-	// ADD CUSTOM VALIDATION RULES START
-        // Add custom validation rule for email
         $.validator.addMethod("customEmail", function(value, element) {
             return this.optional(element) || /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(value);
         }, "Please enter a valid email address");
-        // Custom method to validate SO number format
 		$.validator.addMethod("SONumberFormat", function(value, element) {
-			// Regular expression to match the format SO- followed by exactly 6 digits
 			return this.optional(element) || /^SO-\d{6}$/.test(value);
 		}, "Please enter a valid order number in the format SO-######");
 
-        // Custom method to ensure SO number is not SO-000000
 		$.validator.addMethod("notSO000000", function(value, element) {
 			return this.optional(element) || value !== "SO-000000";
 		}, "SO Number cannot be SO-000000");
 
-        // Custom method to ensure no leading or trailing spaces
 		$.validator.addMethod("noSpaces", function(value, element) {
 			return this.optional(element) || /^[^\s]+(\s+[^\s]+)*$/.test(value);
 		}, "No leading or trailing spaces allowed");
 
-		// Add custom validation rule for numeric input only (excluding spaces)
 		$.validator.addMethod("numericOnly", function(value, element) {
-			// Remove spaces before validation
 			value = value.replace(/\s+/g, '');
 			return this.optional(element) || /^[0-9+]+$/.test(value);
 		}, "Please enter a valid number");
 
-        // Add custom validation rule for address field (no multiple consecutive spaces)
         $.validator.addMethod("validAddress", function(value, element) {
             return this.optional(element) || !/\s\s+/.test(value);
         }, "No more than one consecutive space is allowed in the address");
-		// Custom method to check if the SO number is unique
 		$.validator.addMethod("uniqueSO", function(value, element) {
 			var result = false;
 			var WoId = $("#wo_id").val(); 
 			$.ajax({
 				type: "POST",
 				async: false,
-				url: "{{route('work-order.uniqueSO')}}", // script to validate in server side
+				url: "{{route('work-order.uniqueSO')}}", 
 				data: {_token: '{{csrf_token()}}', so_number: value, id: WoId},
 				success: function(data) {
 					result = (data == true) ? true : false;
@@ -1948,7 +1863,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This SO Number is already taken! Try another.");
-		// Custom method to check if the SO number is unique
 		$.validator.addMethod("uniqueWO", function(element) {
 			var result = false;
 			var WoId = $("#wo_id").val(); 
@@ -1956,7 +1870,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			$.ajax({
 				type: "POST",
 				async: false,
-				url: "{{route('work-order.uniqueWO')}}", // script to validate in server side
+				url: "{{route('work-order.uniqueWO')}}", 
 				data: {_token: '{{csrf_token()}}', wo_number: wo_number, id: WoId},
 				success: function(data) {
 					result = (data == true) ? true : false;
@@ -1964,15 +1878,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			return result; 
 		}, "This WO Number is already taken! Try another.");
-		// Adding the new custom validation rule to ensure SO Number is greater than SO-006500
 		$.validator.addMethod("greaterThanExisting", function(value, element) {
-			// Extract the numeric part from the SO Number (e.g., "SO-006501" -> "006501")
 			var numericPart = parseInt(value.split('-')[1], 10);
 
-			// Check if the extracted number is greater than 6500
 			return this.optional(element) || numericPart > 6500;
 		}, "SO Number must be greater than SO-006500");
-		// Custom method to validate at least one vehicle is selected when deposit_received_as is custom_deposit
 		$.validator.addMethod("customDepositVehicleRequired", function(value, element) {
 			if (selectedDepositReceivedValue === 'custom_deposit' && addedVins.length > 0) {
 				return $('select[name="deposit_aganist_vehicle[]"]').val().length > 0;
@@ -1981,13 +1891,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}, "At least one vehicle must be selected if deposit is received as custom deposit");
 
 		$.validator.addMethod("allVinsSelected", function(value, element) {
-			// Get all selected VINs across all dynamicselect2 elements
 			let selectedVins = new Set();
 			$('.dynamicselect2').each(function() {
 				$(this).val().forEach(vin => selectedVins.add(vin));
 			});
 
-			// Check if each VIN in addedVins is in the selectedVins set
 			for (let vin of addedVins) {
 				if (!selectedVins.has(vin)) {
 					return false;
@@ -1996,15 +1904,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 			return true;
 		}, "All work order vehicles should be selected under one BOE per VIN field.");
-		// Add a custom validator method for checking if the value is a year with 4 digits
 		$.validator.addMethod("year4digits", function(value, element) {
 			return this.optional(element) || /^\d{4}$/.test(value);
 		}, "Please enter a valid year with 4 digits.");
-    // ADD CUSTOM VALIDATION RULE END
 
-	// CLIENT SIDE VALIDATION START
 	
-        $('#WOForm').validate({ // initialize the plugin 
+        $('#WOForm').validate({ 
             rules: {
                 type: {
                     required: true,
@@ -2020,7 +1925,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				},
 				wo_number: {
 					uniqueWO: function() {
-						return $("#wo_number").val() !== ''; // Apply the uniqueWO validation only if wo_number is not empty
+						return $("#wo_number").val() !== ''; 
 					}
 				},
                 batch: {
@@ -2260,11 +2165,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			},
 			submitHandler: function(form) {  
-				// Prevent default form submission
 				event.preventDefault();
-				// Show the overlay
 				$('#overlay').show();
-				// Collect all comments
 				const comments = [];
 				if (workOrder == null) {
 					const commentElements = document.querySelectorAll('#comments-section .comment');
@@ -2280,7 +2182,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							
 							const files = Array.from(fileElements).map(file => ({
 								src: file.src,
-								name: file.alt || file.getAttribute('src').split('/').pop() // Use file name for images and PDFs
+								name: file.alt || file.getAttribute('src').split('/').pop() 
 							}));
 
 							if (textElement) {
@@ -2295,7 +2197,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					}
 				}
 
-				// Update phone numbers if elements are defined
 				if (typeof iti !== 'undefined') {
 					$('#customer_company_number_full').val(iti.getNumber());
 				}
@@ -2358,11 +2259,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					});
 				}
 				$('.dynamicselect2').prop('disabled', false);
-				// Append comments to form data
 				const formData = new FormData(form);
 				formData.append('comments', JSON.stringify(comments));
 
-				// Send form data via AJAX
 				fetch(form.action, {
 					method: form.method,
 					body: formData,
@@ -2382,38 +2281,31 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					}
 				}).catch(error => {
 					alert(error.message);
-					// // Check if the error message matches the specific text
 					// if (error.message === "Can't edit the work order because the sales support confirmed the data.") {
-					// 	// Disable the #submit and #submit-from-top buttons
 					// 	document.querySelectorAll('#WOForm #submit').forEach(function(element) {
 					// 		element.disabled = true;
 					// 	});
 					// 	const submitFromTopButton = document.getElementById('submit-from-top');
 					// 	if (submitFromTopButton) {
 					// 		submitFromTopButton.disabled = true;
-					// 		submitFromTopButton.classList.add('disabled'); // Optionally, add a disabled class for styling
+					// 		submitFromTopButton.classList.add('disabled'); 
 					// 	}
 					// }
 					console.error('Form submission error:', error);
 				}).finally(() => {
-					// Hide the overlay
 					$('#overlay').hide();
 				});
 			}
         });
-    // CLIENT SIDE VALIDATION END
 	function sanitizeQuantity(input) {
 		let value = input.value;
-		// Remove non-numeric characters and ensure it's a positive integer
 		value = value.replace(/[^0-9]/g, '');
 		input.value = value;
 	}
 	function sanitizeAmount(input) {
 		let value = input.value;
-		// Remove non-numeric characters except for dots
 		value = value.replace(/[^0-9.]/g, '');
 
-		// Remove multiple dots
 		const parts = value.split('.');
 		if (parts.length > 2) {
 			value = parts[0] + '.' + parts.slice(1).join('');
@@ -2434,8 +2326,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		
   
 
-	// ADDON DYNAMICALLY ADD AND REMOVE START
-		// Function to reset row indexes
 		function resetRowIndexes() {
 			$(".addon_outer").find(".addon_input_outer_row").each(function (index, element) {
 				var newIndex = index + 1;
@@ -2446,7 +2336,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$(element).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
 				$(element).find('textarea').attr('id', `addon_description_${newIndex}`);
 
-				// Reinitialize Select2 for the updated elements
 				$(`#addons_${newIndex}`).select2({
 					allowClear: true,
 					maximumSelectionLength: 1,
@@ -2466,15 +2355,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				},
 				dataType: 'json',
 				success: function(response) {
-					// Iterate over each dynamicselect2 element to update its options
 					$('.addondynamicselect2').each(function() { 
 						var $dropdown = $(this);
-						var currentVal = $dropdown.val(); // Store current selected values
+						var currentVal = $dropdown.val(); 
 
-						// Clear current options in addons dropdown
 						$dropdown.empty();
 
-						// Populate the addons dropdown with new options
 						if (response.charges && response.charges.length > 0) {
 							$("#addon-dynamic-div").show();
 							$.each(response.charges, function(index, charge) {
@@ -2492,14 +2378,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 							});
 						}
 
-						// Re-initialize Select2 with options
 						$dropdown.select2({
 							allowClear: true,
 							maximumSelectionLength: 1,
 							placeholder: "Choose Addon",
 						});
 
-						// Re-set the previously selected values
 						$dropdown.val(currentVal).trigger('change');
 					});
 				},
@@ -2518,7 +2402,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 								<div class="col-xxl-12 col-lg-12 col-md-12">
 									<label class="col-form-label text-md-end">Addon :</label>
 									<select name="addons[]" id="addons_${index}" class="form-control widthinput addondynamicselect2" data-index="${index}" multiple="true">
-										<!-- Add-on options will be dynamically populated -->
 										@foreach($addons as $addon)
 										<option value="{{$addon->addon_code}} - {{$addon->addon_name}}">{{$addon->addon_code}} - {{$addon->addon_name}}</option>
 										@endforeach
@@ -2546,27 +2429,21 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				</div>
 			`);
 
-			// Append the new row to the container
 			$(".addon_outer").append(newRow);
 
-			// Initialize Select2 only on the newly added element
 			$(`#addons_${index}`).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
 				placeholder: "Choose Addon",
 			});
 
-			// Call to update disabled options
 			disableAddonSelectedOptions();
 		}
 
-	// ADDON DYNAMICALLY ADD AND REMOVE END
 
-	// BOE DYNAMICALLY ADD AND REMOVE START
 		function addChild() {
 			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-			// Check if there are any available options
 			if (getAvailableOptions().length > 0) {
 				if (index <= addedVins.length) {
 					var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
@@ -2586,16 +2463,13 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 						</div>
 					`);
 
-					// Append the new row to the container
 					$(".form_field_outer").append(newRow);
 
-					// Initialize Select2 only on the newly added element
 					$(`#boe_vin_${index}`).select2({
 						allowClear: true,
 						placeholder: "Choose VIN Per BOE",
 					});
 
-					// // Add validation rules for all dynamicselect2 elements
 					// $('.dynamicselect2').each(function() {
 					// 	$(this).rules('add', {
 					// 		required: true,
@@ -2629,19 +2503,16 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			return addedVins.filter(vin => !selectedOptions.includes(vin));
 		}
 		function resetIndexes() {
-			// Loop through each .form_field_outer_row and reset the index
 			$(".form_field_outer").find(".form_field_outer_row").each(function(index, element) {
-				var newIndex = index + 1; // Index starts from 0, so add 1 to start from 1
+				var newIndex = index + 1; 
 				$(element).attr('id', newIndex);
 
-				// Update the label text, IDs, and names
 				$(element).find('label').attr('for', `boe_vin_${newIndex}`).text(`VIN per BOE: ${newIndex}`);
 				$(element).find('select')
 					.attr('id', `boe_vin_${newIndex}`)
 					.attr('name', `boe[${newIndex}][vin][]`)
 					.data('index', newIndex);
 
-				// Reinitialize Select2
 				$(`#boe_vin_${newIndex}`).select2({
 					allowClear: true,
 					placeholder: "Choose VIN Per BOE",
@@ -2651,7 +2522,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			disableAddonSelectedOptions();
 		}
 		function disableAddonSelectedOptions() {
-			// Get all selected options
 			var selectedOptions = [];
 			$(".addondynamicselect2").each(function () {
 				$(this).find('option:selected').each(function () {
@@ -2659,7 +2529,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				});
 			});
 
-			// Disable the selected options in all .addondynamicselect2 elements
 			$(".addondynamicselect2").each(function () {
 				var $select = $(this);
 				$select.find('option').each(function () {
@@ -2675,7 +2544,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}
 
 		function disableSelectedOptions() { 
-			// Get all selected options
 			var selectedOptions = [];
 			$(".dynamicselect2").each(function() {
 				$(this).find('option:selected').each(function() {
@@ -2683,7 +2551,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				});
 			});
 
-			// Disable the selected options in all .dynamicselect2 elements
 			$(".dynamicselect2").each(function() {
 				var $select = $(this);
 				$select.find('option').each(function() {
@@ -2696,13 +2563,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					}
 				});
 
-				// Refresh Select2 to apply changes
-				// $select.select2(); // COMMENTED BECAUSE OF UNSELECT OF  VIN PER BOE CAUSE ERROR IN CONSOLE
+				// $select.select2(); 
 			});
 		}
-	// BOE DYNAMICALLY ADD AND REMOVE END
 
-	// ADD AND REMOVE VEHICLE TO WO START
 		function addVIN() { 
 			var selectedVIN = $("#vin_multiple").val(); 
 			if (selectedVIN != '' && selectedVIN.length > 0) { 
@@ -2738,7 +2602,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
 				if(index > 0) {
-					// Append selectedVIN data as dropdown option for all dynamicselect2 class
 					$(".dynamicselect2").each(function() { 
 						var selectElement = $(this);  
 						selectedVIN.forEach(function(vin) {
@@ -2761,7 +2624,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 		}
 		function drawTableRow(data) { 
-			// Get the table body element by ID
 			var tableBody = document.querySelector('#myTable tbody');
 
 			var firstRow = document.createElement('tr');
@@ -2771,7 +2633,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			var thirdRow = document.createElement('tr');
 			var lastRow = document.createElement('tr');
 
-			// First Row Elements
 			var removeIconCell = createCellWithRemoveButton();
 
 			var vinCell = document.createElement('td');
@@ -2779,7 +2640,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				+'<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vehicle_id]" value="' + (data.vehicle_id) + '">'
 				+ '<input type="hidden" name="vehicle[' +data.vehicle_id+ '][vin]" value="' + (data.vin) + '">'
 				+ (data.vin);
-			vinCell.dataset.vin = data.vin; // Correctly setting the data-vin attribute
+			vinCell.dataset.vin = data.vin; 
 
 			var brandCell = createEditableCell(data.brand, 'Enter Brand','vehicle['+data.vehicle_id+'][brand]');
 			var variantCell = createEditableCell(data.variant, 'Enter Variant','vehicle['+data.vehicle_id+'][variant]');
@@ -2801,7 +2662,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				// var shipmentCell = createEditableCell(data.shipment, 'Enter Shipment','vehicle['+data.vehicle_id+'][shipment]');
 			}
 
-			// Append cells to the first row
 			firstRow.appendChild(removeIconCell);
 			firstRow.appendChild(vinCell);
 			firstRow.appendChild(brandCell);
@@ -2822,9 +2682,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			if(type == 'export_cnf') {
 				firstRow.appendChild(shipmentCell);
 			}
-			// firstRow.style.borderTop = '1px solid #b3b3b3';
 
-			// Second Row Elements
 			var emptyLabelCell = document.createElement('td');
 			emptyLabelCell.colSpan = 1;
 			emptyLabelCell.textContent = '';
@@ -2849,7 +2707,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			modificationInputElement.value= data.modification_or_jobs_to_perform_per_vin;
 			modificationInputCell.appendChild(modificationInputElement);
 
-			// Add validation rule for modificationInputElement
 			$(modificationInputElement).rules('add', {
 				noSpaces: true,
 				messages: {
@@ -2857,12 +2714,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			});
 
-			// Append cells to the second row
 			secondRow.appendChild(emptyLabelCell);
 			secondRow.appendChild(modificationLabelCell);
 			secondRow.appendChild(modificationInputCell);
 
-			// Third Row Elements
 			var emptyLabelThirdRowCell = document.createElement('td');
 			emptyLabelThirdRowCell.colSpan = 1;
 			emptyLabelThirdRowCell.textContent = '';
@@ -2886,7 +2741,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			specialRequestInputElement.style.width = '100%';
 			specialRequestInputElement.value = data.special_request_or_remarks;
 			specialRequestInputCell.appendChild(specialRequestInputElement);
-			// Add validation rule for specialRequestInputCell
 			$(specialRequestInputCell).rules('add', {
 				noSpaces: true,
 				messages: {
@@ -2894,12 +2748,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			});
 
-			// Append cells to the third row
 			thirdRow.appendChild(emptyLabelThirdRowCell);
 			thirdRow.appendChild(specialRequestLabelCell);
 			thirdRow.appendChild(specialRequestInputCell);
 
-			// Last Row Elements
 			var createAddon = createAddonCell(data.vehicle_id);
 			if(type == 'export_cnf') {
 				createAddon.colSpan = 18;
@@ -2907,23 +2759,19 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			else {
 				createAddon.colSpan = 17;
 			}
-			// Append cells to the last row
 			lastRow.appendChild(createAddon);
 
-			// Append rows to the table body
 			tableBody.appendChild(firstRow);
 			tableBody.appendChild(secondRow);
 			tableBody.appendChild(thirdRow);
 
-			// Store the VIN in the first row's data attribute for easy retrieval on click
 			$(firstRow).data('vin', data.vin);
 
-			// Store the vin in the third row's data attribute for easy retrieval on click
 			$(thirdRow).data('vin', data.vin);
 
 			var allVehicleRows = [firstRow, secondRow, thirdRow];
-			var addonIndex = 0; // Initialize addon index for each vehicle
-			var currentRow = thirdRow; // Start with the thirdRow
+			var addonIndex = 0; 
+			var currentRow = thirdRow; 
 			if (data.addons && data.addons.length > 0) {
 				for (var j = 0; j < data.addons.length; j++) {
 
@@ -2932,26 +2780,23 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					var optionsDate = { day: '2-digit', month: 'short', year: 'numeric' };
 					var optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
 
-					// Format date and time separately
 					var formattedDate = DateToBeformat.toLocaleDateString('en-GB', optionsDate);
 					var formattedTime = DateToBeformat.toLocaleTimeString('en-GB', optionsTime);
 
-					// Combine the formatted date and time
 					var addonDate = formattedDate + ', ' + formattedTime;
 
 
-					var addonId = data.addons[j].id; // Set the correct addonId based on your logic
+					var addonId = data.addons[j].id; 
 					var addonValue = data.addons[j].addon_code;
 					var addonQuantity = data.addons[j].addon_quantity;
 					var addonDescription = data.addons[j].addon_description;
 					if(addonValue != null) {
 						currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
-						addonIndex++; // Increment addonIndex after calling drawTableAddon
+						addonIndex++; 
 					}
 				}
 			}
 
-			// Gather data from all dynamically added addon input fields
 			$('.addon_input_outer_row').each(function() { 
 				var addonId = $(this).attr('id').split('_')[2];
 				var addonDate = '';
@@ -2960,7 +2805,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				var addonDescription = $(`#addon_description_${addonId}`).val();
 				if(addonValue != null) { 
 					currentRow = drawTableAddon(allVehicleRows,currentRow,data,addonIndex,addonId,addonDate,addonValue,addonQuantity,addonDescription);
-					addonIndex++; // Increment addonIndex after calling drawTableAddon
+					addonIndex++; 
 				}
 			});
 			tableBody.appendChild(lastRow);
@@ -2970,21 +2815,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		function drawTableAddon(allVehicleRows, thirdRow, data, addonIndex, addonId,addonDate, addonValue, addonQuantity, addonDescription) { 
 			var removeAddonCell = createAddonRemoveButton();
 			
-			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
 			var addonRow = document.createElement('tr');
-			addonRow.className = data.vehicle_id; // Add the vehicle_id as a class for addonRow
+			addonRow.className = data.vehicle_id; 
 
-			// Addon Row Label
 			var serviceBreakdownLabelCell = document.createElement('td');
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
 
-			// Addon Row Label
 			var serviceBreakdownDateLabelCell = document.createElement('td');
 			serviceBreakdownDateLabelCell.colSpan = 1;
 			serviceBreakdownDateLabelCell.textContent = addonDate; 
 
-			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
 			addonValueCell.textContent = addonValue;
@@ -3009,7 +2850,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+data.vehicle_id+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="'+(addonDescription ?? '')+'" class="form-control widthinput" id="addon_description_'+data.vehicle_id+'_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 
-			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
 			addonRow.appendChild(serviceBreakdownDateLabelCell);
@@ -3017,32 +2857,26 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
 			
-			// Insert the new row into the array
 			allVehicleRows.push(addonRow);
 			
-			// Append the addon row after the third row
 			thirdRow.insertAdjacentElement('afterend', addonRow);
-			// Add validation rules for all dynamicselectaddon elements
 			$("#addon_quantity_"+data.vehicle_id+"_"+addonIndex).rules('add', {
 				digits: true,
-				min: 1 // Ensure it's a positive integer
+				min: 1 
 			});
 			$("#addon_description_"+data.vehicle_id+"_"+addonIndex).rules('add', {
 				noSpaces: true,
 			});
-			return addonRow; // Return the newly created addonRow to be used as the next reference row
+			return addonRow; 
 		}
 
-		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
 
-			var vin = $(this).closest('tr').data('vin'); // Assuming each row has a data-vin attribute
+			var vin = $(this).closest('tr').data('vin'); 
 			if (vin) {
-				// Unselect and remove the VIN from all dynamicselect2 class elements
 				$(".dynamicselect2").each(function() {
 					var selectElement = $(this);
 					selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
-					// Trigger change to update the Select2 UI
 					selectElement.trigger('change');
 				});
 				$('select option[value="'+ vin +'"]').prop('disabled', false);
@@ -3055,30 +2889,23 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
 			findAllVINs();
 		});
-		// Event delegation to handle remove button click for remove addons row from vehicle table section
 		$('#myTable').on('click', '.remove-addon-row', function() {
-			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
-			var className = addon.attr('class'); // Get the class name of the tr
+			var addon = $(this).closest('tr'); 
+			var className = addon.attr('class'); 
 			
 			addon.remove();
 
-			// Find all rows with the same class name and reset their indices
 			var allVehicleRows = $('#myTable tr.' + className);
 			allVehicleRows.each(function(index) {
 				var row = $(this);			
-				// Update hidden input field for addon_code
 				row.find('.child_addon_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_code]').attr('id', 'addons_' + className + '_' + index);
 
-				// Update quantity input field within the specific div structure
 				row.find('div.input-group input[type="text"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_quantity]').attr('id', 'addon_quantity_' + className + '_' + index);
 
-				// Update description input field within the <td> element
 				row.find('td input[id^="addon_description_"]').attr('name', 'vehicle[' + className + '][addons][' + index + '][addon_description]').attr('id', 'addon_description_' + className + '_' + index);
 				
-				// Update hidden input field for addon ID
 				row.find('.child_addon_id_' + className).attr('name', 'vehicle[' + className + '][addons][' + index + '][id]');
 
-				// Check if the element is a select element and re-initialize select2
 				if (row.find('select.child_addon_' + className).length > 0) {
 					$('#addons_' + className + '_' + index).select2({
 						allowClear: true,
@@ -3089,15 +2916,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			});
 			vehicleAddonDropdown(className)
 		});
-		// Event delegation to handle add addon for vehicle in the vehicle line level
 		$('#myTable').on('click', '.create-addon-row', function() {
-			// Get the data-id for this td
 			var dataId = $(this).closest('td').data('id');
 			
-			// Find the next addon index for this particular dataId
 			var addonIndex = 0;
 			$('.' + dataId).each(function(index) {
-				addonIndex = index + 1; // Adjust the index based on 0 or 1 based indexing 
+				addonIndex = index + 1; 
 			});
 			var addonValue = '';
 			var addonQuantity = '';
@@ -3105,21 +2929,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 
 			var removeAddonCell = createAddonRemoveButton();
 
-			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
 			var addonRow = document.createElement('tr');
-			addonRow.className = dataId; // Add the vehicle_id as a class for addonRow
+			addonRow.className = dataId; 
 
-			// Addon Row Label
 			var serviceBreakdownLabelCell = document.createElement('td');
 			serviceBreakdownLabelCell.colSpan = 1;
 			serviceBreakdownLabelCell.textContent = 'Service Breakdown';
 
-			// Addon Row Label
 			var serviceBreakdownDateLabelCell = document.createElement('td');
 			serviceBreakdownDateLabelCell.colSpan = 1;
 			serviceBreakdownDateLabelCell.textContent = '';
 
-			// Addon Row Elements
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
 			addonValueCell.innerHTML = '<select name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_code]" id="addons_'+dataId+'_'+addonIndex+'" class="child_addon_'+dataId+' form-control widthinput dynamicselectaddon" data-parant="'+dataId+'" multiple="true">'
@@ -3144,7 +2964,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
 			addonDescriptionCell.innerHTML = '<input name="vehicle['+dataId+'][addons]['+addonIndex+'][addon_description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description_'+dataId+ '_' + addonIndex + '" placeholder="Enter Addon Custom Details">';
 			
-			// Append cells to the addon row
 			addonRow.appendChild(removeAddonCell);
 			addonRow.appendChild(serviceBreakdownLabelCell);
 			addonRow.appendChild(serviceBreakdownDateLabelCell);
@@ -3152,14 +2971,12 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
 
-			// Append the addon row after the last addon of the row VIN or before the add addon button
 			var parentElementRemove = $(this).closest('tr');
 			var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
 
 			if (firstRemoveRowButton.length) {
 				firstRemoveRowButton.after(addonRow);
 
-				// Push addonRow element into data-rows array of firstRemoveRowButton element
 				var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
 				rowsData.push(addonRow);
 				firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
@@ -3168,13 +2985,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			}
 			var parentElement = this.parentElement.parentElement;
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
-			// Initialize select2 after appending the row to the DOM
 			$('#addons_' + dataId + '_' + addonIndex).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
 				placeholder: "Choose Addon"
 			});
-				// Add validation rules for all dynamicselectaddon elements
 				$('.dynamicselectaddon').each(function() {
                     $(this).rules('add', {
                         required: true,
@@ -3185,7 +3000,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
                 });
 				$("#addon_quantity_"+dataId+"_"+addonIndex).rules('add', {
 					digits: true,
-					min: 1 // Ensure it's a positive integer
+					min: 1 
 				});
 				$("#addon_description_"+dataId+"_"+addonIndex).rules('add', {
 					noSpaces: true,
@@ -3193,7 +3008,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			vehicleAddonDropdown(dataId);
 		});
 		function vehicleAddonDropdown(dataId) {
-			// Collect all selected addon values for the specific dataId
 			var selectedAddonValues = [];
 			$('.' + dataId).find('.child_addon_' + dataId).each(function() {
 				if ($(this).is('input')) {
@@ -3202,20 +3016,17 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					selectedAddonValues.push($(this).val()[0]);
 				}
 			});
-			// Disable the collected options in all select elements for the dataId
 			$('.' + dataId).find('select').each(function() {
 				var selectElement = $(this);
 				var currentSelectedValue = selectElement.val();
 				selectElement.find('option').each(function() {
 					var optionValue = $(this).val();
-					// Disable options that are in the selectedAddonValues array but are not the currently selected value
 					if (selectedAddonValues.includes(optionValue) && optionValue !== currentSelectedValue[0]) {
 						$(this).prop('disabled', true);
 					} else {
 						$(this).prop('disabled', false);
 					}
 				});
-				// Refresh select2 to show disabled options
 				selectElement.trigger('change.select2');
 			});
 		}
@@ -3247,14 +3058,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			const table = document.getElementById('myTable');
 
 			document.addEventListener('DOMContentLoaded', function() {
-				// Attach event listeners to all remove buttons
 				const removeButtons = document.querySelectorAll('.remove-btn');
 
 				removeButtons.forEach(button => {
 					button.addEventListener('click', function(event) {
-						// Find the row to be removed
 						const row = event.target.closest('tr');
-						// Remove the row
 						row.remove();
 					});
 				});
@@ -3269,14 +3077,11 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			inputElement.value = value;
 			inputElement.style.border = 'none';
 
-			// Generate a unique ID for the input element
-			var uniqueId = name.replace(/[\[\]]+/g, '_'); // Replace square brackets with underscores
+			var uniqueId = name.replace(/[\[\]]+/g, '_'); 
 			inputElement.id = uniqueId;
 
-			// Append the input element to the cell
 			cell.appendChild(inputElement);
 
-			// Add validation rules using the ID as the selector
 			setTimeout(function() {
 				var rules = {
 					noSpaces: true,
@@ -3285,12 +3090,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					}
 				};
 				
-				// Add custom validation for model year fields
 				if (name.includes('model_year') || name.includes('model_year_to_mention_on_documents')) {
 					rules.year4digits = true;
 				}
 				
-				// Apply the validation rules
 				$('#'+uniqueId).rules('add', rules);
 			}, 0);
 
@@ -3317,7 +3120,7 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}
 		function createAddonCell(vehicle_id) {
 			var cell = document.createElement('td');
-			cell.setAttribute('data-id', vehicle_id); // Setting the data-id attribute
+			cell.setAttribute('data-id', vehicle_id); 
 			var addButton = document.createElement('a');
 			addButton.className = 'addon_btn_round create-addon-row';
 			addButton.title = 'Create Addon';
@@ -3368,7 +3171,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			});
 
-			// Set the selected values for select2
 			$(selectElement).val(certification_per_vin).trigger('change');
 
 			return cell;
@@ -3416,15 +3218,10 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				}
 			});
 
-			// Set the selected values for select2
 			$(selectElement).val(shipment).trigger('change');
 
 			return cell;
 		}
-
-	// ADD AND REMOVE VEHICLE TO WO END
-
-	// HIDE FIELDS START
 		function hideDependentTransportType() {
 			$("#airline-div").hide();
 			$("#airway-bill-div").hide();
@@ -3439,9 +3236,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 			$("#airway-details-div").hide();
 			$("#transportation-company-details-div").hide();
 		}
-	// HIDE FIELDS END
-
-	// CUSTOMER DETAILS SECTION START
         function checkValue() {
 			selectedCustomerEmail = $('#customer_email').val();
 			selectedCustomerAddress = $('#customer_address').val();
@@ -3451,12 +3245,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             var Other = document.getElementById('Other');
             var switchToDropdown = document.getElementById('switchToDropdown');
             
-            // Store the current select value
             var selectedCustomerName = $('#customer_name').val();
-            // $('#customer_reference_type').val('select');
             $('#customer_reference_id').val(selectedCustomerName);
             
-            // Hide the select2 container and show the text input
             $('#customer_name').next('.select2-container').hide();
             textInput.style.display = 'inline';
             Other.style.display = 'none';
@@ -3475,12 +3266,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             var Other = document.getElementById('Other');
             var switchToDropdown = document.getElementById('switchToDropdown');
             
-            // Store the current text input value
             var newCustomerName = $('#textInput').val();
-            // $('#customer_reference_type').val('input');
             $('#customer_reference_id').val(newCustomerName);
             
-            // Show the select2 container and hide the text input
             $('#customer_name').next('.select2-container').show();
             textInput.style.display = 'none';
             Other.style.display = 'inline';
@@ -3488,7 +3276,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
             
             var selectedCustomerName = $('#customer_name').val();
             if (selectedCustomerName.length > 0) {
-                // setCustomerRelations(selectedCustomerName);
 				$('#customer_address').val(selectedCustomerAddress);
 				$('#customer_email').val(selectedCustomerEmail);
 				$('#customer_company_number').val(selectedCustomerContact);
@@ -3499,7 +3286,6 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				$('#customer_company_number').val('');
 			}
         }
-	// CUSTOMER DETAILS SECTION END
 	function isSOExist() { console.log('inside isSOExist');
 		var SONumber = $('#so_number').val().trim();
 		var editWoId = '';
@@ -3508,28 +3294,25 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		}
 		console.log("isEdit is - "+editWoId);
 		var selectedBatch = '';
-		// Ensure 'batch' exists before accessing its value
 		if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
-			selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
+			selectedBatch = $('#batch').val(); 
 		}
 		
-		if (SONumber === '') { // Check if SO Number is empty
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
+		if (SONumber === '') { 
+			document.getElementById('wo_number').value = ''; 
+			return; 
 		}
 		
-		// Step 1: Split the string to get the part after "SO-"
 		let parts = SONumber.split("SO-");
-		if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
+		if (parts.length !== 2 || parts[0] !== '') { 
+			document.getElementById('wo_number').value = ''; 
+			return; 
 		}
 		
-		// Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
 		let numberPart = parts[1];
-		if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
-			document.getElementById('wo_number').value = ''; // Clear the WO Number field
-			return; // Exit the function
+		if (numberPart === '' || numberPart.length !== 6) { 
+			document.getElementById('wo_number').value = ''; 
+			return; 
 		}
 		
 		if (type === 'local_sale') {
@@ -3539,9 +3322,9 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 				url: '/check-so-number',
 				method: 'POST',
 				data: {
-					_token: $('meta[name="csrf-token"]').attr('content'), // Add CSRF token
+					_token: $('meta[name="csrf-token"]').attr('content'), 
 					so_number: SONumber,
-					work_order_id: editWoId ? editWoId : null // If in edit mode, pass the work_order_id
+					work_order_id: editWoId ? editWoId : null 
 				},
 				success: function(response) { 
 					if (response.exists) { 
@@ -3577,115 +3360,93 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 					}
 				},
 				error: function(xhr) {
-					console.error(xhr.responseText); // Log errors
+					console.error(xhr.responseText); 
 				} 
 			}); 
 		}
 	}
-	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
 	function setWo() {
-    var SONumber = $('#so_number').val().trim(); // Get the value of the SO Number input and trim any whitespace
+    var SONumber = $('#so_number').val().trim(); 
     var selectedBatch = '';
     
     if (type == 'export_exw' || type == 'export_cnf') {
-        selectedBatch = $('#batch').val(); // Get the value of the batch and trim any whitespace
+        selectedBatch = $('#batch').val(); 
     }
     
-    if (SONumber === '') { // Check if SO Number is empty
-        document.getElementById('wo_number').value = ''; // Clear the WO Number field
-        return; // Exit the function
+    if (SONumber === '') { 
+        document.getElementById('wo_number').value = ''; 
+        return; 
     }
     
-    // Step 1: Split the string to get the part after "SO-"
     let parts = SONumber.split("SO-");
-    if (parts.length !== 2 || parts[0] !== '') { // Check if the format is invalid
-        document.getElementById('wo_number').value = ''; // Clear the WO Number field
-        return; // Exit the function
+    if (parts.length !== 2 || parts[0] !== '') { 
+        document.getElementById('wo_number').value = ''; 
+        return; 
     }
     
-    // Step 2: Preserve the part after "SO-" as is (keep the 6 digits)
     let numberPart = parts[1];
-    if (numberPart === '' || numberPart.length !== 6) { // Check if the number part is empty or not 6 digits
-        document.getElementById('wo_number').value = ''; // Clear the WO Number field
-        return; // Exit the function
+    if (numberPart === '' || numberPart.length !== 6) { 
+        document.getElementById('wo_number').value = ''; 
+        return; 
     }
     
     let WONumber = '';
     
-    // Check if the sale type is 'local_sale'
     if (type === 'local_sale') {
-        // Construct the WO Number without batch information
         WONumber = "WO-" + numberPart + "-LS";
     } else {
         if (isBatchChecked) {
-            // Extract the batch number (assuming it is in the format "Batch 1", "Batch 2", etc.)
             let batchNumber = '';
 			if (selectedBatch && typeof selectedBatch === 'string') {
-				batchNumber = selectedBatch.replace(/\D/g, ''); // Remove all non-digit characters
+				batchNumber = selectedBatch.replace(/\D/g, ''); 
 			}
-            if (selectedBatch === '' || batchNumber === '') { // Check if the batch is empty or invalid
-                document.getElementById('wo_number').value = ''; // Clear the WO Number field
-                return; // Exit the function
+            if (selectedBatch === '' || batchNumber === '') { 
+                document.getElementById('wo_number').value = ''; 
+                return; 
             }
 
-            // Format batch number as B01, B02, ..., B09, B10, etc.
             let formattedBatchNumber = batchNumber.padStart(2, '0');
 
-		// Construct the WO Number with batch information
 		WONumber = "WO-" + numberPart + "-B" + formattedBatchNumber;
         } else {
-            // Construct the WO Number with "-SB" when the batch is not checked
             WONumber = "WO-" + numberPart + "-SW";
         }
     }
 
-		// Set the WO Number field
 		document.getElementById('wo_number').value = WONumber;
 	}
 
-	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
 
-	// SET DEPOSIT BALANCE START
 		function setDepositAganistVehicleDropdownOptions() {
-			// Get the previously selected values
 			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
-			// Empty the select element before adding new options
 			$('#deposit_aganist_vehicle').empty();
-			// Add new options to the select element
 			addedVins.forEach(function(vin) {
 				$('#deposit_aganist_vehicle').append(new Option(vin, vin));
 			});
 
-			// Initialize or reinitialize Select2
 			$('#deposit_aganist_vehicle').select2({
 				allowClear: true,
 				placeholder: "Choose Vehicle"
 			});
 
-			// Reselect previously selected values if they still exist
 			$('#deposit_aganist_vehicle').val(previouslySelectedValues.filter(function(value) {
 				return addedVins.includes(value);
 			})).trigger('change');
 		}
 		
-	// SET DEPOSIT BALANCE END
 
-	// CURRENCY UPDATE START
 		function updateCurrency() {
 			var currency = document.getElementById("currency").value;
 			var currencyText = document.querySelector("#currency option:checked").textContent;
 			document.getElementById("amount_received_currency").textContent = currencyText;
 			document.getElementById("balance_amount_currency").textContent = currencyText;
 		}
-	// CURRENCY UPDATE END
 
     function sanitizeInput(input) {
-        // Replace multiple spaces with a single space
         input.value = input.value.replace(/\s\s+/g, ' ');
     }
 
     function sanitizeNumberInput(input) {
-        // Remove any non-numeric characters
         input.value = input.value.replace(/[^0-9]/g, '');
     }
 	
@@ -3733,9 +3494,8 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 	function toggleBatchDropdown() {
 		const isBatchCheckbox = document.getElementById('is_batch');
 		
-		// Ensure the checkbox element exists before accessing its properties
 		if (isBatchCheckbox) {
-			isBatchChecked = isBatchCheckbox.checked; // Update the value of isBatchChecked
+			isBatchChecked = isBatchCheckbox.checked; 
 			
 			const batchDropdown = document.getElementById('batchDropdownSection');
 			
@@ -3748,21 +3508,18 @@ $allfieldPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-
 		setWo();
 	}
 
-	// Run the function on page load if the checkbox exists
 	document.addEventListener('DOMContentLoaded', function () {
 		const isBatchCheckbox = document.getElementById('is_batch');
 		
 		if (isBatchCheckbox) {
-			toggleBatchDropdown(); // Call to set the initial state
+			toggleBatchDropdown(); 
 			
-			// Update the value of isBatchChecked on page load
 			isBatchChecked = isBatchCheckbox.checked;
 		}
 		setWo();
 	});
 	function updateStyledComment() {
         let text = $('#new-comment').val();
-        // Replace the special mention syntax with a styled span
         text = text.replace(/@\[(\w+)\]/g, '<span class="mention" style="color: blue;">@$1</span>');
         $('#styled-comment').html(text);
     }
@@ -3774,7 +3531,6 @@ $hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-a
 @if ($hasAmountPermission)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // List of input field IDs and classes to disable
             const fieldsToDisable = [
                 'so_total_amount',
                 'so_vehicle_quantity',
@@ -3783,7 +3539,6 @@ $hasAmountPermission = Auth::user()->hasPermissionForSelectedRole(['can-create-a
                 'balance_amount',
             ];
 
-            // Disable each field by ID or class
             fieldsToDisable.forEach(function(field) {
                 const elementsById = document.getElementById(field);
                 const elementsByClass = document.getElementsByClassName(field);
@@ -3812,9 +3567,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-
 @if ($hasPermission)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // List of input field IDs and classes to disable
             const fieldsToDisable = [
-                'transport_type', // Class name for radio buttons
+                'transport_type', 
                 'brn',
                 'container_number',
                 'airline_reference_id',
@@ -3836,7 +3590,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['restrict-all-work-
                 'delivery_date',
             ];
 
-            // Disable each field by ID or class
             fieldsToDisable.forEach(function(field) {
                 const elementsById = document.getElementById(field);
                 const elementsByClass = document.getElementsByClassName(field);

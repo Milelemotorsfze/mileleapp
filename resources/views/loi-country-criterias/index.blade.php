@@ -1,5 +1,6 @@
 @extends('layouts.table')
 @section('content')
+
     @can('loi-restricted-country-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
@@ -41,9 +42,11 @@
                     <table id="loi-criteria-country-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
+                            <th>Actions</th>
                             <th>S.NO:</th>
                             <th>Country</th>
                             <th>Steering</th>
+                            <!-- <th>TTC Approval Model</th> -->
                             <th>Is LOI Restricted</th>
                             <th>Restricted Model Lines</th>
                             <th>Allowed Model Lines</th>
@@ -57,7 +60,7 @@
                             <th>Created By</th>    
                             <th>Updated At</th>                                
                             <th>Updated By</th>
-                            <th>Actions</th>
+                          
                         </tr>
                         </thead>
                         <tbody>
@@ -65,24 +68,7 @@
                         </div>
                         @foreach ($loiCountryCriterias as $key => $loiCountryCriteria)
                             <tr>
-                                
-                                <td> {{ ++$i }}</td>                              
-                                <td>{{ $loiCountryCriteria->country->name ?? '' }}</td>
-                                <td>{{ $loiCountryCriteria->steering }} </td>
-                                <td>   @if($loiCountryCriteria->is_loi_restricted == true) Yes @else No @endif  </td>
-                                <td>{{ implode(", ",$loiCountryCriteria->restricted_model_lines)  ?? '' }}</td>
-                                <td>{{ implode(", ",$loiCountryCriteria->allowed_model_lines)  ?? '' }}</td>
-                                <td> @if($loiCountryCriteria->is_only_company_allowed == true) Yes @else No @endif </td>
-                                <td>{{ $loiCountryCriteria->max_qty_per_passport }}</td>
-                                <td> {{ $loiCountryCriteria->max_qty_for_company }} </td>
-                                <td>{{ $loiCountryCriteria->min_qty_for_company }}</td>
-                                <td>{{ $loiCountryCriteria->comment}}</td>
-                                <td>{{ $loiCountryCriteria->status }} </td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->created_at)->format('d M Y')  }}</td>
-                                <td>{{ $loiCountryCriteria->createdBy->name ?? '' }} </td>     
-                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->updated_at)->format('d M Y')  }}</td>
-                                <td>  {{ $loiCountryCriteria->updatedBy->name ?? '' }}</td>
-                                <td>
+                            <td>
                                 @can('loi-restricted-country-edit')
                                     @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-edit');
@@ -105,16 +91,69 @@
                                         @endif
                                     @endif
                                 @endcan
-                                @can('loi-restricted-country-delete')
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-delete');
-                                    @endphp
-                                    @if ($hasPermission)
-                                        <button data-url="{{ route('loi-country-criterias.destroy', $loiCountryCriteria->id ) }}" class="mt-1 btn btn-danger btn-sm btn-delete">
-                                            <i class="fa fa-trash"></i></button>
+                                    @can('loi-restricted-country-delete')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-delete');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <button data-url="{{ route('loi-country-criterias.destroy', $loiCountryCriteria->id ) }}" class="mt-1 btn btn-danger btn-sm btn-delete">
+                                                <i class="fa fa-trash"></i></button>
+                                        @endif
+                                    @endcan
+                                    @if ($loiCountryCriteria->ttc_models)
+                                        <button type="button" class="btn btn-soft-violet primary btn-sm mt-1" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+                                        title="View TTC Approval Required Models" data-bs-toggle="modal" data-bs-target="#view-ttc-approval-models-{{$loiCountryCriteria->id}}">
+                                            <i class="fa fa-list"></i> View TTC Models
+                                        </button>
                                     @endif
-                                @endcan
-                                </td>                           
+                                </td>  
+                                <td> {{ ++$i }}</td>                              
+                                <td>{{ $loiCountryCriteria->country->name ?? '' }}</td>
+                                <td>{{ $loiCountryCriteria->steering }} </td>
+                                <td>  @if($loiCountryCriteria->is_loi_restricted == true) Yes @else No @endif  </td>
+                                <td>{{ implode(", ",$loiCountryCriteria->restricted_model_lines)  ?? '' }}</td>
+                                <td>{{ implode(", ",$loiCountryCriteria->allowed_model_lines)  ?? '' }}</td>
+                                <td> @if($loiCountryCriteria->is_only_company_allowed == true) Yes @else No @endif </td>
+                                <td>{{ $loiCountryCriteria->max_qty_per_passport }}</td>
+                                <td> {{ $loiCountryCriteria->max_qty_for_company }} </td>
+                                <td>{{ $loiCountryCriteria->min_qty_for_company }}</td>
+                                <td>{{ $loiCountryCriteria->comment}}</td>
+                                <td>{{ $loiCountryCriteria->status }} </td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->created_at)->format('d M Y')  }}</td>
+                                <td>{{ $loiCountryCriteria->createdBy->name ?? '' }} </td>     
+                                <td>{{ \Illuminate\Support\Carbon::parse($loiCountryCriteria->updated_at)->format('d M Y')  }}</td>
+                                <td>  {{ $loiCountryCriteria->updatedBy->name ?? '' }}</td>
+
+                                 <!-- To View TTC  Models -->
+                                <div class="modal fade" id="view-ttc-approval-models-{{$loiCountryCriteria->id}}" tabindex="-1" 
+                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">TTC Approval Required Models</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body pl-2 pr-2" style="font-size:12px; overflow-y: auto;max-height: 300px;">
+                                            @php
+                                                $chunks = array_chunk($loiCountryCriteria->ttc_models, 3);
+                                             @endphp
+
+                                        <div class="row">
+                                            @foreach($chunks as $chunk)
+                                                <div class="col-md-3 col-lg-3 col-sm-12">
+                                                    <ul>
+                                                        @foreach($chunk as $model)
+                                                            <li>{{ $model }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
                             </tr>
                         @endforeach
                         </tbody>

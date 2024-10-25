@@ -9,23 +9,30 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\MasterModelLines;
+use App\Models\MasterModel;
+use App\Models\CountryTTCApprovalModel;
 use App\Models\LoiAllowedOrRestrictedModelLines;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
-use Yajra\DataTables\Html\Builder;
+use Illuminate\Support\Facades\DB;
 
 class LoiCountryCriteriasController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Builder $builder)
+    public function index()
     {
         (new UserActivityController)->createActivity('Open LOI Restricted Counties List');
 
         $loiCountryCriterias = LoiCountryCriteria::orderBy('updated_at','DESC')->get();
+        foreach($loiCountryCriterias as $loiCountryCriteria) {
+            $country_id = $loiCountryCriteria->country_id;
+            $loiCountryCriteria->ttc_models = MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
+                $query->where('country_id', $country_id);
+            })->pluck('model')->toArray();
+        }
 
         return view('loi-country-criterias.index', compact('loiCountryCriterias'));
     }
@@ -40,8 +47,9 @@ class LoiCountryCriteriasController extends Controller
         $LOIRestrictedCountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->pluck('country_id');
         $countries = Country::whereNotIn('id', $LOIRestrictedCountries)->get();
         $modelLines = MasterModelLines::all();
+        $models = MasterModel::groupBy('model')->get();
 
-        return view('loi-country-criterias.create', compact('countries','modelLines'));
+        return view('loi-country-criterias.create', compact('countries','modelLines','models'));
     }
 
     /**
@@ -53,7 +61,8 @@ class LoiCountryCriteriasController extends Controller
             'country_id' => 'required'
         ]);
 
-//        dd($request->all());
+        DB::beginTransaction();
+
         $loiCountryCriteria = new LoiCountryCriteria();
         $loiCountryCriteria->country_id = $request->country_id;
         $loiCountryCriteria->comment = $request->comment;
@@ -85,12 +94,23 @@ class LoiCountryCriteriasController extends Controller
                 $loiModelLine->is_restricted = true;
                 $loiModelLine->save();
             }
-
         }
 
         $loiCountryCriteria->save();
 
+        if($request->ttc_approval_models) {
+            foreach($request->ttc_approval_models as $value) {
+                $TTCAprovalModel = new CountryTTCApprovalModel();
+                $TTCAprovalModel->master_model_id = $value;
+                $TTCAprovalModel->country_id = $request->country_id;
+                $TTCAprovalModel->save();
+            }
+            
+        }
+        
         (new UserActivityController)->createActivity('Created Entry in  LOI Restricted Counties.');
+
+        DB::commit();
 
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Restricted Country Added Successfully.');
 
@@ -113,10 +133,15 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria = LoiCountryCriteria::find($id);
 
         $modelLines = MasterModelLines::all();
-        $alreadyAddedIds = LoiCountryCriteria::whereNot('country_id', $loiCountryCriteria->country_id)->pluck('country_id');
+        $alreadyAddedIds = LoiCountryCriteria::whereNot('country_id', $loiCountryCriteria->country_id
+        )->pluck('country_id');
         $countries = Country::whereNotIn('id', $alreadyAddedIds)->get();
+        $models = MasterModel::groupBy('model')->get();
+        $TTCApprovalModels = CountryTTCApprovalModel::where('country_id', $loiCountryCriteria->country_id)
+                                    ->pluck('master_model_id')->toArray();
 
-        return view('loi-country-criterias.edit', compact('countries','loiCountryCriteria','modelLines'));
+        return view('loi-country-criterias.edit', compact('countries','loiCountryCriteria','modelLines','models',
+                'TTCApprovalModels'));
     }
 
     /**
@@ -127,6 +152,8 @@ class LoiCountryCriteriasController extends Controller
         $request->validate([
             'country_id' => 'required'
         ]);
+
+        DB::beginTransaction();
 
         $loiCountryCriteria =  LoiCountryCriteria::find($id);
         $loiCountryCriteria->country_id = $request->country_id;
@@ -162,11 +189,21 @@ class LoiCountryCriteriasController extends Controller
                 $loiModelLine->is_restricted = true;
                 $loiModelLine->save();
             }
-
         }
 
+        if($request->ttc_approval_models) {
+            $TTCApprovalModels = CountryTTCApprovalModel::where('country_id', $loiCountryCriteria->country_id)->delete();
+            foreach($request->ttc_approval_models as $value) {
+                $TTCAprovalModel = new CountryTTCApprovalModel();
+                $TTCAprovalModel->master_model_id = $value;
+                $TTCAprovalModel->country_id = $request->country_id;
+                $TTCAprovalModel->save();
+
+            }
+        }
         (new UserActivityController)->createActivity('Updated LOI Restricted Counties.');
 
+        DB::commit();
 
         return redirect()->route('loi-country-criterias.index')->with('success','LOI Country Criteria Updated Successfully.');
     }

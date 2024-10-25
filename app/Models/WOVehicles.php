@@ -68,61 +68,50 @@ class WOVehicles extends Model
         }
         return $certification;
     }
-    public function getModificationStatusAttribute() {
-        // if($this->sales_support_data_confirmation_at != '' && $this->finance_approval_status == 'Approved' && $this->coo_approval_status == 'Approved') {
-            $status = 'Not Initiated';
-        // }
-        // else {
-        //     $status = 'Blank';
-        // }
-        // Get the latest modification status from the database
+    public function getModificationStatusAttribute()
+    {
+        $status = 'Not Initiated';  // Default status
+
+        // If no modification jobs and no addons, set to 'No Modifications'
+        if (is_null($this->modification_or_jobs_to_perform_per_vin) && $this->addons()->count() == 0) {
+            return 'No Modifications';
+        }
+
+        // Fetch the latest modification status from the database
         $data = WOVehicleStatus::where('w_o_vehicle_id', $this->id)
                                 ->orderBy('created_at', 'DESC')
                                 ->first();
-    
-        // Check if no modification jobs and no addons, set status to 'No Modifications'
-        if ($this->modification_or_jobs_to_perform_per_vin == null && $this->addons()->count() == 0) {
-            $status = 'No Modifications';
+
+        // If status data exists, return the latest status
+        if ($data) {
+            return $data->status;
         }
-        // Otherwise, if modification status data exists, use the latest status
-        elseif ($data) {
-            $status = $data->status;
-        }
-    
+
         return $status;
-    } 
-    public function getPDIStatusAttribute() {
-        // Set default status to 'Not Initiated'
-        $status = 'Not Initiated';
-    
-        // Get the latest pdi status from the database
+    }
+    public function getPDIStatusAttribute()
+    {
+        $status = 'Not Initiated';  // Default status
+
+        // Get the latest PDI status from the database
         $data = WOVehiclePDIStatus::where('w_o_vehicle_id', $this->id)
-                                ->orderBy('created_at', 'DESC')
-                                ->first();
-    
-        //if pdi status data exists, use the latest status
-        if ($data) {
-            $status = $data->status;
-        }
-    
-        return $status;
-    }  
-    public function getDeliveryStatusAttribute() {
-        // Set default status to 'On Hold'
-        $status = 'On Hold';
-    
-        // Get the latest pdi status from the database
+                                    ->latest('created_at')
+                                    ->first();
+
+        return $data ? $data->status : $status;
+    }
+
+    public function getDeliveryStatusAttribute()
+    {
+        $status = 'On Hold';  // Default status
+
+        // Get the latest delivery status from the database
         $data = WOVehicleDeliveryStatus::where('w_o_vehicle_id', $this->id)
-                                ->orderBy('created_at', 'DESC')
-                                ->first();
-    
-        //if pdi status data exists, use the latest status
-        if ($data) {
-            $status = $data->status;
-        }
-    
-        return $status;
-    }  
+                                    ->latest('created_at')
+                                    ->first();
+
+        return $data ? $data->status : $status;
+    }
     public function addons()
     {
         return $this->hasMany(WOVehicleAddons::class,'w_o_vehicle_id','id');
@@ -170,4 +159,15 @@ class WOVehicles extends Model
         return $this->hasOne(WOVehicleDeliveryStatus::class, 'w_o_vehicle_id') // Explicitly define the foreign key here
             ->latestOfMany('created_at');  // Sort by the date field
     }
+    public function woBoe()
+    {
+        return $this->belongsTo(WOBOE::class, 'work_order_id', 'wo_id')
+                    ->where(function($query) {
+                        $query->whereColumn('wo_boe.boe_number', 'boe_number')  // Compare the boe_number between two tables
+                              ->orWhere(function($query) {
+                                  $query->where('wo_boe.boe_number', 1)  // Check if wo_boe.boe_number is 1
+                                        ->where('boe_number', 0);  // Check if the current model's boe_number is 0
+                              });
+                    });
+    }    
 }
