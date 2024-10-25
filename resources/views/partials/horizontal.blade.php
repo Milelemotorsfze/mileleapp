@@ -1,6 +1,6 @@
 <style>
     .dropdown-menu-scrollable {
-        max-height: 90vh; /* Adjust this value as needed */
+        max-height: 80vh; 
         overflow-y: auto;
     }
     .badge-notification {
@@ -81,7 +81,7 @@
 .topnav .dropdown .dropdown-menu {
     margin-top: 0;
     border-radius: 0 0 .25rem .25rem;
-    right: auto!important;
+    /* right: auto!important; */
 }
     }
 </style>
