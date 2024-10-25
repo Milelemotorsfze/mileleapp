@@ -636,177 +636,177 @@
 							    <td>@if($data->is_batch == 0) Single @else {{$data->batch ?? ''}} @endif</td>	
                             @endif	
 							@if(isset($type) && $type != 'status_report')					
-							<td>{{$data->customer_name ?? ''}}</td>
-							<td class="no-click">{{$data->customer_email ?? ''}}</td>
-							<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
-							<td>{{$data->customer_address ?? ''}}</td>
-							<td>{{$data->customer_representative_name ?? ''}}</td>
-							<td class="no-click">{{$data->customer_representative_email ?? ''}}</td>
-							<td class="no-click">{{$data->customer_representative_contact ?? ''}}</td>	
-                            @if(isset($type) && $type == 'export_exw'|| $type == 'all')													
-                                <td>{{$data->freight_agent_name ?? ''}}</td>
-                                <td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
-                                <td class="no-click">{{$data->freight_agent_contact_number ?? ''}}</td>
-								<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
-								<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
-                            @endif
-							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
-								<td>@if($data->type == 'export_cnf'){{ $data->cross_trade ?? '' }}@endif</td>
-							@endif
-                            @if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
-								<td>@if($data->type == 'export_exw' || $data->type == 'export_cnf'){{ $data->temporary_exit ?? '' }}@endif</td>
-                                <td>{{$data->port_of_loading ?? ''}}</td>
-                                <td>{{$data->port_of_discharge ?? ''}}</td>
-                                <td>{{$data->final_destination ?? ''}}</td>
-                                <td>{{$data->transport_type ?? ''}}</td>
-                                <td>
-									@if($data->transport_type == 'air' || $data->transport_type == 'sea')
-										@if($data->brn_file)
-											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
-												<button class="btn btn-primary mb-1 btn-style">View</button>
-											</a>
-											<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
-												<button class="btn btn-info btn-style">Download</button>
-											</a>
+								<td>{{$data->customer_name ?? ''}}</td>
+								<td class="no-click">{{$data->customer_email ?? ''}}</td>
+								<td class="no-click">{{$data->customer_company_number ?? ''}}</td>
+								<td>{{$data->customer_address ?? ''}}</td>
+								<td>{{$data->customer_representative_name ?? ''}}</td>
+								<td class="no-click">{{$data->customer_representative_email ?? ''}}</td>
+								<td class="no-click">{{$data->customer_representative_contact ?? ''}}</td>	
+								@if(isset($type) && $type == 'export_exw'|| $type == 'all')													
+									<td>{{$data->freight_agent_name ?? ''}}</td>
+									<td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
+									<td class="no-click">{{$data->freight_agent_contact_number ?? ''}}</td>
+									<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
+									<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
+								@endif
+								@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
+									<td>@if($data->type == 'export_cnf'){{ $data->cross_trade ?? '' }}@endif</td>
+								@endif
+								@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'|| $type == 'all'))
+									<td>@if($data->type == 'export_exw' || $data->type == 'export_cnf'){{ $data->temporary_exit ?? '' }}@endif</td>
+									<td>{{$data->port_of_loading ?? ''}}</td>
+									<td>{{$data->port_of_discharge ?? ''}}</td>
+									<td>{{$data->final_destination ?? ''}}</td>
+									<td>{{$data->transport_type ?? ''}}</td>
+									<td>
+										@if($data->transport_type == 'air' || $data->transport_type == 'sea')
+											@if($data->brn_file)
+												<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" target="_blank">
+													<button class="btn btn-primary mb-1 btn-style">View</button>
+												</a>
+												<a href="{{ url('wo/brn_file/' . $data->brn_file) }}" download>
+													<button class="btn btn-info btn-style">Download</button>
+												</a>
+											@endif
 										@endif
+									</td>
+									<td>
+										@if($data->transport_type == 'air')
+											{{$data->airline ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->shipping_line ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->trailer_number_plate ?? ''}}
+										@endif									
+									</td>
+									<td>
+										@if($data->transport_type == 'air')
+											{{$data->airway_bill ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->container_number ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transportation_company ?? ''}}
+										@endif
+									</td>
+									<td class="@if($data->transport_type == 'road') no-click @endif">
+										@if($data->transport_type == 'air')
+											{{$data->airway_details ?? ''}}
+										@elseif($data->transport_type == 'sea')
+											{{$data->forward_import_code ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transporting_driver_contact_number ?? ''}}
+										@endif
+									</td>
+									<td>
+										@if($data->transport_type == 'sea')
+											{{$data->brn ?? ''}}
+										@elseif($data->transport_type == 'road')
+											{{$data->transportation_company_details ?? ''}}
+										@endif
+									</td>
+								@endif
+								<td>{{$data->so_vehicle_quantity ?? ''}}</td>
+								<td>
+									@if($data->so_total_amount != 0.00 || $data->amount_received != 0.00 || $data->balance_amount != 0.00)
+									{{$data->currency ?? ''}}
 									@endif
 								</td>
-                                <td>
-									@if($data->transport_type == 'air')
-										{{$data->airline ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->shipping_line ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->trailer_number_plate ?? ''}}
-									@endif									
-								</td>
-                                <td>
-									@if($data->transport_type == 'air')
-										{{$data->airway_bill ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->container_number ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transportation_company ?? ''}}
+								<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
+								<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
+								<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
+								<td>{{$data->delivery_location ?? ''}}</td>
+								<td>{{$data->delivery_contact_person ?? ''}}</td>
+								<td class="no-click">{{$data->delivery_contact_person_number ?? ''}}</td>
+								<td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
+								@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
+									<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
+									<td>{{$data->bill_of_loading_details ?? ''}}</td>
+									<td>{{$data->shipper ?? ''}}</td>
+									<td>{{$data->consignee ?? ''}}</td>
+									<td>{{$data->notify_party ?? ''}}</td>
+									<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
+								@endif
+								<td>
+									@if($data->signed_pfi)
+										<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                                <td class="@if($data->transport_type == 'road') no-click @endif">
-									@if($data->transport_type == 'air')
-										{{$data->airway_details ?? ''}}
-									@elseif($data->transport_type == 'sea')
-										{{$data->forward_import_code ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transporting_driver_contact_number ?? ''}}
+								<td>
+									@if($data->signed_contract)
+										<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                                <td>
-									@if($data->transport_type == 'sea')
-										{{$data->brn ?? ''}}
-									@elseif($data->transport_type == 'road')
-										{{$data->transportation_company_details ?? ''}}
+								<td>
+									@if($data->payment_receipts)
+										<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
 									@endif
 								</td>
-                            @endif
-                            <td>{{$data->so_vehicle_quantity ?? ''}}</td>
-							<td>
-								@if($data->so_total_amount != 0.00 || $data->amount_received != 0.00 || $data->balance_amount != 0.00)
-								{{$data->currency ?? ''}}
-								@endif
-							</td>
-							<td>@if($data->so_total_amount != 0.00){{$data->so_total_amount ?? ''}} @endif</td>
-							<td>@if($data->amount_received != 0.00){{$data->amount_received ?? ''}} @endif</td>
-							<td>@if($data->balance_amount != 0.00){{$data->balance_amount ?? ''}} @endif</td>
-							<td>{{$data->delivery_location ?? ''}}</td>
-							<td>{{$data->delivery_contact_person ?? ''}}</td>
-							<td class="no-click">{{$data->delivery_contact_person_number ?? ''}}</td>
-                            <td>@if($data->delivery_date != ''){{\Carbon\Carbon::parse($data->delivery_date)->format('d M Y') ?? ''}}@endif</td>
-							@if(isset($type) && ($type == 'export_cnf'|| $type == 'all'))
-								<td>{{$data->preferred_shipping_line_of_customer ?? ''}}</td>
-								<td>{{$data->bill_of_loading_details ?? ''}}</td>
-								<td>{{$data->shipper ?? ''}}</td>
-								<td>{{$data->consignee ?? ''}}</td>
-								<td>{{$data->notify_party ?? ''}}</td>
-								<td>{{$data->special_or_transit_clause_or_request ?? ''}}</td>
-							@endif
-                            <td>
-								@if($data->signed_pfi)
-									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/signed_pfi/' . $data->signed_pfi) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->signed_contract)
-									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/signed_contract/' . $data->signed_contract) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->payment_receipts)
-									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/payment_receipts/' . $data->payment_receipts) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->noc)
-									<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/noc/' . $data->noc) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->enduser_trade_license)
-									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->enduser_passport)
-									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-                            <td>
-								@if($data->enduser_contract)
-									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
-							<td>
-								@if($data->vehicle_handover_person_id)
-									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
-										<button class="btn btn-primary mb-1 btn-style">View</button>
-									</a>
-									<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
-										<button class="btn btn-info btn-style">Download</button>
-									</a>
-								@endif
-							</td>
+								<td>
+									@if($data->noc)
+										<a href="{{ url('wo/noc/' . $data->noc) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/noc/' . $data->noc) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_trade_license)
+										<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_trade_license/' . $data->enduser_trade_license) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_passport)
+										<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_passport/' . $data->enduser_passport) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->enduser_contract)
+										<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/enduser_contract/' . $data->enduser_contract) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
+								<td>
+									@if($data->vehicle_handover_person_id)
+										<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" target="_blank">
+											<button class="btn btn-primary mb-1 btn-style">View</button>
+										</a>
+										<a href="{{ url('wo/vehicle_handover_person_id/' . $data->vehicle_handover_person_id) }}" download>
+											<button class="btn btn-info btn-style">Download</button>
+										</a>
+									@endif
+								</td>
 							@endif
 							<td>{{$data->CreatedBy->name ?? ''}}</td>
                             <td>@if($data->created_at != ''){{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}@endif</td>
