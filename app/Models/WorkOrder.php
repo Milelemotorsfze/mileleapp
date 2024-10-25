@@ -666,6 +666,51 @@ class WorkOrder extends Model
             default => 'badge-soft-dark',
         };
     }
+    public function getFormBadgeClass($status, $type)
+    {
+        return match ($type) {
+            'status' => match ($status) {
+                'On Hold' => 'badge-soft-warning',
+                'Active' => 'badge-soft-success',
+                'Cancelled' => 'badge-soft-danger',
+                'Succeeded' => 'badge-soft-primary',
+                'Partially Delivered' => 'badge-soft-info',
+                default => 'badge-soft-secondary',
+            },
+            'confirmation' => match ($status) {
+                'Confirmed' => 'badge-soft-success',
+                'Not Confirmed' => 'badge-soft-danger',
+                default => 'badge-soft-secondary',
+            },
+            'approval' => match ($status) {
+                'Pending' => 'badge-soft-info',
+                'Approved' => 'badge-soft-success',
+                'Rejected' => 'badge-soft-danger',
+                default => 'badge-soft-secondary',
+            },
+            'docs' => match ($status) {
+                'In Progress' => 'badge-soft-info',
+                'Ready' => 'badge-soft-success',
+                'Not Initiated' => 'badge-soft-danger',
+                default => 'badge-soft-secondary',
+            },
+            'modification' => match ($status) {
+                'INITIATED' => 'badge-soft-info',
+                'NOT INITIATED' => 'badge-soft-danger',
+                'NO MODIFICATIONS' => 'badge-soft-warning',
+                'COMPLETED' => 'badge-soft-success',
+                default => 'badge-soft-dark',
+            },
+            'delivery' => match ($status) {
+                'READY' => 'badge-soft-info',
+                'ON HOLD' => 'badge-soft-danger',
+                'DELIVERED' => 'badge-soft-success',
+                'DELIVERED WITH DOCS HOLD' => 'badge-soft-warning',
+                default => 'badge-soft-dark',
+            },
+            default => 'badge-soft-secondary',
+        };
+    }
     public function formatDate($date)
     {
         return $date ? \Carbon\Carbon::parse($date)->format('d M Y') : '';
