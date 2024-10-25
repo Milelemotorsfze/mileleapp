@@ -452,8 +452,7 @@
 									<td>{{ $data->customer_address ?? '' }}</td>
 									<td>{{ $data->customer_representative_name ?? '' }}</td>
 									<td class="no-click">{{ $data->customer_representative_email ?? '' }}</td>
-									<td class="no-click">{{ $data->customer_representative_contact ?? '' }}</td>
-								@endif
+									<td class="no-click">{{ $data->customer_representative_contact ?? '' }}</td>								
 								@if(isset($type) && $type == 'export_exw'|| $type == 'all')													
 									<td>{{$data->freight_agent_name ?? ''}}</td>
 									<td class="no-click">{{$data->freight_agent_email ?? ''}}</td>
@@ -504,6 +503,7 @@
 								@component('components.view-download-buttons', ['filePath' => 'wo/enduser_passport/', 'fileName' => $data->enduser_passport])@endcomponent
 								@component('components.view-download-buttons', ['filePath' => 'wo/enduser_contract/', 'fileName' => $data->enduser_contract])@endcomponent
 								@component('components.view-download-buttons', ['filePath' => 'wo/vehicle_handover_person_id/', 'fileName' => $data->vehicle_handover_person_id])@endcomponent
+								@endif
 								<td>{{ $data->CreatedBy->name ?? '' }}</td>
 								<td>{{ $data->formatDate($data->created_at) }}</td>
 								<td>{{ $data->UpdatedBy->name ?? '' }}</td>
