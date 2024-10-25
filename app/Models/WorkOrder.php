@@ -616,4 +616,82 @@ class WorkOrder extends Model
         return $this->hasOne(WoStatus::class, 'wo_id')
             ->latestOfMany('status_changed_at'); 
     }
+    public function confirmationStatus()
+    {
+        return $this->sales_support_data_confirmation_at ? 'Confirmed' : 'Not Confirmed';
+    }
+    public function latestStatusBadgeClass()
+    {
+        return match ($this->latestStatus->status ?? '') {
+            'On Hold' => 'badge-soft-warning',
+            'Active' => 'badge-soft-success',
+            'Cancelled' => 'badge-soft-danger',
+            'Succeeded' => 'badge-soft-primary',
+            'Partially Delivered' => 'badge-soft-info',
+            default => 'badge-soft-secondary',
+        };
+    }
+    public function financeApprovalBadgeClass()
+    {
+        return match ($this->finance_approval_status) {
+            'Pending' => 'badge-soft-info',
+            'Approved' => 'badge-soft-success',
+            'Rejected' => 'badge-soft-danger',
+            default => 'badge-soft-secondary',
+        };
+    }
+    public function cooApprovalBadgeClass()
+    {
+        return match ($this->coo_approval_status) {
+            'Pending' => 'badge-soft-info',
+            'Approved' => 'badge-soft-success',
+            'Rejected' => 'badge-soft-danger',
+            default => 'badge-soft-secondary',
+        };
+    }
+    public function getBadgeClass($fieldValue)
+    {
+        return match ($fieldValue) {
+            'In Progress' => 'badge-soft-info',
+            'Ready' => 'badge-soft-success',
+            'Not Initiated' => 'badge-soft-danger',
+            'INITIATED' => 'badge-soft-info',
+            'NO MODIFICATIONS' => 'badge-soft-warning',
+            'NOT INITIATED' => 'badge-soft-danger',
+            'COMPLETED' => 'badge-soft-success',
+            'READY' => 'badge-soft-info',
+            'ON HOLD' => 'badge-soft-danger',
+            'DELIVERED WITH DOCS HOLD' => 'badge-soft-warning',
+            'DELIVERED' => 'badge-soft-success',
+            default => 'badge-soft-dark',
+        };
+    }
+    public function formatDate($date)
+    {
+        return $date ? \Carbon\Carbon::parse($date)->format('d M Y') : '';
+    }
+
+    public function getTransportField($field)
+    {
+        return match ($this->transport_type) {
+            'air' => match ($field) {
+                'name' => $this->airline,
+                'id' => $this->airway_bill,
+                'details' => $this->airway_details,
+            },
+            'sea' => match ($field) {
+                'name' => $this->shipping_line,
+                'id' => $this->container_number,
+                'details' => $this->forward_import_code,
+                'additional' => $this->brn,
+            },
+            'road' => match ($field) {
+                'name' => $this->trailer_number_plate,
+                'id' => $this->transportation_company,
+                'details' => $this->transporting_driver_contact_number,
+                'additional' => $this->transportation_company_details,
+            },
+            default => '',
+        };
+    }
 }
