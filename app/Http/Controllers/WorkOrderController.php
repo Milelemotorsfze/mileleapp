@@ -2998,11 +2998,6 @@ class WorkOrderController extends Controller
             'status_filter' => $request->status_filter,
             'sales_support_filter' => $request->sales_support_filter,
             'finance_approval_filter' => $request->finance_approval_filter,
-            'coo_approval_filter' => $request->coo_approval_filter,
-            'docs_status_filter' => $request->docs_status_filter,
-            'modification_filter' => $request->modification_filter,
-            'pdi_filter' => $request->pdi_filter,
-            'delivery_filter' => $request->delivery_filter
         ]);
     
         // Check if the filter record exists for the current user
