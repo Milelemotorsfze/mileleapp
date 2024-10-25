@@ -209,10 +209,12 @@ class WorkOrderController extends Controller
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
+                ,'sales_person_id','created_by','created_at','updated_at'
             ]);
         })
         ->when($type === 'status_report', function ($query) {
-            $query->select(['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by']);
+            $query->select(['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at']);
         })
         ->when($type === 'export_exw', function ($query) {
             $query->select([
@@ -223,7 +225,8 @@ class WorkOrderController extends Controller
                 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
                 'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
             ]);
         })
         ->when($type === 'export_cnf', function ($query) {
@@ -235,7 +238,8 @@ class WorkOrderController extends Controller
                 'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
             ]);
         })
         ->when($type === 'local_sale', function ($query) {
@@ -244,7 +248,8 @@ class WorkOrderController extends Controller
                 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 'transporting_driver_contact_number', 
                 'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
-                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
             ]);
         })
         ->when($type !== 'all' && $type !== 'status_report', function ($query) use ($type) {
@@ -294,7 +299,7 @@ class WorkOrderController extends Controller
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
-        // 'sales_person_id','customer_reference_id','customer_reference_type','airline_reference_id','deposit_received_as','sales_support_data_confirmation_by',
+        // 'customer_reference_id','customer_reference_type','airline_reference_id','deposit_received_as','sales_support_data_confirmation_by',
         // 'finance_approval_by','finance_approved_at','coe_office_approval_by','coe_office_approved_at','coe_office_direct_approval_comments','created_by','deleted_by',
         
     // if ($type === 'all') {
