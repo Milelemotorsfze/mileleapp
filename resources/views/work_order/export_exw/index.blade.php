@@ -165,7 +165,7 @@
 							'selected' => $filters['finance_approval_filter'] ?? []
 						],
 						'coo-approval-filter' => [
-							'label' => 'Fin. Approval',
+							'label' => 'COO Approval',
 							'options' => $cooApprovalStatuses,
 							'selected' => $filters['coo_approval_filter'] ?? []
 						]
