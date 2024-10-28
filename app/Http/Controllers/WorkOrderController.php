@@ -293,13 +293,13 @@ class WorkOrderController extends Controller
             }
             if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
                 $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
-                $includeBlank = in_array('blank', $normalizedCOOApprovalFilter);
+                $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);
     
                 $query->whereHas('latestCOO', function ($q) use ($normalizedCOOApprovalFilter) {
                     $q->whereIn(\DB::raw('lower(status)'), $normalizedCOOApprovalFilter);
                 });
     
-                if ($includeBlank) {
+                if ($includeBlankCOO) {
                     $query->orWhereDoesntHave('latestCOO');  // Handle the 'Blank' case for missing finance approvals
                 }
             }
