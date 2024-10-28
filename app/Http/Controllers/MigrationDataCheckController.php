@@ -50,9 +50,76 @@ class MigrationDataCheckController extends Controller
     public function addPFIItems() {
         // populate each item in list with parent and child
         // list Only have Toyota PFI
+        $length = 6;
+        $offset = 2;
+        $prefix = "P ";
+
+       $migrationPFIs =  DB::table('migration_pfi_items')->get();
+       foreach($migrationPFIs as $migrationPFI) {
+        $latestItem = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItem){
+            $latestUUID =  $latestItem->code;
+            $latestUUIDNumber = substr($latestUUID, $offset, $length);
+            
+            $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+            $latestCode =  $prefix.$newCode;
+        }else{
+            $latestCode = $prefix.'001';
+        }
+        $pfiItem = new PfiItem();
+        $pfiItem->pfi_id = $migrationPFI->pfi_id;
+        $pfiItem->code = $latestCode;
+        $pfiItem->master_model_id = $migrationPFI->master_model_id;
+        $pfiItem->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItem->unit_price = $migrationPFI->unit_price;
+        $pfiItem->created_by = 16;
+        $pfiItem->is_parent = true;
+        $pfiItem->save();
+
+        $latestItemChild = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItemChild){
+
+            $latestUUIDChild =  $latestItemChild->code;
+            $latestUUIDNumberChild = substr($latestUUIDChild, $offset, $length);
+            $newCode =  str_pad($latestUUIDNumberChild + 1, 3, 0, STR_PAD_LEFT);
+            $latestCodeChild =  $prefix.$newCode;
+
+        }else{
+            $latestCodeChild = $prefix.'001';
+        }
+
+        $pfiItemChild = new PfiItem();
+        $pfiItemChild->code = $latestCodeChild;
+        $pfiItemChild->pfi_id = $migrationPFI->pfi_id;
+        $pfiItemChild->parent_pfi_item_id = $pfiItemId;
+        $pfiItemChild->loi_item_id = $migrationPFI->loi_item_id;
+        $pfiItemChild->master_model_id = $migrationPFI->master_model_id;
+        $pfiItemChild->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItemChild->unit_price = $migrationPFI->unit_price;
+        $pfiItemChild->created_by = 16;
+        $pfiItemChild->is_parent = false;
+        $pfiItemChild->save();
+       }
+       // chcek multiple pfi items in a pfi are under same model line or not
+       // if same model line keep parent id same and remove the parent item of the another 
+    //    $alreadyAddedPfi = [];
+    //    $ChildPfiItems = PFIItem::where('is_parent', false)->whereNotIn('pfi_id', $alreadyAddedPfi)->get();
+    //    foreach($ChildPfiItems as $ChildPfi){
+    //     $isMultiplePfiParent = PFIItem::where('pfi_id'. $ChildPfi->pfi_id)
+    //                 ->where('is_parent', true)->get();
+                    
+    //     if($isMultiplePfiParent->count() >= 2) {
+    //         // chcek model line of each child
+            
+
+    //     }
+    //    }
 
 
-
+       return "all pfi are added in pfi items";
+    //    $ChildPfi =  DB::table('migration_pfi_items')->get();
     }
     public function currencyCheckPFI() {
         // : If vendor is MMC Currency can be EUR also else currency will be USD 
@@ -72,6 +139,7 @@ class MigrationDataCheckController extends Controller
     public function PFIAmountCheck() {
         // PFI amount: it should be tally with sum of each item quantity * unit price  
         $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+        $notmatchingPfis = [];
         foreach($allPfi as $pfi) { 
             $pfiSum = DB::table('pfi_items')
                 ->where('pfi_id', $pfi->id)
@@ -79,10 +147,14 @@ class MigrationDataCheckController extends Controller
                 ->select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))->first(); 
 
                 if($pfiSum->total != $pfi->amount) {
-                    return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
+                    $notmatchingPfis[] = $pfi->id;
+                    // info($pfiSum->total);
+                    // info($pfi->amount);
+                    // return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
         
                 }
         }
+        return $notmatchingPfis;
         return "all PFI Amount is correct";
     }
     public function CheckLOICodeUniqueinPFI() {

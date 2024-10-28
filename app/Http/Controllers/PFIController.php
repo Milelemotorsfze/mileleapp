@@ -569,9 +569,9 @@ class PFIController extends Controller
         $parentPfiItem->childPfiItems = PfiItem::where('pfi_id', $pfi->id)->where('is_parent', false)
                                         ->where('parent_pfi_item_id', $parentPfiItem->id)->orderBy('id','ASC')->get();
 
-        $request['page'] = 'Edit';  
-        $request['client_id']  = $pfi->customer->id;
-        $request['country_id'] = $pfi->country->id;
+        // $request['page'] = 'Edit';  
+        // $request['client_id']  = $pfi->customer->id;
+        // $request['country_id'] = $pfi->country->id;
         
         $masterModel = MasterModel::where('model', $parentPfiItem->masterModel->model)
                             ->where('sfx', $parentPfiItem->masterModel->sfx)
@@ -579,7 +579,6 @@ class PFIController extends Controller
         $parentPfiItem->exactMatches = MasterModel::where('model', $parentPfiItem->masterModel->model)
                                                     ->where('sfx', $parentPfiItem->masterModel->sfx)->pluck('id')->toArray();
             
-
         $parentPfiItem->is_brand_toyota = 1;
         $brandName = "TOYOTA";
         if(strtoupper($masterModel->modelLine->brand->brand_name) !== $brandName)
@@ -587,14 +586,17 @@ class PFIController extends Controller
             $parentPfiItem->is_brand_toyota = 0;
         }
         
-
         foreach($parentPfiItem->childPfiItems as $childItem)
          {                     
-            $request['model'] = $childItem->masterModel->model;
-            $request['sfx'] = $childItem->masterModel->sfx;
-            $LOIItems =  $this->getLOIItemCode($request);
-            $childItem->LOIItemCodes = $LOIItems['codes'];
-            
+            // $request['model'] = $childItem->masterModel->model;
+            // $request['sfx'] = $childItem->masterModel->sfx;
+            // $LOIItems =  $this->getLOIItemCode($request);
+            // $childItem->LOIItemCodes = $LOIItems['codes'];
+            $childItem->LOIItemCodes = letterOfIndentItem::whereHas('pfiItems', function($query)use($id,$parentPfiItem){
+                    $query->where('pfi_id', $id)
+                    ->where('parent_pfi_item_id', $parentPfiItem->id);
+            })->get();
+
             if($childItem->letterOfIndentItem) {
                 $childItem->remainingQuantity = $childItem->letterOfIndentItem->quantity - $childItem->letterOfIndentItem->utilized_quantity;
             }
@@ -824,9 +826,9 @@ class PFIController extends Controller
                     $query->where('master_model_line_id', $parentModel->master_model_line_id); 
                 });
             }              
-        if($request->selectedLOIItemIds) {
-            $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
-        }
+        // if($request->selectedLOIItemIds) {
+        //     $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
+        // }
         $data['codes'] = $loiItems->get();
         $parentModels = MasterModel::where('model', $request->model)
                                 ->where('sfx', $request->sfx)
