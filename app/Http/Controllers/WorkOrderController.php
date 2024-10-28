@@ -291,6 +291,18 @@ class WorkOrderController extends Controller
                     $query->orWhereDoesntHave('latestFinance');  // Handle the 'Blank' case for missing finance approvals
                 }
             }
+            if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
+                $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
+                $includeBlank = in_array('blank', $normalizedCOOApprovalFilter);
+    
+                $query->whereHas('latestCOO', function ($q) use ($normalizedCOOApprovalFilter) {
+                    $q->whereIn(\DB::raw('lower(status)'), $normalizedCOOApprovalFilter);
+                });
+    
+                if ($includeBlank) {
+                    $query->orWhereDoesntHave('latestCOO');  // Handle the 'Blank' case for missing finance approvals
+                }
+            }
         })
         ->with(['latestFinance', 'latestDocs', 'boe', 'vehicles'])
         ->latest()
@@ -301,53 +313,7 @@ class WorkOrderController extends Controller
     }
         // 'customer_reference_id','customer_reference_type','airline_reference_id','deposit_received_as','sales_support_data_confirmation_by',
         // 'finance_approval_by','finance_approved_at','coe_office_approval_by','coe_office_approved_at','coe_office_direct_approval_comments','created_by','deleted_by',
-        
-    // if ($type === 'all') {
-    //     $query->select('id','type','date','so_number','temporary_exit','delivery_advise','showroom_transfer','cross_trade','is_batch','batch','wo_number',
-    //     'customer_name','customer_email','customer_company_number','customer_address',
-    //     'customer_representative_name','customer_representative_email','customer_representative_contact','freight_agent_name','freight_agent_email',
-    //     'freight_agent_contact_number','port_of_loading','port_of_discharge','final_destination','transport_type','brn_file','brn','container_number',
-    //     'airline','airway_bill','shipping_line','forward_import_code','trailer_number_plate','transportation_company',
-    //     'transporting_driver_contact_number','airway_details','transportation_company_details','currency','so_total_amount','so_vehicle_quantity',
-    //     'amount_received','balance_amount','delivery_location','delivery_contact_person','delivery_contact_person_number','delivery_date',
-    //     'preferred_shipping_line_of_customer','bill_of_loading_details','shipper','consignee','notify_party','special_or_transit_clause_or_request',
-    //     'signed_pfi','signed_contract','payment_receipts','noc','enduser_trade_license','enduser_passport','enduser_contract','vehicle_handover_person_id',
-    //     'sales_support_data_confirmation_at',
-    //     'updated_by');
-    // } elseif ($type === 'status_report') {
-    //     $query->select('id','date','so_number','is_batch','batch','wo_number','airway_details','sales_support_data_confirmation_at','updated_by');
-    // } elseif ($type === 'export_exw') {
-    //     $query->select('id','type','date','so_number','temporary_exit','delivery_advise','showroom_transfer','is_batch','batch','wo_number',
-    //     'customer_name','customer_email','customer_company_number','customer_address',
-    //     'customer_representative_name','customer_representative_email','customer_representative_contact','freight_agent_name','freight_agent_email',
-    //     'freight_agent_contact_number','port_of_loading','port_of_discharge','final_destination','transport_type','brn_file','brn','container_number',
-    //     'airline','airway_bill','shipping_line','forward_import_code','trailer_number_plate','transportation_company',
-    //     'transporting_driver_contact_number','airway_details','transportation_company_details','currency','so_total_amount','so_vehicle_quantity',
-    //     'amount_received','balance_amount','delivery_location','delivery_contact_person','delivery_contact_person_number','delivery_date',
-    //     'signed_pfi','signed_contract','payment_receipts','noc','enduser_trade_license','enduser_passport','enduser_contract','vehicle_handover_person_id',
-    //     'sales_support_data_confirmation_at',
-    //     'updated_by');
-    // }elseif ($type === 'export_cnf') {
-    //     $query->select('id','type','date','so_number','temporary_exit','cross_trade','is_batch','batch','wo_number',
-    //     'customer_name','customer_email','customer_company_number','customer_address',
-    //     'customer_representative_name','customer_representative_email','customer_representative_contact','port_of_loading','port_of_discharge','final_destination','transport_type','brn_file','brn','container_number',
-    //     'airline','airway_bill','shipping_line','forward_import_code','trailer_number_plate','transportation_company',
-    //     'transporting_driver_contact_number','airway_details','transportation_company_details','currency','so_total_amount','so_vehicle_quantity',
-    //     'amount_received','balance_amount','delivery_location','delivery_contact_person','delivery_contact_person_number','delivery_date',
-    //     'preferred_shipping_line_of_customer','bill_of_loading_details','shipper','consignee','notify_party','special_or_transit_clause_or_request',
-    //     'signed_pfi','signed_contract','payment_receipts','noc','enduser_trade_license','enduser_passport','enduser_contract','vehicle_handover_person_id',
-    //     'sales_support_data_confirmation_at',
-    //     'updated_by');
-    // }elseif ($type === 'local_sale') {
-    //     $query->select('id','date','so_number','wo_number',
-    //     'customer_name','customer_email','customer_company_number','customer_address',
-    //     'customer_representative_name','customer_representative_email','customer_representative_contact','transporting_driver_contact_number','airway_details',
-    //     'currency','so_total_amount','so_vehicle_quantity',
-    //     'amount_received','balance_amount','delivery_location','delivery_contact_person','delivery_contact_person_number','delivery_date',
-    //     'signed_pfi','signed_contract','payment_receipts','noc','enduser_trade_license','enduser_passport','enduser_contract','vehicle_handover_person_id',
-    //     'sales_support_data_confirmation_at',
-    //     'updated_by');
-    // }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -2998,6 +2964,7 @@ class WorkOrderController extends Controller
             'status_filter' => $request->status_filter,
             'sales_support_filter' => $request->sales_support_filter,
             'finance_approval_filter' => $request->finance_approval_filter,
+            'coo_approval_filter' => $request->coo_approval_filter,
         ]);
     
         // Check if the filter record exists for the current user

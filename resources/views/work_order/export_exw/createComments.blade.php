@@ -39,6 +39,13 @@
     .hover-options button i {
         pointer-events: none;
     }
+    .reply {
+		margin-left: 30px; 
+		margin-top: 10px;
+	}
+    .replies {
+		margin-left: 30px; 
+	}
     .reply-button {
         margin-left:10px;
     }

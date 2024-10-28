@@ -163,11 +163,16 @@
 							'label' => 'Fin. Approval',
 							'options' => $financeApprovalStatuses,
 							'selected' => $filters['finance_approval_filter'] ?? []
+						],
+						'coo-approval-filter' => [
+							'label' => 'Fin. Approval',
+							'options' => $cooApprovalStatuses,
+							'selected' => $filters['coo_approval_filter'] ?? []
 						]
 					];
 				@endphp
 				@foreach($filterOptions as $id => $filter)
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<label for="{{ $id }}" class="col-form-label text-md-end">{{ __($filter['label']) }}</label>
 							<select name="{{ $id }}" id="{{ $id }}" multiple="true" class="form-control widthinput" autofocus>
@@ -181,7 +186,7 @@
 						</div>
 					</div>
 				@endforeach
-				<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+				<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
 					<button id="apply-filters" type="submit" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
 						Save & Apply Filters
 					</button>
@@ -568,6 +573,7 @@
                 status_filter: $('#status-filter').val(),
                 sales_support_filter: $('#sales-support-filter').val(),
                 finance_approval_filter: $('#finance-approval-filter').val(),
+				coo_approval_filter: $('#coo-approval-filter').val(),
                 type: "{{ isset($type) ? $type : '' }}",
                 _token: '{{ csrf_token() }}'
             };
