@@ -393,10 +393,6 @@
     }
 </style>
 @section('content')
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
-@endphp
-@if ($hasPermission)
 <!-- Modal for updating task status -->
 <div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -536,7 +532,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             </a>
         </div>
     </div>
-
+    @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
     <!-- Completion Button -->
     <div class="col-2">
     <div class="completion-button">
@@ -549,6 +548,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     </button>
 </div>
     </div>
+    @endif
 </div>
 
 <div class="container mt-4">
@@ -580,38 +580,58 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         <tr>
                                             <th>Client Name</th>
                                             <td id="name-field" data-field="name">{{ $lead->name }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Company</th>
                                             <td id="company_name-field" data-field="company_name">{{ $lead->company_name }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Phone</th>
                                             <td id="phone-field" data-field="phone">{{ $lead->phone }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Email</th>
                                             <td id="email-field" data-field="email">{{ $lead->email }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                     </table>
                                 </div>
@@ -624,29 +644,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                                         <tr>
                                             <th>Priority</th>
                                             <td id="priority-field" data-field="priority">{{ $lead->priority }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Language</th>
                                             <td id="language-field" data-field="language">{{ $lead->language }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                         <tr>
                                             <th>Location</th>
                                             <td id="location-field" data-field="location">{{ $lead->location }}</td>
+                                            @php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
                                             <td>
                                                 <button class="btn btn-sm btn-link edit-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </td>
+                                            @endif
                                         </tr>
                                     </table>
                                 </div>
@@ -665,12 +700,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                 <div class="card shadow-sm position-relative">
                     <div class="card-body">
                         <!-- Buttons in the top-right corner -->
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                        @endphp
+                        @if ($hasPermission)
                         <div class="position-absolute top-0 end-0 p-2">
                             <button class="btn btn-danger btn-sm me-1" onclick="removeModelLine({{ $requirement->id }})">
                                 <i class="fas fa-trash-alt"></i> Remove
                             </button>
                         </div>
-
+                        @endif
                         <!-- Main content -->
                         <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
                         <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
@@ -687,6 +726,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     </div>
 </div>
 <hr>
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasPermission)
 <div class="add-model-line mt-4">
     <h6>Add More Model Line</h6>
     <form id="addModelLineForm">
@@ -759,10 +802,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         </div>
     </form>
 </div>
+@endif
 </div>
 <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
     <h5 class="mt-3">Documents & Files</h5>
-    
+    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                        @endphp
+                        @if ($hasPermission)
     <!-- File Upload Form -->
     <form id="fileUploadForm" enctype="multipart/form-data">
         @csrf
@@ -773,13 +820,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         </div>
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
+    @endif
     <div class="row mt-4" id="uploadedFiles">
     @foreach($documents as $document)
         <div class="col-md-3" id="file-{{ $document->id }}">
             <div class="file-item" style="position: relative; margin-bottom: 20px;">
+            @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                        @endphp
+                        @if ($hasPermission)
                 <button class="btn btn-danger btn-sm remove-file" data-id="{{ $document->id }}" style="position: absolute; right: 10px; top: 10px;">
                     <i class="fas fa-times"></i>
                 </button>
+                @endif
                 @if($document->document_type === 'pdf')
                     <iframe src="{{ url($document->document_path) }}" style="width: 100%; height: 300px; border: 1px solid #ccc;"></iframe>
                 @else
@@ -821,12 +874,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                         </ul>
                         <div class="tab-content mt-3" id="activity-inner-tabs-content">
                             <div class="tab-pane fade show active" id="logcall-content" role="tabpanel">
+                            @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                        @endphp
+                        @if ($hasPermission)
                                 <div class="form-group">
                                     <label for="logCall">Log a Conversation</label>
                                     <textarea class="form-control" id="logCall" rows="3" placeholder="Recording Activity..."></textarea>
                                     <input type="hidden" id="lead_id" value="{{ $lead->id }}">
                                     <button class="btn btn-primary mt-2" id="addLogBtn">Add</button>
                                 </div>
+                                @endif
                                 <div class="mt-4" id="conversationLogs"></div>
                             </div>
                             <div class="tab-pane fade" id="task-content" role="tabpanel">
@@ -878,11 +936,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         </div>
     </div>
 </div>
-@else
-@php
-redirect()->route('home')->send();
-@endphp
-@endif
 <script>
     let currentStep = 1;
     let status = '{{ $lead->status }}';

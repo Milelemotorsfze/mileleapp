@@ -178,12 +178,15 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
-      </li>
+      </li> -->
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
       </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
+      </li> -->
       <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
       </li> -->
@@ -1124,6 +1127,37 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="tab-pane fade show" id="tab11">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample11" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                <th>Priority</th>
+                  <th>Lead Date</th>
+                  <th>Selling Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Stage</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
       <div class="tab-pane fade show active" id="tab10">
       <br>
         <div class="card-body">
@@ -1141,7 +1175,6 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Location</th>
                   <th>Remarks & Messages</th>
                   <th>Created By</th>
-                  <th>Action</th>
                 </tr>
               </thead>
             </table>
@@ -3007,6 +3040,119 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
+    dataTable11 = $('#dtBasicExample11').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+    columns: [
+        {
+            data: 'priority',
+            name: 'calls.priority',
+            title: 'Priority'
+        },
+        {
+            data: 'leaddate',
+            name: 'leaddate',
+            title: 'Lead Date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    if (!data || !moment(data).isValid()) {
+                        return '';
+                    }
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
+        {
+            data: 'type',
+            name: 'calls.type',
+            title: 'Selling Type'
+        },
+        {
+            data: 'name',
+            name: 'calls.name',
+            title: 'Customer Name',
+            render: function (data, type, row) {
+                let displayName = data ? data : '(Sample)';
+                let url = "{{ route('calls.leaddetailpage', ':id') }}".replace(':id', row.id);
+                return `<a href="${url}">${displayName}</a>`;
+            }
+        },
+        {
+            data: 'phone',
+            name: 'calls.phone',
+            title: 'Customer Phone'
+        },
+        {
+            data: 'email',
+            name: 'calls.email',
+            title: 'Customer Email'
+        },
+        {
+            data: 'model_line',
+            name: 'master_model_lines.model_line',
+            title: 'Brands & Models'
+        },
+        {
+            data: 'language',
+            name: 'calls.language',
+            title: 'Preferred Language'
+        },
+        {
+            data: 'location',
+            name: 'calls.location',
+            title: 'Location'
+        },
+        {
+            data: 'remarks',
+            name: 'calls.remarks',
+            title: 'Remarks & Messages'
+        },
+        {
+            data: 'status',
+            name: 'calls.status',
+            title: 'Status',
+            render: function (data, type, row) {
+                let colorClass;
+                switch (data) {
+                    case 'contacted':
+                        colorClass = 'btn-primary';
+                        break;
+                    case 'working':
+                        colorClass = 'btn-info';
+                        break;
+                    case 'qualify':
+                        colorClass = 'btn-warning';
+                        break;
+                    case 'converted':
+                        colorClass = 'btn-success';
+                        break;
+                    case 'Follow Up':
+                        colorClass = 'btn-secondary';
+                        break;
+                    case 'Prospecting':
+                        colorClass = 'btn-danger';
+                        break;
+                    default:
+                        colorClass = 'btn-light';
+                }
+                // Render as a styled button
+                return `<span class="btn ${colorClass} btn-sm">${data}</span>`;
+            }
+          },
+        {
+            data: 'created_by_name',
+            name: 'created_by_name',
+            title: 'Created By'
+        },
+        {
+            data: 'sales_person_name',
+            name: 'sales_person_name',
+            title: 'Assigned To'
+        }
+    ]
+});
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
     serverSide: true,
@@ -3026,7 +3172,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     }
         },
         { data: 'type', name: 'calls.type' },
-        { data: 'name', name: 'calls.name' },
+        {
+            data: 'name',
+            name: 'calls.name',
+            title: 'Customer Name',
+            render: function (data, type, row) {
+                let displayName = data ? data : '(Sample)';
+                let url = "{{ route('calls.leaddetailpage', ':id') }}".replace(':id', row.id);
+                return `<a href="${url}">${displayName}</a>`;
+            }
+        },
         { data: 'phone', name: 'calls.phone' },
         { data: 'email', name: 'calls.email' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -3037,41 +3192,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 }
             },
         { data: 'createdby', name: 'users.name' },
-        {
-    data: 'id',
-    name: 'id',
-    searchable: false,
-    render: function (data, type, row) {
-        const bookingUrl = `{{ url('booking/create') }}/${data}`;
-        const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-
-        // Check if calls.name is null or empty
-        if (!row.name) {
-            // If calls.name is null, show a button that opens a modal for client selection
-            return `
-                <button type="button" class="btn btn-sm btn-warning" onclick="openClientSelectionModal(${data})">
-                    Select Client
-                </button>
-            `;
-        } else {
-            // If calls.name is not null, show the dropdown with the options
-            return `
-                <div class="dropdown">
-                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">FollowUp</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                        <li><a class="dropdown-item" href="${qoutationUrl}">Quotation</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                    </ul>
-                </div>
-            `;
-        }
-    }
-}
     ]
     });
     });

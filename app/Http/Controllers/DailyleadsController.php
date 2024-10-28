@@ -11,7 +11,6 @@ use App\Models\CallsRequirement;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ModelHasRoles;
 use App\Mail\TaskAssigned;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\LeadDocument;
 use App\Models\User;
@@ -162,6 +161,39 @@ class DailyleadsController extends Controller
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
             }
+            else if($status === "activelead")
+            {
+                $activelead = calls::select([
+                    'calls.priority',
+                    'calls.id',
+                    'calls.name',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.status',
+                    'calls.leadtype', 
+                    'calls.location',
+                    'calls.language',
+                    'master_model_lines.model_line',
+                    'brands.brand_name',
+                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
+                    \DB::raw("sales_person_user.name as sales_person_name"),
+                    \DB::raw("created_by_user.name as created_by_name")
+                ])
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')
+                ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
+                ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if(!$hasPermission) {
+                    $activelead->where('calls.sales_person', $id);
+                }
+                $activelead = $activelead->groupBy('calls.id')->get();
+                return DataTables::of($activelead)->toJson(); 
+            }
             else if($status === "bulkleads")
             {
                 $bulkleads = calls::select([
@@ -183,10 +215,12 @@ class DailyleadsController extends Controller
                 ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-                ->where('calls.sales_person', $id)
-                ->whereNotNull('calls.leadtype')
-                ->groupby('calls.id')
-                ->get();
+                ->whereNotNull('calls.leadtype');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if(!$hasPermission) {
+                    $bulkleads->where('calls.sales_person', $id);
+                }
+                $bulkleads = $bulkleads->groupBy('calls.id')->get();
                 return DataTables::of($bulkleads)->toJson();   
             }
             else
@@ -1052,44 +1086,28 @@ public function storeLog(Request $request)
         return response()->json($logs);
     }
     public function storeTask(Request $request)
-{
-    $assigner = User::find($request->assign_by);
-    $task = LeadsTask::create([
-        'lead_id' => $request->lead_id,
-        'assigned_by' => $request->assign_by,
-        'task_message' => $request->task_message,
-        'status' => 'Pending'
-    ]);
-    $task->load('assigner');
-
-    // Log the activity
-    $log = new LeadsLog();
-    $log->user_id = auth()->id();
-    $log->lead_id = $request->lead_id;
-    $log->activity = 'Assigned new task to ' . ($assigner ? $assigner->name : 'Unknown') . ': "' . $request->task_message . '"';
-    $log->save();
-
-    // Retrieve the name of the logged-in user who assigned the task
-    $assignerName = auth()->user()->name;
-
-    // Send the email notification
-    if ($assigner && $assigner->email) {
-        Mail::to($assigner->email)->send(new TaskAssigned(
-            $request->task_message,
-            $request->client_name, // Ensure client_name is in the request
-            $request->client_phone, // Ensure client_phone is in the request
-            $assignerName
-        ));
-    }
-
-    return response()->json([
-        'success' => true,
-        'task' => $task,
-        'created_at' => Carbon::parse($task->created_at)->format('H:i:s d M Y'),
-        'relative_time' => Carbon::parse($task->created_at)->diffForHumans(),
-        'assigner_name' => $task->assigner ? $task->assigner->name : 'Unknown'
-    ]);
-}
+    {
+        $assigner = User::find($request->assign_by);
+        $task = LeadsTask::create([
+            'lead_id' => $request->lead_id,
+            'assigned_by' => $request->assign_by,
+            'task_message' => $request->task_message,
+            'status' => 'Pending'
+        ]);
+        $task->load('assigner');
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->lead_id;
+        $log->activity = 'Assigned new task to ' . ($assigner ? $assigner->name : 'Unknown') . ': "' . $request->task_message . '"';
+        $log->save();
+        return response()->json([
+            'success' => true,
+            'task' => $task,
+            'created_at' => Carbon::parse($task->created_at)->format('H:i:s d M Y'),
+            'relative_time' => Carbon::parse($task->created_at)->diffForHumans(),
+            'assigner_name' => $task->assigner ? $task->assigner->name : 'Unknown'
+        ]);
+    }    
 public function getTasks($lead_id)
 {
     $tasks = LeadsTask::where('lead_id', $lead_id)
