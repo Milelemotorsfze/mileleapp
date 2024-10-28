@@ -8,8 +8,14 @@ use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
+use Illuminate\Support\Facades\Storage;
 use App\Models\ModelHasRoles;
+use App\Mail\TaskAssigned;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Models\LeadDocument;
+use App\Models\User;
+use App\Models\LeadsTask;
 use App\Models\Quotation;
 use App\Models\Language;
 use App\Models\Rejection;
@@ -29,6 +35,9 @@ use App\Models\LeadChat;
 use App\Models\LeadChatReply;
 use App\Models\Clients;
 use App\Models\ClientLeads;
+use App\Models\Country;
+use App\Models\LeadsLog;
+use App\Models\CallsConversationLog;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
@@ -865,11 +874,20 @@ public function leaddetailpage($id)
 {
     $lead = Calls::find($id);
     $languages = Language::all();
-    $countries = CountryListFacade::getList('en');
-    $requirements = CallsRequirement::where('lead_id', $id)->with(['masterModelLine.brand'])->get();
+    $requirements = CallsRequirement::where('lead_id', $id)->with(['masterModelLine.brand', 'country'])->get();
     $brands = Brand::all();
+    $countries = Country::get();
     $mastermodellines = MasterModelLines::all();
-    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines'));
+    $users = User::all();
+    $tasks = LeadsTask::where('lead_id', $id)->orderBy('created_at', 'desc')->get(); 
+    $documents = LeadDocument::where('lead_id', $id)->get();
+    $logs = DB::table('leads_log')
+        ->join('users', 'leads_log.user_id', '=', 'users.id')
+        ->select('leads_log.activity', 'leads_log.created_at', 'users.name as user_name')
+        ->where('leads_log.lead_id', $id)
+        ->orderBy('leads_log.created_at', 'desc')
+        ->get();
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs'));
 }
 public function leaddeupdate(Request $request)
 {
@@ -883,23 +901,10 @@ public function leaddeupdate(Request $request)
     $lead->save();
     return response()->json(['success' => true]);
 }
-public function addModelLine(Request $request)
-{
-    // Validate and store the new model line
-    $requirement = CallsRequirement::create([
-        'lead_id' => $request->lead_id,
-        'brand' => $request->brand,
-        'model_line' => $request->model_line,
-    ]);
-
-    // Return the newly created model line as a response
-    return response()->json($requirement);
-}
-
-public function removeModelLine($id)
+public function removeModelLine($requirementId)
 {
     // Find and delete the model line
-    $requirement = CallsRequirement::find($id);
+    $requirement = CallsRequirement::find($requirementId);
     $requirement->delete();
     return response()->json(['success' => true]);
 }
@@ -934,7 +939,6 @@ public function storeMessages(Request $request)
         $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
         return response()->json($modelLines);
     }
-    
     public function getTrimAndVariants($modelLineId) {
         $uniqueTrims = Varaint::where('master_model_lines_id', $modelLineId)->groupby('model_detail')->get();             
         $variants = Varaint::where('master_model_lines_id', $modelLineId)->get();
@@ -942,6 +946,197 @@ public function storeMessages(Request $request)
             'trims' => $uniqueTrims,
             'variants' => $variants,
         ]);
+    }
+    public function addModelLine(Request $request) {
+        $trim = $request->input('trim') === 'other' ? $request->input('custom_trim') : $request->input('trim');
+        $variant = $request->input('variant') === 'other' ? $request->input('custom_variant') : $request->input('variant');
+    $modelLine = new CallsRequirement();
+    $modelLine->model_line_id = $request->input('model_line');
+    $modelLine->lead_id = $request->input('lead_id');
+    $modelLine->qty = $request->input('qty');
+    $modelLine->asking_price = $request->input('asking_price');
+    $modelLine->offer_price = $request->input('offer_price');
+    $modelLine->countries_id = $request->input('countries_id');
+    $modelLine->trim = $trim;
+    $modelLine->variant = $variant;
+    $modelLine->save();
+    $modelLine = CallsRequirement::with(['masterModelLine.brand', 'country'])
+        ->find($modelLine->id);
+    return response()->json([
+        'id' => $modelLine->id,
+        'brand' => $modelLine->masterModelLine->brand->brand_name ?? 'N/A',  // Returning brand name
+        'model_line' => $modelLine->masterModelLine->model_line ?? 'N/A',
+        'trim' => $modelLine->trim,
+        'qty' => $modelLine->qty,
+        'asking_price' => $modelLine->asking_price,
+        'offer_price' => $modelLine->offer_price,
+        'country' => $modelLine->country->name ?? 'N/A',
+        'variant' => $modelLine->variant,
+    ]);
+    }
+    public function fileupload(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $fileNameToStore = time() . '_' . uniqid() . '.' . $extension;
+            $destinationPath = public_path('storage/PL_Documents');
+            $file->move($destinationPath, $fileNameToStore);
+            $filePath = 'storage/PL_Documents/' . $fileNameToStore;
+            $document = LeadDocument::create([
+                'lead_id' => $request->input('lead_id'),
+                'document_name' => $file->getClientOriginalName(),
+                'document_path' => $filePath,
+                'document_type' => in_array($extension, ['jpg', 'jpeg', 'png']) ? 'image' : 'pdf',
+            ]);
+            $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->input('lead_id');
+        $log->activity = 'Uploading New File Document "' . $document->document_name . '"';
+        $log->save();
+            return response()->json([
+                'success' => true,
+                'file' => [
+                    'name' => $document->document_name,
+                    'url' => url($document->document_path),
+                    'type' => $document->document_type
+                ]
+            ]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'No file uploaded.']);
+        }
+    }
+    public function removeFile(Request $request)
+{
+    $document = LeadDocument::find($request->id);
+
+    if ($document) {
+        $filePath = public_path($document->document_path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $document->lead_id;
+        $log->activity = 'Deleted the Uploading file Document name is "' . $document->document_name . '"';
+        $log->save();
+        $document->delete();
+        return response()->json(['success' => true, 'message' => 'File deleted successfully.']);
+    } else {
+        return response()->json(['success' => false, 'message' => 'File not found.']);
+    }
+}  
+public function storeLog(Request $request)
+    {
+        $request->validate([
+            'lead_id' => 'required|integer',
+            'conversation' => 'required|string|max:1000',
+        ]);
+        $log = CallsConversationLog::create([
+            'lead_id' => $request->input('lead_id'),
+            'conversation' => $request->input('conversation')
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'log' => $log,
+            'formatted_time' => Carbon::parse($log->created_at)->format('H:i:s d M Y'),
+            'relative_time' => Carbon::parse($log->created_at)->diffForHumans()
+        ]);
+    }
+
+    public function getLogs($lead_id)
+    {
+        $logs = CallsConversationLog::where('lead_id', $lead_id)->orderBy('created_at', 'asc')->get();
+
+        return response()->json($logs);
+    }
+    public function storeTask(Request $request)
+{
+    $assigner = User::find($request->assign_by);
+    $task = LeadsTask::create([
+        'lead_id' => $request->lead_id,
+        'assigned_by' => $request->assign_by,
+        'task_message' => $request->task_message,
+        'status' => 'Pending'
+    ]);
+    $task->load('assigner');
+
+    // Log the activity
+    $log = new LeadsLog();
+    $log->user_id = auth()->id();
+    $log->lead_id = $request->lead_id;
+    $log->activity = 'Assigned new task to ' . ($assigner ? $assigner->name : 'Unknown') . ': "' . $request->task_message . '"';
+    $log->save();
+
+    // Retrieve the name of the logged-in user who assigned the task
+    $assignerName = auth()->user()->name;
+
+    // Send the email notification
+    if ($assigner && $assigner->email) {
+        Mail::to($assigner->email)->send(new TaskAssigned(
+            $request->task_message,
+            $request->client_name, // Ensure client_name is in the request
+            $request->client_phone, // Ensure client_phone is in the request
+            $assignerName
+        ));
+    }
+
+    return response()->json([
+        'success' => true,
+        'task' => $task,
+        'created_at' => Carbon::parse($task->created_at)->format('H:i:s d M Y'),
+        'relative_time' => Carbon::parse($task->created_at)->diffForHumans(),
+        'assigner_name' => $task->assigner ? $task->assigner->name : 'Unknown'
+    ]);
+}
+public function getTasks($lead_id)
+{
+    $tasks = LeadsTask::where('lead_id', $lead_id)
+        ->with('assigner')
+        ->orderBy('created_at', 'desc')
+        ->get();
+    return response()->json($tasks);
+}
+public function tasksupdateStatus(Request $request)
+{
+    $request->validate([
+        'task_id' => 'required|exists:leads_task,id',
+        'status' => 'required|in:Pending,In Progress,Completed',
+    ]);
+    $updated = LeadsTask::where('id', $request->task_id)
+        ->update(['status' => $request->status]);
+    if ($updated) {
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = LeadsTask::find($request->task_id)->lead_id;
+        $log->activity = 'Updated task status to ' . $request->status;
+        $log->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Task status updated successfully',
+            'updated_status' => $request->status,
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Task not found or status not updated.',
+        ], 404);
+    }
+}
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string',
+        ]);
+        $lead = Calls::findOrFail($id);
+        $lead->status = $request->input('status');
+        if ($lead->save()) {
+            return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+        } 
+        else {
+            return response()->json(['success' => false, 'message' => 'Failed to update status.']);
+        }
     }
 }
 

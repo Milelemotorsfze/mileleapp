@@ -3,6 +3,70 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style>
+    #taskLogs {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+#log-content {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+     #conversationLogs {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+.card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-body p {
+    font-size: 16px;
+}
+
+.card-body .text-muted {
+    font-size: 12px;
+}
+
+.card-body .d-flex {
+    display: flex;
+    justify-content: space-between;
+}
+        .file-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+.file-item button.remove-file {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.file-item img,
+.file-item iframe {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ccc;
+}
+
+.file-item p {
+    margin-top: 10px;
+    text-align: center;
+}
     .comments-header {
         position: sticky;
         top: 0;
@@ -332,8 +396,85 @@
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
 @endphp
-
 @if ($hasPermission)
+<!-- Modal for updating task status -->
+<div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectionModalLabel">Rejection</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="date-input" class="form-label">Date:</label>
+          </div>
+          <div class="col-md-8">
+            <input type="date" class="form-control" id="date-input-reject" value="{{ date('Y-m-d') }}">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="reason" class="form-label">Reason:</label>
+          </div>
+          <div class="col-md-8">
+            <select class="form-control" id="reason-reject">
+              <option value="">Select Reason</option>
+              <option value="Brand not available">Brand not available</option>
+              <option value="Model not available">Model not available</option>
+              <option value="Variant not available">Variant not available</option>
+              <option value="Price Issue">Price Issue</option>
+              <option value="Not Interested">Not Interested</option>
+              <option value="Others">Others</option>
+            </select>
+            <input type="text" class="form-control mt-2" id="other-reason" style="display: none;" placeholder="Specify Other Reason">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="sales-notes" class="form-label">Sales Notes:</label>
+          </div>
+          <div class="col-md-8">
+            <textarea class="form-control" id="salesnotes-reject"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="saveRejection()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="updateTaskModal" tabindex="-1" role="dialog" aria-labelledby="updateTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateTaskModalLabel">Update Task Status</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <form id="updateTaskForm">
+    @csrf
+    <input type="hidden" id="taskId" name="task_id">
+    <div class="form-group">
+        <label for="taskStatus">Task Status</label>
+        <select class="form-control" id="taskStatus" name="status">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- Page Header and Lead Title -->
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="card-title">Lead</h4>
@@ -371,7 +512,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             </a>
 
             <!-- Step 4: Qualify -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'qualify' ? 'active' : ($lead->status === 'disqualify' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(4)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'qualify' ? 'active' : ($lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(4)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Qualify</span>
@@ -379,7 +520,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             </a>
 
             <!-- Step 5: Disqualify -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'disqualify' ? 'active disqualified' : '' }}" onclick="moveToStep(5)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'Rejected' ? 'active disqualified' : '' }}" onclick="moveToStep(5)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Disqualify</span>
@@ -387,7 +528,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             </a>
 
             <!-- Step 6: Converted -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'converted' ? 'active' : ($lead->status === 'disqualify' ? 'disqualified' : '') }}" onclick="moveToStep(6)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'converted' ? 'active' : ($lead->status === 'Rejected' ? 'disqualified' : '') }}" onclick="moveToStep(6)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Converted</span>
@@ -398,15 +539,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 
     <!-- Completion Button -->
     <div class="col-2">
-        <div class="completion-button">
-            <button id="completeButton" class="btn btn-primary btn-lg" onclick="markAsDone({{ $lead->id }})"
-                @if($lead->status === 'disqualify') disabled @endif>
-                Mark as Done
-            </button>
-        </div>
+    <div class="completion-button">
+    <button id="completeButton" class="btn btn-primary btn-lg" onclick="markAsDone({{ $lead->id }})">
+        Mark as Done
+    </button>
+    <!-- Quotation button with smaller size and positioned below -->
+    <button id="quotationButton" class="btn btn-success btn-sm mt-2" style="display: none;" onclick="makeQuotation({{ $lead->id }})">
+        Make a Quotation
+    </button>
+</div>
     </div>
 </div>
-
 
 <div class="container mt-4">
     <!-- Tabs for navigation -->
@@ -421,7 +564,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab">Documents & Files</a>
         </li>
     </ul>
-
     <!-- Main row content -->
     <div class="row mt-3">
         <!-- Dynamic tab content (Left Section) -->
@@ -519,24 +661,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     <div id="existing-models" class="container my-3">
     <div class="row">
         @foreach($requirements as $requirement)
-            <div class="col-md-6 mb-3">
-                <div class="card shadow-sm" id="requirement-{{ $requirement->id }}">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
-                            <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
-                            <p class="card-text text-muted"><strong>Trim:</strong> {{ $requirement->model_line }}</p>
-                                <p class="card-text text-muted"><strong>Variant:</strong> {{ $requirement->model_line }}</p>
+            <div class="col-md-6 mb-3" id="requirement-{{ $requirement->id }}">
+                <div class="card shadow-sm position-relative">
+                    <div class="card-body">
+                        <!-- Buttons in the top-right corner -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <button class="btn btn-danger btn-sm me-1" onclick="removeModelLine({{ $requirement->id }})">
+                                <i class="fas fa-trash-alt"></i> Remove
+                            </button>
                         </div>
-                        <button class="btn btn-danger btn-sm" onclick="removeModelLine({{ $requirement->id }})">
-                            <i class="fas fa-trash-alt"></i> Remove
-                        </button>
+
+                        <!-- Main content -->
+                        <h5 class="card-title mb-0">{{ $requirement->masterModelLine->brand->brand_name }}</h5>
+                        <p class="card-text text-muted">{{ $requirement->masterModelLine->model_line }}</p>
+                        <p class="card-text text-muted"><strong>Trim:</strong> {{ $requirement->trim }}</p>
+                        <p class="card-text text-muted"><strong>Variant:</strong> {{ $requirement->variant }}</p>
+                        <p class="card-text text-muted"><strong>Quantity:</strong> {{ $requirement->qty }}</p>
+                        <p class="card-text text-muted"><strong>Final Destination:</strong> {{ $requirement->country->name ?? 'N/A' }}</p>
+                        <p class="card-text text-muted"><strong>Asking Price:</strong> {{ $requirement->asking_price }}</p>
+                        <p class="card-text text-muted"><strong>Offer Price:</strong> {{ $requirement->offer_price }}</p>
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
 </div>
+<hr>
 <div class="add-model-line mt-4">
     <h6>Add More Model Line</h6>
     <form id="addModelLineForm">
@@ -546,8 +696,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         <div class="row">
             <!-- Brand input -->
             <div class="col-md-3">
-                <label for="brand">Brand</label>
-                <select name="brand" class="form-control" id="brand" required>
+                <select name="brand" class="form-control select2" id="brand" required>
                     <option value="" disabled selected>Select Brand</option>
                     @foreach($brands as $brand)
                         <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
@@ -557,37 +706,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
 
             <!-- Model Line input -->
             <div class="col-md-3">
-                <label for="model_line">Model Line</label>
-                <select name="model_line" class="form-control" id="model_line" required disabled>
+                <select name="model_line" class="form-control select2" id="model_line" required disabled>
                     <option value="" disabled selected>Select Model Line</option>
                 </select>
             </div>
 
             <!-- Trim dropdown -->
             <div class="col-md-3">
-                <label for="trim">Trim</label>
-                <select name="trim" class="form-control" id="trim" required disabled>
+                <select name="trim" class="form-control select2" id="trim" required disabled>
                     <option value="" disabled selected>Select Trim</option>
                 </select>
             </div>
 
             <!-- Variant dropdown -->
             <div class="col-md-3">
-                <label for="variant">Variant</label>
-                <select name="variant" class="form-control" id="variant" required disabled>
+                <select name="variant" class="form-control select2" id="variant" required disabled>
                     <option value="" disabled selected>Select Variant</option>
                 </select>
             </div>
             <div class="col-md-3 mt-4">
-        <label for="asking_price">Asking Price</label>
         <input type="number" name="asking_price" class="form-control" id="asking_price" placeholder="Enter asking price" required>
     </div>
 
     <!-- Offer Price input -->
     <div class="col-md-3 mt-4">
-        <label for="offer_price">Offer Price</label>
         <input type="number" name="offer_price" class="form-control" id="offer_price" placeholder="Enter offer price" required>
     </div>
+    <div class="col-md-3 mt-4">
+        <input type="number" name="qty" class="form-control" id="qty" placeholder="Enter Quanity" required>
+    </div>
+    <div class="col-md-3 mt-4">
+    <select name="countries_id" class="form-control select2" id="countries_id" required>
+        <option value="" disabled selected>Select Final Destination</option>
+        @foreach($countries as $country)
+    <option value="{{ $country->id }}">{{ $country->name }}</option> <!-- 'id' should match the foreign key -->
+@endforeach
+    </select>
+</div>
+    <div id="custom_trim_container" style="display:none;" class="col-md-3 mt-4">
+    <input type="text" id="custom_trim" name="custom_trim" placeholder="Enter custom trim">
+</div>
+
+<div id="custom_variant_container" style="display:none;" class="col-md-3 mt-4">
+    <input type="text" id="custom_variant" name="custom_variant" placeholder="Enter custom variant">
+</div>
         </div>
         <!-- Submit button in a new row -->
         <div class="form-row mt-3">
@@ -598,72 +760,118 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
     </form>
 </div>
 </div>
-                <!-- Documents & Files tab -->
-                <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-                    <h5 class="mt-3">Documents & Files</h5>
-                    <p>Upload files and add notes related to the lead here.</p>
-                </div>
+<div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+    <h5 class="mt-3">Documents & Files</h5>
+    
+    <!-- File Upload Form -->
+    <form id="fileUploadForm" enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+        <div class="form-group">
+            <label for="file">Choose File (PDF, PNG, JPG):</label>
+            <input type="file" class="form-control-file" id="file" name="file" accept="image/png, image/jpeg, application/pdf">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+    <div class="row mt-4" id="uploadedFiles">
+    @foreach($documents as $document)
+        <div class="col-md-3" id="file-{{ $document->id }}">
+            <div class="file-item" style="position: relative; margin-bottom: 20px;">
+                <button class="btn btn-danger btn-sm remove-file" data-id="{{ $document->id }}" style="position: absolute; right: 10px; top: 10px;">
+                    <i class="fas fa-times"></i>
+                </button>
+                @if($document->document_type === 'pdf')
+                    <iframe src="{{ url($document->document_path) }}" style="width: 100%; height: 300px; border: 1px solid #ccc;"></iframe>
+                @else
+                    <img src="{{ url($document->document_path) }}" class="img-fluid" style="width: 100%; height: 300px; object-fit: cover;" alt="{{ $document->document_name }}">
+                @endif
+                <p class="mt-2">{{ $document->document_name }}</p>
             </div>
         </div>
-
-        <!-- Activity section (Right Section, constant across all tabs) -->
-        <div class="col-md-4">
-            <h5>Activity</h5>
-            <div class="card">
-                <div class="card-body">
-                    <!-- Nested tabs for Activity and Chatter -->
-                    <ul class="nav nav-tabs" id="activityTab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="activity-activity-tab" data-toggle="tab" href="#activity-tab-content" role="tab">Activity</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="chatter-tab" data-toggle="tab" href="#chatter-tab-content" role="tab">Chatter</a>
-                        </li>
-                    </ul>
-
-                    <!-- Nested tab content for Activity and Chatter -->
-                    <div class="tab-content" id="activityTabContent">
-                        <!-- Activity tab content -->
-                        <div class="tab-pane fade show active" id="activity-tab-content" role="tabpanel">
-                            <div class="mt-3">
-                                <!-- Inner tabs for Log a Call, Task, Event -->
-                                <ul class="nav nav-pills" id="activity-inner-tabs" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="logcall-tab" data-toggle="pill" href="#logcall-content" role="tab">Log a Call</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="task-tab" data-toggle="pill" href="#task-content" role="tab">Task</a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content mt-3" id="activity-inner-tabs-content">
-                                    <div class="tab-pane fade show active" id="logcall-content" role="tabpanel">
-                                        <div class="form-group">
-                                            <label for="logCall">Log a Conversation</label>
-                                            <textarea class="form-control" id="logCall" rows="3" placeholder="Recap your call..."></textarea>
-                                            <button class="btn btn-primary mt-2">Add</button>
-                                        </div>
-                                    </div>
-
-                                    <div class="tab-pane fade" id="task-content" role="tabpanel">
-                                        <div class="form-group">
-                                            <label for="task">Create a Task</label>
-                                            <textarea class="form-control" id="task" rows="3" placeholder="Describe your task..."></textarea>
-                                            <button class="btn btn-primary mt-2">Add Task</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tab-pane fade" id="chatter-tab-content" role="tabpanel">
-            <div id="messages" class="fixed-height"></div>
-            <div class="message-input-wrapper mb-3">
-                <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
-                <button id="send-message" class="btn btn-success send-icon">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+    @endforeach
+</div>
+</div>
             </div>
+        </div>
+<div class="col-md-4">
+    <h5>Activity</h5>
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="activityTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="activity-activity-tab" data-toggle="tab" href="#activity-tab-content" role="tab" aria-controls="activity-tab-content" aria-selected="true">Activity</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="chatter-tab" data-toggle="tab" href="#chatter-tab-content" role="tab" aria-controls="chatter-tab-content" aria-selected="false">Chatter</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="activityTabContent">
+                <div class="tab-pane fade show active" id="activity-tab-content" role="tabpanel" aria-labelledby="activity-activity-tab">
+                    <div class="mt-3">
+                        <ul class="nav nav-pills" id="activity-inner-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="logcall-tab" data-toggle="pill" href="#logcall-content" role="tab">Record Activities</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="task-tab" data-toggle="pill" href="#task-content" role="tab">Task</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="task-tab" data-toggle="pill" href="#log-content" role="tab">Logs</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content mt-3" id="activity-inner-tabs-content">
+                            <div class="tab-pane fade show active" id="logcall-content" role="tabpanel">
+                                <div class="form-group">
+                                    <label for="logCall">Log a Conversation</label>
+                                    <textarea class="form-control" id="logCall" rows="3" placeholder="Recording Activity..."></textarea>
+                                    <input type="hidden" id="lead_id" value="{{ $lead->id }}">
+                                    <button class="btn btn-primary mt-2" id="addLogBtn">Add</button>
+                                </div>
+                                <div class="mt-4" id="conversationLogs"></div>
+                            </div>
+                            <div class="tab-pane fade" id="task-content" role="tabpanel">
+                                <div class="form-group">
+        <label for="assignBy">Assign By</label>
+        <select class="form-control" id="assignBy" name="assign_by">
+            @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="task">Task Message</label>
+        <textarea class="form-control" id="task" rows="3" placeholder="Describe your task..."></textarea>
+    </div>
+    <button class="btn btn-primary mt-2" id="addTaskBtn">Add Task</button>
+    <div class="mt-4" id="taskLogs"></div>
+                            </div>
+                            <div class="tab-pane fade" id="log-content" role="tabpanel">
+    @if($logs->isEmpty())
+        <p>No logs available.</p>
+    @else
+        @foreach($logs as $log)
+            <div class="card mt-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ $log->user_name }}</strong>
+                        <small class="text-muted">{{ $log->created_at }}</small>
+                    </div>
+                    <p class="mb-1">{{ $log->activity }}</p>
+                </div>
+            </div>
+        @endforeach
+    @endif
+</div>
                         </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="chatter-tab-content" role="tabpanel" aria-labelledby="chatter-tab">
+                    <div id="messages" class="fixed-height"></div>
+                    <div class="message-input-wrapper mb-3">
+                        <textarea id="message" class="form-control main-message" placeholder="Type a message..." rows="1"></textarea>
+                        <button id="send-message" class="btn btn-success send-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -679,163 +887,150 @@ redirect()->route('home')->send();
     let currentStep = 1;
     let status = '{{ $lead->status }}';
 
-    // Function to update steps on the page
-    function moveToStep(step) {
-        // Prevent moving forward if disqualified
-        if (status === 'disqualify') {
-            return;
+    document.addEventListener('DOMContentLoaded', () => {
+        if (status === 'converted') {
+            document.getElementById('quotationButton').style.display = 'block';
         }
+    });
 
-        // Set the current step number
+    function moveToStep(step) {
         currentStep = step;
-
-        // Get all steps
         const steps = document.querySelectorAll('.step');
-
-        // Reset all steps and mark them as active/completed
         steps.forEach((stepElem, index) => {
-            stepElem.classList.remove('completed', 'active', 'disqualified');
+            stepElem.classList.remove('completed', 'active', 'disqualified', 'converted');
             if (index < currentStep - 1) {
                 stepElem.classList.add('completed');
             } else if (index === currentStep - 1) {
                 stepElem.classList.add('active');
             }
         });
-
-        // Handle if the current step is Disqualify
-        if (currentStep === 5) {
-            status = 'disqualify'; // Set status to disqualified
-            document.querySelector('.step:last-child').classList.add('disqualified'); // Mark Converted as red
-            document.getElementById('completeButton').disabled = true; // Disable button
-        }
     }
-
-    // Function to send the status update to the server
+    function makeQuotation(leadId) {
+        const url = `{{ route('qoutation.proforma_invoice', ['callId' => ':leadId']) }}`.replace(':leadId', leadId);
+        window.location.href = url;
+    }
     function markAsDone(leadId) {
-
-        const steps = document.querySelectorAll('.step');
-        let lastCompletedStep = -1;
-
-        steps.forEach((stepElem, index) => {
-            if (stepElem.classList.contains('completed')) {
-                lastCompletedStep = index;
-            }
-        });
-
-        if (lastCompletedStep !== -1 && lastCompletedStep + 1 < steps.length) {
-            moveToStep(lastCompletedStep + 2); // Move to the next step
+        if (currentStep === 2) {
+        const name = document.getElementById('name-field').innerText.trim();
+        const companyName = document.getElementById('company_name-field').innerText.trim();
+        const phone = document.getElementById('phone-field').innerText.trim();
+        const email = document.getElementById('email-field').innerText.trim();
+        if (!name || !companyName || !phone || !email) {
+            alert('Please ensure that Name, Company Name, Phone, and Email fields are filled out before marking as contacted.');
+            return;
         }
-
-        // Determine the new status based on the current step
+    }
+    else if (currentStep === 3) {
+        const requirements = document.querySelectorAll('[id^="requirement-"]');
+        if (requirements.length === 0) {
+            alert('Please add at least one requirement before marking this lead as "working."');
+            return;
+        }
+    }
         let newStatus = '';
-        if (currentStep === 1) {
-            newStatus = 'new';
-        } else if (currentStep === 2) {
-            newStatus = 'contacted';
-        } else if (currentStep === 3) {
-            newStatus = 'working';
-        } else if (currentStep === 4) {
-            newStatus = 'qualify';
-        } else if (currentStep === 5) {
+        if (currentStep === 1) newStatus = 'new';
+        else if (currentStep === 2) newStatus = 'contacted';
+        else if (currentStep === 3) newStatus = 'working';
+        else if (currentStep === 4) newStatus = 'qualify';
+        else if (currentStep === 5 && status !== 'disqualify') {
             newStatus = 'disqualify';
-        } else if (currentStep === 6) {
+            $('#rejectionModal').data('callId', leadId).modal('show');
+            return;
+        } else if (currentStep === 5 && status === 'disqualify') {
             newStatus = 'converted';
+        } else if (currentStep === 6 && status !== 'converted') {
+            newStatus = 'converted';
+        } else if (currentStep === 6 && status === 'converted') {
+            newStatus = 'disqualify';
+            $('#rejectionModal').data('callId', leadId).modal('show');
+            return;
         }
-
-        // Send the new status to the server
         fetch(`/leads/${leadId}/update-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    status: newStatus
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Status updated to: ' + newStatus);
-                    // Optionally reload or refresh the page to reflect changes
-                    window.location.reload();
-                } else {
-                    alert('Failed to update status.');
-                }
-            });
-    }
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const steps = document.querySelectorAll('.step');
-        let lastCompletedStep = -1;
-
-        steps.forEach((stepElem, index) => {
-            if (stepElem.classList.contains('completed')) {
-                lastCompletedStep = index;
-            }
-        });
-
-        if (lastCompletedStep !== -1 && lastCompletedStep + 1 < steps.length) {
-            moveToStep(lastCompletedStep + 2);
-        }
-    });
-
-    // Handle if the current step is Disqualify
-    if (currentStep === 5) {
-        status = 'disqualify'; // Set status to disqualified
-        document.querySelector('.step:last-child').classList.add('disqualified'); // Mark Converted as red
-        document.getElementById('completeButton').disabled = true; // Disable button
-    }
-
-    // Update button text based on the step
-    const button = document.getElementById('completeButton');
-    if (currentStep === 6) {
-        button.textContent = 'Mark as Done';
-    } else {
-        button.textContent = 'Continue';
-    }
-// Function to send the status update to the server
-function markAsDone(leadId) {
-    // Determine the new status based on the current step
-    let newStatus = '';
-    if (currentStep === 1) {
-        newStatus = 'new';
-    } else if (currentStep === 2) {
-        newStatus = 'contacted';
-    } else if (currentStep === 3) {
-        newStatus = 'working';
-    } else if (currentStep === 4) {
-        newStatus = 'qualify';
-    } else if (currentStep === 5) {
-        newStatus = 'disqualify';
-    } else if (currentStep === 6) {
-        newStatus = 'converted';
-    }
-
-    // Send the new status to the server
-    fetch(`/leads/${leadId}/update-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            status: newStatus
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ status: newStatus })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Status updated to: ' + newStatus);
-            // Optionally reload or refresh the page to reflect changes
-            window.location.reload();
-        } else {
-            alert('Failed to update status.');
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Status updated to: ' + newStatus);
+                if (newStatus === 'converted') {
+                    document.querySelector('.step:nth-child(5)').classList.add('disqualified');
+                    document.querySelector('.step:nth-child(6)').classList.add('converted');
+                    document.getElementById('completeButton').style.display = 'none';
+                    document.getElementById('quotationButton').style.display = 'block';
+                } else if (newStatus === 'disqualify') {
+                    document.querySelector('.step:nth-child(5)').classList.add('disqualified');
+                    $('#rejectionModal').modal('show');
+                } else {
+                    window.location.reload();
+                }
+                status = newStatus;
+            } else {
+                alert('Failed to update status.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the status.');
+        });
+    }
+    function saveRejection() {
+        const reason = document.getElementById('reason-reject').value;
+        const callId = $('#rejectionModal').data('callId');
+        const date = document.getElementById('date-input-reject').value;
+        let salesNotes = document.getElementById('salesnotes-reject').value;
+
+        if (!reason) {
+            alert('Please provide a reason');
+            return;
         }
+
+        let rejectionReason = reason;
+        if (reason === "Others") {
+            rejectionReason = document.getElementById('other-reason').value;
+            if (!rejectionReason) {
+                alert('Please specify the other reason');
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        formData.append('callId', callId);
+        formData.append('date', date);
+        formData.append('reason', rejectionReason);
+        formData.append('salesNotes', salesNotes);
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('{{ route('sales.rejection') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alertify.success('Rejection saved successfully');
+                $('#rejectionModal').modal('hide');
+                window.location.reload();
+            } else {
+                alert('Error saving rejection');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while saving the rejection.');
+        });
+    }
+    document.getElementById('reason-reject').addEventListener('change', function() {
+        const otherReasonInput = document.getElementById('other-reason');
+        otherReasonInput.style.display = this.value === 'Others' ? 'block' : 'none';
     });
-}
-    </script>
+</script>
 <script>
 $(document).ready(function() {
     $('.edit-btn').on('click', function() {
@@ -927,26 +1122,47 @@ function removeModelLine(requirementId) {
         });
     }
 }
-// Handle the form submission to add a new model line
 $('#addModelLineForm').submit(function(e) {
     e.preventDefault();
-
+    var formData = $(this).serializeArray();
+    if ($('#trim').val() === 'other') {
+        formData.push({ name: 'custom_trim', value: $('#custom_trim').val() });
+    }
+    if ($('#variant').val() === 'other') {
+        formData.push({ name: 'custom_variant', value: $('#custom_variant').val() });
+    }
     $.ajax({
-        url: '/add-model-line', // Define this route in your controller
+        url: '/add-model-line',
         type: 'POST',
-        data: $(this).serialize(),
+        data: formData,
         success: function(response) {
-            // Append the new model line to the existing list
             $('#existing-models').append(
-                '<div class="model-line" id="requirement-' + response.id + '">' +
-                '<span>' + response.brand + ' - ' + response.model_line + '</span>' +
-                '<button class="btn btn-danger btn-sm" onclick="removeModelLine(' + response.id + ')">X</button>' +
+                '<div class="col-md-6 mb-3" id="requirement-' + response.id + '">' +
+                '<div class="card shadow-sm">' +
+                '<div class="card-body d-flex justify-content-between align-items-center">' +
+                '<div>' +
+                '<div class="position-absolute top-0 end-0 p-2">'+
+                 '<button class="btn btn-danger btn-sm me-1" onclick="removeModelLine(' + response.id + ')">' +
+                '<i class="fas fa-trash-alt"></i> Remove' +
+                '</button>' +
+                '</div>'+
+                '<h5 class="card-title mb-0">' + response.brand + '</h5>' +
+                '<p class="card-text text-muted">' + response.model_line + '</p>' +
+                '<p class="card-text text-muted"><strong>Trim:</strong> ' + response.trim + '</p>' +
+                '<p class="card-text text-muted"><strong>Variant:</strong> ' + response.variant + '</p>' +
+                '<p class="card-text text-muted"><strong>Quantity:</strong> ' + response.qty + '</p>' +
+                '<p class="card-text text-muted"><strong>Asking Price:</strong> ' + response.asking_price + '</p>' +
+                '<p class="card-text text-muted"><strong>Offer Price:</strong> ' + response.offer_price + '</p>' +
+                '<p class="card-text text-muted"><strong>Country:</strong> ' + response.country + '</p>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div>'
             );
-
-            // Clear the form fields
-            $('#brand').val('');
-            $('#model_line').val('');
+            // Clear the form fields after successful submission
+            $('#addModelLineForm')[0].reset(); // Resets the form
+            $('#custom_trim').val('').parent().hide(); // Hide custom trim input
+            $('#custom_variant').val('').parent().hide(); // Hide custom variant input
         },
         error: function(err) {
             alert('Error adding model line');
@@ -1110,6 +1326,7 @@ $(document).ready(function() {
 </script>
 <script>
 $(document).ready(function() {
+    $('.select2').select2();
     // When brand is selected, fetch model lines via AJAX
     $('#brand').on('change', function() {
         var brandId = $(this).val();
@@ -1127,10 +1344,13 @@ $(document).ready(function() {
                     $.each(data, function(index, modelLine) {
                         $('#model_line').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
                     });
+                    $('#model_line').select2(); // Reinitialize Select2
                 }
             });
         }
     });
+
+    // Fetch trims and variants based on model line
     $('#model_line').on('change', function() {
         var modelLineId = $(this).val();
         if (modelLineId) {
@@ -1144,14 +1364,319 @@ $(document).ready(function() {
                     $.each(data.trims, function(index, trim) {
                         $('#trim').append('<option value="' + trim.model_detail + '">' + trim.model_detail + '</option>');
                     });
+                    $('#trim').append('<option value="other">Other</option>'); // Add "Other" option for Trim
+                    $('#trim').select2(); // Reinitialize Select2
                     $('#variant').html('<option value="" disabled selected>Select Variant</option>');
                     $.each(data.variants, function(index, variant) {
-                        $('#variant').append('<option value="' + variant.id + '">' + variant.name + '</option>');
+                        $('#variant').append('<option value="' + variant.name + '">' + variant.name + '</option>');
                     });
+                    $('#variant').append('<option value="other">Other</option>');
+                    $('#variant').select2(); // Reinitialize Select2
+                }
+            });
+        }
+    });
+
+    // Show input for "Other" Trim
+    $('#trim').on('change', function() {
+        var trimValue = $(this).val();
+        if (trimValue === 'other') {
+            $('#custom_trim_container').show();
+        } else {
+            $('#custom_trim_container').hide();
+        }
+    });
+
+    // Show input for "Other" Variant
+    $('#variant').on('change', function() {
+        var variantValue = $(this).val();
+        if (variantValue === 'other') {
+            $('#custom_variant_container').show(); // Show the input field for custom Variant
+        } else {
+            $('#custom_variant_container').hide(); // Hide the input field if "Other" is not selected
+        }
+    });
+});
+</script>
+<script>
+$(document).ready(function () {
+    // Handle file upload via AJAX
+    $('#fileUploadForm').on('submit', function (e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        $.ajax({
+            url: '{{ route('leadsfile.upload') }}', // route for handling the upload
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if(response.success) {
+                    displayUploadedFile(response.file);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (error) {
+                alert('File upload failed.');
+            }
+        });
+    });
+
+    // Function to display uploaded files dynamically
+    function displayUploadedFile(file) {
+        let fileElement = '';
+        if(file.type === 'pdf') {
+            fileElement = `
+                <div class="col-md-3">
+                    <a href="${file.url}" target="_blank">
+                        <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    </a>
+                    <p>${file.name}</p>
+                </div>
+            `;
+        } else if (file.type === 'image') {
+            fileElement = `
+                <div class="col-md-3">
+                    <img src="${file.url}" class="img-fluid" alt="${file.name}">
+                    <p>${file.name}</p>
+                </div>
+            `;
+        }
+        $('#uploadedFiles').append(fileElement); // Append new file to the existing list
+    }
+});
+</script>
+<script>
+$(document).ready(function () {
+    // Handle file removal via AJAX
+    $('.remove-file').on('click', function (e) {
+        e.preventDefault();
+        var fileId = $(this).data('id'); // Get the file ID from the button data attribute
+
+        if(confirm('Are you sure you want to delete this file?')) {
+            $.ajax({
+                url: '{{ route('leadsfile.remove') }}', // Define a route to handle the deletion
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: fileId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Remove the file element from the DOM
+                        $('#file-' + fileId).remove();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (error) {
+                    alert('Failed to delete the file.');
                 }
             });
         }
     });
 });
+</script>
+<script>
+$(document).ready(function() {
+    // Load existing logs when the page loads
+    var leadId = $('#lead_id').val();
+    loadLogs(leadId);
+
+    // Handle the log submission
+    $('#addLogBtn').on('click', function(e) {
+        e.preventDefault();
+
+        var conversation = $('#logCall').val();
+
+        if(conversation.trim() === '') {
+            alert('Please enter a conversation.');
+            return;
+        }
+
+        $.ajax({
+            url: '{{ route('store.log') }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                lead_id: leadId,
+                conversation: conversation
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#logCall').val('');
+                    prependLog(response.log.conversation, response.formatted_time, response.relative_time);
+                }
+            },
+            error: function(error) {
+                alert('Failed to log conversation.');
+            }
+        });
+    });
+    function loadLogs(leadId) {
+        $.ajax({
+            url: '{{ url("/get-logs") }}/' + leadId,
+            type: 'GET',
+            success: function(logs) {
+                logs.forEach(function(log) {
+                    var formattedTime = moment(log.created_at).format('HH:mm:ss D MMM YYYY');
+                    var relativeTime = moment(log.created_at).fromNow();
+                    prependLog(log.conversation, formattedTime, relativeTime);
+                });
+            },
+            error: function(error) {
+                console.log('Failed to load logs.');
+            }
+        });
+    }
+    function prependLog(conversation, formattedTime, relativeTime) {
+        var logHtml = `
+            <div class="card mt-2">
+                <div class="card-body">
+                    <p class="mb-1">${conversation}</p>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">${formattedTime}</small>
+                        <small class="text-muted">${relativeTime}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#conversationLogs').prepend(logHtml);
+    }
+});
+$(document).ready(function() {
+    var leadId = '{{ $lead->id }}';
+    loadTasks(leadId);
+    $('#addTaskBtn').on('click', function(e) {
+        e.preventDefault();
+
+        var taskMessage = $('#task').val();
+        var assignedBy = $('#assignBy').val();
+
+        if (taskMessage.trim() === '' || !assignedBy) {
+            alert('Please enter a task and assign it.');
+            return;
+        }
+
+        $.ajax({
+            url: '{{ route("taskstore.task") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                lead_id: leadId,
+                assign_by: assignedBy,
+                task_message: taskMessage
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#task').val('');
+                    prependTask(
+                        response.task.task_message,
+                        'Pending',
+                        response.task.id,
+                        response.created_at,
+                        response.relative_time,
+                        response.assigner_name
+                    );
+                }
+            },
+            error: function(error) {
+                alert('Failed to create task.');
+            }
+        });
+    });
+    function loadTasks(leadId) {
+        $.ajax({
+            url: '{{ url("/get-tasks") }}/' + leadId,
+            type: 'GET',
+            success: function(tasks) {
+                tasks.forEach(function(task) {
+                    prependTask(
+                        task.task_message,
+                        task.status,
+                        task.id,
+                        moment(task.created_at).format('HH:mm:ss D MMM YYYY'),
+                        moment(task.created_at).fromNow(),
+                        task.assigner ? task.assigner.name : 'Unknown'
+                    );
+                });
+            },
+            error: function(error) {
+                console.log('Failed to load tasks.');
+            }
+        });
+    }
+    function prependTask(taskMessage, status, taskId, createdAt, relativeTime, assignerName) {
+        function getStatusColorClass(status) {
+        switch(status) {
+            case 'Pending':
+                return 'text-danger'; // Red for Pending
+            case 'In Progress':
+                return 'text-warning'; // Yellow for In Progress
+            case 'Completed':
+                return 'text-success'; // Green for Completed
+            default:
+                return 'text-muted'; // Default color
+        }
+    }
+        var taskHtml = `
+            <div class="card mt-2" id="task-${taskId}">
+                <div class="card-body">
+                    <p class="mb-1">${taskMessage}</p>
+                     <div class="d-flex justify-content-start">
+                        <small class="text-muted">Assigned To: ${assignerName}</small>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">${createdAt}</small>
+                        <small class="text-muted">${relativeTime}</small>
+                        <small class="${getStatusColorClass(status)}">${status}</small>
+                    </div>
+                    <button 
+                    class="btn btn-secondary btn-sm mt-2" 
+                    onclick="setTaskIdInModal(${taskId})" 
+                    data-toggle="modal" 
+                    data-target="#updateTaskModal">
+                    Update Status
+                </button>
+                </div>
+            </div>
+        `;
+        $('#taskLogs').prepend(taskHtml);
+    }
+});
+</script>
+<script>
+$(document).ready(function() {
+    $('#updateTaskForm').on('submit', function(e) {
+        e.preventDefault();
+        const taskId = $('#taskId').val();
+        const status = $('#taskStatus').val();
+        $.ajax({
+            url: '{{ route("leads-tasks.update") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                task_id: taskId,
+                status: status
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    location.reload();
+                    $(`#task-${taskId} .task-status`).text(response.updated_status);
+                    $('#updateTaskModal').modal('hide');
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+                alert('Failed to update task status. Please try again.');
+            }
+        });
+    });
+});
+function setTaskIdInModal(taskId) {
+    $('#taskId').val(taskId);
+}
 </script>
 @endsection
