@@ -74,19 +74,14 @@ class PFIController extends Controller
                     ->editColumn('created_at', function($query) {
                         return Carbon::parse($query->created_at)->format('d M Y');
                     })
-                    ->editColumn('created_at', function($query) {
-                        if($query->updated_at) {
-                            return Carbon::parse($query->created_at)->format('d M Y');
-                        }
-                        return "";
-                    })
                     ->editColumn('updated_by', function($query) {                  
                         if($query->updated_by){
                             return $query->updatedBy->name ?? '';
                         }
-                    })                    ->editColumn('updated_at', function($query) {
+                    })
+                    ->editColumn('updated_at', function($query) {
                         if($query->updated_at) {
-                        return Carbon::parse($query->updated_at)->format('d M Y');
+                            return Carbon::parse($query->updated_at)->format('d M Y');
                         }
                         return "";
                     })

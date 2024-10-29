@@ -180,6 +180,7 @@ class LoiCountryCriteriasController extends Controller
                 $loiModelLine->save();
             }
         }
+        
         if($request->restricted_master_model_line_ids) {
             foreach($request->restricted_master_model_line_ids as $restrictedModelLine) {
 
@@ -190,9 +191,9 @@ class LoiCountryCriteriasController extends Controller
                 $loiModelLine->save();
             }
         }
-
+        $TTCApprovalModels = CountryTTCApprovalModel::where('country_id', $loiCountryCriteria->country_id)->delete();
         if($request->ttc_approval_models) {
-            $TTCApprovalModels = CountryTTCApprovalModel::where('country_id', $loiCountryCriteria->country_id)->delete();
+         
             foreach($request->ttc_approval_models as $value) {
                 $TTCAprovalModel = new CountryTTCApprovalModel();
                 $TTCAprovalModel->master_model_id = $value;
