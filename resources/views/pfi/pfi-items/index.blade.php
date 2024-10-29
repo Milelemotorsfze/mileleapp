@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
- 
     @can('PFI-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
@@ -165,6 +164,7 @@
 @endsection
 
 @push('scripts')
+
     <script type="text/javascript">
         $(document).ready(function () {
             var table = $('#PFI-Items-table').DataTable({      
@@ -285,8 +285,6 @@
             placeholder: "Model Line ",
             maximumSelectionLength: 1
         });
-
-
  
     </script>
 @endpush
