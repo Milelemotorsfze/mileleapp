@@ -26,36 +26,34 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-        // chcek pfinumber is unique within the year
-        // $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
-        // $pfiNumbers = [];
-        // foreach($allPfi as $pfi) {
-        //     $pfi = PFI::whereNot('id', $pfi->id)
-        //     ->where('pfi_reference_number', $pfi->pfi_reference_number)
-        //     ->whereYear('pfi_date', Carbon::now()->year)
-        //     ->get();
+       
+        // $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+        // $notmatchingPfis = [];
+        // foreach($allPfi as $pfi) { 
+        //     $pfiSum = DB::table('pfi_items')
+        //         ->where('pfi_id', $pfi->id)
+        //         ->where('is_parent', true)
+        //         ->select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))->first(); 
+
+        //         if($pfiSum->total != $pfi->amount) {
+        //             $notmatchingPfis[] = $pfi->id;
+        //             // info($pfiSum->total);
+        //             // info($pfi->amount);
+        //             return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
+        
+        //         }
+        // }
+        // // return $notmatchingPfis;
+        // return "all PFI Amount is correct";
 
         
-        //     if($pfi->count() > 1) {
-        //          $pfiNumbers[] = $pfi->pfi_reference_number;
-        //     }
-        // }
-        // return $pfiNumbers;
-        // return "all opfi numebr is unique within the year";
-        // Ok - local
-
-       
-      
-    }
-    public function addPFIItems() {
-        // populate each item in list with parent and child
-        // list Only have Toyota PFI
         $length = 6;
         $offset = 2;
         $prefix = "P ";
 
        $migrationPFIs =  DB::table('migration_pfi_items')->get();
        foreach($migrationPFIs as $migrationPFI) {
+       
         $latestItem = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
 
         if($latestItem){
@@ -89,11 +87,114 @@ class MigrationDataCheckController extends Controller
         }else{
             $latestCodeChild = $prefix.'001';
         }
+        
 
         $pfiItemChild = new PfiItem();
         $pfiItemChild->code = $latestCodeChild;
         $pfiItemChild->pfi_id = $migrationPFI->pfi_id;
-        $pfiItemChild->parent_pfi_item_id = $pfiItemId;
+        $pfiItemChild->parent_pfi_item_id = $pfiItem->id;
+        if($migrationPFI->loi_item_id) {
+            $pfiItemChild->loi_item_id = $migrationPFI->loi_item_id;
+
+        }
+        $pfiItemChild->master_model_id = $migrationPFI->master_model_id;
+        $pfiItemChild->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItemChild->unit_price = $migrationPFI->unit_price;
+        $pfiItemChild->created_by = 16;
+        $pfiItemChild->is_parent = false;
+        $pfiItemChild->save();
+       }
+
+       return "all pfi are added in pfi items";
+      
+    }
+
+    public function PFIUniqueWithinYear() {
+         // chcek pfinumber is unique within the year
+         $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
+         $pfiNumbers = [];
+         foreach($allPfi as $pfi) {
+             $pfi = PFI::whereNot('id', $pfi->id)
+             ->where('pfi_reference_number', $pfi->pfi_reference_number)
+             ->whereYear('pfi_date', Carbon::now()->year)
+             ->get();
+ 
+         
+             if($pfi->count() > 1) {
+                  $pfiNumbers[] = $pfi->pfi_reference_number;
+             }
+         }
+         // return $pfiNumbers;
+         return "all opfi numebr is unique within the year";
+         // Ok - local
+    }
+    public function PFIItemqutycheckwithLOIItem() {
+        // maximum quantity not exceeded check
+
+        $quantityExceededPfi = [];
+        $pfiItems = PFIItem::where('is_parent', false)->get();
+        foreach($pfiItems as $pfiItem){
+            // chcek each pfi item pfi quantity is less the or equal to LOI Item quantity.
+            if($pfiItem->LOIItem) {
+              if($pfiItem->LOIItem->quantity > $pfiItem->pfi_quantity) {
+                  $quantityExceededPfi[] = $pfiItem->pfi->id;
+                  return $pfiItem->pfi->id;
+              }
+            }
+          
+        }
+
+        return "all pfi items quantity is less than oor eqaul to corresponding  loi item quantiity.";
+    }
+    public function addPFIItems() {
+        // populate each item in list with parent and child
+        // list Only have Toyota PFI
+        $length = 6;
+        $offset = 2;
+        $prefix = "P ";
+
+       $migrationPFIs =  DB::table('migration_pfi_items')->get();
+       foreach($migrationPFIs as $migrationPFI) {
+       
+        $latestItem = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItem){
+            $latestUUID =  $latestItem->code;
+            $latestUUIDNumber = substr($latestUUID, $offset, $length);
+            
+            $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+            $latestCode =  $prefix.$newCode;
+        }else{
+            $latestCode = $prefix.'001';
+        }
+        $pfiItem = new PfiItem();
+        $pfiItem->pfi_id = $migrationPFI->pfi_id;
+        $pfiItem->code = $latestCode;
+        $pfiItem->master_model_id = $migrationPFI->master_model_id;
+        $pfiItem->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItem->unit_price = $migrationPFI->unit_price;
+        $pfiItem->created_by = 16;
+        $pfiItem->is_parent = true;
+        $pfiItem->save();
+
+        $latestItemChild = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItemChild){
+
+            $latestUUIDChild =  $latestItemChild->code;
+            $latestUUIDNumberChild = substr($latestUUIDChild, $offset, $length);
+            $newCode =  str_pad($latestUUIDNumberChild + 1, 3, 0, STR_PAD_LEFT);
+            $latestCodeChild =  $prefix.$newCode;
+
+        }else{
+            $latestCodeChild = $prefix.'001';
+        }
+        
+
+        $pfiItemChild = new PfiItem();
+        $pfiItemChild->code = $latestCodeChild;
+        $pfiItemChild->pfi_id = $migrationPFI->pfi_id;
+        $pfiItemChild->parent_pfi_item_id = $pfiItem->id;
         $pfiItemChild->loi_item_id = $migrationPFI->loi_item_id;
         $pfiItemChild->master_model_id = $migrationPFI->master_model_id;
         $pfiItemChild->pfi_quantity = $migrationPFI->pfi_qty;
@@ -120,6 +221,30 @@ class MigrationDataCheckController extends Controller
 
        return "all pfi are added in pfi items";
     //    $ChildPfi =  DB::table('migration_pfi_items')->get();
+    }
+    public function pfiSteeringModelineCheck() {
+          // handdrive and model line of parent and chikld should be same except Hiace
+          $notMatchingSteering = [];
+          $motMatchingModelLines = [];
+          $pfiItems = PFIItem::where('is_parent', true)->get();
+          foreach($pfiItems as $pfiItem){
+              $childItem = PFIItem::where('parent_pfi_item_id', $pfiItem->id)
+                      ->where('is_parent', false)->first();
+              if($pfiItem->masterModel->steering != $childItem->masterModel->steering) {
+                  $notMatchingSteering[] = $pfiItem->pfi->id;
+                  return $pfiItem->pfi->id;
+              }
+              if($pfiItem->masterModel->modelLine->id != $childItem->masterModel->modelLine->id) {
+                  // chcek it is Hiace or not 
+                  if($pfiItem->masterModel->modelLine->id != 107 || $pfiItem->masterModel->modelLine->id != 108 ) {
+                      $motMatchingModelLines[] = $pfiItem->pfi->id;
+                      return $pfiItem->pfi->id;
+                  }
+  
+              }
+          }
+  
+          return "all steering and model line requirements are correct";
     }
     public function currencyCheckPFI() {
         // : If vendor is MMC Currency can be EUR also else currency will be USD 
@@ -157,32 +282,13 @@ class MigrationDataCheckController extends Controller
         return $notmatchingPfis;
         return "all PFI Amount is correct";
     }
-    public function CheckLOICodeUniqueinPFI() {
-         // chcek uniue LOI Item each in pfi item
-         // chcek child items only , parent do not have LOI Item Code
-
-        $PfiItems = PfiItem::where('is_parent', false)->get();
-        foreach($PfiItems as $PfiItem) {
-            $duplicateCount = PfiItem::where('pfi_id', $PfiItem->pfi_id)
-            ->where('is_parent', false)
-            ->where('loi_item_id', $PfiItem->loi_item_id)
-            ->count();
-    
-            if($duplicateCount > 1) {
-                return $duplicateCount; 
-             } 
-           }
-           return "all PFI have unique loi item code.";
-
-    }
-    //
+   
     
     public function PfiQtyCheck() {
 
         $qtyExceededLOI = [];
         $datas =  DB::table('migration_pfi_items')
         ->select('loi_number','loi_item_id')
-        ->where('payment_status','PAID')
         ->selectRaw("SUM(pfi_qty) as total_pfi_qty")
         // ->whereNotIn('loi_item_id', $qtyExceededLOI)
         ->groupBy('loi_item_id')
