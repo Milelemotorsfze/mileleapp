@@ -167,7 +167,7 @@ class WorkOrder extends Model
     {
         $data = WOApprovals::where('work_order_id', $this->id)
                             ->where('type', 'finance')
-                            ->orderBy('id', 'DESC')
+                            ->orderBy('updated_at', 'DESC')
                             ->first();
 
         if (!$data) {
@@ -204,7 +204,7 @@ class WorkOrder extends Model
     {
         $data = WOApprovals::where('work_order_id', $this->id)
                             ->where('type', 'coo')
-                            ->orderBy('id', 'DESC')
+                            ->orderBy('updated_at', 'DESC')
                             ->first();
         if (!$data || $this->can_show_coo_approval !== 'yes') {
             return '';
