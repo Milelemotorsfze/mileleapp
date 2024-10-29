@@ -288,10 +288,10 @@ class WorkOrderController extends Controller
             $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);      
             $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);     
             $filteredDatas = $filteredDatas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
-                if ($includeBlank && (!$data->latestFinance || $data->can_show_coo_approval == 'no')) {
+                if ($includeBlank && (!$data->latestFinance || $data->can_show_fin_approval == 'no')) {
                     return true;
                 }     
-                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter) && $data->can_show_coo_approval == 'yes';
+                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter) && $data->can_show_fin_approval == 'yes';
             });
         }      
         if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
