@@ -23,6 +23,7 @@ class SendDailyUserActivityEmail extends Command
             ->whereDate('created_at', now()->toDateString())
             ->get();
             info($activities);
-        Mail::to('abdul@milele.com')->send(new UserActivityEmail($activities));
+        // Mail::to('abdul@milele.com')->send(new UserActivityEmail($activities));
+        Mail::to('rejitha.rajendran@milele.com')->send(new UserActivityEmail($activities));
     }
 }
