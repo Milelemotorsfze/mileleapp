@@ -207,11 +207,6 @@ div.container {
   padding: 0px 10px;
 }
 
-.rolename-username-main-div {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .navbar-main-div {
   padding: 0px 2px;
 }
@@ -240,8 +235,13 @@ nav.navbar.navbar-light.navbar-expand-lg:active {
 
 @media (min-width: 992px) {
   .more-button-username-rolename-container {
-      margin: 0px 33px 0px -20px;
-      position: relative;
+    margin: 0px 33px 0px -20px;
+    position: relative;
+  }
+  
+  .rolename-username-main-div {
+    display: flex;
+    justify-content: flex-end;
   }
 }
 
