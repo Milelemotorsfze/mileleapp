@@ -9,7 +9,7 @@
 
     <p>
         Kindly remind the customer that the export documents are about to expire for this work order, 
-        and we will be canceling and then reprocessing these documents. The customer will be charged 
+        and we will be cancelling and then reprocessing these documents. The customer will be charged 
         1560 AED for the cancellation and reprocessing.
     </p>
 
@@ -55,7 +55,8 @@
     @else
         <p>No vehicles found for this BOE.</p>
     @endif
-
+    </br>
+    <p>if the customer has already exported these vehicles, please ignore this message.</p></br>
     <p>Regards,</p>
     <p>Milele Matrix</p>
 
