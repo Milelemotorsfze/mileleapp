@@ -244,3 +244,20 @@ nav.navbar.navbar-light.navbar-expand-lg:active {
       position: relative;
   }
 }
+
+@media screen and (max-width: 991.99px) {
+  .rolename-username-main-div {
+    padding-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column-reverse;
+  }
+  
+  .more-button-username-rolename-container {
+    margin: 0px 0px 0px -10px;
+    }
+
+    .navbar-nav .dropdown-menu {
+      position: absolute; 
+    }
+}
