@@ -55,7 +55,8 @@
     @else
         <p>No vehicles found for this BOE.</p>
     @endif
-
+    </br>
+    <p>if the customer has already exported these vehicles, please ignore this message.</p></br>
     <p>Regards,</p>
     <p>Milele Matrix</p>
 
