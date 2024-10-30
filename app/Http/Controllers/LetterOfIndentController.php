@@ -767,8 +767,10 @@ class LetterOfIndentController extends Controller
                 $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
                 $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
+                $customerYearCode = $yearCode . $nextLoiCount;
+                
                 $LOI->uuid = $uuid;
-
+                $LOI->year_code = $customerYearCode;
                 $LOI->client_id = $request->client_id;
                 $LOI->country_id = $request->country;
                 $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
@@ -1030,7 +1032,6 @@ class LetterOfIndentController extends Controller
             }
 
         }
-        info($msg);
         $LOI->review = $request->review;
         $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->updated_by = Auth::id();
@@ -1045,6 +1046,7 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');
         $LOI = LetterOfIndent::find($request->id);
         $LOI->comments = $request->comments;
+        $LOI->updated_by = Auth::id();
         $LOI->save();
 
         return response(true);
@@ -1101,6 +1103,7 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::find($id);
         $LOI->status = $request->status;
         $LOI->submission_status = $request->status;
+        $LOI->updated_by = Auth::id();
         $LOI->save();
 
         return redirect()->back()->with('success', 'Status updated as "New" successfully.');
@@ -1113,38 +1116,35 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::find($id);
         $LOI->is_expired = true;
         $LOI->expired_date = Carbon::now()->format('Y-m-d');
+        $LOI->updated_by = Auth::id();
         $LOI->timestamps = false;
         $LOI->save();
 
         return response(true);
     }
-    // public function RequestTTCApproval(Request $request) {
-    //     (new UserActivityController)->createActivity('TTC approval done successfully.');
-    
-    //     $LOI = LetterOfIndent::find($request->id);
 
-    //     DB::beginTransaction();
+    public function getIsLOIEditable(Request $request) {
+        $loi_id = $request->id;
+        $pfiItems = PfiItem::where('is_parent', false)
+                ->WhereHas('letterOfIndentItem', function($query)use($loi_id) {
+                    $query->where('letter_of_indent_id', $loi_id);
+                });
+        $data = [];
+        if($pfiItems->count() <= 0) {
+            // not editable
+            $data['is_editable'] = 1;
+           
+        }else{
+            $alreadyUsedLOIItems = [];
+            foreach($pfiItems->get() as $pfiItem) {
+                $alreadyUsedLOIItems[] = $pfiItem->letterOfIndentItem->code." - (PFI Number - ".$pfiItem->pfi->pfi_reference_number." ) ";
 
-    //     if($request->status == 'REJECTED') {
-    //         $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
-    //         $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
-    //         $msg = 'Rejected';
+            }
+            $data['is_editable'] = $alreadyUsedLOIItems;
+        }
+        $data['editUrl'] = route('letter-of-indents.edit', $loi_id);
 
-
-    //     }elseif ($request->status == 'APPROVE') {
-    //         $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-    //         $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-    //         $msg = 'Approved';
-    //     }
-
-    //     $LOI->review = $request->review;
-    //     $LOI->loi_approval_date = $request->loi_approval_date;
-    //     $LOI->updated_by = Auth::id();
-    //     $LOI->save();
-
-    //     DB::commit();
-
-    //     return response()->json($msg);
-    // }
+        return response($data);
+    }
 
 }

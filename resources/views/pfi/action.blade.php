@@ -40,7 +40,7 @@
         </li>
         @endif
     @endcan
-    @can('pfi-payment-status-update')
+    <!-- @can('pfi-payment-status-update')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
         @endphp
@@ -52,7 +52,7 @@
             </button>
         </li>
         @endif
-    @endcan
+    @endcan -->
     @can('pfi-delete')
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
@@ -150,7 +150,7 @@
             </div>
         </div>
         <!-- PFI Items Modal -->
-        <div class="modal fade " id="view-pfi-items-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1"
+        <div class="modal fade" id="view-pfi-items-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">

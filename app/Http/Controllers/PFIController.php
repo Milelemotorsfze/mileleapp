@@ -770,21 +770,23 @@ class PFIController extends Controller
 
     }
    
-    public function paymentStatusUpdate(Request $request, $id) {
+    // public function paymentStatusUpdate(Request $request, $id) {
 
-        (new UserActivityController)->createActivity('PFI payment status updated.');
+    //     (new UserActivityController)->createActivity('PFI payment status updated.');
 
-        $pfi = PFI::find($id);
-        $pfi->payment_status = $request->payment_status;
-        $pfi->save();
-        return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
-    }
+    //     $pfi = PFI::find($id);
+    //     $pfi->payment_status = $request->payment_status;
+    //     $pfi->updated_by = Auth::id();
+    //     $pfi->save();
+    //     return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
+    // }
     public function relaesedAmountUpdate(Request $request) {
         (new UserActivityController)->createActivity('PFI released amount updated.');
 
         $pfi = PFI::find($request->pfi_id);
         $pfi->released_amount = $request->released_amount;
         $pfi->released_date = $request->released_date;
+        $pfi->updated_by = Auth::id();
         $pfi->save();
         return response($pfi);
     }
