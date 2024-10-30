@@ -238,7 +238,7 @@ nav.navbar.navbar-light.navbar-expand-lg:active {
   position: static;
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 992px) {
   .more-button-username-rolename-container {
       margin: 0px 33px 0px -20px;
       position: relative;
