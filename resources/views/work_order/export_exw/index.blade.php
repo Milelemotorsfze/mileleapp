@@ -168,7 +168,12 @@
 							'label' => 'COO Approval',
 							'options' => $cooApprovalStatuses,
 							'selected' => $filters['coo_approval_filter'] ?? []
-						]
+						],
+						'docs-status-filter' => [
+							'label' => 'Documentation',
+							'options' => $docsStatuses,
+							'selected' => $filters['docs_status_filter'] ?? []
+						],
 					];
 				@endphp
 				@foreach($filterOptions as $id => $filter)
@@ -522,7 +527,7 @@
 						@endforeach
 					</tbody>
 				</table>
-				<div class="d-flex justify-content-center mt-4">
+				<div class="d-flex justify-content-left mt-4">
 					{{ $datas->links() }}
 				</div>
 			</div>
@@ -574,6 +579,7 @@
                 sales_support_filter: $('#sales-support-filter').val(),
                 finance_approval_filter: $('#finance-approval-filter').val(),
 				coo_approval_filter: $('#coo-approval-filter').val(),
+				docs_status_filter: $('#docs-status-filter').val(),
                 type: "{{ isset($type) ? $type : '' }}",
                 _token: '{{ csrf_token() }}'
             };

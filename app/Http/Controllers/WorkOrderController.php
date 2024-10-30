@@ -304,6 +304,27 @@ class WorkOrderController extends Controller
                 return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter) && $data->can_show_coo_approval == 'yes';
             });
         }
+        if (isset($filters['docs_status_filter']) && !empty($filters['docs_status_filter'])) {
+            $docsStatusFilter = $filters['docs_status_filter'];
+            $includeBlankDocs = in_array('Blank', $docsStatusFilter);
+        
+            $filteredDatas = $datas->filter(function ($data) use ($docsStatusFilter, $includeBlankDocs) {
+                // Check if docs_status is in filter list and other conditions are met
+                $matchesFilter = in_array($data->docs_status, $docsStatusFilter) 
+                    && $data->sales_support_data_confirmation_at !== null 
+                    && $data->finance_approval_status === 'Approved' 
+                    && $data->coo_approval_status === 'Approved';
+        
+                // Handle cases where docs_status is "Blank" and other conditions aren't fully met
+                $matchesBlank = $includeBlankDocs 
+                    && ($data->docs_status == 'Blank') 
+                    && ($data->sales_support_data_confirmation_at === null 
+                        || $data->finance_approval_status !== 'Approved' 
+                        || $data->coo_approval_status !== 'Approved');
+        
+                return $matchesFilter || $matchesBlank;
+            });
+        }
         // Pagination parameters
         $page = request()->get('page', 1);
         $perPage = 100;
@@ -2978,6 +2999,7 @@ class WorkOrderController extends Controller
             'sales_support_filter' => $request->sales_support_filter,
             'finance_approval_filter' => $request->finance_approval_filter,
             'coo_approval_filter' => $request->coo_approval_filter,
+            'docs_status_filter' => $request->docs_status_filter,
         ]);
     
         // Check if the filter record exists for the current user
