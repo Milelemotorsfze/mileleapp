@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
-        $schedule->command('email:send-daily-activity')->dailyAt('11:13');
+        $schedule->command('email:send-daily-activity')->dailyAt('11:16');
         // $schedule->command('email:send-daily-activity')->everyMinute();
         $schedule->command('leads:reassign')->hourly()->appendOutputTo(storage_path('logs/leads_reassign.log'));
         $schedule->command('notifications:send')->everyMinute();
