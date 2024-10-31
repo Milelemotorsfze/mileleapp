@@ -46,6 +46,7 @@ class LetterOfIndentController extends Controller
     public function index(Builder $builder, Request $request)
     {
         (new UserActivityController)->createActivity('Open LOI Listing Page.');
+        $expiryCheck = $this->CheckLOIExpiry();
 
         $tab = $request->tab;
         $data = LetterOfIndent::orderBy('updated_at','DESC')->with([
@@ -80,6 +81,7 @@ class LetterOfIndentController extends Controller
                     LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED,LetterOfIndent::LOI_STATUS_TTC_APPROVED,
                     LetterOfIndent::LOI_STATUS_TTC_REJECTED]);
             }
+           
             
         if (request()->ajax()) {
             return DataTables::of($data)
@@ -124,39 +126,13 @@ class LetterOfIndentController extends Controller
                     return view('letter_of_indents.actions.loi_template_links',compact('templateTypes','letterOfIndent'));
                 })
                 ->editColumn('is_expired', function($query) {
-                    $LOI = LetterOfIndent::select('id','is_expired','client_id','date')->find($query->id);
-                    $LOItype = $LOI->client->customertype;
-                    $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-                    if($LOIExpiryCondition && $LOI->is_expired == false) {    
-                        info($LOI->id);   
-                        $currentDate = Carbon::now();
-                        $year = $LOIExpiryCondition->expiry_duration_year;
-                        $expiryDate = Carbon::parse($LOI->date)->addYears($year);
-                        info("expiry date");
-                        info($expiryDate);
-                        // do not make status expired, becasue to know at which status stage it got expired
-                        if($currentDate->gt($expiryDate) == true) {
-                            info($LOI->id);
-                            info("expired");
-                            $LOI->is_expired = true;     
-                            $LOI->expired_date = Carbon::now()->format('Y-m-d');
-                            $LOI->timestamps = false;        
-                            $LOI->save();  
-                        }
-                        // else{
-                        //     $LOI->is_expired = false;  
-                        //     $LOI->expired_date = NULL;  
-                        //     $LOI->timestamps = false;               
-                        //     $LOI->save();  
-                        // }
-                    }
 
-                    if($LOI->is_expired == true) {
+                    if($query->is_expired == true) {
                         $msg = 'Expired';
                         return  '<button class="btn btn-sm btn-secondary">'.$msg.'</button>';
                     }else{
                         
-                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $LOI->id) . '">Not Expired</button>';
+                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $query->id) . '">Not Expired</button>';
                        return $msg;
                     }                                           
                  })
@@ -204,6 +180,49 @@ class LetterOfIndentController extends Controller
         }
 
         return view('letter_of_indents.index');
+    }
+    public function CheckLOIExpiry() 
+    {
+        // return "all";
+        $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
+        ->where('is_expired', false)->get();
+        // return $letterOfIndents->count();
+        info($letterOfIndents->count());
+        foreach($letterOfIndents as $letterOfIndent) {
+            info($letterOfIndent->id);
+            $LOItype = $letterOfIndent->client->customertype;
+          
+            $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
+            
+            if($LOIExpiryCondition) {        
+                $currentDate = Carbon::now();
+                $year = $LOIExpiryCondition->expiry_duration_year;
+                $expiryDate = Carbon::parse($letterOfIndent->date)->addYears($year);
+                // return $letterOfIndent->date;
+                // return $expiryDate;
+                // do not make status expired, becasue to know at which status stage it got expired
+                if($currentDate->gt($expiryDate) == true) {
+                     info("expired successfully");
+                    $letterOfIndent->is_expired = true;     
+                    $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
+                    $letterOfIndent->timestamps = false;  
+                    $letterOfIndent->save();  
+                    (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
+                    // info($letterOfIndent);
+                    info("expiry shecduler");
+                }
+              info("not expired");
+                // else{
+                //     $letterOfIndent->is_expired = false;  
+                //     $letterOfIndent->expired_date = NULL;  
+                //     $letterOfIndent->timestamps = false;               
+                //     $letterOfIndent->save();  
+                //     // info($letterOfIndent);
+                //     info("else expiry shecduler");
+                // }
+            }
+        }
+        return true;
     }
     /**
      * Show the form for creating a new resource.
