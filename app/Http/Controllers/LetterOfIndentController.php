@@ -187,9 +187,9 @@ class LetterOfIndentController extends Controller
         $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
         ->where('is_expired', false)->get();
         // return $letterOfIndents->count();
-        info($letterOfIndents->count());
+        // info($letterOfIndents->count());
         foreach($letterOfIndents as $letterOfIndent) {
-            info($letterOfIndent->id);
+            // info($letterOfIndent->id);
             $LOItype = $letterOfIndent->client->customertype;
           
             $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
@@ -202,16 +202,16 @@ class LetterOfIndentController extends Controller
                 // return $expiryDate;
                 // do not make status expired, becasue to know at which status stage it got expired
                 if($currentDate->gt($expiryDate) == true) {
-                     info("expired successfully");
+                    //  info("expired successfully");
                     $letterOfIndent->is_expired = true;     
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
                     $letterOfIndent->timestamps = false;  
                     $letterOfIndent->save();  
                     (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                     // info($letterOfIndent);
-                    info("expiry shecduler");
+                    // info("expiry shecduler");
                 }
-              info("not expired");
+            //   info("not expired");
                 // else{
                 //     $letterOfIndent->is_expired = false;  
                 //     $letterOfIndent->expired_date = NULL;  

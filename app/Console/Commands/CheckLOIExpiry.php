@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\LetterOfIndent;
 use App\Models\LOIExpiryCondition;
 use Carbon\Carbon;
+use App\Http\Controllers\UserActivityController;
 
 class CheckLOIExpiry extends Command
 {
