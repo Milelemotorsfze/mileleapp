@@ -42,6 +42,7 @@ class CheckLOIExpiry extends Command
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
                     $letterOfIndent->timestamps = false;  
                     $letterOfIndent->save();  
+                    (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                     // info($letterOfIndent);
                     info("expiry shecduler");
 

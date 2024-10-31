@@ -24,6 +24,8 @@ class LOIItemController extends Controller
      */
     public function index(Request $request)
     {
+        (new UserActivityController)->createActivity('Open LOI Items List Page');
+
         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
         $countries = Country::select('id','name')->get();
         $modelLines = MasterModelLines::select('id','model_line')->get();
