@@ -222,7 +222,7 @@ class LetterOfIndentController extends Controller
                 // }
             }
         }
-        return
+        return true;
     }
     /**
      * Show the form for creating a new resource.
