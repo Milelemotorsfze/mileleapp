@@ -170,6 +170,13 @@ class LOIItemController extends Controller
                         $query->where('comments', 'like', "%{$request->comments}%");
                     });
                 }
+                if(!empty($request->loi_from_date && $request->loi_to_date)) {
+                    info($request->loi_from_date);
+                    info($request->loi_to_date);
+                    $data->whereHas('LOI',function($query) use($request) {
+                        $query->whereBetween('date',  [$request->loi_from_date, $request->loi_to_date]);
+                    });
+                }
 
 
                 if($request->export == 'EXCEL') {
