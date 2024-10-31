@@ -252,6 +252,10 @@ class PFIController extends Controller
                 $data->having("total_price", 'like', "%{$request->total_price}%");
 
             }
+            if(!empty($request->pfi_item_code)) {
+                $data->where("code", 'like', "%{$request->pfi_item_code}%");
+
+            }
            
             // return $data->get();
             if($request->export == 'EXCEL') {
@@ -268,6 +272,7 @@ class PFIController extends Controller
                     
                         $loiItemCode = implode(", ", $LOICodes);   
                     return [
+                        'PFI Item Code' => $data->code ?? '',
                         'LOI Item Code' => $loiItemCode ?? '',
                         'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),
                         'PFI Number' => $data->pfi->pfi_reference_number,
