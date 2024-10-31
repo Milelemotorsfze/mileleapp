@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserActivityEmail;
 use App\Models\UserActivities;
+use Exception;
 
 class SendDailyUserActivityEmail extends Command
 {
