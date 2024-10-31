@@ -140,13 +140,9 @@ class PFIController extends Controller
             ->where('is_parent', true)
             ->orderBy('updated_at','DESC')->with([
                 'pfi' => function ($query) {
-                $query->select('id','supplier_id','country_id','client_id','pfi_reference_number',
-                'currency','amount','comment','pfi_date');
+                    $query->select('id','supplier_id','country_id','client_id','pfi_reference_number','currency','amount','comment','pfi_date');
             },
-            'letterOfIndentItem' => function ($query) {
-                $query->select('id','code','master_model_id','letter_of_indent_id');
-            },
-           
+          
             'masterModel'  => function ($query) {
                 $query->select('id','model','sfx','steering','master_model_line_id');
             },
@@ -165,8 +161,6 @@ class PFIController extends Controller
             'pfi.country'  => function ($query) {
                 $query->select('id','name');
             }]);
-
-            // return $data->get();
 
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
@@ -272,6 +266,7 @@ class PFIController extends Controller
                     
                         $loiItemCode = implode(", ", $LOICodes);   
                     return [
+                        'PFI ID' => $data->pfi->id ?? '',
                         'PFI Item Code' => $data->code ?? '',
                         'LOI Item Code' => $loiItemCode ?? '',
                         'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),

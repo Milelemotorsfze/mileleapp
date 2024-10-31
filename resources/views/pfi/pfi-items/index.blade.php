@@ -202,7 +202,7 @@
         columns: [
             {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'code', 'name' : 'code' , orderable: true},
-            {'data' : 'loi_item_code', 'name' : 'letterOfIndentItem.code' , orderable: true},
+            {'data' : 'loi_item_code', 'name' : 'loi_item_code' , orderable: true},
             // {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},
