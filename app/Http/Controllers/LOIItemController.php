@@ -24,6 +24,8 @@ class LOIItemController extends Controller
      */
     public function index(Request $request)
     {
+        (new UserActivityController)->createActivity('Open LOI Items List Page');
+
         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
         $countries = Country::select('id','name')->get();
         $modelLines = MasterModelLines::select('id','model_line')->get();
@@ -168,6 +170,13 @@ class LOIItemController extends Controller
                 if(!empty($request->comments)) {
                     $data->whereHas('LOI',function($query) use($request) {
                         $query->where('comments', 'like', "%{$request->comments}%");
+                    });
+                }
+                if(!empty($request->loi_from_date && $request->loi_to_date)) {
+                    info($request->loi_from_date);
+                    info($request->loi_to_date);
+                    $data->whereHas('LOI',function($query) use($request) {
+                        $query->whereBetween('date',  [$request->loi_from_date, $request->loi_to_date]);
                     });
                 }
 

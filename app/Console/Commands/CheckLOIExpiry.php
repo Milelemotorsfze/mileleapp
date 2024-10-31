@@ -14,7 +14,7 @@ class CheckLOIExpiry extends Command
      *
      * @var string
      */
-    protected $signature = 'loi-expiry:check';
+    protected $signature = 'expiry:check';
 
     /**
      * The console command description.
@@ -40,17 +40,21 @@ class CheckLOIExpiry extends Command
                 if($currentDate->gt($expiryDate) == true) {
                     $letterOfIndent->is_expired = true;     
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
-                    $letterOfIndent->timestamps = false;        
+                    $letterOfIndent->timestamps = false;  
                     $letterOfIndent->save();  
-                    info($letterOfIndent);
+                    (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
+                    // info($letterOfIndent);
+                    info("expiry shecduler");
 
-                }else{
-                    $letterOfIndent->is_expired = false;  
-                    $letterOfIndent->expired_date = NULL;  
-                    $letterOfIndent->timestamps = false;               
-                    $letterOfIndent->save();  
-                    info($letterOfIndent);
                 }
+                // else{
+                //     $letterOfIndent->is_expired = false;  
+                //     $letterOfIndent->expired_date = NULL;  
+                //     $letterOfIndent->timestamps = false;               
+                //     $letterOfIndent->save();  
+                //     // info($letterOfIndent);
+                //     info("else expiry shecduler");
+                // }
             }
 
         }

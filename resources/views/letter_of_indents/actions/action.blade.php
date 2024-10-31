@@ -1,4 +1,4 @@
-
+<!-- {{ $letterOfIndent->is_loi_editable }} -->
 <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
     <i class="fa fa-bars" aria-hidden="true"></i>
@@ -36,8 +36,10 @@
         @endphp
             @if ($hasPermission)
             <li>
-                <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}" class="btn btn-info btn-sm mt-1"
-                title="Edit LOI" style="width:100%; margin-top:2px; margin-bottom:2px;" >
+            
+                <button type="button" 
+                 class="btn btn-info btn-sm mt-1 edit-button" title="Edit LOI"
+                 style="width:100%; margin-top:2px; margin-bottom:2px;" onclick="edit({{ $letterOfIndent->id }})" >
                  <i class="fa fa-edit"></i> Edit
                 </a>
             </li>
@@ -324,7 +326,28 @@
             }
             
         }
-        
+
+        function edit(id) {
+            let url =  "{{ route('loi.get-is-editable') }}";
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: id,
+                    _token: '{{ csrf_token() }}'
+                },
+                success:function (data) {
+                    if(data.is_editable == 1) {
+                        window.location.href = data.editUrl;
+                    }else{
+                        alertify.confirm('This LOI is already used to create PFI, '+ data.is_editable +' Please remove these items from PFI to edit this LOI.',function (e) {
+                        });
+                    }
+                }
+            });
+        }
+                   
     </script>
 
    

@@ -36,9 +36,9 @@
                         @endphp
                         @if ($hasPermission)
                         <li>
-                            <button type="button" data-bs-toggle="modal" style="width:100%; margin-top:2px; margin-bottom:2px;"
-                             data-bs-target="#update-loi-status-{{ $letterOfIndent->id }}"
-                            class="btn btn-info btn-sm " title="Reverse Update of Status to New">Status Update</button>  
+                            <button type="button" onclick="checkExistingInPFI({{$letterOfIndent->id}})" 
+                            style="width:100%; margin-top:2px; margin-bottom:2px;" data-id="#update-loi-status-{{ $letterOfIndent->id }}"
+                            class="btn btn-info btn-sm" title="Reverse Update of Status to New">Status Update</button>  
                         </li>            
                         @endif
                     @endcan
@@ -275,7 +275,26 @@
         </div>
     </div>
      <script>
-        
+        function checkExistingInPFI(id) {
+             let url =  "{{ route('loi.get-is-editable') }}";
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: id,
+                    _token: '{{ csrf_token() }}'
+                },
+                success:function (data) {
+                    if(data.is_editable == 1) {
+                        $('#update-loi-status-'+id).modal('show');
+                    }else{
+                        alertify.confirm('This LOI is already used to create PFI, '+ data.is_editable +' Please remove these items from PFI to update this LOI.',function (e) {
+                        });
+                    }
+                }
+            });
+        }
         $('.ttc-approve-reject-btn').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
