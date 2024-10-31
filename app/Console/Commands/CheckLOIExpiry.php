@@ -28,16 +28,25 @@ class CheckLOIExpiry extends Command
      */
     public function handle()
     {
-        $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')->get();
+        $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
+                            ->where('is_expired', false)->get();
+        // return $letterOfIndents->count();
+        // info($letterOfIndents->count());
         foreach($letterOfIndents as $letterOfIndent) {
+            info($letterOfIndent->id);
             $LOItype = $letterOfIndent->client->customertype;
+          
             $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-            if($LOIExpiryCondition && $letterOfIndent->is_expired == false) {        
+            
+            if($LOIExpiryCondition) {        
                 $currentDate = Carbon::now();
                 $year = $LOIExpiryCondition->expiry_duration_year;
                 $expiryDate = Carbon::parse($letterOfIndent->date)->addYears($year);
+                // return $letterOfIndent->date;
+                // return $expiryDate;
                 // do not make status expired, becasue to know at which status stage it got expired
                 if($currentDate->gt($expiryDate) == true) {
+                     info("expired");
                     $letterOfIndent->is_expired = true;     
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
                     $letterOfIndent->timestamps = false;  
@@ -45,8 +54,8 @@ class CheckLOIExpiry extends Command
                     (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                     // info($letterOfIndent);
                     info("expiry shecduler");
-
                 }
+              info("not expired");
                 // else{
                 //     $letterOfIndent->is_expired = false;  
                 //     $letterOfIndent->expired_date = NULL;  
@@ -56,7 +65,6 @@ class CheckLOIExpiry extends Command
                 //     info("else expiry shecduler");
                 // }
             }
-
         }
         
     }
