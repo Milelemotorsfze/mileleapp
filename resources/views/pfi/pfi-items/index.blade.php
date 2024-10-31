@@ -68,6 +68,9 @@
                     <thead class="bg-soft-secondary">
                             <tr>
                                 <th>S.No</th>
+                                <th>PFI Item Code
+                                    <input class="small-width" onkeyup="reload()" name="pfi-item-code" type="text" id="pfi-item-code" placeholder="PFI Item Code">
+                                </th> 
                                 <th>LOI Item Code
                                     <input class="small-width" onkeyup="reload()" name="code" type="text" id="code" placeholder="LOI Item Code">
                                 </th> 
@@ -174,7 +177,7 @@
             ajax: {
             url:  "{{ route('pfi-item.list') }}",
             data: function (d) {
-
+                d.pfi_item_code = $('#pfi-item-code').val(); 
                 d.code = $('#code').val();  // Add custom parameters to send to the server
                 // d.status = $('#loi-status').val();
                 d.pfi_date = $('#pfi-date').val();
@@ -198,6 +201,7 @@
         },
         columns: [
             {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
+            {'data' : 'code', 'name' : 'code' , orderable: true},
             {'data' : 'loi_item_code', 'name' : 'letterOfIndentItem.code' , orderable: true},
             // {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
@@ -233,6 +237,7 @@
                 console.log(code); // Add custom parameters to send to the server
                 // let status = $('#loi-status').val();
                 let pfi_date = $('#pfi-date').val();
+                let pfi_item_code = $('#pfi-item-code').val();
                 let pfi_number = $('#pfi-number').val();
                 let supplier_id = $('#supplier-id').val();
                 let client_id = $('#customer-id').val();
@@ -249,7 +254,7 @@
                 let total_price = $('#total-price').val();
                 let comment = $('#comment').val();
 
-            var exportUrl = "{{ route('pfi-item.list')}}"+ "?code="+code+"&pfi_date="+pfi_date+
+            var exportUrl = "{{ route('pfi-item.list')}}"+ "?code="+code+"&pfi_date="+pfi_date+"&pfi_item_code="+pfi_item_code+
             "&pfi_number="+pfi_number+"&supplier_id="+supplier_id+"&country_id="+country_id+"&currency="+currency+"&steering="+steering+
             "&brand="+brand+"&client_id="+ client_id+"&model_line="+model_line+"&model="+model+"&sfx="+sfx+"&unit_price="+unit_price+
             "&pfi_amount="+pfi_amount+"&total_price="+total_price+"&comment="+comment+"&pfi_quantity="+pfi_quantity+"&export=EXCEL";
