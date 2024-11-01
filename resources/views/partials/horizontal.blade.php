@@ -288,9 +288,14 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('getVehiclePenaltyReport')}}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Penalty Report</span>
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Customs Clearance</span>
+                                                <div class="arrow-down"></div>
                                             </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('getVehiclePenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized Vehicles</a>            
+                                                <a href="{{route('getClearedPenalties')}}" class="dropdown-item" data-key="t-login">Cleared Penalties</a>
+                                            </div>
                                         </div>
                                         @endif
                                     </div>
