@@ -39,6 +39,9 @@
         margin-top:1px;
         font-size:10px;
     }
+    .sfx-width{
+        min-width:30px !important;
+    }
     .cps-img{
         margin-left:0px;
         width:100px !important;
@@ -108,7 +111,7 @@
                 </p>
 
                 <p> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
-                    <span style="margin-left:15px;">{{ strtoupper(substr($pfi->customer->name, 0,15)) }} </span>
+                    <span style="margin-left:15px;">{{ strtoupper(substr($pfi->customer->name, 0, 15)) }} </span>
                 </p>
                 <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:10px;font-weight:bold"> SAMARI RETAIL BLOC A</span>
                     <span style="margin-left:245px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
@@ -118,7 +121,7 @@
                     <tr>
                         <td>Description</td>
                         <td>Product Code</td>
-                        <td></td>
+                        <td class="sfx-width"></td>
                         <td>Availability</td>
                         <td>Quantity</td>
                         <td>Unit Price</td>
@@ -180,7 +183,7 @@
                 <p class="noraml-font">Delivery time mentioned is EXW Jebel Ali and is valid at the date of the proforma and is subject to prior sales.</p>
                 <p class="noraml-font">Prohibition of resale after arrival in <span style="padding-left:30px"> {{ strtoupper($pfi->country->name ?? '')}} </sapn></p>
                 <p class="noraml-font">Copies of original B/L must be submitted to AMS ME</p>
-                <p style="margin:0px">We remain at your disposal for further information</p>
+                <p style="margin:0px">We remain at your disposal for further information.</p>
                 <P style="text-align: center;bottom: 0;font-weight:normal;margin-top:100px">
                     AMS ME FZE - Office 1519, 15th Floor, Tower A, JAFZA ONE, Gate 5, Jebel Ali Free Zone - PO Box 17879 - Dubai - UAE
 
