@@ -96,7 +96,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="9" class="text-center">No data history available.</td>
+                                <td colspan="15" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
