@@ -92,7 +92,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">Model Description</label>
+                        <label class="form-label">PFI Model Description</label>
                         <input type="text" class="form-control" name="model_description" placeholder="Model Description"
                          value="{{ $masterModel->model_description }}">
                    </div>
