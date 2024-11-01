@@ -10,6 +10,12 @@
     </style>
 </head>
 @section('content')
+@php
+    $canViewPenaltyInfo = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penalty-report']);
+    $canViewWODetails = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
+    $canAddPenalty = Auth::user()->hasPermissionForSelectedRole(['can-update-vehicle-penalty']);
+@endphp
+@if ($canViewPenaltyInfo)
 <body>
     <div class="card-header">
         <h4 class="card-title">Penalized Vehicles Info</h4>
@@ -92,10 +98,7 @@
                                             <i class="fa fa-bars" aria-hidden="true"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-start">
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
-                                                @endphp
-                                                @if ($hasPermission)
+                                                @if ($canViewWODetails)
                                                 <li>
                                                     <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-info" href="{{route('work-order.show',$data->workOrder->id ?? '')}}">
                                                     <i class="fa fa-eye" aria-hidden="true"></i> View Details
@@ -103,10 +106,7 @@
                                                 </li>
                                                 @endif
 
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-update-vehicle-penalty']);
-                                                @endphp
-                                                @if ($hasPermission)
+                                                @if ($canAddPenalty)
                                                     <a style="width:100%; margin-top:2px; margin-bottom:2px;" class="me-2 btn btn-sm btn-info d-inline-block" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updatePenaltyModal_{{$data->id}}">
                                                         <i class="fa fa-file" aria-hidden="true"></i> Update Penalty Info
                                                     </a>
@@ -285,5 +285,6 @@
     });
 </script>
 </body>
+@endif
 @endsection
 
