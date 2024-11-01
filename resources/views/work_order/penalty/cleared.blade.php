@@ -14,6 +14,10 @@
     </style>
 </head>
 @section('content')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penalty-report']);
+@endphp
+@if ($hasPermission)
 <body>
     <div class="card-header">
         <h4 class="card-title">Cleared Penalties Info</h4>
@@ -96,7 +100,7 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="9" class="text-center">No data history available.</td>
+                                <td colspan="15" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -119,5 +123,6 @@
     });
 </script>
 </body>
+@endif
 @endsection
 
