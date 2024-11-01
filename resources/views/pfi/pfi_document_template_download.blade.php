@@ -89,13 +89,13 @@
                 <span class="date"> {{ \Illuminate\Support\Carbon::now()->format('d/m/Y')}} </span>
             </p>
 
-            <p> Buyer : MILELE MOTORS <span  style="margin-left:180px;"> End user: </span>
+            <p  style="margin-bottom:8px;"> Buyer : MILELE MOTORS <span  style="margin-left:183px;"> End user: </span>
                 <span >{{ strtoupper(substr($pfi->customer->name, 0,15)) }} </span>
             </p>
-            <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:8px"> SAMARI RETAIL BLOC A</span>
+            <p style="margin-left:40px;margin-bottom:0px;margin-top-"> <span style="font-size:8px;font-wight:800px;"> SAMARI RETAIL BLOC A</span>
                 <span style="margin-left:220px;"> {{ strtoupper($pfi->country->name ?? '') }}</span>
             </p>
-            <p class="address" style="font-size:8px">RAS EL KHOR- DUBAI-UAE </p>
+            <p class="address" style="font-size:8px;font-wight:800px">RAS EL KHOR- DUBAI-UAE </p>
             <table id="pfi-items">
                 <tr>
                     <td>Description</td>
