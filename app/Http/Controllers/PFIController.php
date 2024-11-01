@@ -481,7 +481,7 @@ class PFIController extends Controller
         }else{
             $fileName = $fileName."_".time().'.pdf';
 
-            if($request->type == 'EDIT') {
+            if($request->type == 'EDIT' && $pfi->pfi_document_without_sign) {
                 $destinationPath = 'New_PFI_document_without_sign';
                 if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
                     \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
@@ -495,7 +495,10 @@ class PFIController extends Controller
                 $pfi->new_pfi_document_without_sign = $fileName;
 
             }else{
-
+                $filedestination = 'PFI_document_withoutsign';
+                if(!\Illuminate\Support\Facades\File::isDirectory($filedestination)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($filedestination, $mode = 0777, true, true);
+                }
                 $filePath = public_path('PFI_document_withoutsign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
                 $pfi->pfi_document_without_sign = $fileName;
