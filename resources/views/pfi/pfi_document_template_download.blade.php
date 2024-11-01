@@ -86,7 +86,7 @@
             </p>
 
             <p> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
-                <span style="margin-left:20px;">{{ strtoupper($pfi->customer->name ?? '') }} </span>
+                <span style="margin-left:20px;">{{ strtoupper(substr($pfi->customer->name, 0,15)) }} </span>
             </p>
             <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:9px"> SAMARI RETAIL BLOC A</span>
                 <span style="margin-left:245px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
@@ -152,7 +152,7 @@
             <p style="margin:0px"> Warranty :  </p>
             <p style="margin:0px"> Bank information :  </p>
             <p class="noraml-font" style="color:red"> ({{$pfi->currency}}) </p>
-            <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirat </p>
+            <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirates </p>
             <p class="noraml-font">IBAN: AE04 0440 0001 0123 821 0701 SWIFT: SCBLAEADXXX</p>
             <p style="margin:0px" >Remarks:</p>
             <p class="noraml-font">Delivery time mentioned is EXW Jebel Ali and is valid at the date of the proforma and is subject to prior sales.</p>
