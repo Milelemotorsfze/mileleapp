@@ -232,6 +232,9 @@
 								@if(isset($type) && in_array($type, ['export_cnf', 'all']))
 									<th rowspan="2" class="light">Cross Trade</th>
 								@endif
+								@if(isset($type) && in_array($type, ['local_sale', 'all']))
+									<th rowspan="2" class="light">LTO</th>
+								@endif
 								@if(isset($type) && in_array($type, ['export_exw', 'export_cnf', 'all']))
 									<th rowspan="2" class="light">Temporary Exit</th>
 									<th rowspan="2" class="light">Port Of Loading</th>
@@ -470,8 +473,11 @@
 									<td>@if($data->type == 'export_exw'){{ $data->delivery_advise ?? '' }}@endif</td>
 									<td>@if($data->type == 'export_exw'){{ $data->showroom_transfer ?? '' }}@endif</td>
 								@endif
-								@if(isset($type) && $type == 'export_cnf')
-									<td>{{ $data->cross_trade ?? '' }}</td>
+								@if(isset($type) && $type == 'export_cnf'|| $type == 'all')		
+									<td>@if($data->type == 'export_cnf') {{ $data->cross_trade ?? '' }} @endif</td>
+								@endif
+								@if(isset($type) && $type == 'local_sale'|| $type == 'all')		
+									<td>@if($data->type == 'local_sale') {{ $data->lto ?? '' }} @endif</td>
 								@endif
 								@if(isset($type) && in_array($type, ['export_exw', 'export_cnf', 'all']))
 									<td>{{ $data->temporary_exit ?? '' }}</td>

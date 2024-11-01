@@ -210,7 +210,7 @@ class WorkOrderController extends Controller
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
-                ,'sales_person_id','created_by','created_at','updated_at'
+                ,'sales_person_id','created_by','created_at','updated_at','lto'
             ]);
         })
         ->when($type === 'status_report', function ($queryStatusReport) {
@@ -250,7 +250,7 @@ class WorkOrderController extends Controller
                 'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at'
+                'sales_person_id','created_by','created_at','updated_at','lto'
             ]);
         })
         ->when($type !== 'all' && $type !== 'status_report', function ($queryType) use ($type) {
@@ -1407,6 +1407,12 @@ class WorkOrderController extends Controller
             }
             else {
                 $newData['cross_trade'] = 'no';
+            }
+            if(isset($request->lto)) {
+                $newData['lto'] = 'yes';
+            }
+            else {
+                $newData['lto'] = 'no';
             }
             // Extract full values for specific nested fields
             $nestedFields = [

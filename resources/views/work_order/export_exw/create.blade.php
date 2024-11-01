@@ -341,7 +341,13 @@
 									<input type="hidden" name="sales_person_id" value="{{ Auth::id() }}">
 								@endif
 							@endif
-
+							@if(isset($type) && $type == 'local_sale')
+							<div class="col-xxl-3 col-lg-3 col-md-3">
+								<label for="lto" class="col-form-label text-md-end">LTO</label></br>
+								<input type="checkbox" id="lto" name="lto" value="yes" class="custom-checkbox @error('lto') is-invalid @enderror" autocomplete="lto"
+										@if(isset($workOrder) && $workOrder->lto == 'yes') checked @endif>
+							</div>
+							@endif
 							<div class="col-xxl-4 col-lg-11 col-md-11">
 								<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
 								<input hidden id="customer_type" name="customer_type" value="existing">
