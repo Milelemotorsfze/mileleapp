@@ -484,7 +484,8 @@ Route::get('/d', function () {
     }); 
     Route::controller(VehiclePenaltyController::class)->group(function(){
         Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
-        Route::post('/vehicle-penalty-store', 'store')->name('penalty.store');
+        Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
     
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
