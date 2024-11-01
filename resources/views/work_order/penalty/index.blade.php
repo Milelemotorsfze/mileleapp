@@ -283,8 +283,48 @@
             console.log("No data available to initialize DataTable.");
         @endif        
     });
+    function validateForm(id) {
+        const totalPenalty = parseFloat(document.getElementById(`total_penalty_amount_${id}`).value);
+        const amountPaid = parseFloat(document.getElementById(`amount_paid_${id}`).value);
+        const errorElement = document.getElementById(`amount_paidError_${id}`);
+        
+        // Clear previous error message
+        errorElement.textContent = '';
+
+        if (amountPaid > totalPenalty) {
+            errorElement.textContent = "Amount Paid cannot exceed Total Penalty Amount.";
+            return false; // Prevent form submission
+        }
+
+        return true; // Allow form submission
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        // Define the daily penalty rate
+        const penaltyRate = 200;
+
+        // Attach an event listener to each payment_date field
+        document.querySelectorAll('[id^=payment_date]').forEach(function (dateInput) {
+            dateInput.addEventListener('change', function () {
+                const id = dateInput.id.match(/\d+/)[0]; // Extract the dynamic ID
+                const declarationDate = dateInput.getAttribute('data-declaration-date'); // Get the declaration date from data attribute
+                const paymentDate = new Date(dateInput.value);
+                const expiryDate = new Date(new Date(declarationDate).setDate(new Date(declarationDate).getDate() + 29));
+
+                // Calculate excess days
+                const excessDays = Math.max(0, Math.ceil((paymentDate - expiryDate) / (1000 * 60 * 60 * 24))) + 1;
+                
+                // Update the excess days and penalty amount fields
+                document.getElementById(`excess_days_${id}`).value = excessDays;
+                document.getElementById(`total_penalty_amount_${id}`).value = excessDays * penaltyRate;
+                document.getElementById(`amount_paid_${id}`).value = excessDays * penaltyRate;
+            });
+        });
+    });
 </script>
 </body>
 @endif
 @endsection
+
+
+            
 
