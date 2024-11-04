@@ -3,6 +3,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style>
+     #assignBy.select2-container {
+        width: 300px !important; /* Adjust the width as needed */
+    }
     #taskLogs {
     height: 400px;
     overflow-y: auto;
@@ -968,7 +971,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         const companyName = document.getElementById('company_name-field').innerText.trim();
         const phone = document.getElementById('phone-field').innerText.trim();
         const email = document.getElementById('email-field').innerText.trim();
-        if (!name || !companyName || !phone || !email) {
+        if (!name || !phone) {
             alert('Please ensure that Name, Company Name, Phone, and Email fields are filled out before marking as contacted.');
             return;
         }
@@ -1731,5 +1734,10 @@ $(document).ready(function() {
 function setTaskIdInModal(taskId) {
     $('#taskId').val(taskId);
 }
+</script>
+<script>
+    $(document).ready(function() {
+        $('#assignBy').select2();
+    });
 </script>
 @endsection

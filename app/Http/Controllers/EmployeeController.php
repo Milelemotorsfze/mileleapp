@@ -39,7 +39,6 @@ class EmployeeController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               info($e);
            }
         }
     }

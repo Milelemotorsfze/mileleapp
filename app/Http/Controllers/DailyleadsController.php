@@ -11,6 +11,7 @@ use App\Models\CallsRequirement;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ModelHasRoles;
 use App\Mail\TaskAssigned;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\LeadDocument;
 use App\Models\User;
@@ -827,7 +828,6 @@ public function saveprospecting(Request $request)
     }
     public function savefollowup(Request $request)
 	{
-        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
@@ -847,7 +847,6 @@ public function saveprospecting(Request $request)
 	}
     public function savefollowupdate(Request $request)
 	{
-        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
@@ -912,7 +911,7 @@ public function leaddetailpage($id)
     $brands = Brand::all();
     $countries = Country::get();
     $mastermodellines = MasterModelLines::all();
-    $users = User::all();
+    $users = User::where('status', 'Active')->get();
     $tasks = LeadsTask::where('lead_id', $id)->orderBy('created_at', 'desc')->get(); 
     $documents = LeadDocument::where('lead_id', $id)->get();
     $logs = DB::table('leads_log')
@@ -931,7 +930,14 @@ public function leaddeupdate(Request $request)
         'lead_id' => 'required|exists:calls,id',
     ]);
     $lead = Calls::find($request->lead_id);
+    $field = $request->field;
+    $oldValue = $lead->{$field};
     $lead->{$request->field} = $request->value;
+    $log = new LeadsLog();
+    $log->user_id = auth()->id();
+    $log->lead_id = $request->lead_id;
+    $log->activity = 'Updated "' . $field . '" from "' . $oldValue . '" to "' . $request->value . '"';
+    $log->save();
     $lead->save();
     return response()->json(['success' => true]);
 }
@@ -996,6 +1002,15 @@ public function storeMessages(Request $request)
     $modelLine->save();
     $modelLine = CallsRequirement::with(['masterModelLine.brand', 'country'])
         ->find($modelLine->id);
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->input('lead_id');
+        $log->activity = 'Added new model line with ID ' . $modelLine->id . 
+                         ' (Brand: ' . ($modelLine->masterModelLine->brand->brand_name ?? 'N/A') . 
+                         ', Model Line: ' . ($modelLine->masterModelLine->model_line ?? 'N/A') . 
+                         ', Trim: ' . $modelLine->trim . 
+                         ', Variant: ' . $modelLine->variant . ')';
+        $log->save();
     return response()->json([
         'id' => $modelLine->id,
         'brand' => $modelLine->masterModelLine->brand->brand_name ?? 'N/A',  // Returning brand name
@@ -1100,6 +1115,10 @@ public function storeLog(Request $request)
         $log->lead_id = $request->lead_id;
         $log->activity = 'Assigned new task to ' . ($assigner ? $assigner->name : 'Unknown') . ': "' . $request->task_message . '"';
         $log->save();
+        $leadLink = route('calls.leaddetailpage', ['id' => $request->lead_id]);
+        if ($assigner && $assigner->email) {
+            Mail::to($assigner->email)->send(new TaskAssigned($assigner, $request->task_message, $leadLink));
+        }
         return response()->json([
             'success' => true,
             'task' => $task,

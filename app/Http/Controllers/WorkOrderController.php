@@ -2270,7 +2270,6 @@ class WorkOrderController extends Controller
                     }
                 }
             }
-            info($canCreateCOOApproval);
             if($canCreateCOOApproval == true) {
                 if(!$hasEditConfirmedPermission) {
                     $cooPendingApprovals = WOApprovals::where('work_order_id',$workOrder->id)->where('type','coo')->where('status','pending')->first();

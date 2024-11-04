@@ -251,7 +251,6 @@ class MigrationDataCheckController extends Controller
                                         ->where('dealer', 'Milele Motors')
                                         ->where('vendor', $data->vendor)
                                         ->count();  
-                                        info("total count in po");
                                                     
 
           if($modelCountInventory < $modelCountPO)  {
@@ -397,7 +396,6 @@ class MigrationDataCheckController extends Controller
     }
     public function migratecustomerCountries() {
         $clients = Clients::where('is_demand_planning_customer', true)->get();
-      info($clients->count());
       foreach($clients as $client) {
         $clientCountry = new ClientCountry();
         $clientCountry->client_id = $client->id;

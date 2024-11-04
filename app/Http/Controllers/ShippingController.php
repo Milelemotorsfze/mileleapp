@@ -127,8 +127,8 @@ class ShippingController extends Controller
             $shippingdoc->created_by = Auth::id();
 
             $latestCode = ShippingDocuments::withTrashed()->orderBy('id', 'desc')->first();
-            info("shipping documnets");
-            info($latestCode);
+            // info("shipping documnets");
+            // info($latestCode);
             $code = $this->generateUUID($latestCode, $category);
             $shippingdoc->code = $code;
 

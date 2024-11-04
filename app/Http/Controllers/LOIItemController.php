@@ -98,7 +98,6 @@ class LOIItemController extends Controller
                         });
                 }
                 if(!empty($request->category)) {
-                    info($request->category);
                     $data->whereHas('LOI',function($query) use($request) {
                             $query->where('category', $request->category);
                         });

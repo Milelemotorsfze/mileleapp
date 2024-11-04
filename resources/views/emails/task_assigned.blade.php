@@ -4,11 +4,11 @@
     <title>New Task Assigned</title>
 </head>
 <body>
-    <h1>New Task Assigned</h1>
-    <p><strong>Assigned By:</strong> {{ $assignerName }}</p>
-    <p><strong>Client Name:</strong> {{ $clientName }}</p>
-    <p><strong>Client Phone:</strong> {{ $clientPhone }}</p>
-    <p><strong>Task Message:</strong> {{ $taskMessage }}</p>
+    <h1>Hello {{ $assigner->name }},</h1>
+    <p>You have a new task assigned:</p>
+    <p><strong>Task:</strong> {{ $taskMessage }}</p>
+    <p>To view the details, click on the link below:</p>
+    <a href="{{ $leadLink }}">View Lead</a>
     <p>Thank you!</p>
 </body>
 </html>

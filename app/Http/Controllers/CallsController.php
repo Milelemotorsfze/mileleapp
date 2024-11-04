@@ -1127,7 +1127,6 @@ public function checkExistenceupdatecalls(Request $request)
     $phone = $request->input('phone');
     $email = $request->input('email');
     $call_id = $request->input('call_id');
-    info($phone);
     if ($phone !== null) {
         $cleanedPhone = ltrim($phone, '+');
         $phoneCount = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->where('id', '<>', $call_id)->count();

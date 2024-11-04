@@ -454,9 +454,9 @@ class SupplierInventoryController extends Controller
                 
                 $DN_RECEIVED = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED);
                 if(!empty($uploadFileContent['delivery_note'])) {
-                    info($uploadFileContent['delivery_note']);
-                    info("DN VALUE");
-                    info($DN_WAITING);
+                    // info($uploadFileContent['delivery_note']);
+                    // info("DN VALUE");
+                    // info($DN_WAITING);
                     if($country == SupplierInventory::COUNTRY_BELGIUM) {
                         if ($DN_WAITING != 0 ) {
                             if ($DN_RECEIVED != 0) {
@@ -495,8 +495,8 @@ class SupplierInventoryController extends Controller
 
             $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
-            info($newModelsWithSteerings);
-            info($newModels);
+            // info($newModelsWithSteerings);
+            // info($newModels);
 
             if(count($newModels) > 0 || count($newModelsWithSteerings) > 0)
             {
@@ -545,8 +545,8 @@ class SupplierInventoryController extends Controller
 
 
                         $modelId = $model->id;
-                        info($uploadFileContent['model']);
-                        info($uploadFileContent['sfx']);
+                        // info($uploadFileContent['model']);
+                        // info($uploadFileContent['sfx']);
                         $modelIds = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->pluck('id')->toArray();
@@ -564,8 +564,8 @@ class SupplierInventoryController extends Controller
                                     ->orwhere('delivery_note', $deliveryNote);
                             });
                         //                       ->whereNull('delivery_note');
-                        info("supplier count");
-                        info($supplierInventories->count());
+                        // info("supplier count");
+                        // info($supplierInventories->count());
 
                         if ($supplierInventories->count() <= 0)
                         {
@@ -670,7 +670,7 @@ class SupplierInventoryController extends Controller
 
                                         ->first();
 
-                                    info($supplierInventory);
+                                    // info($supplierInventory);
 
                                     if (empty($supplierInventory)) {
                                         info("chasis matching row not avaialble, case of chasis updation ore new chaisi row add");
