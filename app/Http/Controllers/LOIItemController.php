@@ -100,7 +100,6 @@ class LOIItemController extends Controller
                         });
                 }
                 if(!empty($request->category)) {
-                    info($request->category);
                     $data->whereHas('LOI',function($query) use($request) {
                             $query->where('category', $request->category);
                         });
@@ -173,8 +172,7 @@ class LOIItemController extends Controller
                     });
                 }
                 if(!empty($request->loi_from_date && $request->loi_to_date)) {
-                    info($request->loi_from_date);
-                    info($request->loi_to_date);
+            
                     $data->whereHas('LOI',function($query) use($request) {
                         $query->whereBetween('date',  [$request->loi_from_date, $request->loi_to_date]);
                     });

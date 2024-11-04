@@ -26,7 +26,15 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-       
+       // chcek all pfi have pfiitems
+       $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+       foreach($allPfi as $pfi) { 
+        $pfiItems = PFIItem::where('pfi_id', $pfi->id)->where('is_parent', true)->get();
+        if($pfiItems->count() <= 0) {
+            return $pfi->id;
+        }
+       }
+       return "all pfi have pfi items";
         // $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
         // $notmatchingPfis = [];
         // foreach($allPfi as $pfi) { 
@@ -46,22 +54,7 @@ class MigrationDataCheckController extends Controller
         // // return $notmatchingPfis;
         // return "all PFI Amount is correct";
 
-        $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
-        $pfiNumbers = [];
-        foreach($allPfi as $pfi) {
-            $pfi = PFI::whereNot('id', $pfi->id)
-            ->where('pfi_reference_number', $pfi->pfi_reference_number)
-            ->whereYear('pfi_date', Carbon::now()->year)
-            ->get();
-
         
-            if($pfi->count() > 1) {
-               $pfiNumbers[] = $pfi->pfi_reference_number;
-               return $pfi->pfi_reference_number;
-            }
-        }
-        // return $pfiNumbers;
-        return "all opfi numebr is unique within the year";
     }
 
     public function PFIUniqueWithinYear() {

@@ -400,7 +400,6 @@ class LetterOfIndentController extends Controller
     
         $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                         ->where('is_trade_license',true)->first();
-                        // return $isCustomerTradeLicense;
         $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                                         ->where('is_passport', false)
                                         ->where('is_trade_license',false)
@@ -580,10 +579,6 @@ class LetterOfIndentController extends Controller
 
     }
 
-
-  
-  
-  
     // public function pdfMerge($letterOfIndentId)
     // {
     //     $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
@@ -616,7 +611,6 @@ class LetterOfIndentController extends Controller
     // }
 
     public function getCustomerDocuments(Request $request) {
-        // info($request->all());
 
         $client = Clients::find($request->client_id);
         $data = [];
@@ -814,9 +808,7 @@ class LetterOfIndentController extends Controller
                 //    if is_passport_added value 1 chcek passport is alredy existing or not , if not existing create new loi document
                 // if is_passport_added value 0 remove all the passport
                 if($request->is_passport_added == 1) {
-                    info("passport added or keep existing");
                     if(!$isCustomerPassport) {
-                        info("passport new added");
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->passport;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -827,21 +819,16 @@ class LetterOfIndentController extends Controller
                 }else if($request->is_passport_added == 2){
                     // value 2
                     // update new passport
-                    info("latest passport => update data");
                     if($isCustomerPassport) {
                         $isCustomerPassport->loi_document_file = $customer->passport;
                         $isCustomerPassport->save();
                     }                       
                  }else{
-                    // value 0
-                    info("no passport selected => delete data");
                     LetterOfIndentDocument::where('is_passport', true)
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
                 if($request->is_trade_license_added == 1 ) {
-                    // 
                     if(!$isCustomerTradeLicense) {
-                        // trade license added
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->tradelicense;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -850,9 +837,7 @@ class LetterOfIndentController extends Controller
                     }
                   
                 }else if($request->is_trade_license_added == 2){
-                    // value 2
                     // update new passport
-                    info("latest tradelicense => update data");
                     if($isCustomerTradeLicense) {
                         $isCustomerTradeLicense->loi_document_file = $customer->tradelicense;
                         $isCustomerTradeLicense->save();
@@ -891,7 +876,6 @@ class LetterOfIndentController extends Controller
                                 $latestUUIDNumber = substr($latestUUID, $offset, $length);
                                 $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
                                 $code =  $prefix.$newCode;
-                                info("New Code");
                             }else{
                                 $code = $prefix.'001';
                             }
@@ -903,7 +887,6 @@ class LetterOfIndentController extends Controller
                             $LOIItem->letter_of_indent_id = $LOI->id;
                             $LOIItem->master_model_id = $model->id ?? '';
                             $LOIItem->quantity = $quantity;
-                            // $LOIItem->uuid = $code;
                             $LOIItem->code = $code;
                             $LOIItem->save();
                         }

@@ -730,7 +730,6 @@ class SupplierController extends Controller
                 {
                     if(count($request->supplierAddon) > 0)
                     {
-                        // info($request->supplierAddon);
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
@@ -1433,8 +1432,6 @@ class SupplierController extends Controller
     }
     public function vendorUniqueCheck(Request $request)
     {
-        // dd('hi');
-        info($request->all());
 
         $contactNumber = $request->contact_number;
         if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
@@ -1462,7 +1459,6 @@ class SupplierController extends Controller
         }else{
             return response($data);
         }
-        // dd($data);
     }
     public function getVendorSubCategories(Request $request) {
         if($request->categories) {
