@@ -1045,13 +1045,9 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
-                  <th>Model Line</th>
-                  <th>Exterior Colour</th>
-                  <th>Interior Colour</th>
-                  <th>Model Year</th>
+                  <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
-                  <th>Description</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -2988,13 +2984,9 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         },
         { data: 'deal_value', name: 'quotations.deal_value' },
         { data: 'sales_notes', name: 'quotations.sales_notes' },
-        { data: 'model_line', name: 'master_model_lines.model_line' },
-        { data: 'exterior', name: 'exterior' },
-        { data: 'interior', name: 'interior' },
-        { data: 'modelyear', name: 'pre_orders_items.modelyear' },
         { data: 'qty', name: 'pre_orders_items.qty' },
+        { data: 'name', name: 'varaints.name' },
         { data: 'countryname', name: 'countryname' },
-        { data: 'description', name: 'pre_orders_items.description' },
         { data: 'status', name: 'status' },
     ],
     createdRow: function (row, data, dataIndex) {

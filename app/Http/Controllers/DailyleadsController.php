@@ -111,20 +111,15 @@ class DailyleadsController extends Controller
                     \DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as date_formatted"),
                     'quotations.deal_value as deal_value',
                     'quotations.sales_notes as sales_notes',
-                    'master_model_lines.model_line as model_line',
                     'pre_orders_items.qty',
-                    'pre_orders_items.description',
+                    'pre_orders_items.notes',
+                    'varaints.name',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior',
-                    'color_codes_interior.name as interior',
-                    'pre_orders_items.modelyear'
                 ])
                 ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
                 ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
-                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
                 ->where('quotations.created_by', $id)
                 ->groupby('pre_orders.id')
                 ->get();
