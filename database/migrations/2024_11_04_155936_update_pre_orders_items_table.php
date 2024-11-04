@@ -32,7 +32,7 @@ class UpdatePreOrdersItemsTable extends Migration
             $table->unsignedBigInteger('variant_id')->nullable();
 
             // Optionally, add a foreign key constraint for variant_id if you want to link it to the variants table
-            $table->foreign('variant_id')->references('id')->on('variants')->onDelete('set null');
+            $table->foreign('variant_id')->references('id')->on('varaints')->onDelete('set null');
         });
     }
 
