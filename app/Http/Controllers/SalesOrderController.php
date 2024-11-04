@@ -45,7 +45,7 @@ class SalesOrderController extends Controller
             if($status === "SalesOrder")
             {
                 $id = Auth::user()->id;
-                info($id);
+                // info($id);
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         if($hasPermission)
         {

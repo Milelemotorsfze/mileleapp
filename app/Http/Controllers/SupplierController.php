@@ -1434,7 +1434,7 @@ class SupplierController extends Controller
     public function vendorUniqueCheck(Request $request)
     {
         // dd('hi');
-        info($request->all());
+        // info($request->all());
 
         $contactNumber = $request->contact_number;
         if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {

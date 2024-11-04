@@ -190,11 +190,9 @@ class PreOrderController extends Controller
             $pre_orders_items = $request->input('Preorder_id_input');
             $notes = $request->input('notes');
             foreach ($polist as $po_number) {
-                info($po_number);
                 $poNumbers = PurchasingOrder::where('po_number', $po_number)->first();
                 if ($poNumbers) {
                     $poid = $poNumbers->id; 
-                    info($poid);
                     $preOrderPos = new PreOrderPos();
                     $preOrderPos->purchasing_order_id = $poid;
                     $preOrderPos->pre_orders_items_id = $pre_orders_items;

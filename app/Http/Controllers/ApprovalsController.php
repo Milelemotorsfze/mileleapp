@@ -456,7 +456,6 @@ class ApprovalsController extends Controller
         {
             $approvalRequest = VehicleApprovalRequests::where('inspection_id', $inspection_id)->where('field', 'Variant Change')->firstOrFail(); 
         }
-        info($approvalRequest);
         if($approvalRequest)
         {
             $approvalRequest->field = "Variant Change";
@@ -1104,7 +1103,6 @@ class ApprovalsController extends Controller
         $incidentData = Incident::select('reason', 'driven_by', 'detail', 'narration', 'type', 'responsivity', 'file_path')
         ->where('inspection_id', $vehicleId)
         ->first();
-        info($incidentData);
         return response()->json([
             'routineInspectionData' => $routineInspectionData,
             'additionalInfo' => $additionalInfo,
@@ -1290,14 +1288,12 @@ class ApprovalsController extends Controller
         }
         foreach ($updatedData as $data) {
             $routineInspection = RoutineInspection::where('check_items', $data['check_items'])->where('inspection_id', $inspectionid)->first();
-            info($routineInspection);
             if ($routineInspection) {
                 $routineInspection->condition = $data['condition'];
                 $routineInspection->remarks = $data['remarks'];
                 $routineInspection->save();
             }
         }
-        info($incidentData);
         if (!empty($incidentData)) {
             $incident = Incident::where('inspection_id', $inspectionid)->first();
             if ($incident) {
@@ -1475,7 +1471,6 @@ public function submitGrn(Request $request)
         // Retrieve the vehicle by ID
         $vehicle = Vehicles::find($request->vehicle_id);
         if (!$vehicle) {
-            info("pouch");
             return response()->json([
                 'success' => false,
                 'message' => 'Vehicle not found',
@@ -1628,7 +1623,6 @@ public function submitGdn(Request $request)
         // Retrieve the vehicle by ID
         $vehicle = Vehicles::find($request->vehicle_id);
         if (!$vehicle) {
-            info("pouch");
             return response()->json([
                 'success' => false,
                 'message' => 'Vehicle not found',
@@ -1636,7 +1630,6 @@ public function submitGdn(Request $request)
         }
         // Retrieve the GRN record by grn_id in the vehicle record
         $gdnRecord = Gdn::find($vehicle->gdn_id);
-        info($vehicle->grn_id);
         if (!$gdnRecord) {
             return response()->json([
                 'success' => false,

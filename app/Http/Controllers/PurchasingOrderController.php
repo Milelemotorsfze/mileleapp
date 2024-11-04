@@ -1681,7 +1681,7 @@ public function checkcreatevins(Request $request)
                     }
                 }
             }
-            info($changes);
+            // info($changes);
             if (!empty($changes)) {
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -1753,7 +1753,7 @@ public function checkcreatevins(Request $request)
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
                 if ($purchasingOrder) {
-                    info($fieldName);
+                //    info ($fieldName);
 //                    check the po is under demand planning
 
                     $loiPurchasingOrder = LOIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
@@ -2438,7 +2438,7 @@ public function paymentreleasesconfirm($id)
 public function paymentreleasesrejected(Request $request, $id)
 {
 
-    info($id);
+    // info($id);
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
@@ -2745,19 +2745,19 @@ public function purchasingallupdateStatusrel(Request $request)
                                     ->pluck('approved_loi_id');
 
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-                info($loiItemIds);
+                // info($loiItemIds);
                 $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-                info($possibleIds);
+                // info($possibleIds);
 
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    info($item);
+                    // info($item);
                     if(in_array($item->master_model_id, $possibleIds)) {
-                        info("master model id including li item");
+                        // info("master model id including li item");
                         if($item->utilized_quantity < $item->approved_quantity) {
-                            info("total quantity < utilized_quantity");
+                            // info("total quantity < utilized_quantity");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
 
@@ -3060,7 +3060,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $paymentOrder->status = 'Initiated Payment';
         $paymentOrder->save();
     }
-    info($paymentOrderStatus);
+    // info($paymentOrderStatus);
 }
             $currency = $purchasedorder->currency;
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
@@ -3577,7 +3577,7 @@ public function rerequestpayment(Request $request)
                   ->orWhere('payment_status', 'Payment Release Rejected');
         })
         ->get();
-    info($vehicles);
+    // info($vehicles);
     foreach ($vehicles as $vehicle) {
         if ($vehicle->payment_status == 'Payment Release Rejected') {
             $status = 'Payment Requested';
@@ -3964,7 +3964,6 @@ public function storeMessages(Request $request)
             'user_id' => auth()->id(),
             'message' => $request->message
         ]);
-
         return response()->json($message->load('user'));
     }
     public function storeReply(Request $request)
@@ -4281,7 +4280,7 @@ public function requestAdditionalPayment(Request $request)
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
             $PurchasingOrder = PurchasingOrder::where('id', $id)->first();
-            info($PurchasingOrder);
+            // info($PurchasingOrder);
             $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
         if ($supplieracc) {
             $paymentad = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
@@ -4473,7 +4472,7 @@ public function submitPaymentDetails(Request $request)
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
         $remarks = $request->input('remarks');
-        info($remarks);
+        // info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         // Get purchase order details
         $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
@@ -5193,7 +5192,7 @@ public function getSwiftDetails($id)
             'bank_name' => $bankMaster->bank_name ?? 'N/A',
         ];
 
-        info($swiftDetails);
+        // info($swiftDetails);
         return response()->json(['success' => true, 'data' => $swiftDetails]);
     } catch (\Exception $e) {
         Log::error('Failed to fetch swift details', ['error' => $e->getMessage()]);
@@ -5232,7 +5231,7 @@ public function paymentconfirm(Request $request)
     if ($type == 'full') {
         $dnNumber = $request->input('dnNumber');
 
-        info($vehicleId);
+        // info($vehicleId);
     } else if ($type == 'vehicle') {
         $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
     $batchNumber = 1;

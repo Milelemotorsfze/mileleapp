@@ -110,7 +110,6 @@ class VehicleInvoiceController extends Controller
             $qtyArray = $request->input('qty');
             $unitPriceArray = $request->input('unit_price');
             $vehicleIds = $request->input('vehicle_id');
-            info($qtyArray);
             foreach ($vehicleIds as $index => $vehicleId) {
                 $vehicleInvoiceItem = new VehicleInvoiceItem();
                 $vehicleInvoiceItem->vehicle_invoice_id = $vehicleInvoice->id;

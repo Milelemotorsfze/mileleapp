@@ -9,7 +9,6 @@ class WebhookController extends Controller
 {
     public function sendMessage()
     {
-        info("waqar");
         $client = new Client();
         $url = 'https://graph.facebook.com/v17.0/172819319256290/messages';
         $accessToken = 'EAAkfJDAbFEQBO6oGJCTtp6YcZAM8haur5B2oDHyY0vLZCyTmF1a6ALWfkyE0cO9kwKs35ZBfIVi3y5LP30dgkKJ0v6BoF19SoVWZAZAs2nI7sUwuZCXrshVqDeAPJ8W4KHOP4EtsZAtHunDoITSgzna4JTEcMWZA1Y4zXAZBxMwkQ3q61xLZCNeZCuMh3shzhLi7WMx78cCvZCit3KkG9iIf5AiNxwZDZD';

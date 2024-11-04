@@ -1616,7 +1616,6 @@ class VehiclesController extends Controller
                     }
                 }
                 if (!empty($changes)) {
-                    info($fieldValue);
                     // Save approval log if the old value is null and the new value is not null
                     if ($fieldValue !== null) {
                         // Update the field in the 'Vehicles' table with the new value
@@ -1666,7 +1665,6 @@ class VehiclesController extends Controller
             $soId = $vehicle->so_id;
             if ($soId)
             {
-                info("soid existing");
                 $so = So::find($soId);
                 if(!empty($so->so_number)) {
                     if($so->so_number != $request->so_numbers[$key])
@@ -2082,7 +2080,6 @@ class VehiclesController extends Controller
 
             }
             if($vehicle->conversion != $request->conversions[$key]) {
-                info("conversion is changed");
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
                 $vehicleslog->date = $currentDateTime->toDateString();
@@ -2642,7 +2639,6 @@ public function viewalls(Request $request)
                 $salespersonName = $vehicle->so->salesperson->name;
             }
             $vehicle->salespersonname = $salespersonName;
-            info($vehicle);
             return $vehicle;
         });
         return response()->json($vehicles);
@@ -2692,7 +2688,6 @@ public function viewalls(Request $request)
             $salespersonName = $vehicle->so->salesperson->name;
         }
         $vehicle->salespersonname = $salespersonName;
-    info($vehicle);
         return response()->json($vehicle);
     }
     public function statuswise(Request $request)
@@ -3184,7 +3179,6 @@ if (!$vehicle) {
 $oldValue = $vehicle->{$request->field};
 $field = $request->field;
 $value = $request->value;
-info($field);
 if ($field == 'price') {
     $value = str_replace(',', '', $value);
 }
@@ -3228,14 +3222,12 @@ return response()->json(['success' => 'Vehicle updated successfully']);
         ->where('id', $vehicle_id)
         ->whereDate('reservation_end_date', '>=', Carbon::today())
         ->first();
-        info($reservation);
     return response()->json($reservation);
 }
 public function saveenhancement(Request $request)
     {
         $vehicleId = $request->input('vehicle_id');
         $variantId = $request->input('variant_id');
-        info($vehicleId);
         $vehicle = Vehicles::find($vehicleId);
         $oldValue = $vehicle->varaints_id;
         if ($vehicle) {
@@ -3305,7 +3297,6 @@ public function saveenhancement(Request $request)
         $vehicleId = $request->input('vehicle_id');
         $int_color = $request->input('int_color_dropdown');
         $ext_color = $request->input('ext_color_dropdown');
-        info($int_color);
         $vehicle = Vehicles::find($vehicleId);
         $oldValueint = $vehicle->int_colour;
         $oldValueex = $vehicle->ex_colour;

@@ -65,7 +65,7 @@ class StockMessageController extends Controller
     }
     public function stockgetMessages($vehicleId)
     {
-        info("new pouch");
+        // info("new pouch");
         $messages = StockMessage::where('vehicle_id', $vehicleId)
                     ->with('user', 'replies.user') // Load user and replies with user
                     ->get();

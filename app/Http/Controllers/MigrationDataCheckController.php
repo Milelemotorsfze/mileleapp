@@ -377,7 +377,6 @@ class MigrationDataCheckController extends Controller
                                         ->where('dealer', 'Milele Motors')
                                         ->where('vendor', $data->vendor)
                                         ->count();  
-                                        info("total count in po");
                                                     
 
           if($modelCountInventory < $modelCountPO)  {

@@ -157,8 +157,6 @@ public function store(Request $request)
         foreach ($selectedData as $item) {
         $vehicleId = $item['vehicleId'];
         $days = $item['days'];
-        info('Vehicle ID: ' . $vehicleId);
-        info('Days: ' . $days);
             BookingRequest::create([
                 'date' => $date,
                 'status' => "New",
@@ -182,7 +180,6 @@ public function store(Request $request)
     if ($request->ajax()) {
         $status = $request->input('status');
         $searchValue = $request->input('search.value');
-        info($searchValue);
         if($status === "New")
         {
         $data = BookingRequest::select([
@@ -496,7 +493,6 @@ public function approval(Request $request)
         $status = $request->input('status');
         $reason = $request->input('reason');
         $bookingRequest = BookingRequest::find($id);
-        info($id);
         $today = now();
         if($status === "Approved"){
         $vehicle_id = $bookingRequest->vehicle_id;
@@ -544,7 +540,6 @@ public function approval(Request $request)
     }
     public function checkingso(Request $request) {
         $callId = $request->input('call_id');
-        info($callId);
         $rowExists = Closed::where('call_id', $callId)->exists();
         if ($rowExists) {
             $closedRow = Closed::where('call_id', $callId)->first();
@@ -563,7 +558,6 @@ public function approval(Request $request)
         $useractivities->save();
         $id = $request->input('id');
         $days = $request->input('days');
-        info($id);
         $reason = $request->input('reason');
         BookingExtended::create([
             'booking_id' => $id,
@@ -628,7 +622,6 @@ public function approval(Request $request)
     }
     public function storedirect(Request $request)
     {
-        info("waqar");
     $validatedData = $request->validate([
         'vehicle_id' => 'required|exists:vehicles,id',
         'booking_start_date' => 'required|date',
