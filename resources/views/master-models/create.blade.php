@@ -88,7 +88,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">Model Description</label>
+                        <label class="form-label">PFI Model Description</label>
                         <input type="text" class="form-control" name="model_description" placeholder="Model Description">
                    </div>
                 </div>
@@ -363,7 +363,6 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
-                    console.log(data);
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{

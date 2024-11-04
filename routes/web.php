@@ -486,7 +486,8 @@ Route::get('/d', function () {
     }); 
     Route::controller(VehiclePenaltyController::class)->group(function(){
         Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
-        Route::post('/vehicle-penalty-store', 'store')->name('penalty.store');
+        Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
     
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
@@ -516,8 +517,10 @@ Route::get('/d', function () {
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
-    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
-        ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
+        ->name('letter-of-indent.request-approval');
+    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
+    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
@@ -525,20 +528,21 @@ Route::get('/d', function () {
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
-    Route::resource('letter-of-indent-items', LOIItemController::class);
+    Route::resource('letter-of-indent-items', LOIItemController::class)->only('index');
     
     Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
                 ->name('letter-of-indents.status-update'); 
     Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
     ->name('letter-of-indents.loi-expiry-status-update'); 
     Route::get('loi/get-customer-documents', [LetterOfIndentController::class,'getCustomerDocuments'])->name('loi.customer-documents');
+    Route::get('loi/get-is-editable', [LetterOfIndentController::class,'getIsLOIEditable'])->name('loi.get-is-editable');
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
-    Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
+    // Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
     Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');

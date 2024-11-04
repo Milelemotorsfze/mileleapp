@@ -1,9 +1,8 @@
 @if(isset($workOrder))
     @php
-        // If total_number_of_boe is 0, consider it as 1
         $boeCount = $workOrder->total_number_of_boe == 0 ? 1 : $workOrder->total_number_of_boe;
-        $woNumber = $workOrder->wo_number; // Capture the work order number
-        $boeData = $workOrder->boe ?? []; // Get BOE data if available
+        $woNumber = $workOrder->wo_number; 
+        $boeData = $workOrder->boe ?? []; 
     @endphp
 
     @if($workOrder->sales_support_data_confirmation_at != '' && $workOrder->finance_approval_status == 'Approved' && $workOrder->coo_approval_status == 'Approved')
@@ -14,7 +13,6 @@
 			<a class="me-2 btn btn-sm btn-info" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateDocStatusModal">
             <i class="fa fa-file" aria-hidden="true"></i> Update Doc Status
             </a>
-            <!-- Modal -->
             <div class="modal fade" id="updateDocStatusModal" tabindex="-1" aria-labelledby="updateDocStatusModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -24,7 +22,6 @@
                         </div>
                         <div class="modal-body">
                             <form id="docStatusForm">
-                                <!-- Radio buttons for doc status -->
                                 <div class="d-flex justify-content-between">
                                     <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                                         <input class="form-check-input me-1" type="radio" name="docStatus" id="docStatusNotInitiated" value="Not Initiated" {{ $workOrder->docs_status == 'Not Initiated' ? 'checked' : '' }}>
@@ -42,20 +39,17 @@
                                     </div>
                                 </div>
 
-                                <!-- Comment section -->
                                 <div class="mb-3 mt-3">
                                     <label for="docComment" class="form-label">Add Comment:</label>
                                     <textarea class="form-control" id="docComment" name="docComment" rows="3"></textarea>
                                     <span id="docCommentError" class="text-danger"></span>
                                 </div>
 
-                                <!-- Dynamic BOE and Declaration Fields -->
                                 <div id="boeFields">
                                     @for($i = 0; $i < $boeCount; $i++)
                                         @php
-                                            // Handle both the case where BOE data exists and where it doesn't
                                             $boeNumber = sprintf("%s-BOE%02d", $woNumber, $i+1);
-                                            $boeInfo = $boeData[$i] ?? null; // Use BOE data if available
+                                            $boeInfo = $boeData[$i] ?? null; 
                                         @endphp
                                         <div class="boe-set mb-3">
                                             <div class="row">
@@ -92,21 +86,17 @@
 
 @if(isset($workOrder))
 <script type="text/javascript">
-    // Function to toggle the display of Declaration Fields based on the selected status
     function toggleDeclarationFields() {
-        // Check if any radio button is selected
         const selectedStatusElement = document.querySelector('input[name="docStatus"]:checked');
         
-        // Handle case where no radio button is selected
         if (!selectedStatusElement) {
             console.error('No radio button is selected or present.');
-            return; // Exit the function if no radio button is selected
+            return; 
         }
         
         const selectedStatus = selectedStatusElement.value;
         const declarationFields = document.getElementById('boeFields');
 
-        // Show BOE and Declaration fields only if the status is "Ready"
         if (selectedStatus === 'Ready') {
             declarationFields.style.display = 'block';
         } else {
@@ -114,27 +104,25 @@
         }
     }
 
-    // Ensure that the fields are shown/hidden correctly when the modal is opened
     document.addEventListener('DOMContentLoaded', function() {
-        toggleDeclarationFields(); // Trigger field visibility check based on pre-selected status
+        $('#updateDocStatusModal').on('shown.bs.modal', function () {
+            toggleDeclarationFields(); 
+        });
     });
 
-    // Event listener for radio button changes
     document.querySelectorAll('input[name="docStatus"]').forEach((radio) => {
         radio.addEventListener('change', toggleDeclarationFields);
     });
 
     function submitDocStatus(workOrderId, woNumber) {
-        // Clear previous errors
         document.querySelectorAll('.text-danger').forEach(function(span) {
-            span.textContent = ''; // Clear all error messages
+            span.textContent = ''; 
         });
 
-        // Check for radio button selection before proceeding
         const selectedStatusElement = document.querySelector('input[name="docStatus"]:checked');
         if (!selectedStatusElement) {
             alertify.error('Please select a documentation status.');
-            return; // Prevent form submission if no status is selected
+            return; 
         }
 
         const selectedStatus = selectedStatusElement.value;
@@ -144,7 +132,6 @@
         let valid = true;
         boeFields.forEach((boeSet, index) => {
             const declarationNumber = document.getElementById(`declarationNumber_${index}`).value;
-            // If Declaration Number is provided, validate it: it must be 13 digits and positive
             if (declarationNumber && (!/^\d{13}$/.test(declarationNumber) || parseInt(declarationNumber) <= 0)) {
                 document.getElementById(`declarationNumberError_${index}`).textContent = 'Please enter a valid 13-digit positive Declaration Number.';
                 valid = false;
@@ -158,17 +145,15 @@
             });
         });
         if (!valid) {
-            return; // Stop form submission if there are validation errors
+            return; 
         }
 
         const comment = document.getElementById('docComment').value;
 
-        // Display confirmation dialog
         alertify.confirm(
             'Confirmation Required',
             `Are you sure you want to update the documentation status for work order ${woNumber} to ${selectedStatus}?`,
-            function() { // If the user clicks "OK"
-                // Perform the AJAX request to update the status
+            function() { 
                 $.ajax({
                     url: '/update-wo-doc-status',
                     method: 'POST',
@@ -177,19 +162,19 @@
                         status: selectedStatus,
                         comment: comment,
                         boeData: boeData,
-                        _token: '{{ csrf_token() }}' // Laravel CSRF token
+                        _token: '{{ csrf_token() }}' 
                     },
                     success: function(response) {
                         alertify.success(response.message);
                         $('#updateDocStatusModal').modal('hide');
-                        location.reload(); // Reload the page after success
+                        location.reload(); 
                     },
                     error: function(xhr) {
                         alertify.error('Failed to update status');
                     }
                 });
             },
-            function() { // If the user clicks "Cancel"
+            function() { 
                 alertify.error('Action canceled');
             }
         );

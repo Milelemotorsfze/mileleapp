@@ -39,6 +39,9 @@
         margin-top:1px;
         font-size:10px;
     }
+    .sfx-width{
+        min-width:30px !important;
+    }
     .cps-img{
         margin-left:0px;
         width:100px !important;
@@ -107,18 +110,18 @@
                     <span class="date"> {{ \Illuminate\Support\Carbon::now()->format('d/m/Y')}} </span>
                 </p>
 
-                <p> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
-                    <span style="margin-left:20px;">{{ strtoupper($pfi->customer->name ?? '') }} </span>
+                <p style="margin-bottom:8px;"> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
+                    <span style="margin-left:15px;">{{ strtoupper(substr($pfi->customer->name, 0, 15)) }} </span>
                 </p>
                 <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:10px;font-weight:bold"> SAMARI RETAIL BLOC A</span>
-                    <span style="margin-left:245px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
+                    <span style="margin-left:295px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
                 </p>
                 <p class="address fw-bold">RAS EL KHOR- DUBAI-UAE </p>
                 <table id="pfi-items">
                     <tr>
                         <td>Description</td>
                         <td>Product Code</td>
-                        <td></td>
+                        <td class="sfx-width"></td>
                         <td>Availability</td>
                         <td>Quantity</td>
                         <td>Unit Price</td>
@@ -127,8 +130,8 @@
                     @foreach($pfiItems as $pfiItem)
                         <tr>
                             <td>{{ $pfiItem->masterModel->model_description ?? ''}}</td>
-                            <td>{{ $pfiItem->masterModel->pfi_model ?? '' }}</td>
-                            <td>{{ $pfiItem->masterModel->pfi_sfx ?? '' }}</td>
+                            <td>{{ $pfiItem->masterModel->pfi_model ?? $pfiItem->masterModel->model }}</td>
+                            <td>{{ $pfiItem->masterModel->pfi_sfx ?? $pfiItem->masterModel->sfx }}</td>
                             <td style="font-weight:normal">Stock</td>
                             <td>{{ $pfiItem->pfi_quantity }}</td>
                             <td style="width:80px">{{ $pfi->currency }} {{ number_format($pfiItem->unit_price)}}</td>
@@ -174,13 +177,13 @@
                 <p style="margin:0px"> Warranty :  </p>
                 <p style="margin:0px"> Bank information :  </p>
                 <p class="noraml-font" style="color:red"> ({{$pfi->currency}}) </p>
-                <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirat </p>
+                <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirates </p>
                 <p class="noraml-font">IBAN: AE04 0440 0001 0123 821 0701 SWIFT: SCBLAEADXXX</p>
                 <p style="margin:0px" >Remarks:</p>
                 <p class="noraml-font">Delivery time mentioned is EXW Jebel Ali and is valid at the date of the proforma and is subject to prior sales.</p>
                 <p class="noraml-font">Prohibition of resale after arrival in <span style="padding-left:30px"> {{ strtoupper($pfi->country->name ?? '')}} </sapn></p>
                 <p class="noraml-font">Copies of original B/L must be submitted to AMS ME</p>
-                <p style="margin:0px">We remain at your disposal for further information</p>
+                <p style="margin:0px">We remain at your disposal for further information.</p>
                 <P style="text-align: center;bottom: 0;font-weight:normal;margin-top:100px">
                     AMS ME FZE - Office 1519, 15th Floor, Tower A, JAFZA ONE, Gate 5, Jebel Ali Free Zone - PO Box 17879 - Dubai - UAE
 

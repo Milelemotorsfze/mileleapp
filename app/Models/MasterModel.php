@@ -36,6 +36,10 @@ class MasterModel extends Model
     {
         return $this->belongsTo(MasterModelLines::class,'master_model_line_id','id');
     }
+    public function TTCApprovalCountry()
+    {
+        return $this->hasMany(CountryTTCApprovalModel::class);
+    }
     public function getIsDeletableAttribute() {
 
         $isExistinInventory = SupplierInventory::where('master_model_id', $this->id)->count();

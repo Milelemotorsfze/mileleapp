@@ -1,9 +1,5 @@
-<!-- <link href="https://ichord.github.io/At.js/dist/css/jquery.atwho.css" rel="stylesheet"> -->
 <link href="{{ asset('css/custom/jquery.atwho.css') }}" rel="stylesheet">
-<!-- <script src="https://ichord.github.io/Caret.js/src/jquery.caret.js"></script> -->
 <script src="{{ asset('js/custom/jquery.caret.js') }}"></script>
-<!-- Include At.js -->
-<!-- <script src="https://ichord.github.io/At.js/dist/js/jquery.atwho.min.js"></script> -->
 <script src="{{ asset('js/custom/jquery.atwho.min.js') }}"></script>
 <style>
     .file-preview {
@@ -43,6 +39,13 @@
     .hover-options button i {
         pointer-events: none;
     }
+    .reply {
+		margin-left: 30px; 
+		margin-top: 10px;
+	}
+    .replies {
+		margin-left: 30px; 
+	}
     .reply-button {
         margin-left:10px;
     }
@@ -74,10 +77,9 @@
     function previewFiles(files, previewContainerId, commentId) {
         const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf'];
         const previewContainer = document.getElementById(previewContainerId);
-        previewContainer.innerHTML = ''; // Clear previous previews
+        previewContainer.innerHTML = ''; 
 
         for (const file of files) {
-            // Check if the file type is allowed
             if (!allowedFileTypes.includes(file.type)) {
                 alert('Invalid file type. Only JPG, JPEG, PNG, and PDF files are allowed.');
                 continue;
@@ -87,7 +89,7 @@
             reader.onload = function(e) {
                 const preview = document.createElement('div');
                 preview.classList.add('file-preview', 'm-1');
-                preview.dataset.commentId = commentId; // Add commentId as a data attribute
+                preview.dataset.commentId = commentId; 
 
                 if (file.type.startsWith('image/')) {
                     preview.innerHTML = `
@@ -145,32 +147,27 @@
 
         if (commentText.trim() === '' && commentFiles.length === 0) return;
 
-        // Extract mentioned user IDs using a regular expression
         const mentionedUserIds = [];
         const mentionPattern = /@(\w+)/g;
         let match;
         while ((match = mentionPattern.exec(commentText)) !== null) {
-            mentionedUserIds.push(match[1]); // Push the user ID or username
+            mentionedUserIds.push(match[1]); 
         }
-        // Disable the submit button to prevent multiple submissions
         const submitButton = parentId ? $(`#reply-form-${parentId} .btn-primary`) : $('#addCommentStyle');
         submitButton.prop('disabled', true);
 
-         // Check file sizes before appending them to FormData
-        const maxFileSize = 2048 * 1024; // 2048 KB in bytes
-        for (const file of commentFiles) { // Changed from filesInput to commentFiles
+        const maxFileSize = 2048 * 1024; 
+        for (const file of commentFiles) { 
             if (file.size > maxFileSize) {
                 alert(`The file ${file.name} exceeds the 2MB size limit.`);
-                submitButton.prop('disabled', false); // Re-enable the submit button if validation fails
+                submitButton.prop('disabled', false); 
                 return;
             }
         }
         const currentDateTime = new Date();
         const formattedDateTime = formatDateTime(currentDateTime);
-        // Assume base URL is available as a constant
         const baseUrl = '{{env('BASE_URL')}}';
 
-        // Get the authenticated user's image path dynamically or fall back to 'OIP.jpg' if not available
         const userProfileImage = "{{ Auth::user()->empProfile && Auth::user()->empProfile->image_path ? Auth::user()->empProfile->image_path : 'images/users/OIP.jpg' }}";
 
         const filePreviewsHtml = Array.from(commentFiles).map(file => {
@@ -260,18 +257,15 @@
 
             commentIdCounter++;
 
-            // Re-enable the submit button after operation is complete
             submitButton.prop('disabled', false);
         }).catch(error => {
             console.error('Error processing files:', error);
-            // Re-enable the submit button in case of an error
             submitButton.prop('disabled', false);
         });
     }
     function showReplyForm(commentId) {
         $(`#reply-form-${commentId}`).toggle();
 
-        // Add event listener for reply file input
         $(`#reply-files-${commentId}`).off('change').on('change', function() {
             previewFiles(this.files, `reply-previews-${commentId}`);
         });

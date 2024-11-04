@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\MasterModel;
 use App\Models\Clients;
+use App\Models\PFI;
+use App\Models\PfiItem;
+use App\Models\Supplier;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiTemplate;
@@ -12,6 +15,7 @@ use App\Models\ClientCountry;
 use App\Models\LetterOfIndentDocument;
 use Illuminate\Support\Facades\File;
 use App\Models\ClientDocument;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 
@@ -19,14 +23,215 @@ class MigrationDataCheckController extends Controller
 {
     /**
      * To chcek pfi qty is <= LOI item qty.
-     */
+      */
+    public function index(Request $request)
+    {
+       
+        // $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+        // $notmatchingPfis = [];
+        // foreach($allPfi as $pfi) { 
+        //     $pfiSum = DB::table('pfi_items')
+        //         ->where('pfi_id', $pfi->id)
+        //         ->where('is_parent', true)
+        //         ->select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))->first(); 
 
+        //         if($pfiSum->total != $pfi->amount) {
+        //             $notmatchingPfis[] = $pfi->id;
+        //             // info($pfiSum->total);
+        //             // info($pfi->amount);
+        //             return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
+        
+        //         }
+        // }
+        // // return $notmatchingPfis;
+        // return "all PFI Amount is correct";
+
+        $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
+        $pfiNumbers = [];
+        foreach($allPfi as $pfi) {
+            $pfi = PFI::whereNot('id', $pfi->id)
+            ->where('pfi_reference_number', $pfi->pfi_reference_number)
+            ->whereYear('pfi_date', Carbon::now()->year)
+            ->get();
+
+        
+            if($pfi->count() > 1) {
+               $pfiNumbers[] = $pfi->pfi_reference_number;
+               return $pfi->pfi_reference_number;
+            }
+        }
+        // return $pfiNumbers;
+        return "all opfi numebr is unique within the year";
+    }
+
+    public function PFIUniqueWithinYear() {
+         // chcek pfinumber is unique within the year
+         $allPfi = PFI::select('id','pfi_reference_number','pfi_date','amount')->get();
+         $pfiNumbers = [];
+         foreach($allPfi as $pfi) {
+             $pfi = PFI::whereNot('id', $pfi->id)
+             ->where('pfi_reference_number', $pfi->pfi_reference_number)
+             ->whereYear('pfi_date', Carbon::now()->year)
+             ->get();
+ 
+         
+             if($pfi->count() > 1) {
+                $pfiNumbers[] = $pfi->pfi_reference_number;
+             }
+         }
+         // return $pfiNumbers;
+         return "all opfi numebr is unique within the year";
+         // Ok - local
+    }
+    public function PFIItemqutycheckwithLOIItem() {
+        // maximum quantity not exceeded check
+
+        $quantityExceededPfi = [];
+        $pfiItems = PFIItem::where('is_parent', false)->get();
+        foreach($pfiItems as $pfiItem){
+            // chcek each pfi item pfi quantity is less the or equal to LOI Item quantity.
+            if($pfiItem->LOIItem) {
+              if($pfiItem->LOIItem->quantity > $pfiItem->pfi_quantity) {
+                  $quantityExceededPfi[] = $pfiItem->pfi->id;
+                  return $pfiItem->pfi->id;
+              }
+            }
+          
+        }
+
+        return "all pfi items quantity is less than oor eqaul to corresponding  loi item quantiity.";
+    }
+    public function addPFIItems() {
+        // populate each item in list with parent and child
+        // list Only have Toyota PFI
+        $length = 6;
+        $offset = 2;
+        $prefix = "P ";
+
+       $migrationPFIs =  DB::table('migration_pfi_items')->get();
+       foreach($migrationPFIs as $migrationPFI) {
+       
+        $latestItem = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItem){
+            $latestUUID =  $latestItem->code;
+            $latestUUIDNumber = substr($latestUUID, $offset, $length);
+            
+            $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+            $latestCode =  $prefix.$newCode;
+        }else{
+            $latestCode = $prefix.'001';
+        }
+        $pfiItem = new PfiItem();
+        $pfiItem->pfi_id = $migrationPFI->pfi_id;
+        $pfiItem->code = $latestCode;
+        $pfiItem->master_model_id = $migrationPFI->master_model_id;
+        $pfiItem->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItem->unit_price = $migrationPFI->unit_price;
+        $pfiItem->created_by = 16;
+        $pfiItem->is_parent = true;
+        $pfiItem->save();
+
+        $latestItemChild = PfiItem::withTrashed()->orderBy('id', 'desc')->first();
+
+        if($latestItemChild){
+
+            $latestUUIDChild =  $latestItemChild->code;
+            $latestUUIDNumberChild = substr($latestUUIDChild, $offset, $length);
+            $newCode =  str_pad($latestUUIDNumberChild + 1, 3, 0, STR_PAD_LEFT);
+            $latestCodeChild =  $prefix.$newCode;
+
+        }else{
+            $latestCodeChild = $prefix.'001';
+        }
+        
+
+        $pfiItemChild = new PfiItem();
+        $pfiItemChild->code = $latestCodeChild;
+        $pfiItemChild->pfi_id = $migrationPFI->pfi_id;
+        $pfiItemChild->parent_pfi_item_id = $pfiItem->id;
+        if($migrationPFI->loi_item_id) {
+            $pfiItemChild->loi_item_id = $migrationPFI->loi_item_id;
+
+        }
+        $pfiItemChild->master_model_id = $migrationPFI->master_model_id;
+        $pfiItemChild->pfi_quantity = $migrationPFI->pfi_qty;
+        $pfiItemChild->unit_price = $migrationPFI->unit_price;
+        $pfiItemChild->created_by = 16;
+        $pfiItemChild->is_parent = false;
+        $pfiItemChild->save();
+       }
+
+       return "all pfi are added in pfi items";
+
+    }
+    public function pfiSteeringModelineCheck() {
+          // handdrive and model line of parent and chikld should be same except Hiace
+          $notMatchingSteering = [];
+          $motMatchingModelLines = [];
+          $pfiItems = PFIItem::where('is_parent', true)->get();
+          foreach($pfiItems as $pfiItem){
+              $childItem = PFIItem::where('parent_pfi_item_id', $pfiItem->id)
+                      ->where('is_parent', false)->first();
+              if($pfiItem->masterModel->steering != $childItem->masterModel->steering) {
+                  $notMatchingSteering[] = $pfiItem->pfi->id;
+                  return $pfiItem->pfi->id;
+              }
+              if($pfiItem->masterModel->modelLine->id != $childItem->masterModel->modelLine->id) {
+                  // chcek it is Hiace or not 
+                  if($pfiItem->masterModel->modelLine->id != 107 || $pfiItem->masterModel->modelLine->id != 108 ) {
+                      $motMatchingModelLines[] = $pfiItem->pfi->id;
+                      return $pfiItem->pfi->id;
+                  }
+  
+              }
+          }
+  
+          return "all steering and model line requirements are correct";
+    }
+    public function currencyCheckPFI() {
+        // : If vendor is MMC Currency can be EUR also else currency will be USD 
+        $allPfi = PFI::select('id','supplier_id','currency')->get();
+        foreach($allPfi as $pfi) {
+            $supplier = Supplier::find($pfi->supplier_id);
+            if($supplier->supplier == 'AMS') {
+                if($pfi->currency == 'EUR') {
+                    return "For AMS EUR is not allowed, The pfi Id is - ".$pfi->id;
+                }
+            }
+        }
+        return "all currencies are correct";
+        // Ok
+    }
+
+    public function PFIAmountCheck() {
+        // PFI amount: it should be tally with sum of each item quantity * unit price  
+        $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+        $notmatchingPfis = [];
+        foreach($allPfi as $pfi) { 
+            $pfiSum = DB::table('pfi_items')
+                ->where('pfi_id', $pfi->id)
+                ->where('is_parent', true)
+                ->select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))->first(); 
+
+                if($pfiSum->total != $pfi->amount) {
+                    $notmatchingPfis[] = $pfi->id;
+                    // info($pfiSum->total);
+                    // info($pfi->amount);
+                    // return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
+        
+                }
+        }
+        return $notmatchingPfis;
+        return "all PFI Amount is correct";
+    }
+   
+    
     public function PfiQtyCheck() {
 
         $qtyExceededLOI = [];
         $datas =  DB::table('migration_pfi_items')
         ->select('loi_number','loi_item_id')
-        ->where('payment_status','PAID')
         ->selectRaw("SUM(pfi_qty) as total_pfi_qty")
         // ->whereNotIn('loi_item_id', $qtyExceededLOI)
         ->groupBy('loi_item_id')
@@ -64,39 +269,7 @@ class MigrationDataCheckController extends Controller
         return $inCorrectModelLine;
     }
 
-    // model and sfx in loi Item is belongs To respective model line model and sfx in PFI Items
-
-    public function modelSfxMatchCheckPFI(){
-        $datas =  DB::table('migration_pfi_items')
-        ->select('loi_number','loi_item_id','model_line_id','master_model_id')
-        ->get();
-
-        $masterModelNotExistItems = []; 
-
-        foreach($datas as $data){
-            $isExistLOIItem = DB::table('migration_loi_items')
-                        ->where('id', $data->loi_item_id)
-                        ->where('master_model_id', $data->master_model_id)->first();
-            // dd($isExistLOIItem);
-            if(!$isExistLOIItem){
-                $masterModel = DB::table('migration_master_models')->where('id', $data->master_model_id)->first();
-                $possibleMasterModelIds = DB::table('migration_master_models')
-                            ->where('model_line_id', $masterModel->model_line_id)
-                            ->pluck('id')->toArray();
-
-                $isExist = DB::table('migration_loi_items')
-                            ->where('id', $data->loi_item_id)
-                            ->whereIn('master_model_id', $possibleMasterModelIds)->first();
-                if(!$isExist) {
-                    
-                    $masterModelNotExistItems[] = $data->loi_item_id;
-                }
-            
-            }
-        }
-
-     return $masterModelNotExistItems;
-    }
+   
     public function modelSfxMatchCheckPO() {
 
         $datas =  DB::table('migration_po_items')
@@ -131,6 +304,7 @@ class MigrationDataCheckController extends Controller
     }
     public function PurcahseOrderQtyCheckwithPFIItems() {
         $PoQtyExceededLOI = [];
+        
         $datas =  DB::table('migration_po_items')
         ->select('pfi_item_id')
         // ->where('payment_status','PAID')
@@ -169,56 +343,8 @@ class MigrationDataCheckController extends Controller
 
          return $incorrectUtilizedQty;
     }
-    public function checkvariantinPO()  {
-         // Variant id is same as model and sfx in the master model
-       $variantIdNotMatching = [];
-       $datas =  DB::table('migration_po_items')->get();
-
-       foreach($datas as $data) {
-       $model = DB::table('migration_master_models')
-                    ->find($data->master_model_id);
-
-        $possibleVariantIds = DB::table('migration_master_models')
-                        ->where('model', $model->model)
-                        ->where('sfx', $model->sfx)
-                        ->pluck('variant_id')->toArray();
-    
-            if(!in_array($data->variant_id, $possibleVariantIds)) {
-                $variantIdNotMatching[] = $data->po_number;
-            }              
-       }
-       return $variantIdNotMatching;
-    }
-    public function uniqueCheckLOIItemsinLOI(){
-        // check the duplicate LOI Items in LOI
-        $duplicates = [];
-        $LOIs = DB::table('migration_letter_of_indents')->whereNotIn('loi_number', $duplicates)->get();
-        foreach ($LOIs as $LOI) {
-        $loiIds = DB::table('migration_loi_items')->where('loi_number', $LOI->loi_number)->pluck('master_model_id')->toArray();
-        
-            if (count($loiIds) !== count(array_unique($loiIds))) {
-                $duplicates[] = $LOI->loi_number;
-            }
-        }
-        return $duplicates;
- 
-    }
-    public function uniqueModel() {
-        $models =  DB::table('migration_master_models')->orderBy('id','DESC')->get();
-        foreach ($models as $model) {
-            $isAlreadyExist =  DB::table('migration_master_models')->where('model', $model->model)
-                ->where('sfx', $model->sfx)
-                ->where('steering', $model->steering)
-                ->where('model_year', $model->model_year)
-                // ->where('model_line_id', $model->model_line_id)
-                ->count();
-            if($isAlreadyExist > 1) {
-                return  redirect()->back()->withErrors('This Model and Sfx and Model Year combination is already existing.');
-            }
-        }
-        
-        return 1;
-    }
+   
+      
     // to check the inventory model-sfx quantity is matching with unpaid po quantity.
     public function checkmodelSfxQTYWithInventory() {
         $alreadyUsedModelIds = [];
@@ -313,79 +439,8 @@ class MigrationDataCheckController extends Controller
             return 1;
     }
     // Customer Id,LOI Date,Dealer,LOI Category,Status,is Expired.
-    public function checkEnumLOI() {
-            
-    //    $loi = LetterOfIndent::whereNull('is_expired')->first();
-    //    if($loi) {
-    //     return $loi;
-    //    }
-    //    return 1;
-    //   $loi = LetterOfIndent::whereNotIn('category',['Management Request','End User Changed','Quantity Inflate','Original','Special'])->get();
-    // $customer = Clients::where('is_demand_planning_customer', true)
-    //         ->whereNotIn('customertype', ['Individual','Company','Government'])->get();
-    // $loi = LetterOfIndent::whereNotIn('dealers',['Trans Cars','Milele Motors'])->get();
-    if($loi) {
-        return $loi;
-      }
-      return 1;
-    }
-    public function index(Request $request)
-    {
-        // // $isPassport = [];
-        // // $isTradeLicense = [];
-        // // $letterOfIndentDocuments = LetterOfIndentDocument::all();
-        // //                         // return $letterOfIndentDocuments;
-        // // foreach($letterOfIndentDocuments as $letterOfIndentDocument) {
-        // //     info($letterOfIndentDocument);
-        //     // $customerDoc = ClientDocument::where('document', $letterOfIndentDocument->loi_document_file)->first();
-        //     // if(!$customerDoc) {
-        //         // info($letterOfIndentDocument->LOI->client->passport);
-        //         // info($letterOfIndentDocument->LOI->client->tradelicense);
-        //         // if($letterOfIndentDocument->LOI->client->passport || $letterOfIndentDocument->LOI->client->tradelicense) {
-        //         //     info("passport / treade license  exist");
-        //         //     $isPassport[] = $letterOfIndentDocument->loi_document_file;
-        //         //     $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->LOI->client->tradelicense;
-        //         //     $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->LOI->client->passport;
-        //         //     $letterOfIndentDocument->save();
-        //         // }
-        //         if($letterOfIndentDocument->customer_trade_license_file_name) {
-        //             $data = ClientDocument::where('document','like', '%' . $letterOfIndentDocument->loi_document_file . '%')->first();
-                    
-        //             if($data) {
-        //                 info($data);
-        //                 $data->delete();
-        //             }
-        //             $letterOfIndentDocument->customer_passport_file_name = $letterOfIndentDocument->loi_document_file;
-        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_trade_license_file_name;
-        //             $letterOfIndentDocument->is_trade_license = 1;
-        //             $letterOfIndentDocument->save();
-        //         }
-        //         if($letterOfIndentDocument->customer_passport_file_name) {
-        //             ClientDocument::where('document','like','%' . $letterOfIndentDocument->loi_document_file . '%')->delete();
-
-        //             $letterOfIndentDocument->customer_trade_license_file_name = $letterOfIndentDocument->loi_document_file;
-        //             $letterOfIndentDocument->loi_document_file = $letterOfIndentDocument->customer_passport_file_name;
-        //             $letterOfIndentDocument->is_passport = 1;
-        //             $letterOfIndentDocument->save();
-        //         }
-        //             info("other doc exist");
-        //         //     $old_path = public_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file);
-        //         //     $new_path = public_path('customer-other-documents/'.$letterOfIndentDocument->loi_document_file);
-       
-        //         //    // return $new_path;
-        //         //    File::copy($old_path, $new_path);
-        //         //    $customerDoc = new clientDocument();
-        //         //    $customerDoc->document = $letterOfIndentDocument->loi_document_file;
-        //         //    $customerDoc->client_id = $letterOfIndentDocument->LOI->client_id;
-        //         //    $customerDoc->save();
-                                   
-        //     // }
-        // }
-        // info("passport");
-        // info($isPassport);
-     
-        // return $isPassport;
-    }
+   
+   
     // transfer file from LOI Documents to Customer Documents
     public function migrateCustomerDocs() {
         $letterOfIndentDocument = LetterOfIndentDocument::find(1);
