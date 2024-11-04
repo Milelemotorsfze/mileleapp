@@ -38,8 +38,6 @@ class PermissionController extends Controller
     {
         $name = $request->name;
         $request->name = Str::slug($request->name);
-//        $this->replace($input);
-       // dd($request->name);
         $this->validate($request, [
             'name' => 'required|unique:permissions,name',
             'module_id' => 'required'

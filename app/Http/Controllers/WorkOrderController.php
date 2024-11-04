@@ -2512,7 +2512,7 @@ class WorkOrderController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               dd($e);
+               info($e);
            }
         }
     }
@@ -2538,7 +2538,7 @@ class WorkOrderController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               dd($e);
+               info($e);
            }
         }
     }
