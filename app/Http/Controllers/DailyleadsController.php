@@ -87,6 +87,7 @@ class DailyleadsController extends Controller
                     'calls.name as customername',
                     'calls.email',
                     'calls.phone',
+                    'calls.created_by',
                     'quotations.created_at',
                     'quotations.deal_value',
                     'quotations.sales_notes',
@@ -141,7 +142,8 @@ class DailyleadsController extends Controller
                     'calls.email',
                     'calls.remarks',
                     'calls.type',
-                    'calls.leadtype', 
+                    'calls.leadtype',
+                    'calls.created_by', 
                     'calls.location',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -172,6 +174,7 @@ class DailyleadsController extends Controller
                     'calls.email',
                     'calls.remarks',
                     'calls.type',
+                    'calls.created_by',
                     'calls.status',
                     'calls.leadtype', 
                     'calls.location',
@@ -205,6 +208,7 @@ class DailyleadsController extends Controller
                     'calls.remarks',
                     'calls.type',
                     'calls.location',
+                    'calls.created_by',
                     'users.name as createdby',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -227,7 +231,7 @@ class DailyleadsController extends Controller
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
             if($status === "Prospecting")
             {
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
