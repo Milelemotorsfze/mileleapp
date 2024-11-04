@@ -305,13 +305,13 @@ input[type=number]::-webkit-outer-spin-button
                     @php
                     $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
                     @endphp
-                    {{ $created_by->name }}
+                    {{ $created_by ? $created_by->name : '??' }}
                   </td>
                   <td>
                   @php
                     $assigned_by = DB::table('users')->where('users.id', $calls->sales_person)->first();
                     @endphp
-                    {{ $assigned_by->name }}
+                    {{ $assigned_by ? $assigned_by->name : '??' }}
                     <!-- <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
       <i class="fa fa-bars" aria-hidden="true"></i>
