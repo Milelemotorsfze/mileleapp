@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
- 
     @can('PFI-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
@@ -31,7 +30,7 @@
                             <i class="fa fa-download" aria-hidden="true"></i> Export</button>
                     @endif
                 @endcan 
-                       <a  class="btn btn-sm btn-info float-end" style="margin-right:5px;" title="LOI List View"
+                       <a  class="btn btn-sm btn-info float-end" style="margin-right:5px;" title="PFI Basic Details List View"
                         href="{{ route('pfi.index') }}" > <i class="fa fa-th-large" ></i> 
                        </a>
                
@@ -69,6 +68,9 @@
                     <thead class="bg-soft-secondary">
                             <tr>
                                 <th>S.No</th>
+                                <th>PFI Item Code
+                                    <input class="small-width" onkeyup="reload()" name="pfi-item-code" type="text" id="pfi-item-code" placeholder="PFI Item Code">
+                                </th> 
                                 <th>LOI Item Code
                                     <input class="small-width" onkeyup="reload()" name="code" type="text" id="code" placeholder="LOI Item Code">
                                 </th> 
@@ -165,6 +167,7 @@
 @endsection
 
 @push('scripts')
+
     <script type="text/javascript">
         $(document).ready(function () {
             var table = $('#PFI-Items-table').DataTable({      
@@ -174,7 +177,7 @@
             ajax: {
             url:  "{{ route('pfi-item.list') }}",
             data: function (d) {
-
+                d.pfi_item_code = $('#pfi-item-code').val(); 
                 d.code = $('#code').val();  // Add custom parameters to send to the server
                 // d.status = $('#loi-status').val();
                 d.pfi_date = $('#pfi-date').val();
@@ -198,7 +201,8 @@
         },
         columns: [
             {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
-            {'data' : 'loi_item_code', 'name' : 'letterOfIndentItem.code' , orderable: false},
+            {'data' : 'code', 'name' : 'code' , orderable: true},
+            {'data' : 'loi_item_code', 'name' : 'loi_item_code' , orderable: true},
             // {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},
@@ -233,6 +237,7 @@
                 console.log(code); // Add custom parameters to send to the server
                 // let status = $('#loi-status').val();
                 let pfi_date = $('#pfi-date').val();
+                let pfi_item_code = $('#pfi-item-code').val();
                 let pfi_number = $('#pfi-number').val();
                 let supplier_id = $('#supplier-id').val();
                 let client_id = $('#customer-id').val();
@@ -249,7 +254,7 @@
                 let total_price = $('#total-price').val();
                 let comment = $('#comment').val();
 
-            var exportUrl = "{{ route('pfi-item.list')}}"+ "?code="+code+"&pfi_date="+pfi_date+
+            var exportUrl = "{{ route('pfi-item.list')}}"+ "?code="+code+"&pfi_date="+pfi_date+"&pfi_item_code="+pfi_item_code+
             "&pfi_number="+pfi_number+"&supplier_id="+supplier_id+"&country_id="+country_id+"&currency="+currency+"&steering="+steering+
             "&brand="+brand+"&client_id="+ client_id+"&model_line="+model_line+"&model="+model+"&sfx="+sfx+"&unit_price="+unit_price+
             "&pfi_amount="+pfi_amount+"&total_price="+total_price+"&comment="+comment+"&pfi_quantity="+pfi_quantity+"&export=EXCEL";
@@ -285,8 +290,6 @@
             placeholder: "Model Line ",
             maximumSelectionLength: 1
         });
-
-
  
     </script>
 @endpush

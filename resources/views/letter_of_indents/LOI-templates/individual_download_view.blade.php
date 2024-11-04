@@ -91,7 +91,6 @@
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
     </div>
-    <div class="page_break"></div>
         <div class="row">
             @foreach($documents as $document) 
                 @if($document->is_passport == 1) 

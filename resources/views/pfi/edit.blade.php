@@ -178,7 +178,9 @@
                                     </div>  
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <div id="file-preview">
+                                            @if($pfi->pfi_document_without_sign)
                                             <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
+                                            @endif
                                         </div>
                                     </div>                                  
                                 </div>
@@ -262,6 +264,7 @@
                                                                     <i class="fas fa-trash-alt"></i> </a>
                                                             </div>
                                                         </div>
+                                                     
                                                         @foreach($pfi_item->childPfiItems as $child_Key => $childPfiItem)
                                                             <div class="row pt-2 m-0 chilItems child-item-{{$key+1}}" id="row-{{$key+1}}-item-{{$child_Key+1}}" style="background-color:#eaeaea">
                                                            
@@ -271,7 +274,8 @@
                                                                     @if($child_Key == 0 )  <label class="form-label">LOI Code</label> @endif
                                                                     <select class="form-control text-dark widthinput loi-items mb-2" required index="{{$key+1}}" multiple
                                                                         name="PfiItem[{{$key+1}}][loi_item][{{$child_Key+1}}]" item="{{$child_Key+1}}" id="loi-item-{{$key+1}}-item-{{$child_Key+1}}">
-                                                                            @foreach($childPfiItem->LOIItemCodes as $LOIItemCode)
+                                                                           {{ $childPfiItem->LOIItemCodes }}
+                                                                        @foreach($childPfiItem->LOIItemCodes as $LOIItemCode)
                                                                                 <option value="{{ $LOIItemCode->id }}" {{$LOIItemCode->id == $childPfiItem->letterOfIndentItem->id ? 'selected' : ''}}>
                                                                                 {{ $LOIItemCode->code }} @if(in_array($LOIItemCode->master_model_id, $pfi_item->exactMatches)) (Exact Match) @endif</option>
                                                                             @endforeach
@@ -756,7 +760,7 @@
             let childIndex = $(this).attr('item');
             $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
             var value = e.params.data.id;
-            hideLOIItemCode(index,childIndex,value);
+            // hideLOIItemCode(index,childIndex,value);
             getLOIItemDetails(index,childIndex);
         });
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
@@ -765,7 +769,7 @@
             var id = e.params.data.id;
             var text = e.params.data.text;
 
-            appendLOIItemCode(index,childIndex,id,text);
+            // appendLOIItemCode(index,childIndex,id,text);
             $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
             $('#unit-price-'+index+'-item-'+childIndex).val("");
             $('#total-amount-'+index+'-item-'+childIndex).val("");
@@ -914,9 +918,9 @@
             let currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
             let loiItemText = $('#' + currentLOIItemId + ' option:selected').text();
            
-            if(loiItemId[0]) {
-                appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
-            }
+            // if(loiItemId[0]) {
+            //     appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
+            // }
               
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
@@ -1076,20 +1080,20 @@
           let model = $('#model-'+index+'-item-0').val();
           let sfx = $('#sfx-'+index+'-item-0').val();
           let url = '{{ route('loi-item-code') }}';
-          var selectedLOIItemIds = [];
+        //   var selectedLOIItemIds = [];
 
-          var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-          for(let i=1; i<=parentIndex;i++) 
-          {
-              let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-              for(let j=0; j<=childIndex;j++) 
-              {
-                  var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
-                  if(eachSelectedLOIItemId) {
-                      selectedLOIItemIds.push(eachSelectedLOIItemId);
-                  }
-              }
-          }
+        //   var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+        //   for(let i=1; i<=parentIndex;i++) 
+        //   {
+        //       let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+        //       for(let j=0; j<=childIndex;j++) 
+        //       {
+        //           var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
+        //           if(eachSelectedLOIItemId) {
+        //               selectedLOIItemIds.push(eachSelectedLOIItemId);
+        //           }
+        //       }
+        //   }
           if(model.length > 0  && sfx.length > 0) {
               $('.overlay').show();
               $.ajax({
@@ -1101,7 +1105,7 @@
                   sfx:sfx[0],
                   client_id:customer[0],
                   country_id:country[0],
-                  selectedLOIItemIds:selectedLOIItemIds
+                //   selectedLOIItemIds:selectedLOIItemIds
               },
               success:function (data) {
                   let codes = data.codes;
@@ -1264,41 +1268,41 @@
           
       }
     
-        function hideLOIItemCode(index,childIndex,value) {
+    //     function hideLOIItemCode(index,childIndex,value) {
                 
-            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-            for(let i=1; i<=parentIndex;i++) 
-            {
-                let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                for(let j=0; j<=rowIndex;j++) 
-                {
-                    var currentId = 'loi-item-'+i+'-item-'+j;
-                    var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+    //         var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+    //         for(let i=1; i<=parentIndex;i++) 
+    //         {
+    //             let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+    //             for(let j=0; j<=rowIndex;j++) 
+    //             {
+    //                 var currentId = 'loi-item-'+i+'-item-'+j;
+    //                 var selectedId = 'loi-item-'+index+'-item-'+childIndex;
     
-                    if(selectedId != currentId ) {
-                        var currentId = 'loi-item-'+i+'-item-'+j;
-                        $('#' + currentId + ' option[value=' + value + ']').detach(); 
-                    }
-                }
-            }
+    //                 if(selectedId != currentId ) {
+    //                     var currentId = 'loi-item-'+i+'-item-'+j;
+    //                     $('#' + currentId + ' option[value=' + value + ']').detach(); 
+    //                 }
+    //             }
+    //         }
 
-        }
-       function appendLOIItemCode(index,childIndex,id,text)
-        {
-            var selectedId = 'loi-item-'+index+'-item-'+childIndex;
-            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-            for(let i=1; i<=parentIndex;i++) 
-            {           
-                let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                for(let j=0; j<=rowIndex;j++) 
-                {             
-                    var currentId = 'loi-item-'+i+'-item-'+j;                     
-                        if(selectedId != currentId) {
-                        $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
-                    }
-                }
-            }    
-        }
+    //     }
+    //    function appendLOIItemCode(index,childIndex,id,text)
+    //     {
+    //         var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+    //         var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+    //         for(let i=1; i<=parentIndex;i++) 
+    //         {           
+    //             let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+    //             for(let j=0; j<=rowIndex;j++) 
+    //             {             
+    //                 var currentId = 'loi-item-'+i+'-item-'+j;                     
+    //                     if(selectedId != currentId) {
+    //                     $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
+    //                 }
+    //             }
+    //         }    
+    //     }
   
         function hideSFX(index, value) {
          

@@ -86,7 +86,6 @@
         @endif
     </div>
 </div>
-<div class="page_break"></div>
     @if($letterOfIndent->LOIDocuments->count() > 0)
         <div class="row">
             @foreach($documents as $document) 

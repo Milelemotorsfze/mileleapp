@@ -118,6 +118,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'workorder_error_report' => [
+            'driver' => 'single',                // Using 'single' driver to create one log file
+            'path' => storage_path('logs/workorder_error_report.log'), // Path to log file
+            'level' => 'error',                  // Only log errors and higher (e.g., critical)
+        ],
     ],
 
 ];

@@ -8,7 +8,6 @@
             <div class="modal-body">
                 <form id="StatusForm_{{$data->id}}">
                     <div class="d-flex flex-wrap justify-content-between">
-                        <!-- Existing Status Options -->
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusActive_{{$data->id}}" value="Active" {{ $data->status == 'Active' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusActive_{{$data->id}}" style="font-size: 14px;">
@@ -21,7 +20,6 @@
                                 On Hold
                             </label>
                         </div>
-                        <!-- New Status Options -->
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="Status_{{$data->id}}" id="StatusPartiallyDelivered_{{$data->id}}" value="Partially Delivered" {{ $data->status == 'Partially Delivered' ? 'checked' : '' }}>
                             <label class="form-check-label" for="StatusPartiallyDelivered_{{$data->id}}" style="font-size: 14px;">
@@ -57,17 +55,14 @@
 
 <script type="text/javascript">
     function submitStatus(workOrderId, woNumber) {
-        // Get the selected status
         const selectedStatus = document.querySelector(`#updateStatusModal_${workOrderId} input[name="Status_${workOrderId}"]:checked`).value;
 
-        // Display the confirmation dialog
         alertify.confirm(
-            'Confirmation Required', // Title of the confirmation dialog
-            `Are you sure you want to update the status for work order ${woNumber} to ${selectedStatus}?`, // Message in the dialog
-            function() { // If the user clicks "OK"
+            'Confirmation Required', 
+            `Are you sure you want to update the status for work order ${woNumber} to ${selectedStatus}?`, 
+            function() { 
                 const comment = document.getElementById(`Comment_${workOrderId}`).value;
 
-                // Perform the AJAX request to update the status
                 $.ajax({
                     url: '/update-wo-status',
                     method: 'POST',
@@ -75,21 +70,19 @@
                         workOrderId: workOrderId,
                         status: selectedStatus,
                         comment: comment,
-                        _token: '{{ csrf_token() }}' // Laravel CSRF token
+                        _token: '{{ csrf_token() }}' 
                     },
                     success: function(response) {
-                        // Handle the response (e.g., show a success message, close the modal)
                         alertify.success(response.message);
                         $(`#updateStatusModal_${workOrderId}`).modal('hide');
-                        location.reload(); // Reload the page after success
+                        location.reload(); 
                     },
                     error: function(xhr) {
-                        // Handle any errors
                         alertify.error('Failed to update status');
                     }
                 });
             },
-            function() { // If the user clicks "Cancel"
+            function() { 
                 alertify.error('Action canceled');
             }
         );

@@ -26,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with('assignedRoles', $assignedRoles);
         });
         Paginator::defaultView('vendor.pagination.custom');
+        Paginator::useBootstrap();
     }
 }

@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('notificationspendingleads:send')->everyMinute();
         $schedule->command('notificationspendingsignquotation:send')->everyMinute();
         $schedule->command('notificationspendingpeospecting:send')->everyMinute();
-        $schedule->command('loi-expiry:check')->daily();
+        $schedule->command('loi_expiry:check')->daily();
         $schedule->command('send:wo_boe_status')->dailyAt('09:00');
     }
 
@@ -38,5 +38,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SendNotificationspendingleads::class,
         \App\Console\Commands\SendNotificationspendingsignquotation::class,
         \App\Console\Commands\SendNotificationspendingpeospecting::class,
+        \App\Console\Commands\CheckLOIExpiry::class,
     ];
 }

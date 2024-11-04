@@ -6,7 +6,6 @@
         <a class="me-2 btn btn-sm btn-info"	href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#updateStatusModal">
         <i class="fa fa-file" aria-hidden="true"></i> Update Status
         </a>
-        <!-- Modal -->
         <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -65,17 +64,14 @@
 @endif
 <script type="text/javascript">
 function submitStatus(workOrderId, woNumber) {
-		// Get the selected status
 		const selectedStatus = document.querySelector(`#updateStatusModal input[name="Status"]:checked`).value;
 
-		// Display the confirmation dialog
 		alertify.confirm(
-			'Confirmation Required', // Title of the confirmation dialog
-			`Are you sure you want to update the status for work order ${woNumber} to ${selectedStatus}?`, // Message in the dialog
-			function() { // If the user clicks "OK"
+			'Confirmation Required', 
+			`Are you sure you want to update the status for work order ${woNumber} to ${selectedStatus}?`, 
+			function() { 
 				const comment = document.getElementById(`woStatus`).value;
 
-				// Perform the AJAX request to update the status
 				$.ajax({
 					url: '/update-wo-status',
 					method: 'POST',
@@ -83,21 +79,19 @@ function submitStatus(workOrderId, woNumber) {
 						workOrderId: workOrderId,
 						status: selectedStatus,
 						comment: comment,
-						_token: '{{ csrf_token() }}' // Laravel CSRF token
+						_token: '{{ csrf_token() }}' 
 					},
 					success: function(response) {
-						// Handle the response (e.g., show a success message, close the modal)
 						alertify.success(response.message);
 						$(`#updateStatusModal`).modal('hide');
-						location.reload(); // Reload the page after success
+						location.reload(); 
 					},
 					error: function(xhr) {
-						// Handle any errors
 						alertify.error('Failed to update status');
 					}
 				});
 			},
-			function() { // If the user clicks "Cancel"
+			function() { 
 				alertify.error('Action canceled');
 			}
 		);

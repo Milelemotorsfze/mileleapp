@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Models\WOBOE;
 use App\Mail\WOBOEStatusMail; 
+use Illuminate\Pagination\LengthAwarePaginator;
 class WorkOrderController extends Controller
 {
     public function workOrderCreate($type) {
@@ -197,120 +198,156 @@ class WorkOrderController extends Controller
         $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
         $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
         $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
-        $datas = WorkOrder::when($type !== 'all' && $type !== 'status_report', function ($query) use ($type) {
-            return $query->where('type', $type);
+        $datas = WorkOrder::query()
+        ->when($type === 'all', function ($queryAll) {
+            $queryAll->select([
+                'id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'cross_trade', 'is_batch', 'batch', 'wo_number', 
+                'customer_name', 'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
+                'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
+                'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
+                'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
+                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
+                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
+                'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
+                ,'sales_person_id','created_by','created_at','updated_at','lto'
+            ]);
         })
-        ->when($hasLimitedAccess, function ($query) use ($authId) {
-            return $query->where('created_by', $authId);
+        ->when($type === 'status_report', function ($queryStatusReport) {
+            $queryStatusReport->select(['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at']);
+        })
+        ->when($type === 'export_exw', function ($queryEXW) {
+            $queryEXW->select([
+                'id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'is_batch', 'batch', 'wo_number', 'customer_name', 
+                'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
+                'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
+                'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
+                'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
+                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
+                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
+            ]);
+        })
+        ->when($type === 'export_cnf', function ($queryCNF) {
+            $queryCNF->select([
+                'id', 'type', 'date', 'so_number', 'temporary_exit', 'cross_trade', 'is_batch', 'batch', 'wo_number', 'customer_name', 'customer_email', 
+                'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 
+                'port_of_loading', 'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 
+                'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
+                'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
+                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
+                'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
+            ]);
+        })
+        ->when($type === 'local_sale', function ($queryLocal) {
+            $queryLocal->select([
+                'id', 'date', 'so_number', 'wo_number', 'customer_name', 'customer_email', 'customer_company_number', 'customer_address',
+                'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 'transporting_driver_contact_number', 
+                'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
+                'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
+                'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at','lto'
+            ]);
+        })
+        ->when($type !== 'all' && $type !== 'status_report', function ($queryType) use ($type) {
+            return $queryType->where('type', $type);
+        })
+        ->when($hasLimitedAccess, function ($queryLimited) use ($authId) {
+            return $queryLimited->where('created_by', $authId);
         })
         ->when($filters, function ($query) use ($filters) {
             // Apply status filter
-            if (isset($filters['status_filter']) && !empty($filters['status_filter'])) {
-                $query->whereHas('latestStatus', function ($q) use ($filters) {
-                    $q->whereIn('status', $filters['status_filter']);
+            if (!empty($filters['status_filter'])) {
+                $query->whereHas('latestStatus', function ($statusFltr) use ($filters) {
+                    $statusFltr->whereIn('status', $filters['status_filter']);
                 });
             }
     
             // Apply sales support filter
-            if (isset($filters['sales_support_filter']) && !empty($filters['sales_support_filter'])) {
-                $query->where(function ($q1) use ($filters) {
+            if (!empty($filters['sales_support_filter'])) {
+                $query->where(function ($salesSupportCnfrm) use ($filters) {
                     if (in_array('Confirmed', $filters['sales_support_filter'])) {
-                        $q1->orWhereNotNull('sales_support_data_confirmation_at');
+                        $salesSupportCnfrm->orWhereNotNull('sales_support_data_confirmation_at');
                     }
                     if (in_array('Not Confirmed', $filters['sales_support_filter'])) {
-                        $q1->orWhereNull('sales_support_data_confirmation_at');
+                        $salesSupportCnfrm->orWhereNull('sales_support_data_confirmation_at');
                     }
                 });
             }
-    
         })
-        ->with('latestFinance','latestDocs','boe')  // Eager-load the latest finance approval
+        
+        ->with(['latestFinance', 'latestCOO','latestDocs', 'boe', 'vehicles'])
         ->latest()
         ->get();
         $filteredDatas = $datas;
         if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
-            // Normalize the status filter array to lowercase
-            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);
-        
-            // Check if 'Blank' is in the filter (case-insensitive)
-            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);
-        
-            // Filter datas where either latestFinance status is in $filters['finance_approval_filter'] or latestFinance is null (if 'Blank' is included)
-            $filteredDatas = $datas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
-                if ($includeBlank && !$data->latestFinance) {
-                    // Include data where latestFinance is null if 'Blank' is selected
+            $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);      
+            $includeBlank = in_array('blank', $normalizedFinanceApprovalFilter);     
+            $filteredDatas = $filteredDatas->filter(function ($data) use ($normalizedFinanceApprovalFilter, $includeBlank) {
+                if ($includeBlank && (!$data->latestFinance || $data->can_show_fin_approval == 'no')) {
                     return true;
-                }
-        
-                // Otherwise, filter based on the latestFinance status
-                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter);
+                }     
+                return $data->latestFinance && in_array(strtolower($data->latestFinance->status), $normalizedFinanceApprovalFilter) && $data->can_show_fin_approval == 'yes';
             });
-        }
-        
+        }      
         if (isset($filters['coo_approval_filter']) && !empty($filters['coo_approval_filter'])) {
-            // Normalize the status filter array to lowercase
-            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);
-            
-            // Check if 'Blank' is in the filter (case-insensitive)
-            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);
-        
-            // Filter datas where either latestCOO status is in $filters['coo_approval_filter'] or latestCOO is null (if 'Blank' is included)
-            $filteredDatas = $datas->filter(function ($data) use ($normalizedCOOApprovalFilter, $includeBlankCOO) {
-                if ($includeBlankCOO && !$data->latestCOO) {
-                    // Include data where latestCOO is null if 'Blank' is selected
+            $normalizedCOOApprovalFilter = array_map('strtolower', $filters['coo_approval_filter']);          
+            $includeBlankCOO = in_array('blank', $normalizedCOOApprovalFilter);      
+            $filteredDatas = $filteredDatas->filter(function ($data) use ($normalizedCOOApprovalFilter, $includeBlankCOO) {
+                if ($includeBlankCOO && (!$data->latestCOO || $data->can_show_coo_approval == 'no') ) {
                     return true;
                 }
-        
-                // Otherwise, filter based on the latestCOO status
-                return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter);
+                return $data->latestCOO && in_array(strtolower($data->latestCOO->status), $normalizedCOOApprovalFilter) && $data->can_show_coo_approval == 'yes';
             });
         }
         if (isset($filters['docs_status_filter']) && !empty($filters['docs_status_filter'])) {
-            // Use the docs status filter directly
             $docsStatusFilter = $filters['docs_status_filter'];
-        
-            // Check if 'Blank' is in the filter
             $includeBlankDocs = in_array('Blank', $docsStatusFilter);
-            // Filter datas where either docs_status is in $filters['docs_status_filter'] or docs_status is 'Not Initiated' (if 'Blank' is included)
+        
             $filteredDatas = $datas->filter(function ($data) use ($docsStatusFilter, $includeBlankDocs) {
-                return in_array($data->docs_status, $docsStatusFilter);
-            });
+                // Check if docs_status is in filter list and other conditions are met
+                $matchesFilter = in_array($data->docs_status, $docsStatusFilter) 
+                    && $data->sales_support_data_confirmation_at !== null 
+                    && $data->finance_approval_status === 'Approved' 
+                    && $data->coo_approval_status === 'Approved';
         
-            // Optionally convert filtered results to array
-            // $filteredDatas = $filteredDatas->values()->toArray();
-        }
-        if (isset($filters['modification_filter']) && !empty($filters['modification_filter'])) {
-            // Use the modification filter directly
-            $modificationFilter = $filters['modification_filter'];
+                // Handle cases where docs_status is "Blank" and other conditions aren't fully met
+                $matchesBlank = $includeBlankDocs 
+                    && ($data->docs_status == 'Blank') 
+                    && ($data->sales_support_data_confirmation_at === null 
+                        || $data->finance_approval_status !== 'Approved' 
+                        || $data->coo_approval_status !== 'Approved');
         
-            // Check if 'Blank' is in the filter
-            $includeBlankModi = in_array('Blank', $modificationFilter);
-        
-            // Filter work orders where at least one vehicle's modification_status matches the filter
-            $filteredDatas = $datas->filter(function ($data) use ($modificationFilter, $includeBlankModi) {
-                // Loop through each vehicle for the current work order
-                foreach ($data->vehicles as $vehicle) {
-                    // If 'Blank' is in the filter and the modification status is 'Not Initiated', include the work order
-                    if ($includeBlankModi && $vehicle->modification_status === 'Not Initiated') {
-                        return true;
-                    }
-        
-                    // If any vehicle's modification_status is in the modificationFilter, include the work order
-                    if (in_array($vehicle->modification_status, $modificationFilter)) {
-                        return true;
-                    }
-                }
-        
-                // If no vehicle matches the filter, exclude the work order
-                return false;
+                return $matchesFilter || $matchesBlank;
             });
         }
-        $datas = $filteredDatas;
-        // Return the view with the type, data, applied filters, and unique options for the select filters
+        // Pagination parameters
+        $page = request()->get('page', 1);
+        $perPage = 100;
+
+        // Slice the collection to get items for the current page
+        $pagedData = $filteredDatas->slice(($page - 1) * $perPage, $perPage)->values();
+
+        // Create the LengthAwarePaginator instance
+        $paginatedFilteredDatas = new LengthAwarePaginator(
+            $pagedData,
+            $filteredDatas->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+        $datas = $paginatedFilteredDatas;
+    
         return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
-
+        // 'customer_reference_id','customer_reference_type','airline_reference_id','deposit_received_as','sales_support_data_confirmation_by',
+        // 'finance_approval_by','finance_approved_at','coe_office_approval_by','coe_office_approved_at','coe_office_direct_approval_comments','created_by','deleted_by',
+    
 
     /**
      * Show the form for creating a new resource.
@@ -1370,6 +1407,12 @@ class WorkOrderController extends Controller
             }
             else {
                 $newData['cross_trade'] = 'no';
+            }
+            if(isset($request->lto)) {
+                $newData['lto'] = 'yes';
+            }
+            else {
+                $newData['lto'] = 'no';
             }
             // Extract full values for specific nested fields
             $nestedFields = [
@@ -2962,9 +3005,6 @@ class WorkOrderController extends Controller
             'finance_approval_filter' => $request->finance_approval_filter,
             'coo_approval_filter' => $request->coo_approval_filter,
             'docs_status_filter' => $request->docs_status_filter,
-            'modification_filter' => $request->modification_filter,
-            'pdi_filter' => $request->pdi_filter,
-            'delivery_filter' => $request->delivery_filter
         ]);
     
         // Check if the filter record exists for the current user
