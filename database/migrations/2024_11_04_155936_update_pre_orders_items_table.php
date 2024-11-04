@@ -14,6 +14,11 @@ class UpdatePreOrdersItemsTable extends Migration
     public function up()
     {
         Schema::table('pre_orders_items', function (Blueprint $table) {
+            // Drop foreign key constraints if they exist
+            $table->dropForeign(['ex_colour']);
+            $table->dropForeign(['int_colour']);
+            $table->dropForeign(['master_model_lines_id']);
+
             // Drop the specified columns
             $table->dropColumn([
                 'modelyear',
@@ -26,8 +31,8 @@ class UpdatePreOrdersItemsTable extends Migration
             // Add the new column for variant ID
             $table->unsignedBigInteger('variant_id')->nullable();
 
-            // Optionally, add a foreign key constraint if you want to link it to the variants table
-            $table->foreign('variant_id')->references('id')->on('varaints')->onDelete('set null');
+            // Optionally, add a foreign key constraint for variant_id if you want to link it to the variants table
+            $table->foreign('variant_id')->references('id')->on('variants')->onDelete('set null');
         });
     }
 
@@ -46,7 +51,12 @@ class UpdatePreOrdersItemsTable extends Migration
             $table->unsignedBigInteger('int_colour')->nullable();
             $table->text('description')->nullable();
 
-            // Remove the variant_id column
+            // Restore foreign key constraints if needed
+            $table->foreign('ex_colour')->references('id')->on('colours')->onDelete('cascade');
+            $table->foreign('int_colour')->references('id')->on('colours')->onDelete('cascade');
+            $table->foreign('master_model_lines_id')->references('id')->on('model_lines')->onDelete('cascade');
+
+            // Remove the variant_id column and its foreign key
             $table->dropForeign(['variant_id']);
             $table->dropColumn('variant_id');
         });
