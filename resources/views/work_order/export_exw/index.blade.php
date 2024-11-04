@@ -485,10 +485,7 @@
 									<td>{{ $data->port_of_discharge ?? '' }}</td>
 									<td>{{ $data->final_destination ?? '' }}</td>
 									<td>{{ $data->transport_type ?? '' }}</td>
-									<td>
-										@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])
-										@endcomponent
-									</td>
+									@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])@endcomponent
 									<td>{{ $data->getTransportField('name') }}</td>
 									<td>{{ $data->getTransportField('id') }}</td>
 									<td class="{{ $data->transport_type == 'road' ? 'no-click' : '' }}">{{ $data->getTransportField('details') }}</td>
