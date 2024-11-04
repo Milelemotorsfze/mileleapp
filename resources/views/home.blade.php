@@ -322,6 +322,7 @@ Procurement
                                                 <thead class="bg-soft-secondary">
                                             <tr>
                                                 <th>Sales Person</th>
+                                                <th>Bulk Leads</th>
                                                 <th>Pending Leads</th>
                                                 <th>Response Time</th>
                                                 <th>Prospectings</th>
@@ -335,6 +336,14 @@ Procurement
                                         @forelse ($undersalesleads as $undersaleslead)
                                         <tr>
                                             <td>{{ $undersaleslead->salespersonname }}</td>
+                                            @php
+                                               $bulkleads = DB::table('calls')
+                                                ->where('calls.sales_person', '=', $undersaleslead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
+                                                ->whereIn('calls.leadtype', ['Bulk Deals', 'Special Orders'])
+                                                ->count();
+                                            @endphp
+                                            <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Bulk Deals']) }}">{{ $bulkleads }}</a></td>
                                             <td><a href="{{ route('sales.summary', ['sales_person_id' => $undersaleslead->sales_person, 'count_type' => 'Pending Leads']) }}">{{ $undersaleslead->lead_count }}</a></td>
                                             @php
                                                 $responsetime = null;
