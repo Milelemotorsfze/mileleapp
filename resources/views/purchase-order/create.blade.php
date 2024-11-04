@@ -323,9 +323,7 @@
 
         if (allBlank) {
             formValid = true;
-            // $('#po-create-form').unbind('submit').submit();
         } else {
-            // if( formValid == true) {
                 var formData = $('#po-create-form').serialize();
                 console.log(formData);
                 $.ajax({
@@ -347,9 +345,7 @@
                         formValid = false;
                     }
                 });
-            // alert(formValid);
             }
-        // }
 
     }
     $('.add-row-btn').click(function(e) {
@@ -409,7 +405,7 @@
                             exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
                         }
                     }
-                    // // Populate Interior Colors dropdown
+                    // Populate Interior Colors dropdown
                     var intColourDropdown = intColourCol.find('select');
                     for (var id in intColours) {
                         if (intColours.hasOwnProperty(id)) {
@@ -500,12 +496,10 @@
             alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
             formValid = false;
         }else{
-            // alert("variant is there");
             formValid = true;
             checkDuplicateVIN();
         }
-        // alert("inside submit");
-        // alert(formValid);
+       
             if( formValid == true) {
                 var poNumber = $('#po_number').val();
                 if(poNumber == '') {
@@ -516,8 +510,7 @@
                     $('#poNumberError').text(" ");
                 }
             }
-        // alert("after po validation submit");
-        // alert(formValid);
+    
         if(formValid == true) {
             $('#po-create-form').unbind('submit').submit();
         }

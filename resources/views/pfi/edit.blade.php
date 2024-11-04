@@ -695,7 +695,6 @@
            var model = e.params.data.id;
            // if unselected model is in the parent row append model in every parent line items
                     appendModel(index,model);
-                // should append model
                 var sfx = $('#sfx-'+index+'-item-0').val();
                 appendSFX(index,model,sfx[0]);
                 $('#sfx-'+index+'-item-0').empty();
@@ -707,11 +706,9 @@
                     resetRowData(index,j); 
                 }
                 enableOrDisableAddMoreButton(index); 
-           // call append LOI Item code if same model am
        });
 
        function resetRowData(index,childIndex) {
-            // parent row data remove
            $('#pfi-quantity-'+index+'-item-0').val(0);
            $('#unit-price-'+index+'-item-0').val("");
            $('#total-amount-'+index+'-item-0').val("");
@@ -760,7 +757,6 @@
             let childIndex = $(this).attr('item');
             $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
             var value = e.params.data.id;
-            // hideLOIItemCode(index,childIndex,value);
             getLOIItemDetails(index,childIndex);
         });
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
@@ -769,7 +765,6 @@
             var id = e.params.data.id;
             var text = e.params.data.text;
 
-            // appendLOIItemCode(index,childIndex,id,text);
             $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
             $('#unit-price-'+index+'-item-'+childIndex).val("");
             $('#total-amount-'+index+'-item-'+childIndex).val("");
@@ -918,10 +913,6 @@
             let currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
             let loiItemText = $('#' + currentLOIItemId + ' option:selected').text();
            
-            // if(loiItemId[0]) {
-            //     appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
-            // }
-              
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
             
@@ -1080,20 +1071,7 @@
           let model = $('#model-'+index+'-item-0').val();
           let sfx = $('#sfx-'+index+'-item-0').val();
           let url = '{{ route('loi-item-code') }}';
-        //   var selectedLOIItemIds = [];
-
-        //   var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-        //   for(let i=1; i<=parentIndex;i++) 
-        //   {
-        //       let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-        //       for(let j=0; j<=childIndex;j++) 
-        //       {
-        //           var eachSelectedLOIItemId = $('#loi-item-'+i+'-item-'+j).val();
-        //           if(eachSelectedLOIItemId) {
-        //               selectedLOIItemIds.push(eachSelectedLOIItemId);
-        //           }
-        //       }
-        //   }
+      
           if(model.length > 0  && sfx.length > 0) {
               $('.overlay').show();
               $.ajax({
@@ -1268,42 +1246,6 @@
           
       }
     
-    //     function hideLOIItemCode(index,childIndex,value) {
-                
-    //         var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-    //         for(let i=1; i<=parentIndex;i++) 
-    //         {
-    //             let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-    //             for(let j=0; j<=rowIndex;j++) 
-    //             {
-    //                 var currentId = 'loi-item-'+i+'-item-'+j;
-    //                 var selectedId = 'loi-item-'+index+'-item-'+childIndex;
-    
-    //                 if(selectedId != currentId ) {
-    //                     var currentId = 'loi-item-'+i+'-item-'+j;
-    //                     $('#' + currentId + ' option[value=' + value + ']').detach(); 
-    //                 }
-    //             }
-    //         }
-
-    //     }
-    //    function appendLOIItemCode(index,childIndex,id,text)
-    //     {
-    //         var selectedId = 'loi-item-'+index+'-item-'+childIndex;
-    //         var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-    //         for(let i=1; i<=parentIndex;i++) 
-    //         {           
-    //             let rowIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-    //             for(let j=0; j<=rowIndex;j++) 
-    //             {             
-    //                 var currentId = 'loi-item-'+i+'-item-'+j;                     
-    //                     if(selectedId != currentId) {
-    //                     $('#loi-item-'+i+'-item-'+j).append($('<option>', {value: id, text : text}));    
-    //                 }
-    //             }
-    //         }    
-    //     }
-  
         function hideSFX(index, value) {
          
          var totalIndex = $("#pfi-items").find(".pfi-items-parent-div").length
