@@ -19,7 +19,7 @@ yarn-error.log
 /.vscode
 
 # Ignore everything in the public directory
-
+/public/*
 
 # Allow the css/custom and js/custom directories and their contents
 !/public/css/
