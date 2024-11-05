@@ -613,7 +613,7 @@ class PFIController extends Controller
             'supplier_id' =>'required',
             'file' => 'mimes:pdf,png,jpeg,jpg'
         ]);
-
+        // return $request->all();
         DB::beginTransaction();
         $pfi = PFI::findOrFail($id);
 
@@ -648,6 +648,7 @@ class PFIController extends Controller
         $pfiItemRowParentId = [];
         $alreadyAddedRows =  PfiItem::where('pfi_id', $pfi->id)->pluck('id')->toArray();
         $updatedRows = [];
+        // Same LOI Item can be add for different parents
         foreach($request->PfiItem as $key => $PfiData) {
             $model = $PfiData['model'];               
             $sfx = $PfiData['sfx'];
@@ -690,7 +691,10 @@ class PFIController extends Controller
                 $parentId = $pfiItemParentRow->id;
                  if(array_key_exists("loi_item", $PfiData)) {
                     foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
-                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)->where('pfi_id',$pfi->id)->first();
+                        $childPfiQuantity = $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)
+                                    ->where('pfi_quantity', $childPfiQuantity)
+                                    ->where('pfi_id',$pfi->id)->first();
                         if(!$pfiItemRow) {
                             $pfiItemRow = new PfiItem();
 
@@ -718,7 +722,7 @@ class PFIController extends Controller
                         $pfiItemRow->pfi_id = $pfi->id;
                         $pfiItemRow->master_model_id = $LOIItem->masterModel->id ?? '';
                         $pfiItemRow->loi_item_id = $loiItem;
-                        $pfiItemRow->pfi_quantity =  $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow->pfi_quantity =  $childPfiQuantity;
                         $pfiItemRow->unit_price = $unitPrice;
                         $pfiItemRow->created_by = Auth::id();
                         $pfiItemRow->parent_pfi_item_id = $parentId;
@@ -807,7 +811,11 @@ class PFIController extends Controller
                     $query->where('master_model_line_id', $parentModel->master_model_line_id); 
                 });
             }              
-       
+            
+            if($request->selectedLOIItemIds) {
+                $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
+            }
+
         $data['codes'] = $loiItems->get();
         $parentModels = MasterModel::where('model', $request->model)
                                 ->where('sfx', $request->sfx)

@@ -303,7 +303,6 @@ class LetterOfIndentController extends Controller
             }
             
             $quantities = $request->quantity;
-            // $isTTCApprovalRequired = 0;
 
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
@@ -329,7 +328,6 @@ class LetterOfIndentController extends Controller
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
-                    // $LOIItem->uuid = $code;
                     $LOIItem->code = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
