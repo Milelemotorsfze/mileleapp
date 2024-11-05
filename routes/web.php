@@ -32,6 +32,7 @@ use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
+use App\Http\Controllers\VehiclePenaltyController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -127,6 +128,8 @@ use App\Http\Controllers\SalaryCertificateController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
+use App\Http\Controllers\LeadChatController;
+
 
 /*
 /*
@@ -481,6 +484,12 @@ Route::get('/d', function () {
         Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
+    Route::controller(VehiclePenaltyController::class)->group(function(){
+        Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
+        Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
+    }); 
+    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -1073,4 +1082,22 @@ Route::get('/d', function () {
     Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
     Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
     Route::post('/update-call-client', [DailyleadsController::class, 'updateCallClient'])->name('update-call-client');
+    Route::get('/callsdeatilspage/{id}', [DailyleadsController::class, 'leaddetailpage'])->name('calls.leaddetailpage');
+    Route::post('/leads/update', [DailyleadsController::class, 'leaddeupdate'])->name('calls.leaddeupdate');
+    Route::post('/add-model-line', [DailyleadsController::class, 'addModelLine']);
+    Route::delete('/remove-model-line/{requirementId}', [DailyleadsController::class, 'removeModelLine']);
+    Route::post('/messages', [DailyleadsController::class, 'storeMessages']);
+    Route::post('/replies', [DailyleadsController::class, 'storeReply']);
+    Route::get('/messages/{leadid}', [DailyleadsController::class, 'indexmessages']);
+    Route::get('/get-model-lines/{brandId}', [DailyleadsController::class, 'getModelLines']);
+    Route::get('/get-trim-variants/{modelLineId}', [DailyleadsController::class, 'getTrimAndVariants']);
+    Route::post('/upload-file', [DailyleadsController::class, 'fileupload'])->name('leadsfile.upload');
+    Route::delete('/remove-file', [DailyleadsController::class, 'removeFile'])->name('leadsfile.remove');
+    Route::post('/store-log', [DailyleadsController::class, 'storeLog'])->name('store.log');
+    Route::get('/get-logs/{lead_id}', [DailyleadsController::class, 'getLogs'])->name('get.logs');
+    Route::post('/store-task', [DailyleadsController::class, 'storeTask'])->name('taskstore.task');
+    Route::post('/update-task', [DailyleadsController::class, 'updateTask'])->name('taskupdate.task');
+    Route::get('/get-tasks/{lead_id}', [DailyleadsController::class, 'getTasks'])->name('get.tasks');
+    Route::post('/tasks/update', [DailyleadsController::class, 'tasksupdateStatus'])->name('leads-tasks.update');
+    Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
 });

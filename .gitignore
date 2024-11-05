@@ -17,7 +17,18 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/public
+
+# Ignore everything in the public directory
+/public/*
+
+# Allow the css/custom and js/custom directories and their contents
+!/public/css/
+!/public/css/custom/
+!/public/css/custom/**
+!/public/js/
+!/public/js/custom/
+!/public/js/custom/**
+
 /latest
 /laravel-blog
 /testings

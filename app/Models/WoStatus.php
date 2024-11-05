@@ -27,4 +27,15 @@ class WoStatus extends Model
     {
         return $this->hasOne(workOrder::class,'id','wo_id');
     }
+    public function statusBadgeClass()
+    {
+        return match ($this->status) {
+            'On Hold' => 'badge-soft-warning',
+            'Active' => 'badge-soft-success',
+            'Cancelled' => 'badge-soft-danger',
+            'Succeeded' => 'badge-soft-primary',
+            'Partially Delivered' => 'badge-soft-info',
+            default => 'badge-soft-secondary',
+        };
+    }
 }

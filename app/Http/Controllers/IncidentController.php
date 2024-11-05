@@ -38,7 +38,6 @@ class IncidentController extends Controller
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
-            info($status);
             if($status === "Repaired")
             {
             $data = Incident::select( [
@@ -242,7 +241,6 @@ class IncidentController extends Controller
         $incidents->status = "Repaired";
         $incidents->repaired_date = $currentDate;
     }
-    info($incidents->status);
     $incidents->save();
     return response()->json(['message' => 'Links saved successfully']);
 }
@@ -376,7 +374,6 @@ public function updatevehicledetails(Request $request)
         $useractivities->save();
         $canvasImageDataURL = $request->input('canvas_image');
         $vin = $request->input('vin');
-        info($vin);
         $vehicle = Vehicles::where('vin', $vin)->first();
         $inspection = New Inspection();
         $inspection->status = "Pending";

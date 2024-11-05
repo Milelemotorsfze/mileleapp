@@ -43,7 +43,6 @@ class InspectionController extends Controller
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
-            info($status);
             if($status === "Pending")
             {
             $data = Vehicles::select( [

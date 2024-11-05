@@ -93,7 +93,6 @@ class BanksController extends Controller
     public function getBanks()
     {
         $banks = BankMaster::all();
-        info($banks);
         return response()->json($banks);
     }
 }

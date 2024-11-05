@@ -1,8 +1,23 @@
 <style>
     .dropdown-menu-scrollable {
-        max-height: 90vh; /* Adjust this value as needed */
+        max-height: 80vh;
         overflow-y: auto;
     }
+    .logo-img {
+        width: auto;
+        height: 40px;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        .logo-img {
+            width: auto;
+            height: 40px;
+            object-fit: contain;
+       }
+    }
+    
     .badge-notification {
       top: -20;
       right: 0;
@@ -28,6 +43,35 @@
         padding-right:3px!important;
         padding-left:3px!important;
     }
+
+    #rolename-dropdown-menu {
+        position: fixed; 
+        z-index: 1050 !important; 
+        min-width: 150px;
+        max-height: 80vh;
+        overflow-y: auto;
+        right: 0;
+        display: none; 
+    }
+
+    .container, .main-wrapper, .navbar, .header {
+        overflow: visible !important; 
+    }
+
+    @media (max-width: 991.99px) {
+    .dropdown-menu {
+        right: 0;
+        left: auto;
+    }
+
+    #rolename-dropdown-menu {
+        top: 100%;
+        left: 0;
+        margin-top: 0.25rem;
+        right: 30px !important;
+    }
+}
+
     @media only screen and (max-device-width: 280px) {
         .responsiveButton {
             position: absolute;
@@ -65,36 +109,43 @@
 
     }
     @media (min-width: 992px) {
-.topnav .dropdown .dropdown-menu {
-    margin-top: 0;
-    border-radius: 0 0 .25rem .25rem;
-    right: auto!important;
-}
+        .dropdown-menu.dropdown-menu-scrollable {
+            right: 0px;
+        }
+        #rolename-dropdown-menu.dropdown-menu-scrollable {
+            right: 9px !important;
+            top: 55px !important;
+        }
+        .topnav .dropdown .dropdown-menu {
+            margin-top: 0;
+            border-radius: 0 0 .25rem .25rem;
+            right: auto!important;
+        }
     }
 </style>
 <script>
-        function checkSession() {
-            fetch('/session-status')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.authenticated) {
-                        window.location.href = '/login';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking session status:', error);
-                });
+    function checkSession() {
+        fetch('/session-status')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.authenticated) {
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session status:', error);
+            });
+    }
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            checkSession(); // Check session when the page becomes visible again
         }
+    });
 
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                checkSession(); // Check session when the page becomes visible again
-            }
-        });
-
-        checkSession(); // Initial check immediately on page load
-        setInterval(checkSession, 15000); // Check every 15 seconds
-    </script>
+    checkSession(); // Initial check immediately on page load
+    setInterval(checkSession, 15000); // Check every 15 seconds
+</script>
 <div class="container">
     <div class="row topnav">
         <!-- <div class="topnav" style="overflow: unset;"> -->
@@ -106,7 +157,7 @@
             </button>
             <div class="d-none d-lg-block">
                 <div class="dropdown d-inline-block align-items-center" style="position: absolute; left: 13px; top:7px; z-index: 500;">
-                    <img src="{{ asset('logo.png') }}" width="20" height="40" alt="Logo" class="mx-auto">
+                    <img src="{{ asset('logo.png') }}" alt="Logo" class="mx-auto logo-img">
                 </div>
             </div>
 
@@ -147,8 +198,8 @@
                                                 <span data-key="t-utility"> Report</span>
                                                 <div class="arrow-down"></div>
                                             </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">                                             
-                                                <a href="{{route('work-order.index','status_report')}}" class="dropdown-item" data-key="t-login">Status Report</a>                                             
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('work-order.index','status_report')}}" class="dropdown-item" data-key="t-login">Status Report</a>
                                                 <a href="{{route('work-order.index','all')}}" class="dropdown-item" data-key="t-login">Full Data</a>
                                             </div>
                                         </div>
@@ -232,6 +283,21 @@
                                         </div>
                                         @endif
 
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penalty-report']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Customs Clearance</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('getVehiclePenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized Vehicles</a>            
+                                                <a href="{{route('getClearedPenalties')}}" class="dropdown-item" data-key="t-login">Cleared Penalties</a>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </li>
                                 @endif
@@ -260,7 +326,7 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
                                         <span data-key="t-extra-pages">
-                                        HR
+                                            HR
                                         </span>
                                         <div class="arrow-down"></div>
                                     </a>
@@ -439,16 +505,16 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-list','current-user-view-liability-list']);
                                         @endphp
                                         @if ($hasPermission)
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_liability.index') }}"  id="topnav-utility" role="button">
-                                        <span data-key="t-utility">Liability</span>
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_liability.index') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Liability</span>
                                         </a>
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-list','view-current-user-leave-list']);
                                         @endphp
                                         @if ($hasPermission)
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_leave.index') }}"  id="topnav-utility" role="button">
-                                        <span data-key="t-utility">Leave</span>
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_leave.index') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Leave</span>
                                         </a>
                                         @endif
                                         <div class="dropdown">
@@ -525,7 +591,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('overtime.index') }}" id="topnav-utility" role="button">
-                                        <span data-key="t-utility">Over Time Application</span>
+                                            <span data-key="t-utility">Over Time Application</span>
                                         </a>
                                         @endif
                                         @php
@@ -533,7 +599,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('separation-handover.index') }}" id="topnav-utility" role="button">
-                                        <span data-key="t-utility">Separation Employee Handover</span>
+                                            <span data-key="t-utility">Separation Employee Handover</span>
                                         </a>
                                         @endif
                                     </div>
@@ -662,7 +728,7 @@
                                 @endif
                                 <!-- End Employee Relations -->
 
-                                
+
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create','addon-supplier-list']);
                                 @endphp
@@ -795,106 +861,106 @@
                                     </div>
                                 </li>
                                 @endif
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
-                            @endphp
-                            <!-- UNCOMMENT BELOW LINE WHEN HR MODULE GO LIVE -->
-                            <!-- OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true  -->
-                            @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true 
-                            OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                                    <i data-feather="grid"></i>
-                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->joining_report_approval['count']+Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
-                                    <span class="approval-count">{{Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
-                                                @endif
-                                            </span>
-                                    <div class="arrow-down"></div>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                    @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-price-action','approve-addon-new-selling-price',]);
-                                    @endphp
-                                    @if ($hasPermission)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','P') }}" id="topnav-auth" role="button">
-                                            <span data-key="t-authentication">Accessories</span>
-                                        </a>
-                                    </div>
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','SP') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Spare Parts</span>
-                                        </a>
-                                    </div>
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','K') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Kits</span>
-                                        </a>
-                                    </div>
-                                    @endif
-
-                                    @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve']);
-                                    @endphp
-                                    @if ($hasPermission)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Warranties</span>
-                                        </a>
-                                    </div>
-                                    @endif
-
-                                    @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form','verify-offer-letter-signature','verify-candidate-personal-information','send-personal-info-form-action']);
-                                    @endphp
-                                    @if(($hasPermission && (Auth::user()->can_show_offer_letter == true OR Auth::user()->can_show_info == true OR Auth::user()->can_show_docs == true OR Auth::user()->can_show_summary == true) )OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR (Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true) OR (Auth::user()->candidate_docs_varify > 0 && Auth::user()->can_show_docs == true) OR (Auth::user()->candidate_personal_information_varify > 0 && Auth::user()->can_show_info == true))
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility"> Employee Hiring @if((Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
-                                            <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters}}</span>
-                                                @endif
-                                            </span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            @if(Auth::user()->hiring_request_approval['can'] == true)
-                                            <a href="{{ route('employee-hiring-request.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Hiring Requests
-                                                @if(Auth::user()->hiring_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->hiring_request_approval['count']}}</span> @endif
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
+                                @endphp
+                                <!-- UNCOMMENT BELOW LINE WHEN HR MODULE GO LIVE -->
+                                <!-- OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true  -->
+                                @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true
+                                OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="grid"></i>
+                                        <span data-key="t-extra-pages">Approvals @if((Auth::user()->joining_report_approval['count']+Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
+                                            <span class="approval-count">{{Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
+                                            @endif
+                                        </span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-price-action','approve-addon-new-selling-price',]);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','P') }}" id="topnav-auth" role="button">
+                                                <span data-key="t-authentication">Accessories</span>
                                             </a>
-                                            @endif
-                                            @if(Auth::user()->job_description_approval['can']  == true)
-                                            <a href="{{ route('employee-hiring-job-description.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Job Descriptions
-                                            @if(Auth::user()->job_description_approval['count'] > 0) <span class="approval-count">{{Auth::user()->job_description_approval['count']}}<span> @endif
-                                            </a>
-                                            @endif
-                                            @if(Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true)
-                                            <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">InterviewSummary @if(Auth::user()->interview_summary_report_approval['count'] > 0)<span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
-                                            </a>
-                                            @endif
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form']);
-                                            @endphp
-                                            @if ($hasPermission && Auth::user()->can_show_docs == true)
-                                            <a href="{{ route('candidate.listDocs') }}" class="dropdown-item" data-key="t-login">Candidate Docs @if(Auth::user()->candidate_docs_varify > 0)<span class="approval-count">{{Auth::user()->candidate_docs_varify}}</span> @endif</a>
-                                            @endif
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
-                                            @endphp
-                                            @if ($hasPermission && Auth::user()->can_show_offer_letter == true)
-                                            <a href="{{ route('candidate.listOfferLetter') }}" class="dropdown-item" data-key="t-login">Offer Letter @if(Auth::user()->verify_offer_letters > 0)<span class="approval-count">{{Auth::user()->verify_offer_letters}}</span> @endif</a>
-                                            @endif
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
-                                            @endphp
-                                            @if ($hasPermission && Auth::user()->can_show_info == true)
-                                            <a href="{{ route('candidate.listingInfo') }}" class="dropdown-item" data-key="t-login">Candidate Info @if(Auth::user()->candidate_personal_information_varify > 0)<span class="approval-count">{{Auth::user()->candidate_personal_information_varify}}</span> @endif</a>
-                                            @endif
                                         </div>
-                                    </div>
-                                    @endif
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','SP') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Spare Parts</span>
+                                            </a>
+                                        </div>
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','K') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Kits</span>
+                                            </a>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Warranties</span>
+                                            </a>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form','verify-offer-letter-signature','verify-candidate-personal-information','send-personal-info-form-action']);
+                                        @endphp
+                                        @if(($hasPermission && (Auth::user()->can_show_offer_letter == true OR Auth::user()->can_show_info == true OR Auth::user()->can_show_docs == true OR Auth::user()->can_show_summary == true) )OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR (Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true) OR (Auth::user()->candidate_docs_varify > 0 && Auth::user()->can_show_docs == true) OR (Auth::user()->candidate_personal_information_varify > 0 && Auth::user()->can_show_info == true))
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employee Hiring @if((Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
+                                                    <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters}}</span>
+                                                    @endif
+                                                </span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @if(Auth::user()->hiring_request_approval['can'] == true)
+                                                <a href="{{ route('employee-hiring-request.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Hiring Requests
+                                                    @if(Auth::user()->hiring_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->hiring_request_approval['count']}}</span> @endif
+                                                </a>
+                                                @endif
+                                                @if(Auth::user()->job_description_approval['can'] == true)
+                                                <a href="{{ route('employee-hiring-job-description.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Job Descriptions
+                                                    @if(Auth::user()->job_description_approval['count'] > 0) <span class="approval-count">{{Auth::user()->job_description_approval['count']}}<span> @endif
+                                                </a>
+                                                @endif
+                                                @if(Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true)
+                                                <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">InterviewSummary @if(Auth::user()->interview_summary_report_approval['count'] > 0)<span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
+                                                </a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form']);
+                                                @endphp
+                                                @if ($hasPermission && Auth::user()->can_show_docs == true)
+                                                <a href="{{ route('candidate.listDocs') }}" class="dropdown-item" data-key="t-login">Candidate Docs @if(Auth::user()->candidate_docs_varify > 0)<span class="approval-count">{{Auth::user()->candidate_docs_varify}}</span> @endif</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
+                                                @endphp
+                                                @if ($hasPermission && Auth::user()->can_show_offer_letter == true)
+                                                <a href="{{ route('candidate.listOfferLetter') }}" class="dropdown-item" data-key="t-login">Offer Letter @if(Auth::user()->verify_offer_letters > 0)<span class="approval-count">{{Auth::user()->verify_offer_letters}}</span> @endif</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
+                                                @endphp
+                                                @if ($hasPermission && Auth::user()->can_show_info == true)
+                                                <a href="{{ route('candidate.listingInfo') }}" class="dropdown-item" data-key="t-login">Candidate Info @if(Auth::user()->candidate_personal_information_varify > 0)<span class="approval-count">{{Auth::user()->candidate_personal_information_varify}}</span> @endif</a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
 
 
-                                    <!-- @if(Auth::user()->joining_report_approval['can'] == true)
+                                        <!-- @if(Auth::user()->joining_report_approval['can'] == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> On Boarding @if((Auth::user()->joining_report_approval['count']) > 0)
@@ -912,8 +978,8 @@
                                         </div>
                                     </div>
                                     @endif -->
-                                    <!-- CAN UNCOMMENT WHEN PASSPORT REQUEST MODULE GET USE -->
-                                    <!-- @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
+                                        <!-- CAN UNCOMMENT WHEN PASSPORT REQUEST MODULE GET USE -->
+                                        <!-- @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Passport Request @if((Auth::user()->passport_submit_request_approval['count']) > 0 OR (Auth::user()->passport_release_request_approval['count']) > 0)
@@ -937,45 +1003,45 @@
                                     </div>
                                     @endif -->
 
-                                    @if(Auth::user()->liability_request_approval['can'] == true OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->overtime_request_approval['can'] == true)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility"> Employee @if((Auth::user()->liability_request_approval['count']) > 0 OR (Auth::user()->leave_request_approval['count']) > 0 OR (Auth::user()->overtime_request_approval['count']) > 0)
-                                            <span class="approval-count">{{Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->overtime_request_approval['count']}}</span>
+                                        @if(Auth::user()->liability_request_approval['can'] == true OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->overtime_request_approval['can'] == true)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employee @if((Auth::user()->liability_request_approval['count']) > 0 OR (Auth::user()->leave_request_approval['count']) > 0 OR (Auth::user()->overtime_request_approval['count']) > 0)
+                                                    <span class="approval-count">{{Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->overtime_request_approval['count']}}</span>
+                                                    @endif
+                                                </span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @if(Auth::user()->liability_request_approval['can'] == true)
+                                                <a href="{{ route('liability.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Liability
+                                                    @if(Auth::user()->liability_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->liability_request_approval['count']}}</span> @endif
+                                                </a>
                                                 @endif
-                                            </span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            @if(Auth::user()->liability_request_approval['can'] == true)
-                                            <a href="{{ route('liability.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Liability
-                                                @if(Auth::user()->liability_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->liability_request_approval['count']}}</span> @endif
-                                            </a>
-                                            @endif
-                                            @if(Auth::user()->leave_request_approval['can'] == true)
-                                            <a href="{{ route('leave.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Leave
-                                                @if(Auth::user()->leave_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->leave_request_approval['count']}}</span> @endif
-                                            </a>
-                                            @endif
-                                            @if(Auth::user()->overtime_request_approval['can'] == true)
-                                            <a href="{{ route('overtime.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Overtime
-                                                @if(Auth::user()->overtime_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->overtime_request_approval['count']}}</span> @endif
-                                            </a>
-                                            @endif
+                                                @if(Auth::user()->leave_request_approval['can'] == true)
+                                                <a href="{{ route('leave.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Leave
+                                                    @if(Auth::user()->leave_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->leave_request_approval['count']}}</span> @endif
+                                                </a>
+                                                @endif
+                                                @if(Auth::user()->overtime_request_approval['can'] == true)
+                                                <a href="{{ route('overtime.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Overtime
+                                                    @if(Auth::user()->overtime_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->overtime_request_approval['count']}}</span> @endif
+                                                </a>
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    @endif
+                                        @endif
 
-                                    @if(Auth::user()->joining_report_approval['can'] == true)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('joiningReport.approvalAwaiting') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility"> Joining Report @if((Auth::user()->joining_report_approval['count']) > 0)
-                                            <span class="approval-count">{{Auth::user()->joining_report_approval['count']}}</span>
-                                                @endif
-                                            </span>
-                                            <!-- <div class="arrow-down"></div> -->
-                                        </a>
-                                        <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                        @if(Auth::user()->joining_report_approval['can'] == true)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('joiningReport.approvalAwaiting') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Joining Report @if((Auth::user()->joining_report_approval['count']) > 0)
+                                                    <span class="approval-count">{{Auth::user()->joining_report_approval['count']}}</span>
+                                                    @endif
+                                                </span>
+                                                <!-- <div class="arrow-down"></div> -->
+                                            </a>
+                                            <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                             @if(Auth::user()->joining_report_approval['can'] == true)
                                             <a href="{{ route('joiningReport.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">New Employee
                                                 @if(Auth::user()->joining_report_approval['count'] > 0) <span class="approval-count">{{Auth::user()->joining_report_approval['count']}}</span> @endif
@@ -988,11 +1054,11 @@
                                             </a>
                                             @endif
                                         </div> -->
+                                        </div>
+                                        @endif
                                     </div>
-                                    @endif
-                                </div>
-                            </li>
-                            @endif
+                                </li>
+                                @endif
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -1010,22 +1076,22 @@
                                                 <span data-key="t-utility">Pending Leads</span>
                                             </a>
                                         </div>
-										<div class="dropdown">
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.inprocess') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">In Process Leads</span>
                                             </a>
                                         </div>
-										<div class="dropdown">
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.converted') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Converted Leads</span>
                                             </a>
                                         </div>
-										<div class="dropdown">
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.rejected') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Rejected Leads</span>
                                             </a>
                                         </div>
-										<div class="dropdown">
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.datacenter') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Leads Data Center</span>
                                             </a>
@@ -1175,279 +1241,279 @@
                                     </a>
                                 </li>
                                 @endif
-                            <!-- Demand planning Module -->
-                        
+                                <!-- Demand planning Module -->
+
                                 @canany(['demand-list','supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
-                                            'supplier-inventory-report-view','demand-planning-supplier-list','LOI-list','PFI-list',
-                                            'model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
-                                            'list-master-models','list-color-code'])
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-list','supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
-                                            'supplier-inventory-report-view','demand-planning-supplier-list','LOI-list','PFI-list',
-                                            'model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
-                                            'list-master-models','list-color-code']);
-                                    @endphp
-                                    @if ($hasPermission)
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                                            <i data-feather="file-text"></i>
-                                            <span data-key="t-extra-pages">Demand & Planning</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
+                                'supplier-inventory-report-view','demand-planning-supplier-list','LOI-list','PFI-list',
+                                'model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
+                                'list-master-models','list-color-code'])
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-list','supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
+                                'supplier-inventory-report-view','demand-planning-supplier-list','LOI-list','PFI-list',
+                                'model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
+                                'list-master-models','list-color-code']);
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="file-text"></i>
+                                        <span data-key="t-extra-pages">Demand & Planning</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
 
-                                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                            @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
-                                                    'list-master-models','list-color-code','demand-planning-supplier-list','list-list-loi-expiry-conditions'])
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer',
+                                        'list-master-models','list-color-code','demand-planning-supplier-list','list-list-loi-expiry-conditions'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
+                                        'model-year-calculation-categories-list','list-customer','list-master-models','list-color-code',
+                                        'list-list-loi-expiry-conditions','demand-planning-supplier-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Master Data</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('demand-planning-supplier-list')
                                                 @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
-                                                    'model-year-calculation-categories-list','list-customer','list-master-models','list-color-code',
-                                                    'list-list-loi-expiry-conditions','demand-planning-supplier-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-list');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                    <div class="dropdown">
-                                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                            <span data-key="t-utility">Master Data</span>
-                                                            <div class="arrow-down"></div>
-                                                        </a>
-                                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                            @can('demand-planning-supplier-list')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-list');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                <a href="{{ route('suppliers.index') }}" class="dropdown-item" data-key="t-login">Vendors</a>
-                                                               
-                                                                @endif
-                                                            @endcan
-                                                            @can('list-customer')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login"> Customers </a>
-                                                                @endif
-                                                            @endcan
-                                                            @can('list-color-code')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('colourcode.index')}}" class="dropdown-item" data-key="t-login"> Colours </a>
-                                                                @endif
-                                                            @endcan
-                                                            @can('list-master-models')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> List Models </a>
-                                                                @endif
-                                                            @endcan
-                                                            @can('list-loi-mapping-criterias')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-mapping-criterias');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('loi-mapping-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Mapping Months </a>
-                                                                @endif
-                                                            @endcan
-                                                            @can('loi-restricted-country-list')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('loi-country-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Country Criterias </a>
-                                                                @endif
-                                                            @endcan
-                                                            @can('list-loi-expiry-conditions')
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-expiry-conditions');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    <a href="{{route('loi-expiry-conditions.index')}}" class="dropdown-item" data-key="t-login"> LOI Expiry Conditions</a>
-                                                                @endif
-                                                            @endcan
-                                                            @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list'])
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list','model-year-calculation-categories-list']);
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                <div class="dropdown">
-                                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                                        <span data-key="t-utility">Model Year</span>
-                                                                        <div class="arrow-down"></div>
-                                                                    </a>
-                                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                                        @can('model-year-calculation-rules-list')
-                                                                            @php
-                                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
-                                                                            @endphp
-                                                                            @if ($hasPermission)
-                                                                                <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">
-                                                                                    List Rules
-                                                                                </a>
-                                                                            @endif
-                                                                        @endcan
-                                                                        @can('model-year-calculation-categories-list')
-                                                                            @php
-                                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
-                                                                            @endphp
-                                                                            @if ($hasPermission)
-                                                                                <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">
-                                                                                    List Categories
-                                                                                </a>
-                                                                            @endif
-                                                                        @endcan
-                                                                    </div>
-                                                                </div>
-                                                                @endif
-                                                            @endcan
-                                                           
-                                                        </div>
-                                                    </div>
+                                                <a href="{{ route('suppliers.index') }}" class="dropdown-item" data-key="t-login">Vendors</a>
+
                                                 @endif
-                                            @endcan
-                                            @can('demand-create')
+                                                @endcan
+                                                @can('list-customer')
                                                 @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-create');
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login"> Customers </a>
+                                                @endif
+                                                @endcan
+                                                @can('list-color-code')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('colourcode.index')}}" class="dropdown-item" data-key="t-login"> Colours </a>
+                                                @endif
+                                                @endcan
+                                                @can('list-master-models')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> List Models </a>
+                                                @endif
+                                                @endcan
+                                                @can('list-loi-mapping-criterias')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-mapping-criterias');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('loi-mapping-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Mapping Months </a>
+                                                @endif
+                                                @endcan
+                                                @can('loi-restricted-country-list')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('loi-country-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Country Criterias </a>
+                                                @endif
+                                                @endcan
+                                                @can('list-loi-expiry-conditions')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-expiry-conditions');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('loi-expiry-conditions.index')}}" class="dropdown-item" data-key="t-login"> LOI Expiry Conditions</a>
+                                                @endif
+                                                @endcan
+                                                @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list','model-year-calculation-categories-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <div class="dropdown">
                                                     <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility">Demand</span>
+                                                        <span data-key="t-utility">Model Year</span>
                                                         <div class="arrow-down"></div>
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        @can('demand-list')
-                                                            @php
-                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                            <a href="{{route('demands.index')}}" class="dropdown-item" data-key="t-login">Demand Lists </a>
-                                                            @endif
-                                                        @endcan
-                                                        <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
-                                                    </div>
-                                                </div>
-                                                @endif
-                                            @endcan
-
-                                            @can('LOI-list')
-                                                @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <div class="dropdown">
-                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility">LOI</span>
-                                                        <div class="arrow-down"></div>
-                                                    </a>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        @can('LOI-create')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                            <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
-                                                            @endif
-                                                        @endcan
-                                                        @can('LOI-list')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                            <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Lists</a>
-                                                            @endif
-                                                        @endcan
-                                                    </div>
-                                                </div>
-                                                @endif
-                                            @endcan
-
-                                            @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
-                                                'supplier-inventory-report-view'])
-                                                @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-inventory-list','supplier-inventory-edit',
-                                                    'supplier-inventory-list-with-date-filter','supplier-inventory-report-view']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <div class="dropdown">
-                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility">Supplier Inventory</span>
-                                                        <div class="arrow-down"></div>
-                                                    </a>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        @can('supplier-inventory-list')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
-                                                            @endif
-                                                        @endcan
-                                                        @can('supplier-inventory-list-view-all')
+                                                        @can('model-year-calculation-rules-list')
                                                         @php
-                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('supplier-inventories.view-all')}}" class="dropdown-item" data-key="t-login">Inventory Stock</a>
-                                                            @endif
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">
+                                                            List Rules
+                                                        </a>
+                                                        @endif
                                                         @endcan
-                                                        @can('supplier-inventory-list-with-date-filter')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
-                                                            @endif
-                                                        @endcan
-                                                        @can('supplier-inventory-report-view')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-report-view');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
-                                                            @endif
+                                                        @can('model-year-calculation-categories-list')
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">
+                                                            List Categories
+                                                        </a>
+                                                        @endif
                                                         @endcan
                                                     </div>
                                                 </div>
                                                 @endif
-                                            @endcan
+                                                @endcan
 
-                                            @canany(['PFI-list','PFI-create'])
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @endcan
+                                        @can('demand-create')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-create');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Demand</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('demand-list')
                                                 @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['PFI-list','PFI-create']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <div class="dropdown">
-                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility">PFI</span>
-                                                        <div class="arrow-down"></div>
-                                                    </a>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        @can('PFI-list')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
-                                                            @endif
-                                                        @endcan
-                                                        @can('PFI-create')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('pfi.create')}}" class="dropdown-item" data-key="t-login">Add New PFI Details </a>
-                                                            @endif
-                                                        @endcan
-                                                    </div>
-                                                </div>
+                                                <a href="{{route('demands.index')}}" class="dropdown-item" data-key="t-login">Demand Lists </a>
                                                 @endif
-                                            @endcan
+                                                @endcan
+                                                <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                            </div>
                                         </div>
-                                    </li>
-                                    @endif
+                                        @endif
+                                        @endcan
+
+                                        @can('LOI-list')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">LOI</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('LOI-create')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
+                                                @endif
+                                                @endcan
+                                                @can('LOI-list')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Lists</a>
+                                                @endif
+                                                @endcan
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @endcan
+
+                                        @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
+                                        'supplier-inventory-report-view'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-inventory-list','supplier-inventory-edit',
+                                        'supplier-inventory-list-with-date-filter','supplier-inventory-report-view']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Supplier Inventory</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('supplier-inventory-list')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                                @endif
+                                                @endcan
+                                                @can('supplier-inventory-list-view-all')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('supplier-inventories.view-all')}}" class="dropdown-item" data-key="t-login">Inventory Stock</a>
+                                                @endif
+                                                @endcan
+                                                @can('supplier-inventory-list-with-date-filter')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
+                                                @endif
+                                                @endcan
+                                                @can('supplier-inventory-report-view')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-report-view');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                                @endif
+                                                @endcan
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @endcan
+
+                                        @canany(['PFI-list','PFI-create'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['PFI-list','PFI-create']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">PFI</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('PFI-list')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                                @endif
+                                                @endcan
+                                                @can('PFI-create')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-create');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('pfi.create')}}" class="dropdown-item" data-key="t-login">Add New PFI Details </a>
+                                                @endif
+                                                @endcan
+                                            </div>
+                                        </div>
+                                        @endif
+                                        @endcan
+                                    </div>
+                                </li>
+                                @endif
                                 @endcan
 
                                 <!-- Demand Planning Module end -->
@@ -1462,11 +1528,11 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                    @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
-                                @endphp
-                                @if ($hasPermission)
-                                    <div class="dropdown">
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('paymentterms.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payment Terms</span>
                                             </a>
@@ -1545,13 +1611,13 @@
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
                                         @endphp
-                                            @if ($hasPermission)
-                                            <div class="dropdown">
-                                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
-                                                    <span data-key="t-utility">Colours </span>
-                                                </a>
-                                            </div>
-                                            @endif
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Colours </span>
+                                            </a>
+                                        </div>
+                                        @endif
 
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
@@ -1647,32 +1713,32 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                    <div class="dropdown">
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.availablevehicles')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Incoming & Available Vehicles</span>
                                             </a>
-                                            </div>
-                                            <div class="dropdown">
+                                        </div>
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.deliveredvehicles')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Delivered Vehicles</span>
                                             </a>
-                                            </div>
-                                            <div class="dropdown">
+                                        </div>
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.dpvehicles')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">DP Vehicles</span>
                                             </a>
-                                            </div>
-                                            <div class="dropdown">
+                                        </div>
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">All Vehicles</span>
                                             </a>
-                                            </div>
-                                            <div class="dropdown">
+                                        </div>
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.currentstatus')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-vehicles">Vehicle Current Status</span>
                                             </a>
-                                            </div>        
-                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                                 @endif
                                 @php
@@ -1722,28 +1788,28 @@
 
                 <!-- Second div with role name -->
                 <div class="nav-item rolename-button" id="rolename-dropdown-button">
-    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
-        @php
-        $selectedrole = Auth::user()->selectedRole;
-        $selected = DB::table('roles')->where('id', $selectedrole)->first();
-        $roleselected = $selected ? $selected->name : null;
-        @endphp
-        {{ $roleselected }}
-    </button>
-    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable">
-        @foreach ($assignedRoles as $role)
-        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
-            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
-        </a>
-        <div class="dropdown-divider"></div>
-        @endforeach
-    </div>
-</div>
+                    <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
+                        @php
+                        $selectedrole = Auth::user()->selectedRole;
+                        $selected = DB::table('roles')->where('id', $selectedrole)->first();
+                        $roleselected = $selected ? $selected->name : null;
+                        @endphp
+                        {{ $roleselected }}
+                    </button>
+                    <div id="rolename-dropdown-menu" class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable">
+                        @foreach ($assignedRoles as $role)
+                        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
+                            <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endforeach
+                    </div>
+                </div>
 
                 <!-- Third div with username -->
                 <div class="nav-item dropdown username-button" id="username-dropdown-button">
                     <button class="btn username-toggle header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
-                    <img class="rounded-circle header-profile-user" src="{{ auth()->user()->empProfile && auth()->user()->empProfile->image_path ? asset(auth()->user()->empProfile->image_path) : asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;padding: 0px!important;">
+                        <img class="rounded-circle header-profile-user" src="{{ auth()->user()->empProfile && auth()->user()->empProfile->image_path ? asset(auth()->user()->empProfile->image_path) : asset('images/users/avatar-1.jpg') }}" alt="Header Avatar" style="float: left;padding: 0px!important;">
                         <span class="d-none d-xl-inline-block fw-medium user-textname-div" style="line-height: 35px;">
                             @php
                             $userName = auth()->user()->name;
@@ -1788,9 +1854,9 @@
                             <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
                             @php
                             $notificationcount = DB::table('leads_notifications')
-                                ->where('user_id', Auth::user()->id)
-                                ->where('status', 'New')
-                                ->count();
+                            ->where('user_id', Auth::user()->id)
+                            ->where('status', 'New')
+                            ->count();
                             @endphp
                             <span class="badge badge-danger row-badge2 badge-notificationing">{{$notificationcount}}</span>
                         </a>
@@ -1803,14 +1869,14 @@
                         <a class="dropdown-item" href="{{ route('departmentnotifications.index') }}">
                             <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
                             @php
-$userDepartmentId = auth()->user()->empProfile->department_id;
+                            $userDepartmentId = auth()->user()->empProfile->department_id;
 
-$departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('departments', function($query) use ($userDepartmentId) {
-    $query->where('master_departments_id', $userDepartmentId);
-})->whereDoesntHave('viewedLogs', function($query) {
-    $query->where('users_id', auth()->id());
-})->count();
-@endphp
+                            $departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('departments', function($query) use ($userDepartmentId) {
+                            $query->where('master_departments_id', $userDepartmentId);
+                            })->whereDoesntHave('viewedLogs', function($query) {
+                            $query->where('users_id', auth()->id());
+                            })->count();
+                            @endphp
                             <span class="badge badge-danger row-badge2 badge-notificationing">{{$departmentnotificationscount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
@@ -1938,6 +2004,7 @@ $departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('d
         window.addEventListener("resize", moveMenuItems);
     });
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         function checkAvailableSpace() {
@@ -1987,86 +2054,64 @@ $departmentnotificationscount = \App\Models\DepartmentNotifications::whereHas('d
     });
 </script>
 
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const moreButton = document.querySelector(".more-button");
         const rolenameButton = document.querySelector(".rolename-button");
-        const usernameButton = document.querySelector(".username-button");
-        const moreDropdown = document.getElementById("more-dropdown-menu");
         const rolenameDropdown = document.getElementById("rolename-dropdown-menu");
-        const usernameDropdown = document.getElementById("username-dropdown-menu");
 
-        // Function to close all dropdowns
-        function closeDropdowns() {
-            moreDropdown.classList.remove("show");
-            rolenameDropdown.classList.remove("show");
-            usernameDropdown.classList.remove("show");
+        function isMobile() {
+            return window.innerWidth < 992; 
         }
 
-        moreButton.addEventListener("mouseenter", function() {
-            closeDropdowns();
-            moreDropdown.classList.add("show");
+        rolenameButton.addEventListener("click", function(event) {
+            event.stopPropagation();
+            toggleDropdownVisibility();
         });
 
-        rolenameButton.addEventListener("mouseenter", function() {
-            closeDropdowns();
-            rolenameDropdown.classList.add("show");
-        });
-
-        usernameButton.addEventListener("mouseenter", function() {
-            closeDropdowns();
-            usernameDropdown.classList.add("show");
-        });
-
-        moreButton.addEventListener("mouseleave", function() {
-            moreDropdown.classList.remove("show");
-        });
-
-        rolenameButton.addEventListener("mouseleave", function() {
-            rolenameDropdown.addEventListener("mouseenter", function() {
-                rolenameDropdown.classList.add("show");
+        if (!isMobile()) {
+            rolenameButton.addEventListener("mouseenter", function() {
+                showDropdown();
+                adjustDropdownPosition(rolenameButton, rolenameDropdown);
             });
-            rolenameDropdown.addEventListener("mouseleave", function() {
-                rolenameDropdown.classList.remove("show");
-            });
-        });
+        }
 
-        usernameButton.addEventListener("mouseleave", function() {
-            usernameDropdown.classList.remove("show");
-        });
-
-        // Toggle rolename dropdown on button click
-        moreButton.addEventListener("click", function() {
-            if (moreDropdown.classList.contains("show")) {
-                moreDropdown.classList.remove("show");
-            } else {
-                closeDropdowns();
-                moreDropdown.classList.add("show");
-            }
-        });
-
-        rolenameButton.addEventListener("click", function() {
-            if (rolenameDropdown.classList.contains("show")) {
-                rolenameDropdown.classList.remove("show");
-            } else {
-                closeDropdowns();
-                rolenameDropdown.classList.add("show");
-            }
-        });
-
-        usernameButton.addEventListener("click", function() {
-            if (usernameDropdown.classList.contains("show")) {
-                usernameDropdown.classList.remove("show");
-            } else {
-                closeDropdowns();
-                usernameDropdown.classList.add("show");
-            }
-        });
-
-        // Close dropdowns when clicking anywhere on the document
         document.addEventListener("click", function() {
-            closeDropdowns();
+            hideDropdown();
+        });
+
+        function toggleDropdownVisibility() {
+            if (rolenameDropdown.style.display === "block") {
+                hideDropdown();
+            } else {
+                showDropdown();
+                adjustDropdownPosition(rolenameButton, rolenameDropdown);
+            }
+        }
+
+        function showDropdown() {
+            rolenameDropdown.style.display = "block";
+        }
+
+        function hideDropdown() {
+            rolenameDropdown.style.display = "none";
+        }
+
+        function adjustDropdownPosition(button, dropdown) {
+            const buttonRect = button.getBoundingClientRect();
+
+            dropdown.style.top = `${buttonRect.bottom + window.scrollY}px`;
+            dropdown.style.left = `${buttonRect.left + window.scrollX}px`;
+
+            if (buttonRect.right + dropdown.offsetWidth > window.innerWidth) {
+                dropdown.style.left = `${window.innerWidth - dropdown.offsetWidth - 10}px`;
+            }
+        }
+
+        window.addEventListener("resize", function() {
+            if (rolenameDropdown.style.display === "block") {
+                adjustDropdownPosition(rolenameButton, rolenameDropdown);
+            }
         });
     });
 </script>
+

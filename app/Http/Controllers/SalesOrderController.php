@@ -45,7 +45,7 @@ class SalesOrderController extends Controller
             if($status === "SalesOrder")
             {
                 $id = Auth::user()->id;
-                info($id);
+                // info($id);
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         if($hasPermission)
         {
@@ -535,6 +535,31 @@ public function showSalesSummary($sales_person_id, $count_type)
         ->where('calls.sales_person', $sales_person_id);
         $leadsQuery->where('calls.status', 'New');
         break;
+        case 'Bulk Deals':
+            $leadsQuery = DB::table('calls')
+            ->select([
+                'calls.id',
+                'calls.created_at',
+                'calls.name',
+                'calls.custom_brand_model',
+                'calls.phone',
+                'calls.email',
+                'calls.remarks',
+                'calls.type',
+                'calls.location',
+                'calls.language',
+                'calls.priority',
+                'master_model_lines.model_line',
+                'users.name as created_by',
+                'brands.brand_name'
+            ])
+            ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->leftJoin('users', 'calls.created_by', '=', 'users.id')
+            ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->where('calls.sales_person', $sales_person_id);
+            $leadsQuery->whereIn('calls.leadtype', ['Bulk Deals', 'Special Orders']);
+            break;
         case 'Prospecting':
             $leadsQuery = DB::table('calls')
             ->select([

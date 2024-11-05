@@ -13,10 +13,20 @@ class CallsRequirement extends Model
         'model_line_id',
         'lead_id',
         'created_at',
+        'trim',
+        'variant',
+        'qty',
+        'asking_price',
+        'offer_price',
+        'countries_id',
     ];
     public $timestamps = false;
     public function masterModelLine()
     {
         return $this->belongsTo(MasterModelLines::class,'model_line_id','id');
+    }
+    public function country()
+    {
+        return $this->belongsTo(Country::class,'countries_id','id');
     }
 }

@@ -17,14 +17,26 @@
         @csrf
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
-
+            @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['salary-certificate-request-for-employee']);
+            @endphp
             <div class="col-lg-3 col-md-6">
                 <label for="requested_for" class="form-label heading-name pb-1"><span class="error">* </span><b>{{ __('Requesting For') }}</b></label>
-                <select name="requested_for" id="requested_for_id" class="form-control widthinput" multiple="true" onchange="" autofocus>
+                <select name="requested_for" id="requested_for_id" class="form-control widthinput" multiple="true" onchange="" autofocus
+                    @if(!$hasPermission) disabled @endif>
+
+                    @if($hasPermission)
                     @foreach($masterEmployees as $User)
                     <option value="{{ $User->id }}">{{ $User->name ?? ''}}</option>
                     @endforeach
+                    @else
+                    <option value="{{ Auth::user()->id }}" selected>{{ Auth::user()->name }}</option>
+                    @endif
+
                 </select>
+                @if(!$hasPermission)
+                <input type="hidden" name="requested_for" value="{{ Auth::user()->id }}">
+                @endif
             </div>
 
             <div class="col-lg-3 col-md-6">

@@ -47,17 +47,14 @@ class MovementController extends Controller
             $columnName = $column['name'];
     
             if ($columnName === 'date' && $searchValue !== null) {
-                info("its date");
                 $movementsQuery->orWhereHas('Movementrefernce', function ($query) use ($searchValue) {
                     $query->where('date', 'like', '%' . $searchValue . '%');
                 });
             } elseif ($columnName === 'model_detail' && $searchValue !== null) {
-                info("model_detail");
                 $movementsQuery->orWhereHas('vehicle.variant', function ($query) use ($searchValue) {
                     $query->where('model_detail', 'like', '%' . $searchValue . '%');
                 });
             } elseif ($columnName === 'from_name' && $searchValue !== null) {
-                info('from_name');
                 $movementsQuery->orWhereHas('fromWarehouse', function ($query) use ($searchValue) {
                     $query->where('name', 'like', '%' . $searchValue . '%');
                 });
@@ -460,7 +457,6 @@ return redirect()->back()->with('success', 'Transition has been successfully Sav
     $vehiclesWithSelectedPo = Vehicles::where('purchasing_order_id', $po_id)->where('gdn_id', null)->pluck('vin');
     $so_ids = Vehicles::where('purchasing_order_id', $po_id)->whereNull('gdn_id')->pluck('so_id');
     $so_numbers = So::whereIn('id', $so_ids)->pluck('so_number');
-    info($so_numbers);
     return response()->json([
         'vin_list' => $vehiclesWithSelectedPo,
         'so_number' => $so_numbers,
@@ -474,7 +470,6 @@ return redirect()->back()->with('success', 'Transition has been successfully Sav
     $vehiclesWithSelectedSo = Vehicles::where('so_id', $so_id)->where('gdn_id', null)->pluck('vin');
     $purchasing_order_id = Vehicles::where('so_id', $so_id)->whereNull('gdn_id')->pluck('purchasing_order_id');
     $po_numbers = PurchasingOrder::whereIn('id', $purchasing_order_id)->pluck('po_number');
-    info($po_numbers);
     return response()->json([
         'vin_list' => $vehiclesWithSelectedSo,
         'po_number' => $po_numbers,
@@ -604,14 +599,12 @@ public function grnfilepost(Request $request)
     public function getVehiclesDataformovementso(Request $request)
     {
         $selectedSOId = $request->input('so_id');
-        info($selectedSOId);
         $vehicles = Vehicles::where('so_id', $selectedSOId)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             ->where('status', '=', 'Approved')
             ->pluck('id');
-            info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);

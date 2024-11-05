@@ -822,6 +822,7 @@ class LetterOfIndentController extends Controller
                         $isCustomerPassport->save();
                     }                       
                  }else{
+
                     LetterOfIndentDocument::where('is_passport', true)
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
