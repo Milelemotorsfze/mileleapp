@@ -193,52 +193,52 @@
                                 <label  class="form-label">Inventory QTY</label>
                             </div>
                         </div>
-                        @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
+                        @foreach($pfiItems as $key => $pfiItem)
                             <div class="row">
-                                <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->id ?? ''}}">
-                                <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
-                                <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
-                                <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
+                                <!-- <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiItem->letterOfIndentItem->id ?? ''}}"> -->
+                                <!-- <input type="hidden" name="approved_loi_ids[]" value="{{$pfiItem->id}}"> -->
+                                <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
+                                <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6 mt-md-2">
                                     <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
-                                           value="{{ $pfiVehicleVariant->letterOfIndentItem->masterModel->model ."-". $pfiVehicleVariant->letterOfIndentItem->masterModel->sfx}}" readonly>
+                                           value="{{ $pfiItem->masterModel->model ."-". $pfiItem->masterModel->sfx}}" readonly>
                                 </div>
                                 <div class="col-lg-2 col-md-6 mt-md-2">
                                     <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
-                                        @foreach($pfiVehicleVariant->masterModels as $masterModel)
+                                        @foreach($pfiItem->masterModels as $masterModel)
                                             <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
                                                     data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
                                                     data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
-                                                {{ $masterModel->variant_id == $pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
+                                                {{ $masterModel->variant_id == $pfiItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
+                                           value="{{$pfiItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="text"  class="form-control" id="master-model-line-{{$key}}"
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
+                                           value="{{$pfiItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                            placeholder="Model Line" readonly>
                                 </div>
                                 <div class="col-lg-2 col-md-6 mt-md-2">
                                     <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
+                                           value="{{$pfiItem->masterModel->variant->detail ?? ''}}">
                                 </div>
                                 <div class="col-lg-2 col-md-6 mt-md-2">
                                     <input type="text"  class="form-control" id="unit-price-{{$key}}"
-                                           value="{{ $pfiVehicleVariant->unit_price }}"
+                                           value="{{ $pfiItem->unit_price }}"
                                            placeholder="Unit Price" readonly>
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
-                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
+                                    <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiItem->quantity}}"
+                                      data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY">
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
-                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control inventory-qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->inventoryQuantity }}" placeholder="QTY">
+                                    <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiItem->inventoryQuantity}}"
+                                      data-id="{{ $pfiItem->id }}"  class="form-control inventory-qty-{{$pfiItem->id}}" value="{{ $pfiItem->inventoryQuantity }}" placeholder="QTY">
                                     <span class="InventoryQuantityError-{{$key}} text-danger"></span>
                                 </div>
                             </div>
@@ -323,9 +323,7 @@
 
         if (allBlank) {
             formValid = true;
-            // $('#po-create-form').unbind('submit').submit();
         } else {
-            // if( formValid == true) {
                 var formData = $('#po-create-form').serialize();
                 console.log(formData);
                 $.ajax({
@@ -347,14 +345,12 @@
                         formValid = false;
                     }
                 });
-            // alert(formValid);
             }
-        // }
 
     }
     $('.add-row-btn').click(function(e) {
         $('.bar').show();
-        var variantQuantity = '{{ $pfiVehicleVariants->count() }}';
+        var variantQuantity = '{{ $pfiItems->count() }}';
         var price = 0;
 
         // Move the declaration and assignment inside the click event function
@@ -409,7 +405,7 @@
                             exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
                         }
                     }
-                    // // Populate Interior Colors dropdown
+                    // Populate Interior Colors dropdown
                     var intColourDropdown = intColourCol.find('select');
                     for (var id in intColours) {
                         if (intColours.hasOwnProperty(id)) {
@@ -500,12 +496,10 @@
             alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
             formValid = false;
         }else{
-            // alert("variant is there");
             formValid = true;
             checkDuplicateVIN();
         }
-        // alert("inside submit");
-        // alert(formValid);
+       
             if( formValid == true) {
                 var poNumber = $('#po_number').val();
                 if(poNumber == '') {
@@ -516,8 +510,7 @@
                     $('#poNumberError').text(" ");
                 }
             }
-        // alert("after po validation submit");
-        // alert(formValid);
+    
         if(formValid == true) {
             $('#po-create-form').unbind('submit').submit();
         }

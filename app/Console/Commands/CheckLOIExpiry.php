@@ -32,7 +32,7 @@ class CheckLOIExpiry extends Command
         $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
                             ->where('is_expired', false)->get();
         foreach($letterOfIndents as $letterOfIndent) {
-            info($letterOfIndent->id);
+        
             $LOItype = $letterOfIndent->client->customertype;
           
             $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
@@ -50,14 +50,7 @@ class CheckLOIExpiry extends Command
                     $letterOfIndent->save();  
                     (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                 }
-                // else{
-                //     $letterOfIndent->is_expired = false;  
-                //     $letterOfIndent->expired_date = NULL;  
-                //     $letterOfIndent->timestamps = false;               
-                //     $letterOfIndent->save();  
-                //     // info($letterOfIndent);
-                //     info("else expiry shecduler");
-                // }
+              
             }
         }
         

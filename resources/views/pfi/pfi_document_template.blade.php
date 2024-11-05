@@ -106,7 +106,7 @@
                 <p>Thank you for your inquiry. Please find hereunder our offer. </span>
                 <p style="font-size:12px;">
                     P-F Invoice {{ \Illuminate\Support\Carbon::now()->format('Y')}}  n°: {{ $pfi->pfi_reference_number }}
-                    <span style="margin-left:200px;"> Date: </span>
+                    <span style="margin-left:300px;"> Date: </span>
                     <span class="date"> {{ \Illuminate\Support\Carbon::now()->format('d/m/Y')}} </span>
                 </p>
 
@@ -188,10 +188,7 @@
                     AMS ME FZE - Office 1519, 15th Floor, Tower A, JAFZA ONE, Gate 5, Jebel Ali Free Zone - PO Box 17879 - Dubai - UAE
 
                 </p>
-                <!-- <div class="row">
-                    <img src="{{ url('images/pfi_terms_and_conditions1.png') }}" > </img>
-                    <img src="{{ url('images/pfi_terms_and_conditions2.png') }}" > </img>
-                </div> -->
+              
         </div>
         </div>
     </div>

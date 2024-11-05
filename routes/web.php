@@ -498,10 +498,6 @@ Route::get('/d', function () {
 
     // Demand & Planning Module
 
-    // suppliers
-
-    //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
-
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
@@ -519,8 +515,6 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
         ->name('letter-of-indent.request-approval');
-    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
-    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
@@ -551,7 +545,7 @@ Route::get('/d', function () {
     Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
-    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
+    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class)->only('create');
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
