@@ -45,8 +45,8 @@
                             <th>VIN Number</th>
                             <th>Claim Date</th>
                             <th>Claim Reference Number</th>
-                            <th>Submitted By</th>
-                            <th>Submitted At</th>
+                            <th>Cancelled By</th>
+                            <th>Cancelled At</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
