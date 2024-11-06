@@ -33,6 +33,7 @@ use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
 use App\Http\Controllers\VehiclePenaltyController;
+use App\Http\Controllers\WOVehicleClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -487,7 +488,14 @@ Route::get('/d', function () {
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    
+    Route::controller(WOVehicleClaimsController::class)->group(function(){
+        Route::get('/vehicle-pending-claims', 'getPendingClaims')->name('getPendingClaims');
+        Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
+        Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
+        Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+    });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
