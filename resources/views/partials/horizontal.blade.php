@@ -298,6 +298,24 @@
                                             </div>
                                         </div>
                                         @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-vehicle-claims']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Claim</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('getPendingClaims')}}" class="dropdown-item" data-key="t-login">Pendings</a>            
+                                                <a href="{{route('getSubmittedClaims')}}" class="dropdown-item" data-key="t-login">Submitted</a>
+                                                <a href="{{route('getApprovedClaims')}}" class="dropdown-item" data-key="t-login">Approved</a>
+                                                <a href="{{route('getCancelledClaims')}}" class="dropdown-item" data-key="t-login">Cancelled</a>
+                                            </div>
+                                        </div>
+                                        @endif
                                     </div>
                                 </li>
                                 @endif
