@@ -1048,6 +1048,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
+                  <th>Sales Person</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -2976,17 +2977,23 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             if (!data || !moment(data).isValid()) {
                 return '';
             }
-            // Convert the date to your desired format
             return moment(data).format('DD-MMM-YYYY');
         }
         return data;
     }
         },
-        { data: 'deal_value', name: 'quotations.deal_value' },
-        { data: 'sales_notes', name: 'quotations.sales_notes' },
-        { data: 'qty', name: 'pre_orders_items.qty' },
+        { 
+            data: 'deal_value', 
+            name: 'quotations.deal_value',
+            render: function(data, type, row) {
+                return parseFloat(data).toLocaleString('en-US');
+            }
+        },
+        { data: 'notes', name: 'pre_orders_items.notes' },
         { data: 'name', name: 'varaints.name' },
+        { data: 'qty', name: 'pre_orders_items.qty' },
         { data: 'countryname', name: 'countryname' },
+        { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
     ],
     createdRow: function (row, data, dataIndex) {
