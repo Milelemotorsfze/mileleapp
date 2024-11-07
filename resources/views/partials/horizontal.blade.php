@@ -244,6 +244,7 @@
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 <a href="{{route('getVehiclePenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized Vehicles</a>            
                                                 <a href="{{route('getClearedPenalties')}}" class="dropdown-item" data-key="t-login">Cleared Penalties</a>
+                                                <a href="{{route('getNoPenalties')}}" class="dropdown-item" data-key="t-login">No Penalties Vehicles</a>
                                             </div>
                                         </div>
                                         @endif
