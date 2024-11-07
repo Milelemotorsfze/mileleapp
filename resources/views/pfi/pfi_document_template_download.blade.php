@@ -4,13 +4,11 @@
 <head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
     <style>
-        /*@page { size: 700pt }*/
         
     .page {
         margin-left: 50px;
         margin-right: 100px;
         font-size:10px;
-        width: 100%;
         font-family: arial, sans-serif;
     }
     p{
@@ -18,7 +16,6 @@
     }
     table ,td{
         font-family: arial, sans-serif;
-        /* width: 100%; */
         border: 1px solid #1c1b1b;
         border-collapse: collapse;
         font-weight:bold;
@@ -92,7 +89,7 @@
             <p  style="margin-bottom:8px;"> Buyer : MILELE MOTORS <span  style="margin-left:183px;"> End user: </span>
                 <span >{{ strtoupper(substr($pfi->customer->name, 0,15)) }} </span>
             </p>
-            <p style="margin-left:40px;margin-bottom:0px;margin-top-"> <span style="font-size:8px;font-wight:800px;"> SAMARI RETAIL BLOC A</span>
+            <p style="margin-left:40px;margin-bottom:0px;width:100%"> <span style="font-size:8px;font-wight:800px;"> SAMARI RETAIL BLOC A</span>
                 <span style="margin-left:220px;"> {{ strtoupper($pfi->country->name ?? '') }}</span>
             </p>
             <p class="address" style="font-size:8px;font-wight:800px">RAS EL KHOR- DUBAI-UAE </p>
