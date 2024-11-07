@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class WOVehicleClaimsController extends Controller
 {
     public function getPendingClaims() {
-        $vehicles = WOVehicles::select('id','vin','work_order_id')->whereDoesntHave('claim')->get();
+        $vehicles = WOVehicles::select('id','vin','work_order_id')->whereDoesntHave('claim')->whereHas('woBoe')->get();
     
         // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
         $datas = $vehicles->filter(function ($vehicle) {
