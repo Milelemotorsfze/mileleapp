@@ -114,13 +114,15 @@ class DailyleadsController extends Controller
                     'pre_orders_items.qty',
                     'pre_orders_items.notes',
                     'varaints.name',
+                    'users.name as salesperson',
                     'countries.name as countryname',
                 ])
                 ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
                 ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
                 ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->where('quotations.created_by', $id)
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
+                ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
