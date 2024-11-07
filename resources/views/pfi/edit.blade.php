@@ -274,10 +274,9 @@
                                                                     @if($child_Key == 0 )  <label class="form-label">LOI Code</label> @endif
                                                                     <select class="form-control text-dark widthinput loi-items mb-2" required index="{{$key+1}}" multiple
                                                                         name="PfiItem[{{$key+1}}][loi_item][{{$child_Key+1}}]" item="{{$child_Key+1}}" id="loi-item-{{$key+1}}-item-{{$child_Key+1}}">
-                                                                           {{ $childPfiItem->LOIItemCodes }}
                                                                         @foreach($childPfiItem->LOIItemCodes as $LOIItemCode)
                                                                                 <option value="{{ $LOIItemCode->id }}" {{$LOIItemCode->id == $childPfiItem->letterOfIndentItem->id ? 'selected' : ''}}>
-                                                                                {{ $LOIItemCode->code }} @if(in_array($LOIItemCode->master_model_id, $pfi_item->exactMatches)) (Exact Match) @endif</option>
+                                                                                 {{ $LOIItemCode->code }} @if(in_array($LOIItemCode->master_model_id, $pfi_item->exactMatches)) (Exact Match) @endif</option>
                                                                             @endforeach
                                                                     
                                                                     </select>
@@ -318,7 +317,7 @@
                                 </div>
 
                                 <div class="col-12 text-center">
-                                    <button type="submit" class="btn btn-primary btn-submit float-end" id="create-pfi">Submit</button>
+                                    <button type="submit" class="btn btn-primary btn-submit float-end" >Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -443,6 +442,54 @@
             }
             return this.valid();
         };
+
+        $('.btn-submit').click(function (e) {
+            e.preventDefault();
+           let formValid = true;
+                // get all loi items Ids
+               var loiItems = $('.loi-items').map(function() {
+                    return $(this).val();
+                }).get();
+                // find duplicate vaules and its ids
+                var duplicates = loiItems.filter(function(value, index, self) {
+                    return self.indexOf(value) !== index && value.trim() !== '';
+                });
+                jQuery.each(duplicates, function(key,value){
+                    var pfiQty = 0;
+                    var remainingQty = 0;
+                    let loiItemCode = 0;
+                    $('.loi-items').each(function() {
+                    // Check if the selected value exists in the current select element
+                        if ($(this).find('option:selected').filter(function() {
+                            return $(this).val() == value;
+                        }).length > 0) {
+                            var index = $(this).attr('index');
+                            var childIndex = $(this).attr('item');
+                            remainingQty = $('#remaining-quantity-'+index+'-item-'+childIndex).val();
+                            loiItemCode = $('#loi-item-'+index+'-item-'+childIndex).text();
+                            let currentItemPfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
+                            pfiQty = parseFloat(pfiQty) + parseFloat(currentItemPfiQty);
+                        }
+                    });
+                    if(pfiQty > remainingQty ) {
+                         formValid = false;
+                         e.preventDefault();
+                        alertify.confirm('Total pfi quantity of '+ loiItemCode+ ' should be less than remaining quantity ( '+remainingQty+' ) ',function (e) {
+                        }).set({title:"Invalid Data"});
+                        return false;
+                    }
+                });
+              
+                if(formValid == true) {
+                    if($("#form-update").valid()) {
+                        $('#form-update').unbind('submit').submit();
+                    }
+                }else{
+                    e.preventDefault();
+                }
+        });
+
+
 
         // check the pfi number is unique within the year
         $('#pfi_reference_number').keyup(function(){
@@ -630,12 +677,10 @@
                     {
                         isData = true;
                          break;
-
                     }                  
             }
-
             if(isData == true) {
-                var confirm = alertify.confirm('While unselectiong this option the entire customer pfi items data will be reset to empty!',function (e) {
+                var confirm = alertify.confirm('While unselecting this option the entire customer pfi items data will be reset to empty!',function (e) {
                     if (e) {
                         resetData();  
                                             
@@ -752,14 +797,17 @@
             $('#loi-item-'+index+'-item-'+childIndex +'-error').remove();
             var value = e.params.data.id;
             getLOIItemDetails(index,childIndex);
-            // hide item in the corresponding parent child dropdowns
+            hideLOIItemCode(index,childIndex,value);
         });
+       
+      
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
+            alert("ok");
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
             var id = e.params.data.id;
             var text = e.params.data.text;
-
+            appendLOIItemCode(index,childIndex,id,text);
             $('#remaining-quantity-'+index+'-item-'+childIndex).val("");
             $('#unit-price-'+index+'-item-'+childIndex).val("");
             $('#total-amount-'+index+'-item-'+childIndex).val("");
@@ -767,6 +815,30 @@
             $('#pfi-quantity-'+index+'-item-'+childIndex).removeAttr("max");
             $('#pfi-quantity-'+index+'-item-'+childIndex).removeClass('is-invalid');
         });
+        function hideLOIItemCode(index,childIndex,value) {
+            let totalRowIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+            for(let j=1; j<=totalRowIndex;j++) 
+            {
+                var currentId = 'loi-item-'+index+'-item-'+j;
+                var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+                if(selectedId != currentId ) {
+                    var currentId = 'loi-item-'+index+'-item-'+j;
+                    $('#' + currentId + ' option[value=' + value + ']').detach(); 
+                }
+            }
+        }
+        function appendLOIItemCode(index,childIndex,id,text)
+        {
+            var selectedId = 'loi-item-'+index+'-item-'+childIndex;
+            let rowIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
+            for(let j=1; j<=rowIndex;j++) 
+            {             
+                var currentId = 'loi-item-'+index+'-item-'+j;                     
+                if(selectedId != currentId) {
+                    $('#loi-item-'+index+'-item-'+j).append($('<option>', {value: id, text : text}));    
+                }
+            }
+        }
 
         $(document.body).on('click', ".add-more", function (e) {
             let index = $(this).attr('index');
@@ -907,7 +979,10 @@
             var loiItemId = $('#loi-item-'+index+'-item-'+childIndex).val();
             let currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
             let loiItemText = $('#' + currentLOIItemId + ' option:selected').text();
-           
+            if(loiItemId[0]) {
+                appendLOIItemCode(index,childIndex,loiItemId,loiItemText);
+            }
+
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
             
@@ -1054,7 +1129,6 @@
                     });
                     
                     $('.overlay').hide();
-                  
                 }
             });           
        }
@@ -1126,23 +1200,7 @@
             let vendor = $('#supplier-id').val();
             let country = $('#country_id').val();
             let customer = $('#client_id').val();
-            var QtyAlreadyUsed = 0;
-            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-                for(let i=1; i<=parentIndex; i++)
-                {
-                    let totalchildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
-                    for(let j=1; j<=totalchildIndex;j++) 
-                    {
-                        var eachselectedModelId = $('#loi-item-'+i+'-item-'+j).val();
-                        if(eachselectedModelId) {
-                            if(eachselectedModelId == loiItem[0]) {
-                               var pfiQty = $('#pfi-quantity-'+i+'-item-'+j).val();
-                                QtyAlreadyUsed = QtyAlreadyUsed + pfiQty;
-                            }
-                        }
-                    }
-                }  
-
+         
             if(loiItem.length > 0) {
                 $('.overlay').show();
 
@@ -1159,9 +1217,9 @@
                         pfi_id: '{{ $pfi->id }}'       
                     },
                     success:function (data) {
-                        var remainingQty = data.remaining_quantity - QtyAlreadyUsed;
-                        $('#remaining-quantity-'+index+'-item-'+childIndex).val(remainingQty);
-                        $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',remainingQty);
+                    
+                        $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
+                        $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
                        
                         calculateTotalAmount(index,childIndex);
                         if(data.isLOIItemPfiExist.length > 0) {
