@@ -84,6 +84,9 @@
         <div class="card-header">
             <h4 class="card-title">PFI Document </h4>
             <a  class="btn btn-sm btn-info float-end" href="{{ route('pfi.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+            <a  class="btn btn-sm btn-primary float-end"  style="margin-right:5px;" href="{{ route('pfi-item.list') }}" title="PFI Item Lists" >
+                <i class="fa fa-table" aria-hidden="true"></i>  View PFI Items</a>
+                
         </div>
         <div class="card-body">
             <div class="container" >
