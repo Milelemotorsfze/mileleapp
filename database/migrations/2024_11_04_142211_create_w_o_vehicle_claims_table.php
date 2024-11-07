@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('w_o_vehicle_claims', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('wo_vehicle_id')->unique();
+            $table->unsignedBigInteger('wo_vehicle_id');
             $table->date('claim_date');
             $table->integer('claim_reference_number')->nullable();
             $table->enum('status', ['Submitted', 'Approved', 'Cancelled'])->nullable();
