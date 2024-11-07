@@ -466,7 +466,8 @@
                             var index = $(this).attr('index');
                             var childIndex = $(this).attr('item');
                             remainingQty = $('#remaining-quantity-'+index+'-item-'+childIndex).val();
-                            loiItemCode = $('#loi-item-'+index+'-item-'+childIndex).text();
+                            currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
+                            loiItemCode = $('#' + currentLOIItemId + ' option:selected').text();
                             let currentItemPfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
                             pfiQty = parseFloat(pfiQty) + parseFloat(currentItemPfiQty);
                         }

@@ -413,12 +413,13 @@
                             var index = $(this).attr('index');
                             var childIndex = $(this).attr('item');
                             remainingQty = $('#remaining-quantity-'+index+'-item-'+childIndex).val();
-                            loiItem = $('#loi-item-'+index+'-item-'+childIndex).text();
+                            currentLOIItemId = 'loi-item-'+index+'-item-'+childIndex;
+                            loiItem = $('#' + currentLOIItemId + ' option:selected').text();
                             let currentItemPfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
                             pfiQty = parseFloat(pfiQty) + parseFloat(currentItemPfiQty);
                         }
                     });
-                   
+                   console.log(loiItem);
                     if(pfiQty > remainingQty ) {
                          formValid = false;
                          e.preventDefault();
