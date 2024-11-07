@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\File;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Crypt;
 
 class PFIController extends Controller
 {
@@ -460,7 +461,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')) {
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'NEW']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'NEW']);
         }
 
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
@@ -468,8 +469,9 @@ class PFIController extends Controller
        
     }
     public function generatePFIDocument(Request $request) {
-
-        $pfi = PFI::find($request->id);
+        $pfiId = Crypt::decrypt($request->id);
+        // return $pfiId;
+        $pfi = PFI::find($pfiId);
         $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
         $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
         $fileName = 'MILELE - '.$pfi->pfi_reference_number;
@@ -657,7 +659,9 @@ class PFIController extends Controller
 
             $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
                 // create parent row
-                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)->where('pfi_id',$pfi->id)->first();
+                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)
+                ->where('is_parent', true)
+                ->where('pfi_id',$pfi->id)->first();
                 if(!$pfiItemParentRow) {
                     $pfiItemParentRow = new PfiItem();
                     
@@ -693,8 +697,10 @@ class PFIController extends Controller
                     foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
                         $childPfiQuantity = $PfiData['pfi_quantity'][$keyValue];
                         $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)
+                                    ->where('is_parent', false)
+                                    ->where('parent_pfi_item_id', $parentId)
                                     ->where('pfi_quantity', $childPfiQuantity)
-                                    ->where('pfi_id',$pfi->id)->first();
+                                    ->where('pfi_id', $pfi->id)->first();
                         if(!$pfiItemRow) {
                             $pfiItemRow = new PfiItem();
 
@@ -739,7 +745,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')){
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'EDIT']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'EDIT']);
         }
 
         return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
