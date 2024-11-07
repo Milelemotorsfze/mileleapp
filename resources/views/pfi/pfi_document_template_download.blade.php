@@ -33,6 +33,9 @@
     .sfx-width{
         min-width:30px !important;
     }
+    .model-width{
+        min-width:100px !important;
+    }
     .total-row-tr {
         height:20px;
         border-right:none;
@@ -96,7 +99,7 @@
             <table id="pfi-items">
                 <tr>
                     <td>Description</td>
-                    <td>Product Code</td>
+                    <td class="model-width">Product Code</td>
                     <td class="sfx-width"></td>
                     <td>Availability</td>
                     <td>Quantity</td>
@@ -105,7 +108,7 @@
                 </tr>
                 @foreach($pfiItems as $pfiItem)
                     <tr>
-                        <td style="width:200px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
+                        <td style="width:180px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
                         <td>{{ $pfiItem->masterModel->pfi_model ??  $pfiItem->masterModel->model}}</td>
                         <td>{{ $pfiItem->masterModel->pfi_sfx ?? $pfiItem->masterModel->sfx }}</td>
                         <td style="font-weight:normal">Stock</td>
