@@ -6,6 +6,7 @@ use App\Models\PreOrder;
 use App\Models\PreOrderPos;
 use App\Models\UserActivities;
 use App\Models\Brand;
+use App\Models\clients;
 use App\Models\ColorCode;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
@@ -116,6 +117,7 @@ class PreOrderController extends Controller
     }
     public function createpreorder($callId) {
     $quotation = Quotation::where('calls_id', $callId)->first();
+    $calls = Quotation::where('calls_id', $callId)->first();
     $quotationItems = QuotationItem::where('quotation_id', $quotation->id)->get();
     $variants = collect();
     foreach ($quotationItems as $item) {
