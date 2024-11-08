@@ -1,6 +1,31 @@
 @extends('layouts.table')
 <link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
 <style>
+    .card {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 15px;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+#reasonBarChart {
+    max-width: 100%;
+    height: 400px;
+}
     .details-control {
             cursor: pointer;
             color: blue;
@@ -1032,6 +1057,94 @@ Procurement
 </div>
 @endif
 @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                      @endphp
+                                      @if ($hasPermission)
+                                      <div class="row">
+    <!-- Full-width Chart Section -->
+    <div class="col-12">
+        <div class="card shadow-sm" style="margin: 20px; padding: 20px;">
+            <div class="card-header align-items-center d-flex justify-content-between">
+                <h5 class="card-title mb-0 flex-grow-1">Leads Rejection Reasons Summary</h5>
+            </div>
+            <div class="card-body text-center">
+                <canvas id="reasonBarChart" style="max-width: 100%; height: 100px;"></canvas> <!-- Set max width and height for full-width display -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+<div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Leads Stage Summary Report</h4>
+                                    <div class="flex-shrink-0">
+                                    <div style="position: relative; width: 100%; height: 5vh;">
+                                    <div id="leadsstatuswise" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <form id="date-range-form" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="start_date" id="start_date">
+                                    <input type="hidden" name="end_date" id="end_date">
+                                </form>
+                                    </div>
+                                </div><!-- end card header -->
+                                <div class="card-body px-0">
+                                            <div class="table-responsive px-3">
+                                                <table id="dtBasicExample4" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                                    <th id="dateColumn">
+                                                    Date
+                                                    </th>
+                                                    <th>
+                                                    Sales Person
+                                                    </th>
+                                                    <th>
+                                                    New / Pending
+                                                    </th>
+                                                    <th>
+                                                    Contacted
+                                                    </th>
+                                                    <th>
+                                                    Working
+                                                    </th>
+                                                    <th>
+                                                    Qualify
+                                                    </th>
+                                                    <th>
+                                                    Disqualify
+                                                    </th>
+                                                    <th>
+                                                    Converted
+                                                    </th>
+                                                    <th>
+                                                    Quotation
+                                                    </th>
+                                                    <th>
+                                                    Pre-order
+                                                    </th>
+                                                    <th>
+                                                    Sales Order
+                                                    </th>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                                <div id="totalRowContainer"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- end tab content -->
+                                </div>
+                                <!-- end card body -->
+                            </div>
+</div>
+@endif
+@php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
                     @endphp
                     @if ($hasPermission)
@@ -1415,6 +1528,61 @@ Procurement
 @endif
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Example data from your controller
+    let data = @json($dataforpie);
+
+    // Extract labels and counts for the chart
+    let labels = data.map(item => item.Reason);
+    let counts = data.map(item => item.count);
+
+    const ctx = document.getElementById('reasonBarChart').getContext('2d');
+    const reasonBarChart = new Chart(ctx, {
+        type: 'bar', // Change 'bar' to 'pie' if you want a full-width pie chart
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Lead Rejection Reasons',
+                data: counts,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
+        }
+    });
+});
+</script>
     <script>
 $(function() {
     function cb(start, end) {
@@ -1879,4 +2047,147 @@ document.getElementById('monthSelector').addEventListener('change', function() {
     .catch(error => console.error('Error:', error));
 });
     </script>
+<script type="text/javascript">
+$(function() {
+    var start = moment().subtract(6, 'days');
+    var end = moment();
+
+    // Initialize DataTable with search option
+    var table = $('#dtBasicExample4').DataTable({
+        "searching": true,
+    });
+
+    // Function to calculate and display total row based on filtered data
+    function calculateAndDisplayTotals() {
+        var totals = {
+            New: 0, Contacted: 0, Working: 0, Qualify: 0, 
+            Rejected: 0, Closed: 0, Converted: 0, Quoted: 0, 
+            Prospecting: 0, NewDemand: 0
+        };
+
+        // Calculate totals based on currently displayed rows
+        table.rows({ filter: 'applied' }).data().each(function(rowData) {
+            if (rowData.length > 2) { // Ensuring rowData has the necessary columns
+                totals.New += parseInt(rowData[2]) || 0;
+                totals.Contacted += parseInt(rowData[3]) || 0;
+                totals.Working += parseInt(rowData[4]) || 0;
+                totals.Qualify += parseInt(rowData[5]) || 0;
+                totals.Rejected += parseInt(rowData[6]) || 0;
+                totals.Converted += parseInt(rowData[7]) || 0;
+                totals.Quoted += parseInt(rowData[8]) || 0;
+                totals.Prospecting += parseInt(rowData[9]) || 0;
+                totals.NewDemand += parseInt(rowData[10]) || 0;
+                totals.Closed += parseInt(rowData[11]) || 0;
+            }
+        });
+
+        // Remove any existing total row
+        table.row('.total-row').remove();
+
+        // Add the total row
+        var totalRow = [
+            'Total', '', totals.New, totals.Contacted, totals.Working,
+            totals.Qualify, totals.Rejected, totals.Converted,
+            totals.Quoted, totals.Prospecting, totals.NewDemand,
+            totals.Closed
+        ];
+        var totalRowNode = table.row.add(totalRow).draw(false).node();
+        $(totalRowNode).addClass('total-row');
+    }
+
+    // Populate filter dropdowns for each column
+    function populateFilterDropdowns() {
+        $('#dtBasicExample4 thead select').remove();
+        table.columns().every(function() {
+            var column = this;
+            var columnIndex = column.index();
+            var columnName = $(column.header()).text().trim();
+
+            if (columnName) {
+                var select = $('<select class="form-control my-1"><option value="">All</option></select>')
+                    .appendTo($(column.header()))
+                    .on('change', function() {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        table.column(columnIndex)
+                            .search(val ? '^' + val + '$' : '', true, false)
+                            .draw();
+
+                        // Recalculate totals after filter is applied
+                        calculateAndDisplayTotals();
+                    });
+                
+                column.data().unique().sort().each(function(d) {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                });
+            }
+        });
+    }
+
+    // Load data and populate filters based on date range
+    function loadDataAndPopulateFilters(start, end) {
+        $.ajax({
+            url: '{{ route('homemarketing.leadstatuswise') }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                start_date: start.format('YYYY-MM-DD'),
+                end_date: end.format('YYYY-MM-DD'),
+            },
+            success: function(response) {
+                table.clear().draw();
+
+                $.each(response.data, function(index, item) {
+                    var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
+                    
+                    // Conditionally populate the row array based on user permission
+                    var row = [
+                        formattedDate,
+                        item.sales_person_name,
+                    ];
+
+                    @if (Auth::user()->hasPermissionForSelectedRole('leads-working-analysis'))
+                        row.push(
+                            item.call_count_New, item.call_count_contacted,
+                            item.call_count_working, item.call_count_qualify,
+                            item.call_count_Rejected, item.call_count_converted,
+                            item.call_count_quoted, item.call_count_Prospecting,
+                            item.call_count_new_demand, item.call_count_closed
+                        );
+                    @else
+                        row.push(item.call_count);
+                    @endif
+
+                    table.row.add(row).draw(false);
+                });
+
+                populateFilterDropdowns();
+
+                // Calculate totals after loading data
+                calculateAndDisplayTotals();
+            }
+        });
+    }
+
+    loadDataAndPopulateFilters(start, end);
+
+    // Date Range Picker
+    $('#leadsstatuswise').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, function(selectedStart, selectedEnd) {
+        $('#leadsstatuswise span').html(selectedStart.format('MMMM D, YYYY') + ' - ' + selectedEnd.format('MMMM D, YYYY'));
+        loadDataAndPopulateFilters(selectedStart, selectedEnd);
+    });
+
+    $('#leadsstatuswise span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+});
+</script>
 @endpush
