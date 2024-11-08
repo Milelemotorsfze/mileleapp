@@ -805,13 +805,14 @@ class SupplierController extends Controller
                 $data['successStore'] = true;
                 (new UserActivityController)->createActivity('Vendor Created');
                 return response()->json(['success' => true,'data' => $data], 200);
-            }else{
-                $suppliers = $this->createSupplier($request);
-                $data['successStore'] = true;
-                (new UserActivityController)->createActivity('Vendor Created');
-                return response()->json(['success' => true,'data' => $data], 200);
-
             }
+            // else{
+            //     $suppliers = $this->createSupplier($request);
+            //     $data['successStore'] = true;
+            //     (new UserActivityController)->createActivity('Vendor Created');
+            //     return response()->json(['success' => true,'data' => $data], 200);
+
+            // }
             info("final response without file upload");
             info($data);
 
