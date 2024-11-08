@@ -1790,6 +1790,9 @@
                 $('.overlay').show();
                 $.ajax({
                 type:'POST',
+                headers:{
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 url: "{{ route('suppliers.store') }}",
                 data: formData,
                 cache:false,
@@ -1802,7 +1805,7 @@
                     console.log(result);
                     console.log(result.data);
                     console.log(result.data.headingError);
-                    if(result.data.headingError && result.data.headingError !== 'aaa')
+                    if(result.data.headingError)
                     {
                         document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
                         $('#submit').html('Save');

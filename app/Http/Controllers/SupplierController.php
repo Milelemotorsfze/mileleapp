@@ -424,8 +424,8 @@ class SupplierController extends Controller
         info("request");
         info($request->all());
         
-        $data = [];
-        $data['headingError'] = "aaa";
+        // $data = [];
+        // $data['headingError'] = "aaa";
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -736,8 +736,7 @@ class SupplierController extends Controller
             elseif($request->activeTab == 'addSupplierDynamically')
             {
                 info("addSupplierDynamically");
-               $suppliers = $this->createSupplier($request);
-
+             
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
                 $supAdd['supplier_id'] = $suppliers->id;
@@ -806,6 +805,12 @@ class SupplierController extends Controller
                 $data['successStore'] = true;
                 (new UserActivityController)->createActivity('Vendor Created');
                 return response()->json(['success' => true,'data' => $data], 200);
+            }else{
+                $suppliers = $this->createSupplier($request);
+                $data['successStore'] = true;
+                (new UserActivityController)->createActivity('Vendor Created');
+                return response()->json(['success' => true,'data' => $data], 200);
+
             }
             info("final response without file upload");
             info($data);
