@@ -421,11 +421,7 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-        info("request");
-        info($request->all());
         
-        // $data = [];
-        // $data['headingError'] = "aaa";
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -443,22 +439,18 @@ class SupplierController extends Controller
         // }
         if ($validator->fails())
         {
-            info("validation error");
-            info($validator->fails());
+            
             return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
         }
         else
         {
-            info("validation success");
             $supplierTypeInput = $request->supplier_types;
             $input = $request->all();
 
             if($request->activeTab == 'uploadExcel')
             {
-                info("uploadExcel");
                 if($request->file('file'))
                 {
-                    info("file uploaded");
                     $headings = (new HeadingRowImport)->toArray($request->file('file'));
                     if(count($headings) > 0)
                     {
@@ -566,7 +558,7 @@ class SupplierController extends Controller
                                 }
                                 if(count($dataError) > 0)
                                 {
-                                    info("response 1");
+                                    
                                     $data['dataError'] = $dataError;
                                     return response()->json(['success' => true,'data' => $data], 200);
                                 }
@@ -632,14 +624,12 @@ class SupplierController extends Controller
                                         }
                                     }
                                     $data['successStore'] = true;
-                                    info("response 2");
                                     (new UserActivityController)->createActivity('Vendor Created');
                                     return response()->json(['success' => true,'data' => $data], 200);
                                 }
                             }
                             else
                             {
-                                info("response 3");
                                 $data['headingError'] = "Uploading excel headings should be addon_code , currency , purchase_price , lead_time_min and lead_time_max";
                                 return response()->json(['success' => true,'data' => $data], 200);;
                             }
@@ -648,7 +638,6 @@ class SupplierController extends Controller
                 }
                 else
                 {
-                    info("file not uploaded");
                     $suppliers = $this->createSupplier($request);
 
                     $supplier_addon['supplier_id'] = $suppliers->id;
@@ -727,7 +716,6 @@ class SupplierController extends Controller
                             }
                         }
                     }
-                    info("response 4");
                     $data['successStore'] = true;
                     (new UserActivityController)->createActivity('Vendor Created');
                     return response()->json(['success' => true,'data' => $data], 200);
@@ -735,7 +723,6 @@ class SupplierController extends Controller
             }
             elseif($request->activeTab == 'addSupplierDynamically')
             {
-                info("addSupplierDynamically");
              
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
@@ -801,20 +788,16 @@ class SupplierController extends Controller
                         }
                     }
                 }
-                info("response 5");
                 $data['successStore'] = true;
                 (new UserActivityController)->createActivity('Vendor Created');
                 return response()->json(['success' => true,'data' => $data], 200);
             }
-            // else{
-            //     $suppliers = $this->createSupplier($request);
-            //     $data['successStore'] = true;
-            //     (new UserActivityController)->createActivity('Vendor Created');
-            //     return response()->json(['success' => true,'data' => $data], 200);
-
-            // }
-            info("final response without file upload");
-            // info($data);
+            else{
+                $suppliers = $this->createSupplier($request);
+                $data['successStore'] = true;
+                (new UserActivityController)->createActivity('Vendor Created');
+                return response()->json(['success' => true,'data' => $data], 200);
+            }
 
         }
     }
@@ -1366,6 +1349,11 @@ class SupplierController extends Controller
                 $data['successStore'] = true;
                 (new UserActivityController)->createActivity('Vendor Updated');
                 return response()->json(['success' => true,'data' => $data], 200);
+            } else{
+                $suppliers = $this->createSupplier($request);
+                $data['successStore'] = true;
+                (new UserActivityController)->createActivity('Vendor Created');
+                return response()->json(['success' => true,'data' => $data], 200);
             }
         }
     }
@@ -1438,18 +1426,6 @@ class SupplierController extends Controller
             $input['updated_by'] = $authId;
             $suppliers->update($input);
 
-//            if(count($request->supplier_types) > 0)
-//            {
-//                $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->delete();
-//
-//                $supplier_typeData['supplier_id'] = $suppliers->id;
-//                $supplier_typeData['updated_by'] = $authId;
-//                foreach($request->supplier_types as $supplier_typeData1)
-//                {
-//                    $supplier_typeData['supplier_type'] = $supplier_typeData1;
-//                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-//                }
-//            }
             $data['successStore'] = true;
             (new UserActivityController)->createActivity('Vendor Updated');
             return response()->json(['success' => true,'data' => $data], 200);
@@ -1457,9 +1433,6 @@ class SupplierController extends Controller
     }
     public function vendorUniqueCheck(Request $request)
     {
-        // dd('hi');
-        // info($request->all());
-
         $contactNumber = $request->contact_number;
         if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
             $isVendorExist = Supplier::where('supplier', $request->name);
