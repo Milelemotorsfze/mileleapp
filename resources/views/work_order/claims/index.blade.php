@@ -14,6 +14,7 @@
     $canViewClaimInfo = Auth::user()->hasPermissionForSelectedRole(['can-view-vehicle-claims']);
     $canViewWODetails = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-details','current-user-export-exw-wo-details','export-cnf-wo-details','current-user-export-cnf-wo-details','local-sale-wo-details','current-user-local-sale-wo-details']);
     $canAddClaim = Auth::user()->hasPermissionForSelectedRole(['can-update-vehicle-claims']);
+    $canViewClaimLog = Auth::user()->hasPermissionForSelectedRole(['can-view-claim-log']);
 @endphp
 @if ($canViewClaimInfo)
 <body>
@@ -88,6 +89,14 @@
                                                         <i class="fa fa-file" aria-hidden="true"></i> Update Claim Info
                                                     </a>
                                                 @endif
+                                                @if ($canViewClaimLog)
+                                                <li>
+                                                    <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Claim Log" class="btn btn-sm btn-info" href="{{route('claim.log',$data->id ?? '')}}">
+                                                    <i class="fa fa-eye" aria-hidden="true"></i> Claim Log
+                                                    </a>
+                                                </li>
+                                                @endif
+                                                
                                             </ul>
                                         </div> 
                                         <div class="modal fade" id="updateClaimModal_{{$data->id}}" tabindex="-1" aria-labelledby="updateClaimModalLabel_{{$data->id}}" aria-hidden="true">

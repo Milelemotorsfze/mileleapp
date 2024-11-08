@@ -166,14 +166,15 @@ class WorkOrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($type)
+    public function index($type, Request $request)
     {
+        $search = $request->query('search'); // Get the 'search' query parameter
         $authId = Auth::id();
 
         // Store permission checks
-        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
-        ]);
+        // $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
+        //     'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
+        // ]);
 
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
             'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
