@@ -421,8 +421,8 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-        
-        info("request".$request->all());
+        info("request");
+        info($request->all());
         
         $data = [];
         $data['headingError'] = "aaa";
@@ -443,7 +443,8 @@ class SupplierController extends Controller
         // }
         if ($validator->fails())
         {
-            info("validation error". $validator->fails());
+            info("validation error");
+            info($validator->fails());
             return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
         }
         else
