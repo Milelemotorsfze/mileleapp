@@ -814,7 +814,7 @@ class SupplierController extends Controller
 
             // }
             info("final response without file upload");
-            info($data);
+            // info($data);
 
         }
     }
