@@ -16,6 +16,10 @@
     50% { opacity: 0; }
     100% { opacity: 1; }
 }
+/* Ensuring specific background styling with important */
+tr.highlight-orange {
+  background-color: #FFE5B4 !important; /* Light orange */
+    }
 /* Add styles for the badges */
 .badge {
     padding: 5px 10px;
@@ -217,7 +221,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+            <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Priority</th>
@@ -238,7 +242,12 @@ input[type=number]::-webkit-outer-spin-button
               </thead>
               <tbody>
                 @foreach ($pendingdata as $key => $calls)
-                    <tr data-id="{{$calls->id}}">
+                @php
+            $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
+            $assigned_by = DB::table('users')->where('users.id', $calls->sales_person)->first();
+            $highlightRow = $created_by && $created_by->id == Auth::id() ? 'highlight-orange' : '';
+        @endphp
+                    <tr data-id="{{$calls->id}}" class="{{ $highlightRow }}">
                 <td>
                     @if ($calls->priority == "High")
                         <i class="fas fa-circle blink" style="color: red;"> Hot</i>
@@ -877,7 +886,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <table id="dtBasicExample2" class="table table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
@@ -946,7 +955,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <table id="dtBasicExample4" class="table table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
@@ -1036,13 +1045,10 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
-                  <th>Model Line</th>
-                  <th>Exterior Colour</th>
-                  <th>Interior Colour</th>
-                  <th>Model Year</th>
+                  <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
-                  <th>Description</th>
+                  <th>Sales Person</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -2143,7 +2149,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             ],
             columnDefs: [
               { type: 'date', targets: [0] }
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        // Check if created_by ID matches the logged-in user's ID
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).addClass('highlight-orange');
+        }
+    }
         });
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
@@ -2500,7 +2512,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             </div>`;
     }
 },
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
         });
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
@@ -2937,7 +2955,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
         });
     dataTable8 = $('#dtBasicExample8').DataTable({
     processing: true,
@@ -2953,23 +2977,31 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             if (!data || !moment(data).isValid()) {
                 return '';
             }
-            // Convert the date to your desired format
             return moment(data).format('DD-MMM-YYYY');
         }
         return data;
     }
         },
-        { data: 'deal_value', name: 'quotations.deal_value' },
-        { data: 'sales_notes', name: 'quotations.sales_notes' },
-        { data: 'model_line', name: 'master_model_lines.model_line' },
-        { data: 'exterior', name: 'exterior' },
-        { data: 'interior', name: 'interior' },
-        { data: 'modelyear', name: 'pre_orders_items.modelyear' },
+        { 
+            data: 'deal_value', 
+            name: 'quotations.deal_value',
+            render: function(data, type, row) {
+                return parseFloat(data).toLocaleString('en-US');
+            }
+        },
+        { data: 'notes', name: 'pre_orders_items.notes' },
+        { data: 'name', name: 'varaints.name' },
         { data: 'qty', name: 'pre_orders_items.qty' },
         { data: 'countryname', name: 'countryname' },
-        { data: 'description', name: 'pre_orders_items.description' },
+        { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
     });
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
@@ -3151,7 +3183,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             name: 'sales_person_name',
             title: 'Assigned To'
         }
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
 });
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
@@ -3192,7 +3230,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 }
             },
         { data: 'createdby', name: 'users.name' },
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
     });
     });
     function toggleRemarks(uniqueId) {

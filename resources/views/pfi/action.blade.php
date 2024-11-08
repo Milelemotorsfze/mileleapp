@@ -40,6 +40,21 @@
         </li>
         @endif
     @endcan
+    @can('create-demand-planning-po')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
+        @endphp
+        @if ($hasPermission)
+             <!-- check PFI have pending qty -->
+            <li>
+            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+             title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
+                <i class="fa fa-plus"></i> Create PO
+            </a>
+        <li> 
+        @endif
+        @endcan
+
     <!-- @can('pfi-payment-status-update')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');

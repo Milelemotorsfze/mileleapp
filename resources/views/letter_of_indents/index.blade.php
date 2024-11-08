@@ -1,17 +1,12 @@
 @extends('layouts.table')
 @section('content')
     <style>
-        /* .modal {
-            position: absolute;
-            min-height: 500px;
-        } */
+        
         .widthinput{
             height:32px!important;
 
         }
-        /* body.modal-open {
-            overflow: hidden;
-        } */
+       
     </style>
  
     @can('LOI-list')

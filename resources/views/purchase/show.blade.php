@@ -1461,7 +1461,7 @@
                             @endif
                             @endif
                         @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('Initiate-payment-request');
                         @endphp
                         @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')

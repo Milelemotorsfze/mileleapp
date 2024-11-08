@@ -33,6 +33,7 @@ use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
 use App\Http\Controllers\VehiclePenaltyController;
+use App\Http\Controllers\WOVehicleClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -487,9 +488,17 @@ Route::get('/d', function () {
     Route::controller(VehiclePenaltyController::class)->group(function(){
         Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    
+    Route::controller(WOVehicleClaimsController::class)->group(function(){
+        Route::get('/vehicle-pending-claims', 'getPendingClaims')->name('getPendingClaims');
+        Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
+        Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
+        Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+    });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -497,10 +506,6 @@ Route::get('/d', function () {
     // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
 
     // Demand & Planning Module
-
-    // suppliers
-
-    //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
@@ -519,8 +524,6 @@ Route::get('/d', function () {
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
     Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
         ->name('letter-of-indent.request-approval');
-    // Route::post('letter-of-indent/request-TTC-approval', [LetterOfIndentController::class, 'RequestTTCApproval'])
-    //     ->name('letter-of-indent.request-TTC-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
@@ -551,7 +554,7 @@ Route::get('/d', function () {
     Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
-    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
+    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class)->only('create');
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');

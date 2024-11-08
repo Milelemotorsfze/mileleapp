@@ -6,6 +6,7 @@ use App\Models\PreOrder;
 use App\Models\PreOrderPos;
 use App\Models\UserActivities;
 use App\Models\Brand;
+use App\Models\clients;
 use App\Models\ColorCode;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
@@ -38,27 +39,19 @@ class PreOrderController extends Controller
                     'pre_orders.id as pre_order_number',
                     'pre_orders.status',
                     'pre_orders_items.id',
-                    'so.so_number',
-                    'so.notes',
-                    'master_model_lines.model_line as model_line',
                     'pre_orders_items.qty',
                     'pre_orders_items.description',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior', 
-                    'color_codes_interior.name as interior', 
-                    'pre_orders_items.modelyear',
-                    'brands.brand_name',
+                    'varaints.name',
+                    'quotations.id as quotationsid',
                     'users.name as salesperson'
                 ])
                 ->leftJoin('pre_orders', 'pre_orders_items.preorder_id', '=', 'pre_orders.id')
-                ->leftJoin('so', 'pre_orders.quotations_id', '=', 'so.quotation_id')
-                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
-                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.quotation_id')
+                ->leftJoin('quotation_details', 'pre_orders.quotations_id', '=', 'quotation_details.quotation_id')
+                ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
-                ->where('pre_orders_items.status', 'Approved')
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
                 ->groupby('pre_orders_items.id');
             }
                 return DataTables::of($preorders)
@@ -115,48 +108,24 @@ class PreOrderController extends Controller
         //
     }
     public function createpreorder($callId) {
-    $excolourcode = ColorCode::where('belong_to', "ex")->get();
-    $intcolourcode = ColorCode::where('belong_to', "int")->get();
     $quotation = Quotation::where('calls_id', $callId)->first();
-    $modelLines = [];
-    $quotationItems = QuotationItem::where('quotation_id', $quotation->id)
-                    ->whereIn('reference_type', [
-                        'App\Models\Varaint',
-                        'App\Models\MasterModelLines',
-                        'App\Models\Brand'
-                    ])->get();
-                foreach ($quotationItems as $item) {
-                    switch ($item->reference_type) {
-                        case 'App\Models\Varaint':
-                        $variant = Varaint::find($item->reference_id);
-                        if ($variant) {
-                            $master_model_lines = $variant->master_model_lines;
-                            if ($master_model_lines) {
-                                $modelLines[$item->id][$variant->master_model_lines_id] = $master_model_lines->model_line;
-                            }
-                        }
-                        break;
-                    case 'App\Models\MasterModelLines':
-                        $masterModelLinesId = $item->reference_id;
-                        // Fetch all model lines associated with this MasterModelLines
-                        $masterModelLines = MasterModelLines::where('id', $masterModelLinesId)->get();
-                        foreach ($masterModelLines as $masterModelLine) {
-                            $modelLines[$item->id][$masterModelLine->id] = $masterModelLine->model_line;
-                        }
-                        break;
-                    case 'App\Models\Brand':
-                        $brandId = $item->reference_id;
-                        $masterModelLines = MasterModelLines::where('brand_id', $brandId)->get();
-                        foreach ($masterModelLines as $masterModelLine) {
-                            $modelLines[$item->id][$masterModelLine->id] = $masterModelLine->model_line;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                        }
-    return view('preorder.create', compact('modelLines', 'quotation', 'intcolourcode', 'excolourcode')); 
-}
+    $calls = Quotation::where('calls_id', $callId)->first();
+    $quotationItems = QuotationItem::where('quotation_id', $quotation->id)->get();
+    $variants = collect();
+    foreach ($quotationItems as $item) {
+        if ($item->reference_type === 'App\Models\Varaint') {
+            $variant = Varaint::where('id', $item->reference_id)->first();
+        } elseif ($item->reference_type === 'App\Models\MasterModelLines') {
+            $variant = Varaint::where('master_model_lines_id', $item->reference_id)->first();
+        } else {
+            continue;
+        }
+        if ($variant && !$variants->contains('id', $variant->id)) {
+            $variants->push($variant);
+        }
+    }
+    return view('preorder.create', compact('variants', 'quotation')); 
+    }
         public function storepreorder(Request $request, $quotationId)
             {
                 $quotationdetails = QuotationDetail::where('quotation_id',$quotationId)->first();
@@ -166,15 +135,14 @@ class PreOrderController extends Controller
                 $preorder->status = "New";
                 $preorder->save();
                 $preorder_items = New PreOrdersItems();
-                foreach ($request->master_model_lines_id as $key => $modelLineId) {
+                foreach ($request->variant_id as $key => $variant_id) {
                     $preorderItem = new PreOrdersItems();
                     $preorderItem->preorder_id = $preorder->id;
                     $preorderItem->countries_id = $quotationdetails->country_id ?? null;
-                    $preorderItem->master_model_lines_id = $modelLineId;
-                    $preorderItem->int_colour = $request->int_colour[$key];
-                    $preorderItem->ex_colour = $request->ex_colour[$key];
-                    $preorderItem->modelyear = $request->modelyear[$key];
+                    $preorderItem->variant_id = $variant_id;
                     $preorderItem->qty = $request->qty[$key];
+                    $preorderItem->notes = $request->notes[$key];
+                    $preorderItem->status = "New";
                     $preorderItem->save();
                 }
             return redirect()->route('dailyleads.index')->with('success', 'Pre Order created successfully.');

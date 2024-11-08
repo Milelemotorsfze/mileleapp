@@ -74,9 +74,6 @@
                                 <th>LOI Item Code
                                     <input class="small-width" onkeyup="reload()" name="code" type="text" id="code" placeholder="LOI Item Code">
                                 </th> 
-                                <!-- <th>LOI Status
-                                    <input type="text" id="loi-status" onkeyup="reload()" placeholder="LOI Status">
-                                </th>  -->
                                 <th>PFI Date
                                     <input type="date" class="small-width" onchange="reload()" id="pfi-date" placeholder="PFI Date">
                                 </th>                                                                              
@@ -203,7 +200,6 @@
             {'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'code', 'name' : 'code' , orderable: true},
             {'data' : 'loi_item_code', 'name' : 'loi_item_code' , orderable: true},
-            // {'data' : 'loi_status', 'name' : 'letterOfIndentItem.LOI.status' , orderable: false},
             {'data' : 'pfi_date', 'name' : 'pfi.pfi_date', orderable: false},
             {'data' : 'pfi.pfi_reference_number', 'name' : 'pfi.pfi_reference_number', orderable: false},
             {'data' : 'pfi.customer.name', 'name' : 'pfi.customer.name', orderable: false,},
@@ -231,11 +227,8 @@
         }  
 
         function exportData() {
-            // var table = $('#PFI-Items-table').DataTable();
-            // table.draw(); 
+            
                 let code = $('#code').val(); 
-                console.log(code); // Add custom parameters to send to the server
-                // let status = $('#loi-status').val();
                 let pfi_date = $('#pfi-date').val();
                 let pfi_item_code = $('#pfi-item-code').val();
                 let pfi_number = $('#pfi-number').val();

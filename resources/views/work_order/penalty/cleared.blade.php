@@ -95,7 +95,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                                     </td>
                                     <td>{{ $data->penalty->remarks ?? '' }}</td>
                                     <td>{{ $data->penalty->createdUser->name ?? '' }}</td>
-                                    <td>@if($data->penalty->created_at != ''){{ \Carbon\Carbon::parse($data->woBoe->created_at)->format('d M Y') }}@endif</td>
+                                    <td>@if($data->penalty->created_at != ''){{ \Carbon\Carbon::parse($data->penalty->created_at)->format('d M Y') }}@endif</td>
                                 </tr>
                             @endforeach
                         @else

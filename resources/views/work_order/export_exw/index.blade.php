@@ -415,20 +415,22 @@
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+										<div class="tooltip-container">
 										<label class="badge {{ $data->getBadgeClass($data->docs_status) }}">
 											<strong>{{ strtoupper($data->docs_status) }}</strong>
 										</label>
 										@if($data->latestDocsStatus && $data->latestDocsStatus->documentation_comment)
-											<div class="tooltip-container">
+											@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
 												<div class="tooltip-text">
 													<div class="tooltip-header">Remarks</div>
 													<div class="tooltip-body">
 														{{ $data->latestDocsStatus->documentation_comment }}
 													</div>
 												</div>
-											</div>
+											@endif
 										@endif
 									@endif
+									</div>
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
@@ -485,10 +487,7 @@
 									<td>{{ $data->port_of_discharge ?? '' }}</td>
 									<td>{{ $data->final_destination ?? '' }}</td>
 									<td>{{ $data->transport_type ?? '' }}</td>
-									<td>
-										@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])
-										@endcomponent
-									</td>
+									@component('components.view-download-buttons', ['filePath' => 'wo/brn_file/', 'fileName' => $data->brn_file])@endcomponent
 									<td>{{ $data->getTransportField('name') }}</td>
 									<td>{{ $data->getTransportField('id') }}</td>
 									<td class="{{ $data->transport_type == 'road' ? 'no-click' : '' }}">{{ $data->getTransportField('details') }}</td>
@@ -599,10 +598,10 @@
                 });
         });
 
-        $('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
-            const workOrderId = $(this).closest('tr').data('id');
-            if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
-        });
+		$('.my-datatable tbody').on('dblclick', 'tr td:not(.no-click)', function() {
+			const workOrderId = $(this).closest('tr').data('id');
+			if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
+		});
         const table = $('.my-datatable').DataTable({
             pageLength: 100,
             lengthMenu: [10, 25, 50, 100, 200],

@@ -87,6 +87,7 @@ class DailyleadsController extends Controller
                     'calls.name as customername',
                     'calls.email',
                     'calls.phone',
+                    'calls.created_by',
                     'quotations.created_at',
                     'quotations.deal_value',
                     'quotations.sales_notes',
@@ -110,21 +111,18 @@ class DailyleadsController extends Controller
                     \DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as date_formatted"),
                     'quotations.deal_value as deal_value',
                     'quotations.sales_notes as sales_notes',
-                    'master_model_lines.model_line as model_line',
                     'pre_orders_items.qty',
-                    'pre_orders_items.description',
+                    'pre_orders_items.notes',
+                    'varaints.name',
+                    'users.name as salesperson',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior',
-                    'color_codes_interior.name as interior',
-                    'pre_orders_items.modelyear'
                 ])
                 ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
                 ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
-                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
-                ->where('quotations.created_by', $id)
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
+                ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
@@ -141,7 +139,8 @@ class DailyleadsController extends Controller
                     'calls.email',
                     'calls.remarks',
                     'calls.type',
-                    'calls.leadtype', 
+                    'calls.leadtype',
+                    'calls.created_by', 
                     'calls.location',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -172,6 +171,7 @@ class DailyleadsController extends Controller
                     'calls.email',
                     'calls.remarks',
                     'calls.type',
+                    'calls.created_by',
                     'calls.status',
                     'calls.leadtype', 
                     'calls.location',
@@ -205,6 +205,7 @@ class DailyleadsController extends Controller
                     'calls.remarks',
                     'calls.type',
                     'calls.location',
+                    'calls.created_by',
                     'users.name as createdby',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -227,7 +228,7 @@ class DailyleadsController extends Controller
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
             if($status === "Prospecting")
             {
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
