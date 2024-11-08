@@ -598,10 +598,10 @@
                 });
         });
 
-        $('.my-datatable tbody').on('click', 'tr td:not(.no-click)', function() {
-            const workOrderId = $(this).closest('tr').data('id');
-            if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
-        });
+		$('.my-datatable tbody').on('dblclick', 'tr td:not(.no-click)', function() {
+			const workOrderId = $(this).closest('tr').data('id');
+			if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
+		});
         const table = $('.my-datatable').DataTable({
             pageLength: 100,
             lengthMenu: [10, 25, 50, 100, 200],
