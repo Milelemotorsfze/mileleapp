@@ -383,6 +383,7 @@ class SupplierController extends Controller
     // }
     public function supplierAddonExcelValidation(Request $request)
     {
+        $data['headingError'] = "";
         if($request->file)
                 {
                     $headings = (new HeadingRowImport)->toArray($request->file);
