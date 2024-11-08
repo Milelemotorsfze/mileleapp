@@ -101,7 +101,7 @@
         radio.addEventListener('change', toggleFields_{{$data->id}});
     });
 
-    function submiDtocStatus(workOrderId, woNumber) {
+    function submitDocStatus(workOrderId, woNumber) {
         document.querySelectorAll('.text-danger').forEach(function(span) {
             span.textContent = ''; 
         });
