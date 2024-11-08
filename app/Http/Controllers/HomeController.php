@@ -300,6 +300,12 @@ $totalvariantss = [
         } else {
             $commissons = [];
         }
+        $dataforpie = DB::table('lead_rejection')
+        ->select('Reason', DB::raw('count(*) as count'))
+        ->whereNotNull('Reason') // Exclude null values
+        ->groupBy('Reason')
+        ->get();
+                info($dataforpie);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         if ($hasPermission) {
             $dpdashboarduae = DB::table('vehicles')
@@ -330,7 +336,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','dpdashboarduae','dpdashboardnon','undersalesleads','commissons','dataforpie'));
         }
         else
         {
@@ -338,7 +344,7 @@ $totalvariantss = [
             'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
             'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
             'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons'));
+             'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname','undersalesleads','commissons','dataforpie'));
         }
     }
     public function marketingupdatechart(Request $request)
@@ -456,4 +462,50 @@ $totalvariantss = [
 
 
     }
+    public function leadstatuswise(Request $request) {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+    
+        $salesPersons = ModelHasRoles::where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->where('users.sales_rap', 'Yes')
+            ->pluck('users.id');
+    
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('leads-working-analysis');
+    
+        $query = DB::table('calls')
+            ->join('users', 'calls.sales_person', '=', 'users.id')
+            ->whereBetween('calls.created_at', [$startDate, $endDate])
+            ->whereIn('calls.sales_person', $salesPersons)
+            ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name');
+    
+        if ($hasPermission) {
+            $query->selectRaw('
+                SUM(CASE WHEN calls.status = "New" THEN 1 ELSE 0 END) AS call_count_New,
+                SUM(CASE WHEN calls.status IN ("contacted", "follow up") THEN 1 ELSE 0 END) AS call_count_contacted,
+                SUM(CASE WHEN calls.status = "working" THEN 1 ELSE 0 END) AS call_count_working,
+                SUM(CASE WHEN calls.status = "qualify" THEN 1 ELSE 0 END) AS call_count_qualify,
+                SUM(CASE WHEN calls.status = "Rejected" THEN 1 ELSE 0 END) AS call_count_Rejected,
+                SUM(CASE WHEN calls.status = "converted" THEN 1 ELSE 0 END) AS call_count_converted,
+                SUM(CASE WHEN calls.status = "Closed" THEN 1 ELSE 0 END) AS call_count_closed,
+                SUM(CASE WHEN calls.status = "Quoted" THEN 1 ELSE 0 END) AS call_count_quoted,
+                SUM(CASE WHEN calls.status = "Prospecting" THEN 1 ELSE 0 END) AS call_count_Prospecting,
+                SUM(CASE WHEN calls.status = "New Demand" THEN 1 ELSE 0 END) AS call_count_new_demand
+            ');
+        } else {
+            $query->selectRaw('COUNT(calls.id) AS call_count');
+        }
+    
+        $query->groupBy('sales_person_name')
+              ->orderByDesc($hasPermission ? 'calls.id' : 'call_count');
+    
+        $data = $query->get();
+    
+        return response()->json([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'data' => $data,
+        ]);
+    }     
 }
