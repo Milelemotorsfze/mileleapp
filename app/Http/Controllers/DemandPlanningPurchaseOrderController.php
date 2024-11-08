@@ -34,12 +34,13 @@ class DemandPlanningPurchaseOrderController extends Controller
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
 
         $pfi = Pfi::find($request->id);
-        $dealer = $pfi->letterOfIndent->dealers ?? '';
-
-        // $pfiVehicleVariants = ApprovedLetterOfIndentItem::select('*', DB::raw('sum(quantity) as quantity'))
-        //     ->where('pfi_id', $request->id)
-        //     ->groupBy('letter_of_indent_item_id')
-        //     ->get();
+        $pfiItemLatest = PFIItem::where('pfi_id', $request->id)
+                            ->where('is_parent', false)
+                            ->first();
+                           
+        $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
+           // ask how to find dealer becz loi is multiple
+        
         $pfiItems = PFIItem::where('pfi_id', $request->id)
                                 ->where('is_parent', true)
                                 ->get();
@@ -50,7 +51,8 @@ class DemandPlanningPurchaseOrderController extends Controller
                                                         ->sum('quantity');
 
             $pfiItem->quantity = $pfiItem->pfi_quantity - $alreadyAddedQuantity;
-
+           
+          
             $masterModel = MasterModel::find($pfiItem->masterModel->id);
             $pfiItem->masterModels = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)
@@ -67,8 +69,8 @@ class DemandPlanningPurchaseOrderController extends Controller
                                                         ->count();
         }
 
-        $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-        $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+        $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
+        $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
         $paymentTerms = PaymentTerms::all();
         return view('purchase-order.create', compact('pfiItems',
             'exColours','intColours','pfi','paymentTerms'));

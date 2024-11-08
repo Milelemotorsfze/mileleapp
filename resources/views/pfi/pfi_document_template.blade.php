@@ -115,7 +115,6 @@
                         <span style="margin-left:300px;"> Date: </span>
                         <span class="date"> {{ \Illuminate\Support\Carbon::now()->format('d/m/Y')}} </span>
                     </p>
-
                     <p style="margin-bottom:8px;"> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
                         <span style="margin-left:15px;">{{ strtoupper(substr($pfi->customer->name, 0, 15)) }} </span>
                     </p>
