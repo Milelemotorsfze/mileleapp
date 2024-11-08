@@ -1799,7 +1799,10 @@
                 {
                     let dataErrorCard = document.getElementById('dataErrorCard');
                     dataErrorCard.hidden = true
-                    if(result.data.headingError)
+                    console.log(result);
+                    console.log(result.data);
+                    console.log(result.data.headingError);
+                    if(result.data.headingError && result.data.headingError !== 'aaa')
                     {
                         document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
                         $('#submit').html('Save');

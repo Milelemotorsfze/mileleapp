@@ -383,7 +383,6 @@ class SupplierController extends Controller
     // }
     public function supplierAddonExcelValidation(Request $request)
     {
-        $data['headingError'] = "";
         if($request->file)
                 {
                     $headings = (new HeadingRowImport)->toArray($request->file);
@@ -422,6 +421,7 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+        $data['headingError'] = "aaa";
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -1433,6 +1433,9 @@ class SupplierController extends Controller
     }
     public function vendorUniqueCheck(Request $request)
     {
+        // dd('hi');
+        // info($request->all());
+
         $contactNumber = $request->contact_number;
         if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
             $isVendorExist = Supplier::where('supplier', $request->name);
