@@ -1790,9 +1790,6 @@
                 $('.overlay').show();
                 $.ajax({
                 type:'POST',
-                headers:{
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
                 url: "{{ route('suppliers.store') }}",
                 data: formData,
                 cache:false,
