@@ -415,20 +415,22 @@
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
+										<div class="tooltip-container">
 										<label class="badge {{ $data->getBadgeClass($data->docs_status) }}">
 											<strong>{{ strtoupper($data->docs_status) }}</strong>
 										</label>
 										@if($data->latestDocsStatus && $data->latestDocsStatus->documentation_comment)
-											<div class="tooltip-container">
+											@if(isset($data->latestDocsStatus) && $data->latestDocsStatus->documentation_comment != null)
 												<div class="tooltip-text">
 													<div class="tooltip-header">Remarks</div>
 													<div class="tooltip-body">
 														{{ $data->latestDocsStatus->documentation_comment }}
 													</div>
 												</div>
-											</div>
+											@endif
 										@endif
 									@endif
+									</div>
 								</td>
 								<td>
 									@if($data->sales_support_data_confirmation_at && $data->finance_approval_status === 'Approved' && $data->coo_approval_status === 'Approved')
