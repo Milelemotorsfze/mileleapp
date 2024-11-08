@@ -1601,7 +1601,7 @@
             var name = $('#supplier').val();
             var supplierType = $('#supplier_type').val();
             var url = '{{ route('vendor.vendorUniqueCheck') }}';
-            if(contactNumber.length > 0 && name.length > 0) {
+            if(contactNumber.length > 0 && name.length > 0 && supplierType.length > 0) {
                 $.ajax({
                     type: "GET",
                     url: url,
@@ -1913,6 +1913,7 @@
         {
             if(clickInput.id == 'supplier_type')
             {
+                VendorUniqueCheck();
                 var value = clickInput.value;
                 if(value == '')
                 {
@@ -1990,6 +1991,7 @@
             }
             if(clickInput.id == 'supplier')
             {
+                VendorUniqueCheck();
                 var value = clickInput.value;
                 if(value == '')
                 {
@@ -2006,6 +2008,7 @@
             }
             if(clickInput.id == 'contact_number')
             {
+                VendorUniqueCheck();
                 var value = clickInput.value;
                 if(value != '')
                 {
@@ -2088,7 +2091,7 @@
                 }
 
             }
-            VendorUniqueCheck();
+          
         }
         function showContactNumberError($msg)
         {
