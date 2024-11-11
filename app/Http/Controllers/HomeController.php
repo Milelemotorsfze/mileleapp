@@ -483,7 +483,7 @@ $totalvariantss = [
         if ($hasPermission) {
             $query->selectRaw('
                 SUM(CASE WHEN calls.status = "New" THEN 1 ELSE 0 END) AS call_count_New,
-                SUM(CASE WHEN calls.status = "contacted" THEN 1 ELSE 0 END) AS call_count_contacted,
+                SUM(CASE WHEN calls.status IN ("contacted", "follow up") THEN 1 ELSE 0 END) AS call_count_contacted,
                 SUM(CASE WHEN calls.status = "working" THEN 1 ELSE 0 END) AS call_count_working,
                 SUM(CASE WHEN calls.status = "qualify" THEN 1 ELSE 0 END) AS call_count_qualify,
                 SUM(CASE WHEN calls.status = "Rejected" THEN 1 ELSE 0 END) AS call_count_Rejected,
