@@ -507,5 +507,19 @@ $totalvariantss = [
             'end_date' => $endDate,
             'data' => $data,
         ]);
-    }     
+    }
+    public function getFilteredData(Request $request)
+{
+    $startDate = $request->start_date;
+    $endDate = $request->end_date;
+        $filteredData = DB::table('lead_rejection')
+        ->select('Reason', DB::raw('count(*) as count'))
+        ->whereNotNull('Reason') // Exclude null values
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->groupBy('Reason')
+        ->get();
+    $labels = $filteredData->pluck('Reason');
+    $counts = $filteredData->pluck('count');
+    return response()->json(['labels' => $labels, 'counts' => $counts]);
+}     
 }

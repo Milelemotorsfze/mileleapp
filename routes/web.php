@@ -1110,4 +1110,5 @@ Route::get('/d', function () {
     Route::post('/tasks/update', [DailyleadsController::class, 'tasksupdateStatus'])->name('leads-tasks.update');
     Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
     Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
+    Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
 });

@@ -1068,7 +1068,16 @@ Procurement
                 <h5 class="card-title mb-0 flex-grow-1">Leads Rejection Reasons Summary</h5>
             </div>
             <div class="card-body text-center">
-                <canvas id="reasonBarChart" style="max-width: 100%; height: 100px;"></canvas> <!-- Set max width and height for full-width display -->
+                <!-- Date Range Picker for Reason Chart -->
+<div id="reasonReportrange" style="cursor: pointer; padding: 5px; border: 1px solid #ccc; width: 250px; text-align: right;">
+    <i class="fa fa-calendar"></i>&nbsp;
+    <span></span> <i class="fa fa-caret-down"></i>
+</div>
+<input type="hidden" id="reason_start_date">
+<input type="hidden" id="reason_end_date">
+
+<!-- Bar Chart Canvas -->
+<canvas id="reasonBarChart"></canvas>
             </div>
         </div>
     </div>
@@ -1533,13 +1542,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // Example data from your controller
     let data = @json($dataforpie);
 
-    // Extract labels and counts for the chart
+    // Extract initial labels and counts for the chart
     let labels = data.map(item => item.Reason);
     let counts = data.map(item => item.count);
 
+    // Initialize the Bar Chart
     const ctx = document.getElementById('reasonBarChart').getContext('2d');
     const reasonBarChart = new Chart(ctx, {
-        type: 'bar', // Change 'bar' to 'pie' if you want a full-width pie chart
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
@@ -1581,6 +1591,56 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     });
+
+    // Function to update the Reason Chart based on date range
+    function updateReasonChart() {
+        let startDate = $('#reason_start_date').val();
+        let endDate = $('#reason_end_date').val();
+
+        $.ajax({
+            url: '/reasondata',  // Replace with your endpoint URL
+            type: 'GET',
+            data: { start_date: startDate, end_date: endDate },
+            success: function(response) {
+                // Assume the response contains new labels and counts
+                reasonBarChart.data.labels = response.labels;
+                reasonBarChart.data.datasets[0].data = response.counts;
+                reasonBarChart.update();
+            }
+        });
+    }
+
+    // Initialize Date Range Picker
+    function cb(start, end) {
+        $('#reasonReportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#reason_start_date').val(start.format('YYYY-MM-DD'));
+        $('#reason_end_date').val(end.format('YYYY-MM-DD'));
+        updateReasonChart();
+    }
+
+    var today = moment();
+    var yesterday = moment().subtract(1, 'days');
+    var last7Days = moment().subtract(6, 'days');
+    var last30Days = moment().subtract(29, 'days');
+    var thisMonthStart = moment().startOf('month');
+    var thisMonthEnd = moment().endOf('month');
+    var lastMonthStart = moment().subtract(1, 'month').startOf('month');
+    var lastMonthEnd = moment().subtract(1, 'month').endOf('month');
+
+    $('#reasonReportrange').daterangepicker({
+        startDate: last7Days,
+        endDate: today,
+        ranges: {
+            'Today': [today, today],
+            'Yesterday': [yesterday, yesterday],
+            'Last 7 Days': [last7Days, today],
+            'Last 30 Days': [last30Days, today],
+            'This Month': [thisMonthStart, thisMonthEnd],
+            'Last Month': [lastMonthStart, lastMonthEnd]
+        }
+    }, cb);
+
+    cb(last7Days, today); //
 });
 </script>
     <script>
