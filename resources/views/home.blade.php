@@ -1057,7 +1057,7 @@ Procurement
 </div>
 @endif
 @php
-                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('leads_summary_dashboard');
                                       @endphp
                                       @if ($hasPermission)
                                       <div class="row">
