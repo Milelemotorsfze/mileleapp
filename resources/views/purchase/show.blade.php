@@ -4140,7 +4140,7 @@ $(document).ready(function() {
     });
 
     function loadMessages() {
-        $.get(`/messages/${purchaseOrderId}`, function(data) {
+        $.get(`/messagespurchased/${purchaseOrderId}`, function(data) {
             $('#messages').empty();
             data.forEach(function(message) {
                 displayMessage(message);
@@ -4219,7 +4219,7 @@ $(document).ready(function() {
     function sendMessage() {
         const message = $('#message').val();
         if (message.trim() !== '') {
-            $.post('/messages', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
+            $.post('/messagespurchased', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
                 displayMessage(data);
                 $('#message').val('');
                 scrollToBottom();
@@ -4230,7 +4230,7 @@ $(document).ready(function() {
     function sendReply(messageId) {
         const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
         if (reply.trim() !== '') {
-            $.post('/replies', { message_id: messageId, reply: reply }, function(data) {
+            $.post('/repliespurchased', { message_id: messageId, reply: reply }, function(data) {
                 const replyHtml = `
                     <div class="message-reply">
                         <div class="d-flex justify-content-between">
