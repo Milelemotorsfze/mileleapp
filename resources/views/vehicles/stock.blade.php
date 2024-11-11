@@ -969,6 +969,53 @@ table.dataTable thead th select {
     searchable: false
 },
 );
+var columnMap = {
+        0: 'id',
+        1: 'vehicles.id',
+        2: 'purchasing_order.po_number',
+        3: 'purchasing_order.po_date',
+        4: 'vehicles.estimation_date',
+        5: 'grn.grn_number',
+        6: 'grn.date',
+        7: 'vehicles.inspection_date',
+        8: 'vehicles.grn_remark',
+        9: 'grn_inspectionid',
+        10: 'vehicles.grn_remark',
+        11: 'reservation_end_date',
+        12: 'bp.name',
+        13: 'so.so_date',
+        14: 'so.so_number',
+        15: 'sp.name',
+        16: 'vehicles.sales_remarks',
+        17: 'pdi_inspectionid',
+        18: 'brands.brand_name',
+        19: 'master_model_lines.model_line',
+        20: 'varaints.model_detail',
+        21: 'varaints.name',
+        22: 'varaints.detail',
+        23: 'vehicles.vin',
+        24: 'varaints.engine',
+        25: 'varaints.my',
+        26: 'varaints.steering',
+        27: 'varaints.fuel_type',
+        28: 'varaints.gear',
+        29: 'vehicles.ex_colour',
+        30: 'vehicles.int_colour',
+        31: 'varaints.upholestry',
+        32: 'vehicles.ppmmyyy',
+        33: 'warehouse.name',
+        34: 'vehicles.territory',
+        35: 'countries.name',
+        36: 'costprice',
+        37: 'vehicles.minimum_commission',
+        38: 'vehicles.gp',
+        39: 'vehicles.price',
+        40: 'documents.import_type',
+        41: 'documents.owership',
+        42: 'documents.document_with',
+        43: 'vehicles.custom_inspection_number',
+        44: 'vehicles.custom_inspection_status',
+    };
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
             serverSide: true,
@@ -976,10 +1023,24 @@ table.dataTable thead th select {
             ajax: {
         url: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
         type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
+        data: function (d) {
+                d.filters = {};  // Initialize an empty filters object
+
+                $('#dtBasicExample7 thead select').each(function () {
+                    var columnIndex = $(this).parent().index(); // Get the column index
+                    var columnName = columnMap[columnIndex]; // Map index to column name
+                    var value = $(this).val();
+                        console.log(columnIndex);
+                    // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
+                    if (value && columnName) {
+                        if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
+                            d.filters[columnName] = value; // Special filters for NULL and non-empty
+                        } else if (value.length > 0) {
+                            d.filters[columnName] = value; // Regular filter values
+                        }
+                    }
+                });
+            },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
@@ -1024,23 +1085,25 @@ table.dataTable thead th select {
             return; // Skip this column
         }
         // Create a select element
-        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+        var select = $('<select multiple="multiple" style="width: 100%">' +
+            '<option value="">Filter by ' + columnHeader + '</option>' +
+            '<option value="__NULL__">Empty</option>' + // Add the Empty option
+            '<option value="__Not EMPTY__">Not Empty</option>' + // Add the Not Empty option
+            '</select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                // Get the selected values
                 var selectedValues = $(this).val();
-                
+
+                // Use ajax.reload to apply filter to the entire table (server-side filtering)
                 if (selectedValues && selectedValues.length > 0) {
-                    // Join selected values as a string that looks for exact matches
-                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
-                    column
-                        .search(exactSearch, true, false)  // Exact match using regex search
-                        .draw();
+                    // Store selected values for this column
+                    api.settings()[0].ajax.data.filters = api.settings()[0].ajax.data.filters || {};
+                    api.settings()[0].ajax.data.filters[index] = selectedValues;
                 } else {
-                    column
-                        .search('', true, false)  // Clear search if no values selected
-                        .draw();
+                    delete api.settings()[0].ajax.data.filters[index];
                 }
+
+                api.ajax.reload(); // Reload the table with new filter data
             });
 
         // Populate the select element with unique values from the column
