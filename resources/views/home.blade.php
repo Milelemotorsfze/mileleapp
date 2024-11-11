@@ -1795,7 +1795,7 @@ $(function() {
                     }
                     table.row.add(row).draw(false);
                 });
-                populateFilterDropdownssummary();
+                populateFilterDropdowns();
 
                 if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
                     var totalRow = [
@@ -2096,7 +2096,7 @@ $(function() {
     }
 
     // Populate filter dropdowns for each column
-    function populateFilterDropdownssummary() {
+    function populateFilterDropdowns() {
         $('#dtBasicExample4 thead select').remove();
         table.columns().every(function() {
             var column = this;
@@ -2160,7 +2160,7 @@ $(function() {
                     table.row.add(row).draw(false);
                 });
 
-                populateFilterDropdownssummary();
+                populateFilterDropdowns();
 
                 // Calculate totals after loading data
                 calculateAndDisplayTotals();
@@ -2184,7 +2184,7 @@ $(function() {
         }
     }, function(selectedStart, selectedEnd) {
         $('#leadsstatuswise span').html(selectedStart.format('MMMM D, YYYY') + ' - ' + selectedEnd.format('MMMM D, YYYY'));
-        loadDataAndPopulateFilterssummary(selectedStart, selectedEnd);
+        loadDataAndPopulateFilters(selectedStart, selectedEnd);
     });
 
     $('#leadsstatuswise span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
