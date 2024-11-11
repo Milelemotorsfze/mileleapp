@@ -880,6 +880,47 @@ var columns6 = [
     searchable: false
 },
         );
+        var columnMap = {
+        0: 'id',
+        1: 'purchasing_order.po_number',
+        2: 'purchasing_order.po_date',
+        3: 'grn.grn_number',
+        4: 'grn.date',
+        6: 'so.so_date',
+        7: 'so.so_number',
+        8: 'users.name',
+        9: 'vehicles.sales_remarks',
+        10: 'gdn.gdn_number',
+        11: 'gdn.date',
+        12: 'pdi_inspectionid',
+        13: 'brands.brand_name',
+        14: 'master_model_lines.model_line',
+        15: 'varaints.model_detail',
+        16: 'varaints.name',
+        17: 'varaints.detail',
+        18: 'vehicles.vin',
+        19: 'varaints.engine',
+        20: 'varaints.my',
+        21: 'varaints.steering',
+        22: 'varaints.fuel_type',
+        23: 'varaints.gear',
+        24: 'vehicles.ex_colour',
+        25: 'vehicles.int_colour',
+        26: 'varaints.upholestry',
+        27: 'vehicles.ppmmyyy',
+        28: 'warehouse.name',
+        29: 'vehicles.territory',
+        30: 'countries.name',
+        31: 'costprice',
+        32: 'vehicles.minimum_commission',
+        33: 'vehicles.gp',
+        34: 'vehicles.price',
+        35: 'documents.import_type',
+        36: 'documents.owership',
+        37: 'documents.document_with',
+        38: 'vehicles.custom_inspection_number',
+        39: 'vehicles.custom_inspection_status',
+    };
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
             serverSide: true,
@@ -887,10 +928,24 @@ var columns6 = [
             ajax: {
         url: "{{ route('vehicles.deliveredvehicles', ['status' => 'Delivered']) }}",
         type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
+        data: function (d) {
+                d.filters = {};  // Initialize an empty filters object
+
+                $('#dtBasicExample6 thead select').each(function () {
+                    var columnIndex = $(this).parent().index(); // Get the column index
+                    var columnName = columnMap[columnIndex]; // Map index to column name
+                    var value = $(this).val();
+                        console.log(columnIndex);
+                    // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
+                    if (value && columnName) {
+                        if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
+                            d.filters[columnName] = value; // Special filters for NULL and non-empty
+                        } else if (value.length > 0) {
+                            d.filters[columnName] = value; // Regular filter values
+                        }
+                    }
+                });
+            },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
@@ -912,23 +967,25 @@ var columns6 = [
             return; // Skip this column
         }
         // Create a select element
-        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+        var select = $('<select multiple="multiple" style="width: 100%">' +
+            '<option value="">Filter by ' + columnHeader + '</option>' +
+            '<option value="__NULL__">Empty</option>' + // Add the Empty option
+            '<option value="__Not EMPTY__">Not Empty</option>' + // Add the Not Empty option
+            '</select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                // Get the selected values
                 var selectedValues = $(this).val();
-                
+
+                // Use ajax.reload to apply filter to the entire table (server-side filtering)
                 if (selectedValues && selectedValues.length > 0) {
-                    // Join selected values as a string that looks for exact matches
-                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
-                    column
-                        .search(exactSearch, true, false)  // Exact match using regex search
-                        .draw();
+                    // Store selected values for this column
+                    api.settings()[0].ajax.data.filters = api.settings()[0].ajax.data.filters || {};
+                    api.settings()[0].ajax.data.filters[index] = selectedValues;
                 } else {
-                    column
-                        .search('', true, false)  // Clear search if no values selected
-                        .draw();
+                    delete api.settings()[0].ajax.data.filters[index];
                 }
+
+                api.ajax.reload(); // Reload the table with new filter data
             });
 
         // Populate the select element with unique values from the column

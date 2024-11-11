@@ -3614,6 +3614,7 @@ public function availablevehicles(Request $request)
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
             if($status === "Delivered")
             {
                 $data = Vehicles::select( [
@@ -3695,6 +3696,16 @@ COALESCE(
                 ->whereNotNull('vehicles.gdn_id')
                 ->whereNotNull('vehicles.grn_id')
                 ->where('vehicles.status', 'Approved');
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        info($columnName);
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
+                } 
                 $data = $data->groupBy('vehicles.id');  
             }
             if ($data) {
