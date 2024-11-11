@@ -1778,7 +1778,7 @@ $(function() {
                         item.sales_person_name,
                         item.call_count,
                     ];
-                    if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
+                    if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
                         row.push(
                             item.call_count_27,
                             item.call_count_16,
@@ -1797,7 +1797,7 @@ $(function() {
                 });
                 populateFilterDropdowns();
 
-                if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
+                if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
                     var totalRow = [
                         'Total',
                         '',
@@ -2145,7 +2145,7 @@ $(function() {
                         item.sales_person_name,
                     ];
 
-                    @if (Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard'))
+                    @if (Auth::user()->hasPermissionForSelectedRole('leads-working-analysis'))
                         row.push(
                             item.call_count_New, item.call_count_contacted,
                             item.call_count_working, item.call_count_qualify,
