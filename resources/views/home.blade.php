@@ -1057,7 +1057,7 @@ Procurement
 </div>
 @endif
 @php
-                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('leads_summary_dashboard');
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard');
                                       @endphp
                                       @if ($hasPermission)
                                       <div class="row">
@@ -1778,7 +1778,7 @@ $(function() {
                         item.sales_person_name,
                         item.call_count,
                     ];
-                    if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
+                    if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
                         row.push(
                             item.call_count_27,
                             item.call_count_16,
@@ -1797,7 +1797,7 @@ $(function() {
                 });
                 populateFilterDropdowns();
 
-                if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
+                if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
                     var totalRow = [
                         'Total',
                         '',
@@ -2124,7 +2124,7 @@ $(function() {
     }
 
     // Load data and populate filters based on date range
-    function loadDataAndPopulateFilters(start, end) {
+    function loadDataAndPopulateFilterssummary(start, end) {
         $.ajax({
             url: '{{ route('homemarketing.leadstatuswise') }}',
             method: 'POST',
@@ -2168,7 +2168,7 @@ $(function() {
         });
     }
 
-    loadDataAndPopulateFilters(start, end);
+    loadDataAndPopulateFilterssummary(start, end);
 
     // Date Range Picker
     $('#leadsstatuswise').daterangepicker({
@@ -2184,7 +2184,7 @@ $(function() {
         }
     }, function(selectedStart, selectedEnd) {
         $('#leadsstatuswise span').html(selectedStart.format('MMMM D, YYYY') + ' - ' + selectedEnd.format('MMMM D, YYYY'));
-        loadDataAndPopulateFilters(selectedStart, selectedEnd);
+        loadDataAndPopulateFilterssummary(selectedStart, selectedEnd);
     });
 
     $('#leadsstatuswise span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
