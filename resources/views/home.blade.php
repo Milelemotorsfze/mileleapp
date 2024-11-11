@@ -2134,29 +2134,31 @@ $(function() {
                 end_date: end.format('YYYY-MM-DD'),
             },
             success: function(response) {
-    table.clear().draw();
+                table.clear().draw();
 
-    $.each(response.data, function(index, item) {
-        var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
-        
-        // Define row array with conditional population based on permissions
-        var row = [
-            formattedDate,
-            item.sales_person_name,
-        ];
+                $.each(response.data, function(index, item) {
+                    var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
+                    
+                    // Conditionally populate the row array based on user permission
+                    var row = [
+                        formattedDate,
+                        item.sales_person_name,
+                    ];
 
-        @if (Auth::user()->hasPermissionForSelectedRole('leads-working-analysis'))
-            row.push(
-                item.call_count_New, item.call_count_contacted,
-                item.call_count_working, item.call_count_qualify,
-                item.call_count_Rejected, item.call_count_converted,
-                item.call_count_quoted, item.call_count_Prospecting,
-                item.call_count_new_demand, item.call_count_closed
-            );
-        @endif
+                    @if (Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard'))
+                        row.push(
+                            item.call_count_New, item.call_count_contacted,
+                            item.call_count_working, item.call_count_qualify,
+                            item.call_count_Rejected, item.call_count_converted,
+                            item.call_count_quoted, item.call_count_Prospecting,
+                            item.call_count_new_demand, item.call_count_closed
+                        );
+                    @else
+                        row.push(item.call_count);
+                    @endif
 
-        table.row.add(row).draw(false);
-    });
+                    table.row.add(row).draw(false);
+                });
 
                 populateFilterDropdownssummary();
 
