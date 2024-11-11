@@ -2124,7 +2124,7 @@ $(function() {
     }
 
     // Load data and populate filters based on date range
-    function loadDataAndPopulateFilterssummary(start, end) {
+    function loadDataAndPopulateFilters(start, end) {
         $.ajax({
             url: '{{ route('homemarketing.leadstatuswise') }}',
             method: 'POST',
@@ -2168,7 +2168,7 @@ $(function() {
         });
     }
 
-    loadDataAndPopulateFilterssummary(start, end);
+    loadDataAndPopulateFilters(start, end);
 
     // Date Range Picker
     $('#leadsstatuswise').daterangepicker({
