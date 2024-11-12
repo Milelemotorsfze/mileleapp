@@ -496,6 +496,7 @@ Route::get('/d', function () {
         Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
         Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
         Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
         Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
         Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
     });    
