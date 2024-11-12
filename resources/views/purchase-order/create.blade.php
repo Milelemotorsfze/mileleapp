@@ -106,7 +106,7 @@
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label font-size-13 "> Territory </label>
-                                <input type="text" class="form-control" readonly value="Africa">
+                                <input type="text" class="form-control" readonly name="territory" value="Africa">
                             </div>
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
@@ -232,7 +232,7 @@
                                            placeholder="Unit Price" readonly>
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiItem->quantity}}"
+                                    <input type="number" id="quantity-{{$key}}" min="0" @if($isToyotaPO) readonly @endif  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiItem->quantity}}"
                                       data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY">
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
@@ -281,25 +281,34 @@
 @push('scripts')
 <script>
     let formValid = true;
+    let isToyotaPO = "{{ $isToyotaPO }}"
     function checkQuantity(key) {
-        var selectedQuantity = $('#quantity-'+key).val();
-        var variantQuantity = $('#quantity-'+key).attr('data-quantity');
-        var inventoryQuantity = $('#inventory-qty-'+key).attr('data-inventory-qty');
-        if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
-            formValid = false;
-            $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
-            $('.add-row-btn').attr('disabled', true);
-        }
-        else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
-            formValid = false;
-            $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
-            $('.add-row-btn').attr('disabled', true);
-        }
-        else{
-            formValid = true;
-            $('.QuantityError-'+key).text("");
-            $('.add-row-btn').attr('disabled', false);
-        }
+       if(isToyotaPO == 1) {
+            var selectedQuantity = $('#quantity-'+key).val();
+            var variantQuantity = $('#quantity-'+key).attr('data-quantity');
+            var inventoryQuantity = $('#inventory-qty-'+key).attr('data-inventory-qty');
+            if(parseInt(inventoryQuantity) > 0) {
+                if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
+                formValid = false;
+                $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
+                $('.add-row-btn').attr('disabled', true);
+                }
+                else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
+                    formValid = false;
+                    $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
+                    $('.add-row-btn').attr('disabled', true);
+                }
+                else{
+                    formValid = true;
+                    $('.QuantityError-'+key).text("");
+                    $('.add-row-btn').attr('disabled', false);
+                }
+            }else{
+                formValid = false;
+                $('.QuantityError-'+key).text("inventory Quantity not available");
+                $('.add-row-btn').attr('disabled', true);
+            }
+       }
     }
 
     function checkDuplicateVIN() {
@@ -412,8 +421,12 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
+                    newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol);
+                    if(isToyotaPO == 0) {
+                        newRow.append(removeBtn);
+                    }
                     $('#variantRowsContainer').append(newRow);
+
                 }
                 $('#variantRowsContainer').show();
             }

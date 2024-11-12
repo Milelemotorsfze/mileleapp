@@ -1068,7 +1068,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->estimation_date = $estimation_arrival;
                 $vehicle->engine = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $vehicle->territory = 'Africa';
+                    $vehicle->territory =  $territory;
                 }else{
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
@@ -1097,7 +1097,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->estimation_date = $estimation_arrival;
                 $purchasinglog->engine_number = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $purchasinglog->territory = 'Africa';
+                    $purchasinglog->territory = $territory;
                 }else{
                     $purchasinglog->territory = $territorys;
                 }

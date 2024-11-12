@@ -2130,16 +2130,16 @@
                 </div>
             @endif
 
-            @can('edit-demand-planning-po')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-demand-planning-po');
-                @endphp
-                @if ($hasPermission)
-{{--                    @if($variantCount > 0)--}}
-                       @include('purchase-order.po_add_vehicles')
-{{--                    @endif--}}
-                @endif
-            @endcan
+                <!-- @can('edit-demand-planning-po')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-demand-planning-po');
+                    @endphp
+                    @if ($hasPermission)
+                        @if($variantCount > 0)
+                            @include('purchase-order.po_add_vehicles')
+                        @endif
+                    @endif
+                @endcan -->
             @endif
             <div class="card">
                 <div class="card-header">
