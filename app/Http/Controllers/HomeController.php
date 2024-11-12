@@ -4,6 +4,7 @@ use App\Models\AddonDetails;
 use App\Models\UserActivities;
 use App\Models\AddonSellingPrice;
 use App\Models\ModelHasRoles;
+use App\Models\Rejection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Calls;
@@ -521,5 +522,33 @@ $totalvariantss = [
     $labels = $filteredData->pluck('Reason');
     $counts = $filteredData->pluck('count');
     return response()->json(['labels' => $labels, 'counts' => $counts]);
-}     
+} 
+public function showRejectedLeads(Request $request)
+{
+    $startDate = $request->query('start_date');
+    $endDate = $request->query('end_date');
+    $reason = $request->query('reason');
+
+    $rejectedLeads = Rejection::where('reason', $reason)
+        ->whereBetween('lead_rejection.created_at', [$startDate, $endDate])
+        ->join('calls', 'lead_rejection.call_id', '=', 'calls.id')
+        ->leftJoin('users as creators', 'calls.created_by', '=', 'creators.id')
+        ->leftJoin('users as assignees', 'calls.sales_person', '=', 'assignees.id')
+        ->select(
+            'calls.created_at',
+            'calls.type as selling_type',
+            'calls.name as customer_name',
+            'calls.id as customer_id',
+            'calls.phone as customer_phone',
+            'calls.email as customer_email',
+            'calls.language as preferred_language',
+            'calls.location',
+            'calls.remarks',
+            'creators.name as created_by_name',
+            'assignees.name as assigned_by_name'
+        )
+        ->get();
+
+    return view('dailyleads.rejectionlist', compact('rejectedLeads', 'startDate', 'endDate', 'reason'));
+}
 }
