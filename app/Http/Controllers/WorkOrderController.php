@@ -236,23 +236,28 @@ class WorkOrderController extends Controller
                 'sales_person_id','created_by','created_at','updated_at','lto'
             ],
         ];
-
-         // Helper function to apply select and search
-         $applySelectAndSearch = function ($query, $search, $columns) {
-            // Select the relevant columns
+        $nonSearchableFields = [
+            'id', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
+            'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'updated_by',
+            'sales_person_id', 'created_by', 'vehicle_handover_person_id'
+        ];
+        // Helper function to apply select and search
+        $applySelectAndSearch = function ($query, $search, $columns) use ($nonSearchableFields) {
             $query->select($columns);
             // Check if there is a search term
             if ($search) {
-                // Split the search term into individual words
+                $searchableColumns = array_filter($columns, function ($column) use ($nonSearchableFields) {
+                    return !in_array($column, $nonSearchableFields);
+                });
                 $searchTerms = preg_split('/\s+/', $search); 
-                $query->where(function ($query) use ($searchTerms, $columns) {
+                $query->where(function ($query) use ($searchTerms, $searchableColumns) {
                     foreach ($searchTerms as $term) {
                         $singleBatchTerms = ['single', 'singl', 'sing', 'sin', 'si', 's'];
                         if (in_array(strtolower($term), $singleBatchTerms)) {
                             $query->orWhere('is_batch', 0);
                         }
-                        $query->orWhere(function ($query) use ($term, $columns) {
-                            foreach ($columns as $column) {
+                        $query->orWhere(function ($query) use ($term, $searchableColumns) {
+                            foreach ($searchableColumns as $column) {
                                 $query->orWhere($column, 'LIKE', "%{$term}%");
                             }
                         });
