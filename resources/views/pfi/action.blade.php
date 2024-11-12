@@ -138,7 +138,7 @@
                                 @if($pfi->pfi_document_without_sign)
                                     <div class="row p-2 justify-content-center">
                                         <div class="col-md-2">
-                                        <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
+                                            <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
                                             class="btn btn-primary mb-2 text-center" download="{{ $oldPFIFileName }}">
                                             Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
                                         </div>
@@ -149,7 +149,7 @@
                             <div class="row p-2 mt-3 justify-content-center">
                                 <label class="fw-bold">Latest PFI Document</label>
                                 <div class="col-md-2">
-                                <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
+                                    <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
                                     class="btn btn-primary mb-2 text-center" download="{{ $newPFIFileName }}">
                                     Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
                                 </div>

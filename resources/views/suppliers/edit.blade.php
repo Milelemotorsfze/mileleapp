@@ -1803,41 +1803,45 @@
 
                         var url = '{{ route('vendor.vendorUniqueCheck') }}';
                         e.preventDefault();
-                        $.ajax({
-                            type: "GET",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                contact_number: contactNumber,
-                                name: name,
-                                supplierType:supplierType,
-                                id: '{{ $supplier->id }}'
-                            },
-                            success:function (data) {
-                                if(data.error) {
-                                    formInputError = true;
-                                    $('#submit').html('Save');
-                                    $('.overlay').hide();
-                                    showContactNumberError(data.error);
-                                    removeSupplierError();
-                                }else if(data.name_error) {
-                                    removeContactNumberError();
-                                    showSupplierError(data.name_error);
-                                    formInputError == true;
-                                    e.preventDefault();
-                                    $('#submit').html('Save');
-                                    $('.overlay').hide();
-                                }
-                                else{
-                                    removeSupplierError();
-                                    removeContactNumberError();
-                                    if(formInputError == false )
-                                    {
-                                        submitForm(e);
+                        if(contactNumber.length > 0 && name.length > 0 && supplierType.length > 0) {
+                            $.ajax({
+                                type: "GET",
+                                url: url,
+                                dataType: "json",
+                                data: {
+                                    contact_number: contactNumber,
+                                    name: name,
+                                    supplierType:supplierType,
+                                    id: '{{ $supplier->id }}'
+                                },
+                                success:function (data) {
+                                    if(data.error) {
+                                        formInputError = true;
+                                        $('#submit').html('Save');
+                                        $('.overlay').hide();
+                                        showContactNumberError(data.error);
+                                        removeSupplierError();
+                                    }else if(data.name_error) {
+                                        removeContactNumberError();
+                                        showSupplierError(data.name_error);
+                                        formInputError == true;
+                                        e.preventDefault();
+                                        $('#submit').html('Save');
+                                        $('.overlay').hide();
+                                    }
+                                    else{
+                                        removeSupplierError();
+                                        removeContactNumberError();
+                                        if(formInputError == false )
+                                        {
+                                            submitForm(e);
+                                        }
                                     }
                                 }
-                            }
-                        });
+                      
+                          
+                            });
+                        }
                     }
                 }
             }

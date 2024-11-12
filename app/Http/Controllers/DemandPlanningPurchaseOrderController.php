@@ -37,10 +37,13 @@ class DemandPlanningPurchaseOrderController extends Controller
         $pfiItemLatest = PFIItem::where('pfi_id', $request->id)
                             ->where('is_parent', false)
                             ->first();
-                           
         $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
-           // ask how to find dealer becz loi is multiple
-        
+        // ask how to find dealer becz loi is multiple
+        $brand = $pfiItemLatest->masterModel->modelLine->brand->brand_name ?? '';
+        $isToyotaPO = 0;
+        if(strcasecmp($brand, 'TOYOTA') == 0) {
+            $isToyotaPO = 1;
+        }
         $pfiItems = PFIItem::where('pfi_id', $request->id)
                                 ->where('is_parent', true)
                                 ->get();
@@ -49,15 +52,11 @@ class DemandPlanningPurchaseOrderController extends Controller
 
             $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiItem->id)
                                                         ->sum('quantity');
-
             $pfiItem->quantity = $pfiItem->pfi_quantity - $alreadyAddedQuantity;
-           
-          
             $masterModel = MasterModel::find($pfiItem->masterModel->id);
             $pfiItem->masterModels = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)
                                             ->get();
-
             $possibleModelIds = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)->pluck('id');
             $pfiItem->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
@@ -65,15 +64,14 @@ class DemandPlanningPurchaseOrderController extends Controller
                                                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                                         ->where('supplier_id', $pfi->supplier_id)
-                                                        ->where('whole_sales', $dealer)
+                                                        ->orwhere('whole_sales', $dealer)
                                                         ->count();
         }
 
         $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
         $paymentTerms = PaymentTerms::all();
-        return view('purchase-order.create', compact('pfiItems',
-            'exColours','intColours','pfi','paymentTerms'));
+        return view('purchase-order.create', compact('pfiItems','isToyotaPO','exColours','intColours','pfi','paymentTerms'));
     }
 
     /**

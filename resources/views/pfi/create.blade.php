@@ -385,7 +385,6 @@
                 var value = $(this).val();
                 loiItems.push(value);
         });
-        console.log(loiItems);
       
       }
       $('.btn-submit').click(function (e) {
@@ -401,7 +400,6 @@
                 });
 
                 jQuery.each(duplicates, function(key,value){
-                    console.log(value);
                     var pfiQty = 0;
                     var remainingQty = 0;
                     let loiItem = 0;
@@ -419,7 +417,6 @@
                             pfiQty = parseFloat(pfiQty) + parseFloat(currentItemPfiQty);
                         }
                     });
-                   console.log(loiItem);
                     if(pfiQty > remainingQty ) {
                          formValid = false;
                          e.preventDefault();
