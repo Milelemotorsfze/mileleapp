@@ -13,7 +13,7 @@ use App\Models\SupplierType;
 use App\Models\Varaint;
 use App\Models\PaymentTerms;
 use Illuminate\Http\Request;
-use App\Models\PFIItem;
+use App\Models\PfiItem;
 use Illuminate\Support\Facades\DB;
 
 class DemandPlanningPurchaseOrderController extends Controller
@@ -34,7 +34,7 @@ class DemandPlanningPurchaseOrderController extends Controller
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
 
         $pfi = Pfi::find($request->id);
-        $pfiItemLatest = PFIItem::where('pfi_id', $request->id)
+        $pfiItemLatest = PfiItem::where('pfi_id', $request->id)
                             ->where('is_parent', false)
                             ->first();
         $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
@@ -44,7 +44,7 @@ class DemandPlanningPurchaseOrderController extends Controller
         if(strcasecmp($brand, 'TOYOTA') == 0) {
             $isToyotaPO = 1;
         }
-        $pfiItems = PFIItem::where('pfi_id', $request->id)
+        $pfiItems = PfiItem::where('pfi_id', $request->id)
                                 ->where('is_parent', true)
                                 ->get();
 
