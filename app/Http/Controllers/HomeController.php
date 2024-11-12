@@ -306,7 +306,6 @@ $totalvariantss = [
         ->whereNotNull('Reason') // Exclude null values
         ->groupBy('Reason')
         ->get();
-                info($dataforpie);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('dp-dashboard');
         if ($hasPermission) {
             $dpdashboarduae = DB::table('vehicles')
@@ -516,7 +515,7 @@ $totalvariantss = [
         $filteredData = DB::table('lead_rejection')
         ->select('Reason', DB::raw('count(*) as count'))
         ->whereNotNull('Reason') // Exclude null values
-        ->whereBetween('created_at', [$startDate, $endDate])
+        ->whereBetween('date', [$startDate, $endDate])
         ->groupBy('Reason')
         ->get();
     $labels = $filteredData->pluck('Reason');
@@ -530,7 +529,7 @@ public function showRejectedLeads(Request $request)
     $reason = $request->query('reason');
 
     $rejectedLeads = Rejection::where('reason', $reason)
-        ->whereBetween('lead_rejection.created_at', [$startDate, $endDate])
+        ->whereBetween('lead_rejection.date', [$startDate, $endDate])
         ->join('calls', 'lead_rejection.call_id', '=', 'calls.id')
         ->leftJoin('users as creators', 'calls.created_by', '=', 'creators.id')
         ->leftJoin('users as assignees', 'calls.sales_person', '=', 'assignees.id')

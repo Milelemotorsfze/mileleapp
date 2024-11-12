@@ -1541,7 +1541,7 @@ Procurement
 document.addEventListener("DOMContentLoaded", function() {
     // Example data from your controller
     let data = @json($dataforpie);
-
+console.log(data);
     // Extract initial labels and counts for the chart
     let labels = data.map(item => item.Reason);
     let counts = data.map(item => item.count);
@@ -1590,35 +1590,55 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             onClick: function(event, elements) {
-                if (elements.length > 0) {
-                    let index = elements[0].index;
-                    let selectedReason = labels[index];
-                    let startDate = $('#reason_start_date').val();
-                    let endDate = $('#reason_end_date').val();
+    if (elements.length > 0) {
+        const firstElement = elements[0];
+        
+        // Use dataIndex directly for the index instead of elements[0].index
+        const index = firstElement?.index ?? firstElement?.datasetIndex;
 
-                    // Redirect to the new page with query parameters
-                    window.location.href = `/show_leads_rejection?start_date=${startDate}&end_date=${endDate}&reason=${encodeURIComponent(selectedReason)}`;
-                }
-            }
+        if (index !== undefined && index < labels.length) {
+            let selectedReason = labels[index];
+
+            console.log("Clicked index (using dataIndex):", index);
+            console.log("Selected reason:", selectedReason);
+
+            let startDate = $('#reason_start_date').val();
+            let endDate = $('#reason_end_date').val();
+
+            // Redirect to the page with the correct query parameters
+            window.location.href = `/show_leads_rejection?start_date=${startDate}&end_date=${endDate}&reason=${encodeURIComponent(selectedReason)}`;
+        } else {
+            console.log("Error: Unable to determine index or reason.");
+        }
+    } else {
+        console.log("No element clicked.");
+    }
+}
         }
     });
     // Function to update the Reason Chart based on date range
     function updateReasonChart() {
-        let startDate = $('#reason_start_date').val();
-        let endDate = $('#reason_end_date').val();
+    let startDate = $('#reason_start_date').val();
+    let endDate = $('#reason_end_date').val();
 
-        $.ajax({
-            url: '/reasondata',  // Replace with your endpoint URL
-            type: 'GET',
-            data: { start_date: startDate, end_date: endDate },
-            success: function(response) {
-                // Assume the response contains new labels and counts
-                reasonBarChart.data.labels = response.labels;
-                reasonBarChart.data.datasets[0].data = response.counts;
-                reasonBarChart.update();
-            }
-        });
-    }
+    $.ajax({
+        url: '/reasondata',  // Replace with your endpoint URL
+        type: 'GET',
+        data: { start_date: startDate, end_date: endDate },
+        success: function(response) {
+            // Update chart data and labels with the response data
+            reasonBarChart.data.labels = response.labels;
+            reasonBarChart.data.datasets[0].data = response.counts;
+            
+            // Update the local `labels` and `counts` arrays used in onClick
+            labels = response.labels;
+            counts = response.counts;
+
+            // Redraw the chart with the new data
+            reasonBarChart.update();
+        }
+    });
+}
     // Initialize Date Range Picker
     function cb(start, end) {
         $('#reasonReportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
