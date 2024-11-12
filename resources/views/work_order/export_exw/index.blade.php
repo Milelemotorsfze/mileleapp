@@ -204,7 +204,7 @@
 				<div class="col-xxl-2 col-lg-6 col-md-6 ms-auto d-flex justify-content-end select-button-main-div">
 					<div class="dropdown-option-div me-2"> <!-- Add spacing between input and button -->
 						<label for="search" class="col-form-label text-md-end">Search</label>
-						<input id="search" name="search" type="text" class="form-control widthinput" placeholder="Search" autocomplete="search">
+						<input id="search" name="search" type="text" class="form-control widthinput" placeholder="Search" autocomplete="search" value="{{ isset($search) ? $search : '' }}">
 					</div>
 					<button id="apply_search" type="button" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
 						Search
