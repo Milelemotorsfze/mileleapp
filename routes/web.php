@@ -1111,4 +1111,5 @@ Route::get('/d', function () {
     Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
     Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
     Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
+    Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
 });

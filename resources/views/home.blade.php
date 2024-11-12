@@ -1588,10 +1588,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 tooltip: {
                     enabled: true
                 }
+            },
+            onClick: function(event, elements) {
+                if (elements.length > 0) {
+                    let index = elements[0].index;
+                    let selectedReason = labels[index];
+                    let startDate = $('#reason_start_date').val();
+                    let endDate = $('#reason_end_date').val();
+
+                    // Redirect to the new page with query parameters
+                    window.location.href = `/show_leads_rejection?start_date=${startDate}&end_date=${endDate}&reason=${encodeURIComponent(selectedReason)}`;
+                }
             }
         }
     });
-
     // Function to update the Reason Chart based on date range
     function updateReasonChart() {
         let startDate = $('#reason_start_date').val();
@@ -1609,7 +1619,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-
     // Initialize Date Range Picker
     function cb(start, end) {
         $('#reasonReportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
