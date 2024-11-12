@@ -238,53 +238,50 @@ class WorkOrderController extends Controller
         ];
         // Define columns, excluding specific fields from search for each type
         $nonSearchableFields = [
-            'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
+            'id', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
             'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'updated_by',
             'sales_person_id', 'created_by', 'vehicle_handover_person_id'
         ];
 
-        $searchableColumns = [];
-        foreach ($columns as $key => $columnSet) {
-            // Filter out non-searchable fields from each column set
-            $searchableColumns[$key] = array_filter($columnSet, function ($col) use ($nonSearchableFields) {
-                return !in_array($col, $nonSearchableFields);
-            });
-        }
-
-        // Helper function to apply select and search
-        $applySelectAndSearch = function ($query, $search, $columns) use ($searchableColumns) {
+         // Helper function to apply select and search
+         $applySelectAndSearch = function ($query, $search, $columns) {
             // Select the relevant columns
             $query->select($columns);
-
-            // Apply search if a search term exists
+            // Check if there is a search term
             if ($search) {
-                $searchTerms = preg_split('/\s+/', $search);
+                // Split the search term into individual words
+                $searchTerms = preg_split('/\s+/', $search); 
                 $query->where(function ($query) use ($searchTerms, $columns) {
                     foreach ($searchTerms as $term) {
                         $query->orWhere(function ($query) use ($term, $columns) {
                             foreach ($columns as $column) {
-                                $query->orWhere($column, 'LIKE', "%{$term}%");
+                                $query->orWhere($column, 'LIKE', "%{$term}%");                           
                             }
                         });
-                        // Check for associated models with "name" matching search term
-                        $query->orWhereHas('salesPerson', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
-                            ->orWhereHas('CreatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
-                            ->orWhereHas('UpdatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
-                            ->orWhereRaw("DATE_FORMAT(date, '%b') = ?", [$term])
-                            ->orWhereRaw("DATE_FORMAT(date, '%M') = ?", [$term])
-                            ->orWhereRaw("DATE_FORMAT(created_at, '%b') = ?", [$term])
-                            ->orWhereRaw("DATE_FORMAT(created_at, '%M') = ?", [$term])
-                            ->orWhereRaw("DATE_FORMAT(updated_at, '%b') = ?", [$term])
-                            ->orWhereRaw("DATE_FORMAT(updated_at, '%M') = ?", [$term]);
+                        $query->orWhereHas('salesPerson', function ($q) use ($term) {
+                            $q->where('name', 'LIKE', "%{$term}%");
+                        });
+            
+                        $query->orWhereHas('CreatedBy', function ($q) use ($term) {
+                            $q->where('name', 'LIKE', "%{$term}%");
+                        });
+            
+                        $query->orWhereHas('UpdatedBy', function ($q) use ($term) {
+                            $q->where('name', 'LIKE', "%{$term}%");
+                        });
+                        $query->orWhereRaw("DATE_FORMAT(date, '%b') = ?", [$term])
+                        ->orWhereRaw("DATE_FORMAT(date, '%M') = ?", [$term])
+                        ->orWhereRaw("DATE_FORMAT(created_at, '%b') = ?", [$term])
+                        ->orWhereRaw("DATE_FORMAT(created_at, '%M') = ?", [$term])
+                        ->orWhereRaw("DATE_FORMAT(updated_at, '%b') = ?", [$term])
+                        ->orWhereRaw("DATE_FORMAT(updated_at, '%M') = ?", [$term]);
                     }
                 });
             }
         };
-
         $datas = WorkOrder::with(['salesPerson', 'CreatedBy', 'UpdatedBy', 'latestFinance', 'latestCOO', 'latestDocs', 'boe', 'vehicles'])
-            ->when(array_key_exists($type, $columns), function ($query) use ($type, $search, $columns, $applySelectAndSearch, $searchableColumns) {
-                // Pass the filtered, searchable columns to applySelectAndSearch
-                $applySelectAndSearch($query, $search, $searchableColumns[$type]);
+            ->when(array_key_exists($type, $columns), function ($query) use ($type, $search, $columns, $applySelectAndSearch) {
+                $applySelectAndSearch($query, $search, $columns[$type]);
             })
             ->when($type !== 'all' && $type !== 'status_report', function ($queryType) use ($type) {
                 return $queryType->where('type', $type);
