@@ -236,12 +236,6 @@ class WorkOrderController extends Controller
                 'sales_person_id','created_by','created_at','updated_at','lto'
             ],
         ];
-        // Define columns, excluding specific fields from search for each type
-        $nonSearchableFields = [
-            'id', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
-            'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'updated_by',
-            'sales_person_id', 'created_by', 'vehicle_handover_person_id'
-        ];
 
          // Helper function to apply select and search
          $applySelectAndSearch = function ($query, $search, $columns) {
@@ -253,28 +247,24 @@ class WorkOrderController extends Controller
                 $searchTerms = preg_split('/\s+/', $search); 
                 $query->where(function ($query) use ($searchTerms, $columns) {
                     foreach ($searchTerms as $term) {
+                        $singleBatchTerms = ['single', 'singl', 'sing', 'sin', 'si', 's'];
+                        if (in_array(strtolower($term), $singleBatchTerms)) {
+                            $query->orWhere('is_batch', 0);
+                        }
                         $query->orWhere(function ($query) use ($term, $columns) {
                             foreach ($columns as $column) {
-                                $query->orWhere($column, 'LIKE', "%{$term}%");                           
+                                $query->orWhere($column, 'LIKE', "%{$term}%");
                             }
                         });
-                        $query->orWhereHas('salesPerson', function ($q) use ($term) {
-                            $q->where('name', 'LIKE', "%{$term}%");
-                        });
-            
-                        $query->orWhereHas('CreatedBy', function ($q) use ($term) {
-                            $q->where('name', 'LIKE', "%{$term}%");
-                        });
-            
-                        $query->orWhereHas('UpdatedBy', function ($q) use ($term) {
-                            $q->where('name', 'LIKE', "%{$term}%");
-                        });
-                        $query->orWhereRaw("DATE_FORMAT(date, '%b') = ?", [$term])
-                        ->orWhereRaw("DATE_FORMAT(date, '%M') = ?", [$term])
-                        ->orWhereRaw("DATE_FORMAT(created_at, '%b') = ?", [$term])
-                        ->orWhereRaw("DATE_FORMAT(created_at, '%M') = ?", [$term])
-                        ->orWhereRaw("DATE_FORMAT(updated_at, '%b') = ?", [$term])
-                        ->orWhereRaw("DATE_FORMAT(updated_at, '%M') = ?", [$term]);
+                        $query->orWhereHas('salesPerson', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereHas('CreatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereHas('UpdatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereRaw("DATE_FORMAT(date, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(date, '%M') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(created_at, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(created_at, '%M') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(updated_at, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(updated_at, '%M') = ?", [$term]);
                     }
                 });
             }
@@ -311,6 +301,7 @@ class WorkOrderController extends Controller
             })
             ->latest()
             ->get();
+
         $filteredDatas = $datas;
         if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
             $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);      
