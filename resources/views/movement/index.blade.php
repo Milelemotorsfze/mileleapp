@@ -144,56 +144,35 @@
     </div>
 </div>
       @endcan
-        <script>
-        setTimeout(function() {
-            $('#error-message').fadeOut('slow');
-        }, 2000);
-        setTimeout(function() {
-            $('#success-message').fadeOut('slow');
-        }, 2000);
-        $(document).ready(function () {
-          $.fn.dataTable.ext.order['mov-number-pre'] = function(data) {
-    var match = data.match(/^MOV - (\d+)/);
-    return match ? parseInt(match[1], 10) : -1;
-};
-            var dataTable = $('#dtBasicExample1').DataTable({
-  pageLength: 10,
-  columnDefs: [
-  { type: 'date', targets: $('.createdDated').index() },
-  { type: 'mov-number', targets: $('.refernacenumber').index() }
-],
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (d === 4) {
-        return;
-      }
+      <script>
+    setTimeout(function() {
+        $('#error-message').fadeOut('slow');
+    }, 2000);
+    setTimeout(function() {
+        $('#success-message').fadeOut('slow');
+    }, 2000);
 
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
+    $(document).ready(function () {
+        $.fn.dataTable.ext.order['mov-number-pre'] = function(data) {
+            var match = data.match(/^MOV - (\d+)/);
+            return match ? parseInt(match[1], 10) : -1;
+        };
+
+        var dataTable = $('#dtBasicExample1').DataTable({
+            pageLength: 10,
+            columnDefs: [
+                { type: 'date', targets: $('.createdDated').index() },
+                { type: 'mov-number', targets: $('.refernacenumber').index() }
+            ]
         });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
-      
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
-      });
+        // Event listeners for hardcoded filters in the header
+        $('#filter-movement-batch, #filter-vehicle-quantity, #filter-created-by, #filter-created-date, #filter-movement-date').on('change', function() {
+            var column = dataTable.column($(this).parent().index());
+            column.search(this.value).draw();
+        });
     });
-  }
-});
-    });
-            </script>
+</script>
 <script>
     $(document).ready(function() {
         var table = $('#dtBasicExample2').DataTable({
