@@ -111,7 +111,7 @@
                                     </select>
                                 </th>
                                 <th>
-                                    Cutsomer Type
+                                    Customer Type
                                     <select class="small-width" id="customer-type" onchange="reload()" multiple>
                                         <option></option>
                                         <option value={{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Clients::CUSTOMER_TYPE_INDIVIDUAL }}</option>
