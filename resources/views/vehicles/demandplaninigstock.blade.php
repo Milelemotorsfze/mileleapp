@@ -302,7 +302,7 @@ table.dataTable thead th select {
 @endif
   <div class="card-header">
     <h4 class="card-title">
-     Demand And Planining Vehicles Only
+    Demand and Planning - Vehicles Only
     </h4>
     <!-- Chat Modal -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">

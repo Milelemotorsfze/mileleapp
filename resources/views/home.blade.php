@@ -81,7 +81,7 @@
                             <th>SFX</th>
                             <th>Variant Name</th>
                             <th>Free Stock</th>
-                            <th>Total Quality</th>
+                            <th>Total Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
