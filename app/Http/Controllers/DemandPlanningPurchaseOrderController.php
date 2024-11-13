@@ -64,7 +64,7 @@ class DemandPlanningPurchaseOrderController extends Controller
                                                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                                         ->where('supplier_id', $pfi->supplier_id)
-                                                        ->orwhere('whole_sales', $dealer)
+                                                        ->where('whole_sales', $dealer)
                                                         ->count();
         }
 

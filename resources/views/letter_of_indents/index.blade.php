@@ -82,7 +82,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -113,7 +113,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -145,7 +145,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
@@ -176,7 +176,7 @@
                                     <th>S.No</th>
                                     <th>LOI Number</th>
                                     <th>LOI Date</th>
-                                    <th>Cutsomer Name</th>
+                                    <th>Customer Name</th>
                                     <th>Customer Type</th>
                                     <th>Country</th>
                                     <th>Category</th>
