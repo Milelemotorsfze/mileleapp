@@ -34,6 +34,7 @@ class DemandPlanningPurchaseOrderController extends Controller
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
 
         $pfi = Pfi::find($request->id);
+        
         $pfiItemLatest = PfiItem::where('pfi_id', $request->id)
                             ->where('is_parent', false)
                             ->first();
