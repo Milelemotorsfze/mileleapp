@@ -3625,46 +3625,7 @@
 					button.disabled = true;
 				});
 			});
-			document.addEventListener("DOMContentLoaded", function() {
-    // Define the conditions for enabling/disabling the buttons
-    const workorder = <?= json_encode($workorder ?? null) ?>;
-    const userRole = <?= json_encode(Auth()->user()->selected_role ?? null) ?>;
-
-    // Array of buttons to apply the condition to
-    const submitButtons = [document.getElementById("submit"), document.getElementById("submit-from-top")];
-
-    const shouldEnableSubmit = !workorder || 
-        (workorder && workorder.id !== 408) || 
-        (workorder && workorder.id === 408 && userRole === 1);
-
-    submitButtons.forEach(button => {
-        if (!shouldEnableSubmit) {
-            // Disable the button if the condition is not met
-            button.classList.add("disabled");
-            button.style.pointerEvents = "none";
-            
-            // Set the tooltip message and initialize with Bootstrap if available
-            button.setAttribute("title", "Contact IT team to update the data");
-            if (typeof $ !== "undefined" && typeof $.fn.tooltip === "function") {
-                $(button).tooltip();  // Initialize Bootstrap tooltip
-            }
-
-            // Add click event listener to show alert when the button is clicked
-            button.addEventListener("click", function(event) {
-                event.preventDefault();  // Prevent any default action
-                alert("Contact IT team to update the data");
-            });
-        } else {
-            // Enable the button if the condition is met
-            button.classList.remove("disabled");
-            button.style.pointerEvents = "auto";
-            button.removeAttribute("title");
-
-            // Remove any existing click event listeners
-            button.onclick = null;
-        }
-    });
-});
+			
 
 		</script>
 	@endif
