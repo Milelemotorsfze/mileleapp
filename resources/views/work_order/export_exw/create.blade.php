@@ -264,7 +264,7 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
+				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</a>
 					@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
 					@else
 						</br>
@@ -633,11 +633,8 @@
 							<div class="col-xxl-12 col-lg-12 col-md-12">
 								<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 								<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
-									@foreach($vins as $index => $vin)
-										<option value="{{ $vin->vin ?? '' }}" 
-											{{ $index < 40 ? 'selected' : '' }}>
-											{{ $vin->vin ?? '' }} / {{ $vin->variant->master_model_lines->brand->brand_name ?? '' }} / {{ $vin->variant->master_model_lines->model_line ?? '' }}
-										</option>
+									@foreach($vins as $vin)
+									<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -1092,7 +1089,7 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif >Submit</button>
+							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</button>
 							@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
 							@else
 								</br>
