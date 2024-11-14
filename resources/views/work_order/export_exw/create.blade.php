@@ -264,7 +264,12 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
+				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</a>
+					@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
+					@else
+						</br>
+						<p>Contact IT team to update WO-006850-SW data</p>
+					@endif
 			</div>
 			<br>
 
@@ -1084,7 +1089,14 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) 
+						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						@endif
+							@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
+							@else
+								</br>
+								<p>Contact IT team to update WO-006850-SW data</p>
+							@endif
 						</div>
 					</div>
 				</div>
