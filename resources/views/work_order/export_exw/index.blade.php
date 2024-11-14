@@ -287,6 +287,7 @@
 								<th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 								<th rowspan="2" class="dark">Total Number Of BOE</th>
 							@endif
+							<th rowspan="2" class="light">Vehilce Count</th>
 						</tr>
 						<tr>
 							<td class="dark">Finance</td>
@@ -542,6 +543,7 @@
 									<td>{{ $data->formatDate($data->sales_support_data_confirmation_at) }}</td>
 									<td>{{ $data->total_number_of_boe != 0 ? $data->total_number_of_boe : '' }}</td>
 								@endif
+								<td>{{ $data->vehicles->count() ?? 0 }}</td>
 							</tr>
 						@endforeach
 					</tbody>
