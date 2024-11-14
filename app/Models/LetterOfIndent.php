@@ -21,14 +21,15 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_SUPPLIER_REJECTED = "Rejected by Supplier";
     public const LOI_STATUS_PARTIAL_APPROVED = "Partialy Utilized LOI";
     public const LOI_STATUS_APPROVED = "Fully Utilized LOI";
-    // public const LOI_STATUS_REJECTED = "Rejected";
+    public const LOI_STATUS_WAITING_FOR_TTC_APPROVAL = "Waiting for TTC Approval";
+    public const LOI_STATUS_TTC_APPROVED = "TTC Approved";
+    public const LOI_STATUS_TTC_REJECTED = "TTC Rejected";
     public const LOI_STATUS_NEW = "New";
     public const LOI_STATUS_PFI_CREATED = "PFI Created";
     public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
     public const LOI_STATUS_EXPIRED = "Expired";
 
-    // delete total loi qty when po section live.
-    protected $appends = [
+    protected $appends = [  
         'total_loi_quantity',
     ];
 

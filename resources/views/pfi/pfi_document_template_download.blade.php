@@ -4,7 +4,6 @@
 <head>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" >
     <style>
-        /*@page { size: 700pt }*/
         
     .page {
         margin-left: 50px;
@@ -17,7 +16,6 @@
     }
     table ,td{
         font-family: arial, sans-serif;
-        width: 100%;
         border: 1px solid #1c1b1b;
         border-collapse: collapse;
         font-weight:bold;
@@ -31,6 +29,12 @@
         border-left:none;
         border-right:none;
         border-bottom:none
+    }
+    .sfx-width{
+        min-width:30px !important;
+    }
+    .model-width{
+        min-width:100px !important;
     }
     .total-row-tr {
         height:20px;
@@ -85,18 +89,18 @@
                 <span class="date"> {{ \Illuminate\Support\Carbon::now()->format('d/m/Y')}} </span>
             </p>
 
-            <p> Buyer : MILELE MOTORS <span  style="margin-left:200px;"> End user: </span>
-                <span style="margin-left:20px;">{{ strtoupper($pfi->customer->name ?? '') }} </span>
+            <p  style="margin-bottom:8px;"> Buyer : MILELE MOTORS <span  style="margin-left:183px;"> End user: </span>
+                <span >{{ strtoupper(substr($pfi->customer->name, 0,15)) }} </span>
             </p>
-            <p style="margin-left:40px;margin-bottom:0px;"> <span style="font-size:9px"> SAMARI RETAIL BLOC A</span>
-                <span style="margin-left:245px;"> {{ strtoupper($pfi->country->name ?? '')}} </span>
+            <p style="margin-left:40px;margin-bottom:0px;width:100%"> <span style="font-size:8px;font-wight:800px;"> SAMARI RETAIL BLOC A</span>
+                <span style="margin-left:220px;"> {{ strtoupper($pfi->country->name ?? '') }}</span>
             </p>
-            <p class="address">RAS EL KHOR- DUBAI-UAE </p>
+            <p class="address" style="font-size:8px;font-wight:800px">RAS EL KHOR- DUBAI-UAE </p>
             <table id="pfi-items">
                 <tr>
                     <td>Description</td>
-                    <td>Product Code</td>
-                    <td></td>
+                    <td class="model-width">Product Code</td>
+                    <td class="sfx-width"></td>
                     <td>Availability</td>
                     <td>Quantity</td>
                     <td>Unit Price</td>
@@ -104,9 +108,9 @@
                 </tr>
                 @foreach($pfiItems as $pfiItem)
                     <tr>
-                        <td style="width:200px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
-                        <td>{{ $pfiItem->masterModel->pfi_model ?? '' }}</td>
-                        <td>{{ $pfiItem->masterModel->pfi_sfx ?? '' }}</td>
+                        <td style="width:180px">{{ $pfiItem->masterModel->model_description ?? ''}} </td>
+                        <td>{{ $pfiItem->masterModel->pfi_model ??  $pfiItem->masterModel->model}}</td>
+                        <td>{{ $pfiItem->masterModel->pfi_sfx ?? $pfiItem->masterModel->sfx }}</td>
                         <td style="font-weight:normal">Stock</td>
                         <td>{{ $pfiItem->pfi_quantity }}</td>
                         <td style="width:80px">{{ $pfi->currency }} {{ number_format($pfiItem->unit_price)}}</td>
@@ -152,13 +156,13 @@
             <p style="margin:0px"> Warranty :  </p>
             <p style="margin:0px"> Bank information :  </p>
             <p class="noraml-font" style="color:red"> ({{$pfi->currency}}) </p>
-            <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirat </p>
+            <p class="noraml-font"> STANDARD CHARTERED BANK - Dubai - United Arab Emirates </p>
             <p class="noraml-font">IBAN: AE04 0440 0001 0123 821 0701 SWIFT: SCBLAEADXXX</p>
             <p style="margin:0px" >Remarks:</p>
             <p class="noraml-font">Delivery time mentioned is EXW Jebel Ali and is valid at the date of the proforma and is subject to prior sales.</p>
             <p class="noraml-font">Prohibition of resale after arrival in <span style="padding-left:30px"> {{ strtoupper($pfi->country->name ?? '')}} </sapn></p>
             <p class="noraml-font">Copies of original B/L must be submitted to AMS ME</p>
-            <p style="margin:0px">We remain at your disposal for further information</p>
+            <p style="margin:0px">We remain at your disposal for further information.</p>
             <div class="row">
                 <img src="{{ public_path('images/pfi_terms_and_conditions1.png') }}" > </img>
                 <img src="{{ public_path('images/pfi_terms_and_conditions2.png') }}" > </img>

@@ -45,7 +45,6 @@ class LetterOfIndentController extends Controller
      */
     public function index(Builder $builder, Request $request)
     {
-
         (new UserActivityController)->createActivity('Open LOI Listing Page.');
 
         $tab = $request->tab;
@@ -73,9 +72,15 @@ class LetterOfIndentController extends Controller
             }else if($request->tab == 'WAITING_FOR_APPROVAL'){
                     $data = $data->where('submission_status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL);
 
+            }else if($request->tab == 'WAITING_FOR_TTC_APPROVAL'){
+                $data = $data->where('submission_status', LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL);
+
             }else if($request->tab == 'SUPPLIER_RESPONSE'){
-                    $data = $data->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED]);
+                    $data = $data->whereIn('submission_status',[LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED,
+                    LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED,LetterOfIndent::LOI_STATUS_TTC_APPROVED,
+                    LetterOfIndent::LOI_STATUS_TTC_REJECTED]);
             }
+           
             
         if (request()->ajax()) {
             return DataTables::of($data)
@@ -120,33 +125,13 @@ class LetterOfIndentController extends Controller
                     return view('letter_of_indents.actions.loi_template_links',compact('templateTypes','letterOfIndent'));
                 })
                 ->editColumn('is_expired', function($query) {
-                    $LOI = LetterOfIndent::select('id','is_expired','client_id','date')->find($query->id);
-                    // $LOItype = $LOI->client->customertype;
-                    // $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-                    // if($LOIExpiryCondition && $LOI->is_expired == false) {        
-                    //     $currentDate = Carbon::now();
-                    //     $year = $LOIExpiryCondition->expiry_duration_year;
-                    //     $expiryDate = Carbon::parse($LOI->date)->addYears($year);
-                    //     // do not make status expired, becasue to know at which status stage it got expired
-                    //     if($currentDate->gt($expiryDate) == true) {
-                    //         $LOI->is_expired = true;     
-                    //         $LOI->expired_date = Carbon::now()->format('Y-m-d');
-                    //         $LOI->timestamps = false;        
-                    //         $LOI->save();  
-                    //     }else{
-                    //         $LOI->is_expired = false;  
-                    //         $LOI->expired_date = NULL;  
-                    //         $LOI->timestamps = false;               
-                    //         $LOI->save();  
-                    //     }
-                    // }
 
-                    if($LOI->is_expired == true) {
+                    if($query->is_expired == true) {
                         $msg = 'Expired';
                         return  '<button class="btn btn-sm btn-secondary">'.$msg.'</button>';
                     }else{
                         
-                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $LOI->id) . '">Not Expired</button>';
+                        $msg = '<button class="btn btn-sm btn-info loi-expiry-status-update" data-url="' . route('letter-of-indents.loi-expiry-status-update', $query->id) . '">Not Expired</button>';
                        return $msg;
                     }                                           
                  })
@@ -163,6 +148,12 @@ class LetterOfIndentController extends Controller
                             return '<button class="btn btn-sm btn-success">'.$msg.'</button>';
                         }else if($query->submission_status == LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED){
                             $msg = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+                            return '<button class="btn btn-sm btn-danger">'.$msg.'</button>';
+                        }else if($query->submission_status == LetterOfIndent::LOI_STATUS_TTC_APPROVED){
+                            $msg = LetterOfIndent::LOI_STATUS_TTC_APPROVED;
+                            return '<button class="btn btn-sm btn-success">'.$msg.'</button>';
+                        }else if($query->submission_status == LetterOfIndent::LOI_STATUS_TTC_REJECTED){
+                            $msg = LetterOfIndent::LOI_STATUS_TTC_REJECTED;
                             return '<button class="btn btn-sm btn-danger">'.$msg.'</button>';
                         }
                     }
@@ -189,6 +180,7 @@ class LetterOfIndentController extends Controller
 
         return view('letter_of_indents.index');
     }
+   
     /**
      * Show the form for creating a new resource.
      */
@@ -284,21 +276,7 @@ class LetterOfIndentController extends Controller
 
             $LOI->save();
 
-            // if ($request->has('files'))
-            // {
-            //     foreach ($request->file('files') as $key => $file)
-            //     {
-            //         $extension = $file->getClientOriginalExtension();
-            //         $fileName = $key.time().'.'.$extension;
-            //         $destinationPath = 'LOI-Documents';
-            //         $file->move($destinationPath, $fileName);
-            //         $LoiDocument = new LetterOfIndentDocument();
-
-            //         $LoiDocument->loi_document_file = $fileName;
-            //         $LoiDocument->letter_of_indent_id = $LOI->id;
-            //         $LoiDocument->save();
-            //     }
-            // }
+          
             if($request->customer_other_documents_Ids) {
                 foreach($request->customer_other_documents_Ids as $customerDocumentId) {
                     $clientDoc = ClientDocument::find($customerDocumentId);
@@ -325,12 +303,13 @@ class LetterOfIndentController extends Controller
             }
             
             $quantities = $request->quantity;
+
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])
                     ->where('model', $request->models[$key])
                     ->orderBy('model_year','DESC')
                     ->first();
-                    
+                
                 if($masterModel) {
                     $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
                     $length = 6;
@@ -349,7 +328,6 @@ class LetterOfIndentController extends Controller
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
-                    // $LOIItem->uuid = $code;
                     $LOIItem->code = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
@@ -420,7 +398,6 @@ class LetterOfIndentController extends Controller
     
         $isCustomerTradeLicense = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                         ->where('is_trade_license',true)->first();
-                        // return $isCustomerTradeLicense;
         $customerOtherDocAdded = LetterOfIndentDocument::where('letter_of_indent_id',$letterOfIndent->id)
                                         ->where('is_passport', false)
                                         ->where('is_trade_license',false)
@@ -600,10 +577,6 @@ class LetterOfIndentController extends Controller
 
     }
 
-
-  
-  
-  
     // public function pdfMerge($letterOfIndentId)
     // {
     //     $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
@@ -636,7 +609,6 @@ class LetterOfIndentController extends Controller
     // }
 
     public function getCustomerDocuments(Request $request) {
-        // info($request->all());
 
         $client = Clients::find($request->client_id);
         $data = [];
@@ -769,8 +741,10 @@ class LetterOfIndentController extends Controller
                 $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
                 $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
+                $customerYearCode = $yearCode . $nextLoiCount;
+                
                 $LOI->uuid = $uuid;
-
+                $LOI->year_code = $customerYearCode;
                 $LOI->client_id = $request->client_id;
                 $LOI->country_id = $request->country;
                 $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
@@ -832,9 +806,7 @@ class LetterOfIndentController extends Controller
                 //    if is_passport_added value 1 chcek passport is alredy existing or not , if not existing create new loi document
                 // if is_passport_added value 0 remove all the passport
                 if($request->is_passport_added == 1) {
-                    info("passport added or keep existing");
                     if(!$isCustomerPassport) {
-                        info("passport new added");
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->passport;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -845,21 +817,17 @@ class LetterOfIndentController extends Controller
                 }else if($request->is_passport_added == 2){
                     // value 2
                     // update new passport
-                    info("latest passport => update data");
                     if($isCustomerPassport) {
                         $isCustomerPassport->loi_document_file = $customer->passport;
                         $isCustomerPassport->save();
                     }                       
                  }else{
-                    // value 0
-                    info("no passport selected => delete data");
+
                     LetterOfIndentDocument::where('is_passport', true)
                                         ->where('letter_of_indent_id', $LOI->id)->delete();
                 }
                 if($request->is_trade_license_added == 1 ) {
-                    // 
                     if(!$isCustomerTradeLicense) {
-                        // trade license added
                         $LoiDocument = new LetterOfIndentDocument();
                         $LoiDocument->loi_document_file = $customer->tradelicense;
                         $LoiDocument->letter_of_indent_id = $LOI->id;
@@ -868,9 +836,7 @@ class LetterOfIndentController extends Controller
                     }
                   
                 }else if($request->is_trade_license_added == 2){
-                    // value 2
                     // update new passport
-                    info("latest tradelicense => update data");
                     if($isCustomerTradeLicense) {
                         $isCustomerTradeLicense->loi_document_file = $customer->tradelicense;
                         $isCustomerTradeLicense->save();
@@ -920,7 +886,6 @@ class LetterOfIndentController extends Controller
                             $LOIItem->letter_of_indent_id = $LOI->id;
                             $LOIItem->master_model_id = $model->id ?? '';
                             $LOIItem->quantity = $quantity;
-                            // $LOIItem->uuid = $code;
                             $LOIItem->code = $code;
                             $LOIItem->save();
                         }
@@ -969,14 +934,19 @@ class LetterOfIndentController extends Controller
             return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");
         }
     }
-    public function RequestSupplierApproval(Request $request)
+    public function RequestApproval(Request $request)
     {
-     (new UserActivityController)->createActivity('Requested for Supplier Approval of LOI.');
+        if($request->type) {
+            (new UserActivityController)->createActivity('LOI (ttc approval)'. $request->type .'Successfully.');
+
+        }else{
+            (new UserActivityController)->createActivity('Requested for Supplier Approval of LOI.');
+        }
       
       $LOI = LetterOfIndent::find($request->id);
 
-      $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
-      $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->submission_status = $request->status;
+      $LOI->status = $request->status;
       $LOI->updated_by = Auth::id();
       $LOI->save();
 
@@ -984,20 +954,46 @@ class LetterOfIndentController extends Controller
 
     }
     public function supplierApproval(Request $request) {
-        (new UserActivityController)->createActivity('Supplier Approved successfully.');
     
         $LOI = LetterOfIndent::find($request->id);
         DB::beginTransaction();
 
+        $msg = '';
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
-            $msg = 'Rejected';
+            (new UserActivityController)->createActivity('Supplier Rejected successfully.');
 
         }elseif ($request->status == 'APPROVE') {
-            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
-            $msg = 'Approved';
+            (new UserActivityController)->createActivity('Supplier Approved successfully.');
+
+            // get LOI Items 
+
+            $loiModels =  MasterModel::whereHas('loiItems', function($query)use($request){
+                                $query->where('letter_of_indent_id', $request->id);
+                            })->pluck('model')->toArray();
+            $possibleMasterModels = MasterModel::whereIn('model', $loiModels)->pluck('id')->toArray();
+            $isTTCApprovalRequired = 0;
+            $country_id = $LOI->country_id;
+            $TTCApprovalModels =  MasterModel::whereHas('TTCApprovalCountry', function($query)use($country_id){
+                                $query->where('country_id', $country_id);
+                            })->pluck('id')->toArray();
+                    
+            foreach($possibleMasterModels as $possibleMasterModel) {
+            if(in_array($possibleMasterModel, $TTCApprovalModels)) {
+                    $isTTCApprovalRequired = 1;
+                    break;
+                }
+            }
+            if($isTTCApprovalRequired == 1) {
+                $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
+                $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL;
+                $msg = 'LOI Status Changed to Waiting for TTC Approval';
+
+            }else{
+                $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+                $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+            }
 
         }
         $LOI->review = $request->review;
@@ -1014,6 +1010,7 @@ class LetterOfIndentController extends Controller
         (new UserActivityController)->createActivity('LOI Comment updated successfully.');
         $LOI = LetterOfIndent::find($request->id);
         $LOI->comments = $request->comments;
+        $LOI->updated_by = Auth::id();
         $LOI->save();
 
         return response(true);
@@ -1070,6 +1067,7 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::find($id);
         $LOI->status = $request->status;
         $LOI->submission_status = $request->status;
+        $LOI->updated_by = Auth::id();
         $LOI->save();
 
         return redirect()->back()->with('success', 'Status updated as "New" successfully.');
@@ -1082,10 +1080,35 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::find($id);
         $LOI->is_expired = true;
         $LOI->expired_date = Carbon::now()->format('Y-m-d');
+        $LOI->updated_by = Auth::id();
         $LOI->timestamps = false;
         $LOI->save();
 
         return response(true);
+    }
+
+    public function getIsLOIEditable(Request $request) {
+        $loi_id = $request->id;
+        $pfiItems = PfiItem::where('is_parent', false)
+                ->WhereHas('letterOfIndentItem', function($query)use($loi_id) {
+                    $query->where('letter_of_indent_id', $loi_id);
+                });
+        $data = [];
+        if($pfiItems->count() <= 0) {
+            // not editable
+            $data['is_editable'] = 1;
+           
+        }else{
+            $alreadyUsedLOIItems = [];
+            foreach($pfiItems->get() as $pfiItem) {
+                $alreadyUsedLOIItems[] = $pfiItem->letterOfIndentItem->code." - (PFI Number - ".$pfiItem->pfi->pfi_reference_number." ) ";
+
+            }
+            $data['is_editable'] = $alreadyUsedLOIItems;
+        }
+        $data['editUrl'] = route('letter-of-indents.edit', $loi_id);
+
+        return response($data);
     }
 
 }

@@ -24,6 +24,8 @@ class LOIItemController extends Controller
      */
     public function index(Request $request)
     {
+        (new UserActivityController)->createActivity('Open LOI Items List Page');
+
         $customers = Clients::where('is_demand_planning_customer', true)->select('id','name')->groupBy('name')->get();
         $countries = Country::select('id','name')->get();
         $modelLines = MasterModelLines::select('id','model_line')->get();
@@ -98,7 +100,6 @@ class LOIItemController extends Controller
                         });
                 }
                 if(!empty($request->category)) {
-                    info($request->category);
                     $data->whereHas('LOI',function($query) use($request) {
                             $query->where('category', $request->category);
                         });
@@ -152,7 +153,7 @@ class LOIItemController extends Controller
                 }
                 if(!empty($request->status)) {
                     $data->whereHas('LOI',function($query) use($request) {
-                        $query->where('status', $request->status);
+                        $query->whereIn('status', $request->status);
                     });
                 }
                 if(!empty($request->so_number)) {
@@ -168,6 +169,12 @@ class LOIItemController extends Controller
                 if(!empty($request->comments)) {
                     $data->whereHas('LOI',function($query) use($request) {
                         $query->where('comments', 'like', "%{$request->comments}%");
+                    });
+                }
+                if(!empty($request->loi_from_date && $request->loi_to_date)) {
+            
+                    $data->whereHas('LOI',function($query) use($request) {
+                        $query->whereBetween('date',  [$request->loi_from_date, $request->loi_to_date]);
                     });
                 }
 
@@ -286,7 +293,13 @@ class LOIItemController extends Controller
                          return  '<button class="btn btn-sm btn-success">'.LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED.'</button>';
                      }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED) {
                          return  '<button class="btn btn-sm btn-danger">'.LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED.'</button>';
-                     }else{
+                     }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL) {
+                        return  '<button class="btn btn-sm btn-warning">'.LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL.'</button>';
+                    }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_TTC_APPROVED) {
+                        return  '<button class="btn btn-sm btn-primary">'.LetterOfIndent::LOI_STATUS_TTC_APPROVED.'</button>';
+                    }else if($query->LOI->status == LetterOfIndent::LOI_STATUS_TTC_REJECTED) {
+                        return  '<button class="btn btn-sm btn-danger">'.LetterOfIndent::LOI_STATUS_TTC_REJECTED.'</button>';
+                    }else{
                         return $query->LOI->status;
                      }                                       
                  })

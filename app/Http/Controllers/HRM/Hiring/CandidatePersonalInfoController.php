@@ -977,7 +977,7 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
                 $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }

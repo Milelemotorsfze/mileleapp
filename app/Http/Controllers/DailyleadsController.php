@@ -8,11 +8,19 @@ use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
+use Illuminate\Support\Facades\Storage;
 use App\Models\ModelHasRoles;
+use App\Mail\TaskAssigned;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use App\Models\LeadDocument;
+use App\Models\User;
+use App\Models\LeadsTask;
 use App\Models\Quotation;
+use App\Models\Language;
 use App\Models\Rejection;
 use App\Models\Closed;
+use App\Models\Varaint;
 use App\Models\LeadSource;
 use App\Models\Brand;
 use App\Models\Fellowup;
@@ -23,8 +31,13 @@ use App\Models\Salesdemand;
 use App\Models\SalespersonOfClients;
 use App\Models\Negotiation;
 use App\Models\Booking;
+use App\Models\LeadChat;
+use App\Models\LeadChatReply;
 use App\Models\Clients;
 use App\Models\ClientLeads;
+use App\Models\Country;
+use App\Models\LeadsLog;
+use App\Models\CallsConversationLog;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
@@ -74,6 +87,7 @@ class DailyleadsController extends Controller
                     'calls.name as customername',
                     'calls.email',
                     'calls.phone',
+                    'calls.created_by',
                     'quotations.created_at',
                     'quotations.deal_value',
                     'quotations.sales_notes',
@@ -97,21 +111,18 @@ class DailyleadsController extends Controller
                     \DB::raw("DATE_FORMAT(quotations.date, '%Y %m %d') as date_formatted"),
                     'quotations.deal_value as deal_value',
                     'quotations.sales_notes as sales_notes',
-                    'master_model_lines.model_line as model_line',
                     'pre_orders_items.qty',
-                    'pre_orders_items.description',
+                    'pre_orders_items.notes',
+                    'varaints.name',
+                    'users.name as salesperson',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior',
-                    'color_codes_interior.name as interior',
-                    'pre_orders_items.modelyear'
                 ])
                 ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
                 ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
-                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
-                ->where('quotations.created_by', $id)
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
+                ->where('pre_orders.requested_by', $id)
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
@@ -128,23 +139,61 @@ class DailyleadsController extends Controller
                     'calls.email',
                     'calls.remarks',
                     'calls.type',
+                    'calls.leadtype',
+                    'calls.created_by', 
                     'calls.location',
                     'calls.language',
                     'master_model_lines.model_line',
                     'brands.brand_name',
                     \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
-                    'fellow_up.sales_notes'
+                    'fellow_up.sales_notes',
+                    \DB::raw("sales_person_user.name as sales_person_name")
                 ])
                 ->leftJoin('calls', 'fellow_up.calls_id', '=', 'calls.id')
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')  // Join for sales_person
                 ->where('calls.sales_person', $id)
                 ->orderBy('fellow_up.date')
                 ->orderBy('fellow_up.time')
                 ->groupby('calls.id')
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
+            }
+            else if($status === "activelead")
+            {
+                $activelead = calls::select([
+                    'calls.priority',
+                    'calls.id',
+                    'calls.name',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.created_by',
+                    'calls.status',
+                    'calls.leadtype', 
+                    'calls.location',
+                    'calls.language',
+                    'master_model_lines.model_line',
+                    'brands.brand_name',
+                    \DB::raw("DATE_FORMAT(calls.created_at, '%Y %m %d') as leaddate"),
+                    \DB::raw("sales_person_user.name as sales_person_name"),
+                    \DB::raw("created_by_user.name as created_by_name")
+                ])
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')
+                ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
+                ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if(!$hasPermission) {
+                    $activelead->where('calls.sales_person', $id);
+                }
+                $activelead = $activelead->groupBy('calls.id')->get();
+                return DataTables::of($activelead)->toJson(); 
             }
             else if($status === "bulkleads")
             {
@@ -156,6 +205,7 @@ class DailyleadsController extends Controller
                     'calls.remarks',
                     'calls.type',
                     'calls.location',
+                    'calls.created_by',
                     'users.name as createdby',
                     'calls.language',
                     'master_model_lines.model_line',
@@ -167,16 +217,18 @@ class DailyleadsController extends Controller
                 ->leftJoin('users', 'calls.sales_person', '=', 'users.id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-                ->where('calls.sales_person', $id)
-                ->whereNotNull('calls.leadtype')
-                ->groupby('calls.id')
-                ->get();
+                ->whereNotNull('calls.leadtype');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if(!$hasPermission) {
+                    $bulkleads->where('calls.sales_person', $id);
+                }
+                $bulkleads = $bulkleads->groupBy('calls.id')->get();
                 return DataTables::of($bulkleads)->toJson();   
             }
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
             if($status === "Prospecting")
             {
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
@@ -235,22 +287,34 @@ class DailyleadsController extends Controller
                         DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y %m %d'), '') as ddate"),
                         DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes"),
                         DB::raw("IFNULL(demand.purchaserremarks, '') as purchaserremarks"),
+                        DB::raw("created_by_user.name as created_by_name"),
+                        DB::raw("sales_person_user.name as sales_person_name")
                     );
                     $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                    $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+                    $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
                 } elseif ($status === 'New Demand') {
                     $data->addSelect(
                         DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
-                        DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                        DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
+                        DB::raw("created_by_user.name as created_by_name"),
+                        DB::raw("sales_person_user.name as sales_person_name")
                     );
                     $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
                     $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%Y %m %d') as ddate"), 'demand.salesnotes as dsalesnotes');
                     $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                    $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
                 } elseif ($status === 'Quoted') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
-                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
+                    DB::raw("created_by_user.name as created_by_name"),
+                    DB::raw("sales_person_user.name as sales_person_name")
                 );
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(demand.date, '%Y %m %d'), '') as ddate"),
                     DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
@@ -332,7 +396,9 @@ class DailyleadsController extends Controller
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%Y %m %d'), '') as date"),
-                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes"),
+                    DB::raw("created_by_user.name as created_by_name"),
+                    DB::raw("sales_person_user.name as sales_person_name")
                 );
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
                 $data->addSelect(
@@ -356,6 +422,8 @@ class DailyleadsController extends Controller
                 $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
                 $data->addSelect(DB::raw("DATE_FORMAT(lead_rejection.date, '%Y %m %d') as rdate"), 'lead_rejection.sales_notes as rsalesnotes', 'lead_rejection.Reason as reason');
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
+                $data->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id');
+                $data->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id');
             }
             $data->groupBy('calls.id');
             $results = $data->get();
@@ -761,7 +829,6 @@ public function saveprospecting(Request $request)
     }
     public function savefollowup(Request $request)
 	{
-        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
@@ -781,7 +848,6 @@ public function saveprospecting(Request $request)
 	}
     public function savefollowupdate(Request $request)
 	{
-        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
@@ -838,4 +904,276 @@ public function updateCallClient(Request $request)
     $clientLead->save();
     return response()->json(['message' => 'Client updated successfully!'], 200);
 }
+public function leaddetailpage($id)
+{
+    $lead = Calls::find($id);
+    $languages = Language::all();
+    $requirements = CallsRequirement::where('lead_id', $id)->with(['masterModelLine.brand', 'country'])->get();
+    $brands = Brand::all();
+    $countries = Country::get();
+    $mastermodellines = MasterModelLines::all();
+    $users = User::where('status', 'Active')->get();
+    $tasks = LeadsTask::where('lead_id', $id)->orderBy('created_at', 'desc')->get(); 
+    $documents = LeadDocument::where('lead_id', $id)->get();
+    $logs = DB::table('leads_log')
+        ->join('users', 'leads_log.user_id', '=', 'users.id')
+        ->select('leads_log.activity', 'leads_log.created_at', 'users.name as user_name')
+        ->where('leads_log.lead_id', $id)
+        ->orderBy('leads_log.created_at', 'desc')
+        ->get();
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs'));
+}
+public function leaddeupdate(Request $request)
+{
+    $request->validate([
+        'field' => 'required|string',
+        'value' => 'required',
+        'lead_id' => 'required|exists:calls,id',
+    ]);
+    $lead = Calls::find($request->lead_id);
+    $field = $request->field;
+    $oldValue = $lead->{$field};
+    $lead->{$request->field} = $request->value;
+    $log = new LeadsLog();
+    $log->user_id = auth()->id();
+    $log->lead_id = $request->lead_id;
+    $log->activity = 'Updated "' . $field . '" from "' . $oldValue . '" to "' . $request->value . '"';
+    $log->save();
+    $lead->save();
+    return response()->json(['success' => true]);
+}
+public function removeModelLine($requirementId)
+{
+    // Find and delete the model line
+    $requirement = CallsRequirement::find($requirementId);
+    $requirement->delete();
+    return response()->json(['success' => true]);
+}
+public function storeMessages(Request $request)
+    {
+        $message = LeadChat::create([
+            'lead_id' => $request->leadid,
+            'user_id' => auth()->id(),
+            'message' => $request->message
+        ]);
+        return response()->json($message->load('user'));
+    }
+    public function storeReply(Request $request)
+    {
+        $reply = LeadChatReply::create([
+            'chat_id' => $request->message_id,
+            'user_id' => auth()->id(),
+            'reply' => $request->reply
+        ]);
+
+        return response()->json($reply->load('user'));
+    }
+    public function indexmessages($leadid)
+    {
+        $messages = LeadChat::where('lead_id', $leadid)
+                            ->with('user', 'replies.user')
+                            ->get();
+
+        return response()->json($messages);
+    }
+    public function getModelLines($brandId) {
+        $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
+        return response()->json($modelLines);
+    }
+    public function getTrimAndVariants($modelLineId) {
+        $uniqueTrims = Varaint::where('master_model_lines_id', $modelLineId)->groupby('model_detail')->get();             
+        $variants = Varaint::where('master_model_lines_id', $modelLineId)->get();
+        return response()->json([
+            'trims' => $uniqueTrims,
+            'variants' => $variants,
+        ]);
+    }
+    public function addModelLine(Request $request) {
+        $trim = $request->input('trim') === 'other' ? $request->input('custom_trim') : $request->input('trim');
+        $variant = $request->input('variant') === 'other' ? $request->input('custom_variant') : $request->input('variant');
+    $modelLine = new CallsRequirement();
+    $modelLine->model_line_id = $request->input('model_line');
+    $modelLine->lead_id = $request->input('lead_id');
+    $modelLine->qty = $request->input('qty');
+    $modelLine->asking_price = $request->input('asking_price');
+    $modelLine->offer_price = $request->input('offer_price');
+    $modelLine->countries_id = $request->input('countries_id');
+    $modelLine->trim = $trim;
+    $modelLine->variant = $variant;
+    $modelLine->save();
+    $modelLine = CallsRequirement::with(['masterModelLine.brand', 'country'])
+        ->find($modelLine->id);
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->input('lead_id');
+        $log->activity = 'Added new model line with ID ' . $modelLine->id . 
+                         ' (Brand: ' . ($modelLine->masterModelLine->brand->brand_name ?? 'N/A') . 
+                         ', Model Line: ' . ($modelLine->masterModelLine->model_line ?? 'N/A') . 
+                         ', Trim: ' . $modelLine->trim . 
+                         ', Variant: ' . $modelLine->variant . ')';
+        $log->save();
+    return response()->json([
+        'id' => $modelLine->id,
+        'brand' => $modelLine->masterModelLine->brand->brand_name ?? 'N/A',  // Returning brand name
+        'model_line' => $modelLine->masterModelLine->model_line ?? 'N/A',
+        'trim' => $modelLine->trim,
+        'qty' => $modelLine->qty,
+        'asking_price' => $modelLine->asking_price,
+        'offer_price' => $modelLine->offer_price,
+        'country' => $modelLine->country->name ?? 'N/A',
+        'variant' => $modelLine->variant,
+    ]);
+    }
+    public function fileupload(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $fileNameToStore = time() . '_' . uniqid() . '.' . $extension;
+            $destinationPath = public_path('storage/PL_Documents');
+            $file->move($destinationPath, $fileNameToStore);
+            $filePath = 'storage/PL_Documents/' . $fileNameToStore;
+            $document = LeadDocument::create([
+                'lead_id' => $request->input('lead_id'),
+                'document_name' => $file->getClientOriginalName(),
+                'document_path' => $filePath,
+                'document_type' => in_array($extension, ['jpg', 'jpeg', 'png']) ? 'image' : 'pdf',
+            ]);
+            $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->input('lead_id');
+        $log->activity = 'Uploading New File Document "' . $document->document_name . '"';
+        $log->save();
+            return response()->json([
+                'success' => true,
+                'file' => [
+                    'name' => $document->document_name,
+                    'url' => url($document->document_path),
+                    'type' => $document->document_type
+                ]
+            ]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'No file uploaded.']);
+        }
+    }
+    public function removeFile(Request $request)
+{
+    $document = LeadDocument::find($request->id);
+
+    if ($document) {
+        $filePath = public_path($document->document_path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $document->lead_id;
+        $log->activity = 'Deleted the Uploading file Document name is "' . $document->document_name . '"';
+        $log->save();
+        $document->delete();
+        return response()->json(['success' => true, 'message' => 'File deleted successfully.']);
+    } else {
+        return response()->json(['success' => false, 'message' => 'File not found.']);
+    }
+}  
+public function storeLog(Request $request)
+    {
+        $request->validate([
+            'lead_id' => 'required|integer',
+            'conversation' => 'required|string|max:1000',
+        ]);
+        $log = CallsConversationLog::create([
+            'lead_id' => $request->input('lead_id'),
+            'conversation' => $request->input('conversation')
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'log' => $log,
+            'formatted_time' => Carbon::parse($log->created_at)->format('H:i:s d M Y'),
+            'relative_time' => Carbon::parse($log->created_at)->diffForHumans()
+        ]);
+    }
+
+    public function getLogs($lead_id)
+    {
+        $logs = CallsConversationLog::where('lead_id', $lead_id)->orderBy('created_at', 'asc')->get();
+
+        return response()->json($logs);
+    }
+    public function storeTask(Request $request)
+    {
+        $assigner = User::find($request->assign_by);
+        $task = LeadsTask::create([
+            'lead_id' => $request->lead_id,
+            'assigned_by' => $request->assign_by,
+            'task_message' => $request->task_message,
+            'status' => 'Pending'
+        ]);
+        $task->load('assigner');
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = $request->lead_id;
+        $log->activity = 'Assigned new task to ' . ($assigner ? $assigner->name : 'Unknown') . ': "' . $request->task_message . '"';
+        $log->save();
+        $leadLink = route('calls.leaddetailpage', ['id' => $request->lead_id]);
+        if ($assigner && $assigner->email) {
+            Mail::to($assigner->email)->send(new TaskAssigned($assigner, $request->task_message, $leadLink));
+        }
+        return response()->json([
+            'success' => true,
+            'task' => $task,
+            'created_at' => Carbon::parse($task->created_at)->format('H:i:s d M Y'),
+            'relative_time' => Carbon::parse($task->created_at)->diffForHumans(),
+            'assigner_name' => $task->assigner ? $task->assigner->name : 'Unknown'
+        ]);
+    }    
+public function getTasks($lead_id)
+{
+    $tasks = LeadsTask::where('lead_id', $lead_id)
+        ->with('assigner')
+        ->orderBy('created_at', 'desc')
+        ->get();
+    return response()->json($tasks);
+}
+public function tasksupdateStatus(Request $request)
+{
+    $request->validate([
+        'task_id' => 'required|exists:leads_task,id',
+        'status' => 'required|in:Pending,In Progress,Completed',
+    ]);
+    $updated = LeadsTask::where('id', $request->task_id)
+        ->update(['status' => $request->status]);
+    if ($updated) {
+        $log = new LeadsLog();
+        $log->user_id = auth()->id();
+        $log->lead_id = LeadsTask::find($request->task_id)->lead_id;
+        $log->activity = 'Updated task status to ' . $request->status;
+        $log->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Task status updated successfully',
+            'updated_status' => $request->status,
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Task not found or status not updated.',
+        ], 404);
+    }
+}
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string',
+        ]);
+        $lead = Calls::findOrFail($id);
+        $lead->status = $request->input('status');
+        if ($lead->save()) {
+            return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+        } 
+        else {
+            return response()->json(['success' => false, 'message' => 'Failed to update status.']);
+        }
+    }
 }

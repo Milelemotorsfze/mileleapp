@@ -108,6 +108,7 @@
                                     <option value="RHD"> RHD </option>
                                 </select>
                             </div>
+                            
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
@@ -123,6 +124,18 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">TTC Approval Models </label>
+                                    <select class="form-control widthinput" multiple name="ttc_approval_models[]" id="ttc_approval_models" autofocus>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->id }}"> {{ $model->model }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>  
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary mt-4">Submit</button>
                             </div>
@@ -149,12 +162,10 @@
         $('#restricted_model_line').select2({
             placeholder : 'Select Restricted Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#allowed_model_line').select2({
             placeholder : 'Select Allowed Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#is_only_company_allowed').select2({
             placeholder : 'Select Option',
@@ -171,15 +182,18 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
-        // $("#form-create").validate({
-        //     ignore: [],
-        //     rules: {
-        //         brand_name: {
-        //             required: true,
-        //             maxlength:255
-        //         },
-        //     },
-        // });
+        $('#ttc_approval_models').select2({
+            placeholder : 'Select Model',
+            allowClear: true,
+        });
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                country_id: {
+                    required: true,
+                },
+            },
+        });
     </script>
 @endpush
 

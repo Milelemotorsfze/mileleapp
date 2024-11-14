@@ -536,9 +536,6 @@ class AddonController extends Controller {
                       $html .=              '</td>
                                         </tr>';
                 }else{
-            //                      info("inside addon types");
-            //                      info($addon->id);
-            //                      info($addon->AddonTypes);
                       $AddonTypes = AddonTypes::where('addon_details_id', $addon->id)->get();
                       foreach($AddonTypes as $key => $AddonTypes) {
 

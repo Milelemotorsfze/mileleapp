@@ -54,7 +54,6 @@
                         <tr>
                             <th>Actions</th>
                             <th>S.NO</th>
-                            <!-- <th>Code</th> -->
                             <th>PFI Number</th>
                             <th>PFI Date</th>
                             <th>Customer Name </th>
@@ -66,8 +65,6 @@
                             <th>Released Amount</th>
                             <th>Release Date</th>
                             <th>Comment</th>
-                            <th>Status</th>
-                            <!-- <th>Payment Status</th> -->
                             <th>Created Date</th>
                             <th>Created By</th>
                             <th>Updated Date</th>
@@ -75,8 +72,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        
-                
                         </tbody>
                     </table>
                 </div>
@@ -108,7 +103,6 @@
             {'data' : 'released_amount', 'name': 'released_amount', orderable: false },          
             {'data' : 'released_date', 'name': 'released_date', orderable: false },        
             {'data' : 'comment', 'name': 'comment', orderable: false },      
-            {'data' : 'status', 'name': 'status', orderable: false },  
             {'data' : 'created_at', 'name': 'created_at', orderable: false }, 
             {'data' : 'created_by', 'name': 'createdBy.name', orderable: false },    
             {'data' : 'updated_at', 'name': 'updated_at', orderable: false }, 

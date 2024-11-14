@@ -1616,7 +1616,6 @@ class VehiclesController extends Controller
                     }
                 }
                 if (!empty($changes)) {
-                    info($fieldValue);
                     // Save approval log if the old value is null and the new value is not null
                     if ($fieldValue !== null) {
                         // Update the field in the 'Vehicles' table with the new value
@@ -1666,7 +1665,6 @@ class VehiclesController extends Controller
             $soId = $vehicle->so_id;
             if ($soId)
             {
-                info("soid existing");
                 $so = So::find($soId);
                 if(!empty($so->so_number)) {
                     if($so->so_number != $request->so_numbers[$key])
@@ -2082,7 +2080,6 @@ class VehiclesController extends Controller
 
             }
             if($vehicle->conversion != $request->conversions[$key]) {
-                info("conversion is changed");
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
                 $vehicleslog->date = $currentDateTime->toDateString();
@@ -2642,7 +2639,6 @@ public function viewalls(Request $request)
                 $salespersonName = $vehicle->so->salesperson->name;
             }
             $vehicle->salespersonname = $salespersonName;
-            info($vehicle);
             return $vehicle;
         });
         return response()->json($vehicles);
@@ -2692,7 +2688,6 @@ public function viewalls(Request $request)
             $salespersonName = $vehicle->so->salesperson->name;
         }
         $vehicle->salespersonname = $salespersonName;
-    info($vehicle);
         return response()->json($vehicle);
     }
     public function statuswise(Request $request)
@@ -2767,6 +2762,8 @@ foreach ($variants as $variant) {
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
+            info($filters);
             if($status === "allstock")
                 {
                     $data = Vehicles::select( [
@@ -2853,6 +2850,16 @@ foreach ($variants as $variant) {
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
+                    foreach ($filters as $columnName => $values) {
+                        if (in_array('__NULL__', $values)) {
+                            info($columnName);
+                            $data->whereNull($columnName); // Filter for NULL values
+                        } elseif (in_array('__Not EMPTY__', $values)) {
+                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        } else {
+                            $data->whereIn($columnName, $values); // Regular filtering for selected values
+                        }
+                    } 
                     $data = $data->groupBy('vehicles.id');  
                 }
         if ($data) {
@@ -3184,7 +3191,6 @@ if (!$vehicle) {
 $oldValue = $vehicle->{$request->field};
 $field = $request->field;
 $value = $request->value;
-info($field);
 if ($field == 'price') {
     $value = str_replace(',', '', $value);
 }
@@ -3228,14 +3234,12 @@ return response()->json(['success' => 'Vehicle updated successfully']);
         ->where('id', $vehicle_id)
         ->whereDate('reservation_end_date', '>=', Carbon::today())
         ->first();
-        info($reservation);
     return response()->json($reservation);
 }
 public function saveenhancement(Request $request)
     {
         $vehicleId = $request->input('vehicle_id');
         $variantId = $request->input('variant_id');
-        info($vehicleId);
         $vehicle = Vehicles::find($vehicleId);
         $oldValue = $vehicle->varaints_id;
         if ($vehicle) {
@@ -3305,7 +3309,6 @@ public function saveenhancement(Request $request)
         $vehicleId = $request->input('vehicle_id');
         $int_color = $request->input('int_color_dropdown');
         $ext_color = $request->input('ext_color_dropdown');
-        info($int_color);
         $vehicle = Vehicles::find($vehicleId);
         $oldValueint = $vehicle->int_colour;
         $oldValueex = $vehicle->ex_colour;
@@ -3436,6 +3439,8 @@ public function availablevehicles(Request $request)
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
+            \Log::info("Received Filters: ", $filters);
                 if($status === "Available Stock")
                 {
                     $data = Vehicles::select( [
@@ -3519,6 +3524,16 @@ public function availablevehicles(Request $request)
                     })
                     ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
+                    foreach ($filters as $columnName => $values) {
+                        if (in_array('__NULL__', $values)) {
+                            info($columnName);
+                            $data->whereNull($columnName); // Filter for NULL values
+                        } elseif (in_array('__Not EMPTY__', $values)) {
+                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        } else {
+                            $data->whereIn($columnName, $values); // Regular filtering for selected values
+                        }
+                    }                               
                     $data = $data->groupBy('vehicles.id');  
                 }
         if ($data) {
@@ -3599,6 +3614,7 @@ public function availablevehicles(Request $request)
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
             if($status === "Delivered")
             {
                 $data = Vehicles::select( [
@@ -3680,6 +3696,16 @@ COALESCE(
                 ->whereNotNull('vehicles.gdn_id')
                 ->whereNotNull('vehicles.grn_id')
                 ->where('vehicles.status', 'Approved');
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        info($columnName);
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
+                } 
                 $data = $data->groupBy('vehicles.id');  
             }
             if ($data) {
@@ -3760,6 +3786,7 @@ COALESCE(
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
             if($status === "dpvehicles")
             {
                 $data = Vehicles::select( [
@@ -3845,6 +3872,16 @@ COALESCE(
                 ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                 ->where('vehicles.status', 'Approved')
                 ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        info($columnName);
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
+                } 
                 $data = $data->groupBy('vehicles.id');
     }  
             if ($data) {

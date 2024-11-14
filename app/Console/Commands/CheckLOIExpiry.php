@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\LetterOfIndent;
 use App\Models\LOIExpiryCondition;
 use Carbon\Carbon;
+use App\Http\Controllers\UserActivityController;
 
 class CheckLOIExpiry extends Command
 {
@@ -14,7 +15,7 @@ class CheckLOIExpiry extends Command
      *
      * @var string
      */
-    protected $signature = 'loi-expiry:check';
+    protected $signature = 'loi_expiry:check';
 
     /**
      * The console command description.
@@ -28,28 +29,29 @@ class CheckLOIExpiry extends Command
      */
     public function handle()
     {
-        $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')->get();
+        $letterOfIndents = LetterOfIndent::select('id','is_expired','client_id','date')
+                            ->where('is_expired', false)->get();
         foreach($letterOfIndents as $letterOfIndent) {
+        
             $LOItype = $letterOfIndent->client->customertype;
+          
             $LOIExpiryCondition = LOIExpiryCondition::where('category_name', $LOItype)->first();
-            if($LOIExpiryCondition && $letterOfIndent->is_expired == false) {        
+            
+            if($LOIExpiryCondition) {        
                 $currentDate = Carbon::now();
                 $year = $LOIExpiryCondition->expiry_duration_year;
                 $expiryDate = Carbon::parse($letterOfIndent->date)->addYears($year);
+               
                 // do not make status expired, becasue to know at which status stage it got expired
                 if($currentDate->gt($expiryDate) == true) {
                     $letterOfIndent->is_expired = true;     
                     $letterOfIndent->expired_date = Carbon::now()->format('Y-m-d');
-                    $letterOfIndent->timestamps = false;        
+                    $letterOfIndent->timestamps = false;  
                     $letterOfIndent->save();  
-                }else{
-                    $letterOfIndent->is_expired = false;  
-                    $letterOfIndent->expired_date = NULL;  
-                    $letterOfIndent->timestamps = false;               
-                    $letterOfIndent->save();  
+                    (new UserActivityController)->createActivity('LOI '.$letterOfIndent->id.' Expired');
                 }
+              
             }
-
         }
         
     }

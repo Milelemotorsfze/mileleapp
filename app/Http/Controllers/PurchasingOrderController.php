@@ -1068,7 +1068,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->estimation_date = $estimation_arrival;
                 $vehicle->engine = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $vehicle->territory = 'Africa';
+                    $vehicle->territory =  $territory;
                 }else{
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
@@ -1097,7 +1097,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->estimation_date = $estimation_arrival;
                 $purchasinglog->engine_number = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $purchasinglog->territory = 'Africa';
+                    $purchasinglog->territory = $territory;
                 }else{
                     $purchasinglog->territory = $territorys;
                 }
@@ -1317,12 +1317,16 @@ public function getBrandsAndModelLines(Request $request)
         $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
+        $vehiclesdn = Vehicles::where('purchasing_order_id', $id)
+        ->where('status', 'Approved')
+        ->whereNotNull('dn_id')
+        ->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
     }
     public function edit($id)
     {
@@ -1681,7 +1685,7 @@ public function checkcreatevins(Request $request)
                     }
                 }
             }
-            info($changes);
+            // info($changes);
             if (!empty($changes)) {
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -1753,7 +1757,7 @@ public function checkcreatevins(Request $request)
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
                 if ($purchasingOrder) {
-                    info($fieldName);
+                //    info ($fieldName);
 //                    check the po is under demand planning
 
                     $loiPurchasingOrder = LOIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
@@ -2438,7 +2442,7 @@ public function paymentreleasesconfirm($id)
 public function paymentreleasesrejected(Request $request, $id)
 {
 
-    info($id);
+    // info($id);
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
@@ -2745,19 +2749,19 @@ public function purchasingallupdateStatusrel(Request $request)
                                     ->pluck('approved_loi_id');
 
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-                info($loiItemIds);
+                // info($loiItemIds);
                 $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-                info($possibleIds);
+                // info($possibleIds);
 
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    info($item);
+                    // info($item);
                     if(in_array($item->master_model_id, $possibleIds)) {
-                        info("master model id including li item");
+                        // info("master model id including li item");
                         if($item->utilized_quantity < $item->approved_quantity) {
-                            info("total quantity < utilized_quantity");
+                            // info("total quantity < utilized_quantity");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
 
@@ -3060,7 +3064,7 @@ if ($paymentOrderStatus->isNotEmpty()) {
         $paymentOrder->status = 'Initiated Payment';
         $paymentOrder->save();
     }
-    info($paymentOrderStatus);
+    // info($paymentOrderStatus);
 }
             $currency = $purchasedorder->currency;
             $supplieraccountchange = SupplierAccount::where('suppliers_id', $purchasedorder->vendors_id)->first();
@@ -3577,7 +3581,7 @@ public function rerequestpayment(Request $request)
                   ->orWhere('payment_status', 'Payment Release Rejected');
         })
         ->get();
-    info($vehicles);
+    // info($vehicles);
     foreach ($vehicles as $vehicle) {
         if ($vehicle->payment_status == 'Payment Release Rejected') {
             $status = 'Payment Requested';
@@ -3964,7 +3968,6 @@ public function storeMessages(Request $request)
             'user_id' => auth()->id(),
             'message' => $request->message
         ]);
-
         return response()->json($message->load('user'));
     }
     public function storeReply(Request $request)
@@ -4281,7 +4284,7 @@ public function requestAdditionalPayment(Request $request)
             $swiftcopy->file_path = 'storage/swift_copies/' . $fileNameToStore;
             $swiftcopy->save();
             $PurchasingOrder = PurchasingOrder::where('id', $id)->first();
-            info($PurchasingOrder);
+            // info($PurchasingOrder);
             $supplieracc = SupplierAccount::where('suppliers_id', $PurchasingOrder->vendors_id)->first();
         if ($supplieracc) {
             $paymentad = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)
@@ -4473,7 +4476,7 @@ public function submitPaymentDetails(Request $request)
         $paymentOption = $request->input('paymentOption');
         $purchaseOrderId = $request->input('purchaseOrderId');
         $remarks = $request->input('remarks');
-        info($remarks);
+        // info($remarks);
         $createdBy = auth()->user()->id; // Assuming you use authentication and want to log the user who created the record
         // Get purchase order details
         $purchaseOrder = PurchasingOrder::find($purchaseOrderId);
@@ -5193,7 +5196,7 @@ public function getSwiftDetails($id)
             'bank_name' => $bankMaster->bank_name ?? 'N/A',
         ];
 
-        info($swiftDetails);
+        // info($swiftDetails);
         return response()->json(['success' => true, 'data' => $swiftDetails]);
     } catch (\Exception $e) {
         Log::error('Failed to fetch swift details', ['error' => $e->getMessage()]);
@@ -5227,44 +5230,86 @@ public function paymentconfirm(Request $request)
     // Method to save DN numbers
     public function saveDnNumbers(Request $request)
     {
-    $purchasingOrderId = $request->input('purchasingOrderId');
-    $type = $request->input('type');
-    if ($type == 'full') {
-        $dnNumber = $request->input('dnNumber');
+        $purchasingOrderId = $request->input('purchasingOrderId');
+        $type = $request->input('type');
+        
+        if ($type == 'full') {
+            $dnNumber = $request->input('dnNumber');
 
-        info($vehicleId);
-    } else if ($type == 'vehicle') {
-        $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
-    $batchNumber = 1;
-    foreach ($vehicles as $vehicle) {
-        $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
-                                   ->orderBy('created_at', 'desc')
-                                   ->first();
-        if ($latestVehicleDn) {
-            $batchNumber = $latestVehicleDn->batch + 1;
-            break;
-        }
-    }
-        $vehicleDNData = $request->input('vehicleDNData');
-        foreach ($vehicleDNData as $vehicleData) {
-            $vehicleId = $vehicleData['vehicleId'];
-            $dnNumber = $vehicleData['dnNumber'];
-            if($dnNumber)
-            {
-            $vehicledn = New VehicleDn();
-            $vehicledn->dn_number = $dnNumber;
-            $vehicledn->vehicles_id = $vehicleId;
-            $vehicledn->created_by = Auth::id();
-            $vehicledn->batch = $batchNumber;
-            $vehicledn->save();
-            $vehicle = Vehicles::find($vehicleId);
-            $vehicle->dn_id = $vehicledn->id;
-            $vehicle->save();
+            // Retrieve all vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+    
+            // Check for the latest batch number among vehicles in the purchasing order
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Loop through each vehicle and assign the same DN number
+            foreach ($vehicles as $vehicle) {
+                // Create a new entry in the VehicleDn table
+                $vehicledn = new VehicleDn();
+                $vehicledn->dn_number = $dnNumber;
+                $vehicledn->vehicles_id = $vehicle->id;
+                $vehicledn->created_by = Auth::id();
+                $vehicledn->batch = $batchNumber;
+                $vehicledn->save();
+    
+                // Update the vehicle's dn_id field with the new VehicleDn record's ID
+                $vehicle->dn_id = $vehicledn->id;
+                $vehicle->save();
+            }
+        } else if ($type == 'vehicle') {
+            // Retrieve vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Get vehicle DN data from the request and ensure it's an array
+            $vehicleDNData = $request->input('vehicleDNData', []);
+    
+            foreach ($vehicleDNData as $vehicleData) {
+                $vehicleId = $vehicleData['vehicleId'];
+                $dnNumber = $vehicleData['dnNumber'];
+    
+                if ($dnNumber) {
+                    $vehicledn = new VehicleDn();
+                    $vehicledn->dn_number = $dnNumber;
+                    $vehicledn->vehicles_id = $vehicleId;
+                    $vehicledn->created_by = Auth::id();
+                    $vehicledn->batch = $batchNumber;
+                    $vehicledn->save();
+    
+                    // Attempt to find the vehicle by ID
+                    $vehicle = Vehicles::find($vehicleId);
+    
+                    // Check if the vehicle exists before assigning the dn_id
+                    if ($vehicle) {
+                        $vehicle->dn_id = $vehicledn->id;
+                        $vehicle->save();
+                    } else {
+                        // Log or handle the error if the vehicle ID is invalid
+                        \Log::error("Vehicle with ID {$vehicleId} not found.");
+                    }
+                }
             }
         }
-    }
-    return response()->json(['success' => true]);
-}
+        return response()->json(['success' => true]);
+    }    
 public function getVehiclesdn($purchaseOrderId) {
     $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
     ->where('status', 'Approved')

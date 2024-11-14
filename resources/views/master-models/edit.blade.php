@@ -92,7 +92,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">Model Description</label>
+                        <label class="form-label">PFI Model Description</label>
                         <input type="text" class="form-control" name="model_description" placeholder="Model Description"
                          value="{{ $masterModel->model_description }}">
                    </div>
@@ -387,20 +387,7 @@
                     $('#detail').html(data.variant.detail);
                     $('#model-detail').html(data.variant.model_detail);
                     $('#netsuite-name').html(data.variant.netsuite_name);
-                    // if(data.variant_items) {
-                    //     jQuery.each(data.variant_items, function(key,value){
-                    //         $("#variant-items").append('<div class="col-sm-4"> ' +
-                    //             '<div class="row mt-2"> ' +
-                    //             '<div class="col-sm-3">' +
-                    //             ' <dl id="variant-specification"> '+ value.model_specification.name ?? '' +' : </dl> ' +
-                    //             '</div> ' +
-                    //             '<div class="col-sm-9"> ' +
-                    //             '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
-                    //             '</div> ' +
-                    //             '</div> ' +
-                    //             '</div>');
-                    //     });
-                    // }
+                   
                 }
             });
         }

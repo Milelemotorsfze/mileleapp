@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\File;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Crypt;
 
 class PFIController extends Controller
 {
@@ -74,19 +75,14 @@ class PFIController extends Controller
                     ->editColumn('created_at', function($query) {
                         return Carbon::parse($query->created_at)->format('d M Y');
                     })
-                    ->editColumn('created_at', function($query) {
-                        if($query->updated_at) {
-                            return Carbon::parse($query->created_at)->format('d M Y');
-                        }
-                        return "";
-                    })
                     ->editColumn('updated_by', function($query) {                  
                         if($query->updated_by){
                             return $query->updatedBy->name ?? '';
                         }
-                    })                    ->editColumn('updated_at', function($query) {
+                    })
+                    ->editColumn('updated_at', function($query) {
                         if($query->updated_at) {
-                        return Carbon::parse($query->updated_at)->format('d M Y');
+                            return Carbon::parse($query->updated_at)->format('d M Y');
                         }
                         return "";
                     })
@@ -145,13 +141,9 @@ class PFIController extends Controller
             ->where('is_parent', true)
             ->orderBy('updated_at','DESC')->with([
                 'pfi' => function ($query) {
-                $query->select('id','supplier_id','country_id','client_id','pfi_reference_number',
-                'currency','amount','comment','pfi_date');
+                    $query->select('id','supplier_id','country_id','client_id','pfi_reference_number','currency','amount','comment','pfi_date');
             },
-            'letterOfIndentItem' => function ($query) {
-                $query->select('id','code','master_model_id','letter_of_indent_id');
-            },
-           
+          
             'masterModel'  => function ($query) {
                 $query->select('id','model','sfx','steering','master_model_line_id');
             },
@@ -170,8 +162,6 @@ class PFIController extends Controller
             'pfi.country'  => function ($query) {
                 $query->select('id','name');
             }]);
-
-            // return $data->get();
 
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
@@ -257,8 +247,11 @@ class PFIController extends Controller
                 $data->having("total_price", 'like', "%{$request->total_price}%");
 
             }
+            if(!empty($request->pfi_item_code)) {
+                $data->where("code", 'like', "%{$request->pfi_item_code}%");
+
+            }
            
-            // return $data->get();
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
                 $data = $data->get();
@@ -273,6 +266,8 @@ class PFIController extends Controller
                     
                         $loiItemCode = implode(", ", $LOICodes);   
                     return [
+                        'PFI ID' => $data->pfi->id ?? '',
+                        'PFI Item Code' => $data->code ?? '',
                         'LOI Item Code' => $loiItemCode ?? '',
                         'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),
                         'PFI Number' => $data->pfi->pfi_reference_number,
@@ -389,7 +384,6 @@ class PFIController extends Controller
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign/';
-        // $destination = 'PFI_document_withsign';
         if ($request->has('file'))
         {
             $file = $request->file('file');
@@ -467,7 +461,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')) {
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'NEW']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'NEW']);
         }
 
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
@@ -475,8 +469,8 @@ class PFIController extends Controller
        
     }
     public function generatePFIDocument(Request $request) {
-
-        $pfi = PFI::find($request->id);
+        $pfiId = Crypt::decrypt($request->id);
+        $pfi = PFI::find($pfiId);
         $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
         $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
         $fileName = 'MILELE - '.$pfi->pfi_reference_number;
@@ -486,7 +480,7 @@ class PFIController extends Controller
         }else{
             $fileName = $fileName."_".time().'.pdf';
 
-            if($request->type == 'EDIT') {
+            if($request->type == 'EDIT' && $pfi->pfi_document_without_sign) {
                 $destinationPath = 'New_PFI_document_without_sign';
                 if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
                     \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
@@ -497,10 +491,14 @@ class PFIController extends Controller
 
                 $filePath = public_path('New_PFI_document_without_sign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
+               
                 $pfi->new_pfi_document_without_sign = $fileName;
 
             }else{
-
+                $filedestination = 'PFI_document_withoutsign';
+                if(!\Illuminate\Support\Facades\File::isDirectory($filedestination)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($filedestination, $mode = 0777, true, true);
+                }
                 $filePath = public_path('PFI_document_withoutsign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
                 $pfi->pfi_document_without_sign = $fileName;
@@ -513,9 +511,9 @@ class PFIController extends Controller
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
 
-        $pfi = PFI::select('id','pfi_reference_number','created_at')
+        $pfi = PFI::select('id','pfi_reference_number','pfi_date')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
-                ->whereYear('created_at', Carbon::now()->year);
+                ->whereYear('pfi_date', Carbon::now()->year);
                 
         if($request->pfi_id) {
 
@@ -569,9 +567,6 @@ class PFIController extends Controller
         $parentPfiItem->childPfiItems = PfiItem::where('pfi_id', $pfi->id)->where('is_parent', false)
                                         ->where('parent_pfi_item_id', $parentPfiItem->id)->orderBy('id','ASC')->get();
 
-        $request['page'] = 'Edit';  
-        $request['client_id']  = $pfi->customer->id;
-        $request['country_id'] = $pfi->country->id;
         
         $masterModel = MasterModel::where('model', $parentPfiItem->masterModel->model)
                             ->where('sfx', $parentPfiItem->masterModel->sfx)
@@ -579,7 +574,6 @@ class PFIController extends Controller
         $parentPfiItem->exactMatches = MasterModel::where('model', $parentPfiItem->masterModel->model)
                                                     ->where('sfx', $parentPfiItem->masterModel->sfx)->pluck('id')->toArray();
             
-
         $parentPfiItem->is_brand_toyota = 1;
         $brandName = "TOYOTA";
         if(strtoupper($masterModel->modelLine->brand->brand_name) !== $brandName)
@@ -587,14 +581,13 @@ class PFIController extends Controller
             $parentPfiItem->is_brand_toyota = 0;
         }
         
-
         foreach($parentPfiItem->childPfiItems as $childItem)
          {                     
-            $request['model'] = $childItem->masterModel->model;
-            $request['sfx'] = $childItem->masterModel->sfx;
-            $LOIItems =  $this->getLOIItemCode($request);
-            $childItem->LOIItemCodes = $LOIItems['codes'];
-            
+            $childItem->LOIItemCodes = letterOfIndentItem::whereHas('pfiItems', function($query)use($id,$parentPfiItem){
+                    $query->where('pfi_id', $id)
+                    ->where('parent_pfi_item_id', $parentPfiItem->id);
+            })->get();
+
             if($childItem->letterOfIndentItem) {
                 $childItem->remainingQuantity = $childItem->letterOfIndentItem->quantity - $childItem->letterOfIndentItem->utilized_quantity;
             }
@@ -622,7 +615,7 @@ class PFIController extends Controller
             'supplier_id' =>'required',
             'file' => 'mimes:pdf,png,jpeg,jpg'
         ]);
-
+        // return $request->all();
         DB::beginTransaction();
         $pfi = PFI::findOrFail($id);
 
@@ -639,7 +632,6 @@ class PFIController extends Controller
         $pfi->client_id = $request->client_id;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
-        // $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
             if (File::exists(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign))) {
@@ -658,6 +650,7 @@ class PFIController extends Controller
         $pfiItemRowParentId = [];
         $alreadyAddedRows =  PfiItem::where('pfi_id', $pfi->id)->pluck('id')->toArray();
         $updatedRows = [];
+        // Same LOI Item can be add for different parents
         foreach($request->PfiItem as $key => $PfiData) {
             $model = $PfiData['model'];               
             $sfx = $PfiData['sfx'];
@@ -666,7 +659,9 @@ class PFIController extends Controller
 
             $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
                 // create parent row
-                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)->where('pfi_id',$pfi->id)->first();
+                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)
+                ->where('is_parent', true)
+                ->where('pfi_id',$pfi->id)->first();
                 if(!$pfiItemParentRow) {
                     $pfiItemParentRow = new PfiItem();
                     
@@ -700,7 +695,12 @@ class PFIController extends Controller
                 $parentId = $pfiItemParentRow->id;
                  if(array_key_exists("loi_item", $PfiData)) {
                     foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
-                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)->where('pfi_id',$pfi->id)->first();
+                        $childPfiQuantity = $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)
+                                    ->where('is_parent', false)
+                                    ->where('parent_pfi_item_id', $parentId)
+                                    ->where('pfi_quantity', $childPfiQuantity)
+                                    ->where('pfi_id', $pfi->id)->first();
                         if(!$pfiItemRow) {
                             $pfiItemRow = new PfiItem();
 
@@ -728,7 +728,7 @@ class PFIController extends Controller
                         $pfiItemRow->pfi_id = $pfi->id;
                         $pfiItemRow->master_model_id = $LOIItem->masterModel->id ?? '';
                         $pfiItemRow->loi_item_id = $loiItem;
-                        $pfiItemRow->pfi_quantity =  $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow->pfi_quantity =  $childPfiQuantity;
                         $pfiItemRow->unit_price = $unitPrice;
                         $pfiItemRow->created_by = Auth::id();
                         $pfiItemRow->parent_pfi_item_id = $parentId;
@@ -745,7 +745,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')){
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'EDIT']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'EDIT']);
         }
 
         return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
@@ -773,21 +773,14 @@ class PFIController extends Controller
 
     }
    
-    public function paymentStatusUpdate(Request $request, $id) {
-
-        (new UserActivityController)->createActivity('PFI payment status updated.');
-
-        $pfi = PFI::find($id);
-        $pfi->payment_status = $request->payment_status;
-        $pfi->save();
-        return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
-    }
+    
     public function relaesedAmountUpdate(Request $request) {
         (new UserActivityController)->createActivity('PFI released amount updated.');
 
         $pfi = PFI::find($request->pfi_id);
         $pfi->released_amount = $request->released_amount;
         $pfi->released_date = $request->released_date;
+        $pfi->updated_by = Auth::id();
         $pfi->save();
         return response($pfi);
     }
@@ -808,7 +801,8 @@ class PFIController extends Controller
                         $query->select('client_id','status','id','is_expired','country_id')
                         ->where('client_id', $request->client_id)
                         ->where('country_id', $request->country_id)
-                        ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED])
+                        ->whereIn('status', [LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL, LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED,
+                            LetterOfIndent::LOI_STATUS_TTC_APPROVED,LetterOfIndent::LOI_STATUS_WAITING_FOR_TTC_APPROVAL])
                         ->where('is_expired', false);
                 });
                 
@@ -823,9 +817,11 @@ class PFIController extends Controller
                     $query->where('master_model_line_id', $parentModel->master_model_line_id); 
                 });
             }              
-        if($request->selectedLOIItemIds) {
-            $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
-        }
+            
+            if($request->selectedLOIItemIds) {
+                $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
+            }
+
         $data['codes'] = $loiItems->get();
         $parentModels = MasterModel::where('model', $request->model)
                                 ->where('sfx', $request->sfx)
@@ -932,6 +928,7 @@ class PFIController extends Controller
         }
         return response($data);
     }
+   
 
      // document sealing
         // if($request->has('file')) {

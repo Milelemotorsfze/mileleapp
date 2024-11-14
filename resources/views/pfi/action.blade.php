@@ -40,7 +40,22 @@
         </li>
         @endif
     @endcan
-    @can('pfi-payment-status-update')
+    @can('create-demand-planning-po')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
+        @endphp
+        @if ($hasPermission)
+             <!-- check PFI have pending qty -->
+            <li>
+            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+             title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
+                <i class="fa fa-plus"></i> Create PO
+            </a>
+        <li> 
+        @endif
+        @endcan
+
+    <!-- @can('pfi-payment-status-update')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
         @endphp
@@ -52,7 +67,7 @@
             </button>
         </li>
         @endif
-    @endcan
+    @endcan -->
     @can('pfi-delete')
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
@@ -120,20 +135,21 @@
                                 @if($pfi->new_pfi_document_without_sign)
                                     <label class="fw-bold">Old PFI Document</label>
                                 @endif
-                            <div class="row p-2 justify-content-center">
-                                <div class="col-md-2">
-                               
-                                <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
-                                    class="btn btn-primary mb-2 text-center" download="{{ $oldPFIFileName }}">
-                                    Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
-                                </div>
-                                <embed src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" height="400" >
-                            </div>
+                                @if($pfi->pfi_document_without_sign)
+                                    <div class="row p-2 justify-content-center">
+                                        <div class="col-md-2">
+                                            <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
+                                            class="btn btn-primary mb-2 text-center" download="{{ $oldPFIFileName }}">
+                                            Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+                                        </div>
+                                        <embed src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" height="400" >
+                                    </div>
+                                @endif
                             @if($pfi->new_pfi_document_without_sign)
                             <div class="row p-2 mt-3 justify-content-center">
                                 <label class="fw-bold">Latest PFI Document</label>
                                 <div class="col-md-2">
-                                <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
+                                    <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
                                     class="btn btn-primary mb-2 text-center" download="{{ $newPFIFileName }}">
                                     Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
                                 </div>
@@ -149,7 +165,7 @@
             </div>
         </div>
         <!-- PFI Items Modal -->
-        <div class="modal fade " id="view-pfi-items-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1"
+        <div class="modal fade" id="view-pfi-items-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">

@@ -92,7 +92,7 @@ class MasterModelController extends Controller
             ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
             ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Model Line'],
             ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI Description'],
-            ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'Milele LOI Description'],
+            ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'PFI Milele LOI Description'],
             ['data' => 'amount_uae', 'name' => 'amount_uae','title' => 'Amount in UAE '],
             ['data' => 'amount_belgium', 'name' => 'amount_belgium','title' => 'Amount in Belgium '],
             ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
@@ -120,7 +120,6 @@ class MasterModelController extends Controller
      */
     public function store(Request $request)
     {
-//        return dd($request->all());
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
@@ -190,8 +189,6 @@ class MasterModelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return dd($request->all());
-
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',

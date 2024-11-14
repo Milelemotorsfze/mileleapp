@@ -403,11 +403,7 @@
                 "quantity[]": {
                     required: true
                 },
-                // "files[]": {
-                //     required:true,
-                //     extension: "png|jpeg|jpg",
-                //     maxsize:5242880 
-                // },
+               
                 "template_type[]":{
                     required:true
                 },
@@ -422,9 +418,7 @@
             },
                 
             messages: {
-                // file: {
-                //     extension: "Please upload file format (png,jpeg,jpg)"
-                // },
+                
                 loi_signature:{
                     extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                 }
@@ -1152,7 +1146,6 @@
                                 return false;
                             }
                         });
-                        // console.log(isOptionExist);
                         if(isOptionExist == 'no'){
                             $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
 
@@ -1298,10 +1291,6 @@
                 }).set({title:"Error !"})
                 e.preventDefault();
             }
-            
-        
-            // alert(formValid);
-           
         });
     </script>
 @endpush

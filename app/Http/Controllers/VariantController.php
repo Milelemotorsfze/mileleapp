@@ -840,10 +840,7 @@ public function savespecification(Request $request)
         else
         {
             $variantItems = VariantItems::where('varaint_id', $id)->with('model_specification', 'model_specification_option')->get();
-        }
-        
-        info($variants->base_varaint_id);
-        
+        }     
         return response()->json([
             'variants' => $variants,
             'variantItems' => $variantItems,

@@ -251,7 +251,7 @@ class QuotationController extends Controller
                $isVehicle = 1;
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
-               info($quotationItem->brand_id);
+            //    info($quotationItem->brand_id);
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
 
@@ -278,18 +278,18 @@ class QuotationController extends Controller
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
            }else if($request->types[$key] == 'Addon') {
-                info($request->reference_ids[$key]);
+                // info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
-                   info("not other");
+                //    info("not other");
 
                    $item = Addon::find($request->reference_ids[$key]);
-                   info($item);
+                //    info($item);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
-               info($request->model_description_ids[$key]);
+            //    info($request->model_description_ids[$key]);
            }
             if($item) {
                 info("item not found");
@@ -1114,13 +1114,13 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
-        info($request->from_shipping_port_id);
-        info($request->to_shipping_port_id);
+        // info($request->from_shipping_port_id);
+        // info($request->to_shipping_port_id);
         $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
-                            info($shippingCharges);               
+                            // info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
@@ -1230,7 +1230,7 @@ public function getVehiclesvins(Request $request)
 {
     $RowId = $request->input('RowId');
     $quotationItem = QuotationItem::where('uuid', $RowId)->first();
-    info($quotationItem);
+    // info($quotationItem);
     switch ($quotationItem->reference_type) {
         case 'App\Models\Varaint':
             $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)

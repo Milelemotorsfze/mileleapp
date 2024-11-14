@@ -16,6 +16,10 @@
     50% { opacity: 0; }
     100% { opacity: 1; }
 }
+/* Ensuring specific background styling with important */
+tr.highlight-orange {
+  background-color: #FFE5B4 !important; /* Light orange */
+    }
 /* Add styles for the badges */
 .badge {
     padding: 5px 10px;
@@ -178,12 +182,15 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
-      </li>
+      </li> -->
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab11">Active Leads</a>
       </li>
+      <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
+      </li> -->
       <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
       </li> -->
@@ -214,7 +221,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+            <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Priority</th>
@@ -230,12 +237,17 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Location</th>
                   <th>Remarks & Messages</th>
                   <th>Created By</th>
-                  <th>Action</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
               <tbody>
                 @foreach ($pendingdata as $key => $calls)
-                    <tr data-id="{{$calls->id}}">
+                @php
+            $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
+            $assigned_by = DB::table('users')->where('users.id', $calls->sales_person)->first();
+            $highlightRow = $created_by && $created_by->id == Auth::id() ? 'highlight-orange' : '';
+        @endphp
+                    <tr data-id="{{$calls->id}}" class="{{ $highlightRow }}">
                 <td>
                     @if ($calls->priority == "High")
                         <i class="fas fa-circle blink" style="color: red;"> Hot</i>
@@ -250,7 +262,7 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td id="remaining-time-{{ $key }}" data-assign-time="{{ $calls->assign_time }}"></td>
                     <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>
+                    <td><a href="{{ route('calls.leaddetailpage', $calls->id) }}">{{ $calls->name ?? '(Sample)' }}</a></td>
                     <td>
                     <div class="dropdown">
                     <a href="#" role="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -302,10 +314,14 @@ input[type=number]::-webkit-outer-spin-button
                     @php
                     $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
                     @endphp
-                    {{ $created_by->name }}
+                    {{ $created_by ? $created_by->name : '??' }}
                   </td>
                   <td>
-                    <div class="dropdown">
+                  @php
+                    $assigned_by = DB::table('users')->where('users.id', $calls->sales_person)->first();
+                    @endphp
+                    {{ $assigned_by ? $assigned_by->name : '??' }}
+                    <!-- <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
@@ -314,7 +330,7 @@ input[type=number]::-webkit-outer-spin-button
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'prospecting')">Prospecting</a></li>
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'uniqueInquiry')">Unique Inquiry / Demand</a></li>
     <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'quotation')">Quotation</a></li>
-    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li>
+    <li><a class="dropdown-item" href="#" onclick="checkAuthorization('{{ $calls->id }}', 'rejected')">Rejected</a></li> -->
     <!-- <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li> -->
@@ -326,8 +342,8 @@ input[type=number]::-webkit-outer-spin-button
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li> -->
-    </ul>
-  </div>
+    <!-- </ul>
+  </div> -->
                     </td>
                     </td>
                   </tr>
@@ -870,7 +886,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <table id="dtBasicExample2" class="table table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
@@ -888,7 +904,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Inquiry Date</th>
                   <th>Inquiry Notes</th>
                   <th>Purchaser Remarks</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -921,7 +938,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Prospectings Notes</th>
                   <th>Demand Date</th>
                   <th>Demand Notes</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -937,7 +955,7 @@ input[type=number]::-webkit-outer-spin-button
 </div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <table id="dtBasicExample4" class="table table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
@@ -960,6 +978,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
                   <th>Signature Status</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -1001,7 +1021,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Deal Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th>
-                  <th>Action</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -1024,13 +1045,10 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
-                  <th>Model Line</th>
-                  <th>Exterior Colour</th>
-                  <th>Interior Colour</th>
-                  <th>Model Year</th>
+                  <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
-                  <th>Description</th>
+                  <th>Sales Person</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1072,6 +1090,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th> -->
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                   <th>Reject Date</th>
                   <th>Reject Reason</th>
                   <th>Reject Notes</th>
@@ -1106,7 +1126,38 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Followup Time</th>
                   <th>Method</th>
                   <th>Sales Notes</th>
-                  <th>Action</th>
+                  <th>Assigned To</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade show" id="tab11">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample11" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                <th>Priority</th>
+                  <th>Lead Date</th>
+                  <th>Selling Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Stage</th>
+                  <th>Created By</th>
+                  <th>Assigned To</th>
                 </tr>
               </thead>
             </table>
@@ -1130,7 +1181,6 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Location</th>
                   <th>Remarks & Messages</th>
                   <th>Created By</th>
-                  <th>Action</th>
                 </tr>
               </thead>
             </table>
@@ -2058,46 +2108,54 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                      if (row.ddate && row.ddate !== '') {
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                    }
-                    else
-                  {
-                    return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                  }
-                  }
-                },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
+                // {
+                //     data: 'id',
+                //     name: 'id',
+                //     searchable: false,
+                //     render: function (data, type, row) {
+                //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                //       if (row.ddate && row.ddate !== '') {
+                //         return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //     }
+                //     else
+                //   {
+                //     return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                 <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                //                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //   }
+                //   }
+                // },
             ],
             columnDefs: [
               { type: 'date', targets: [0] }
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        // Check if created_by ID matches the logged-in user's ID
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).addClass('highlight-orange');
+        }
+    }
         });
         dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
@@ -2215,25 +2273,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-                {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                    }
-                },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
+                // {
+                //     data: 'id',
+                //     name: 'id',
+                //     searchable: false,
+                //     render: function (data, type, row) {
+                //       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                //       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                //         return `
+                //             <div class="dropdown">
+                //                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                //                     <i class="fa fa-bars" aria-hidden="true"></i>
+                //                 </button>
+                //                 <ul class="dropdown-menu dropdown-menu-end">
+                //                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                //                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                //                 </ul>
+                //             </div>`;
+                //     }
+                // },
             ]
         });
        dataTable4 = $('#dtBasicExample4').DataTable({
@@ -2413,6 +2473,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                     }
                 }
             },
+            { data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
             {
     data: 'id',
     name: 'id',
@@ -2450,7 +2512,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             </div>`;
     }
 },
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
         });
        dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
@@ -2851,6 +2919,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
+{ data: 'created_by_name', name: 'created_by_name' },
+{ data: 'sales_person_name', name: 'sales_person_name' },
 {
             data: 'rdate',
             name: 'rdate',
@@ -2885,7 +2955,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         }
     }
 },
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
         });
     dataTable8 = $('#dtBasicExample8').DataTable({
     processing: true,
@@ -2901,23 +2977,31 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             if (!data || !moment(data).isValid()) {
                 return '';
             }
-            // Convert the date to your desired format
             return moment(data).format('DD-MMM-YYYY');
         }
         return data;
     }
         },
-        { data: 'deal_value', name: 'quotations.deal_value' },
-        { data: 'sales_notes', name: 'quotations.sales_notes' },
-        { data: 'model_line', name: 'master_model_lines.model_line' },
-        { data: 'exterior', name: 'exterior' },
-        { data: 'interior', name: 'interior' },
-        { data: 'modelyear', name: 'pre_orders_items.modelyear' },
+        { 
+            data: 'deal_value', 
+            name: 'quotations.deal_value',
+            render: function(data, type, row) {
+                return parseFloat(data).toLocaleString('en-US');
+            }
+        },
+        { data: 'notes', name: 'pre_orders_items.notes' },
+        { data: 'name', name: 'varaints.name' },
         { data: 'qty', name: 'pre_orders_items.qty' },
         { data: 'countryname', name: 'countryname' },
-        { data: 'description', name: 'pre_orders_items.description' },
+        { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
     });
     dataTable9 = $('#dtBasicExample9').DataTable({
     processing: true,
@@ -2963,30 +3047,150 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
         { data: 'sales_notes', name: 'fellow_up.sales_notes' },
-        {
-                    data: 'id',
-                    name: 'id',
-                    searchable: false,
-                    render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                </ul>
-                            </div>`;
-                  }
-                },
+        // {
+        //             data: 'id',
+        //             name: 'id',
+        //             searchable: false,
+        //             render: function (data, type, row) {
+        //               const bookingUrl = `{{ url('booking/create') }}/${data}`;
+        //               const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+        //                 return `
+        //                     <div class="dropdown">
+        //                         <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+        //                             <i class="fa fa-bars" aria-hidden="true"></i>
+        //                         </button>
+        //                         <ul class="dropdown-menu dropdown-menu-end">
+        //                         <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+        //                             <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+        //                             <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+        //                         </ul>
+        //                     </div>`;
+        //           }
+        //         }, 
+                { data: 'sales_person_name', name: 'sales_person_name' },   
     ]
     });
+    dataTable11 = $('#dtBasicExample11').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'activelead']) }}",
+    columns: [
+        {
+            data: 'priority',
+            name: 'calls.priority',
+            title: 'Priority'
+        },
+        {
+            data: 'leaddate',
+            name: 'leaddate',
+            title: 'Lead Date',
+            render: function (data, type, row) {
+                if (type === 'display' || type === 'filter') {
+                    if (!data || !moment(data).isValid()) {
+                        return '';
+                    }
+                    return moment(data).format('DD-MMM-YYYY');
+                }
+                return data;
+            }
+        },
+        {
+            data: 'type',
+            name: 'calls.type',
+            title: 'Selling Type'
+        },
+        {
+            data: 'name',
+            name: 'calls.name',
+            title: 'Customer Name',
+            render: function (data, type, row) {
+                let displayName = data ? data : '(Sample)';
+                let url = "{{ route('calls.leaddetailpage', ':id') }}".replace(':id', row.id);
+                return `<a href="${url}">${displayName}</a>`;
+            }
+        },
+        {
+            data: 'phone',
+            name: 'calls.phone',
+            title: 'Customer Phone'
+        },
+        {
+            data: 'email',
+            name: 'calls.email',
+            title: 'Customer Email'
+        },
+        {
+            data: 'model_line',
+            name: 'master_model_lines.model_line',
+            title: 'Brands & Models'
+        },
+        {
+            data: 'language',
+            name: 'calls.language',
+            title: 'Preferred Language'
+        },
+        {
+            data: 'location',
+            name: 'calls.location',
+            title: 'Location'
+        },
+        {
+            data: 'remarks',
+            name: 'calls.remarks',
+            title: 'Remarks & Messages'
+        },
+        {
+            data: 'status',
+            name: 'calls.status',
+            title: 'Status',
+            render: function (data, type, row) {
+                let colorClass;
+                switch (data) {
+                    case 'contacted':
+                        colorClass = 'btn-primary';
+                        break;
+                    case 'working':
+                        colorClass = 'btn-info';
+                        break;
+                    case 'qualify':
+                        colorClass = 'btn-warning';
+                        break;
+                    case 'converted':
+                        colorClass = 'btn-success';
+                        break;
+                    case 'Follow Up':
+                        colorClass = 'btn-secondary';
+                        break;
+                    case 'Prospecting':
+                        colorClass = 'btn-danger';
+                        break;
+                    default:
+                        colorClass = 'btn-light';
+                }
+                // Render as a styled button
+                return `<span class="btn ${colorClass} btn-sm">${data}</span>`;
+            }
+          },
+        {
+            data: 'created_by_name',
+            name: 'created_by_name',
+            title: 'Created By'
+        },
+        {
+            data: 'sales_person_name',
+            name: 'sales_person_name',
+            title: 'Assigned To'
+        }
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
+        }
+    }
+});
     dataTable9 = $('#dtBasicExample10').DataTable({
     processing: true,
     serverSide: true,
@@ -3006,7 +3210,16 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     }
         },
         { data: 'type', name: 'calls.type' },
-        { data: 'name', name: 'calls.name' },
+        {
+            data: 'name',
+            name: 'calls.name',
+            title: 'Customer Name',
+            render: function (data, type, row) {
+                let displayName = data ? data : '(Sample)';
+                let url = "{{ route('calls.leaddetailpage', ':id') }}".replace(':id', row.id);
+                return `<a href="${url}">${displayName}</a>`;
+            }
+        },
         { data: 'phone', name: 'calls.phone' },
         { data: 'email', name: 'calls.email' },
         { data: 'model_line', name: 'master_model_lines.model_line' },
@@ -3017,42 +3230,13 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 }
             },
         { data: 'createdby', name: 'users.name' },
-        {
-    data: 'id',
-    name: 'id',
-    searchable: false,
-    render: function (data, type, row) {
-        const bookingUrl = `{{ url('booking/create') }}/${data}`;
-        const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-
-        // Check if calls.name is null or empty
-        if (!row.name) {
-            // If calls.name is null, show a button that opens a modal for client selection
-            return `
-                <button type="button" class="btn btn-sm btn-warning" onclick="openClientSelectionModal(${data})">
-                    Select Client
-                </button>
-            `;
-        } else {
-            // If calls.name is not null, show the dropdown with the options
-            return `
-                <div class="dropdown">
-                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
-                        <i class="fa fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">FollowUp</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
-                        <li><a class="dropdown-item" href="${qoutationUrl}">Quotation</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                    </ul>
-                </div>
-            `;
+    ],
+    createdRow: function (row, data, dataIndex) {
+        console.log(data.created_by);
+        if (data.created_by === {{ Auth::id() }}) {
+            $(row).css('background-color', '#FFE5B4');
         }
     }
-}
-    ]
     });
     });
     function toggleRemarks(uniqueId) {

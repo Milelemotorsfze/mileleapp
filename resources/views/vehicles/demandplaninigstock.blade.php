@@ -302,7 +302,7 @@ table.dataTable thead th select {
 @endif
   <div class="card-header">
     <h4 class="card-title">
-     Demand And Planining Vehicles Only
+    Demand and Planning - Vehicles Only
     </h4>
     <!-- Chat Modal -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
@@ -897,7 +897,49 @@ if (hasPricePermission) {
     searchable: false
 },
         );
-            
+        var columnMap = {
+        0: 'id',
+        1: 'vehicles.id',
+        2: 'purchasing_order.po_number',
+        3: 'purchasing_order.po_date',
+        4: 'vehicles.estimation_date',
+        5: 'grn.grn_number',
+        6: 'grn.date',
+        9: 'so.so_date',
+        10: 'so.so_number',
+        11: 'users.name',
+        12: 'vehicles.sales_remarks',
+        13: 'gdn.gdn_number',
+        14: 'gdn.date',
+        15: 'pdi_inspectionid',
+        16: 'brands.brand_name',
+        17: 'master_model_lines.model_line',
+        18: 'varaints.model_detail',
+        19: 'varaints.name',
+        20: 'varaints.detail',
+        21: 'vehicles.vin',
+        22: 'varaints.engine',
+        23: 'varaints.my',
+        24: 'varaints.steering',
+        25: 'varaints.fuel_type',
+        26: 'varaints.gear',
+        27: 'vehicles.ex_colour',
+        28: 'vehicles.int_colour',
+        29: 'varaints.upholestry',
+        30: 'vehicles.ppmmyyy',
+        31: 'warehouse.name',
+        32: 'vehicles.territory',
+        33: 'countries.name',
+        34: 'costprice',
+        35: 'vehicles.minimum_commission',
+        36: 'vehicles.gp',
+        37: 'vehicles.price',
+        38: 'documents.import_type',
+        39: 'documents.owership',
+        40: 'documents.document_with',
+        41: 'vehicles.custom_inspection_number',
+        42: 'vehicles.custom_inspection_status',
+    };   
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
             serverSide: true,
@@ -905,10 +947,24 @@ if (hasPricePermission) {
             ajax: {
         url: "{{ route('vehicles.dpvehicles', ['status' => 'dpvehicles']) }}",
         type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
+        data: function (d) {
+                d.filters = {};  // Initialize an empty filters object
+
+                $('#dtBasicExample8 thead select').each(function () {
+                    var columnIndex = $(this).parent().index(); // Get the column index
+                    var columnName = columnMap[columnIndex]; // Map index to column name
+                    var value = $(this).val();
+                        console.log(columnIndex);
+                    // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
+                    if (value && columnName) {
+                        if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
+                            d.filters[columnName] = value; // Special filters for NULL and non-empty
+                        } else if (value.length > 0) {
+                            d.filters[columnName] = value; // Regular filter values
+                        }
+                    }
+                });
+            },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
@@ -952,23 +1008,25 @@ if (hasPricePermission) {
             return; // Skip this column
         }
         // Create a select element
-        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+        var select = $('<select multiple="multiple" style="width: 100%">' +
+            '<option value="">Filter by ' + columnHeader + '</option>' +
+            '<option value="__NULL__">Empty</option>' + // Add the Empty option
+            '<option value="__Not EMPTY__">Not Empty</option>' + // Add the Not Empty option
+            '</select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                // Get the selected values
                 var selectedValues = $(this).val();
-                
+
+                // Use ajax.reload to apply filter to the entire table (server-side filtering)
                 if (selectedValues && selectedValues.length > 0) {
-                    // Join selected values as a string that looks for exact matches
-                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
-                    column
-                        .search(exactSearch, true, false)  // Exact match using regex search
-                        .draw();
+                    // Store selected values for this column
+                    api.settings()[0].ajax.data.filters = api.settings()[0].ajax.data.filters || {};
+                    api.settings()[0].ajax.data.filters[index] = selectedValues;
                 } else {
-                    column
-                        .search('', true, false)  // Clear search if no values selected
-                        .draw();
+                    delete api.settings()[0].ajax.data.filters[index];
                 }
+
+                api.ajax.reload(); // Reload the table with new filter data
             });
 
         // Populate the select element with unique values from the column

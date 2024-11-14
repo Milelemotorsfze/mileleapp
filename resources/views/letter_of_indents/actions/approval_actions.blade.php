@@ -12,12 +12,23 @@
                         @endphp
                         @if ($hasPermission)
                         <li>
-                            <button type="button" data-id="{{ $letterOfIndent->id }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
-                            data-url="{{ route('letter-of-indent.request-supplier-approval') }}"
-                                    class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>              
+                            <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL }}"
+                            data-url="{{ route('letter-of-indent.request-approval') }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                                class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Request Supplier Approval </button>              
                         </li>
                         @endif
                     @endcan
+                @elseif($type == 'WAITING_FOR_TTC_APPROVAL')
+                    <li>
+                        <button type="button" data-id="{{ $letterOfIndent->id }}" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_TTC_APPROVED }}"
+                        data-message="Approve" data-url="{{ route('letter-of-indent.request-approval') }}" style="width:100%; margin-top:2px; margin-bottom:2px;"
+                            class="btn btn-primary btn-sm ttc-approve-reject-btn" title="TTC Approval">Approve </button>  
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-danger btn-sm mt-1 ttc-approve-reject-btn" data-url="{{ route('letter-of-indent.request-approval') }}"
+                        data-id="{{ $letterOfIndent->id }}" data-message="Reject" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_TTC_REJECTED }}"
+                         style="width:100%; margin-top:2px; margin-bottom:2px;" > Reject </button> 
+                    </li>    
                 @elseif($type == 'WAITING_FOR_APPROVAL')
                     @can('loi-status-update')
                         @php
@@ -25,9 +36,9 @@
                         @endphp
                         @if ($hasPermission)
                         <li>
-                            <button type="button" data-bs-toggle="modal" style="width:100%; margin-top:2px; margin-bottom:2px;"
-                             data-bs-target="#update-loi-status-{{ $letterOfIndent->id }}"
-                            class="btn btn-info btn-sm " title="Reverse Update of Status to New">Status Update</button>  
+                            <button type="button" onclick="checkExistingInPFI({{$letterOfIndent->id}})" 
+                            style="width:100%; margin-top:2px; margin-bottom:2px;" data-id="#update-loi-status-{{ $letterOfIndent->id }}"
+                            class="btn btn-info btn-sm" title="Reverse Update of Status to New">Status Update</button>  
                         </li>            
                         @endif
                     @endcan
@@ -264,11 +275,37 @@
         </div>
     </div>
      <script>
-         $('.btn-request-supplier-approval').on('click',function(){
+        function checkExistingInPFI(id) {
+             let url =  "{{ route('loi.get-is-editable') }}";
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: id,
+                    _token: '{{ csrf_token() }}'
+                },
+                success:function (data) {
+                    if(data.is_editable == 1) {
+                        $('#update-loi-status-'+id).modal('show');
+                    }else{
+                        alertify.confirm('This LOI is already used to create PFI, '+ data.is_editable +' Please remove these items from PFI to update this LOI.',function (e) {
+                        });
+                    }
+                }
+            });
+        }
+        $('.ttc-approve-reject-btn').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
-           
-            var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
+            let status =  $(this).attr('data-status');
+            let msg =  $(this).attr('data-message');
+            let successMsg = 'Approved';
+            if(msg !== 'Approve') {
+                successMsg = 'Rejected';
+               
+            }
+            var confirm = alertify.confirm('Are you sure? Do You want to '+ msg +' this LOI?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",
@@ -276,18 +313,50 @@
                         dataType: "json",
                         data: {
                             id: id,
+                            status:status,
+                            type:successMsg,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            var table1 = $('.waiting-for-ttc-approval-table').DataTable();
+                                table1.ajax.reload();
+                            var table = $('.supplier-response-table').DataTable();
+                                table.ajax.reload();
+                            alertify.success('LOI '+ successMsg +' Successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Confirm ?"})
+        });
+      
+         $('.btn-request-supplier-approval').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            let status =  $(this).attr('data-status');
+           
+            var confirm = alertify.confirm('Are you sure? Do you want to send this LOI for supplier Approval?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status,status,
                             _token: '{{ csrf_token() }}'
                         },
                         success:function (data) {
                             var table = $('.new-LOI-table').DataTable();
-                            table.ajax.reload();
+                                table.ajax.reload();
                             var table1 = $('.waiting-for-approval-table').DataTable();
-                            table1.ajax.reload();
-                            alertify.success('Approval Request Send Successfully.');
+                                table1.ajax.reload();
+                            var table3 = $('.waiting-for-ttc-approval-table').DataTable();
+                                table3.ajax.reload();
+                            alertify.success('Supplier Approval Request Send Successfully.');
                         }
                     });
                 }
-            }).set({title:"Delete Item"})
+            }).set({title:"Confirm ?"})
         });
       
         function approve(id){
@@ -316,14 +385,14 @@
                                 success: function (response)
                                 {
                                     var table1 = $('.waiting-for-approval-table').DataTable();
-                                    table1.ajax.reload();
+                                        table1.ajax.reload();
+                                    var table2 = $('.waiting-for-ttc-approval-table').DataTable();
+                                        table2.ajax.reload();
                                     var table3 = $('.supplier-response-table').DataTable();
                                         table3.ajax.reload();
-                                    alertify.success('Supplier Approved successfully.');
-
+                                    alertify.success('Supplier Approved successfully.'+response);
                                     },
                                     error: function (error) {
-                                    console.error(error);
                                     }
                                 });
                         }
@@ -371,7 +440,6 @@
 
                                     },
                                     error: function (error) {
-                                    console.error(error);
                                     }
                                 });
                         }

@@ -129,6 +129,8 @@ use App\Http\Controllers\SalaryCertificateController;
 use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
+use App\Http\Controllers\LeadChatController;
+
 
 /*
 /*
@@ -506,10 +508,6 @@ Route::get('/d', function () {
 
     // Demand & Planning Module
 
-    // suppliers
-
-    //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
-
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
@@ -525,8 +523,8 @@ Route::get('/d', function () {
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
-    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
-        ->name('letter-of-indent.request-supplier-approval');
+    Route::post('letter-of-indent/request-approval', [LetterOfIndentController::class, 'RequestApproval'])
+        ->name('letter-of-indent.request-approval');
     Route::post('letter-of-indent/update-comment', [LetterOfIndentController::class, 'updateComment'])
     ->name('update-loi-comment');
 
@@ -534,20 +532,21 @@ Route::get('/d', function () {
     Route::resource('loi-mapping-criterias', LOIMappingCriteriaController::class);
     Route::post('utilization-quantity/update/{id}', [LetterOfIndentController::class, 'utilizationQuantityUpdate'])->name('utilization-quantity-update');
     Route::resource('loi-expiry-conditions', LOIExpiryConditionController::class);
-    Route::resource('letter-of-indent-items', LOIItemController::class);
+    Route::resource('letter-of-indent-items', LOIItemController::class)->only('index');
     
     Route::post('letter-of-indents/status-update/{id}', [LetterOfIndentController::class, 'statusUpdate'])
                 ->name('letter-of-indents.status-update'); 
     Route::post('letter-of-indents/loi-expiry-status-update/{id}', [LetterOfIndentController::class, 'ExpiryStatusUpdate'])
     ->name('letter-of-indents.loi-expiry-status-update'); 
     Route::get('loi/get-customer-documents', [LetterOfIndentController::class,'getCustomerDocuments'])->name('loi.customer-documents');
+    Route::get('loi/get-is-editable', [LetterOfIndentController::class,'getIsLOIEditable'])->name('loi.get-is-editable');
 
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
     Route::resource('pfi', PFIController::class);
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
-    Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
+    // Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
     Route::get('pfi-item/get-loi-item', [PFIController::class,'getLOIItemCode'])->name('loi-item-code');
     Route::get('pfi-item/get-loi-item-details', [PFIController::class,'getLOIItemDetails'])->name('loi-item-details');
@@ -556,7 +555,7 @@ Route::get('/d', function () {
     Route::get('pfi-item/get-brand', [PFIController::class,'getBrand'])->name('pfi-item.get-brand');
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
-    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
+    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class)->only('create');
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
@@ -1004,9 +1003,9 @@ Route::get('/d', function () {
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
-    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
-    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
-    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+    Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/repliespurchased', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messagespurchased/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
     Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
@@ -1093,4 +1092,25 @@ Route::get('/d', function () {
     Route::get('/salesperson-commissions/{sales_person_id}', [SalesOrderController::class, 'showSalespersonCommissions'])->name('salesperson.commissions');
     Route::get('/salesperson/vehicles/{vehicle_invoice_id}', [SalesOrderController::class, 'showVehicles'])->name('salesperson.vehicles');
     Route::post('/update-call-client', [DailyleadsController::class, 'updateCallClient'])->name('update-call-client');
+    Route::get('/callsdeatilspage/{id}', [DailyleadsController::class, 'leaddetailpage'])->name('calls.leaddetailpage');
+    Route::post('/leads/update', [DailyleadsController::class, 'leaddeupdate'])->name('calls.leaddeupdate');
+    Route::post('/add-model-line', [DailyleadsController::class, 'addModelLine']);
+    Route::delete('/remove-model-line/{requirementId}', [DailyleadsController::class, 'removeModelLine']);
+    Route::post('/messages', [DailyleadsController::class, 'storeMessages']);
+    Route::post('/replies', [DailyleadsController::class, 'storeReply']);
+    Route::get('/messages/{leadid}', [DailyleadsController::class, 'indexmessages']);
+    Route::get('/get-model-lines/{brandId}', [DailyleadsController::class, 'getModelLines']);
+    Route::get('/get-trim-variants/{modelLineId}', [DailyleadsController::class, 'getTrimAndVariants']);
+    Route::post('/upload-file', [DailyleadsController::class, 'fileupload'])->name('leadsfile.upload');
+    Route::delete('/remove-file', [DailyleadsController::class, 'removeFile'])->name('leadsfile.remove');
+    Route::post('/store-log', [DailyleadsController::class, 'storeLog'])->name('store.log');
+    Route::get('/get-logs/{lead_id}', [DailyleadsController::class, 'getLogs'])->name('get.logs');
+    Route::post('/store-task', [DailyleadsController::class, 'storeTask'])->name('taskstore.task');
+    Route::post('/update-task', [DailyleadsController::class, 'updateTask'])->name('taskupdate.task');
+    Route::get('/get-tasks/{lead_id}', [DailyleadsController::class, 'getTasks'])->name('get.tasks');
+    Route::post('/tasks/update', [DailyleadsController::class, 'tasksupdateStatus'])->name('leads-tasks.update');
+    Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
+    Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
+    Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
+    Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
 });

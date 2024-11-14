@@ -609,7 +609,7 @@ table.dataTable thead th select {
           </div> 
         </div>  
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="variantviewLabel">View Variants</h5>
@@ -628,7 +628,7 @@ table.dataTable thead th select {
   </div>
   <script>
         $(document).ready(function () {
-var now = new Date();
+        var now = new Date();
     var columns3 = [
         {
         data: null,
@@ -969,16 +969,77 @@ var now = new Date();
     searchable: false
 },
         );
+        var columnMap = {
+        0: 'id',
+        1: 'vehicles.id',
+        2: 'purchasing_order.po_number',
+        3: 'purchasing_order.po_date',
+        4: 'vehicles.estimation_date',
+        5: 'grn.grn_number',
+        6: 'grn.date',
+        7: 'vehicles.inspection_date',
+        8: 'vehicles.grn_remark',
+        9: 'grn_inspectionid',
+        10: 'vehicles.grn_remark',
+        11: 'reservation_end_date',
+        12: 'bp.name',
+        13: 'so.so_date',
+        14: 'so.so_number',
+        15: 'sp.name',
+        16: 'vehicles.sales_remarks',
+        17: 'pdi_inspectionid',
+        18: 'brands.brand_name',
+        19: 'master_model_lines.model_line',
+        20: 'varaints.model_detail',
+        21: 'varaints.name',
+        22: 'varaints.detail',
+        23: 'vehicles.vin',
+        24: 'varaints.engine',
+        25: 'varaints.my',
+        26: 'varaints.steering',
+        27: 'varaints.fuel_type',
+        28: 'varaints.gear',
+        29: 'vehicles.ex_colour',
+        30: 'vehicles.int_colour',
+        31: 'varaints.upholestry',
+        32: 'vehicles.ppmmyyy',
+        33: 'warehouse.name',
+        34: 'vehicles.territory',
+        35: 'countries.name',
+        36: 'costprice',
+        37: 'vehicles.minimum_commission',
+        38: 'vehicles.gp',
+        39: 'vehicles.price',
+        40: 'documents.import_type',
+        41: 'documents.owership',
+        42: 'documents.document_with',
+        43: 'vehicles.custom_inspection_number',
+        44: 'vehicles.custom_inspection_status',
+    };
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
         url: "{{ route('vehicles.availablevehicles', ['status' => 'Available Stock']) }}",
         type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
+        data: function (d) {
+                d.filters = {};  // Initialize an empty filters object
+
+                $('#dtBasicExample3 thead select').each(function () {
+                    var columnIndex = $(this).parent().index(); // Get the column index
+                    var columnName = columnMap[columnIndex]; // Map index to column name
+                    var value = $(this).val();
+                        console.log(columnIndex);
+                    // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
+                    if (value && columnName) {
+                        if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
+                            d.filters[columnName] = value; // Special filters for NULL and non-empty
+                        } else if (value.length > 0) {
+                            d.filters[columnName] = value; // Regular filter values
+                        }
+                    }
+                });
+            },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
@@ -1011,83 +1072,76 @@ var now = new Date();
     colReorder: true,
     initComplete: function () {
     var api = this.api();
+
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {
         var column = this;
         var columnHeader = $(column.header()).text();  // Get the column header text
         var headerWidth = $(column.header()).outerWidth(); // Get the actual width of the header
-        // List of column headers you want to exclude from filtering
         var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'GRN Report', 'Aging', 'Vehicle Cost'];
-        // Skip columns where you don't want filters (either by header name or index)
+        
         if (excludeFilters.includes(columnHeader)) {
-            return; // Skip this column
+            return; // Skip columns that don't require filters
         }
-        // Create a select element
-        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+
+        // Create a select element with "Empty" and "Not Empty" options
+        var select = $('<select multiple="multiple" style="width: 100%">' +
+            '<option value="">Filter by ' + columnHeader + '</option>' +
+            '<option value="__NULL__">Empty</option>' + // Add the Empty option
+            '<option value="__Not EMPTY__">Not Empty</option>' + // Add the Not Empty option
+            '</select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                // Get the selected values
                 var selectedValues = $(this).val();
-                
+
+                // Use ajax.reload to apply filter to the entire table (server-side filtering)
                 if (selectedValues && selectedValues.length > 0) {
-                    // Join selected values as a string that looks for exact matches
-                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
-                    column
-                        .search(exactSearch, true, false)  // Exact match using regex search
-                        .draw();
+                    // Store selected values for this column
+                    api.settings()[0].ajax.data.filters = api.settings()[0].ajax.data.filters || {};
+                    api.settings()[0].ajax.data.filters[index] = selectedValues;
                 } else {
-                    column
-                        .search('', true, false)  // Clear search if no values selected
-                        .draw();
+                    delete api.settings()[0].ajax.data.filters[index];
                 }
+
+                api.ajax.reload(); // Reload the table with new filter data
             });
 
         // Populate the select element with unique values from the column
-        column.data().unique().sort().each(function (d, j) {
-            if (d) {
-                // If this is the 'po_date' column, format the date
-                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+        column.data().unique().sort().each(function (d) {
+            if (d !== null && d !== '') {  // Skip nulls and empty strings
+                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date' || columnHeader === 'GRN Date' || columnHeader === 'Reservation End' || columnHeader === 'SO Date') {
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                } 
-                else if (columnHeader === 'Production Year') { 
+                } else if (columnHeader === 'Production Year') { 
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         year: 'numeric',
                         month: 'long'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                }
-                else if (columnHeader === 'Price') {
-                    var formattedPrice = parseFloat(d).toLocaleString('en-US', {
+                } else if (columnHeader === 'Price' || columnHeader === 'Minimum Commission') {
+                    var formattedValue = parseFloat(d).toLocaleString('en-US', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                     });
-                    select.append('<option value="' + d + '">' + formattedPrice + '</option>');
-                }
-                else if (columnHeader === 'Minimum Commission') {
-                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                    });
-                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
-                }
-                else {
+                    select.append('<option value="' + d + '">' + formattedValue + '</option>');
+                } else {
                     select.append('<option value="' + d + '">' + d + '</option>');
                 }
             }
         });
+        
         select.select2({
             placeholder: columnHeader, // Placeholder for the column
             allowClear: true,  // Option to clear selections
-            dropdownAutoWidth: true,  // Dynamically adjust dropdown width based on content
+            dropdownAutoWidth: true,  // Adjust dropdown width based on content
             width: headerWidth + 'px'  // Set the width of the select2 dropdown equal to the header width
         });
 
-        // Also, set the width of the <select> element to match the header
+        // Set width of the <select> element to match header
         select.css('width', headerWidth + 'px');
     });
 }
