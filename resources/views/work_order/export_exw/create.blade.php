@@ -1089,7 +1089,9 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</button>
+						@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) 
+						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						@endif
 							@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
 							@else
 								</br>
