@@ -197,7 +197,7 @@
                         </div>
                         @foreach($pfiItems as $key => $pfiItem)
                             <div class="row">
-                            <input type="hidden" id="pfi-item-id-{{$key}}" value="{{$pfiItem->id ?? ''}}"> 
+                            <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
                                 <!-- <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiItem->letterOfIndentItem->id ?? ''}}"> -->
                                 <!-- <input type="hidden" name="approved_loi_ids[]" value="{{$pfiItem->id}}"> -->
                                 <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
@@ -236,8 +236,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="number" id="quantity-{{$key}}" min="0" @if($isToyotaPO) readonly @endif max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
-                                      data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" 
-                                     >
+                                      data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
                                 @if($isToyotaPO)
@@ -286,6 +285,7 @@
 <script>
     let formValid = true;
     let isToyotaPO = "{{ $isToyotaPO }}"
+    let isEnableVehicleAdd = true;
     // function checkQuantity(key) {
     //    if(isToyotaPO == 1) {
     //         var selectedQuantity = $('#quantity-'+key).val();
@@ -377,7 +377,7 @@
                 // toyota - only one po
                 // check  pfiQuantity is less than inventory quantity  -> 
                 if(pfiQuantity > inventoryQuantity) {
-                    formValid == false;
+                    isEnableVehicleAdd == false;
                     alertify.confirm('Required vehicle quanity is not available in the inventory',function (e) {
                     }).set({title:"Invalid Data"});
                     return false;
@@ -389,12 +389,13 @@
                     var model = $('#model-'+i).val();
                     alertify.confirm('You are not allowed to increase the Item quantity than in PFI, ('+ model +')',function (e) {
                     }).set({title:"Invalid Data"});
-                    formValid == false;
+                    isEnableVehicleAdd == false;
                     return false;
                 }
             }
         }
-        if(formValid == true) {
+       
+        if(isEnableVehicleAdd == true) {
             for (var i = 0; i < variantQuantity; i++) {
                 // check remaining quantity is available or not
                 var qty = $('#quantity-'+i).val();
@@ -450,7 +451,7 @@
                                 intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                             }
                         }
-                        newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol);
+                        newRow.append(pfiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol);
                         if(isToyotaPO == 0) {
                             newRow.append(removeBtn);
                         }
