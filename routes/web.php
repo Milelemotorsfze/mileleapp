@@ -130,7 +130,8 @@ use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
 use App\Http\Controllers\LeadChatController;
-
+use App\Exports\UAEVehicleStockExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 /*
 /*
@@ -1113,4 +1114,7 @@ Route::get('/d', function () {
     Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
     Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
     Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
+    Route::get('/export-uae-vehicle-stock', function () {
+        return Excel::download(new UAEVehicleStockExport, 'uae_vehicle_stock.xlsx');
+    });
 });
