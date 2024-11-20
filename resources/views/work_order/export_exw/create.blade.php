@@ -632,14 +632,9 @@
 						<div class="row">
 							<div class="col-xxl-12 col-lg-12 col-md-12">
 								<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
-								<select id="vin_multiple" name="vin_multiple[]" class="form-control widthinput" multiple="true">
-									@foreach($vins as $index => $vin)
-										<option value="{{ $vin->vin ?? '' }}" 
-											@if($index < 1) selected @endif>
-											{{ $vin->vin ?? '' }} / 
-											{{ $vin->variant->master_model_lines->brand->brand_name ?? '' }} / 
-											{{ $vin->variant->master_model_lines->model_line ?? '' }}
-										</option>
+								<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
+									@foreach($vins as $vin)
+									<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -2291,88 +2286,41 @@
 					}
 					$('.dynamicselect2').prop('disabled', false);
 					const formData = new FormData(form);
+					formData.append('comments', JSON.stringify(comments));
 
-// Convert FormData to a plain object
-const formDataObject = {};
-formData.forEach((value, key) => {
-    if (!formDataObject[key]) {
-        formDataObject[key] = value;
-    } else {
-        // Handle multiple values for the same key
-        if (!Array.isArray(formDataObject[key])) {
-            formDataObject[key] = [formDataObject[key]];
-        }
-        formDataObject[key].push(value);
-    }
-});
-
-// Add additional data
-formDataObject.comments = comments;
-
-// Convert the object to a JSON string
-const jsonData = JSON.stringify(formDataObject);
-
-// Chunk the data
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB
-const chunks = [];
-for (let i = 0; i < jsonData.length; i += CHUNK_SIZE) {
-    chunks.push(jsonData.slice(i, i + CHUNK_SIZE));
-}
-
-// Function to send chunks sequentially
-async function sendChunks(chunks) {
-    for (let i = 0; i < chunks.length; i++) {
-        const chunkData = {
-            chunk: chunks[i],
-            index: i,
-            totalChunks: chunks.length,
-        };
-
-        try {
-            const response = await fetch(form.action, {
-                method: 'POST',
-                body: JSON.stringify(chunkData),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText);
-            }
-
-            const result = await response.json();
-            console.log(`Chunk ${i + 1}/${chunks.length} uploaded successfully`, result);
-
-            if (!result.success) {
-                throw new Error(result.message);
-            }
-        } catch (error) {
-            console.error(`Error uploading chunk ${i + 1}:`, error.message);
-            alert(`Error uploading chunk ${i + 1}: ${error.message}`);
-            return false;
-        }
-    }
-
-    return true;
-}
-
-// Upload all chunks
-sendChunks(chunks)
-    .then(success => {
-        if (success) {
-            alert('Form submitted successfully!');
-            window.location.href = `{{ url('work-order-info') }}/${type}`;
-        }
-    })
-    .catch(error => {
-        console.error('Form submission error:', error);
-    })
-    .finally(() => {
-        $('#overlay').hide();
-    });
+					fetch(form.action, {
+						method: form.method,
+						body: formData,
+						headers: {
+							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+						}
+					}).then(response => {
+						if (!response.ok) {
+							return response.text().then(text => { throw new Error(text) });
+						}
+						return response.json();
+					}).then(data => {
+						if (data.success) {
+							window.location.href = `{{ url('work-order-info') }}/${type}`;
+						} else {
+							throw new Error(data.message);
+						}
+					}).catch(error => {
+						alert(error.message);
+						// if (error.message === "Can't edit the work order because the sales support confirmed the data.") {
+						// 	document.querySelectorAll('#WOForm #submit').forEach(function(element) {
+						// 		element.disabled = true;
+						// 	});
+						// 	const submitFromTopButton = document.getElementById('submit-from-top');
+						// 	if (submitFromTopButton) {
+						// 		submitFromTopButton.disabled = true;
+						// 		submitFromTopButton.classList.add('disabled'); 
+						// 	}
+						// }
+						console.error('Form submission error:', error);
+					}).finally(() => {
+						$('#overlay').hide();
+					});
 				}
 			});
 		function sanitizeQuantity(input) {

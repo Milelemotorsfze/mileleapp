@@ -414,43 +414,6 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
 
         try {
-            // Check if this is a chunked request
-            if ($request->has('chunk') && $request->has('index')) {
-                $chunkData = $request->input('chunk');
-                $chunkIndex = $request->input('index');
-                $totalChunks = $request->input('totalChunks');
-
-                // Save each chunk in a temporary location
-                $tempFilePath = storage_path('app/temp_work_order.json');
-                $chunks = [];
-                
-                // Check if the file exists
-                if (file_exists($tempFilePath)) {
-                    $chunks = json_decode(file_get_contents($tempFilePath), true) ?? [];
-                }
-
-                // Add the current chunk
-                $chunks[$chunkIndex] = $chunkData;
-
-                // Save back the updated chunks
-                file_put_contents($tempFilePath, json_encode($chunks));
-
-                // If all chunks are received, reconstruct the full data
-                if (count($chunks) == $totalChunks) {
-                    ksort($chunks); // Ensure chunks are in the correct order
-                    $fullData = implode('', $chunks);
-                    $reconstructedInput = json_decode($fullData, true);
-
-                    // Cleanup the temporary file
-                    unlink($tempFilePath);
-
-                    // Merge the reconstructed data into the request
-                    $request->merge($reconstructedInput);
-                } else {
-                    // Return success for partial chunks
-                    return response()->json(['success' => true, 'message' => 'Chunk received successfully.']);
-                }
-            }
             $authId = Auth::id();
             // Retrieve validated input data
             $validated = $request->validated();
