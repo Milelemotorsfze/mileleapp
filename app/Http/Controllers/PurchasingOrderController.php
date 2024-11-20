@@ -61,6 +61,7 @@ use App\Mail\PurchaseOrderUpdated;
 use App\Mail\ChangeVariantNotification;
 use App\Models\Dnaccess;
 use App\Models\VehicleDn;
+use Illuminate\Support\Facades\Crypt;
 
 
 class PurchasingOrderController extends Controller
@@ -99,15 +100,18 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        // $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list');
         if ($hasPermission){
+            // return 1;
         if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
-            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+            $demandPlanningPoIds = PfiItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id')->toArray();
 //            return $demandPlanningPoIds;
             // add migrated user Ids
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
+            ->whereIn('id',$demandPlanningPoIds)
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                       ->from('vehicles')
@@ -139,12 +143,13 @@ class PurchasingOrderController extends Controller
     else
     {
         if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
-            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+            $demandPlanningPoIds = PfiItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
 //            return $demandPlanningPoIds;
             // add migrated user Ids
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
+            ->whereIn('id',$demandPlanningPoIds)
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                       ->from('vehicles')
@@ -1108,33 +1113,36 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->role = Auth::user()->selectedRole;
                 $purchasinglog->save();
             }
-                $masterModels = $request->master_model_id;
-
+                
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    // return $request->pfi_items;
-                    // $pfiItemsOfPurcahseOrders = $request->pfi_items;
-                    foreach($request->pfi_items as $key => $pfiItemsOfPurcahseOrder) {
+                    $masterModels = $request->master_model_id;
+                    $pfiId = Crypt::decrypt($request->pfi_id);
+
+                    foreach($request->pfi_items as $key => $pfiItem) {
                         if($request->item_quantity_selected[$key] > 0) {
                             $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
-                            $PfiItemPurchaseOrder->pfi_item_id = $pfiItemsOfPurcahseOrder;
+                            $PfiItemPurchaseOrder->pfi_id = $pfiId;
+                            $PfiItemPurchaseOrder->pfi_item_id = $pfiItem;
                             $PfiItemPurchaseOrder->purchase_order_id = $purchasingOrderId;
                             $PfiItemPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
                             $PfiItemPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
                             $PfiItemPurchaseOrder->save();
                         }
                     }
+                   
                     // if toyota pfi -> map with inventory
-                    // $dealer = $pfi->letterOfIndent->dealers ?? '';
+                    $pfi = PFI::find($pfiId);
+                    $dealer = $pfi->letterOfIndent->dealers ?? '';
                     // $alreadyAddedIds = [];
-                    // foreach($masterModels as $key => $masterModel)
-                    // {
-                    //     // status change to WAITING
+                    foreach($masterModels as $key => $masterModel)
+                    {
+                     // status change to WAITING
                         
-                    //     $model = MasterModel::find($masterModel);
-                    //     $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
-                    //                                 ->where('vin', $vins[$key])
-                    //                                 ->whereNull('supplier_inventory_id')
-                    //                                 ->first();
+                        $model = MasterModel::find($masterModel);
+                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
+                                                    ->where('vin', $vins[$key])
+                                                    ->whereNull('supplier_inventory_id')
+                                                    ->first();
 
                     //     $possibleModelIds = MasterModel::where('model', $model->model)
                     //                         ->where('sfx', $model->sfx)->pluck('id');
@@ -1174,7 +1182,7 @@ public function getBrandsAndModelLines(Request $request)
 
                     //         $alreadyAddedIds[] = $inventoryItem->id;
                     //     }
-                    // }
+                    }
                 }
         }
         DB::commit();

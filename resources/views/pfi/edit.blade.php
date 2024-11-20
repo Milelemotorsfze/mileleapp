@@ -803,7 +803,6 @@
        
       
         $(document.body).on('select2:unselect', ".loi-items", function (e) {
-            alert("ok");
             let index = $(this).attr('index');
             let childIndex = $(this).attr('item');
             var id = e.params.data.id;

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\ColorCode;
-use App\Models\LOIItemPurchaseOrder;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
 use App\Models\SupplierInventory;
@@ -14,7 +13,9 @@ use App\Models\Varaint;
 use App\Models\PaymentTerms;
 use Illuminate\Http\Request;
 use App\Models\PfiItem;
+use App\Models\Country;
 use Illuminate\Support\Facades\DB;
+use App\Models\MasterShippingPorts;
 
 class DemandPlanningPurchaseOrderController extends Controller
 {
@@ -51,7 +52,7 @@ class DemandPlanningPurchaseOrderController extends Controller
 
         foreach ($pfiItems as $pfiItem) {
 
-            $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiItem->id)
+            $alreadyAddedQuantity = PfiItemPurchaseOrder::where('pfi_item_id', $pfiItem->id)
                                                         ->sum('quantity');
             $pfiItem->quantity = $pfiItem->pfi_quantity - $alreadyAddedQuantity;
             $masterModel = MasterModel::find($pfiItem->masterModel->id);
@@ -72,7 +73,8 @@ class DemandPlanningPurchaseOrderController extends Controller
         $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
         $paymentTerms = PaymentTerms::all();
-        return view('purchase-order.create', compact('pfiItems','isToyotaPO','exColours','intColours','pfi','paymentTerms'));
+        $countries = Country::select('id','name')->get();
+        return view('purchase-order.create', compact('pfiItems','exColours','isToyotaPO','intColours','pfi','paymentTerms','countries'));
     }
 
     /**

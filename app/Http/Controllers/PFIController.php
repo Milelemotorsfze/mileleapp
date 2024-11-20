@@ -8,6 +8,7 @@ use App\Models\MasterModel;
 use App\Models\LetterOfIndentItem;
 use App\Models\PFI;
 use App\Models\PfiItem;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Clients;
 use App\Models\Country;
@@ -100,7 +101,6 @@ class PFIController extends Controller
                             })
                             ->pluck('code')->toArray();
 
-                            // $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
                             $item->loi_item_code = implode(",", $LOICodes);  
                         }
                         $newPFIFileName = "";
@@ -108,16 +108,26 @@ class PFIController extends Controller
                             $filename = $pfi->new_pfi_document_without_sign;
                             $newPFIFileName =  strstr($filename, '_', true) . ".pdf";
                         }
-
                         $oldPFIFileName =  strstr($pfi->pfi_document_without_sign, '_', true) . ".pdf";
-
-                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName'));
+                        $showCreatePOBtn = 1;
+                        $PoUtilizedQty = PfiItemPurchaseOrder::where('pfi_id', $pfi->id)
+                                                ->sum('quantity');
+                        if($PoUtilizedQty) {
+                            $pfiQty =  PfiItem::select('is_parent','pfi_id','pfi_quantity')
+                                        ->where('is_parent', true)
+                                        ->where('pfi_id', $pfi->id)
+                                        ->sum('pfi_quantity');
+                            if($pfiQty <= $PoUtilizedQty) {
+                                $showCreatePOBtn = 0;
+                            }
+                        }                      
+                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName','showCreatePOBtn',
+                        'PoUtilizedQty'));
                     })
                     ->rawColumns(['action'])
                     ->toJson();
                 }
 
-            
             return view('pfi.index');
     }
     public function PFIItemList(Request $request) {

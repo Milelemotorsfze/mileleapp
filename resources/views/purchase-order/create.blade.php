@@ -29,6 +29,9 @@
             font-size: 17px;
             border-radius: 10px;
         }
+        .form-control {
+            height:32px !important
+        }
     </style>
     @can('create-demand-planning-po')
         @php
@@ -66,6 +69,7 @@
                 <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form">
                     @csrf
                     <input type="hidden" name="po_from" value="DEMAND_PLANNING">
+                    <input type="hidden" name="pfi_id" value="{{ \Crypt::encrypt($pfi->id) }}">
                     <div class="row">
                         <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
@@ -117,14 +121,21 @@
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
-
                                 <label for="choices-single-default" class="form-label font-size-13 "> Currency </label>
                                 <input type="text" class="form-control" name="currency" readonly value="{{ $pfi->currency ?? '' }}">
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-6">
-                            <label class="form-label">Total Unit Price:</label>
+                            <label class="form-label">Total Unit Price</label>
                             <input type="text" name="totalcost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" readonly value="{{ strtoupper($pfi->customer->name ?? '') }}">
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">PFI Number</label>
+                            <input type="text" class="form-control" readonly value="{{ $pfi->pfi_reference_number ?? '' }}">
                         </div>
                     </div>
                     <div id="variantRowsContainer" style="display: none;">
@@ -196,57 +207,57 @@
                             @endif
                         </div>
                         @foreach($pfiItems as $key => $pfiItem)
-                            <div class="row">
-                            <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
-                                <!-- <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiItem->letterOfIndentItem->id ?? ''}}"> -->
-                                <!-- <input type="hidden" name="approved_loi_ids[]" value="{{$pfiItem->id}}"> -->
-                                <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
-                                <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
-                                           value="{{ $pfiItem->masterModel->model ."-". $pfiItem->masterModel->sfx}}" readonly>
-                                </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
-                                        @foreach($pfiItem->masterModels as $masterModel)
-                                            <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
-                                                    data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
-                                                    data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
-                                                {{ $masterModel->variant_id == $pfiItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
-                                           value="{{$pfiItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" id="master-model-line-{{$key}}"
-                                           value="{{$pfiItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
-                                           placeholder="Model Line" readonly>
-                                </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
-                                           value="{{$pfiItem->masterModel->variant->detail ?? ''}}">
-                                </div>
-                                <div class="col-lg-2 col-md-6 mt-md-2">
-                                    <input type="text"  class="form-control" id="unit-price-{{$key}}"
-                                           value="{{ $pfiItem->unit_price }}"
-                                           placeholder="Unit Price" readonly>
-                                </div>
-                                <div class="col-lg-1 col-md-6 mt-md-2">
-                                    <input type="number" id="quantity-{{$key}}" min="0" @if($isToyotaPO) readonly @endif max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
-                                      data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
-                                    <span class="QuantityError-{{$key}} text-danger"></span>
-                                </div>
-                                @if($isToyotaPO)
-                                    <div class="col-lg-1 col-md-6 mt-md-2">
-                                        <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiItem->inventoryQuantity}}"
-                                        data-id="{{ $pfiItem->id }}"  class="form-control inventory-qty-{{$pfiItem->id}}" value="{{ $pfiItem->inventoryQuantity }}" placeholder="QTY">
-                                        <span class="InventoryQuantityError-{{$key}} text-danger"></span>
+                                <div class="row">
+                                <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
+                                    <!-- <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiItem->letterOfIndentItem->id ?? ''}}"> -->
+                                    <!-- <input type="hidden" name="approved_loi_ids[]" value="{{$pfiItem->id}}"> -->
+                                    <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
+                                    <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
+                                            value="{{ $pfiItem->masterModel->model ."-". $pfiItem->masterModel->sfx}}" readonly>
                                     </div>
-                                @endif
-                            </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
+                                            @foreach($pfiItem->masterModels as $masterModel)
+                                                <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
+                                                        data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
+                                                        data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
+                                                    {{ $masterModel->variant_id == $pfiItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
+                                            value="{{$pfiItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" id="master-model-line-{{$key}}"
+                                            value="{{$pfiItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
+                                            placeholder="Model Line" readonly>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
+                                            value="{{$pfiItem->masterModel->variant->detail ?? ''}}">
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <input type="text"  class="form-control" id="unit-price-{{$key}}"
+                                            value="{{ $pfiItem->unit_price }}"
+                                            placeholder="Unit Price" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="number" id="quantity-{{$key}}" min="0" @if($isToyotaPO) readonly @endif max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
+                                        data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
+                                        <span class="QuantityError-{{$key}} text-danger"></span>
+                                    </div>
+                                    @if($isToyotaPO)
+                                        <div class="col-lg-1 col-md-6 mt-md-2">
+                                            <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiItem->inventoryQuantity}}"
+                                            data-id="{{ $pfiItem->id }}"  class="form-control inventory-qty-{{$pfiItem->id}}" value="{{ $pfiItem->inventoryQuantity }}" placeholder="QTY">
+                                            <span class="InventoryQuantityError-{{$key}} text-danger"></span>
+                                        </div>
+                                    @endif
+                                </div>
                         @endforeach
                         <div class="col-12 justify-content-end">
                             <button type="button" class="btn btn-primary float-end add-row-btn">
@@ -268,7 +279,12 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label">Prefered Destination:</label>
-                            <input type="text" id="fd" name="fd" class="form-control" value="{{old('fd')}}" placeholder="Prefered Destination" >
+                            <select name="prefered_destination" class="form-control" id="prefered_destination" multiple>
+                                <option value="">Select the Prefered Destination</option>
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}"{{ $country->id == $pfi->country_id ? 'selected' : ''}} >{{ $country->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <br><br>
@@ -286,37 +302,12 @@
     let formValid = true;
     let isToyotaPO = "{{ $isToyotaPO }}"
     let isEnableVehicleAdd = true;
-    // function checkQuantity(key) {
-    //    if(isToyotaPO == 1) {
-    //         var selectedQuantity = $('#quantity-'+key).val();
-    //         var variantQuantity = $('#quantity-'+key).attr('data-quantity');
-    //         var inventoryQuantity = $('#inventory-qty-'+key).attr('data-inventory-qty');
-    //         if(parseInt(inventoryQuantity) > 0) {
-    //             if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
-    //             formValid = false;
-    //             $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
-    //             $('.add-row-btn').attr('disabled', true);
-    //             }
-    //             else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
-    //                 formValid = false;
-    //                 $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
-    //                 $('.add-row-btn').attr('disabled', true);
-    //             }
-    //             else{
-    //                 formValid = true;
-    //                 $('.QuantityError-'+key).text("");
-    //                 $('.add-row-btn').attr('disabled', false);
-    //             }
-    //         }else{
-    //             formValid = false;
-    //             $('.QuantityError-'+key).text("inventory Quantity not available");
-    //             $('.add-row-btn').attr('disabled', true);
-    //         }
-    //    }
-    // }
 
+    $('#prefered_destination').select2({
+        placeholder: "Select Prefered Destination",
+        maximumSelectionLength: 1
+    })
     function checkDuplicateVIN() {
-
         var vinValues = $('input[name="vin[]"]').map(function() {
             return $(this).val();
         }).get();
@@ -338,7 +329,6 @@
             formValid = true;
         } else {
                 var formData = $('#po-create-form').serialize();
-                console.log(formData);
                 $.ajax({
                     url: '{{ route('vehicles.check-create-vins') }}',
                     method: 'POST',
@@ -364,20 +354,20 @@
     $('.add-row-btn').click(function(e) {
         $('.bar').show();
         var variantQuantity = '{{ $pfiItems->count() }}';
+        console.log(variantQuantity);
         var price = 0;
         var exColours = <?= json_encode($exColours) ?>;
         var intColours = <?= json_encode($intColours) ?>;
         var sum = $('#total-price').val();
-
         for (var i = 0; i < variantQuantity; i++) {
             var selectedQty = $('#quantity-'+i).val();
             var pfiQuantity = $('#quantity-'+i).attr('data-quantity');
             var inventoryQuantity = $('#inventory-qty-'+i).attr('data-inventory-qty');
             if(isToyotaPO == 1) {
                 // toyota - only one po
-                // check  pfiQuantity is less than inventory quantity  -> 
-                if(pfiQuantity > inventoryQuantity) {
-                    isEnableVehicleAdd == false;
+                // check  pfiQuantity is less than inventory quantity  
+                if(parseInt(inventoryQuantity) < parseInt(pfiQuantity)) {
+                    isEnableVehicleAdd = false;
                     alertify.confirm('Required vehicle quanity is not available in the inventory',function (e) {
                     }).set({title:"Invalid Data"});
                     return false;
@@ -385,14 +375,15 @@
             }else{
                  // not toyota - multiple po 
                 // maximum quantity should the the pfi item quantity 
-                if(pfiQuantity < selectedQty) {
+                if(parseInt(pfiQuantity) < parseInt(selectedQty)) {
                     var model = $('#model-'+i).val();
-                    alertify.confirm('You are not allowed to increase the Item quantity than in PFI, ('+ model +')',function (e) {
+                    alertify.confirm('The Maximum PFI quantity you can enter for the model '+ model +' is ' + pfiQuantity +'.',function (e) {
                     }).set({title:"Invalid Data"});
-                    isEnableVehicleAdd == false;
+                    isEnableVehicleAdd = false;
                     return false;
                 }
             }
+            console.log(i);
         }
        
         if(isEnableVehicleAdd == true) {
