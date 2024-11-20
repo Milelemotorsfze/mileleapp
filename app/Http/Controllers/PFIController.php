@@ -173,6 +173,7 @@ class PFIController extends Controller
                 $query->select('id','name');
             }]);
 
+            
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
                         $query->where('code', 'like', "%{$request->code}%");
@@ -199,8 +200,8 @@ class PFIController extends Controller
                     });
             }
             if(!empty($request->client_id)) {
-                $data->whereHas('letterOfIndentItem.LOI',function($query) use($request) {
-                        $query->where('client_id',$request->client_id);
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('client_id', $request->client_id);
                     });
             }
             if(!empty($request->country_id)) {
@@ -208,7 +209,6 @@ class PFIController extends Controller
                         $query->where('country_id', $request->country_id);
                     });
             }
-
             if(!empty($request->supplier_id)) {
                 $data->whereHas('pfi',function($query) use($request) {
                         $query->where('supplier_id', $request->supplier_id);
@@ -234,7 +234,6 @@ class PFIController extends Controller
                         $query->where('sfx', 'like', "%{$request->sfx}%");
                     });
             }
-           
             if(!empty($request->pfi_quantity)) {
                 $data->where('pfi_quantity', 'like', "%{$request->pfi_quantity}%");
     
@@ -255,13 +254,21 @@ class PFIController extends Controller
             }
             if(!empty($request->total_price)) {
                 $data->having("total_price", 'like', "%{$request->total_price}%");
-
             }
             if(!empty($request->pfi_item_code)) {
                 $data->where("code", 'like', "%{$request->pfi_item_code}%");
-
             }
-           
+            if($request->tab == 'TOYOTA'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->where('brand_name', 'like', "TOYOTA");
+                });
+
+            }else if($request->tab == 'OTHER-BRANDS'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->whereNot('brand_name', 'TOYOTA');
+                });
+            }
+      
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
                 $data = $data->get();
