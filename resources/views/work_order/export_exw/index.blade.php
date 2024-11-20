@@ -1,6 +1,9 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <style>
+	.widthinput {
+        height: 32px !important;
+    }
 	.btn-full-width {
 		width: 100%;
 		margin-top: 2px;
@@ -197,6 +200,17 @@
 					</button>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-xxl-2 col-lg-6 col-md-6 ms-auto d-flex justify-content-end select-button-main-div">
+					<div class="dropdown-option-div me-2"> <!-- Add spacing between input and button -->
+						<label for="search" class="col-form-label text-md-end">Search</label>
+						<input id="search" name="search" type="text" class="form-control widthinput" placeholder="Search" autocomplete="search" value="{{ isset($search) ? $search : '' }}">
+					</div>
+					<button id="apply_search" type="button" class="btn btn-info btn-sm mb-3" style="margin-top:25px!important;">
+						Search
+					</button>
+				</div>
+			</div>
 			<br/>
 			<div class="table-responsive">
 				<table class="my-datatable table table-striped table-editable" style="width:100%;">
@@ -273,6 +287,7 @@
 								<th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 								<th rowspan="2" class="dark">Total Number Of BOE</th>
 							@endif
+							<th rowspan="2" class="light">Vehilce Count</th>
 						</tr>
 						<tr>
 							<td class="dark">Finance</td>
@@ -528,13 +543,11 @@
 									<td>{{ $data->formatDate($data->sales_support_data_confirmation_at) }}</td>
 									<td>{{ $data->total_number_of_boe != 0 ? $data->total_number_of_boe : '' }}</td>
 								@endif
+								<td>{{ $data->vehicles->count() ?? 0 }}</td>
 							</tr>
 						@endforeach
 					</tbody>
 				</table>
-				<div class="d-flex justify-content-left mt-4">
-					{{ $datas->links() }}
-				</div>
 			</div>
 		</div>
     </div>
@@ -603,17 +616,19 @@
 			if (workOrderId) window.location.href = `/work-order/${workOrderId}`;
 		});
         const table = $('.my-datatable').DataTable({
-            pageLength: 100,
-            lengthMenu: [10, 25, 50, 100, 200],
-            order: [],
-            columnDefs: [{ targets: 'no-sort', orderable: false }],
-            paging: false,
-            info: false,
-            lengthChange: false,
-            initComplete: function() {
-                hideEmptyColumns(this.api());
-            }
-        });
+			pageLength: 100,
+			lengthMenu: [10, 25, 50, 100, 200],
+			order: [],
+			columnDefs: [{ targets: 'no-sort', orderable: false }],
+			paging: false,
+			info: false,
+			lengthChange: false,
+			searching: false,  // Disables the search box
+			initComplete: function() {
+				hideEmptyColumns(this.api());
+			}
+		});
+
         function hideEmptyColumns(tableApi) {
 			tableApi.columns().every(function() {
 				const column = this;
@@ -627,5 +642,12 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+	document.getElementById('apply_search').addEventListener('click', function() {
+		const searchValue = document.getElementById('search').value;
+		const type = 'all';  // Modify this if 'type' should be dynamically set based on other input
+
+		// Redirect to the URL with both 'type' and 'search' parameters
+		window.location.href = `/work-order-info/${type}?search=${encodeURIComponent(searchValue)}`;
+	});
 </script>
 @endpush

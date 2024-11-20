@@ -609,7 +609,7 @@ table.dataTable thead th select {
           </div> 
         </div>  
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="variantviewLabel">View Variants</h5>

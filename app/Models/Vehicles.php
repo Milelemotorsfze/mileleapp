@@ -48,6 +48,10 @@ class Vehicles extends Model
         'purchased_paid_percentage',
 
     ];
+    public function dn()
+{
+    return $this->belongsTo(VehicleDn::class, 'dn_id');
+}
     public function variant()
     {
         return $this->belongsTo(Varaint::class,'varaints_id');

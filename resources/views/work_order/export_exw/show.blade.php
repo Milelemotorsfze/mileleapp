@@ -1084,7 +1084,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                             <div class="card">
                                 <div class="card-header" style="background-color : #e8f3fd!important;">
                                     <h4 class="card-title">
-                                        <center style="font-size:12px;">Vehicles and Addons Informations</center>
+                                        <center style="font-size:12px;">Vehicles and Addons Informations (Total Vehicle Count - {{count($workOrder->vehicles) ?? 'No vehicles'}})</center>
                                     </h4>
                                 </div>
                                 <div class="card-body">

@@ -69,6 +69,11 @@
         
         <div class="card">
         <div class="card-body px-0">
+        <div class="text-right mb-3">
+    <a href="{{ url('/export-uae-vehicle-stock') }}" class="btn btn-success">
+        Export to Excel
+    </a>
+</div>
             <div class="table-responsive px-3">
                 <div class="card-header align-items-center">
                     <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">UAE Vehicle Stock</h4>
@@ -81,7 +86,7 @@
                             <th>SFX</th>
                             <th>Variant Name</th>
                             <th>Free Stock</th>
-                            <th>Total Quality</th>
+                            <th>Total Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1068,7 +1073,16 @@ Procurement
                 <h5 class="card-title mb-0 flex-grow-1">Leads Rejection Reasons Summary</h5>
             </div>
             <div class="card-body text-center">
-                <canvas id="reasonBarChart" style="max-width: 100%; height: 100px;"></canvas> <!-- Set max width and height for full-width display -->
+                <!-- Date Range Picker for Reason Chart -->
+<div id="reasonReportrange" style="cursor: pointer; padding: 5px; border: 1px solid #ccc; width: 250px; text-align: right;">
+    <i class="fa fa-calendar"></i>&nbsp;
+    <span></span> <i class="fa fa-caret-down"></i>
+</div>
+<input type="hidden" id="reason_start_date">
+<input type="hidden" id="reason_end_date">
+
+<!-- Bar Chart Canvas -->
+<canvas id="reasonBarChart"></canvas>
             </div>
         </div>
     </div>
@@ -1532,14 +1546,15 @@ Procurement
 document.addEventListener("DOMContentLoaded", function() {
     // Example data from your controller
     let data = @json($dataforpie);
-
-    // Extract labels and counts for the chart
+console.log(data);
+    // Extract initial labels and counts for the chart
     let labels = data.map(item => item.Reason);
     let counts = data.map(item => item.count);
 
+    // Initialize the Bar Chart
     const ctx = document.getElementById('reasonBarChart').getContext('2d');
     const reasonBarChart = new Chart(ctx, {
-        type: 'bar', // Change 'bar' to 'pie' if you want a full-width pie chart
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
@@ -1578,9 +1593,88 @@ document.addEventListener("DOMContentLoaded", function() {
                 tooltip: {
                     enabled: true
                 }
-            }
+            },
+            onClick: function(event, elements) {
+    if (elements.length > 0) {
+        const firstElement = elements[0];
+        
+        // Use dataIndex directly for the index instead of elements[0].index
+        const index = firstElement?.index ?? firstElement?.datasetIndex;
+
+        if (index !== undefined && index < labels.length) {
+            let selectedReason = labels[index];
+
+            console.log("Clicked index (using dataIndex):", index);
+            console.log("Selected reason:", selectedReason);
+
+            let startDate = $('#reason_start_date').val();
+            let endDate = $('#reason_end_date').val();
+
+            // Redirect to the page with the correct query parameters
+            window.location.href = `/show_leads_rejection?start_date=${startDate}&end_date=${endDate}&reason=${encodeURIComponent(selectedReason)}`;
+        } else {
+            console.log("Error: Unable to determine index or reason.");
+        }
+    } else {
+        console.log("No element clicked.");
+    }
+}
         }
     });
+    // Function to update the Reason Chart based on date range
+    function updateReasonChart() {
+    let startDate = $('#reason_start_date').val();
+    let endDate = $('#reason_end_date').val();
+
+    $.ajax({
+        url: '/reasondata',  // Replace with your endpoint URL
+        type: 'GET',
+        data: { start_date: startDate, end_date: endDate },
+        success: function(response) {
+            // Update chart data and labels with the response data
+            reasonBarChart.data.labels = response.labels;
+            reasonBarChart.data.datasets[0].data = response.counts;
+            
+            // Update the local `labels` and `counts` arrays used in onClick
+            labels = response.labels;
+            counts = response.counts;
+
+            // Redraw the chart with the new data
+            reasonBarChart.update();
+        }
+    });
+}
+    // Initialize Date Range Picker
+    function cb(start, end) {
+        $('#reasonReportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#reason_start_date').val(start.format('YYYY-MM-DD'));
+        $('#reason_end_date').val(end.format('YYYY-MM-DD'));
+        updateReasonChart();
+    }
+
+    var today = moment();
+    var yesterday = moment().subtract(1, 'days');
+    var last7Days = moment().subtract(6, 'days');
+    var last30Days = moment().subtract(29, 'days');
+    var thisMonthStart = moment().startOf('month');
+    var thisMonthEnd = moment().endOf('month');
+    var lastMonthStart = moment().subtract(1, 'month').startOf('month');
+    var lastMonthEnd = moment().subtract(1, 'month').endOf('month');
+
+    $('#reasonReportrange').daterangepicker({
+        startDate: last7Days,
+        endDate: today,
+        ranges: {
+            'Today': [today, today],
+            'Yesterday': [yesterday, yesterday],
+            'Last 7 Days': [last7Days, today],
+            'Last 30 Days': [last30Days, today],
+            'This Month': [thisMonthStart, thisMonthEnd],
+            'Last Month': [lastMonthStart, lastMonthEnd]
+        }
+    }, cb);
+
+    cb(last7Days, today); //
 });
 </script>
     <script>
@@ -1778,7 +1872,7 @@ $(function() {
                         item.sales_person_name,
                         item.call_count,
                     ];
-                    if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
+                    if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
                         row.push(
                             item.call_count_27,
                             item.call_count_16,
@@ -1797,7 +1891,7 @@ $(function() {
                 });
                 populateFilterDropdowns();
 
-                if ({{ Auth::user()->hasPermissionForSelectedRole('leads-summary-dashboard') ? 'true' : 'false' }}) {
+                if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
                     var totalRow = [
                         'Total',
                         '',
@@ -2124,7 +2218,7 @@ $(function() {
     }
 
     // Load data and populate filters based on date range
-    function loadDataAndPopulateFilterssummary(start, end) {
+    function loadDataAndPopulateFilters(start, end) {
         $.ajax({
             url: '{{ route('homemarketing.leadstatuswise') }}',
             method: 'POST',
@@ -2168,7 +2262,7 @@ $(function() {
         });
     }
 
-    loadDataAndPopulateFilterssummary(start, end);
+    loadDataAndPopulateFilters(start, end);
 
     // Date Range Picker
     $('#leadsstatuswise').daterangepicker({
@@ -2184,7 +2278,7 @@ $(function() {
         }
     }, function(selectedStart, selectedEnd) {
         $('#leadsstatuswise span').html(selectedStart.format('MMMM D, YYYY') + ' - ' + selectedEnd.format('MMMM D, YYYY'));
-        loadDataAndPopulateFilterssummary(selectedStart, selectedEnd);
+        loadDataAndPopulateFilters(selectedStart, selectedEnd);
     });
 
     $('#leadsstatuswise span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));

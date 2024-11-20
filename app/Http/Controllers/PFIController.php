@@ -470,7 +470,6 @@ class PFIController extends Controller
     }
     public function generatePFIDocument(Request $request) {
         $pfiId = Crypt::decrypt($request->id);
-        // return $pfiId;
         $pfi = PFI::find($pfiId);
         $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
         $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
@@ -492,6 +491,7 @@ class PFIController extends Controller
 
                 $filePath = public_path('New_PFI_document_without_sign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
+               
                 $pfi->new_pfi_document_without_sign = $fileName;
 
             }else{
@@ -928,6 +928,7 @@ class PFIController extends Controller
         }
         return response($data);
     }
+   
 
      // document sealing
         // if($request->has('file')) {

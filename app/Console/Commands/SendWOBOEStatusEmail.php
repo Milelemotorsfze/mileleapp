@@ -46,9 +46,9 @@ class SendWOBOEStatusEmail extends Command
             // Fetch team emails from the .env file
             $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
             $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
-            $developerEmail = env('DEVELOPER_EMAIL');
+            $wareHouseTeamEmail = env('WAREHOUSE_TEAM_EMAIL');
             // Send email to the salesperson's email and team emails from .env file
-            Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail,$developerEmail])
+            Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail,$wareHouseTeamEmail])
                 ->send(new WOBOEStatusMail($boe, $salesperson));
         }
 

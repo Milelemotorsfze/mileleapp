@@ -12,7 +12,18 @@ use Illuminate\Support\Facades\Auth;
 class WOVehicleClaimsController extends Controller
 {
     public function getPendingClaims() {
-        $vehicles = WOVehicles::select('id','vin','work_order_id')->whereDoesntHave('claim')->whereHas('woBoe')->get();
+        $vehicles = WOVehicles::select('id', 'vin', 'work_order_id')
+        ->where(function($query) {
+            // Condition 1: No associated claim
+            $query->whereDoesntHave('claim')
+                  // Condition 2: Or the latest associated claim has a 'Cancelled' status
+                  ->orWhereHas('claim', function($q) {
+                      $q->where('status', 'Cancelled')
+                        ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+                  });
+        })
+        ->whereHas('woBoe')
+        ->get();
     
         // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
         $datas = $vehicles->filter(function ($vehicle) {
@@ -24,21 +35,24 @@ class WOVehicleClaimsController extends Controller
     }
     public function getSubmittedClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
-            $q->where('status','Submitted');
+            $q->where('status','Submitted')
+                ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Submitted Vehicles Listing');
         return view('work_order.claims.submitted', compact('datas'));
     }
     public function getApprovedClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
-            $q->where('status','Approved');
+            $q->where('status','Approved')
+            ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Approved Vehicles Listing');
         return view('work_order.claims.approved', compact('datas'));
     }
     public function getCancelledClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
-            $q->where('status','Cancelled');
+            $q->where('status','Cancelled')
+            ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Cancelled Vehicles Listing');
         return view('work_order.claims.cancelled', compact('datas'));

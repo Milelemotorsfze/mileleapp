@@ -264,8 +264,12 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-
-				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
+				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</a>
+					@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
+					@else
+						</br>
+						<p>Contact IT team to update WO-006850-SW data</p>
+					@endif
 			</div>
 			<br>
 
@@ -1085,7 +1089,14 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) 
+						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						@endif
+							@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
+							@else
+								</br>
+								<p>Contact IT team to update WO-006850-SW data</p>
+							@endif
 						</div>
 					</div>
 				</div>
@@ -3626,6 +3637,47 @@
 					button.disabled = true;
 				});
 			});
+			document.addEventListener("DOMContentLoaded", function() {
+    // Define the conditions for enabling/disabling the buttons
+    const workorder = <?= json_encode($workorder ?? null) ?>;
+    const userRole = <?= json_encode(Auth()->user()->selected_role ?? null) ?>;
+
+    // Array of buttons to apply the condition to
+    const submitButtons = [document.getElementById("submit"), document.getElementById("submit-from-top")];
+
+    const shouldEnableSubmit = !workorder || 
+        (workorder && workorder.id !== 408) || 
+        (workorder && workorder.id === 408 && userRole === 1);
+
+    submitButtons.forEach(button => {
+        if (!shouldEnableSubmit) {
+            // Disable the button if the condition is not met
+            button.classList.add("disabled");
+            button.style.pointerEvents = "none";
+            
+            // Set the tooltip message and initialize with Bootstrap if available
+            button.setAttribute("title", "Contact IT team to update the data");
+            if (typeof $ !== "undefined" && typeof $.fn.tooltip === "function") {
+                $(button).tooltip();  // Initialize Bootstrap tooltip
+            }
+
+            // Add click event listener to show alert when the button is clicked
+            button.addEventListener("click", function(event) {
+                event.preventDefault();  // Prevent any default action
+                alert("Contact IT team to update the data");
+            });
+        } else {
+            // Enable the button if the condition is met
+            button.classList.remove("disabled");
+            button.style.pointerEvents = "auto";
+            button.removeAttribute("title");
+
+            // Remove any existing click event listeners
+            button.onclick = null;
+        }
+    });
+});
+
 		</script>
 	@endif
 

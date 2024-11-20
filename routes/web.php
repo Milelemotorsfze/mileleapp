@@ -130,7 +130,8 @@ use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
 use App\Http\Controllers\LeadChatController;
-
+use App\Exports\UAEVehicleStockExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 /*
 /*
@@ -496,6 +497,7 @@ Route::get('/d', function () {
         Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
         Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
         Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
         Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
         Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
     });    
@@ -1002,9 +1004,9 @@ Route::get('/d', function () {
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
-    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
-    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
-    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+    Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/repliespurchased', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messagespurchased/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
     Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
@@ -1110,4 +1112,9 @@ Route::get('/d', function () {
     Route::post('/tasks/update', [DailyleadsController::class, 'tasksupdateStatus'])->name('leads-tasks.update');
     Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
     Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
+    Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
+    Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
+    Route::get('/export-uae-vehicle-stock', function () {
+        return Excel::download(new UAEVehicleStockExport, 'uae_vehicle_stock.xlsx');
+    });
 });

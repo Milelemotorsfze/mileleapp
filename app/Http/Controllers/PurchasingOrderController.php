@@ -6,6 +6,7 @@ use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\LetterOfIndentItem;
 use App\Models\LetterOfIndent;
 use App\Models\LOIItemPurchaseOrder;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\MasterModel;
 use Illuminate\Support\Facades\Log;
 use App\Models\PFI;
@@ -978,7 +979,7 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-//         dd($request->all());
+        // return $request->all();
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -1068,7 +1069,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->estimation_date = $estimation_arrival;
                 $vehicle->engine = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $vehicle->territory = 'Africa';
+                    $vehicle->territory =  $territory;
                 }else{
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
@@ -1097,7 +1098,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->estimation_date = $estimation_arrival;
                 $purchasinglog->engine_number = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $purchasinglog->territory = 'Africa';
+                    $purchasinglog->territory = $territory;
                 }else{
                     $purchasinglog->territory = $territorys;
                 }
@@ -1110,72 +1111,70 @@ public function getBrandsAndModelLines(Request $request)
                 $masterModels = $request->master_model_id;
 
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
-                    foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
-
-                        $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
-                        $pfi = PFI::find($approvedLoiItem->pfi_id);
-                        $pfi->status = 'PO Initiated';
-                        $pfi->save();
-
+                    // return $request->pfi_items;
+                    // $pfiItemsOfPurcahseOrders = $request->pfi_items;
+                    foreach($request->pfi_items as $key => $pfiItemsOfPurcahseOrder) {
                         if($request->item_quantity_selected[$key] > 0) {
-                            $loiPurchaseOrder = new LOIItemPurchaseOrder();
-                            $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
-                            $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
-                            $loiPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
-                            $loiPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
-                            $loiPurchaseOrder->save();
+                            $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
+                            $PfiItemPurchaseOrder->pfi_item_id = $pfiItemsOfPurcahseOrder;
+                            $PfiItemPurchaseOrder->purchase_order_id = $purchasingOrderId;
+                            $PfiItemPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
+                            $PfiItemPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
+                            $PfiItemPurchaseOrder->save();
                         }
                     }
-                    $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    $alreadyAddedIds = [];
-                    foreach($masterModels as $key => $masterModel)
-                    {
-                        $model = MasterModel::find($masterModel);
-                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
-                                                    ->where('vin', $vins[$key])
-                                                    ->whereNull('supplier_inventory_id')
-                                                    ->first();
+                    // if toyota pfi -> map with inventory
+                    // $dealer = $pfi->letterOfIndent->dealers ?? '';
+                    // $alreadyAddedIds = [];
+                    // foreach($masterModels as $key => $masterModel)
+                    // {
+                    //     // status change to WAITING
+                        
+                    //     $model = MasterModel::find($masterModel);
+                    //     $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
+                    //                                 ->where('vin', $vins[$key])
+                    //                                 ->whereNull('supplier_inventory_id')
+                    //                                 ->first();
 
-                        $possibleModelIds = MasterModel::where('model', $model->model)
-                                            ->where('sfx', $model->sfx)->pluck('id');
+                    //     $possibleModelIds = MasterModel::where('model', $model->model)
+                    //                         ->where('sfx', $model->sfx)->pluck('id');
 
-                        $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                            ->whereNull('purchase_order_id')
-                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                            ->where('supplier_id', $vendors_id)
-                            ->whereNotIn('id', $alreadyAddedIds)
-                            ->where('whole_sales', $dealer);
+                    //     $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                    //         ->whereNull('purchase_order_id')
+                    //         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                    //         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                    //         ->where('supplier_id', $vendors_id)
+                    //         ->whereNotIn('id', $alreadyAddedIds)
+                    //         ->where('whole_sales', $dealer);
 
-                        if($vins[$key]) {
-                             $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
-                        }
+                    //     if($vins[$key]) {
+                    //          $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
+                    //     }
 
-                        if($inventoryItem->count() > 0) {
-                            $inventoryIds = $inventoryItem->pluck('id');
-                            $inventory = SupplierInventory::where('pfi_id', $pfi->id)
-                                                ->whereIn('id', $inventoryIds);
+                    //     if($inventoryItem->count() > 0) {
+                    //         $inventoryIds = $inventoryItem->pluck('id');
+                    //         $inventory = SupplierInventory::where('pfi_id', $pfi->id)
+                    //                             ->whereIn('id', $inventoryIds);
 
-                            if($inventory->count() > 0) {
-                                $inventoryItem = $inventory->first();
-                            }else{
-                                $inventoryItem = $inventoryItem->first();
-                                $inventoryItem->pfi_id = $pfi->id;
-                            }
+                    //         if($inventory->count() > 0) {
+                    //             $inventoryItem = $inventory->first();
+                    //         }else{
+                    //             $inventoryItem = $inventoryItem->first();
+                    //             $inventoryItem->pfi_id = $pfi->id;
+                    //         }
 
-                            $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
-                            $inventoryItem->purchase_order_id = $purchasingOrder->id;
-                            $inventoryItem->save();
+                    //         $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
+                    //         $inventoryItem->purchase_order_id = $purchasingOrder->id;
+                    //         $inventoryItem->save();
 
-                            // add entry to inventory log table
+                    //         // add entry to inventory log table
 
-                            $vehicle->supplier_inventory_id = $inventoryItem->id;
-                            $vehicle->save();
+                    //         $vehicle->supplier_inventory_id = $inventoryItem->id;
+                    //         $vehicle->save();
 
-                            $alreadyAddedIds[] = $inventoryItem->id;
-                        }
-                    }
+                    //         $alreadyAddedIds[] = $inventoryItem->id;
+                    //     }
+                    // }
                 }
         }
         DB::commit();
@@ -1317,12 +1316,16 @@ public function getBrandsAndModelLines(Request $request)
         $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
+        $vehiclesdn = Vehicles::where('purchasing_order_id', $id)
+        ->where('status', 'Approved')
+        ->whereNotNull('dn_id')
+        ->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
     }
     public function edit($id)
     {
@@ -5226,44 +5229,86 @@ public function paymentconfirm(Request $request)
     // Method to save DN numbers
     public function saveDnNumbers(Request $request)
     {
-    $purchasingOrderId = $request->input('purchasingOrderId');
-    $type = $request->input('type');
-    if ($type == 'full') {
-        $dnNumber = $request->input('dnNumber');
+        $purchasingOrderId = $request->input('purchasingOrderId');
+        $type = $request->input('type');
+        
+        if ($type == 'full') {
+            $dnNumber = $request->input('dnNumber');
 
-        // info($vehicleId);
-    } else if ($type == 'vehicle') {
-        $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
-    $batchNumber = 1;
-    foreach ($vehicles as $vehicle) {
-        $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
-                                   ->orderBy('created_at', 'desc')
-                                   ->first();
-        if ($latestVehicleDn) {
-            $batchNumber = $latestVehicleDn->batch + 1;
-            break;
-        }
-    }
-        $vehicleDNData = $request->input('vehicleDNData');
-        foreach ($vehicleDNData as $vehicleData) {
-            $vehicleId = $vehicleData['vehicleId'];
-            $dnNumber = $vehicleData['dnNumber'];
-            if($dnNumber)
-            {
-            $vehicledn = New VehicleDn();
-            $vehicledn->dn_number = $dnNumber;
-            $vehicledn->vehicles_id = $vehicleId;
-            $vehicledn->created_by = Auth::id();
-            $vehicledn->batch = $batchNumber;
-            $vehicledn->save();
-            $vehicle = Vehicles::find($vehicleId);
-            $vehicle->dn_id = $vehicledn->id;
-            $vehicle->save();
+            // Retrieve all vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+    
+            // Check for the latest batch number among vehicles in the purchasing order
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Loop through each vehicle and assign the same DN number
+            foreach ($vehicles as $vehicle) {
+                // Create a new entry in the VehicleDn table
+                $vehicledn = new VehicleDn();
+                $vehicledn->dn_number = $dnNumber;
+                $vehicledn->vehicles_id = $vehicle->id;
+                $vehicledn->created_by = Auth::id();
+                $vehicledn->batch = $batchNumber;
+                $vehicledn->save();
+    
+                // Update the vehicle's dn_id field with the new VehicleDn record's ID
+                $vehicle->dn_id = $vehicledn->id;
+                $vehicle->save();
+            }
+        } else if ($type == 'vehicle') {
+            // Retrieve vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Get vehicle DN data from the request and ensure it's an array
+            $vehicleDNData = $request->input('vehicleDNData', []);
+    
+            foreach ($vehicleDNData as $vehicleData) {
+                $vehicleId = $vehicleData['vehicleId'];
+                $dnNumber = $vehicleData['dnNumber'];
+    
+                if ($dnNumber) {
+                    $vehicledn = new VehicleDn();
+                    $vehicledn->dn_number = $dnNumber;
+                    $vehicledn->vehicles_id = $vehicleId;
+                    $vehicledn->created_by = Auth::id();
+                    $vehicledn->batch = $batchNumber;
+                    $vehicledn->save();
+    
+                    // Attempt to find the vehicle by ID
+                    $vehicle = Vehicles::find($vehicleId);
+    
+                    // Check if the vehicle exists before assigning the dn_id
+                    if ($vehicle) {
+                        $vehicle->dn_id = $vehicledn->id;
+                        $vehicle->save();
+                    } else {
+                        // Log or handle the error if the vehicle ID is invalid
+                        \Log::error("Vehicle with ID {$vehicleId} not found.");
+                    }
+                }
             }
         }
-    }
-    return response()->json(['success' => true]);
-}
+        return response()->json(['success' => true]);
+    }    
 public function getVehiclesdn($purchaseOrderId) {
     $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
     ->where('status', 'Approved')

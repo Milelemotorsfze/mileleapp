@@ -166,15 +166,10 @@ class WorkOrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($type)
+    public function index($type, Request $request)
     {
+        $search = $request->query('search'); // Get the 'search' query parameter
         $authId = Auth::id();
-
-        // Store permission checks
-        $hasFullAccess = Auth::user()->hasPermissionForSelectedRole([
-            'list-export-exw-wo', 'list-export-cnf-wo', 'list-export-local-sale-wo'
-        ]);
-
         $hasLimitedAccess = Auth::user()->hasPermissionForSelectedRole([
             'view-current-user-export-exw-wo-list', 'view-current-user-export-cnf-wo-list', 'view-current-user-local-sale-wo-list'
         ]);
@@ -198,10 +193,8 @@ class WorkOrderController extends Controller
         $vehiclesModificationSummary = WOVehicles::all()->pluck('modification_status')->unique()->sort()->values();
         $pdiSummary = WOVehicles::all()->pluck('pdi_status')->unique()->sort()->values();
         $deliverySummary = WOVehicles::all()->pluck('delivery_status')->unique()->sort()->values();
-        $datas = WorkOrder::query()
-        ->when($type === 'all', function ($queryAll) {
-            $queryAll->select([
-                'id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'cross_trade', 'is_batch', 'batch', 'wo_number', 
+        $columns = [
+            'all' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'cross_trade', 'is_batch', 'batch', 'wo_number', 
                 'customer_name', 'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
                 'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
                 'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
@@ -211,16 +204,12 @@ class WorkOrderController extends Controller
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
                 ,'sales_person_id','created_by','created_at','updated_at','lto'
-            ]);
-        })
-        ->when($type === 'status_report', function ($queryStatusReport) {
-            $queryStatusReport->select(['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at']);
-        })
-        ->when($type === 'export_exw', function ($queryEXW) {
-            $queryEXW->select([
-                'id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'is_batch', 'batch', 'wo_number', 'customer_name', 
-                'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
+            ],
+            'status_report' => ['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
+                'sales_person_id','created_by','created_at','updated_at'
+            ],
+            'export_exw' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'delivery_advise', 'showroom_transfer', 'is_batch', 'batch', 'wo_number', 
+                'customer_name', 'customer_email', 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 
                 'customer_representative_contact', 'freight_agent_name', 'freight_agent_email', 'freight_agent_contact_number', 'port_of_loading', 
                 'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 'shipping_line', 
                 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
@@ -228,11 +217,8 @@ class WorkOrderController extends Controller
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
                 'sales_person_id','created_by','created_at','updated_at'
-            ]);
-        })
-        ->when($type === 'export_cnf', function ($queryCNF) {
-            $queryCNF->select([
-                'id', 'type', 'date', 'so_number', 'temporary_exit', 'cross_trade', 'is_batch', 'batch', 'wo_number', 'customer_name', 'customer_email', 
+            ],
+            'export_cnf' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'cross_trade', 'is_batch', 'batch', 'wo_number', 'customer_name', 'customer_email', 
                 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 
                 'port_of_loading', 'port_of_discharge', 'final_destination', 'transport_type', 'brn_file', 'brn', 'container_number', 'airline', 'airway_bill', 
                 'shipping_line', 'forward_import_code', 'trailer_number_plate', 'transportation_company', 'transporting_driver_contact_number', 'airway_details', 
@@ -241,48 +227,86 @@ class WorkOrderController extends Controller
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
                 'sales_person_id','created_by','created_at','updated_at'
-            ]);
-        })
-        ->when($type === 'local_sale', function ($queryLocal) {
-            $queryLocal->select([
-                'id', 'date', 'so_number', 'wo_number', 'customer_name', 'customer_email', 'customer_company_number', 'customer_address',
+            ],
+            'local_sale' => ['id', 'date', 'so_number', 'wo_number', 'customer_name', 'customer_email', 'customer_company_number', 'customer_address',
                 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 'transporting_driver_contact_number', 
                 'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
                 'sales_person_id','created_by','created_at','updated_at','lto'
-            ]);
-        })
-        ->when($type !== 'all' && $type !== 'status_report', function ($queryType) use ($type) {
-            return $queryType->where('type', $type);
-        })
-        ->when($hasLimitedAccess, function ($queryLimited) use ($authId) {
-            return $queryLimited->where('created_by', $authId);
-        })
-        ->when($filters, function ($query) use ($filters) {
-            // Apply status filter
-            if (!empty($filters['status_filter'])) {
-                $query->whereHas('latestStatus', function ($statusFltr) use ($filters) {
-                    $statusFltr->whereIn('status', $filters['status_filter']);
+            ],
+        ];
+        $nonSearchableFields = [
+            'id', 'brn_file', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc',
+            'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'updated_by',
+            'sales_person_id', 'created_by', 'vehicle_handover_person_id'
+        ];
+        // Helper function to apply select and search
+        $applySelectAndSearch = function ($query, $search, $columns) use ($nonSearchableFields) {
+            $query->select($columns);
+            // Check if there is a search term
+            if ($search) {
+                $searchableColumns = array_filter($columns, function ($column) use ($nonSearchableFields) {
+                    return !in_array($column, $nonSearchableFields);
+                });
+                $searchTerms = preg_split('/\s+/', $search); 
+                $query->where(function ($query) use ($searchTerms, $searchableColumns) {
+                    foreach ($searchTerms as $term) {
+                        $singleBatchTerms = ['single', 'singl', 'sing', 'sin', 'si', 's'];
+                        if (in_array(strtolower($term), $singleBatchTerms)) {
+                            $query->orWhere('is_batch', 0);
+                        }
+                        $query->orWhere(function ($query) use ($term, $searchableColumns) {
+                            foreach ($searchableColumns as $column) {
+                                $query->orWhere($column, 'LIKE', "%{$term}%");
+                            }
+                        });
+                        $query->orWhereHas('salesPerson', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereHas('CreatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereHas('UpdatedBy', fn($q) => $q->where('name', 'LIKE', "%{$term}%"))
+                            ->orWhereRaw("DATE_FORMAT(date, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(date, '%M') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(created_at, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(created_at, '%M') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(updated_at, '%b') = ?", [$term])
+                            ->orWhereRaw("DATE_FORMAT(updated_at, '%M') = ?", [$term]);
+                    }
                 });
             }
-    
-            // Apply sales support filter
-            if (!empty($filters['sales_support_filter'])) {
-                $query->where(function ($salesSupportCnfrm) use ($filters) {
-                    if (in_array('Confirmed', $filters['sales_support_filter'])) {
-                        $salesSupportCnfrm->orWhereNotNull('sales_support_data_confirmation_at');
-                    }
-                    if (in_array('Not Confirmed', $filters['sales_support_filter'])) {
-                        $salesSupportCnfrm->orWhereNull('sales_support_data_confirmation_at');
-                    }
-                });
-            }
-        })
-        
-        ->with(['latestFinance', 'latestCOO','latestDocs', 'boe', 'vehicles'])
-        ->latest()
-        ->get();
+        };
+        $datas = WorkOrder::with(['salesPerson', 'CreatedBy', 'UpdatedBy', 'latestFinance', 'latestCOO', 'latestDocs', 'boe', 'vehicles'])
+            ->when(array_key_exists($type, $columns), function ($query) use ($type, $search, $columns, $applySelectAndSearch) {
+                $applySelectAndSearch($query, $search, $columns[$type]);
+            })
+            ->when($type !== 'all' && $type !== 'status_report', function ($queryType) use ($type) {
+                return $queryType->where('type', $type);
+            })
+            ->when($hasLimitedAccess, function ($queryLimited) use ($authId) {
+                return $queryLimited->where('created_by', $authId);
+            })
+            ->when($filters, function ($queryStatus) use ($filters) {
+                // Apply status filter
+                if (!empty($filters['status_filter'])) {
+                    $queryStatus->whereHas('latestStatus', function ($statusFltr) use ($filters) {
+                        $statusFltr->whereIn('status', $filters['status_filter']);
+                    });
+                }
+
+                // Apply sales support filter
+                if (!empty($filters['sales_support_filter'])) {
+                    $queryStatus->where(function ($salesSupportCnfrm) use ($filters) {
+                        if (in_array('Confirmed', $filters['sales_support_filter'])) {
+                            $salesSupportCnfrm->orWhereNotNull('sales_support_data_confirmation_at');
+                        }
+                        if (in_array('Not Confirmed', $filters['sales_support_filter'])) {
+                            $salesSupportCnfrm->orWhereNull('sales_support_data_confirmation_at');
+                        }
+                    });
+                }
+            })
+            ->latest()
+            ->get();
+
         $filteredDatas = $datas;
         if (isset($filters['finance_approval_filter']) && !empty($filters['finance_approval_filter'])) {
             $normalizedFinanceApprovalFilter = array_map('strtolower', $filters['finance_approval_filter']);      
@@ -342,12 +366,9 @@ class WorkOrderController extends Controller
         );
         $datas = $paginatedFilteredDatas;
     
-        return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations',
+        return view('work_order.export_exw.index', compact('type', 'datas', 'filters', 'statuses', 'salesSupportDataConfirmations','search',
             'financeApprovalStatuses','cooApprovalStatuses','docsStatuses','vehiclesModificationSummary','pdiSummary','deliverySummary'));
     }
-        // 'customer_reference_id','customer_reference_type','airline_reference_id','deposit_received_as','sales_support_data_confirmation_by',
-        // 'finance_approval_by','finance_approved_at','coe_office_approval_by','coe_office_approved_at','coe_office_direct_approval_comments','created_by','deleted_by',
-    
 
     /**
      * Show the form for creating a new resource.

@@ -675,13 +675,13 @@ public function uploadVinFile(Request $request)
     if ($request->hasFile('vin_file')) {
         $file = $request->file('vin_file');
         $vinData = [];
-        
+
         // Process CSV file
         if (($handle = fopen($file, 'r')) !== false) {
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $vinData[] = [
                     'vin' => $data[0], // VIN number
-                    'to' => $data[1] // Warehouse name (from file, you need to add this column)
+                    'to' => $data[1]   // Warehouse name (from file, you need to add this column)
                 ];
             }
             fclose($handle);
@@ -692,61 +692,55 @@ public function uploadVinFile(Request $request)
         $vinNumbers = array_column($vinData, 'vin');
 
         // Retrieve vehicles based on permissions
-        if ($hasPermission) {
-            $vehicles = Vehicles::whereIn('vin', $vinNumbers)
-                ->whereNotNull('vin')
-                ->where('status', '!=', 'cancel')
-                ->whereNull('grn_id')
-                ->where('status', '=', 'Approved')
-                ->pluck('id');
-        } else {
-            $vehicles = Vehicles::whereIn('vin', $vinNumbers)
-                ->whereNotNull('vin')
-                ->where('status', '!=', 'cancel')
-                ->whereNull('gdn_id')
-                ->where('status', '=', 'Approved')
-                ->pluck('id');
-        }
+        $query = Vehicles::whereIn('vin', $vinNumbers)
+            ->whereNotNull('vin')
+            ->where('status', '!=', 'cancel')
+            ->whereNull($hasPermission ? 'grn_id' : 'gdn_id')
+            ->where('status', '=', 'Approved');
+
+        $vehicles = $query->get()->keyBy('vin'); // Retrieve vehicles and key them by VIN
+
         if ($vehicles->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No matching VINs found']);
         }
-        // Fetch vehicle details and match warehouse names
+
+        // Prepare vehicle details in the same order as vinData
         $vehicleDetails = [];
-        foreach ($vehicles as $key => $vehicle) {
-            $data = Vehicles::find($vehicle);
-            $vehicle = Vehicles::where('vin', $data->vin)->first();
-            $variant = Varaint::find($vehicle->varaints_id)->name;
-            $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
-            $so = $vehicle->so_id ? So::find($vehicle->so_id) : null;
-            $so_number = $so ? $so->so_number : '';
-            $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
-            $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
-            $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
-            $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
-            $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+        foreach ($vinData as $entry) {
+            $vin = $entry['vin'];
+            $toWarehouse = $entry['to'];
+            
+            if (isset($vehicles[$vin])) {
+                $vehicle = $vehicles[$vin];
+                $variant = Varaint::find($vehicle->varaints_id)->name;
+                $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+                $so = $vehicle->so_id ? So::find($vehicle->so_id) : null;
+                $so_number = $so ? $so->so_number : '';
+                $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+                $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+                $movement = Movement::where('vin', $vin)->pluck('to')->last();
+                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
 
-            // Default to Supplier if no warehouse name found
-            if (empty($warehouseName)) {
-                $warehouseName = $vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first() : 1;
+                // Default to Supplier if no warehouse name found
+                $warehouseName = $warehouseName ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first() : 1);
+                $warehouseNames = $warehouseNames ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first() : "Supplier");
+
+                // Match the 'to' warehouse from the CSV and set as default
+                $matchedWarehouse = Warehouse::where('name', $toWarehouse)->first();
+
+                $vehicleDetails[] = [
+                    'vin' => $vin,
+                    'variant' => $variant,
+                    'modelLine' => $modelLine,
+                    'brand' => $brand,
+                    'warehouseName' => $warehouseName,
+                    'warehouseNames' => $warehouseNames,
+                    'po_number' => $po_number,
+                    'so_number' => $so_number,
+                    'matchedWarehouseId' => $matchedWarehouse ? $matchedWarehouse->id : null // Store the matched warehouse ID
+                ];
             }
-            if (empty($warehouseNames)) {
-                $warehouseNames = $vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first() : "Supplier";
-            }
-
-            // Match the 'to' warehouse from the CSV and set as default
-            $matchedWarehouse = Warehouse::where('name', $vinData[$key]['to'])->first();
-
-            $vehicleDetails[$key] = [
-                'vin' => $data->vin,
-                'variant' => $variant,
-                'modelLine' => $modelLine,
-                'brand' => $brand,
-                'warehouseName' => $warehouseName,
-                'warehouseNames' => $warehouseNames,
-                'po_number' => $po_number,
-                'so_number' => $so_number,
-                'matchedWarehouseId' => $matchedWarehouse ? $matchedWarehouse->id : null // Store the matched warehouse ID
-            ];
         }
 
         return response()->json(['success' => true, 'vehicleDetails' => $vehicleDetails]);
