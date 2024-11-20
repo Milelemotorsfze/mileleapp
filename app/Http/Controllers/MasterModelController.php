@@ -22,7 +22,9 @@ class MasterModelController extends Controller
     {
         (new UserActivityController)->createActivity('Open the listing page of Master Models.');
 
-        $masterModel = MasterModel::orderBy('id','DESC');
+        $masterModel = MasterModel::orderBy('id','DESC')->with(['variant'  => function ($query) {
+                $query->select('id','name','master_model_lines_id');
+            }]);
 
         if($request->export == 'EXCEL') {
             $data = $masterModel->get();
@@ -74,7 +76,7 @@ class MasterModelController extends Controller
                 ->editColumn('amount_belgium', function($query) {
                     return  number_format($query->amount_belgium);
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action','variant_id'])
                  
                 ->toJson();
         }
@@ -89,7 +91,7 @@ class MasterModelController extends Controller
             ['data' => 'pfi_sfx', 'name' => 'pfi_sfx','title' => 'New SFX'],
             ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
             ['data' => 'model_description', 'name' => 'model_description','title' => 'Model Description'],
-            ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
+            ['data' => 'variant_id', 'name' => 'variant.name','title' => 'Variant'],
             ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Model Line'],
             ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI Description'],
             ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'PFI Milele LOI Description'],
