@@ -411,9 +411,23 @@ class WorkOrderController extends Controller
      */
     public function store(StoreWorkOrderRequest $request)
     { 
+        info($request->all());
         DB::beginTransaction();
 
         try {
+            $chunkIndex = $request->input('chunkIndex');
+            $totalChunks = $request->input('totalChunks');
+            $chunk = $request->input('chunk');
+    
+            if (!$chunk || !$chunkIndex || !$totalChunks) {
+                return response()->json(['success' => false, 'message' => 'Invalid chunk data.'], 400);
+            }
+    
+            Log::info("Processing chunk {$chunkIndex} of {$totalChunks}");
+    
+            // Process the chunk
+            $chunkStoragePath = storage_path("chunks/work_order_chunk_{$chunkIndex}.json");
+            file_put_contents($chunkStoragePath, $chunk);
             $authId = Auth::id();
             // Retrieve validated input data
             $validated = $request->validated();
@@ -917,14 +931,18 @@ class WorkOrderController extends Controller
             }
             // Commit the transaction
             DB::commit(); 
-            
+            Log::info("Processing chunk {$chunkIndex} of {$totalChunks}");
             return response()->json(['success' => true, 'message' => 'Work order created successfully.']);
         } catch (\Exception $e) {  
             // Rollback the transaction
             DB::rollBack();
 
             // Log the error for debugging
-            Log::error('Error creating Work Order: ' . $e->getMessage());
+            // Log detailed error message
+        Log::error('Error processing chunk:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
