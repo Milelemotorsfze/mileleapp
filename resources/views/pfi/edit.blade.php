@@ -179,7 +179,9 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <div id="file-preview">
                                             @if($pfi->pfi_document_without_sign)
-                                            <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
+                                                <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
+                                            @elseif($pfi->new_pfi_document_without_sign)
+                                                <iframe src="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" ></iframe>
                                             @endif
                                         </div>
                                     </div>                                  

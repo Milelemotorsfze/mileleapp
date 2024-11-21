@@ -407,25 +407,26 @@
             ajax: {
             url:  "{{ route('pfi-item.list',['tab' => 'all']) }}",
             data: function (d) {
-                d.pfi_item_code = $('#pfi-item-code-all').val(); 
-                d.code = $('#code-all').val();  // Add custom parameters to send to the server
+                let activeTabType = $('.tab-pane.active').attr('type');
+                d.pfi_item_code = $('#pfi-item-code-'+activeTabType).val(); 
+                d.code = $('#code-'+activeTabType).val();  // Add custom parameters to send to the server
                 // d.status = $('#loi-status').val();
-                d.pfi_date = $('#pfi-date-all').val();
-                d.pfi_number = $('#pfi-number-all').val();
-                d.supplier_id = $('#supplier-id-all').val();
-                d.client_id = $('#customer-id-all').val();
-                d.country_id = $('#country-id-all').val();
-                d.currency = $('#currency-all').val();
-                d.steering = $('#steering-all').val();
-                d.brand = $('#brand-id-all').val();
-                d.model_line = $('#model-line-id-all').val();
-                d.model = $('#model-all').val();
-                d.sfx = $('#sfx-all').val();
-                d.pfi_quantity = $('#pfi-quantity-all').val();
-                d.total_price = $('#total-price-all').val();
-                d.unit_price = $('#unit-price-all').val();
-                d.pfi_amount = $('#pfi-amount-all').val();
-                d.comment = $('#comment-all').val();
+                d.pfi_date = $('#pfi-date-'+activeTabType).val();
+                d.pfi_number = $('#pfi-number-all'+activeTabType).val();
+                d.supplier_id = $('#supplier-id-all'+activeTabType).val();
+                d.client_id = $('#customer-id-all'+activeTabType).val();
+                d.country_id = $('#country-id-all'+activeTabType).val();
+                d.currency = $('#currency-all'+activeTabType).val();
+                d.steering = $('#steering-all'+activeTabType).val();
+                d.brand = $('#brand-id-all'+activeTabType).val();
+                d.model_line = $('#model-line-id-all'+activeTabType).val();
+                d.model = $('#model-all'+activeTabType).val();
+                d.sfx = $('#sfx-all'+activeTabType).val();
+                d.pfi_quantity = $('#pfi-quantity-all'+activeTabType).val();
+                d.total_price = $('#total-price-all'+activeTabType).val();
+                d.unit_price = $('#unit-price-all'+activeTabType).val();
+                d.pfi_amount = $('#pfi-amount-all'+activeTabType).val();
+                d.comment = $('#comment-'+activeTabType).val();
             
             }
         },
@@ -458,25 +459,26 @@
             ajax: {
             url:  "{{ route('pfi-item.list', ['tab' => 'TOYOTA']) }}",
             data: function (d) {
-                d.pfi_item_code = $('#pfi-item-code-toyota').val(); 
-                d.code = $('#code-toyota').val();  // Add custom parameters to send to the server
+                let activeTabType = $('.tab-pane.active').attr('type');
+                d.pfi_item_code = $('#pfi-item-code-'+activeTabType).val(); 
+                d.code = $('#code-'+activeTabType).val();  // Add custom parameters to send to the server
                 // d.status = $('#loi-status').val();
-                d.pfi_date = $('#pfi-date-toyota').val();
-                d.pfi_number = $('#pfi-number-toyota').val();
-                d.supplier_id = $('#supplier-id-toyota').val();
-                d.client_id = $('#customer-id-toyota').val();
-                d.country_id = $('#country-id-toyota').val();
-                d.currency = $('#currency-toyota').val();
-                d.steering = $('#steering-toyota').val();
-                d.brand = $('#brand-id-toyota').val();
-                d.model_line = $('#model-line-id-toyota').val();
-                d.model = $('#model-toyota').val();
-                d.sfx = $('#sfx-toyota').val();
-                d.pfi_quantity = $('#pfi-quantity-toyota').val();
-                d.total_price = $('#total-price-toyota').val();
-                d.unit_price = $('#unit-price-toyota').val();
-                d.pfi_amount = $('#pfi-amount-toyota').val();
-                d.comment = $('#comment-toyota').val();
+                d.pfi_date = $('#pfi-date-'+activeTabType).val();
+                d.pfi_number = $('#pfi-number-'+activeTabType).val();
+                d.supplier_id = $('#supplier-id-'+activeTabType).val();
+                d.client_id = $('#customer-id-'+activeTabType).val();
+                d.country_id = $('#country-id-'+activeTabType).val();
+                d.currency = $('#currency-'+activeTabType).val();
+                d.steering = $('#steering-'+activeTabType).val();
+                d.brand = $('#brand-id-'+activeTabType).val();
+                d.model_line = $('#model-line-id-'+activeTabType).val();
+                d.model = $('#model-'+activeTabType).val();
+                d.sfx = $('#sfx-'+activeTabType).val();
+                d.pfi_quantity = $('#pfi-quantity-'+activeTabType).val();
+                d.total_price = $('#total-price-'+activeTabType).val();
+                d.unit_price = $('#unit-price-'+activeTabType).val();
+                d.pfi_amount = $('#pfi-amount-'+activeTabType).val();
+                d.comment = $('#comment-'+activeTabType).val();
             
             }
         },

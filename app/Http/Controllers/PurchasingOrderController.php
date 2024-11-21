@@ -1007,6 +1007,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->currency = $request->input('currency');
         $purchasingOrder->shippingmethod = $request->input('shippingmethod');
         if($request->po_from != 'DEMAND_PLANNING') {
+            $purchasingOrder->is_demand_planning_po = true;
             $purchasingOrder->shippingcost = $request->input('shippingcost');
         }
         $purchasingOrder->totalcost = $request->input('totalcost');
@@ -1115,9 +1116,7 @@ public function getBrandsAndModelLines(Request $request)
             }
                 
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $masterModels = $request->master_model_id;
                     $pfiId = Crypt::decrypt($request->pfi_id);
-
                     foreach($request->pfi_items as $key => $pfiItem) {
                         if($request->item_quantity_selected[$key] > 0) {
                             $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
@@ -1129,60 +1128,59 @@ public function getBrandsAndModelLines(Request $request)
                             $PfiItemPurchaseOrder->save();
                         }
                     }
-                   
                     // if toyota pfi -> map with inventory
-                    $pfi = PFI::find($pfiId);
-                    $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    // $alreadyAddedIds = [];
-                    foreach($masterModels as $key => $masterModel)
-                    {
-                     // status change to WAITING
-                        
-                        $model = MasterModel::find($masterModel);
-                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
-                                                    ->where('vin', $vins[$key])
-                                                    ->whereNull('supplier_inventory_id')
-                                                    ->first();
+                    $pfiItemLatest = PfiItem::where('pfi_id', $pfiId)
+                                    ->where('is_parent', true)
+                                    ->first();
+                    $brand = $pfiItemLatest->masterModel->modelLine->brand->brand_name ?? '';
+                        if(strcasecmp($brand, 'TOYOTA') == 0) {
+                            $masterModels = $request->master_model_id;
+                            $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
+                            $alreadyAddedIds = [];
+                            foreach($masterModels as $key => $masterModel)
+                            {
+                                // map to inventory
+                                $masterModel = MasterModel::find($masterModel);
+                                $possibleModelIds = MasterModel::where('model', $model->model)
+                                                    ->where('sfx', $model->sfx)->pluck('id');
 
-                    //     $possibleModelIds = MasterModel::where('model', $model->model)
-                    //                         ->where('sfx', $model->sfx)->pluck('id');
+                                $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                                    ->whereNull('purchase_order_id')
+                                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                    ->where('supplier_id', $vendors_id)
+                                    ->whereNotIn('id', $alreadyAddedIds)
+                                    ->where('whole_sales', $dealer);
 
-                    //     $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                    //         ->whereNull('purchase_order_id')
-                    //         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                    //         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                    //         ->where('supplier_id', $vendors_id)
-                    //         ->whereNotIn('id', $alreadyAddedIds)
-                    //         ->where('whole_sales', $dealer);
+                                if($ex_colours[$key]) {
+                                    $inventoryItem = $inventoryItem->where('exterior_color_code_id', $ex_colours[$key]);
+                                }
+                                if($int_colours[$key]) {
+                                    $inventoryItem = $inventoryItem->where('interior_color_code_id', $int_colours[$key]);
+                                }
 
-                    //     if($vins[$key]) {
-                    //          $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
-                    //     }
+                                if($inventoryItem->count() > 0) {
+                                    $inventoryItem = $inventoryItem->first();
+                                    $inventoryItem->pfi_id = $pfi->id;
+                                    $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
+                                    $inventoryItem->purchase_order_id = $purchasingOrder->id;
+                                    $inventoryItem->save();
 
-                    //     if($inventoryItem->count() > 0) {
-                    //         $inventoryIds = $inventoryItem->pluck('id');
-                    //         $inventory = SupplierInventory::where('pfi_id', $pfi->id)
-                    //                             ->whereIn('id', $inventoryIds);
+                                    $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
+                                                            ->when(!empty($vins[$key]), function ($query) use ($vins, $key) {
+                                                                return $query->where('vin', $vins[$key]);
+                                                            })
+                                                            ->whereNull('supplier_inventory_id')
+                                                            ->first();
 
-                    //         if($inventory->count() > 0) {
-                    //             $inventoryItem = $inventory->first();
-                    //         }else{
-                    //             $inventoryItem = $inventoryItem->first();
-                    //             $inventoryItem->pfi_id = $pfi->id;
-                    //         }
+                                    $vehicle->supplier_inventory_id = $inventoryItem->id;
+                                    $vehicle->save();
 
-                    //         $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
-                    //         $inventoryItem->purchase_order_id = $purchasingOrder->id;
-                    //         $inventoryItem->save();
-
-                    //         // add entry to inventory log table
-
-                    //         $vehicle->supplier_inventory_id = $inventoryItem->id;
-                    //         $vehicle->save();
-
-                    //         $alreadyAddedIds[] = $inventoryItem->id;
-                    //     }
-                    }
+                                    (new SupplierInventoryController)->inventoryLog('Inventory item allocated for Purchase Order ('. $purchasingOrder->po_number.')', $inventoryItem->id);
+                                    $alreadyAddedIds[] = $inventoryItem->id;
+                                }
+                            }
+                        }
                 }
         }
         DB::commit();
@@ -1449,72 +1447,75 @@ public function getBrandsAndModelLines(Request $request)
                 }
 
     //         Demand planning PO
-                $masterModels = $request->master_model_id;
-
                 if($request->po_from == 'DEMAND_PLANNING') {
-                    $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
-                    foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
 
-                        $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
-                        $pfi = PFI::find($approvedLoiItem->pfi_id);
-                        $pfi->status = 'PO Initiated';
-                        $pfi->save();
+                    $masterModels = $request->master_model_id;
+                    $pfiId = Crypt::decrypt($request->pfi_id);
 
+                    foreach($request->pfi_items as $key => $pfiItem) {
                         if($request->item_quantity_selected[$key] > 0) {
-                            $loiPurchaseOrder = new LOIItemPurchaseOrder();
-                            $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
-                            $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
-                            $loiPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
-                            $loiPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
-                            $loiPurchaseOrder->save();
+                            $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
+                            $PfiItemPurchaseOrder->pfi_id = $pfiId;
+                            $PfiItemPurchaseOrder->pfi_item_id = $pfiItem;
+                            $PfiItemPurchaseOrder->purchase_order_id = $purchasingOrderId;
+                            $PfiItemPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
+                            $PfiItemPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
+                            $PfiItemPurchaseOrder->save();
                         }
                     }
+                
+                    // if toyota pfi -> map with inventory
+                    $pfi = PFI::find($pfiId);
                     $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    $alreadyAddedIds = [];
+                    // $alreadyAddedIds = [];
                     foreach($masterModels as $key => $masterModel)
                     {
+                    // status change to WAITING
+                        
                         $model = MasterModel::find($masterModel);
-                        $possibleModelIds = MasterModel::where('model', $model->model)
-                                            ->where('sfx', $model->sfx)->pluck('id');
-                        $vehicle = Vehicles::where('model_id', $masterModel)
-                                                    ->where('purchasing_order_id', $purchasingOrderId)
+                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
                                                     ->where('vin', $vins[$key])
                                                     ->whereNull('supplier_inventory_id')
                                                     ->first();
 
+                    //     $possibleModelIds = MasterModel::where('model', $model->model)
+                    //                         ->where('sfx', $model->sfx)->pluck('id');
 
-                        $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                            ->whereNull('purchase_order_id')
-                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                            ->whereNotIn('id', $alreadyAddedIds)
-                            ->where('supplier_id', $purchasingOrder->vendors_id)
-                            ->where('whole_sales', $dealer);
+                    //     $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                    //         ->whereNull('purchase_order_id')
+                    //         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                    //         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                    //         ->where('supplier_id', $vendors_id)
+                    //         ->whereNotIn('id', $alreadyAddedIds)
+                    //         ->where('whole_sales', $dealer);
 
-                        if($vins[$key]) {
-                            $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
-                        }
+                    //     if($vins[$key]) {
+                    //          $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
+                    //     }
 
-                        if($inventoryItem->count() > 0) {
-                            $inventoryIds = $inventoryItem->pluck('id');
-                            $inventory = SupplierInventory::where('pfi_id', $pfi->id)
-                                                        ->whereIn('id', $inventoryIds);
-                            if($inventory->count() > 0) {
-                                $inventoryItem = $inventory->first();
+                    //     if($inventoryItem->count() > 0) {
+                    //         $inventoryIds = $inventoryItem->pluck('id');
+                    //         $inventory = SupplierInventory::where('pfi_id', $pfi->id)
+                    //                             ->whereIn('id', $inventoryIds);
 
-                            }else{
-                                $inventoryItem = $inventoryItem->first();
-                                $inventoryItem->pfi_id = $pfi->id;
-                            }
-                            $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
-                            $inventoryItem->purchase_order_id = $purchasingOrder->id;
-                            $inventoryItem->save();
+                    //         if($inventory->count() > 0) {
+                    //             $inventoryItem = $inventory->first();
+                    //         }else{
+                    //             $inventoryItem = $inventoryItem->first();
+                    //             $inventoryItem->pfi_id = $pfi->id;
+                    //         }
 
-                            $vehicle->supplier_inventory_id = $inventoryItem->id;
-                            $vehicle->save();
+                    //         $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
+                    //         $inventoryItem->purchase_order_id = $purchasingOrder->id;
+                    //         $inventoryItem->save();
 
-                            $alreadyAddedIds[] = $inventoryItem->id;
-                        }
+                    //         // add entry to inventory log table
+
+                    //         $vehicle->supplier_inventory_id = $inventoryItem->id;
+                    //         $vehicle->save();
+
+                    //         $alreadyAddedIds[] = $inventoryItem->id;
+                    //     }
                     }
                 }
 

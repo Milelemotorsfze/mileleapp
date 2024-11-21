@@ -493,7 +493,7 @@ class PFIController extends Controller
         $fileName = 'MILELE - '.$pfi->pfi_reference_number;
         
         if($request->download == 1) {
-            return $pdfFile->download($fileName.'.pdf');
+            return $pdfFile->download($fileName.'.pdf',['compress' => true]);
         }else{
             $fileName = $fileName."_".time().'.pdf';
 

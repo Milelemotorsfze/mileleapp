@@ -32,6 +32,9 @@
         .form-control {
             height:32px !important
         }
+        .interior-color{
+            max-width:50px !important;
+        }
     </style>
     @can('create-demand-planning-po')
         @php
@@ -421,8 +424,8 @@
                         var brandCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="brand[]" title="'+ brand +'"  value="' + brand + '" class="form-control" readonly></div>');
                         var masterModelLineCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ masterModelLine +'" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
                         var detailCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="detail[]" value="' + detail + '"  title="'+ detail +'"  class="form-control" readonly></div>');
-                        var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
-                        var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+                        var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="ex_colour[]" multiple class="form-control exterior-color"><option value="">Exterior Color</option></select></div>');
+                        var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" multiple class="form-control interior-color"><option value="">Interior Color</option></select></div>');
                         var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
                         var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
                         var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="engine_number[]" class="form-control"></div>');
@@ -449,6 +452,15 @@
 
                         $('#variantRowsContainer').append(newRow);
 
+                        $('.exterior-color').select2({
+                            placeholder: 'Exterior Color',
+                            maximumSelectionLength: 1
+                         });
+                         $('.interior-color').select2({
+                            placeholder: 'Interior Color',
+                            maximumSelectionLength: 1,
+                          
+                         });
                     }
                     $('#variantRowsContainer').show();
                 
