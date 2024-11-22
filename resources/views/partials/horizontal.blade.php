@@ -174,7 +174,7 @@
                                 <li class="nav-item dropdown dashboard-menu-div">
                                     <a class="nav-link dropdown-toggle arrow-none ml-3" href="/" id="topnav-more" role="button">
                                         <i data-feather="home"></i>
-                                        <span data-key="t-extra-pages">Dashboard</span>
+                                        <span data-key="t-extra-pages">Dashboard (test-live)</span>
                                     </a>
                                 </li>
                                 @php
