@@ -114,6 +114,18 @@
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
+                                    <label for="production-date" class="form-label">Production Date</label>
+                                    <input 
+                                        type="month" 
+                                        id="production-date" 
+                                        name="ppmmyyy" 
+                                        class="form-control" 
+                                        value="{{ old('ppmmyyy') }}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>
                                     <select class="form-control" autofocus name="gearbox" id="gear">
                                         <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
