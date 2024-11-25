@@ -131,6 +131,7 @@ use App\Http\Controllers\VehicleInvoiceController;
 use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\BelgiumVehicleStockExport;
 
 /*
 /*
@@ -1112,5 +1113,8 @@ Route::get('/d', function () {
     Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
     Route::get('/export-uae-vehicle-stock', function () {
         return Excel::download(new UAEVehicleStockExport, 'uae_vehicle_stock.xlsx');
+    });
+    Route::get('/export-belgium-vehicle-stock', function () {
+        return Excel::download(new BelgiumVehicleStockExport, 'belgium_vehicle_stock.xlsx');
     });
 });
