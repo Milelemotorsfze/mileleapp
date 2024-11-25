@@ -8,6 +8,7 @@ use App\Models\MasterModel;
 use App\Models\LetterOfIndentItem;
 use App\Models\PFI;
 use App\Models\PfiItem;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Clients;
 use App\Models\Country;
@@ -100,7 +101,6 @@ class PFIController extends Controller
                             })
                             ->pluck('code')->toArray();
 
-                            // $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
                             $item->loi_item_code = implode(",", $LOICodes);  
                         }
                         $newPFIFileName = "";
@@ -108,16 +108,26 @@ class PFIController extends Controller
                             $filename = $pfi->new_pfi_document_without_sign;
                             $newPFIFileName =  strstr($filename, '_', true) . ".pdf";
                         }
-
                         $oldPFIFileName =  strstr($pfi->pfi_document_without_sign, '_', true) . ".pdf";
-
-                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName'));
+                        $showCreatePOBtn = 1;
+                        $PoUtilizedQty = PfiItemPurchaseOrder::where('pfi_id', $pfi->id)
+                                                ->sum('quantity');
+                        if($PoUtilizedQty) {
+                            $pfiQty =  PfiItem::select('is_parent','pfi_id','pfi_quantity')
+                                        ->where('is_parent', true)
+                                        ->where('pfi_id', $pfi->id)
+                                        ->sum('pfi_quantity');
+                            if($pfiQty <= $PoUtilizedQty) {
+                                $showCreatePOBtn = 0;
+                            }
+                        }                      
+                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName','showCreatePOBtn',
+                        'PoUtilizedQty'));
                     })
                     ->rawColumns(['action'])
                     ->toJson();
                 }
 
-            
             return view('pfi.index');
     }
     public function PFIItemList(Request $request) {
@@ -163,6 +173,7 @@ class PFIController extends Controller
                 $query->select('id','name');
             }]);
 
+            
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
                         $query->where('code', 'like', "%{$request->code}%");
@@ -189,8 +200,8 @@ class PFIController extends Controller
                     });
             }
             if(!empty($request->client_id)) {
-                $data->whereHas('letterOfIndentItem.LOI',function($query) use($request) {
-                        $query->where('client_id',$request->client_id);
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('client_id', $request->client_id);
                     });
             }
             if(!empty($request->country_id)) {
@@ -198,7 +209,6 @@ class PFIController extends Controller
                         $query->where('country_id', $request->country_id);
                     });
             }
-
             if(!empty($request->supplier_id)) {
                 $data->whereHas('pfi',function($query) use($request) {
                         $query->where('supplier_id', $request->supplier_id);
@@ -224,7 +234,6 @@ class PFIController extends Controller
                         $query->where('sfx', 'like', "%{$request->sfx}%");
                     });
             }
-           
             if(!empty($request->pfi_quantity)) {
                 $data->where('pfi_quantity', 'like', "%{$request->pfi_quantity}%");
     
@@ -245,13 +254,21 @@ class PFIController extends Controller
             }
             if(!empty($request->total_price)) {
                 $data->having("total_price", 'like', "%{$request->total_price}%");
-
             }
             if(!empty($request->pfi_item_code)) {
                 $data->where("code", 'like', "%{$request->pfi_item_code}%");
-
             }
-           
+            if($request->tab == 'TOYOTA'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->where('brand_name', 'like', "TOYOTA");
+                });
+
+            }else if($request->tab == 'OTHER-BRANDS'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->whereNot('brand_name', 'TOYOTA');
+                });
+            }
+      
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
                 $data = $data->get();
@@ -476,7 +493,7 @@ class PFIController extends Controller
         $fileName = 'MILELE - '.$pfi->pfi_reference_number;
         
         if($request->download == 1) {
-            return $pdfFile->download($fileName.'.pdf');
+            return $pdfFile->download($fileName.'.pdf',['compress' => true]);
         }else{
             $fileName = $fileName."_".time().'.pdf';
 

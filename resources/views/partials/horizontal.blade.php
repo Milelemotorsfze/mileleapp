@@ -1148,9 +1148,9 @@
                                 </li>
                                 @endif
                                 @endcan
-                                @can('view-po-details')
+                                @canany(['view-po-details','demand-planning-po-list',])
                                 @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -1171,7 +1171,7 @@
                                 </li>
                                 @endif
                                 @endif
-                                @endcan
+                                @endcanany
                                 @can('variants-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
@@ -1391,7 +1391,7 @@
                                             </div>
                                         </div>
                                         @endif
-                                        @endcan
+                                        @endcanany
                                         @can('demand-create')
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-create');
@@ -1533,7 +1533,7 @@
                                     </div>
                                 </li>
                                 @endif
-                                @endcan
+                                @endcanany
 
                                 <!-- Demand Planning Module end -->
                                 @php
