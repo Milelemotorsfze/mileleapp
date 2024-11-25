@@ -340,7 +340,8 @@ class InspectionController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $vehicle = Vehicles::find($id);
-        $vehicle->ppmmyyy = $request->input('ppmmyyy');
+        $selectedDate = Carbon::createFromFormat('Y-m', $request->input('ppmmyyy'))->format('M-Y');
+        $vehicle->ppmmyyy = $selectedDate;
         $vehicle->save();
         $inspections = new Inspection();
         $inspections->vehicle_id = $id;
