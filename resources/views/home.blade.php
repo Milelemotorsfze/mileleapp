@@ -136,6 +136,11 @@
 <div class="card">
     <div class="card-body px-0">
         <div class="table-responsive px-3">
+        <div class="text-right mb-3">
+    <a href="{{ url('/export-belgium-vehicle-stock') }}" class="btn btn-success">
+        Export to Excel
+    </a>
+</div>
             <div class="card-header align-items-center">
                 <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Belgium Vehicle Stock</h4>
             </div>

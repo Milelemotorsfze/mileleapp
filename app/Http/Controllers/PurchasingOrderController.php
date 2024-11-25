@@ -1803,9 +1803,11 @@ public function checkcreatevins(Request $request)
         foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
             $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
             if ($purchasingOrder) {
+                $logisticsEmail = env('LOGISTICS_EMAIL', 'default@domain.com');
+                $additionalEmail = env('CSO_EMAIL', null);
                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
-                ? ['team.logistics@milele.com'] 
-                : ['team.logistics@milele.com', 'abdul@milele.com'];
+                ? [$logisticsEmail] 
+                : [$logisticsEmail, $additionalEmail];
                 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
                 $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
                     $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
@@ -3470,11 +3472,11 @@ if ($paymentOrderStatus->isNotEmpty()) {
     if (!empty($changedFields)) {
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com'];
+        $recipients = config('mail.custom_recipients.dp');
     }
     else
     {
-        $recipients = ['abdul@milele.com'];
+        $recipients = config('mail.custom_recipients.cso');
     }
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
@@ -3889,11 +3891,17 @@ public function updatePrices(Request $request)
 }
 if($purchasingOrder->is_demand_planning_po == 1)
 {
-    $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+    $recipients = [
+        config('mail.custom_recipients.dp'),
+        config('mail.custom_recipients.finance'),
+    ];
 }
 else
 {
-    $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+    $recipients = [
+        config('mail.custom_recipients.cso'),
+        config('mail.custom_recipients.finance'),
+    ];
 }
 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
 // Format the detail text including the price changes information
@@ -4055,11 +4063,11 @@ public function updateVariants(Request $request)
     $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com'];
+        $recipients = config('mail.custom_recipients.dp');
     }
     else
     {
-        $recipients = ['abdul@milele.com']; 
+        $recipients = config('mail.custom_recipients.cso'); 
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
                   "PFI Number: " . $purchasingOrder->pl_number . "\n" .
@@ -4622,12 +4630,12 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-    $recipients = ['team.finance@milele.com'];
+    $recipients = config('mail.custom_recipients.finance');
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     else
     {
-        $recipients = ['team.finance@milele.com'];
+        $recipients = config('mail.custom_recipients.finance');
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4712,12 +4720,12 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = ['team.dp@milele.com'];
+            $recipients = config('mail.custom_recipients.dp');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
-            $recipients = ['abdul@milele.com'];
+            $recipients = config('mail.custom_recipients.cso');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4824,12 +4832,12 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = ['team.dp@milele.com'];
+            $recipients = config('mail.custom_recipients.dp');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
-            $recipients = ['abdul@milele.com'];
+            $recipients = config('mail.custom_recipients.cso');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4903,12 +4911,18 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+        $recipients = [
+            config('mail.custom_recipients.dp'),
+            config('mail.custom_recipients.finance'),
+        ];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     else 
     {
-        $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+        $recipients = [
+            config('mail.custom_recipients.cso'),
+            config('mail.custom_recipients.finance'),
+        ];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
