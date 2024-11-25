@@ -340,6 +340,8 @@ class InspectionController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $vehicle = Vehicles::find($id);
+        $vehicle->ppmmyyy = $request->input('ppmmyyy');
+        $vehicle->save();
         $inspections = new Inspection();
         $inspections->vehicle_id = $id;
         $inspections->remark = $request->input('remarks');
