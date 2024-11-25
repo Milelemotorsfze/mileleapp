@@ -30,10 +30,14 @@
             border-radius: 10px;
         }
         .form-control {
-            height:32px !important
+            height:32px !important;
         }
-        .interior-color{
-            max-width:50px !important;
+        .select2-container {
+            width: 100% !important;
+        }
+      .select2-selection__rendered {
+            font-size: 12px !important;
+            font-weight: 400 !important; /* Adjust this value as needed */
         }
     </style>
     @can('create-demand-planning-po')
@@ -69,9 +73,10 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
-                <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form">
+                <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form"  enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="po_from" value="DEMAND_PLANNING">
+                    <input type="hidden" name="is_demand_planning_po" value="1">
                     <input type="hidden" name="pfi_id" value="{{ \Crypt::encrypt($pfi->id) }}">
                     <div class="row">
                         <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
@@ -151,12 +156,10 @@
                                 <label for="brandInput" class="form-label">Variant:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">Brand:</label>
+                                <label for="QTY" class="form-label">Brand & Model Line:</label>
                             </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">Model Line:</label>
-                            </div>
-                            <div class="col-lg-1 col-md-6">
+                          
+                            <div class="col-lg-2 col-md-6">
                                 <label for="QTY" class="form-label">Variants Detail:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
@@ -212,8 +215,7 @@
                         @foreach($pfiItems as $key => $pfiItem)
                                 <div class="row">
                                 <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
-                                    <!-- <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiItem->letterOfIndentItem->id ?? ''}}"> -->
-                                    <!-- <input type="hidden" name="approved_loi_ids[]" value="{{$pfiItem->id}}"> -->
+                                  
                                     <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
                                     <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
                                     <div class="col-lg-2 col-md-6 mt-md-2">
@@ -305,7 +307,7 @@
     let formValid = true;
     let isToyotaPO = "{{ $isToyotaPO }}"
     let isEnableVehicleAdd = true;
-
+    
     $('#prefered_destination').select2({
         placeholder: "Select Prefered Destination",
         maximumSelectionLength: 1
@@ -357,7 +359,6 @@
     $('.add-row-btn').click(function(e) {
         $('.bar').show();
         var variantQuantity = '{{ $pfiItems->count() }}';
-        console.log(variantQuantity);
         var price = 0;
         var exColours = <?= json_encode($exColours) ?>;
         var intColours = <?= json_encode($intColours) ?>;
@@ -394,8 +395,8 @@
                 // check remaining quantity is available or not
                 var qty = $('#quantity-'+i).val();
                 var actualQuantity = $('#quantity-'+i).attr('data-quantity');
-            
                 var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
+
                     $('#quantity-'+i).attr('data-quantity',remaingQuantity);
                     $('#quantity-'+i).val(remaingQuantity);
                     var selectedVariant = $('#variant-id-'+i).find(":selected").text();
@@ -414,58 +415,78 @@
                     var unitPrices = price * qty;
                     var sum = parseInt(sum) + parseInt(unitPrices);
                     $('#total-price').val(sum);
+                    var brandModelLine = masterModelLine+'-'+brand;
 
                     for (var j = 0; j < qty; j++) {
-                        var newRow = $('<div class="row row-space"></div>');
-                        var pfiItemCol  = $('<input type="hidden" name="pfi_item_Ids[]" value="' + pfiItemId + '" >');
-                        var masterModelCol  = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
-                        var ModelCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ model +'"  value="' + model + '" class="form-control" readonly></div>');
-                        var variantCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" id="variant-id" title="'+ selectedVariant +'"   title="'+ model +'"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
-                        var brandCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="brand[]" title="'+ brand +'"  value="' + brand + '" class="form-control" readonly></div>');
-                        var masterModelLineCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ masterModelLine +'" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-                        var detailCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="detail[]" value="' + detail + '"  title="'+ detail +'"  class="form-control" readonly></div>');
-                        var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="ex_colour[]" multiple class="form-control exterior-color"><option value="">Exterior Color</option></select></div>');
-                        var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" multiple class="form-control interior-color"><option value="">Interior Color</option></select></div>');
-                        var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                        var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                        var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="engine_number[]" class="form-control"></div>');
-                        var unitPrice = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" value="' + price + '"  title="'+ price +'" name="unit_prices[]" readonly class="form-control"></div>');
-                        var removeBtn = $('<div class="col-lg-1 col-md-6 mt-md-2"><button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
-                        // Populate Exterior Colors dropdown
-                        var exColourDropdown = exColourCol.find('select');
-                        for (var id in exColours) {
-                            if (exColours.hasOwnProperty(id)) {
-                                exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
-                            }
-                        }
-                        // Populate Interior Colors dropdown
-                        var intColourDropdown = intColourCol.find('select');
-                        for (var id in intColours) {
-                            if (intColours.hasOwnProperty(id)) {
-                                intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
-                            }
-                        }
-                        newRow.append(pfiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol);
+                        var newRow = $(`<div class="row row-space">
+                                    <input type="hidden" name="pfi_item_Ids[]" value="${ pfiItemId }" >
+                                    <input type="hidden" id="model-id" name="master_model_id[]" value="${ masterModelId }" >
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" title="${ model }"  value="${ model }" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" id="variant-id" title="${ selectedVariant }"   title="${ model }" 
+                                         name="variant_id[]" value="${selectedVariant}" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" title="${ brandModelLine }"  value="${ brandModelLine }" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 mt-md-2">
+                                        <textarea name="detail[]" class="form-control" readonly style="width: 100%;">${detail}</textarea>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mb-5 mt-md-2">
+                                        <select name="ex_colour[]" class="form-control exterior-colours">
+                                            <option value="">Exterior Color</option>
+                                                @foreach ($exColours as $colour)
+                                                    <option value="{{ $colour->id }}">
+                                                        {{ $colour->name }} @if($colour->code) ( {{ $colour->code}}) @endif
+                                                    </option>
+                                                @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <select name="int_colour[]" class="form-control interior-colours">
+                                            <option value="">Interior Color</option>
+                                            @foreach ($intColours as $colour)
+                                                <option value="{{ $colour->id }}">
+                                                    {{ $colour->name }} @if($colour->code) ( {{ $colour->code}}) @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="date" name="estimated_arrival[]" class="form-control">
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" name="engine_number[]" class="form-control" >
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" value="${price}"  title="${price}" name="unit_prices[]" readonly class="form-control">
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 mt-md-2">
+                                        <input type="text" name="vin[]" class="form-control"  title="VIN Number" placeholder="VIN">
+                                    </div>
+                                </div>`);
+                        var removeBtn = $(`<div class="col-lg-1 col-md-6 mt-md-2">
+                                            <button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger btn-sm remove-row-btn">
+                                                <i class="fas fa-times"></i></button>
+                                            </div>`);
+                       
                         if(isToyotaPO == 0) {
                             newRow.append(removeBtn);
                         }
-
                         $('#variantRowsContainer').append(newRow);
-
-                        $('.exterior-color').select2({
-                            placeholder: 'Exterior Color',
-                            maximumSelectionLength: 1
-                         });
-                         $('.interior-color').select2({
-                            placeholder: 'Interior Color',
-                            maximumSelectionLength: 1,
-                          
-                         });
+                        $('.exterior-colours').select2({
+                            placeholder: 'Exterior',
+                            width: '100%',
+                        });
+                        $('.interior-colours').select2({
+                            placeholder: 'Interior',
+                            width: '100%',
+                        });
                     }
                     $('#variantRowsContainer').show();
-                
             }
-
         }
     });
 

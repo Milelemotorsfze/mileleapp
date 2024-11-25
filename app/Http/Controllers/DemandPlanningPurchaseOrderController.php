@@ -70,8 +70,8 @@ class DemandPlanningPurchaseOrderController extends Controller
                                                         ->count();
         }
 
-        $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
-        $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->pluck('name', 'id')->toArray();
+        $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->get();
+        $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->get();
         $paymentTerms = PaymentTerms::all();
         $countries = Country::select('id','name')->get();
         return view('purchase-order.create', compact('pfiItems','exColours','isToyotaPO','intColours','pfi','paymentTerms','countries'));
