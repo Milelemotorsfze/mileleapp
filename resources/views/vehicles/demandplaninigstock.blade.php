@@ -571,9 +571,7 @@ table.dataTable thead th select {
                   <th>GP %</th>
                   <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -860,9 +858,7 @@ if (hasPricePermission) {
         });
     }
                 columns9.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         {
     data: null,
     name: 'chat',
@@ -934,11 +930,9 @@ if (hasPricePermission) {
         35: 'vehicles.minimum_commission',
         36: 'vehicles.gp',
         37: 'vehicles.price',
-        38: 'documents.import_type',
-        39: 'documents.owership',
-        40: 'documents.document_with',
-        41: 'vehicles.custom_inspection_number',
-        42: 'vehicles.custom_inspection_status',
+        38: 'vehicles.ownership_type',
+        39: 'vehicles.custom_inspection_number',
+        40: 'vehicles.custom_inspection_status',
     };   
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
