@@ -568,9 +568,7 @@ table.dataTable thead th select {
                   <th>GP %</th>
                     <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
                   <th>Comments</th>
@@ -829,9 +827,7 @@ var columns6 = [
                 });
             }
                 columns6.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         { 
         data: 'custom_inspection_number', 
         name: 'vehicles.custom_inspection_number',
@@ -915,11 +911,9 @@ var columns6 = [
         32: 'vehicles.minimum_commission',
         33: 'vehicles.gp',
         34: 'vehicles.price',
-        35: 'documents.import_type',
-        36: 'documents.owership',
-        37: 'documents.document_with',
-        38: 'vehicles.custom_inspection_number',
-        39: 'vehicles.custom_inspection_status',
+        35: 'vehicles.ownership_type',
+        36: 'vehicles.custom_inspection_number',
+        37: 'vehicles.custom_inspection_status',
     };
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
