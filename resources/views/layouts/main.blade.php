@@ -15,8 +15,20 @@
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script> -->
 		<script src="{{ asset('js/custom/jquery.validate.min.js') }}"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script> -->
+        <script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
 
         <style>
+            .table-responsive {
+                height: 80vh;
+                overflow-y: auto;
+                white-space: nowrap;
+                cursor: grab;
+            }
+
+            .dragscroll-interaction {
+                cursor: default;
+            }
+
      /* .modal-content {
             position:fixed;
             top: 50%;
@@ -92,6 +104,29 @@
         <!-- JAVASCRIPT -->
         @include('partials/vendor-scripts')
         @stack('scripts')
+        <!-- For Drag-and-Scroll Behavior -->
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+                const dragScrollElements = document.querySelectorAll('.dragscroll');
+
+                dragScrollElements.forEach(el => {
+                    el.addEventListener('mousedown', (event) => {
+                        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+                            el.classList.add('dragscroll-interaction'); // Disable dragscroll
+                        }
+                    });
+
+                    el.addEventListener('mouseup', () => {
+                        el.classList.remove('dragscroll-interaction'); // Re-enable dragscroll
+                    });
+
+                    el.addEventListener('mouseleave', () => {
+                        el.classList.remove('dragscroll-interaction'); // Ensure dragscroll re-enables if the mouse leaves
+                    });
+                });
+            });
+        </script>
+
         <!-- dropzone js -->
         <script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
         <script src="{{ asset('js/app.js') }}"></script>

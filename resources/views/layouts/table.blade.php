@@ -14,6 +14,7 @@
         <!-- <meta name="csrf-token" content="content"> -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
         <style>
             .btn-soft-blue{
                 background-color: #1bb4e3;
@@ -49,6 +50,15 @@
 .approvalBtnClass button {
 	margin-left:2px!important;
 }
+.table-responsive {
+    height: 80vh;
+    overflow-y: auto;
+    white-space: nowrap;
+    cursor: grab;
+}
+.dragscroll-interaction {
+    cursor: default;
+}
         </style>
     </head>
     <body data-layout="horizontal">
@@ -77,6 +87,34 @@
         <script src="{{ asset('js/app.js')}}"></script>
         <script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
         <script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
+
+         <!-- For Drag-and-Scroll Behavior -->
+         <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+            const tableWrapper = document.querySelector('.table-responsive');
+
+            // Disable dragscroll while focusing on input elements
+            tableWrapper.addEventListener('mousedown', (event) => {
+                if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+                    tableWrapper.classList.add('dragscroll-disabled'); // Disable dragging
+                    tableWrapper.style.cursor = "default"; // Change cursor style
+                }
+            });
+
+            // Re-enable dragscroll when focus is removed from inputs
+            tableWrapper.addEventListener('mouseup', () => {
+                tableWrapper.classList.remove('dragscroll-disabled'); // Re-enable dragging
+                tableWrapper.style.cursor = "grab"; // Restore cursor style
+            });
+
+            tableWrapper.addEventListener('mouseleave', () => {
+                tableWrapper.classList.remove('dragscroll-disabled'); // Re-enable dragging on mouse leave
+                tableWrapper.style.cursor = "grab";
+            });
+        });
+
+        </script>
+
         <script>
         $(document).ready(function ()
         {
