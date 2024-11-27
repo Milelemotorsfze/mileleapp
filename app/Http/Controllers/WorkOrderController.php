@@ -282,7 +282,10 @@ class WorkOrderController extends Controller
                 return $queryType->where('type', $type);
             })
             ->when($hasLimitedAccess, function ($queryLimited) use ($authId) {
-                return $queryLimited->where('created_by', $authId);
+                return $queryLimited->where(function ($subQuery) use ($authId) {
+                    $subQuery->where('created_by', $authId)
+                             ->orWhere('sales_person_id', $authId);
+                });
             })
             ->when($filters, function ($queryStatus) use ($filters) {
                 // Apply status filter
