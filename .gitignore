@@ -5,7 +5,6 @@
 /public/storage
 /storage/*.key
 /vendor
-.htaccess
 .env
 .env.backup
 .env.production
@@ -21,6 +20,7 @@ yarn-error.log
 
 # Ignore everything in the public directory
 /public/*
+.htaccess
 
 # Allow the css/custom and js/custom directories and their contents
 !/public/css/
