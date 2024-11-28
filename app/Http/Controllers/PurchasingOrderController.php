@@ -1135,7 +1135,7 @@ public function getBrandsAndModelLines(Request $request)
                                     ->where('is_parent', true)
                                     ->first();
                     $brand = $parentPfiItemLatest->masterModel->modelLine->brand->brand_name ?? '';
-                        if(strcasecmp($brand, 'TOYOTA') == 0) {
+                        if(strcasecmp($brand, 'TOYOTA') == 0 && $request->can_inventory_allocate == 1) {
                             $masterModels = $request->master_model_id;
                             $childPfiItemLatest =  PfiItem::where('pfi_id', $pfiId)
                                                     ->where('is_parent', false)
@@ -1158,14 +1158,11 @@ public function getBrandsAndModelLines(Request $request)
                                     ->where('whole_sales', $dealer);
                                    
                                  // if exterior colour is coming check same colour is existing with inventory
-                                if($ex_colours[$key]) {
-                                   $inventoryItem->where('exterior_color_code_id', $ex_colours[$key]);
+                                if($ex_colours[$key] && $int_colours[$key]) {
+                                   $inventoryItem->where('exterior_color_code_id', $ex_colours[$key])
+                                                    ->where('interior_color_code_id', $int_colours[$key]);
                                 }
-
-                                if($int_colours[$key]) {
-                                    $inventoryItem->where('interior_color_code_id', $int_colours[$key]);
-                                }
-                                 
+                               
                                 if($inventoryItem->count() > 0) {
                                     $inventory = $inventoryItem->first();
 

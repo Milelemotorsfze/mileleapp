@@ -546,6 +546,10 @@ Route::get('/d', function () {
     Route::get('pfi-item/get-customer-countries', [PFIController::class,'getCustomerCountries'])->name('pfi-item.customer-countries');
     // PO
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class)->only('create');
+    Route::get('dp-purchase-order/check-inventory-colour', [DemandPlanningPurchaseOrderController::class,'checkInventoryColour'])
+                                                                ->name('dp-purchase-order.inventory-check');
+    Route::get('dp-purchasing-order/check-po-number', [DemandPlanningPurchaseOrderController::class, 'uniqueCheckPONumber'])->name('dp-purchasing-order.checkPONumber');
+  
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
