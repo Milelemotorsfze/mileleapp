@@ -5,7 +5,6 @@
 /public/storage
 /storage/*.key
 /vendor
-.htaccess
 .env
 .env.backup
 .env.production
