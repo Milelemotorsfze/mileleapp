@@ -656,7 +656,7 @@
 						</div>
 						</br>
 						<div class="row">
-							<div class="table-responsive">
+							<div class="table-responsive" >
 								<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 									<tr style="border-bottom:1px solid #b3b3b3;">
 										<th>Action</th>

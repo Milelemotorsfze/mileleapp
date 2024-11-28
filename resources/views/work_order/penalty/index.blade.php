@@ -23,7 +23,7 @@
 
     <div class="card-body">
         <div class="row">
-            <div class="table-responsive">
+            <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
                     <thead style="background-color: #e6f1ff">
                         <tr>

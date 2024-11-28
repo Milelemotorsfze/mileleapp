@@ -212,7 +212,7 @@
 				</div>
 			</div>
 			<br/>
-			<div class="table-responsive">
+			<div class="table-responsive dragscroll">
 				<table class="my-datatable table table-striped table-editable" style="width:100%;">
 					<thead>
 						<tr>

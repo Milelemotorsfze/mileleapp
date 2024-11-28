@@ -1089,7 +1089,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="table-responsive">
+							            <div class="table-responsive" >
                                             <table class="my-datatable table table-striped table-editable table" style="width:100%;">
                                                 <tr style="border-bottom:1px solid #b3b3b3; background-color : #e8f3fd!important;">
                                                     <th>Action</th>
