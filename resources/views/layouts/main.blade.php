@@ -19,7 +19,7 @@
 
         <style>
             .table-responsive {
-                height: 80vh;
+                /* height: 80vh; */
                 overflow-y: auto;
                 white-space: nowrap;
                 cursor: grab;

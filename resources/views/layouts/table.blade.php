@@ -51,7 +51,7 @@
 	margin-left:2px!important;
 }
 .table-responsive {
-    height: 80vh;
+    /* height: 80vh; */
     overflow-y: auto;
     white-space: nowrap;
     cursor: grab;
