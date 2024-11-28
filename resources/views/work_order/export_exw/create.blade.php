@@ -281,12 +281,7 @@
 				<div class="card">
 					<div class="card-header">
 						<h4 class="card-title">
-							<center>General Informations<?php
-                                echo 'max_input_vars: ' . ini_get('max_input_vars') . PHP_EOL;
-                                echo 'max_multipart_body_parts: ' . ini_get('max_multipart_body_parts') . PHP_EOL;
-                                echo 'post_max_size: ' . ini_get('post_max_size') . PHP_EOL;
-                                echo 'upload_max_filesize: ' . ini_get('upload_max_filesize') . PHP_EOL;
-                                ?></center>
+							<center>General Informations</center>
 						</h4>
 					</div>
 					<div class="card-body">
@@ -639,7 +634,7 @@
 								<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 								<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
 									@foreach($vins as $vin)
-									<option value="{{$vin->vin ?? ''}}" @if($index < 55) selected @endif>{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
+									<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -3688,4 +3683,3 @@
 	@endif
 
 @endsection
-
