@@ -2703,6 +2703,7 @@ public function viewalls(Request $request)
         ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
+->whereNot('category', 'Modified')
 ->get();
 $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
 $normalizationMap = [
@@ -3381,6 +3382,7 @@ public function availablevehicles(Request $request)
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
@@ -3557,6 +3559,7 @@ public function availablevehicles(Request $request)
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
@@ -3730,6 +3733,7 @@ COALESCE(
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [

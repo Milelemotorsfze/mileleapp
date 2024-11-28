@@ -830,7 +830,6 @@ table.dataTable thead th select {
                 var words = data.split(' ');
                 var firstFiveWords = words.slice(0, 5).join(' ') + '...';
                 var fullText = data;
-
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
