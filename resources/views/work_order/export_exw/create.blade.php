@@ -634,7 +634,7 @@
 								<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 								<select id="vin_multiple" name="vin_multiple[]" class="form-control widthinput" multiple="true">
 									@foreach($vins as $index => $vin)
-										<option value="{{ $vin->vin ?? '' }}" @if($index < 55) selected @endif>
+										<option value="{{ $vin->vin ?? '' }}">
 											{{ $vin->vin ?? '' }} / 
 											{{ $vin->variant->master_model_lines->brand->brand_name ?? '' }} / 
 											{{ $vin->variant->master_model_lines->model_line ?? '' }}
