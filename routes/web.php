@@ -1116,4 +1116,6 @@ Route::get('/d', function () {
     Route::get('/export-belgium-vehicle-stock', function () {
         return Excel::download(new BelgiumVehicleStockExport, 'belgium_vehicle_stock.xlsx');
     });
+    Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
+    Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
 });

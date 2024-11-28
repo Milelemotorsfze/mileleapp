@@ -565,7 +565,7 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP %</th>
+                  <!-- <th>GP %</th> -->
                     <th>Price</th>
                 @endif
                   <th>Document Owership</th>
@@ -807,7 +807,7 @@ var columns6 = [
                         return ''; // Return an empty string if there's no price
                     }
         },
-                    { data: 'gp', name: 'vehicles.gp' },
+                    // { data: 'gp', name: 'vehicles.gp' },
                     {
                     data: 'price', 
                     name: 'vehicles.price', 
@@ -909,11 +909,11 @@ var columns6 = [
         30: 'countries.name',
         31: 'costprice',
         32: 'vehicles.minimum_commission',
-        33: 'vehicles.gp',
-        34: 'vehicles.price',
-        35: 'vehicles.ownership_type',
-        36: 'vehicles.custom_inspection_number',
-        37: 'vehicles.custom_inspection_status',
+        // 33: 'vehicles.gp',
+        33: 'vehicles.price',
+        34: 'vehicles.ownership_type',
+        35: 'vehicles.custom_inspection_number',
+        36: 'vehicles.custom_inspection_status',
     };
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
