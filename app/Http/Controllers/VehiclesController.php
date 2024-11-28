@@ -2774,6 +2774,7 @@ foreach ($variants as $variant) {
                         'vehicles.sales_remarks',
                         'vehicles.estimation_date',
                         'vehicles.territory',
+                        'vehicles.ownership_type',
                         'vehicles.inspection_date',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
@@ -3453,6 +3454,7 @@ public function availablevehicles(Request $request)
                          DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
                         'vehicles.reservation_end_date',
                         'vehicles.vin',
+                        'vehicles.ownership_type',
                         'vehicles.inspection_date',
                         'vehicles.engine',
                         'vehicles.minimum_commission',
@@ -3624,6 +3626,7 @@ public function availablevehicles(Request $request)
                     'vehicles.ppmmyyy',
                     'vehicles.reservation_end_date',
                     'vehicles.vin',
+                    'vehicles.ownership_type',
                     'vehicles.price',
                     'vehicles.territory',
                     'vehicles.sales_remarks',
@@ -3797,6 +3800,7 @@ COALESCE(
                     'vehicles.sales_remarks',
                     'vehicles.gp',
                     'vehicles.territory',
+                    'vehicles.ownership_type',
                     'vehicles.inspection_date',
                     'vehicles.custom_inspection_number',
                     'vehicles.custom_inspection_status',
@@ -3916,5 +3920,28 @@ COALESCE(
         } else {
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
+    }
+    public function getonwershipData(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            return response()->json([
+                'ownership_type' => $vehicle->ownership_type,
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+    }
+    public function saveonwership(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'documentonwership' => 'required|string',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->ownership_type = $request->input('documentonwership');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
     }

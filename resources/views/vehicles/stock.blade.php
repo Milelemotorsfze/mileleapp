@@ -593,12 +593,10 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP %</th>
+                  <!-- <th>GP %</th> -->
                     <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
                   <th>Comments</th>
@@ -881,7 +879,7 @@ table.dataTable thead th select {
     }
 
     columns7.push(
-                    { data: 'gp', name: 'vehicles.gp' },
+                    // { data: 'gp', name: 'vehicles.gp' },
                     {
             data: 'minimum_commission', 
             name: 'vehicles.minimum_commission', 
@@ -918,9 +916,7 @@ table.dataTable thead th select {
         });
     }
                 columns7.push(
-                { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+                { data: 'ownership_type', name: 'vehicles.ownership_type' },
         { 
         data: 'custom_inspection_number', 
         name: 'vehicles.custom_inspection_number',
@@ -1006,13 +1002,11 @@ var columnMap = {
         35: 'countries.name',
         36: 'costprice',
         37: 'vehicles.minimum_commission',
-        38: 'vehicles.gp',
-        39: 'vehicles.price',
-        40: 'documents.import_type',
-        41: 'documents.owership',
-        42: 'documents.document_with',
-        43: 'vehicles.custom_inspection_number',
-        44: 'vehicles.custom_inspection_status',
+        // 38: 'vehicles.gp',
+        38: 'vehicles.price',
+        39: 'vehicles.ownership_type',
+        40: 'vehicles.custom_inspection_number',
+        41: 'vehicles.custom_inspection_status',
     };
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,

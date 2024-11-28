@@ -45,13 +45,14 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
         @endphp
         @if ($hasPermission)
-             <!-- check PFI have pending qty -->
+            @if($showCreatePOBtn == 1) 
             <li>
-            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
-             title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
-                <i class="fa fa-plus"></i> Create PO
-            </a>
-        <li> 
+                <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+                title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
+                    <i class="fa fa-plus"></i> Create PO
+                </a>
+            <li> 
+            @endif
         @endif
         @endcan
 
@@ -73,12 +74,14 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
             @endphp
             @if ($hasPermission)
-            <li>
-                <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
-                        data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
-                    <i class="fa fa-trash"></i> To Delete PFI
-                </button>
+            @if($PoUtilizedQty <= 0 )
+                <li>
+                    <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
+                            data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
+                        <i class="fa fa-trash"></i> To Delete PFI
+                    </button>
                 </li>
+                @endif
             @endif
         @endcan
     </ul>

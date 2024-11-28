@@ -112,6 +112,26 @@
                                     </select>
                                 </div>
                             </div>
+                            @php
+    // Convert the 'Mar-2021' format to '2021-03' if $vehicle->ppmmyyy exists
+    $formattedDate = '';
+    if (!empty($vehicle->ppmmyyy)) {
+        $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
+        $formattedDate = $date ? $date->format('Y-m') : '';
+    }
+@endphp
+<div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="mb-3">
+        <label for="production-date" class="form-label">Production Date</label>
+        <input 
+            type="month" 
+            id="production-date" 
+            name="ppmmyyy" 
+            class="form-control" 
+            value="{{ $formattedDate }}"
+        >
+    </div>
+</div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>

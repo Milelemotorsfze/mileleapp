@@ -568,12 +568,10 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP %</th>
+                  <!-- <th>GP %</th> -->
                   <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -840,7 +838,7 @@ if (hasPricePermission) {
                         return ''; // Return an empty string if there's no price
                     }
         },
-        { data: 'gp', name: 'vehicles.gp' },
+        // { data: 'gp', name: 'vehicles.gp' },
         {
                     data: 'price', 
                     name: 'vehicles.price', 
@@ -860,9 +858,7 @@ if (hasPricePermission) {
         });
     }
                 columns9.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         {
     data: null,
     name: 'chat',
@@ -932,13 +928,11 @@ if (hasPricePermission) {
         33: 'countries.name',
         34: 'costprice',
         35: 'vehicles.minimum_commission',
-        36: 'vehicles.gp',
-        37: 'vehicles.price',
-        38: 'documents.import_type',
-        39: 'documents.owership',
-        40: 'documents.document_with',
-        41: 'vehicles.custom_inspection_number',
-        42: 'vehicles.custom_inspection_status',
+        // 36: 'vehicles.gp',
+        36: 'vehicles.price',
+        37: 'vehicles.ownership_type',
+        38: 'vehicles.custom_inspection_number',
+        39: 'vehicles.custom_inspection_status',
     };   
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,

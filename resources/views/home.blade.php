@@ -136,6 +136,11 @@
 <div class="card">
     <div class="card-body px-0">
         <div class="table-responsive px-3">
+        <div class="text-right mb-3">
+    <a href="{{ url('/export-belgium-vehicle-stock') }}" class="btn btn-success">
+        Export to Excel
+    </a>
+</div>
             <div class="card-header align-items-center">
                 <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Belgium Vehicle Stock</h4>
             </div>
@@ -1309,7 +1314,7 @@ Procurement
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-<td><a href="{{ route('calls.show', ['call' => $rowsmonth->id, 'brand_id' => $rowsmonth->brand_id, 'model_line_id' => $rowsmonth->model_line_id, 'location' => $rowsmonth->location, 'days' => '30', 'custom_brand_model' => $rowsmonth->custom_brand_model]) }}">{{ $rowsmonth->count }}</a></td>
+<td><a href="{{ route('calls.showcalls', ['call' => $rowsmonth->id, 'brand_id' => $rowsmonth->brand_id, 'model_line_id' => $rowsmonth->model_line_id, 'location' => $rowsmonth->location, 'days' => '30', 'custom_brand_model' => $rowsmonth->custom_brand_model]) }}">{{ $rowsmonth->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -1367,7 +1372,7 @@ Procurement
                                                     $regionsf = $regionsg ? $regionsg->region_name : '';
                                                     @endphp
                                                     <td>{{ $regionsf }}</td>
-                                                    <td><a href="{{ route('calls.show', ['call' => $rowsweek->id, 'brand_id' => $rowsweek->brand_id, 'model_line_id' => $rowsweek->model_line_id, 'location' => $rowsweek->location, 'days' => '7', 'custom_brand_model' => $rowsweek->custom_brand_model]) }}">{{ $rowsweek->count }}</a></td>
+                                                    <td><a href="{{ route('calls.showcalls', ['call' => $rowsweek->id, 'brand_id' => $rowsweek->brand_id, 'model_line_id' => $rowsweek->model_line_id, 'location' => $rowsweek->location, 'days' => '7', 'custom_brand_model' => $rowsweek->custom_brand_model]) }}">{{ $rowsweek->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -1422,7 +1427,7 @@ Procurement
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-<td><a href="{{ route('calls.show', ['call' => $rowsyesterday->id, 'brand_id' => $rowsyesterday->brand_id, 'model_line_id' => $rowsyesterday->model_line_id, 'location' => $rowsyesterday->location, 'days' => '2', 'custom_brand_model' => $rowsyesterday->custom_brand_model]) }}">{{ $rowsyesterday->count }}</a></td>
+<td><a href="{{ route('calls.showcalls', ['call' => $rowsyesterday->id, 'brand_id' => $rowsyesterday->brand_id, 'model_line_id' => $rowsyesterday->model_line_id, 'location' => $rowsyesterday->location, 'days' => '2', 'custom_brand_model' => $rowsyesterday->custom_brand_model]) }}">{{ $rowsyesterday->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>

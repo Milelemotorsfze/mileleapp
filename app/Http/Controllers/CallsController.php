@@ -584,7 +584,7 @@ foreach ($modelLineIds as $modelLineId) {
         return redirect()->route('calls.index')
         ->with('success','Call Record created successfully');
     }
-    public function show(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
+    public function showcalls(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
 {   
     $brandId = $request->route('brand_id');
     $location = $request->route('location');

@@ -132,6 +132,7 @@ use App\Http\Controllers\VehicleInvoiceController;
 use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\BelgiumVehicleStockExport;
 
 /*
 /*
@@ -615,7 +616,6 @@ Route::get('/d', function () {
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
     Route::post('/update-priority', [StrategyController::class, 'updatePriority'])->name('strategy.updatePriority');
     Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
-    Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
     Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
     Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');
@@ -669,8 +669,8 @@ Route::get('/d', function () {
     Route::get('model-lines/viewspec/{id}', [VariantController::class, 'viewSpecification'])->name('model-lines.viewspec');
     Route::post('/variants/save-option', [VariantController::class, 'saveOption'])->name('variants.saveOption');
     Route::post('/variants/savespecification', [VariantController::class, 'savespecification'])->name('variants.savespecification');
-    Route::name('calls.show')
-    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
+    Route::name('calls.showcalls')
+    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'showcalls'])
     ->where([
         'call' => '[0-9]+',
         'brand_id' => '[0-9]+',
@@ -1117,4 +1117,9 @@ Route::get('/d', function () {
     Route::get('/export-uae-vehicle-stock', function () {
         return Excel::download(new UAEVehicleStockExport, 'uae_vehicle_stock.xlsx');
     });
+    Route::get('/export-belgium-vehicle-stock', function () {
+        return Excel::download(new BelgiumVehicleStockExport, 'belgium_vehicle_stock.xlsx');
+    });
+    Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
+    Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
 });
