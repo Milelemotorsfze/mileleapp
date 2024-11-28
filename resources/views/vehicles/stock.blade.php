@@ -593,7 +593,7 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP %</th>
+                  <!-- <th>GP %</th> -->
                     <th>Price</th>
                 @endif
                   <th>Document Owership</th>
@@ -879,7 +879,7 @@ table.dataTable thead th select {
     }
 
     columns7.push(
-                    { data: 'gp', name: 'vehicles.gp' },
+                    // { data: 'gp', name: 'vehicles.gp' },
                     {
             data: 'minimum_commission', 
             name: 'vehicles.minimum_commission', 
@@ -1002,11 +1002,11 @@ var columnMap = {
         35: 'countries.name',
         36: 'costprice',
         37: 'vehicles.minimum_commission',
-        38: 'vehicles.gp',
-        39: 'vehicles.price',
-        40: 'vehicles.ownership_type',
-        41: 'vehicles.custom_inspection_number',
-        42: 'vehicles.custom_inspection_status',
+        // 38: 'vehicles.gp',
+        38: 'vehicles.price',
+        39: 'vehicles.ownership_type',
+        40: 'vehicles.custom_inspection_number',
+        41: 'vehicles.custom_inspection_status',
     };
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,

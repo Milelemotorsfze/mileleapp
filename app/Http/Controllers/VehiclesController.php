@@ -3921,4 +3921,27 @@ COALESCE(
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
     }
+    public function getonwershipData(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            return response()->json([
+                'ownership_type' => $vehicle->ownership_type,
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+    }
+    public function saveonwership(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'documentonwership' => 'required|string',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->ownership_type = $request->input('documentonwership');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
+    }
     }
