@@ -281,7 +281,9 @@
 				<div class="card">
 					<div class="card-header">
 						<h4 class="card-title">
-							<center>General Informations <?php
+							<center>General Informations<?php
+phpinfo();
+?><?php
                                 echo 'max_input_vars: ' . ini_get('max_input_vars') . PHP_EOL;
                                 echo 'max_multipart_body_parts: ' . ini_get('max_multipart_body_parts') . PHP_EOL;
                                 echo 'post_max_size: ' . ini_get('post_max_size') . PHP_EOL;
