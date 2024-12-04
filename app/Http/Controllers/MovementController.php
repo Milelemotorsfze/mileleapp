@@ -232,6 +232,11 @@ class MovementController extends Controller
         foreach ($vin as $index => $value) {
             if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
+            $ownershipType = is_array($request->input('ownership_type')) 
+                ? $request->input('ownership_type')[$index] 
+                : $request->input('ownership_type');
+            $vehicle->ownership_type = $ownershipType;
+            $vehicle->save();
             if ($vehicle) {
                 if (($from[$index] === '1' && $to[$index] !== '3')) {
                     $grnVins[] = $vin[$index];
@@ -430,6 +435,7 @@ return redirect()->back()->with('success', 'Transition has been successfully Sav
     $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
     $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
     $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+    $ownership_type = $vehicle->ownership_type;
     $movement = Movement::where('vin', $vin)->pluck('to')->last();
     $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
     if (empty($warehouseName)) {
@@ -443,6 +449,7 @@ return redirect()->back()->with('success', 'Transition has been successfully Sav
     return response()->json([
         'variant' => $variant,
         'brand' => $brand,
+        'ownership_type' => $ownership_type,
         'movement' => $warehouseName,
         'po_number' => $po_number,
         'so_number' => $so_number,
@@ -565,6 +572,7 @@ public function grnfilepost(Request $request)
                 $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
                 $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+                $ownership_type = $vehicle->ownership_type;
                 $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
                 $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
                 $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
@@ -589,6 +597,7 @@ public function grnfilepost(Request $request)
                  $vehicleDetails[$key]['variant'] = $variant;
                  $vehicleDetails[$key]['modelLine'] = $modelLine;
                  $vehicleDetails[$key]['brand'] = $brand;
+                 $vehicleDetails[$key]['ownership_type'] = $ownership_type;
                  $vehicleDetails[$key]['warehouseName'] = $warehouseName;
                  $vehicleDetails[$key]['warehouseNames'] = $warehouseNames;
                  $vehicleDetails[$key]['po_number'] = $po_number;
@@ -614,6 +623,7 @@ public function grnfilepost(Request $request)
                 $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
                 $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
                 $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+                $ownership_type = $vehicle->ownership_type;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
                 $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
                 $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
@@ -637,6 +647,7 @@ public function grnfilepost(Request $request)
                    }
                    }
                  $vehicleDetails[$key]['variant'] = $variant;
+                 $vehicleDetails[$key]['ownership_type'] = $ownership_type;
                  $vehicleDetails[$key]['modelLine'] = $modelLine;
                  $vehicleDetails[$key]['brand'] = $brand;
                  $vehicleDetails[$key]['warehouseName'] = $warehouseName;
@@ -681,7 +692,8 @@ public function uploadVinFile(Request $request)
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $vinData[] = [
                     'vin' => $data[0], // VIN number
-                    'to' => $data[1]   // Warehouse name (from file, you need to add this column)
+                    'to' => $data[1],   // Warehouse name (from file, you need to add this column)
+                    'ownership_type' => $data[2]
                 ];
             }
             fclose($handle);
@@ -709,7 +721,7 @@ public function uploadVinFile(Request $request)
         foreach ($vinData as $entry) {
             $vin = $entry['vin'];
             $toWarehouse = $entry['to'];
-            
+            $ownership_type = $entry['ownership_type'];
             if (isset($vehicles[$vin])) {
                 $vehicle = $vehicles[$vin];
                 $variant = Varaint::find($vehicle->varaints_id)->name;
@@ -721,16 +733,14 @@ public function uploadVinFile(Request $request)
                 $movement = Movement::where('vin', $vin)->pluck('to')->last();
                 $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
                 $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
-
                 // Default to Supplier if no warehouse name found
                 $warehouseName = $warehouseName ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first() : 1);
                 $warehouseNames = $warehouseNames ?: ($vehicle->latest_location ? Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first() : "Supplier");
-
                 // Match the 'to' warehouse from the CSV and set as default
                 $matchedWarehouse = Warehouse::where('name', $toWarehouse)->first();
-
                 $vehicleDetails[] = [
                     'vin' => $vin,
+                    'ownership_type' => $ownership_type,
                     'variant' => $variant,
                     'modelLine' => $modelLine,
                     'brand' => $brand,
