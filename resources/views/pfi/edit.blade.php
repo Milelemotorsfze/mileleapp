@@ -996,7 +996,9 @@
                 var indexNumber = $(this).attr('index');
                 var sfx = $('#sfx-'+indexNumber+'-item-0').val();
                 var model = $('#model-'+indexNumber+'-item-0').val();
-                
+                if(model[0]) {
+                    appendModel(indexNumber,model[0]);
+                }
                 if(sfx[0]) {
                     appendSFX(indexNumber,model[0],sfx[0]);
                 }
@@ -1326,7 +1328,29 @@
            }
           
       }
-    
+      function appendModel(index,model){
+            var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+            for(let i=1; i<= parentIndex; i++)
+            {
+                if(i != index) {
+                    let Currentmodel = $('#model-'+i+'-item-0').val();
+                    if(model !== Currentmodel[0] ) {
+                        // chcek this option value alredy exist in dropdown list or not.
+                        var currentId = 'model-'+i+'-item-0';    
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
+                            if (this.text == model) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        if(isOptionExist == 'no'){
+                            $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}))
+                        }
+                    }
+                }
+            }
+        }
         function hideSFX(index, value) {
          
          var totalIndex = $("#pfi-items").find(".pfi-items-parent-div").length
