@@ -530,7 +530,8 @@ class PFIController extends Controller
 
         $pfi = PFI::select('id','pfi_reference_number','pfi_date')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
-                ->whereYear('pfi_date', Carbon::now()->year);
+                ->whereYear('pfi_date', Carbon::now()->year)
+                ->whereNotIn(\DB::raw('MONTH(pfi_date)'), [12, 1]);
                 
         if($request->pfi_id) {
 
