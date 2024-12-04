@@ -16,6 +16,7 @@ use App\Models\PfiItem;
 use App\Models\Country;
 use Illuminate\Support\Facades\DB;
 use App\Models\MasterShippingPorts;
+use App\Models\PurchasingOrder;
 
 class DemandPlanningPurchaseOrderController extends Controller
 {
@@ -74,7 +75,55 @@ class DemandPlanningPurchaseOrderController extends Controller
         $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->get();
         $paymentTerms = PaymentTerms::all();
         $countries = Country::select('id','name')->get();
-        return view('purchase-order.create', compact('pfiItems','exColours','isToyotaPO','intColours','pfi','paymentTerms','countries'));
+        return view('purchase-order.create', compact('pfiItems','exColours','isToyotaPO','intColours','pfi',
+        'paymentTerms','countries'));
+    }
+    public function checkInventoryColour(Request $request) {
+        $masterModels = $request->master_model_id;
+        $pfi = Pfi::findOrFail($request->pfi_id);
+        $childPfiItemLatest = PfiItem::where('pfi_id', $request->pfi_id)
+                                ->where('is_parent', false)
+                                ->first();
+        $dealer =  $childPfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
+        $alreadyAddedIds = [];
+        $data = [];
+        foreach($masterModels as $key => $masterModel)
+        {
+            // map to inventory
+            $masterModel = MasterModel::find($masterModel);
+            $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                                ->where('sfx', $masterModel->sfx)->pluck('id');
+
+            $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                ->whereNull('purchase_order_id')
+                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                ->where('supplier_id', $pfi->supplier_id)
+                ->whereNotIn('id', $alreadyAddedIds)
+                ->where('whole_sales', $dealer);
+               
+             // if exterior colour is coming check same colour is existing with inventory
+            if($request->ex_colours[$key] && $request->int_colours[$key]) {
+               $inventoryItem->where('exterior_color_code_id', $request->ex_colours[$key])
+                                ->where('interior_color_code_id', $request->int_colours[$key]);
+            }
+            if($inventoryItem->count() <= 0) {
+                // exact match not found
+                $data[] = $masterModel->model.'-'.$masterModel->sfx;
+            }
+        }
+        return response($data);
+           
+    }
+    public function uniqueCheckPONumber(Request $request)
+    {
+        $poNumber = $request->input('poNumber');
+        $existingPO = PurchasingOrder::select('po_number')->where('po_number', $poNumber)->first();
+        if($existingPO) {
+            return response(true);
+        }else{
+            return response(false);
+        }
     }
 
     /**

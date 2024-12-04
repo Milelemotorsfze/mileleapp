@@ -294,6 +294,7 @@
                     </div>
                     <br><br>
                       <div class="row">
+                        <input type="hidden" id="can-inventory-allocate" value="0" name="can_inventory_allocate">
                           <button type="submit" class="btn btncenter btn-success" id="submit-button">Submit</button>
                       </div>
                 </form>
@@ -387,7 +388,6 @@
                     return false;
                 }
             }
-            console.log(i);
         }
        
         if(isEnableVehicleAdd == true) {
@@ -518,31 +518,35 @@
         $('#total-price').val(remainingPrice);
 
     });
-    $('#po_number').on('change', function() {
+    $('#po_number').on('keyup', function() {
+        checkPOUnique();
+    });
+
+    function checkPOUnique() {
         var poNumber = $('#po_number').val();
         $.ajax({
-            url: '{{ route('purchasing-order.checkPONumber') }}',
-            type: 'POST',
+            url: "{{ route('dp-purchasing-order.checkPONumber') }}",
+            async: false,
+            type: 'GET',
             data: {
-                '_token': '{{ csrf_token() }}',
                 'poNumber': poNumber
             },
             success: function(response) {
-                $('#poNumberError').hide().text('');
-                formValid = true;
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    $('#poNumberError').text("PO Number Already Existing");
+                if(response == true) {
                     formValid = false;
+                    $('#po_number').addClass('is-invalid');
+                    $('#poNumberError').text("PO Number Already Existing");
+                }else{
+                    formValid = true;
+                    $('#po_number').removeClass('is-invalid');
+                    $('#poNumberError').text(" ");
                 }
-            }
+            }   
         });
-    });
+    }
 
     $('.variants').on('change', function() {
         var key = $(this).attr('data-key');
-        console.log(key);
         var model = $(this).find('option:selected').attr("data-model-id");
         var brand = $(this).find('option:selected').attr("data-brand");
         var modelLine = $(this).find('option:selected').attr("data-model-line");
@@ -554,33 +558,83 @@
         $('#variant-detail-'+key).val(variantDetail);
     });
 
+
     $('#submit-button').click(function(e) {
         e.preventDefault();
 
         var variantIds = $('input[name="variant_id[]"]').map(function() {
             return $(this).val();
         }).get();
-
-        if (variantIds.length === 0) {
-            alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
-            formValid = false;
-        }else{
-            formValid = true;
-            checkDuplicateVIN();
-        }
        
-            if( formValid == true) {
-                var poNumber = $('#po_number').val();
-                if(poNumber == '') {
-                    formValid = false;
-                    $('#poNumberError').text("This field is required")
-                }else{
-                    formValid = true;
-                    $('#poNumberError').text(" ");
-                }
+            var poNumber = $('#po_number').val();
+            if(poNumber == '') {
+                formValid = false;
+                $('#po_number').addClass('is-invalid');
+                $('#poNumberError').text("This field is required")
+            }else{
+                formValid = true;
+                $('#po_number').removeClass('is-invalid');
+                $('#poNumberError').text(" ");
             }
-    
+            if(formValid == true) {
+                checkPOUnique();
+            }
+
+            if(formValid == true) {
+                if (variantIds.length === 0) {
+                alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
+                formValid = false;
+            }else{
+                formValid = true;
+                checkDuplicateVIN();
+            }
+        }
+
         if(formValid == true) {
+             //  mapping confirmation nand colour check if po is for toyota
+            if(isToyotaPO == 1) {
+                let exteriorColours = $('select[name="ex_colour[]"]').map(function() {
+                    return $(this).val();
+                }).get();
+
+                let interiorColours = $('select[name="int_colour[]"]').map(function() {
+                    return $(this).val();
+                }).get();
+
+                let masterModelsIds = $('input[name="master_model_id[]"]').map(function() {
+                    return $(this).val();
+                }).get();
+
+                let msg = '';
+                if(exteriorColours.length > 0 && interiorColours.length > 0) {
+
+                    $.ajax({
+                    url: "{{ route('dp-purchase-order.inventory-check') }}",
+                    type: 'GET',
+                    data: {
+                        'int_colours': interiorColours,
+                        'ex_colours': exteriorColours,
+                        'master_model_id': masterModelsIds,
+                        'pfi_id': "{{ $pfi->id }}"
+                    },
+                    success: function(response) {
+                        if(response.length > 0) {
+                               msg = "Inventory doest not exist exact colour matches with po vehicles";
+                        }else{
+                            msg = "The exact colour matches  in inventory "
+                        }
+                       
+                        }
+                    });
+                }
+                var confirm = alertify.confirm(msg+'Do you want to allocate the PO vehicles with supplier inventory?',function (e) {
+                                        if (e) {
+                                            $('#can-inventory-allocate').val(1);
+                                        }
+                                    }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                                            $('#can-inventory-allocate').val(0);
+                                        });
+            }
             $('#po-create-form').unbind('submit').submit();
         }
     });

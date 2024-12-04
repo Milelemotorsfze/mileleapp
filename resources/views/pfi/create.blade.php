@@ -522,7 +522,7 @@
                     $('#pfi-quantity-'+index+'-item-0').val(totalPfiQty);
                 }
                
-                var unitPrice = $('#unit-price-'+index+'-item-0').val();
+            var unitPrice = $('#unit-price-'+index+'-item-0').val();
             var eachItemTotal = parseFloat(totalPfiQty) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-0').val(eachItemTotal);
 
