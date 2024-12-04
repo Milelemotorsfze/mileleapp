@@ -1262,6 +1262,7 @@ public function getBrandsAndModelLines(Request $request)
     ->sum('price_change'));
     $intialamount = PurchasedOrderPaidAmounts::where('purchasing_order_id', $id)->where('status', 'Request For Payment')->sum('amount');
     $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
+    // return $purchasingOrder;
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
@@ -1348,7 +1349,11 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments',
+            'vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 
+            'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 
+            'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend',
+            'additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
     }
     public function edit($id)
     {
@@ -1785,8 +1790,8 @@ public function checkcreatevins(Request $request)
                 //    info ($fieldName);
 //                    check the po is under demand planning
 
-                    $loiPurchasingOrder = LOIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
-                       if($loiPurchasingOrder) {
+                    $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
+                       if($purchasingOrderPFI) {
                            $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
                            if($supplierInventory) {
                                if($fieldName == 'vin') {
@@ -1829,9 +1834,16 @@ public function checkcreatevins(Request $request)
         foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
             $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
             if ($purchasingOrder) {
+                $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
+                if($purchasingOrderPFI) {
+                   $pfiNumber = $purchasingOrderPFI->pfi->pfi_reference_number; 
+                }else{
+                    $pfiNumber = $purchasingOrder->pl_number;
+                }
+                // $recipients = $purchasingOrder->is_demand_planning_purchase_order == 1 
                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
-                ? ['team.logistics@milele.com'] 
-                : ['team.logistics@milele.com', 'abdul@milele.com'];
+                ? [env('LOGISTICS_EMAIL')] 
+                : [env('LOGISTICS_EMAIL'), env('CSO_EMAIL')];
                 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
                 $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
                     $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
@@ -1847,14 +1859,14 @@ public function checkcreatevins(Request $request)
                 })->toArray(); // Ensure it's an array
                 Mail::to($recipients)->send(new VINEmailNotification(
                     $purchasingOrder->po_number, 
-                    $purchasingOrder->pl_number, 
+                    $pfiNumber,
                     $orderUrl, 
                     count($vehicles), 
                     $vehicleDetails
                 ));
                 // Save notification details to the database
                 $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
-              "PFI Number: " . $purchasingOrder->pl_number . "\n" .
+              "PFI Number: " .  $pfiNumber . "\n" .
               "Stage: Update The VIN\n" .
               "Number of Units: " . count($vehicles) . "\n" .
               "Old VIN: " . ($vinChange['old_vin'] ?? '') . "\n" .

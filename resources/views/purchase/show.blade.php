@@ -153,6 +153,7 @@
     }
 </style>
 @section('content')
+
 <!-- Modal Structure -->
 <div class="modal fade" id="addDNModalUnique" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -747,7 +748,7 @@
         @endif
         <div class="card-body">
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
     <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
@@ -904,7 +905,24 @@
                                 <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                             </div>
                             <div class="col-lg-6 col-md-3 col-sm-12">
-                                <span> {{ $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->pfi_reference_number ?? '' }} </span>
+                                <span> {{ $purchasingOrder->PFIPurchasingOrder->pfi->pfi_reference_number ?? '' }} </span>
+                            </div>
+                        </div>
+                      
+                        <div class="row">
+                            <div class="col-lg-4 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
+                            </div>
+                            <div class="col-lg-6 col-md-3 col-sm-12">
+                            @if($purchasingOrder->PFIPurchasingOrder->pfi->pfi_document_without_sign)
+                                <a href="{{ url('PFI_document_withoutsign/'.$purchasingOrder->PFIPurchasingOrder->pfi->pfi_document_without_sign) }}" class="btn btn-primary btn-sm" target="_blank" >
+                                    <i class="fas fa-file-pdf mr-2"></i> View PFI
+                                </a>
+                                @else
+                                <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" class="btn btn-primary btn-sm" target="_blank" >
+                                    <i class="fas fa-file-pdf mr-2"></i> View PFI
+                                </a>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -1160,11 +1178,13 @@
                 <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+           
                 <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
             </div>
         </div>
     </div>
 </div>
+
 @endif
 
 @foreach ($oldPlFiles as $index => $oldPlFile)
@@ -1593,6 +1613,7 @@
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
+                              
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1758,33 +1779,33 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval']);
                             @endphp
                             @if ($hasPermission)
-                            <td>
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
-                                    <option value="">Exterior Color</option>
-                                    @foreach ($exColours as $id => $exColour)
-                                        @if ($id == $vehicles->ex_colour)
-                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
-                                        @else
-                                            <option value="{{ $id }}">{{ $exColour }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
-                                    <option value="">Interior Color</option>
-                                    @foreach ($intColours as $id => $intColour)
-                                        @if ($id == $vehicles->int_colour)
-                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
-                                        @else
-                                            <option value="{{ $id }}">{{ $intColour }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>{{ $vehicles->vin }}</td>
-                            <td>{{ $vehicles->engine }}</td>
-                            <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                                <td>
+                                    <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                        <option value="">Exterior Color</option>
+                                        @foreach ($exColours as $id => $exColour)
+                                            @if ($id == $vehicles->ex_colour)
+                                                <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                            @else
+                                                <option value="{{ $id }}">{{ $exColour }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                        <option value="">Interior Color</option>
+                                        @foreach ($intColours as $id => $intColour)
+                                            @if ($id == $vehicles->int_colour)
+                                                <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                            @else
+                                                <option value="{{ $id }}">{{ $intColour }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>{{ $vehicles->vin }}</td>
+                                <td>{{ $vehicles->engine }}</td>
+                                <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
                                 <td>{{ $vehicles->ppmmyyy }}</td>
                             @endif

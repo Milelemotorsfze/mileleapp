@@ -41,16 +41,22 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(Vehicles::class);
     }
+    // need to remove
     public function LOIPurchasingOrder()
     {
         return $this->hasOne(LOIItemPurchaseOrder::class, 'purchase_order_id');
     }
+    public function PFIPurchasingOrder()
+    {
+        return $this->hasOne(PfiItemPurchaseOrder::class, 'purchase_order_id');
+    }
     public function getIsDemandPlanningPurchaseOrderAttribute() {
-        $isDemandPlanningPO = LOIItemPurchaseOrder::where('purchase_order_id', $this->id)->count();
+        $isDemandPlanningPO = PfiItemPurchaseOrder::where('purchase_order_id', $this->id)->count();
         if($isDemandPlanningPO > 0) {
             return true;
         }
         return false;
+        info($isDemandPlanningPO);
     }
     public function polPort()
     {

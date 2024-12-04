@@ -612,7 +612,6 @@ class PFIController extends Controller
         }
     }
 
-
      return view('pfi.edit', compact('suppliers','masterModels','customers','pfi','customerCountries','parentPfiItems'));
     }
    
