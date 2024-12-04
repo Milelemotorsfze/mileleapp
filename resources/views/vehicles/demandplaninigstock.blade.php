@@ -926,14 +926,25 @@ if (hasPricePermission) {
         31: 'warehouse.name',
         32: 'vehicles.territory',
         33: 'countries.name',
-        34: 'costprice',
-        35: 'vehicles.minimum_commission',
-        // 36: 'vehicles.gp',
-        36: 'vehicles.price',
-        37: 'vehicles.ownership_type',
-        38: 'vehicles.custom_inspection_number',
-        39: 'vehicles.custom_inspection_status',
     };   
+    if (hasManagementPermission) {
+    columnMap[33] = 'costprice';
+    columnMap[34] = 'vehicles.minimum_commission';
+    columnMap[35] = 'vehicles.price';
+    columnMap[36] = 'vehicles.ownership_type';
+    columnMap[37] = 'vehicles.custom_inspection_number';
+    columnMap[38] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[33] = 'vehicles.minimum_commission';
+    columnMap[34] = 'vehicles.price';
+    columnMap[35] = 'vehicles.ownership_type';
+    columnMap[36] = 'vehicles.custom_inspection_number';
+    columnMap[37] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[33] = 'vehicles.ownership_type';
+    columnMap[34] = 'vehicles.custom_inspection_number';
+    columnMap[35] = 'vehicles.custom_inspection_status';
+}
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
             serverSide: true,
