@@ -75,9 +75,17 @@ class SendClaimSubmissionReminder extends Command
         
                         Please note that if the customer has not yet exported the vehicle, kindly ask them to bring the vehicle back to DUCAMZ. We will cancel and then reprocess these documents, and the customer will be charged 1560 AED for this.
                     ";
+                    // Determine recipients based on work order type
+                    if ($vehicle->workOrder->type == 'export_cnf') {
+                        // Send email only to logistics team
+                        $recipients = [$logisticsTeamEmail];
+                    } else {
+                        // Send email to salesperson, sales support, logistics team, and developer
+                        $recipients = [$salesperson->email, $salesSupportEmail, $logisticsTeamEmail];
+                    }
         
                     // Send email with dynamic subject containing the label
-                    Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail, $developerEmail])
+                    Mail::to($recipients)
                         ->send(new SendClaimSubmissionReminderEmail($vehicle, $emailContent, $details['label']));
                 }
             }
