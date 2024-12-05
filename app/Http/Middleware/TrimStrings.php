@@ -16,4 +16,10 @@ class TrimStrings extends Middleware
         'password',
         'password_confirmation',
     ];
+    public function boot()
+    {
+        ini_set('post_max_size', '1024M');
+        ini_set('upload_max_filesize', '1024M');
+        ini_set('max_input_vars', '50000');
+    }
 }

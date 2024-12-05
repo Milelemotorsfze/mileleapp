@@ -632,10 +632,15 @@
 						<div class="row">
 							<div class="col-xxl-12 col-lg-12 col-md-12">
 								<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
-								<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
-									@foreach($vins as $vin)
-									<option value="{{$vin->vin ?? ''}}">{{$vin->vin ?? ''}} / {{$vin->variant->master_model_lines->brand->brand_name ?? ''}} / {{$vin->variant->master_model_lines->model_line ?? ''}}</option>
-									@endforeach
+								<select id="vin_multiple" name="vin_multiple[]" class="form-control widthinput" multiple="true">
+									@foreach($vins as $index => $vin)
+										<option value="{{ $vin->vin ?? '' }}" 
+											@if($index < 50) selected @endif>
+											{{ $vin->vin ?? '' }} / 
+											{{ $vin->variant->master_model_lines->brand->brand_name ?? '' }} / 
+											{{ $vin->variant->master_model_lines->model_line ?? '' }}
+										</option>
+										@endforeach
 								</select>
 							</div>
 						</div>
@@ -1248,11 +1253,7 @@
 			});	
 		}
 		$(document).ready(function () { 
-			$.ajaxSetup({
-				headers: {
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-				}
-			});
+			
 			console.log('Is vins an array:', Array.isArray(vins));
 			document.getElementById('submit-from-top').addEventListener('click', function() { 
 				document.getElementById('submit').click();
@@ -2191,9 +2192,11 @@
 					}
 				},
 				submitHandler: function(form) {  
-					event.preventDefault();
 					$('#overlay').show();
-					const comments = [];
+
+					const formData = new FormData(form); // Initialize formData here
+					const comments = []; // Initialize once
+
 					if (workOrder == null) {
 						const commentElements = document.querySelectorAll('#comments-section .comment');
 						
@@ -2203,124 +2206,100 @@
 								const parentId = comment.getAttribute('data-parent-id');
 								const dateTime = comment.getAttribute('data-date-time');
 								const textElement = comment.querySelector('.comment-text');
-								
+
 								const fileElements = comment.querySelectorAll(`.file-preview[data-comment-id="${commentId}"] img, .file-preview[data-comment-id="${commentId}"] embed`);
-								
 								const files = Array.from(fileElements).map(file => ({
 									src: file.src,
-									name: file.alt || file.getAttribute('src').split('/').pop() 
+									name: file.alt || file.getAttribute('src').split('/').pop()
 								}));
 
 								if (textElement) {
 									const text = textElement.textContent.trim();
 									comments.push({ commentId, parentId, text, dateTime, files });
-								} else {
-									console.warn('Text element is missing for a comment:', comment);
 								}
 							});
-						} else {
-							console.warn('No comments found in #comments-section.');
 						}
 					}
 
-					if (typeof iti !== 'undefined') {
-						$('#customer_company_number_full').val(iti.getNumber());
-					}
-					if (typeof customer_representative_contact !== 'undefined') {
-						$('#customer_representative_contact_full').val(customer_representative_contact.getNumber());
-					}
-					if (typeof delivery_contact_person_number !== 'undefined') {
-						$('#delivery_contact_person_number_full').val(delivery_contact_person_number.getNumber());
-					}				
-					if (typeof freight_agent_contact_number !== 'undefined') {
-						$('#freight_agent_contact_number_full').val(freight_agent_contact_number.getNumber());
-					}
-					if (typeof transporting_driver_contact_number !== 'undefined') {
-						$('#transporting_driver_contact_number_full').val(transporting_driver_contact_number.getNumber());
-					}
+					const serializedComments = JSON.stringify(comments); // Serialize after populating
+					formData.append('comments', serializedComments); // Append serialized comments to formData
 
-					const elementsByClass = document.getElementsByClassName('transport_type');
-
-					if (elementsByClass.length > 0) {
-						Array.from(elementsByClass).forEach(function(element) {
-							element.disabled = false;
-						});
-					}
-
-					const deposit_received_asClass = document.getElementsByClassName('deposit_received_as');
-
-					if (deposit_received_asClass.length > 0) {
-						Array.from(deposit_received_asClass).forEach(function(element) {
-							element.disabled = false;
-						});
-					}
-
-					
-					$('#airline').prop('disabled', false).trigger('change');
+					// Handle other processing, like enabling disabled elements
 					$('#currency').prop('disabled', false).trigger('change');
-					$('#deposit_aganist_vehicle').prop('disabled', false).trigger('change');	
-					$('#vin_multiple').prop('disabled', false).trigger('change');	
-					$('#brn_file').prop('disabled', false).trigger('change');
-					$('#signed_pfi').prop('disabled', false).trigger('change');	
-					$('#signed_contract').prop('disabled', false).trigger('change');	
-					$('#payment_receipts').prop('disabled', false).trigger('change');	
-					$('#noc').prop('disabled', false).trigger('change');	
-					$('#enduser_trade_license').prop('disabled', false).trigger('change');	
-					$('#enduser_passport').prop('disabled', false).trigger('change');	
-					$('#enduser_contract').prop('disabled', false).trigger('change');	
-					$('#vehicle_handover_person_id').prop('disabled', false).trigger('change');	
-					const isBatchElement = document.getElementById('is_batch');
-					if (isBatchElement) {
-					isBatchElement.disabled = false;
-					}
-					const batchElement = document.getElementById('batch');
-					if (batchElement) {
-					batchElement.disabled = false;
-					}
-					var table = document.getElementById('myTable');
-					if (table) {
-						var selects = table.querySelectorAll('select');
-						selects.forEach(function(input) {
-						input.disabled = false;
-						});
-					}
-					$('.dynamicselect2').prop('disabled', false);
-					const formData = new FormData(form);
-					formData.append('comments', JSON.stringify(comments));
 
-					fetch(form.action, {
-						method: form.method,
-						body: formData,
-						headers: {
-							'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+					// Chunking logic
+					function createChunks(data, chunkSize) {
+						const chunks = [];
+						let index = 0;
+
+						while (index < data.length) {
+							chunks.push(data.slice(index, index + chunkSize));
+							index += chunkSize;
 						}
-					}).then(response => {
-						if (!response.ok) {
-							return response.text().then(text => { throw new Error(text) });
+
+						return chunks;
+					}
+
+					const mainPayload = Object.fromEntries(formData.entries());
+					const payloadJSON = JSON.stringify(mainPayload);
+					const payloadChunks = createChunks(payloadJSON, 1 * 1024 * 1024); // 1MB chunks
+
+					async function sendChunks(chunks) {
+						let success = true;
+
+						for (let i = 0; i < chunks.length; i++) {
+							const chunkPayload = {
+								chunk: chunks[i],
+								chunkIndex: i + 1,
+								totalChunks: chunks.length,
+							};
+
+							try {
+								const response = await fetch(form.action, {
+									method: form.method,
+									body: JSON.stringify(chunkPayload),
+									headers: {
+										'Content-Type': 'application/json',
+										'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+									},
+								});
+
+								const rawResponse = await response.text(); // Capture raw response
+								console.log(`Chunk ${i + 1} server response:`, rawResponse);
+
+								if (!response.ok) {
+									throw new Error(`Chunk ${i + 1} upload failed with status ${response.status}`);
+								}
+
+								const data = JSON.parse(rawResponse);
+
+								if (!data.success) {
+									throw new Error(data.message || `Chunk ${i + 1} failed to process.`);
+								}
+							} catch (error) {
+								console.error(`Chunk upload error:`, error.message);
+								alert(`Error uploading chunk ${i + 1}: ${error.message}`);
+								success = false;
+								break;
+							}
 						}
-						return response.json();
-					}).then(data => {
-						if (data.success) {
+
+						return success;
+					}
+
+					(async function submitFormWithChunks() {
+						$('#overlay').show();
+
+						const isSuccessful = await sendChunks(payloadChunks);
+
+						if (isSuccessful) {
 							window.location.href = `{{ url('work-order-info') }}/${type}`;
 						} else {
-							throw new Error(data.message);
+							alert('Failed to upload data. Please try again.');
 						}
-					}).catch(error => {
-						alert(error.message);
-						// if (error.message === "Can't edit the work order because the sales support confirmed the data.") {
-						// 	document.querySelectorAll('#WOForm #submit').forEach(function(element) {
-						// 		element.disabled = true;
-						// 	});
-						// 	const submitFromTopButton = document.getElementById('submit-from-top');
-						// 	if (submitFromTopButton) {
-						// 		submitFromTopButton.disabled = true;
-						// 		submitFromTopButton.classList.add('disabled'); 
-						// 	}
-						// }
-						console.error('Form submission error:', error);
-					}).finally(() => {
+
 						$('#overlay').hide();
-					});
+					})();
 				}
 			});
 		function sanitizeQuantity(input) {
