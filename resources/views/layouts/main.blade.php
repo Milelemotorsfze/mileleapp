@@ -19,9 +19,7 @@
 
         <style>
             .table-responsive {
-                /* height: 80vh; */
                 overflow-y: auto;
-                white-space: nowrap;
                 cursor: grab;
             }
 
@@ -112,16 +110,16 @@
                 dragScrollElements.forEach(el => {
                     el.addEventListener('mousedown', (event) => {
                         if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
-                            el.classList.add('dragscroll-interaction'); // Disable dragscroll
+                            el.classList.add('dragscroll-interaction'); 
                         }
                     });
 
                     el.addEventListener('mouseup', () => {
-                        el.classList.remove('dragscroll-interaction'); // Re-enable dragscroll
+                        el.classList.remove('dragscroll-interaction'); 
                     });
 
                     el.addEventListener('mouseleave', () => {
-                        el.classList.remove('dragscroll-interaction'); // Ensure dragscroll re-enables if the mouse leaves
+                        el.classList.remove('dragscroll-interaction'); 
                     });
                 });
             });
