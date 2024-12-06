@@ -220,7 +220,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div> -->
         <div class="card-body">
-          <div class="table-responsive">
+          <div class="table-responsive dragscroll">
             <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
@@ -1879,6 +1879,7 @@ $(document).ready(function () {
     { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
+  orderCellsTop: true,
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
