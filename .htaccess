@@ -19,7 +19,7 @@ RewriteRule ^(.*)$ public/$1 [L]
    php_flag display_errors Off
    php_value max_execution_time 30
    php_value max_input_time 60
-   php_value max_input_vars 1000
+   php_value max_input_vars 50000
    php_value memory_limit 256M
    php_value post_max_size 8M
    php_value session.gc_maxlifetime 1440
@@ -31,7 +31,7 @@ RewriteRule ^(.*)$ public/$1 [L]
    php_flag display_errors Off
    php_value max_execution_time 30
    php_value max_input_time 60
-   php_value max_input_vars 1000
+   php_value max_input_vars 50000
    php_value memory_limit 256M
    php_value post_max_size 8M
    php_value session.gc_maxlifetime 1440
