@@ -495,7 +495,7 @@
             $('#country-error').remove();
             $('#customer-files').attr('hidden',true);
             $('.customer-doc-div').html('');
-            getModels(1,'all');
+            getModels('all','all');
         });
 
         $('#date').change(function (){
@@ -1135,7 +1135,7 @@
                 if(i != index) {
                     let model = $('#model-'+i).val();
         
-                    if(unSelectedmodel == model[0] ) {
+                    // if(unSelectedmodel == model[0] ) {
                         // chcek this option value alredy exist in dropdown list or not.
                         var currentId = 'model-' + i;
                         var isOptionExist = 'no';
@@ -1150,7 +1150,7 @@
                             $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
 
                         }
-                    }
+                    // }
                 }
             }
         }
