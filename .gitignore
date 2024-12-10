@@ -33,3 +33,8 @@ yarn-error.log
 /latest
 /laravel-blog
 /testings
+
+# Configuration files
+php.ini
+user.ini
+.htaccess
