@@ -1070,6 +1070,7 @@ if (hasManagementPermission) {
                         console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
+                    console.log("not empty");
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
                             d.filters[columnName] = value; // Special filters for NULL and non-empty
                         } else if (value.length > 0) {
