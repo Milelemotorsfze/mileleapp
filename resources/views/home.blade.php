@@ -107,6 +107,7 @@
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
                                             ->whereNull('gdn_id')
+                                            ->whereNotNull('vin')
                                             ->where('vehicles.status', 'Approved')
                                             ->where(function ($query) {
                                                 $query->whereNull('vehicles.reservation_end_date')
@@ -121,6 +122,7 @@
                                         $vehicleCountfull = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->where('vehicles.status', 'Approved')
+                                            ->whereNotNull('vin')
                                             ->whereNull('gdn_id')
                                             ->count();
                                     @endphp
@@ -172,6 +174,7 @@
                                         $vehicleCount = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
+                                            ->whereNotNull('vin')
                                             ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->where(function ($query) {
@@ -187,6 +190,7 @@
                                         $vehicleCountfull = DB::table('vehicles')
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->where('vehicles.status', 'Approved')
+                                            ->whereNotNull('vin')
                                             ->whereNull('gdn_id')
                                             ->count();
                                     @endphp

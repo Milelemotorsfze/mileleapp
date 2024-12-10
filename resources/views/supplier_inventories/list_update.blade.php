@@ -155,7 +155,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select  class="supplier" data-field="supplier_id" @if($supplierInventory->purchase_order_id) disabled @endif
+                                <select class="supplier" data-field="supplier_id" @if($supplierInventory->purchase_order_id) disabled @endif
                                         data-id="{{ $supplierInventory->id }}" id="supplier_id-editable-{{$supplierInventory->id}}">
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}" {{ $supplierInventory->supplier_id == $supplier->id ? 'selected' : '' }}>

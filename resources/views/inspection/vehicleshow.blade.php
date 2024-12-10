@@ -112,12 +112,20 @@
                                     </select>
                                 </div>
                             </div>
-                            @php
-    // Convert the 'Mar-2021' format to '2021-03' if $vehicle->ppmmyyy exists
+    @php
+    // Initialize formattedDate as an empty string
     $formattedDate = '';
+
+    // Check if $vehicle->ppmmyyy exists and matches the expected format
     if (!empty($vehicle->ppmmyyy)) {
-        $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
-        $formattedDate = $date ? $date->format('Y-m') : '';
+        try {
+            // Attempt to parse 'Mar-2021' format
+            $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
+            $formattedDate = $date->format('Y-m');
+        } catch (\Exception $e) {
+            // Handle invalid date format gracefully
+            $formattedDate = '';
+        }
     }
 @endphp
 <div class="col-lg-2 col-md-6 col-sm-12">

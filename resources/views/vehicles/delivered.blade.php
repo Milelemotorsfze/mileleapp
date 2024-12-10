@@ -900,21 +900,33 @@ var columns6 = [
         21: 'varaints.steering',
         22: 'varaints.fuel_type',
         23: 'varaints.gear',
-        24: 'vehicles.ex_colour',
-        25: 'vehicles.int_colour',
+        24: 'ex_color.name',
+        25: 'int_color.name',
         26: 'varaints.upholestry',
         27: 'vehicles.ppmmyyy',
         28: 'warehouse.name',
         29: 'vehicles.territory',
         30: 'countries.name',
-        31: 'costprice',
-        32: 'vehicles.minimum_commission',
-        // 33: 'vehicles.gp',
-        33: 'vehicles.price',
-        34: 'vehicles.ownership_type',
-        35: 'vehicles.custom_inspection_number',
-        36: 'vehicles.custom_inspection_status',
     };
+    // Extend columnMap based on permissions
+if (hasManagementPermission) {
+    columnMap[31] = 'costprice';
+    columnMap[32] = 'vehicles.minimum_commission';
+    columnMap[33] = 'vehicles.price';
+    columnMap[34] = 'vehicles.ownership_type';
+    columnMap[35] = 'vehicles.custom_inspection_number';
+    columnMap[36] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[31] = 'vehicles.minimum_commission';
+    columnMap[32] = 'vehicles.price';
+    columnMap[33] = 'vehicles.ownership_type';
+    columnMap[34] = 'vehicles.custom_inspection_number';
+    columnMap[35] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[31] = 'vehicles.ownership_type';
+    columnMap[32] = 'vehicles.custom_inspection_number';
+    columnMap[33] = 'vehicles.custom_inspection_status';
+}
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
             serverSide: true,

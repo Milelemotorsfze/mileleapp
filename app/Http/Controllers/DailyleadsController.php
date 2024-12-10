@@ -58,7 +58,7 @@ class DailyleadsController extends Controller
         $clients = SalespersonOfClients::with('client')
         ->where('sales_person_id', $id)
         ->get();
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')|| Auth::user()->hasPermissionForSelectedRole('leads-view-only');
         if($hasPermission)
         {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
@@ -188,7 +188,7 @@ class DailyleadsController extends Controller
                 ->leftJoin('users as sales_person_user', 'calls.sales_person', '=', 'sales_person_user.id')
                 ->leftJoin('users as created_by_user', 'calls.created_by', '=', 'created_by_user.id')
                 ->whereIn('calls.status', ['contacted', 'working', 'qualify', 'converted', 'Follow Up', 'Prospecting']);
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access')|| Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $activelead->where('calls.sales_person', $id);
                 }
@@ -218,7 +218,7 @@ class DailyleadsController extends Controller
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->whereNotNull('calls.leadtype');
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if(!$hasPermission) {
                     $bulkleads->where('calls.sales_person', $id);
                 }
@@ -231,7 +231,7 @@ class DailyleadsController extends Controller
             $data = Calls::select(['calls.id',DB::raw("DATE_FORMAT(calls.created_at, '%Y-%m-%d') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.created_by', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
             if($status === "Prospecting")
             {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
                     $data->whereIn('calls.status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
@@ -243,7 +243,7 @@ class DailyleadsController extends Controller
             }
             else
             {
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                 if($hasPermission)
                 {
                     $data->where('calls.status', $status)->orderBy('created_at', 'desc');

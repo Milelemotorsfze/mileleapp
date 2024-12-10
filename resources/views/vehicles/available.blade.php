@@ -1028,21 +1028,33 @@ table.dataTable thead th select {
         26: 'varaints.steering',
         27: 'varaints.fuel_type',
         28: 'varaints.gear',
-        29: 'vehicles.ex_colour',
-        30: 'vehicles.int_colour',
+        29: 'ex_color.name',
+        30: 'int_color.name',
         31: 'varaints.upholestry',
         32: 'vehicles.ppmmyyy',
         33: 'warehouse.name',
         34: 'vehicles.territory',
         35: 'countries.name',
-        36: 'costprice',
-        37: 'vehicles.minimum_commission',
-        // 38: 'vehicles.gp',
-        38: 'vehicles.price',
-        39: 'vehicles.ownership_type',
-        40: 'vehicles.custom_inspection_number',
-        41: 'vehicles.custom_inspection_status',
     };
+// Extend columnMap based on permissions
+if (hasManagementPermission) {
+    columnMap[36] = 'costprice';
+    columnMap[37] = 'vehicles.minimum_commission';
+    columnMap[38] = 'vehicles.price';
+    columnMap[39] = 'vehicles.ownership_type';
+    columnMap[40] = 'vehicles.custom_inspection_number';
+    columnMap[41] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[36] = 'vehicles.minimum_commission';
+    columnMap[37] = 'vehicles.price';
+    columnMap[38] = 'vehicles.ownership_type';
+    columnMap[39] = 'vehicles.custom_inspection_number';
+    columnMap[40] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[36] = 'vehicles.ownership_type';
+    columnMap[37] = 'vehicles.custom_inspection_number';
+    columnMap[38] = 'vehicles.custom_inspection_status';
+}
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
@@ -1051,7 +1063,6 @@ table.dataTable thead th select {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
-
                 $('#dtBasicExample3 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
@@ -1059,6 +1070,7 @@ table.dataTable thead th select {
                         console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
+                    console.log("not empty");
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
                             d.filters[columnName] = value; // Special filters for NULL and non-empty
                         } else if (value.length > 0) {
