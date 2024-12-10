@@ -34,7 +34,8 @@
             </button>
         </li>
         <li>
-            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
+            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" 
+            title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
                 <i class="fa fa-list"></i> View PFI Items
             </button>
         </li>

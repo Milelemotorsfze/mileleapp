@@ -140,7 +140,7 @@
                 "pageLength": 5,
                 "dom": 'frtip',
             });
-
+            $('#variant-update-table').DataTable();
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');
