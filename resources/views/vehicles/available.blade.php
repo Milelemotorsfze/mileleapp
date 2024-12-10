@@ -1063,7 +1063,6 @@ if (hasManagementPermission) {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
-
                 $('#dtBasicExample3 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
