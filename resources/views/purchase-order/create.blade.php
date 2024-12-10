@@ -78,6 +78,7 @@
                     <input type="hidden" name="po_from" value="DEMAND_PLANNING">
                     <input type="hidden" name="is_demand_planning_po" value="1">
                     <input type="hidden" name="pfi_id" value="{{ \Crypt::encrypt($pfi->id) }}">
+                    
                     <div class="row">
                         <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
@@ -251,7 +252,7 @@
                                             placeholder="Unit Price" readonly>
                                     </div>
                                     <div class="col-lg-1 col-md-6 mt-md-2">
-                                        <input type="number" id="quantity-{{$key}}" min="0" @if($isToyotaPO) readonly @endif max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
+                                        <input type="number" id="quantity-{{$key}}" min="0 max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
                                         data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
                                         <span class="QuantityError-{{$key}} text-danger"></span>
                                     </div>
@@ -307,6 +308,7 @@
 <script>
     let formValid = true;
     let isToyotaPO = "{{ $isToyotaPO }}"
+    let totalPOqty = "{{ $totalPOqty }}"
     let isEnableVehicleAdd = true;
     
     $('#prefered_destination').select2({
@@ -368,16 +370,16 @@
             var selectedQty = $('#quantity-'+i).val();
             var pfiQuantity = $('#quantity-'+i).attr('data-quantity');
             var inventoryQuantity = $('#inventory-qty-'+i).attr('data-inventory-qty');
-            if(isToyotaPO == 1) {
-                // toyota - only one po
-                // check  pfiQuantity is less than inventory quantity  
-                if(parseInt(inventoryQuantity) < parseInt(pfiQuantity)) {
-                    isEnableVehicleAdd = false;
-                    alertify.confirm('Required vehicle quanity is not available in the inventory',function (e) {
-                    }).set({title:"Invalid Data"});
-                    return false;
-                }
-            }else{
+            // if(isToyotaPO == 1) {
+            //     // toyota - only one po
+            //     // check  pfiQuantity is less than inventory quantity  
+            //     if(parseInt(inventoryQuantity) < parseInt(pfiQuantity)) {
+            //         isEnableVehicleAdd = false;
+            //         alertify.confirm('Required vehicle quanity is not available in the inventory',function (e) {
+            //         }).set({title:"Invalid Data"});
+            //         return false;
+            //     }
+            // }else{
                  // not toyota - multiple po 
                 // maximum quantity should the the pfi item quantity 
                 if(parseInt(pfiQuantity) < parseInt(selectedQty)) {
@@ -386,8 +388,10 @@
                     }).set({title:"Invalid Data"});
                     isEnableVehicleAdd = false;
                     return false;
+                }else{
+                    isEnableVehicleAdd = true;
                 }
-            }
+            // }
         }
        
         if(isEnableVehicleAdd == true) {
@@ -468,13 +472,11 @@
                                     </div>
                                 </div>`);
                         var removeBtn = $(`<div class="col-lg-1 col-md-6 mt-md-2">
-                                            <button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger btn-sm remove-row-btn">
+                                            <button type="button" data-unit-price="${price}" data-approved-id="${dataid}" class="btn btn-danger btn-sm remove-row-btn">
                                                 <i class="fas fa-times"></i></button>
                                             </div>`);
                        
-                        if(isToyotaPO == 0) {
                             newRow.append(removeBtn);
-                        }
                         $('#variantRowsContainer').append(newRow);
                         $('.exterior-colours').select2({
                             placeholder: 'Exterior',
@@ -581,61 +583,71 @@
             }
 
             if(formValid == true) {
+                if(isToyotaPO == 1) {
+
+                }
                 if (variantIds.length === 0) {
-                alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
-                formValid = false;
-            }else{
-                formValid = true;
-                checkDuplicateVIN();
+                    alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
+                    formValid = false;
+                }else{
+                    if(isToyotaPO == 1 && totalPOqty !== variantIds.length) {
+                        alertify.alert('This is PO For Toyota, So Please utilize all quantity ('+totalPOqty+')').set({title:"Alert !"});
+                        formValid = false;
+                    }else{
+                        formValid = true;
+                        checkDuplicateVIN();
+                    }
+                    
+                }
             }
-        }
 
         if(formValid == true) {
-             //  mapping confirmation nand colour check if po is for toyota
-            if(isToyotaPO == 1) {
-                let exteriorColours = $('select[name="ex_colour[]"]').map(function() {
-                    return $(this).val();
-                }).get();
-
-                let interiorColours = $('select[name="int_colour[]"]').map(function() {
-                    return $(this).val();
-                }).get();
-
-                let masterModelsIds = $('input[name="master_model_id[]"]').map(function() {
-                    return $(this).val();
-                }).get();
-
-                let msg = '';
-                if(exteriorColours.length > 0 && interiorColours.length > 0) {
-
-                    $.ajax({
-                    url: "{{ route('dp-purchase-order.inventory-check') }}",
-                    type: 'GET',
-                    data: {
-                        'int_colours': interiorColours,
-                        'ex_colours': exteriorColours,
-                        'master_model_id': masterModelsIds,
-                        'pfi_id': "{{ $pfi->id }}"
-                    },
-                    success: function(response) {
-                        if(response.length > 0) {
-                               msg = "Inventory doest not exist exact colour matches with po vehicles";
-                        }else{
-                            msg = "The exact colour matches  in inventory "
-                        }
-                       
-                        }
-                    });
-                }
-                var confirm = alertify.confirm(msg+'Do you want to allocate the PO vehicles with supplier inventory?',function (e) {
-                                        if (e) {
-                                            $('#can-inventory-allocate').val(1);
-                                        }
-                                    }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
-                                            $('#can-inventory-allocate').val(0);
-                                        });
-            }
             $('#po-create-form').unbind('submit').submit();
+             //  mapping confirmation nand colour check if po is for toyota
+            // if(isToyotaPO == 1) {
+                // let exteriorColours = $('select[name="ex_colour[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let interiorColours = $('select[name="int_colour[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let masterModelsIds = $('input[name="master_model_id[]"]').map(function() {
+                //     return $(this).val();
+                // }).get();
+
+                // let msg = '';
+                // if(exteriorColours.length > 0 && interiorColours.length > 0) {
+
+                //     $.ajax({
+                //     url: "{{ route('dp-purchase-order.inventory-check') }}",
+                //     type: 'GET',
+                //     data: {
+                //         'int_colours': interiorColours,
+                //         'ex_colours': exteriorColours,
+                //         'master_model_id': masterModelsIds,
+                //         'pfi_id': "{{ $pfi->id }}"
+                //     },
+                //     success: function(response) {
+                //         if(response.length > 0) {
+                //                msg = "Inventory doest not exist exact colour matches with po vehicles";
+                //         }else{
+                //             msg = "The exact colour matches  in inventory "
+                //         }
+                       
+                //         }
+                //     });
+                // }
+                // var confirm = alertify.confirm(msg+'Do you want to allocate the PO vehicles with supplier inventory?',function (e) {
+                //                         if (e) {
+                //                             $('#can-inventory-allocate').val(1);
+                //                         }
+                //                     }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                //                             $('#can-inventory-allocate').val(0);
+                //                         });
+            // }
+          
         }
     });
 </script>

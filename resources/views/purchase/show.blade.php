@@ -153,6 +153,7 @@
     }
 </style>
 @section('content')
+
 <!-- Modal Structure -->
 <div class="modal fade" id="addDNModalUnique" data-purchase-order-id="{{ $purchasingOrder->id }}" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -240,7 +241,7 @@
   </div>
 </div>
 <div class="modal fade" id="purchaseOrderModal" tabindex="-1" role="dialog" aria-labelledby="purchaseOrderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg modal-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="purchaseOrderModalLabel">Initiate Payments</h5>
@@ -416,7 +417,7 @@
     </div>
 </div>
 <div class="modal fade" id="vehicleModalvariant" tabindex="-1" role="dialog" aria-labelledby="vehicleModalvariantLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="vehicleModalvariantLabel">Active Vehicles Details</h5>
@@ -430,6 +431,54 @@
         </div>
     </div>
 </div>
+   <!-- DP Variant update  -->
+
+<div class="modal fade" id="updateDPVehicleVariant" tabindex="-1" role="dialog" aria-labelledby="updateDPVehicleVariantLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateDPVehicleVariantLabel">Update Vehicles Variant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="variant-update-table" class="table table-striped table-editable table-edits table table-condensed" >
+                    <thead class="bg-soft-secondary">
+                    <tr>
+                        <th>Ref.No:</th>
+                        <th>VIN</th>
+                        <th>Variant</th>
+                        <th>New Variant </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <div hidden>{{$i=0;}}
+                    </div>
+                        @foreach($vehicles as $vehicle)
+                        <tr>
+                            <td>{{ $vehicle->id }}</td>
+                            <td>{{ $vehicle->vin }}</td>
+                            <td>{{ $vehicle->variant->name ?? '' }}</td>
+                            <td>
+                                <select class="form-control variant-id"  multiple data-vehicle-id="{{ $vehicle->id}}">
+                                    @foreach($vehicle->variants as $variant)
+                                    <option value="{{$variant->id}}" > {{ $variant->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateVariantBtn">Update Variant</button>
+            </div>
+        </div>
+    </div>
+</div>
+           
+   <!-- modal end  -->
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -747,7 +796,7 @@
         @endif
         <div class="card-body">
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
     <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
@@ -758,24 +807,40 @@
         <div class="modal-body p-3">
     <div class="container">
         <div class="row">
+        <input type="hidden" id="purchasing_order_id" name="purchasing_order_id" class="form-control" value="{{ $purchasingOrder->id }}">
+
         <div class="col-md-4 p-3">
                 <label for="netsuitpo" class="form-label font-size-13 text-center">Netsuit PO:</label>
             </div>
             <div class="col-md-8 p-3">
             <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" value="{{$purchasingOrder->po_number}}">
             </div>
-            <div class="col-md-4 p-3">
-                <label for="vendorName" class="form-label font-size-13 text-center">Vendor Name:</label>
-            </div>
-            <div class="col-md-8 p-3">
-            <input type="hidden" id="purchasing_order_id" name="purchasing_order_id" class="form-control" value="{{ $purchasingOrder->id }}">
-            <select class="form-control" autofocus name="vendors_id" id="vendors" required>
-                <option value="" disabled>Select The Vendor</option>
-                @foreach($vendors as $vendor)
-                    <option value="{{ $vendor->id }}" {{ ($vendor->supplier === $vendorsname) ? 'selected' : '' }}>{{ $vendor->supplier }}</option>
-                @endforeach
-            </select>
-            </div>
+            @if($purchasingOrder->is_demand_planning_purchase_order == false)
+                <div class="col-md-4 p-3">
+                    <label for="vendorName" class="form-label font-size-13 text-center">Vendor Name:</label>
+                </div>
+                <div class="col-md-8 p-3">
+                    <select class="form-control" autofocus name="vendors_id" id="vendors" required>
+                        <option value="" disabled>Select The Vendor</option>
+                        @foreach($vendors as $vendor)
+                            <option value="{{ $vendor->id }}" {{ ($vendor->supplier === $vendorsname) ? 'selected' : '' }}>{{ $vendor->supplier }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4 p-3">
+                    <label for="currency" class="form-label font-size-13 text-center">Currency:</label>
+                </div>
+                <div class="col-md-8 p-3">
+                    <select class="form-control" autofocus name="currency" required>
+                        <option value="AED" {{ $purchasingOrder->currency === 'AED' ? 'selected' : '' }}>AED</option>
+                        <option value="USD" {{ $purchasingOrder->currency === 'USD' ? 'selected' : '' }}>USD</option>
+                        <option value="EUR" {{ $purchasingOrder->currency === 'EUR' ? 'selected' : '' }}>EUR</option>
+                        <option value="GBP" {{ $purchasingOrder->currency === 'GBP' ? 'selected' : '' }}>GBP</option>
+                        <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
+                        <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
+                    </select>
+                </div>
+            @endif
             <div class="col-md-4 p-3">
                 <label for="paymentTerms" class="form-label font-size-13 text-center">Payment Terms:</label>
             </div>
@@ -787,19 +852,7 @@
                                 @endforeach
                             </select>
             </div>
-            <div class="col-md-4 p-3">
-                <label for="currency" class="form-label font-size-13 text-center">Currency:</label>
-            </div>
-            <div class="col-md-8 p-3">
-                <select class="form-control" autofocus name="currency" required>
-                <option value="AED" {{ $purchasingOrder->currency === 'AED' ? 'selected' : '' }}>AED</option>
-                <option value="USD" {{ $purchasingOrder->currency === 'USD' ? 'selected' : '' }}>USD</option>
-                <option value="EUR" {{ $purchasingOrder->currency === 'EUR' ? 'selected' : '' }}>EUR</option>
-                <option value="GBP" {{ $purchasingOrder->currency === 'GBP' ? 'selected' : '' }}>GBP</option>
-                <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
-                <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
-            </select>
-            </div>
+           
             <div class="col-md-4 p-3">
                 <label for="shippingMethod" class="form-label font-size-13 text-center">Shipping Method:</label>
             </div>
@@ -845,31 +898,34 @@
             </select>
             </div>
             <div class="col-md-4 p-3">
-            <label for="Incoterm" class="form-label">Preferred Destination:</label>
+                <label for="Incoterm" class="form-label">Preferred Destination:</label>
             </div>
             <div class="col-md-8 p-3">
-            <select name="fd" class="form-control" id="fd">
-            <option value="">Select the Preferred Destination</option>
-            @foreach ($countries as $country)
-                <option value="{{ $country->id }}" {{ $country->id == $purchasingOrder->fd ? 'selected' : '' }}>
-                    {{ $country->name }}
-                </option>
-            @endforeach
-        </select>
+                <select name="fd" class="form-control" id="fd">
+                    <option value="">Select the Preferred Destination</option>
+                    @foreach ($countries as $country)
+                        <option value="{{ $country->id }}" {{ $country->id == $purchasingOrder->fd ? 'selected' : '' }}>
+                            {{ $country->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-            <div class="col-md-4 p-3">
-                <label for="shippingCost" class="form-label font-size-13 text-center">PFI Number:</label>
-            </div>
-            <div class="col-md-8 p-3">
-            <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PFI Number" value="{{$purchasingOrder->pl_number}}">
-            </div>
-            <div class="col-md-4 p-3">
-                <label for="shippingCost" class="form-label font-size-13 text-center">Upload PFI:</label>
-            </div>
-            <div class="col-md-8 p-3">
-            <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
-            </div>
+            @if($purchasingOrder->is_demand_planning_purchase_order == false)
+                <div class="col-md-4 p-3">
+                    <label for="shippingCost" class="form-label font-size-13 text-center">PFI Number:</label>
+                </div>
+                <div class="col-md-8 p-3">
+                    <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PFI Number" value="{{$purchasingOrder->pl_number}}">
+                </div>
+                <div class="col-md-4 p-3">
+                    <label for="shippingCost" class="form-label font-size-13 text-center">Upload PFI:</label>
+                </div>
+                <div class="col-md-8 p-3">
+                    <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
+                </div>
+            @endif
         </div>
+
         </div>
             </div>
                     <div class="modal-footer">
@@ -904,7 +960,24 @@
                                 <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
                             </div>
                             <div class="col-lg-6 col-md-3 col-sm-12">
-                                <span> {{ $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->pfi_reference_number ?? '' }} </span>
+                                <span> {{ $purchasingOrder->PFIPurchasingOrder->pfi->pfi_reference_number ?? '' }} </span>
+                            </div>
+                        </div>
+                      
+                        <div class="row">
+                            <div class="col-lg-4 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label"><strong>PFI Document</strong></label>
+                            </div>
+                            <div class="col-lg-6 col-md-3 col-sm-12">
+                            @if($purchasingOrder->PFIPurchasingOrder->pfi->pfi_document_without_sign)
+                                <a href="{{ url('PFI_document_withoutsign/'.$purchasingOrder->PFIPurchasingOrder->pfi->pfi_document_without_sign) }}" class="btn btn-primary btn-sm" target="_blank" >
+                                    <i class="fas fa-file-pdf mr-2"></i> View PFI
+                                </a>
+                                @else
+                                <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" class="btn btn-primary btn-sm" target="_blank" >
+                                    <i class="fas fa-file-pdf mr-2"></i> View PFI
+                                </a>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -1160,11 +1233,13 @@
                 <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+           
                 <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
             </div>
         </div>
     </div>
 </div>
+
 @endif
 
 @foreach ($oldPlFiles as $index => $oldPlFile)
@@ -1545,25 +1620,32 @@
                     <h4 class="card-title">Active Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                     @if($purchasingOrder->status != "Cancelled")
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                    @endphp
-                    @if ($hasPermission)
-                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn me-2">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn me-2" style="display: none;">Update</a>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
-                    @endphp
-                    @if ($hasPermission)
-                    <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-variant-vehicles');
-                    @endphp
-                    @if ($hasPermission)
-                    <a href="#" class="btn btn-sm btn-primary float-left updatevariant-btn me-2" data-id="{{ $purchasingOrder->id }}">Variant Update</a>
-                    @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                        @endphp
+                        @if ($hasPermission)
+                            <a href="#" class="btn btn-sm btn-primary float-end edit-btn me-2">Edit</a>
+                            <a href="#" class="btn btn-sm btn-success float-end update-btn me-2" style="display: none;">Update</a>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
+                        @endphp
+                        @if ($hasPermission)
+                            <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
+                        @endif
+                            <!-- Variant update -->
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-variant-vehicles');
+                        @endphp
+                        @if ($hasPermission)
+                            @if($purchasingOrder->is_demand_planning_purchase_order)
+                                <a href="#"  class="btn btn-sm btn-info float-left update-po-variant-btn me-2" 
+                                data-bs-toggle="modal" data-bs-target="#updateDPVehicleVariant">Update Variant</a>
+                            @else
+                                <a href="#" class="btn btn-sm btn-primary float-left updatevariant-btn me-2"
+                                    data-id="{{ $purchasingOrder->id }}">Variant Update</a>
+                            @endif
+                        @endif
                     @endif
                 </div>
                 <div class="card-body">
@@ -1593,6 +1675,7 @@
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Production Date</th>
+                              
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 <!-- @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
@@ -1758,33 +1841,33 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval']);
                             @endphp
                             @if ($hasPermission)
-                            <td>
-                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
-                                    <option value="">Exterior Color</option>
-                                    @foreach ($exColours as $id => $exColour)
-                                        @if ($id == $vehicles->ex_colour)
-                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
-                                        @else
-                                            <option value="{{ $id }}">{{ $exColour }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
-                                    <option value="">Interior Color</option>
-                                    @foreach ($intColours as $id => $intColour)
-                                        @if ($id == $vehicles->int_colour)
-                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
-                                        @else
-                                            <option value="{{ $id }}">{{ $intColour }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>{{ $vehicles->vin }}</td>
-                            <td>{{ $vehicles->engine }}</td>
-                            <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                                <td>
+                                    <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                        <option value="">Exterior Color</option>
+                                        @foreach ($exColours as $id => $exColour)
+                                            @if ($id == $vehicles->ex_colour)
+                                                <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                            @else
+                                                <option value="{{ $id }}">{{ $exColour }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                        <option value="">Interior Color</option>
+                                        @foreach ($intColours as $id => $intColour)
+                                            @if ($id == $vehicles->int_colour)
+                                                <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                            @else
+                                                <option value="{{ $id }}">{{ $intColour }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>{{ $vehicles->vin }}</td>
+                                <td>{{ $vehicles->engine }}</td>
+                                <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
                                 <td>{{ $vehicles->ppmmyyy }}</td>
                             @endif
@@ -4071,26 +4154,49 @@ $('#savevariantBtn').click(function(){
             variant_id: selectedVariant
         });
     });
-    var purchasingOrderId = $('#vehicleModalvariant').data('purchasingOrderId'); // Retrieve the stored id
-
-    $.ajax({
-        url: '{{ route("vehicles.updateVariants") }}',
-        method: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',
-            variants: selectedVariants,
-            purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
-        },
-        success: function(response) {
-            alert('Variants updated successfully!');
-            $('#vehicleModalvariant').modal('hide');
-            window.location.reload();
-        },
-        error: function(xhr) {
-            console.log(xhr.responseText);
-        }
-    });
+    updateVariants(selectedVariants);
 });
+
+    $('#updateVariantBtn').click(function(){
+        var selectedVariants = [];
+        $('.variant-id').each(function() {
+            var vehicleId = $(this).data('vehicle-id');
+            var eachSelectedVariant = $(this).val();
+            if(eachSelectedVariant[0]) {
+                selectedVariants.push({
+                vehicle_id: vehicleId,
+                variant_id: eachSelectedVariant[0]
+            });
+            }
+        });
+        updateVariants(selectedVariants);
+    
+    });
+
+    function updateVariants(selectedVariants){
+        var purchasingOrderId = "{{ $purchasingOrder->id }}"; // Retrieve the stored id
+
+        $.ajax({
+            url: '{{ route("vehicles.updateVariants") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                variants: selectedVariants,
+                purchasing_order_id: purchasingOrderId // Pass the purchasing order ID
+            },
+            success: function(response) {
+                alertify.confirm('Variants updated successfully',function (e) {
+                }).set({title:"Update Variant"});
+
+                $('#vehicleModalvariant').modal('hide');
+                window.location.reload();
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
         function calculateTotalPrice() {
             var totalPrice = 0;
             $('.new-price').each(function() {
@@ -5168,6 +5274,11 @@ $.ajax({
             placeholder: 'Interior Color',
             allowClear: true,
             width: 'resolve'  // Adjust the width dynamically or apply your custom width
+        });
+
+        $('.variant-id').select2({
+            placeholder: 'Variant',
+            maximumSelectionLength: 1 // Adjust the width dynamically or apply your custom width
         });
     });
 </script>

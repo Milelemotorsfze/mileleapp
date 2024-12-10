@@ -515,7 +515,7 @@
             }).on('change', function() {
                 getCustomers();
                 $('.customer-doc-div').html('');
-                getModels(1,'all');
+                getModels('all','all');
               
             });
             $('#customer').select2({
@@ -1224,6 +1224,7 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
+            console.log(selectedModelIds);
            
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",
@@ -1380,22 +1381,23 @@
             {
                 if(i != index) {
                     let model = $('#model-'+i).val();
-                    if(unSelectedmodel == model[0] ) {
-                    // chcek this option value alredy exist in dropdown list or not.
-                    var currentId = 'model-' + i;
-                    var isOptionExist = 'no';
-                    $('#' + currentId +' option').each(function () {
+        
+                    // if(unSelectedmodel == model[0] ) {
+                        // chcek this option value alredy exist in dropdown list or not.
+                        var currentId = 'model-' + i;
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
 
-                        if (this.text == unSelectedmodel) {
-                            isOptionExist = 'yes';
-                            return false;
+                            if (this.text == unSelectedmodel) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        if(isOptionExist == 'no'){
+                            $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
+
                         }
-                    });
-                    if(isOptionExist == 'no'){
-                        $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
-                    }
-
-                    }
+                    // }
                 }
             }
         }
