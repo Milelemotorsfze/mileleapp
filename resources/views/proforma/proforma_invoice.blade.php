@@ -655,7 +655,7 @@
         @if($quotation->shipping_method == 'EXW')
                <p style="font-weight: bolder"> Currency Exchange </p>
                Bank Payments AED transfers at actuals. USD transfer at  {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
-                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60.
+                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.67.
             @if($quotation->currency == 'EURO')
                 <p style="font-weight: bolder"> Currency Exchange </p>
 Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.

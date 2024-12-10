@@ -202,6 +202,8 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
+                                    <option value="4x2" {{ old('geadrive_trainrbox') == '4x2' ? 'selected' : '' }}>4x2</option>
+                                    <option value="4x4" {{ old('geadrive_trainrbox') == '4x4' ? 'selected' : '' }}>4x4</option>
                                         <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
                                         <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
                                         <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>

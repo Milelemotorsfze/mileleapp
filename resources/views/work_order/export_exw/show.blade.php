@@ -1084,12 +1084,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                             <div class="card">
                                 <div class="card-header" style="background-color : #e8f3fd!important;">
                                     <h4 class="card-title">
-                                        <center style="font-size:12px;">Vehicles and Addons Informations</center>
+                                        <center style="font-size:12px;">Vehicles and Addons Informations (Total Vehicle Count - {{count($workOrder->vehicles) ?? 'No vehicles'}})</center>
                                     </h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="table-responsive">
+							            <div class="table-responsive" >
                                             <table class="my-datatable table table-striped table-editable table" style="width:100%;">
                                                 <tr style="border-bottom:1px solid #b3b3b3; background-color : #e8f3fd!important;">
                                                     <th>Action</th>

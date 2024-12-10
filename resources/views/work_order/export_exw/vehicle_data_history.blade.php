@@ -16,7 +16,7 @@
     </div>
 </div>
 <div class="row mt-1">
-    <div class="table-responsive">
+    <div class="table-responsive dragscroll">
         <table id="myVehAddonTable" class="table table-striped table-editable table-edits table table-condensed my-datatable" >
             <thead style="background-color: #e6f1ff">
                 <tr>

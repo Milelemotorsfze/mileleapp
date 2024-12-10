@@ -25,7 +25,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
 
     <div class="card-body">
         <div class="row">
-            <div class="table-responsive">
+            <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
                     <thead style="background-color: #e6f1ff">
                         <tr>
@@ -95,7 +95,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                                     </td>
                                     <td>{{ $data->penalty->remarks ?? '' }}</td>
                                     <td>{{ $data->penalty->createdUser->name ?? '' }}</td>
-                                    <td>@if($data->penalty->created_at != ''){{ \Carbon\Carbon::parse($data->woBoe->created_at)->format('d M Y') }}@endif</td>
+                                    <td>@if($data->penalty->created_at != ''){{ \Carbon\Carbon::parse($data->penalty->created_at)->format('d M Y') }}@endif</td>
                                 </tr>
                             @endforeach
                         @else

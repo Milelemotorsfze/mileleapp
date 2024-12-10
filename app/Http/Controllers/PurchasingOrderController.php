@@ -1370,16 +1370,19 @@ public function getBrandsAndModelLines(Request $request)
         $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
+        $vehiclesdn = Vehicles::where('purchasing_order_id', $id)
+        ->where('status', 'Approved')
+        ->whereNotNull('dn_id')
+        ->get();
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments',
-            'vehiclesdel','countries','ports','purchasingOrderSwiftCopies','purchasedorderevents', 
-            'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 
-            'totalSurcharges', 'totalDiscounts','oldPlFiles','transitions', 'accounts','additionalpaymentpend',
-            'additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies',
+            'purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts',
+            'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
+
     }
     public function edit($id)
     {
@@ -1860,16 +1863,23 @@ public function checkcreatevins(Request $request)
         foreach ($groupedVehicles as $purchasingOrderId => $vehicles) {
             $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
             if ($purchasingOrder) {
+
                 $purchasingOrderPFI = PFIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
                 if($purchasingOrderPFI) {
                    $pfiNumber = $purchasingOrderPFI->pfi->pfi_reference_number; 
                 }else{
                     $pfiNumber = $purchasingOrder->pl_number;
                 }
-                // $recipients = $purchasingOrder->is_demand_planning_purchase_order == 1 
+//                 // $recipients = $purchasingOrder->is_demand_planning_purchase_order == 1 
+//                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
+//                 ? [env('LOGISTICS_EMAIL')] 
+//                 : [env('LOGISTICS_EMAIL'), env('CSO_EMAIL')];
+                $logisticsEmail = env('LOGISTICS_EMAIL', 'default@domain.com');
+                $additionalEmail = env('CSO_EMAIL', null);
                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
-                ? [env('LOGISTICS_EMAIL')] 
-                : [env('LOGISTICS_EMAIL'), env('CSO_EMAIL')];
+                ? [$logisticsEmail] 
+                : [$logisticsEmail, $additionalEmail];
+
                 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
                 $vehicleDetails = $vehicles->map(function ($vehicle) use ($vinChanges) {
                     $vinChange = collect($vinChanges)->firstWhere('new_vin', $vehicle->vin);
@@ -3534,11 +3544,11 @@ if ($paymentOrderStatus->isNotEmpty()) {
     if (!empty($changedFields)) {
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com'];
+        $recipients = config('mail.custom_recipients.dp');
     }
     else
     {
-        $recipients = ['abdul@milele.com'];
+        $recipients = config('mail.custom_recipients.cso');
     }
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     Mail::to($recipients)->send(new PurchaseOrderUpdated($purchasingOrder->po_number, $purchasingOrder->pl_number, $changedFields, $orderUrl));
@@ -3953,11 +3963,17 @@ public function updatePrices(Request $request)
 }
 if($purchasingOrder->is_demand_planning_po == 1)
 {
-    $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+    $recipients = [
+        config('mail.custom_recipients.dp'),
+        config('mail.custom_recipients.finance'),
+    ];
 }
 else
 {
-    $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+    $recipients = [
+        config('mail.custom_recipients.cso'),
+        config('mail.custom_recipients.finance'),
+    ];
 }
 $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
 // Format the detail text including the price changes information
@@ -4125,11 +4141,11 @@ public function updateVariants(Request $request)
     $orderUrl = url('/purchasing-order/' . $purchasingOrderId);
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = [env('DP_EMAIL')];
+        $recipients = config('mail.custom_recipients.dp');
     }
     else
     {
-        $recipients = [env('CSO_EMAIL')]; 
+        $recipients = config('mail.custom_recipients.cso'); 
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
                   "PFI Number: " . $purchasingOrder->pl_number . "\n" .
@@ -4692,12 +4708,12 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-    $recipients = ['team.finance@milele.com'];
+    $recipients = config('mail.custom_recipients.finance');
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     else
     {
-        $recipients = ['team.finance@milele.com'];
+        $recipients = config('mail.custom_recipients.finance');
     Mail::to($recipients)->send(new EmailNotificationrequest($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4782,12 +4798,12 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = ['team.dp@milele.com'];
+            $recipients = config('mail.custom_recipients.dp');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
-            $recipients = ['abdul@milele.com'];
+            $recipients = config('mail.custom_recipients.cso');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4894,12 +4910,12 @@ public function submitPaymentDetails(Request $request)
             $currency = $supplierAccountTransaction->account_currency;
             if($purchasingOrder->is_demand_planning_po == 1)
             {
-            $recipients = ['team.dp@milele.com'];
+            $recipients = config('mail.custom_recipients.dp');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             else
             {
-            $recipients = ['abdul@milele.com'];
+            $recipients = config('mail.custom_recipients.cso');
             Mail::to($recipients)->send(new EmailNotificationInitiate($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
             }
             $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -4973,12 +4989,18 @@ public function submitPaymentDetails(Request $request)
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
     {
-        $recipients = ['team.dp@milele.com', 'team.finance@milele.com'];
+        $recipients = [
+            config('mail.custom_recipients.dp'),
+            config('mail.custom_recipients.finance'),
+        ];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     else 
     {
-        $recipients = ['abdul@milele.com', 'team.finance@milele.com'];
+        $recipients = [
+            config('mail.custom_recipients.cso'),
+            config('mail.custom_recipients.finance'),
+        ];
     Mail::to($recipients)->send(new DPrealeasedEmailNotification($purchasingOrder->po_number, $purchasingOrder->pl_number, $supplierAccountTransaction->transaction_amount, $purchasingOrder->totalcost, $transactionCount, $orderUrl, $currency));
     }
     $detailText = "PO Number: " . $purchasingOrder->po_number . "\n" .
@@ -5299,44 +5321,86 @@ public function paymentconfirm(Request $request)
     // Method to save DN numbers
     public function saveDnNumbers(Request $request)
     {
-    $purchasingOrderId = $request->input('purchasingOrderId');
-    $type = $request->input('type');
-    if ($type == 'full') {
-        $dnNumber = $request->input('dnNumber');
+        $purchasingOrderId = $request->input('purchasingOrderId');
+        $type = $request->input('type');
+        
+        if ($type == 'full') {
+            $dnNumber = $request->input('dnNumber');
 
-        // info($vehicleId);
-    } else if ($type == 'vehicle') {
-        $vehicles =  Vehicles::where('purchasing_order_id', $purchasingOrderId);
-    $batchNumber = 1;
-    foreach ($vehicles as $vehicle) {
-        $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
-                                   ->orderBy('created_at', 'desc')
-                                   ->first();
-        if ($latestVehicleDn) {
-            $batchNumber = $latestVehicleDn->batch + 1;
-            break;
-        }
-    }
-        $vehicleDNData = $request->input('vehicleDNData');
-        foreach ($vehicleDNData as $vehicleData) {
-            $vehicleId = $vehicleData['vehicleId'];
-            $dnNumber = $vehicleData['dnNumber'];
-            if($dnNumber)
-            {
-            $vehicledn = New VehicleDn();
-            $vehicledn->dn_number = $dnNumber;
-            $vehicledn->vehicles_id = $vehicleId;
-            $vehicledn->created_by = Auth::id();
-            $vehicledn->batch = $batchNumber;
-            $vehicledn->save();
-            $vehicle = Vehicles::find($vehicleId);
-            $vehicle->dn_id = $vehicledn->id;
-            $vehicle->save();
+            // Retrieve all vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+    
+            // Check for the latest batch number among vehicles in the purchasing order
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Loop through each vehicle and assign the same DN number
+            foreach ($vehicles as $vehicle) {
+                // Create a new entry in the VehicleDn table
+                $vehicledn = new VehicleDn();
+                $vehicledn->dn_number = $dnNumber;
+                $vehicledn->vehicles_id = $vehicle->id;
+                $vehicledn->created_by = Auth::id();
+                $vehicledn->batch = $batchNumber;
+                $vehicledn->save();
+    
+                // Update the vehicle's dn_id field with the new VehicleDn record's ID
+                $vehicle->dn_id = $vehicledn->id;
+                $vehicle->save();
+            }
+        } else if ($type == 'vehicle') {
+            // Retrieve vehicles associated with the purchasing order
+            $vehicles = Vehicles::where('purchasing_order_id', $purchasingOrderId)->get();
+            $batchNumber = 1;
+            foreach ($vehicles as $vehicle) {
+                $latestVehicleDn = VehicleDn::where('vehicles_id', $vehicle->id)
+                                            ->orderBy('created_at', 'desc')
+                                            ->first();
+                if ($latestVehicleDn) {
+                    $batchNumber = $latestVehicleDn->batch + 1;
+                    break;
+                }
+            }
+    
+            // Get vehicle DN data from the request and ensure it's an array
+            $vehicleDNData = $request->input('vehicleDNData', []);
+    
+            foreach ($vehicleDNData as $vehicleData) {
+                $vehicleId = $vehicleData['vehicleId'];
+                $dnNumber = $vehicleData['dnNumber'];
+    
+                if ($dnNumber) {
+                    $vehicledn = new VehicleDn();
+                    $vehicledn->dn_number = $dnNumber;
+                    $vehicledn->vehicles_id = $vehicleId;
+                    $vehicledn->created_by = Auth::id();
+                    $vehicledn->batch = $batchNumber;
+                    $vehicledn->save();
+    
+                    // Attempt to find the vehicle by ID
+                    $vehicle = Vehicles::find($vehicleId);
+    
+                    // Check if the vehicle exists before assigning the dn_id
+                    if ($vehicle) {
+                        $vehicle->dn_id = $vehicledn->id;
+                        $vehicle->save();
+                    } else {
+                        // Log or handle the error if the vehicle ID is invalid
+                        \Log::error("Vehicle with ID {$vehicleId} not found.");
+                    }
+                }
             }
         }
-    }
-    return response()->json(['success' => true]);
-}
+        return response()->json(['success' => true]);
+    }    
 public function getVehiclesdn($purchaseOrderId) {
     $vehicles = Vehicles::where('purchasing_order_id', $purchaseOrderId)
     ->where('status', 'Approved')

@@ -103,7 +103,7 @@
                     <th>Interior Colour</th>
                     <th>Exterior Colour</th>
                     <th>Minimum Commission</th>
-                    <th>GP</th>
+                    <!-- <th>GP</th> -->
                     <th>Price</th>
                 </tr>
                 <tr>
@@ -113,7 +113,7 @@
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
                     <th><select class="filter-select"><option value="">All</option></select></th>
-                    <th><select class="filter-select"><option value="">All</option></select></th>
+                    <!-- <th><select class="filter-select"><option value="">All</option></select></th> -->
                     <th><select class="filter-select"><option value="">All</option></select></th>
                 </tr>
             </thead>
@@ -149,14 +149,14 @@
                         return `<input type="text" class="editable-minimum_commission" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
                     }
                 },
-                {
-                    data: 'gp', 
-                    name: 'vehicles.gp', 
-                    render: function (data, type, row) {
-                        var displayValue = data === null || data == 0 ? '' : data;
-                        return `<input type="text" class="editable-gp" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
-                    }
-                },
+                // {
+                //     data: 'gp', 
+                //     name: 'vehicles.gp', 
+                //     render: function (data, type, row) {
+                //         var displayValue = data === null || data == 0 ? '' : data;
+                //         return `<input type="text" class="editable-gp" data-varaint-id="${row.varaints_id}" data-int-colour="${row.int_colour}" data-ex-colour="${row.ex_colour}" value="${displayValue}" />`;
+                //     }
+                // },
                 {
                     data: 'price', 
                     name: 'vehicles.price', 

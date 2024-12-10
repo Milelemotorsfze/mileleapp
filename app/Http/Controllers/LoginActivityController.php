@@ -23,11 +23,12 @@ class LoginActivityController extends Controller
         $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'))->startOfDay();
         $endDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'))->endOfDay();
         $userId = $request->input('user_id');
-        $data = User::join('user_activities', 'users.id', '=', 'user_activities.users_id')
-        ->where('users.id', $userId)
+        $data = UserActivities::join('users', 'user_activities.users_id', '=', 'users.id')
+        ->where('user_activities.users_id', $userId)
         ->whereBetween('user_activities.created_at', [$startDate, $endDate])
         ->select('users.name', 'users.email', 'user_activities.created_at', 'user_activities.activity')
         ->get();
+        info($data);
     return response()->json(['data' => $data]);
     }
 }

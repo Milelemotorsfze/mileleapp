@@ -33,6 +33,7 @@ use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
 use App\Http\Controllers\VehiclePenaltyController;
+use App\Http\Controllers\WOVehicleClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -129,7 +130,9 @@ use App\Http\Controllers\VehicleNetsuiteCostController;
 use App\Http\Controllers\StockMessageController;
 use App\Http\Controllers\VehicleInvoiceController;
 use App\Http\Controllers\LeadChatController;
-
+use App\Exports\UAEVehicleStockExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\BelgiumVehicleStockExport;
 
 /*
 /*
@@ -487,9 +490,18 @@ Route::get('/d', function () {
     Route::controller(VehiclePenaltyController::class)->group(function(){
         Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
+        Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    
+    Route::controller(WOVehicleClaimsController::class)->group(function(){
+        Route::get('/vehicle-pending-claims', 'getPendingClaims')->name('getPendingClaims');
+        Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
+        Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
+        Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
+        Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
+        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+    });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
 
@@ -608,7 +620,6 @@ Route::get('/d', function () {
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
     Route::post('/update-priority', [StrategyController::class, 'updatePriority'])->name('strategy.updatePriority');
     Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
-    Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
     Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
     Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');
@@ -662,8 +673,8 @@ Route::get('/d', function () {
     Route::get('model-lines/viewspec/{id}', [VariantController::class, 'viewSpecification'])->name('model-lines.viewspec');
     Route::post('/variants/save-option', [VariantController::class, 'saveOption'])->name('variants.saveOption');
     Route::post('/variants/savespecification', [VariantController::class, 'savespecification'])->name('variants.savespecification');
-    Route::name('calls.show')
-    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
+    Route::name('calls.showcalls')
+    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'showcalls'])
     ->where([
         'call' => '[0-9]+',
         'brand_id' => '[0-9]+',
@@ -997,9 +1008,9 @@ Route::get('/d', function () {
     //Price Update Purchased Order
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
-    Route::post('/messages', [PurchasingOrderController::class, 'storeMessages']);
-    Route::post('/replies', [PurchasingOrderController::class, 'storeReply']);
-    Route::get('/messages/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
+    Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);
+    Route::post('/repliespurchased', [PurchasingOrderController::class, 'storeReply']);
+    Route::get('/messagespurchased/{purchaseOrderId}', [PurchasingOrderController::class, 'indexmessages']);
     Route::get('purchasedorder/vehicles-data-variants/{id}', [PurchasingOrderController::class, 'vehiclesdatagettingvariants'])->name('vehicles.vehiclesdatagettingvariants');
     Route::post('/vehicles/updateVariants', [PurchasingOrderController::class, 'updateVariants'])->name('vehicles.updateVariants');
     Route::get('/viewpdireport/method', [VehiclesController::class, 'generatepfiPDF']);
@@ -1104,4 +1115,15 @@ Route::get('/d', function () {
     Route::get('/get-tasks/{lead_id}', [DailyleadsController::class, 'getTasks'])->name('get.tasks');
     Route::post('/tasks/update', [DailyleadsController::class, 'tasksupdateStatus'])->name('leads-tasks.update');
     Route::post('/leads/{leadId}/update-status', [DailyleadsController::class, 'updateStatus']);
+    Route::post('/marekting/leadstatuswise', [HomeController::class, 'leadstatuswise'])->name('homemarketing.leadstatuswise');
+    Route::get('/reasondata', [HomeController::class, 'getFilteredData']);
+    Route::get('/show_leads_rejection', [HomeController::class, 'showRejectedLeads'])->name('leads.showrejection');
+    Route::get('/export-uae-vehicle-stock', function () {
+        return Excel::download(new UAEVehicleStockExport, 'uae_vehicle_stock.xlsx');
+    });
+    Route::get('/export-belgium-vehicle-stock', function () {
+        return Excel::download(new BelgiumVehicleStockExport, 'belgium_vehicle_stock.xlsx');
+    });
+    Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
+    Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
 });

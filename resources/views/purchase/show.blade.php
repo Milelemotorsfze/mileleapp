@@ -155,7 +155,7 @@
 @section('content')
 
 <!-- Modal Structure -->
-<div class="modal fade" id="addDNModalUnique" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
+<div class="modal fade" id="addDNModalUnique" data-purchase-order-id="{{ $purchasingOrder->id }}" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -2317,22 +2317,34 @@
         <a href="#" class="btn btn-sm btn-success adddnnumberbutton-btn" data-id="{{ $purchasingOrder->id }}" data-bs-toggle="modal" data-bs-target="#addDNModalUnique">Add New DN Numbers</a>
     </div>
     <div class="table-responsive">
-                        <table id="dtBasicExample10" class="table table-striped table-editable table-edits table table-bordered">
-                            <thead class="bg-soft-secondary">
-                            <tr>
-                                <th>Ref No</th>
-                                <th>Brand</th>
-                                <th>Model Line</th>
-                                <th>Variant</th>
-                                <th>Exterior Colour</th>
-                                <th>Interior Colour</th>
-                                <th>VIN</th>
-                                <th>DN Number</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+    <table id="dtBasicExample10" class="table table-striped table-editable table-edits table table-bordered">
+    <thead class="bg-soft-secondary">
+        <tr>
+            <th>Ref No</th>
+            <th>Brand</th>
+            <th>Model Line</th>
+            <th>Variant</th>
+            <th>Exterior Colour</th>
+            <th>Interior Colour</th>
+            <th>VIN</th>
+            <th>DN Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($vehiclesdn as $vehicle)
+        <tr>
+            <td>{{ $vehicle->id }}</td>
+            <td>{{ $vehicle->variant->brand->brand_name }}</td>
+            <td>{{ $vehicle->variant->master_model_lines->model_line }}</td>
+            <td>{{ $vehicle->variant->name }}</td>
+            <td>{{ $vehicle->exterior?->name ?? 'N/A' }}</td>
+            <td>{{ $vehicle->interior?->name ?? 'N/A' }}</td>
+            <td>{{ $vehicle->vin }}</td>
+            <td>{{ $vehicle->dn->dn_number ?? 'N/A' }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
                     </div>
             </div>
         </div>
@@ -4246,7 +4258,7 @@ $(document).ready(function() {
     });
 
     function loadMessages() {
-        $.get(`/messages/${purchaseOrderId}`, function(data) {
+        $.get(`/messagespurchased/${purchaseOrderId}`, function(data) {
             $('#messages').empty();
             data.forEach(function(message) {
                 displayMessage(message);
@@ -4325,7 +4337,7 @@ $(document).ready(function() {
     function sendMessage() {
         const message = $('#message').val();
         if (message.trim() !== '') {
-            $.post('/messages', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
+            $.post('/messagespurchased', { purchase_order_id: purchaseOrderId, message: message }, function(data) {
                 displayMessage(data);
                 $('#message').val('');
                 scrollToBottom();
@@ -4336,7 +4348,7 @@ $(document).ready(function() {
     function sendReply(messageId) {
         const reply = $(`#reply-input-${messageId}`).find('.reply-message').val();
         if (reply.trim() !== '') {
-            $.post('/replies', { message_id: messageId, reply: reply }, function(data) {
+            $.post('/repliespurchased', { message_id: messageId, reply: reply }, function(data) {
                 const replyHtml = `
                     <div class="message-reply">
                         <div class="d-flex justify-content-between">
@@ -5125,13 +5137,12 @@ $(document).ready(function() {
 });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     const dnSelection = document.getElementById('dnSelection');
     const fullPOInput = document.getElementById('fullPOInput');
     const vehicleTabledn = document.getElementById('vehicleTabledn');
     const vehicleTableBodydn = document.getElementById('vehicleTableBodydn');
     const saveDNButton = document.getElementById('saveDNButton');
-    
     dnSelection.addEventListener('change', function () {
         if (dnSelection.value === 'full') {
             fullPOInput.classList.remove('d-none');
@@ -5172,75 +5183,81 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
     });
+});
+$(document).ready(function () {
+    // Handle dropdown selection change
+    $('#dnSelection').change(function () {
+        if ($(this).val() === 'full') {
+            $('#fullPOInput').removeClass('d-none');
+            $('#vehicleTabledn').addClass('d-none');
+        } else {
+            $('#fullPOInput').addClass('d-none');
+            $('#vehicleTabledn').removeClass('d-none');
+        }
+    });
 
-    saveDNButton.addEventListener('click', function () {
-        const purchasingOrderId = "{{ $purchasingOrder->id }}"; // Ensure this variable is correctly populated in your Blade template
-
-        if (dnSelection.value === 'full') {
-            const dnNumberFullPO = document.getElementById('dnNumberFullPO').value;
-
-            // Send Full PO DN Number to controller
-            fetch('/save-dn-numbers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
+    // Handle save button click
+    $('#saveDNButton').click(function () {
+        // Get the purchasing order ID (assuming you have a way to get this value)
+        var purchasingOrderId = "{{ $purchasingOrder->id }}"; // Replace with actual PO ID
+        console.log(purchasingOrderId);
+        // Check if "Full PO" option is selected
+        if ($('#dnSelection').val() === 'full') {
+            var dnNumberFullPO = $('#dnNumberFullPO').val();
+            $.ajax({
+                url: '/save-dn-numbers',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
                     purchasingOrderId: purchasingOrderId,
                     dnNumber: dnNumberFullPO,
                     type: 'full'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                }),
+                success: function (response) {
+                    alert('DN Number saved successfully for Full PO!');
+                    $('#addDNModalUnique').modal('hide');
+                    setTimeout(function() {
+        location.reload();
+    }, 500); 
+                },
+                error: function (xhr, status, error) {
+                    alert('Error saving DN Number: ' + error);
                 }
-                return response.json();
-            })
-            .then(data => {
-                // Handle success response
-                console.log('DN number saved successfully:', data);
-            })
-            .catch(error => {
-                console.error('Error saving DN number:', error);
             });
         } else {
-            const vehicleInputs = document.querySelectorAll('.dn-number-input');
-            const vehicleDNData = [];
-
-            vehicleInputs.forEach(input => {
-                const vehicleId = input.getAttribute('data-vehicle-id');
-                const dnNumber = input.value;
-                vehicleDNData.push({ vehicleId: vehicleId, dnNumber: dnNumber });
-            });
-
-            // Send Vehicle DN Numbers to controller
-            fetch('/save-dn-numbers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    purchasingOrderId: purchasingOrderId,
-                    vehicleDNData: vehicleDNData,
-                    type: 'vehicle'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+            // If "Individual Vehicles" is selected, get DN numbers for each vehicle
+            var vehicleData = [];
+            $('#vehicleTableBodydn tr').each(function () {
+                var vehicleId = $(this).find('.dn-number-input').data('vehicle-id');
+                var dnNumber = $(this).find('.dn-number-input').val();
+                if (dnNumber) { // Only include if DN Number is filled in
+                    vehicleData.push({
+                        vehicleId: vehicleId,
+                        dnNumber: dnNumber
+                    });
                 }
-                return response.json();
-            })
-            .then(data => {
-                // Handle success response
-                console.log('Vehicle DN numbers saved successfully:', data);
-            })
-            .catch(error => {
-                console.error('Error saving DN numbers:', error);
             });
+            // Prepare data for "Individual Vehicles" and send AJAX request
+$.ajax({
+    url: '/save-dn-numbers',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+        purchasingOrderId: purchasingOrderId,
+        vehicleDNData: vehicleData, // Make sure this name matches what the backend expects
+        type: 'vehicle'
+    }),
+    success: function (response) {
+        alert('DN Numbers saved successfully for individual vehicles!');
+        $('#addDNModalUnique').modal('hide');
+        setTimeout(function() {
+        location.reload();
+    }, 500); 
+    },
+    error: function (xhr, status, error) {
+        alert('Error saving DN Numbers: ' + error);
+    }
+});
         }
     });
 });

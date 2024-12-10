@@ -1799,6 +1799,9 @@
                 {
                     let dataErrorCard = document.getElementById('dataErrorCard');
                     dataErrorCard.hidden = true
+                    console.log(result);
+                    console.log(result.data);
+                    console.log(result.data.headingError);
                     if(result.data.headingError)
                     {
                         document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;

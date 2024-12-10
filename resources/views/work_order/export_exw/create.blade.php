@@ -264,7 +264,6 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-
 				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
 			</div>
 			<br>
@@ -635,6 +634,7 @@
 								</select>
 							</div>
 						</div>
+						
 						<div class="row">
 							<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
 							</div>
@@ -651,7 +651,7 @@
 						</div>
 						</br>
 						<div class="row">
-							<div class="table-responsive">
+							<div class="table-responsive" >
 								<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 									<tr style="border-bottom:1px solid #b3b3b3;">
 										<th>Action</th>
@@ -1085,7 +1085,7 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 						</div>
 					</div>
 				</div>

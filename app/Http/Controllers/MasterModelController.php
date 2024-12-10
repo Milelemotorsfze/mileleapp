@@ -122,7 +122,6 @@ class MasterModelController extends Controller
      */
     public function store(Request $request)
     {
-//        return dd($request->all());
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
@@ -192,8 +191,6 @@ class MasterModelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return dd($request->all());
-
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',

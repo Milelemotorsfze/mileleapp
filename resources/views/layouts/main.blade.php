@@ -15,8 +15,8 @@
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script> -->
 		<script src="{{ asset('js/custom/jquery.validate.min.js') }}"></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script> -->
-
         <style>
+
      /* .modal-content {
             position:fixed;
             top: 50%;
@@ -92,6 +92,7 @@
         <!-- JAVASCRIPT -->
         @include('partials/vendor-scripts')
         @stack('scripts')
+
         <!-- dropzone js -->
         <script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
         <script src="{{ asset('js/app.js') }}"></script>

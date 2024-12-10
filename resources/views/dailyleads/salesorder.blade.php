@@ -1,5 +1,7 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+
 <style>
 /* Ensure table rows do not wrap text */
 table.dataTable {
@@ -42,6 +44,8 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 .table-responsive {
     height: 80vh;
     overflow-y: auto;
+    white-space: nowrap;
+    cursor: grab;
 }
    .btn-outline-primary {
     margin-bottom: 5px;
@@ -322,7 +326,7 @@ table.dataTable thead th select {
     </div>
 </div>
         <div class="card-body">
-        <div class="table-responsive" style="height: 80vh;">
+        <div class="table-responsive dragscroll" style="height: 80vh;">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>

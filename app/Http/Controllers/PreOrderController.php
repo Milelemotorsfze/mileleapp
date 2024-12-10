@@ -6,6 +6,7 @@ use App\Models\PreOrder;
 use App\Models\PreOrderPos;
 use App\Models\UserActivities;
 use App\Models\Brand;
+use App\Models\clients;
 use App\Models\ColorCode;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
@@ -38,27 +39,19 @@ class PreOrderController extends Controller
                     'pre_orders.id as pre_order_number',
                     'pre_orders.status',
                     'pre_orders_items.id',
-                    'so.so_number',
-                    'so.notes',
-                    'master_model_lines.model_line as model_line',
                     'pre_orders_items.qty',
                     'pre_orders_items.description',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior', 
-                    'color_codes_interior.name as interior', 
-                    'pre_orders_items.modelyear',
-                    'brands.brand_name',
+                    'varaints.name',
+                    'quotations.id as quotationsid',
                     'users.name as salesperson'
                 ])
                 ->leftJoin('pre_orders', 'pre_orders_items.preorder_id', '=', 'pre_orders.id')
-                ->leftJoin('so', 'pre_orders.quotations_id', '=', 'so.quotation_id')
-                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
-                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.quotation_id')
+                ->leftJoin('quotation_details', 'pre_orders.quotations_id', '=', 'quotation_details.quotation_id')
+                ->leftJoin('varaints', 'pre_orders_items.variant_id', '=', 'varaints.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
-                ->where('pre_orders_items.status', 'Approved')
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
                 ->groupby('pre_orders_items.id');
             }
                 return DataTables::of($preorders)
@@ -116,6 +109,7 @@ class PreOrderController extends Controller
     }
     public function createpreorder($callId) {
     $quotation = Quotation::where('calls_id', $callId)->first();
+    $calls = Quotation::where('calls_id', $callId)->first();
     $quotationItems = QuotationItem::where('quotation_id', $quotation->id)->get();
     $variants = collect();
     foreach ($quotationItems as $item) {
@@ -148,6 +142,7 @@ class PreOrderController extends Controller
                     $preorderItem->variant_id = $variant_id;
                     $preorderItem->qty = $request->qty[$key];
                     $preorderItem->notes = $request->notes[$key];
+                    $preorderItem->status = "New";
                     $preorderItem->save();
                 }
             return redirect()->route('dailyleads.index')->with('success', 'Pre Order created successfully.');

@@ -3,7 +3,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
                     @section('content')
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                     @endphp
                     @if ($hasPermission)
   <div class="card-header">
@@ -158,6 +158,10 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
+      @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    @endphp
+                    @if ($hasPermission)
       <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
         <i class="fa fa-users" aria-hidden="true"></i> Customers
       </a>
@@ -169,6 +173,7 @@ input[type=number]::-webkit-outer-spin-button
       <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
+      @endif
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
@@ -220,7 +225,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div> -->
         <div class="card-body">
-          <div class="table-responsive">
+          <div class="table-responsive dragscroll">
             <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
@@ -980,7 +985,12 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Signature Status</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
+                  @php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
                   <th>Action</th>
+                  @endif
                 </tr>
               </thead>
             </table>
@@ -1048,6 +1058,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Variant</th>
                   <th>Qty</th>
                   <th>Country</th>
+                  <th>Sales Person</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1878,6 +1889,7 @@ $(document).ready(function () {
     { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
+  orderCellsTop: true,
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
@@ -2474,6 +2486,10 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             },
             { data: 'created_by_name', name: 'created_by_name' },
 { data: 'sales_person_name', name: 'sales_person_name' },
+@php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
             {
     data: 'id',
     name: 'id',
@@ -2511,6 +2527,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             </div>`;
     }
 },
+@endif
             ],
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);
@@ -2976,17 +2993,23 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             if (!data || !moment(data).isValid()) {
                 return '';
             }
-            // Convert the date to your desired format
             return moment(data).format('DD-MMM-YYYY');
         }
         return data;
     }
         },
-        { data: 'deal_value', name: 'quotations.deal_value' },
-        { data: 'sales_notes', name: 'quotations.sales_notes' },
-        { data: 'qty', name: 'pre_orders_items.qty' },
+        { 
+            data: 'deal_value', 
+            name: 'quotations.deal_value',
+            render: function(data, type, row) {
+                return parseFloat(data).toLocaleString('en-US');
+            }
+        },
+        { data: 'notes', name: 'pre_orders_items.notes' },
         { data: 'name', name: 'varaints.name' },
+        { data: 'qty', name: 'pre_orders_items.qty' },
         { data: 'countryname', name: 'countryname' },
+        { data: 'salesperson', name: 'salesperson' },
         { data: 'status', name: 'status' },
     ],
     createdRow: function (row, data, dataIndex) {

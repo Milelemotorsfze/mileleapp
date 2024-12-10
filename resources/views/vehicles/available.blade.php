@@ -486,6 +486,40 @@ table.dataTable thead th select {
         </div>
     </div>
 </div>
+<div class="modal fade" id="onwershipModal" tabindex="-1" role="dialog" aria-labelledby="onwershipModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <form id="onwershipForm" method="POST" action="/onwership-update">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_idonwership">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="onwershipModalLabel">Document Onwership</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="onwershiplabel">Document Onwership</label>
+                        <select class="form-control" id="documentonwership" name="documentonwership" required>
+                            <option value="" disabled selected>Select Onwership</option>
+                            <option value="Incoming">Incoming</option>
+                            <option value="Milele Motors FZE">Milele Motors FZE</option>
+                            <option value="Trans Car FZE">Trans Car FZE</option>
+                            <option value="Supplier Docs">Supplier Docs</option>
+                            <option value="Supplier Docs + VCC + BOE">Supplier Docs + VCC + BOE</option>
+                            <option value="RTA Possesion Cert/BOD">RTA Possesion Cert/BOD</option>
+                            <option value="RTA Possession Cert/Milele Cars Trading">RTA Possession Cert/Milele Cars Trading</option>
+                            <option value="RTA Possession Cert/Milele Car Rental">RTA Possession Cert/Milele Car Rental</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -592,12 +626,10 @@ table.dataTable thead th select {
                   @endif
                   @if ($hasPricePermission)
                      <th>Minimum Commission</th>
-                     <th>GP %</th>
+                     <!-- <th>GP %</th> -->
                     <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
                   <th>Comments</th>
@@ -609,7 +641,7 @@ table.dataTable thead th select {
           </div> 
         </div>  
       <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="variantviewLabel">View Variants</h5>
@@ -628,7 +660,7 @@ table.dataTable thead th select {
   </div>
   <script>
         $(document).ready(function () {
-var now = new Date();
+        var now = new Date();
     var columns3 = [
         {
         data: null,
@@ -798,7 +830,6 @@ var now = new Date();
                 var words = data.split(' ');
                 var firstFiveWords = words.slice(0, 5).join(' ') + '...';
                 var fullText = data;
-
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
@@ -898,7 +929,7 @@ var now = new Date();
                         return ''; // Return an empty string if there's no price
                     }
         },
-            { data: 'gp', name: 'vehicles.gp' },
+            // { data: 'gp', name: 'vehicles.gp' },
             {
             data: 'price', 
             name: 'vehicles.price', 
@@ -918,9 +949,7 @@ var now = new Date();
         });
     }
     columns3.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         { 
         data: 'custom_inspection_number', 
         name: 'vehicles.custom_inspection_number',
@@ -969,16 +998,87 @@ var now = new Date();
     searchable: false
 },
         );
+        var columnMap = {
+        0: 'id',
+        1: 'vehicles.id',
+        2: 'purchasing_order.po_number',
+        3: 'purchasing_order.po_date',
+        4: 'vehicles.estimation_date',
+        5: 'grn.grn_number',
+        6: 'grn.date',
+        7: 'vehicles.inspection_date',
+        8: 'vehicles.grn_remark',
+        9: 'grn_inspectionid',
+        10: 'vehicles.grn_remark',
+        11: 'reservation_end_date',
+        12: 'bp.name',
+        13: 'so.so_date',
+        14: 'so.so_number',
+        15: 'sp.name',
+        16: 'vehicles.sales_remarks',
+        17: 'pdi_inspectionid',
+        18: 'brands.brand_name',
+        19: 'master_model_lines.model_line',
+        20: 'varaints.model_detail',
+        21: 'varaints.name',
+        22: 'varaints.detail',
+        23: 'vehicles.vin',
+        24: 'varaints.engine',
+        25: 'varaints.my',
+        26: 'varaints.steering',
+        27: 'varaints.fuel_type',
+        28: 'varaints.gear',
+        29: 'ex_color.name',
+        30: 'int_color.name',
+        31: 'varaints.upholestry',
+        32: 'vehicles.ppmmyyy',
+        33: 'warehouse.name',
+        34: 'vehicles.territory',
+        35: 'countries.name',
+    };
+// Extend columnMap based on permissions
+if (hasManagementPermission) {
+    columnMap[36] = 'costprice';
+    columnMap[37] = 'vehicles.minimum_commission';
+    columnMap[38] = 'vehicles.price';
+    columnMap[39] = 'vehicles.ownership_type';
+    columnMap[40] = 'vehicles.custom_inspection_number';
+    columnMap[41] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[36] = 'vehicles.minimum_commission';
+    columnMap[37] = 'vehicles.price';
+    columnMap[38] = 'vehicles.ownership_type';
+    columnMap[39] = 'vehicles.custom_inspection_number';
+    columnMap[40] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[36] = 'vehicles.ownership_type';
+    columnMap[37] = 'vehicles.custom_inspection_number';
+    columnMap[38] = 'vehicles.custom_inspection_status';
+}
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
         url: "{{ route('vehicles.availablevehicles', ['status' => 'Available Stock']) }}",
         type: "POST",
-        data: function(d) {
-            // Add any additional parameters to be sent along with the POST request here
-            // d.extra_param = "extra_value";
-        },
+        data: function (d) {
+                d.filters = {};  // Initialize an empty filters object
+                $('#dtBasicExample3 thead select').each(function () {
+                    var columnIndex = $(this).parent().index(); // Get the column index
+                    var columnName = columnMap[columnIndex]; // Map index to column name
+                    var value = $(this).val();
+                        console.log(columnIndex);
+                    // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
+                    if (value && columnName) {
+                    console.log("not empty");
+                        if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
+                            d.filters[columnName] = value; // Special filters for NULL and non-empty
+                        } else if (value.length > 0) {
+                            d.filters[columnName] = value; // Regular filter values
+                        }
+                    }
+                });
+            },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
@@ -1011,83 +1111,76 @@ var now = new Date();
     colReorder: true,
     initComplete: function () {
     var api = this.api();
+
     // For each column in the table, create a dropdown filter
     api.columns().every(function (index) {
         var column = this;
         var columnHeader = $(column.header()).text();  // Get the column header text
         var headerWidth = $(column.header()).outerWidth(); // Get the actual width of the header
-        // List of column headers you want to exclude from filtering
         var excludeFilters = ['Variant Detail', 'Actions', 'Comments', 'Status', 'PDI Report', 'GRN Report', 'Aging', 'Vehicle Cost'];
-        // Skip columns where you don't want filters (either by header name or index)
+        
         if (excludeFilters.includes(columnHeader)) {
-            return; // Skip this column
+            return; // Skip columns that don't require filters
         }
-        // Create a select element
-        var select = $('<select multiple="multiple" style="width: 100%"><option value="">Filter by ' + columnHeader + '</option></select>')
+
+        // Create a select element with "Empty" and "Not Empty" options
+        var select = $('<select multiple="multiple" style="width: 100%">' +
+            '<option value="">Filter by ' + columnHeader + '</option>' +
+            '<option value="__NULL__">Empty</option>' + // Add the Empty option
+            '<option value="__Not EMPTY__">Not Empty</option>' + // Add the Not Empty option
+            '</select>')
             .appendTo($(column.header()).empty())  // Append to the header cell
             .on('change', function () {
-                // Get the selected values
                 var selectedValues = $(this).val();
-                
+
+                // Use ajax.reload to apply filter to the entire table (server-side filtering)
                 if (selectedValues && selectedValues.length > 0) {
-                    // Join selected values as a string that looks for exact matches
-                    var exactSearch = '^(' + selectedValues.join('|') + ')$';  // Use ^ and $ for exact matching
-                    column
-                        .search(exactSearch, true, false)  // Exact match using regex search
-                        .draw();
+                    // Store selected values for this column
+                    api.settings()[0].ajax.data.filters = api.settings()[0].ajax.data.filters || {};
+                    api.settings()[0].ajax.data.filters[index] = selectedValues;
                 } else {
-                    column
-                        .search('', true, false)  // Clear search if no values selected
-                        .draw();
+                    delete api.settings()[0].ajax.data.filters[index];
                 }
+
+                api.ajax.reload(); // Reload the table with new filter data
             });
 
         // Populate the select element with unique values from the column
-        column.data().unique().sort().each(function (d, j) {
-            if (d) {
-                // If this is the 'po_date' column, format the date
-                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date'|| columnHeader === 'GRN Date'|| columnHeader === 'Reservation End'|| columnHeader === 'SO Date') {
+        column.data().unique().sort().each(function (d) {
+            if (d !== null && d !== '') {  // Skip nulls and empty strings
+                if (columnHeader === 'PO Date' || columnHeader === 'Estimated Arrival' || columnHeader === 'Inspection Date' || columnHeader === 'GRN Date' || columnHeader === 'Reservation End' || columnHeader === 'SO Date') {
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                } 
-                else if (columnHeader === 'Production Year') { 
+                } else if (columnHeader === 'Production Year') { 
                     var dateObj = new Date(d);
                     var formattedDate = dateObj.toLocaleDateString('en-GB', {
                         year: 'numeric',
                         month: 'long'
                     });
                     select.append('<option value="' + d + '">' + formattedDate + '</option>');
-                }
-                else if (columnHeader === 'Price') {
-                    var formattedPrice = parseFloat(d).toLocaleString('en-US', {
+                } else if (columnHeader === 'Price' || columnHeader === 'Minimum Commission') {
+                    var formattedValue = parseFloat(d).toLocaleString('en-US', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                     });
-                    select.append('<option value="' + d + '">' + formattedPrice + '</option>');
-                }
-                else if (columnHeader === 'Minimum Commission') {
-                    var formattedminimum_commission = parseFloat(d).toLocaleString('en-US', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                    });
-                    select.append('<option value="' + d + '">' + formattedminimum_commission + '</option>');
-                }
-                else {
+                    select.append('<option value="' + d + '">' + formattedValue + '</option>');
+                } else {
                     select.append('<option value="' + d + '">' + d + '</option>');
                 }
             }
         });
+        
         select.select2({
             placeholder: columnHeader, // Placeholder for the column
             allowClear: true,  // Option to clear selections
-            dropdownAutoWidth: true,  // Dynamically adjust dropdown width based on content
+            dropdownAutoWidth: true,  // Adjust dropdown width based on content
             width: headerWidth + 'px'  // Set the width of the select2 dropdown equal to the header width
         });
 
-        // Also, set the width of the <select> element to match the header
+        // Set width of the <select> element to match header
         select.css('width', headerWidth + 'px');
     });
 }
@@ -1162,6 +1255,16 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
         @if ($hascustominspectionPermission)
             var datainspection = table3.row(this).data();
             opencustominspectionModal(datainspection.id);
+        @endif
+    }
+    else if(columnHeader.includes('Document Owership')) {
+        @php
+        $hasonwershipPermission = Auth::user()->hasPermissionForSelectedRole('ownership-type');
+        @endphp
+        @if ($hasonwershipPermission)
+        console.log("inside");
+            var dataownership = table3.row(this).data();
+            openownershipModal(dataownership.id);
         @endif
     }
     else if (columnHeader.includes('Reservation End')) {
@@ -1548,6 +1651,27 @@ function openeditingcolorModal(vehicleId) {
     // Show the modal
     $('#custominspectionModal').modal('show');
 }
+function openownershipModal(vehicleIdonwership) {
+    // Set the vehicle_idinspection value
+    $('#vehicle_idonwership').val(vehicleIdonwership);
+console.log("pounch");
+    // Make an AJAX call to get the custom inspection details
+    $.ajax({
+        url: '/get-onwership-data',  // The route to get the custom inspection data
+        type: 'GET',
+        data: { vehicle_id: vehicleIdonwership },
+        success: function(response) {
+            // Populate the modal fields with the fetched data
+            $('#documentonwership').val(response.documentonwership);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+
+    // Show the modal
+    $('#onwershipModal').modal('show');
+}
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
@@ -1748,6 +1872,48 @@ $('#custominspectionForm').on('submit', function(e) {
             ...row.data(), // Keep other fields intact
             custom_inspection_number: response.custom_inspection_number, // Update inspection number
             custom_inspection_status: response.custom_inspection_status // Update inspection status
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#onwershipForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#onwershipModal').modal('hide');
+            alertify.success('Onwership Update Successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table3 = $('#dtBasicExample3').DataTable();
+           var vehicleId = $('#vehicle_idonwership').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table3.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            vehicle_idonwership: response.vehicle_idonwership, // Update inspection number
         }).draw(false); // Redraw the row
     } else {
         console.error("No matching row found for vehicle ID: " + vehicleId);

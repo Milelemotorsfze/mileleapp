@@ -878,7 +878,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                         <div class="tab-content mt-3" id="activity-inner-tabs-content">
                             <div class="tab-pane fade show active" id="logcall-content" role="tabpanel">
                             @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                         @endphp
                         @if ($hasPermission)
                                 <div class="form-group">

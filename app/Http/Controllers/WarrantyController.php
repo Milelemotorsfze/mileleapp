@@ -144,7 +144,6 @@ class WarrantyController extends Controller
      */
     public function update(Request $request, string $id)
     {
-    //    dd($request->all());
         $this->validate($request, [
             'warranty_policies_id' => 'required',
             'supplier_id' => 'required',

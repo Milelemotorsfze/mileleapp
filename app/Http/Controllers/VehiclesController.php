@@ -2703,6 +2703,7 @@ public function viewalls(Request $request)
         ->get();
 $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
 ->orderBy('id', 'DESC')
+->whereNot('category', 'Modified')
 ->get();
 $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
 $normalizationMap = [
@@ -2762,6 +2763,8 @@ foreach ($variants as $variant) {
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
+            info($filters);
             if($status === "allstock")
                 {
                     $data = Vehicles::select( [
@@ -2772,6 +2775,7 @@ foreach ($variants as $variant) {
                         'vehicles.sales_remarks',
                         'vehicles.estimation_date',
                         'vehicles.territory',
+                        'vehicles.ownership_type',
                         'vehicles.inspection_date',
                         'vehicles.custom_inspection_number',
                         'vehicles.custom_inspection_status',
@@ -2848,6 +2852,16 @@ foreach ($variants as $variant) {
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
+                    foreach ($filters as $columnName => $values) {
+                        if (in_array('__NULL__', $values)) {
+                            info($columnName);
+                            $data->whereNull($columnName); // Filter for NULL values
+                        } elseif (in_array('__Not EMPTY__', $values)) {
+                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        } else {
+                            $data->whereIn($columnName, $values); // Regular filtering for selected values
+                        }
+                    } 
                     $data = $data->groupBy('vehicles.id');  
                 }
         if ($data) {
@@ -3368,6 +3382,7 @@ public function availablevehicles(Request $request)
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
@@ -3427,6 +3442,8 @@ public function availablevehicles(Request $request)
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
+            \Log::info("Received Filters: ", $filters);
                 if($status === "Available Stock")
                 {
                     $data = Vehicles::select( [
@@ -3439,6 +3456,7 @@ public function availablevehicles(Request $request)
                          DB::raw("DATE_FORMAT(vehicles.reservation_start_date, '%d-%b-%Y') as reservation_start_date"),
                         'vehicles.reservation_end_date',
                         'vehicles.vin',
+                        'vehicles.ownership_type',
                         'vehicles.inspection_date',
                         'vehicles.engine',
                         'vehicles.minimum_commission',
@@ -3510,6 +3528,16 @@ public function availablevehicles(Request $request)
                     })
                     ->whereNull('vehicles.gdn_id')
                     ->where('vehicles.status', 'Approved');
+                    foreach ($filters as $columnName => $values) {
+                        if (in_array('__NULL__', $values)) {
+                            info($columnName);
+                            $data->whereNull($columnName); // Filter for NULL values
+                        } elseif (in_array('__Not EMPTY__', $values)) {
+                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        } else {
+                            $data->whereIn($columnName, $values); // Regular filtering for selected values
+                        }
+                    }                               
                     $data = $data->groupBy('vehicles.id');  
                 }
         if ($data) {
@@ -3531,6 +3559,7 @@ public function availablevehicles(Request $request)
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
@@ -3590,6 +3619,7 @@ public function availablevehicles(Request $request)
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
             if($status === "Delivered")
             {
                 $data = Vehicles::select( [
@@ -3599,6 +3629,7 @@ public function availablevehicles(Request $request)
                     'vehicles.ppmmyyy',
                     'vehicles.reservation_end_date',
                     'vehicles.vin',
+                    'vehicles.ownership_type',
                     'vehicles.price',
                     'vehicles.territory',
                     'vehicles.sales_remarks',
@@ -3671,6 +3702,16 @@ COALESCE(
                 ->whereNotNull('vehicles.gdn_id')
                 ->whereNotNull('vehicles.grn_id')
                 ->where('vehicles.status', 'Approved');
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        info($columnName);
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
+                } 
                 $data = $data->groupBy('vehicles.id');  
             }
             if ($data) {
@@ -3692,6 +3733,7 @@ COALESCE(
         ->get();
         $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
         ->orderBy('id', 'DESC')
+        ->whereNot('category', 'Modified')
         ->get();
         $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
         $normalizationMap = [
@@ -3751,6 +3793,7 @@ COALESCE(
     }
         if ($request->ajax()) {
             $status = $request->input('status');
+            $filters = $request->input('filters', []);
             if($status === "dpvehicles")
             {
                 $data = Vehicles::select( [
@@ -3761,6 +3804,7 @@ COALESCE(
                     'vehicles.sales_remarks',
                     'vehicles.gp',
                     'vehicles.territory',
+                    'vehicles.ownership_type',
                     'vehicles.inspection_date',
                     'vehicles.custom_inspection_number',
                     'vehicles.custom_inspection_status',
@@ -3836,6 +3880,16 @@ COALESCE(
                 ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
                 ->where('vehicles.status', 'Approved')
                 ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        info($columnName);
+                        $data->whereNull($columnName); // Filter for NULL values
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                    } else {
+                        $data->whereIn($columnName, $values); // Regular filtering for selected values
+                    }
+                } 
                 $data = $data->groupBy('vehicles.id');
     }  
             if ($data) {
@@ -3870,5 +3924,28 @@ COALESCE(
         } else {
             return response()->json(['error' => 'Vehicle not found'], 404);
         }
+    }
+    public function getonwershipData(Request $request)
+    {
+        $vehicleId = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            return response()->json([
+                'ownership_type' => $vehicle->ownership_type,
+            ]);
+        } else {
+            return response()->json(['error' => 'Vehicle not found'], 404);
+        }
+    }
+    public function saveonwership(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'documentonwership' => 'required|string',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->ownership_type = $request->input('documentonwership');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }
     }

@@ -116,7 +116,12 @@ return [
     | of the emails. Or, you may simply stick with the Laravel defaults!
     |
     */
-
+'custom_recipients' => [
+    'logistics' => env('LOGISTICS_EMAIL', 'default@domain.com'),
+    'dp' => env('DP_EMAIL', 'default@domain.com'),
+    'finance' => env('FINANCE_EMAIL', 'default@domain.com'),
+    'cso' => env('CSO_EMAIL', 'default@domain.com'),
+],
     'markdown' => [
         'theme' => 'default',
 
