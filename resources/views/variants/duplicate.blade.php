@@ -232,11 +232,11 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>
-                                    <select class="form-control" autofocus name="upholstery" id="upholstery">
-                                    <option value="Leather" {{ isset($variant) && $variant->upholstery == 'Leather' ? 'selected' : '' }}>Leather</option>
-                                    <option value="Fabric" {{ isset($variant) && $variant->upholstery == 'Fabric' ? 'selected' : '' }}>Fabric</option>
-                                    <option value="Vinyl" {{ isset($variant) && $variant->upholstery == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
-                                    <option value="Leather & Fabric" {{ isset($variant) && $variant->upholstery == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
+                                    <select class="form-control" autofocus name="upholestry" id="upholstery">
+                                    <option value="Leather" {{ isset($variant) && $variant->upholestry == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                    <option value="Fabric" {{ isset($variant) && $variant->upholestry == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                    <option value="Vinyl" {{ isset($variant) && $variant->upholestry == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                                    <option value="Leather & Fabric" {{ isset($variant) && $variant->upholestry == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
                                 </select>
                                 </div>
                             </div>
