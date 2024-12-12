@@ -10,6 +10,7 @@ class WorkOrder extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "work_orders";
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'type',
         'date',
