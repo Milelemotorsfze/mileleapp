@@ -502,6 +502,13 @@ class WorkOrderController extends Controller
             else {
                 $input['is_batch'] = 1;
             }
+            if (isset($request->lto)) {
+                $input['lto'] = 'yes';
+            } elseif (!isset($request->lto) && $request->type === 'local_sale') {
+                $input['lto'] = 'no';
+            } else {
+                $input['lto'] = null;
+            }
             $workOrder = WorkOrder::create($input);
             $createwostatus['wo_id'] = $workOrder->id;
             $createwostatus['status_changed_by'] = $authId;
@@ -1432,11 +1439,12 @@ class WorkOrderController extends Controller
             else {
                 $newData['cross_trade'] = 'no';
             }
-            if(isset($request->lto)) {
+            if (isset($request->lto)) {
                 $newData['lto'] = 'yes';
-            }
-            else {
+            } elseif (!isset($request->lto) && $request->type === 'local_sale') {
                 $newData['lto'] = 'no';
+            } else {
+                $newData['lto'] = null;
             }
             // Extract full values for specific nested fields
             $nestedFields = [
