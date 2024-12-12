@@ -10,6 +10,7 @@ class WOVehicles extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "w_o_vehicles";
+    protected $dates = ['deleted_at'];
     protected $fillable = [
         'work_order_id',
         'vehicle_id',

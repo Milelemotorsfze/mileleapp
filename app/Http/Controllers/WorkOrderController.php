@@ -502,6 +502,13 @@ class WorkOrderController extends Controller
             else {
                 $input['is_batch'] = 1;
             }
+            if (isset($request->lto)) {
+                $input['lto'] = 'yes';
+            } elseif (!isset($request->lto) && $request->type === 'local_sale') {
+                $input['lto'] = 'no';
+            } else {
+                $input['lto'] = null;
+            }
             $workOrder = WorkOrder::create($input);
             $createwostatus['wo_id'] = $workOrder->id;
             $createwostatus['status_changed_by'] = $authId;
@@ -1432,11 +1439,12 @@ class WorkOrderController extends Controller
             else {
                 $newData['cross_trade'] = 'no';
             }
-            if(isset($request->lto)) {
+            if (isset($request->lto)) {
                 $newData['lto'] = 'yes';
-            }
-            else {
+            } elseif (!isset($request->lto) && $request->type === 'local_sale') {
                 $newData['lto'] = 'no';
+            } else {
+                $newData['lto'] = null;
             }
             // Extract full values for specific nested fields
             $nestedFields = [
@@ -2370,10 +2378,65 @@ class WorkOrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(WorkOrder $workOrder)
+    public function destroy($id)
     {
-        //
+        $authId = Auth::id(); // Get the authenticated user's ID
+
+        // Start the transaction
+        DB::beginTransaction();
+
+        try {
+            // Find the WorkOrder by ID
+            $workOrder = WorkOrder::findOrFail($id);
+
+            // Check if the WorkOrder has already been soft-deleted
+            if ($workOrder->trashed()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This work order has already been deleted.'
+                ], 400);
+            }
+
+            // Soft delete related WOVehicles records
+            WOVehicles::where('work_order_id', $id)->each(function ($vehicle) use ($authId) {
+                $vehicle->deleted_by = $authId;
+                $vehicle->save();
+                $vehicle->delete();
+            });
+
+            // Update 'deleted_by' and soft delete the WorkOrder
+            $workOrder->deleted_by = $authId;
+            $workOrder->save();
+            $workOrder->delete();
+
+            // Commit the transaction
+            DB::commit();
+
+            // Return JSON success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Work order and related vehicles deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            // Roll back the transaction on error
+            DB::rollBack();
+
+            // Log the error for debugging (optional)
+            Log::error('Error deleting work order', [
+                'error' => $e->getMessage(),
+                'work_order_id' => $id
+            ]);
+
+            // Return error response
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete work order. Please try again later.',
+                'error_details' => $e->getMessage() // Optional: Remove this in production
+            ], 500);
+        }
     }
+    
     public function fetchAddons(Request $request)
     {
         // $vins = $request->input('vins');
