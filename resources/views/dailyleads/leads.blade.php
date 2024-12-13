@@ -476,12 +476,26 @@
 </div>
     <!-- Page Header and Lead Title -->
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="card-title">Lead</h4>
-        <h4 class="card-title">{{$lead->name}}</h4>
-        <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
-            <i class="fa fa-arrow-left"></i> Back
+    <h4 class="card-title">Lead</h4>
+    <h4 class="card-title">{{$lead->name}}</h4>
+    
+    <div>
+    <a class="btn btn-sm btn-info" href="{{ route('dailyleads.index') }}">
+            <i class="fa fa-arrow-left"></i> Back to Listing
         </a>
+        @if($previousLead)
+            <a href="{{ route('calls.leaddetailpage', $previousLead->id) }}" class="btn btn-sm btn-warning">
+                <i class="fa fa-arrow-left"></i> Previous Lead
+            </a>
+        @endif
+
+        @if($nextLead)
+            <a href="{{ route('calls.leaddetailpage', $nextLead->id) }}" class="btn btn-sm btn-success">
+                Next Lead <i class="fa fa-arrow-right"></i>
+            </a>
+        @endif
     </div>
+</div>
 <!-- Full-width container for the progress bar -->
 <div class="progress-bar-container row">
     <div class="col-10">

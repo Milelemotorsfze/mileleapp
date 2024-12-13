@@ -921,7 +921,21 @@ public function leaddetailpage($id)
         ->where('leads_log.lead_id', $id)
         ->orderBy('leads_log.created_at', 'desc')
         ->get();
-    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs'));
+        $nextLead = Calls::where('sales_person', auth()->id())
+        ->where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '>', $id)
+        ->orderBy('id', 'asc')
+        ->first();
+
+    // Fetch Previous Lead
+    $previousLead = Calls::where('sales_person', auth()->id())
+        ->where('status', '!=', 'Quoted')
+        ->where('status', '!=', 'Closed')
+        ->where('id', '<', $id)
+        ->orderBy('id', 'desc')
+        ->first();
+    return view('dailyleads.leads', compact('lead', 'languages', 'countries', 'requirements', 'brands', 'mastermodellines', 'countries', 'documents','users','tasks','logs', 'nextLead', 'previousLead'));
 }
 public function leaddeupdate(Request $request)
 {
