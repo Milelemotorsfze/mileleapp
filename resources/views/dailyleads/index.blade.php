@@ -181,11 +181,8 @@ input[type=number]::-webkit-outer-spin-button
       <div class="clearfix"></div>
 <br>
     <ul class="nav nav-pills nav-fill">
-    <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
-      </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
@@ -212,12 +209,15 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li> -->
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
       </li>
     </ul>
   </div>
   <div class="tab-content">
-      <div class="tab-pane fade show" id="tab1">
+      <div class="tab-pane fade show active" id="tab1">
       <br>
       <!-- <div class="row">
   <div class="col-lg-1">
@@ -241,6 +241,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Preferred Language</th>
                   <th>Location</th>
                   <th>Remarks & Messages</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -315,6 +316,35 @@ input[type=number]::-webkit-outer-spin-button
                     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
                     @endphp
                     <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    <td>
+    @php
+        $colorClass = '';
+        switch ($calls->status) {
+            case 'contacted':
+                $colorClass = 'badge-primary';
+                break;
+            case 'working':
+                $colorClass = 'badge-info';
+                break;
+            case 'qualify':
+                $colorClass = 'badge-warning';
+                break;
+            case 'converted':
+                $colorClass = 'badge-success';
+                break;
+            case 'Follow Up':
+                $colorClass = 'badge-secondary';
+                break;
+            case 'New':
+                $colorClass = 'badge-danger';
+                break;
+            default:
+                $colorClass = 'badge-light';
+        }
+    @endphp
+
+    <span class="badge {{ $colorClass }}">{{ ucfirst($calls->status) }}</span>
+</td>
                     <td>
                     @php
                     $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
@@ -909,6 +939,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Inquiry Date</th>
                   <th>Inquiry Notes</th>
                   <th>Purchaser Remarks</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -1174,7 +1205,7 @@ $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
           </div>
         </div>
       </div>
-      <div class="tab-pane fade show active" id="tab10">
+      <div class="tab-pane fade show" id="tab10">
       <br>
         <div class="card-body">
           <div class="table-responsive">
