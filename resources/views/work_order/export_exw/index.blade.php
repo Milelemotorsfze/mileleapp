@@ -560,6 +560,9 @@
 						@endforeach
 					</tbody>
 				</table>
+				<div class="d-flex justify-content-left mt-4">
+					{{ $datas->links() }}
+				</div>
 			</div>
 		</div>
     </div>
