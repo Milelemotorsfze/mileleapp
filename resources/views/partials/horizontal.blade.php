@@ -114,7 +114,7 @@
         }
         #rolename-dropdown-menu.dropdown-menu-scrollable {
             right: 9px !important;
-            margin-top: 2px !important;
+            top: 55px !important;
         }
         .topnav .dropdown .dropdown-menu {
             margin-top: 0;
