@@ -785,7 +785,7 @@
 									placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
 									onkeyup="sanitizeInput(this)">
 							</div>
-						</div>
+						</div></br>
 						<div class="row" id="boe-div">
 							<div class="col-xxl-12 col-lg-12 col-md-12 form_field_outer" id="child">
 							</div>
