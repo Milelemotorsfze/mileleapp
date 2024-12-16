@@ -114,7 +114,7 @@
         }
         #rolename-dropdown-menu.dropdown-menu-scrollable {
             right: 9px !important;
-            top: 55px !important;
+            margin-top: 2px !important;
         }
         .topnav .dropdown .dropdown-menu {
             margin-top: 0;
@@ -1806,7 +1806,7 @@
                 </div>
 
                 <!-- Second div with role name -->
-                <div class="nav-item rolename-button" id="rolename-dropdown-button">
+                <div class="nav-item rolename-button pb-2 pt-2" id="rolename-dropdown-button">
                     <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
                         @php
                         $selectedrole = Auth::user()->selectedRole;
@@ -2092,6 +2092,19 @@
                 showDropdown();
                 adjustDropdownPosition(rolenameButton, rolenameDropdown);
             });
+
+            rolenameButton.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200);
+            });
+
+            rolenameDropdown.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200); 
+            });
+
+            rolenameDropdown.addEventListener("mouseenter", function() {
+                showDropdown(); 
+            });
+
         }
 
         document.addEventListener("click", function() {
@@ -2099,11 +2112,22 @@
         });
 
         function toggleDropdownVisibility() {
-            if (rolenameDropdown.style.display === "block") {
-                hideDropdown();
-            } else {
-                showDropdown();
-                adjustDropdownPosition(rolenameButton, rolenameDropdown);
+            if (window.innerWidth < 992) {
+                const isVisible = rolenameDropdown.style.display === "block";
+                hideDropdown(); 
+                if (!isVisible) {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
+            }
+
+            else {
+                if (rolenameDropdown.style.display === "block") {
+                    hideDropdown();
+                } else {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
             }
         }
 
@@ -2113,6 +2137,12 @@
 
         function hideDropdown() {
             rolenameDropdown.style.display = "none";
+        }
+
+        function hideDropdownIfOutside() {
+            if (!rolenameDropdown.matches(":hover") && !rolenameButton.matches(":hover")) {
+                hideDropdown();
+            }
         }
 
         function adjustDropdownPosition(button, dropdown) {
