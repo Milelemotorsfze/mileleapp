@@ -44,7 +44,11 @@
                                     <textarea class="form-control" id="docComment" name="docComment" rows="3"></textarea>
                                     <span id="docCommentError" class="text-danger"></span>
                                 </div>
-
+                                <div id="claimCheckboxField" class="form-check mt-3" style="display: none;">
+                                    <input class="form-check-input" type="checkbox" id="hasClaimCheckbox" name="hasClaim" value="1" 
+                                        {{ $workOrder->has_claim == 'yes' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="hasClaimCheckbox">Has Claim</label>
+                                </div></br>
                                 <div id="boeFields">
                                     @for($i = 0; $i < $boeCount; $i++)
                                         @php
@@ -88,19 +92,21 @@
 <script type="text/javascript">
     function toggleDeclarationFields() {
         const selectedStatusElement = document.querySelector('input[name="docStatus"]:checked');
-        
+        const declarationFields = document.getElementById('boeFields');
+        const claimCheckboxField = document.getElementById('claimCheckboxField');
         if (!selectedStatusElement) {
             console.error('No radio button is selected or present.');
             return; 
         }
         
         const selectedStatus = selectedStatusElement.value;
-        const declarationFields = document.getElementById('boeFields');
 
         if (selectedStatus === 'Ready') {
             declarationFields.style.display = 'block';
+            claimCheckboxField.style.display = 'block'; // Show the Has Claim checkbox
         } else {
             declarationFields.style.display = 'none';
+            claimCheckboxField.style.display = 'none'; // Hide the Has Claim checkbox
         }
     }
 
@@ -149,6 +155,7 @@
         }
 
         const comment = document.getElementById('docComment').value;
+        const hasClaim = document.getElementById('hasClaimCheckbox')?.checked || false; // Capture checkbox value
 
         alertify.confirm(
             'Confirmation Required',
@@ -161,6 +168,7 @@
                         workOrderId: workOrderId,
                         status: selectedStatus,
                         comment: comment,
+                        hasClaim: hasClaim, // Include Has Claim checkbox state
                         boeData: boeData,
                         _token: '{{ csrf_token() }}' 
                     },
