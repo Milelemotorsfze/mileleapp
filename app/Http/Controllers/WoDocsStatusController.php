@@ -16,11 +16,16 @@ class WoDocsStatusController extends Controller
 {
     public function updateDocStatus(Request $request)
     {   
+        // Normalize the 'hasClaim' input to a valid boolean value
+        $request->merge([
+            'hasClaim' => filter_var($request->input('hasClaim'), FILTER_VALIDATE_BOOLEAN) ? 1 : 0
+        ]);
         // Validate the incoming request data
         $validatedData = $request->validate([
             'workOrderId' => 'required|exists:work_orders,id',
             'status' => 'required|in:Not Initiated,In Progress,Ready',
             'comment' => 'nullable|string',
+            'hasClaim' => 'nullable|in:0,1', // Only accept 0 or 1
             'boeData' => 'nullable|array', // BOE data is optional
             'boeData.*.boe_number' => 'string|nullable', // BOE number should be a string
             'boeData.*.boe' => 'string|nullable', // BOE field should be a string
@@ -66,8 +71,16 @@ class WoDocsStatusController extends Controller
                 }
             }
         }
+        // Determine the has_claim value for WorkOrder
+        $hasClaimValue = ($validatedData['status'] === 'Ready') 
+            ? ($validatedData['hasClaim'] ? 'yes' : 'no') 
+            : null;
         // Fetch the work order vehicle
         $workOrder = WorkOrder::findOrFail($validatedData['workOrderId']);
+        // Update the WorkOrders table with has_claim and status
+        $workOrder->update([
+            'has_claim' => $hasClaimValue,
+        ]);
 
         // Only send an email if the status is "Ready"
         if ($validatedData['status'] === 'Ready') {

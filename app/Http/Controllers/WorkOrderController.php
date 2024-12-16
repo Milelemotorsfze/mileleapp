@@ -203,7 +203,7 @@ class WorkOrderController extends Controller
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by'
-                ,'sales_person_id','created_by','created_at','updated_at','lto'
+                ,'sales_person_id','created_by','created_at','updated_at','lto','has_claim'
             ],
             'status_report' => ['id', 'date', 'so_number', 'is_batch', 'batch', 'wo_number', 'airway_details', 'sales_support_data_confirmation_at', 'updated_by',
                 'sales_person_id','created_by','created_at','updated_at'
@@ -216,7 +216,7 @@ class WorkOrderController extends Controller
                 'transportation_company_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at'
+                'sales_person_id','created_by','created_at','updated_at','has_claim'
             ],
             'export_cnf' => ['id', 'type', 'date', 'so_number', 'temporary_exit', 'cross_trade', 'is_batch', 'batch', 'wo_number', 'customer_name', 'customer_email', 
                 'customer_company_number', 'customer_address', 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 
@@ -226,14 +226,14 @@ class WorkOrderController extends Controller
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'preferred_shipping_line_of_customer', 'bill_of_loading_details', 
                 'shipper', 'consignee', 'notify_party', 'special_or_transit_clause_or_request', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at'
+                'sales_person_id','created_by','created_at','updated_at','has_claim'
             ],
             'local_sale' => ['id', 'date', 'so_number', 'wo_number', 'customer_name', 'customer_email', 'customer_company_number', 'customer_address',
                 'customer_representative_name', 'customer_representative_email', 'customer_representative_contact', 'transporting_driver_contact_number', 
                 'airway_details', 'currency', 'so_total_amount', 'so_vehicle_quantity', 'amount_received', 'balance_amount', 'delivery_location', 
                 'delivery_contact_person', 'delivery_contact_person_number', 'delivery_date', 'signed_pfi', 'signed_contract', 'payment_receipts', 'noc', 
                 'enduser_trade_license', 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'sales_support_data_confirmation_at', 'updated_by',
-                'sales_person_id','created_by','created_at','updated_at','lto'
+                'sales_person_id','created_by','created_at','updated_at','lto','has_claim'
             ],
         ];
         $nonSearchableFields = [
@@ -1558,7 +1558,7 @@ class WorkOrderController extends Controller
                 'enduser_passport', 'enduser_contract', 'vehicle_handover_person_id', 'new_customer_name', 'existing_customer_name','customer_name','customer_reference_id',
                 'is_brn_file_delete','is_signed_pfi_delete','is_signed_contract_delete','is_payment_receipts_delete','is_noc_delete',
                 'is_enduser_trade_license_delete','is_enduser_passport_delete','is_enduser_contract_delete','is_vehicle_handover_person_id_delete',
-                'vin_multiple',
+                'vin_multiple','has_claim'
             ];
 
             // Filter $newData to exclude array values and fields in the exclude list
