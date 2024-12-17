@@ -501,7 +501,7 @@
     <div class="col-10">
         <div class="steps-container">
             <!-- Step 1: New -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'new' ? 'active' : ($lead->status !== 'new' ? 'completed' : '') }}" onclick="moveToStep(1)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'New' ? 'active' : ($lead->status === 'contacted' || $lead->status === 'working' || $lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}"  onclick="moveToStep(1)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">New</span>
@@ -509,7 +509,7 @@
             </a>
 
             <!-- Step 2: Contacted -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'contacted' ? 'active' : ($lead->status !== 'new' && $lead->status !== 'contacted' ? 'completed' : '') }}" onclick="moveToStep(2)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'contacted' ? 'active' : ($lead->status === 'working' || $lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(2)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Contacted</span>
@@ -517,7 +517,7 @@
             </a>
 
             <!-- Step 3: Working -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'working' ? 'active' : ($lead->status !== 'new' && $lead->status !== 'contacted' && $lead->status !== 'working' ? 'completed' : '') }}" onclick="moveToStep(3)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'working' ? 'active' : ($lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(3)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Working</span>
