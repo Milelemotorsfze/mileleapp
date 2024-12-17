@@ -3809,22 +3809,44 @@ $(document).ready(function() {
     $('#form-update_basicdetails').submit(function(event) {
         event.preventDefault();
 
-        // Create a FormData object
-        var formData = new FormData(this);
+        var poNumber = $('#po_number').val();
+        var purchasingOrderId = $('#purchasing_order_id').val();
 
+        // Perform AJAX check for duplicate PO number
         $.ajax({
             type: 'POST',
-            url: $(this).attr('action'),
-            data: formData,
-            contentType: false, // Important for file upload
-            processData: false, // Important for file upload
-            success: function(response) {
-                alert('Purchase order details updated successfully!');
-                location.reload();
+            url: '{{ route("purchasing-order.checkPoNumber") }}', // Backend route to validate
+            data: {
+                po_number: poNumber,
+                purchasing_order_id: purchasingOrderId,
+                _token: '{{ csrf_token() }}' // CSRF token for security
             },
-            error: function(xhr, status, error) {
+            success: function(response) {
+                if (response.exists) {
+                    alert('Error: PO Number already exists for a different record!');
+                } else {
+                    // If validation passes, submit the form data
+                    var formData = new FormData($('#form-update_basicdetails')[0]);
+                    $.ajax({
+                        type: 'POST',
+                        url: $('#form-update_basicdetails').attr('action'),
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            alert('Purchase order details updated successfully!');
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('An error occurred while updating purchase order details.');
+                        }
+                    });
+                }
+            },
+            error: function(xhr) {
                 console.error(xhr.responseText);
-                alert('An error occurred while updating purchase order details.');
+                alert('An error occurred while validating PO Number.');
             }
         });
     });

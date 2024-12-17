@@ -5409,4 +5409,16 @@ public function getVehiclesdn($purchaseOrderId) {
         ->get();
     return response()->json($vehicles);
 }
+public function checkPoNumberedit(Request $request)
+{
+    $poNumber = $request->input('po_number');
+    $currentId = $request->input('purchasing_order_id');
+
+    // Check if PO number exists for another ID
+    $exists = PurchasingOrder::where('po_number', $poNumber)
+                ->where('id', '!=', $currentId)
+                ->exists();
+
+    return response()->json(['exists' => $exists]);
+}
 }

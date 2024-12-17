@@ -1127,4 +1127,5 @@ Route::get('/d', function () {
     });
     Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
     Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
+    Route::post('/purchasing-order/check-po-number', [PurchasingOrderController::class, 'checkPoNumberedit'])->name('purchasing-order.checkPoNumber');
 });
