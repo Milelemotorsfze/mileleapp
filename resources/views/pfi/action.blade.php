@@ -34,12 +34,29 @@
             </button>
         </li>
         <li>
-            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
+            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" 
+            title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
                 <i class="fa fa-list"></i> View PFI Items
             </button>
         </li>
         @endif
     @endcan
+    @can('create-demand-planning-po')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
+        @endphp
+        @if ($hasPermission)
+            @if($showCreatePOBtn == 1) 
+            <li>
+                <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+                title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
+                    <i class="fa fa-plus"></i> Create PO
+                </a>
+            <li> 
+            @endif
+        @endif
+        @endcan
+
     <!-- @can('pfi-payment-status-update')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
@@ -58,12 +75,14 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
             @endphp
             @if ($hasPermission)
-            <li>
-                <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
-                        data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
-                    <i class="fa fa-trash"></i> To Delete PFI
-                </button>
+            @if($PoUtilizedQty <= 0 )
+                <li>
+                    <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
+                            data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
+                        <i class="fa fa-trash"></i> To Delete PFI
+                    </button>
                 </li>
+                @endif
             @endif
         @endcan
     </ul>
@@ -123,7 +142,7 @@
                                 @if($pfi->pfi_document_without_sign)
                                     <div class="row p-2 justify-content-center">
                                         <div class="col-md-2">
-                                        <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
+                                            <a href="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" width="100px"
                                             class="btn btn-primary mb-2 text-center" download="{{ $oldPFIFileName }}">
                                             Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
                                         </div>
@@ -134,7 +153,7 @@
                             <div class="row p-2 mt-3 justify-content-center">
                                 <label class="fw-bold">Latest PFI Document</label>
                                 <div class="col-md-2">
-                                <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
+                                    <a href="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" width="100px"
                                     class="btn btn-primary mb-2 text-center" download="{{ $newPFIFileName }}">
                                     Download <i class="fa fa-arrow-down" aria-hidden="true"></i></a>
                                 </div>

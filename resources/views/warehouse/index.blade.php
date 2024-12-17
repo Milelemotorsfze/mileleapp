@@ -70,7 +70,7 @@ th.nowrap-td {
     </style>
 @section('content')
 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
                     @endphp
                     @if ($hasPermission)
     <div class="card-header">

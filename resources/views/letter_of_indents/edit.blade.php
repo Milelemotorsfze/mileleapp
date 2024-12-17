@@ -515,7 +515,7 @@
             }).on('change', function() {
                 getCustomers();
                 $('.customer-doc-div').html('');
-                getModels(1,'all');
+                getModels('all','all');
               
             });
             $('#customer').select2({
@@ -681,7 +681,6 @@
         }
 
         function checkCountryCriterias() {
-            // console.log('reached');
             let url = '{{ route('loi-country-criteria.check') }}';
             var customer = $('#customer').val();
             var country = $('#country').val();
@@ -770,7 +769,6 @@
                     $("#deleted-docs option").attr("selected", "selected");
                 });
                 $(this).attr('hidden',true);
-                // $(".add-customer-doc option[value='"+id+"']").remove();
                 $('#add-customer-doc-'+id).attr('hidden', false);
                 let type = "subtract";
                 updateDocumentCount(type);
@@ -885,8 +883,6 @@
 
                 }).set({title:"Alert !"})
                
-                // let type = 'add';
-                // updateDocumentCount(type);
             }
 
             function addPassportToLOI() {
@@ -968,23 +964,6 @@
                 });
             }
 
-        // jQuery.validator.addMethod('fileCheck', function(value, element) {
-        //     let remainingCount = $('#remaining-document-count').val();
-        //     console.log(remainingCount);
-        //     if(remainingCount != 0) {
-        //         return true;
-        //     }else{
-        //         return false;
-        //     }
-        // },'This field is required');
-
-        // $('#file-upload').change(function () {
-        //     if($('#file-upload')[0].files.length !== 0) {
-        //         let newRemainingCount = + $('#remaining-document-count').val() + + 1;
-            
-        //         $('#remaining-document-count').val(newRemainingCount);
-        //     }
-        // });
 
         $("#form-update").validate({
             ignore: [],
@@ -1019,11 +998,7 @@
                 "template_type[]":{
                     required:true
                 },
-                // "files[]": {
-                //     fileCheck:true,
-                //     extension: "png|jpeg|jpg",
-                //     maxsize:5242880  
-                // },
+                
                 loi_signature: {
                     required:function(element) {
                         return $("#template-type").val() != 'general' && signature == '';
@@ -1033,9 +1008,7 @@
                 }
             },
                 messages: {
-                    // "files[]": {
-                    //     extension: "Please upload file  format (png,jpeg,jpg)"
-                    // },
+                    
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
@@ -1251,6 +1224,7 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
+            console.log(selectedModelIds);
            
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",
@@ -1407,22 +1381,23 @@
             {
                 if(i != index) {
                     let model = $('#model-'+i).val();
-                    if(unSelectedmodel == model[0] ) {
-                    // chcek this option value alredy exist in dropdown list or not.
-                    var currentId = 'model-' + i;
-                    var isOptionExist = 'no';
-                    $('#' + currentId +' option').each(function () {
+        
+                    // if(unSelectedmodel == model[0] ) {
+                        // chcek this option value alredy exist in dropdown list or not.
+                        var currentId = 'model-' + i;
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
 
-                        if (this.text == unSelectedmodel) {
-                            isOptionExist = 'yes';
-                            return false;
+                            if (this.text == unSelectedmodel) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        if(isOptionExist == 'no'){
+                            $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
+
                         }
-                    });
-                    if(isOptionExist == 'no'){
-                        $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
-                    }
-
-                    }
+                    // }
                 }
             }
         }
@@ -1523,8 +1498,7 @@
             let isValidCountryCheck = $('#is-country-validation-error').val();
             let ispassportAdded = $('#add-passport-to-loi').val();
             let isTradeLicenseAdded = $('#add-trade-license-to-loi').val();
-            // alert(ispassportAdded);
-            // alert(totalDocumentCount);
+            
             uniqueCheckSoNumber();
             if(ispassportAdded != 0 || isTradeLicenseAdded == 1 || totalDocumentCount > 0) {
                 if (formValid == true && isValidCountryCheck == 0) {

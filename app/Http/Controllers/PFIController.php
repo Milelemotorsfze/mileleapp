@@ -8,6 +8,7 @@ use App\Models\MasterModel;
 use App\Models\LetterOfIndentItem;
 use App\Models\PFI;
 use App\Models\PfiItem;
+use App\Models\PfiItemPurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Clients;
 use App\Models\Country;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\File;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Crypt;
 
 class PFIController extends Controller
 {
@@ -99,7 +101,6 @@ class PFIController extends Controller
                             })
                             ->pluck('code')->toArray();
 
-                            // $pfi_quantity = $pfiQuantity + $item->pfi_quantity;
                             $item->loi_item_code = implode(",", $LOICodes);  
                         }
                         $newPFIFileName = "";
@@ -107,16 +108,26 @@ class PFIController extends Controller
                             $filename = $pfi->new_pfi_document_without_sign;
                             $newPFIFileName =  strstr($filename, '_', true) . ".pdf";
                         }
-
                         $oldPFIFileName =  strstr($pfi->pfi_document_without_sign, '_', true) . ".pdf";
-
-                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName'));
+                        $showCreatePOBtn = 1;
+                        $PoUtilizedQty = PfiItemPurchaseOrder::where('pfi_id', $pfi->id)
+                                                ->sum('quantity');
+                        if($PoUtilizedQty) {
+                            $pfiQty =  PfiItem::select('is_parent','pfi_id','pfi_quantity')
+                                        ->where('is_parent', true)
+                                        ->where('pfi_id', $pfi->id)
+                                        ->sum('pfi_quantity');
+                            if($pfiQty <= $PoUtilizedQty) {
+                                $showCreatePOBtn = 0;
+                            }
+                        }                      
+                        return view('pfi.action',compact('pfi','parentPfiItems','oldPFIFileName','newPFIFileName','showCreatePOBtn',
+                        'PoUtilizedQty'));
                     })
                     ->rawColumns(['action'])
                     ->toJson();
                 }
 
-            
             return view('pfi.index');
     }
     public function PFIItemList(Request $request) {
@@ -162,6 +173,7 @@ class PFIController extends Controller
                 $query->select('id','name');
             }]);
 
+            
             if(!empty($request->code)) {
                 $data->whereHas('ChildPfiItems.letterOfIndentItem',function($query) use($request) {
                         $query->where('code', 'like', "%{$request->code}%");
@@ -188,8 +200,8 @@ class PFIController extends Controller
                     });
             }
             if(!empty($request->client_id)) {
-                $data->whereHas('letterOfIndentItem.LOI',function($query) use($request) {
-                        $query->where('client_id',$request->client_id);
+                $data->whereHas('pfi',function($query) use($request) {
+                        $query->where('client_id', $request->client_id);
                     });
             }
             if(!empty($request->country_id)) {
@@ -197,7 +209,6 @@ class PFIController extends Controller
                         $query->where('country_id', $request->country_id);
                     });
             }
-
             if(!empty($request->supplier_id)) {
                 $data->whereHas('pfi',function($query) use($request) {
                         $query->where('supplier_id', $request->supplier_id);
@@ -223,7 +234,6 @@ class PFIController extends Controller
                         $query->where('sfx', 'like', "%{$request->sfx}%");
                     });
             }
-           
             if(!empty($request->pfi_quantity)) {
                 $data->where('pfi_quantity', 'like', "%{$request->pfi_quantity}%");
     
@@ -244,14 +254,21 @@ class PFIController extends Controller
             }
             if(!empty($request->total_price)) {
                 $data->having("total_price", 'like', "%{$request->total_price}%");
-
             }
             if(!empty($request->pfi_item_code)) {
                 $data->where("code", 'like', "%{$request->pfi_item_code}%");
-
             }
-           
-            // return $data->get();
+            if($request->tab == 'TOYOTA'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->where('brand_name', 'like', "TOYOTA");
+                });
+
+            }else if($request->tab == 'OTHER-BRANDS'){
+                $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
+                    $query->whereNot('brand_name', 'TOYOTA');
+                });
+            }
+      
             if($request->export == 'EXCEL') {
                 (new UserActivityController)->createActivity('Downloaded PFI Item List');
                 $data = $data->get();
@@ -384,7 +401,6 @@ class PFIController extends Controller
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign/';
-        // $destination = 'PFI_document_withsign';
         if ($request->has('file'))
         {
             $file = $request->file('file');
@@ -462,7 +478,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')) {
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'NEW']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'NEW']);
         }
 
         return redirect()->route('pfi.index')->with('success', 'PFI created Successfully');
@@ -470,14 +486,14 @@ class PFIController extends Controller
        
     }
     public function generatePFIDocument(Request $request) {
-
-        $pfi = PFI::find($request->id);
+        $pfiId = Crypt::decrypt($request->id);
+        $pfi = PFI::find($pfiId);
         $pfiItems = PfiItem::where('is_parent', true)->where('pfi_id', $pfi->id)->get();
         $pdfFile = PDF::loadView('pfi.pfi_document_template_download', compact('pfi','pfiItems'));
         $fileName = 'MILELE - '.$pfi->pfi_reference_number;
         
         if($request->download == 1) {
-            return $pdfFile->download($fileName.'.pdf');
+            return $pdfFile->download($fileName.'.pdf',['compress' => true]);
         }else{
             $fileName = $fileName."_".time().'.pdf';
 
@@ -492,6 +508,7 @@ class PFIController extends Controller
 
                 $filePath = public_path('New_PFI_document_without_sign/'.$fileName);
                 file_put_contents($filePath, $pdfFile->output());
+               
                 $pfi->new_pfi_document_without_sign = $fileName;
 
             }else{
@@ -513,7 +530,8 @@ class PFIController extends Controller
 
         $pfi = PFI::select('id','pfi_reference_number','pfi_date')
                 ->where('pfi_reference_number', $request->pfi_reference_number)
-                ->whereYear('pfi_date', Carbon::now()->year);
+                ->whereYear('pfi_date', Carbon::now()->year)
+                ->whereNotIn(\DB::raw('MONTH(pfi_date)'), [12, 1]);
                 
         if($request->pfi_id) {
 
@@ -567,9 +585,6 @@ class PFIController extends Controller
         $parentPfiItem->childPfiItems = PfiItem::where('pfi_id', $pfi->id)->where('is_parent', false)
                                         ->where('parent_pfi_item_id', $parentPfiItem->id)->orderBy('id','ASC')->get();
 
-        // $request['page'] = 'Edit';  
-        // $request['client_id']  = $pfi->customer->id;
-        // $request['country_id'] = $pfi->country->id;
         
         $masterModel = MasterModel::where('model', $parentPfiItem->masterModel->model)
                             ->where('sfx', $parentPfiItem->masterModel->sfx)
@@ -586,10 +601,6 @@ class PFIController extends Controller
         
         foreach($parentPfiItem->childPfiItems as $childItem)
          {                     
-            // $request['model'] = $childItem->masterModel->model;
-            // $request['sfx'] = $childItem->masterModel->sfx;
-            // $LOIItems =  $this->getLOIItemCode($request);
-            // $childItem->LOIItemCodes = $LOIItems['codes'];
             $childItem->LOIItemCodes = letterOfIndentItem::whereHas('pfiItems', function($query)use($id,$parentPfiItem){
                     $query->where('pfi_id', $id)
                     ->where('parent_pfi_item_id', $parentPfiItem->id);
@@ -600,7 +611,6 @@ class PFIController extends Controller
             }
         }
     }
-
 
      return view('pfi.edit', compact('suppliers','masterModels','customers','pfi','customerCountries','parentPfiItems'));
     }
@@ -622,7 +632,7 @@ class PFIController extends Controller
             'supplier_id' =>'required',
             'file' => 'mimes:pdf,png,jpeg,jpg'
         ]);
-
+        // return $request->all();
         DB::beginTransaction();
         $pfi = PFI::findOrFail($id);
 
@@ -639,7 +649,6 @@ class PFIController extends Controller
         $pfi->client_id = $request->client_id;
         $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
-        // $fileName = 'MILELE - '.$request->pfi_reference_number;
         if ($request->has('file'))
         {
             if (File::exists(public_path('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign))) {
@@ -658,6 +667,7 @@ class PFIController extends Controller
         $pfiItemRowParentId = [];
         $alreadyAddedRows =  PfiItem::where('pfi_id', $pfi->id)->pluck('id')->toArray();
         $updatedRows = [];
+        // Same LOI Item can be add for different parents
         foreach($request->PfiItem as $key => $PfiData) {
             $model = $PfiData['model'];               
             $sfx = $PfiData['sfx'];
@@ -666,7 +676,9 @@ class PFIController extends Controller
 
             $masterModel = MasterModel::where('model', $model)->where('sfx', $sfx)->orderBy('model_year','DESC')->first();
                 // create parent row
-                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)->where('pfi_id',$pfi->id)->first();
+                $pfiItemParentRow = PfiItem::where('master_model_id', $masterModel->id)
+                ->where('is_parent', true)
+                ->where('pfi_id',$pfi->id)->first();
                 if(!$pfiItemParentRow) {
                     $pfiItemParentRow = new PfiItem();
                     
@@ -700,7 +712,12 @@ class PFIController extends Controller
                 $parentId = $pfiItemParentRow->id;
                  if(array_key_exists("loi_item", $PfiData)) {
                     foreach($PfiData['loi_item'] as $keyValue => $loiItem) {
-                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)->where('pfi_id',$pfi->id)->first();
+                        $childPfiQuantity = $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow = PfiItem::where('loi_item_id', $loiItem)
+                                    ->where('is_parent', false)
+                                    ->where('parent_pfi_item_id', $parentId)
+                                    ->where('pfi_quantity', $childPfiQuantity)
+                                    ->where('pfi_id', $pfi->id)->first();
                         if(!$pfiItemRow) {
                             $pfiItemRow = new PfiItem();
 
@@ -728,7 +745,7 @@ class PFIController extends Controller
                         $pfiItemRow->pfi_id = $pfi->id;
                         $pfiItemRow->master_model_id = $LOIItem->masterModel->id ?? '';
                         $pfiItemRow->loi_item_id = $loiItem;
-                        $pfiItemRow->pfi_quantity =  $PfiData['pfi_quantity'][$keyValue];
+                        $pfiItemRow->pfi_quantity =  $childPfiQuantity;
                         $pfiItemRow->unit_price = $unitPrice;
                         $pfiItemRow->created_by = Auth::id();
                         $pfiItemRow->parent_pfi_item_id = $parentId;
@@ -745,7 +762,7 @@ class PFIController extends Controller
 
         $supplier = Supplier::find($request->supplier_id);
         if($supplier->supplier == 'AMS' && !$request->has('file')){
-            return redirect()->route('pfi.pfi-document',['id' => $pfi->id,'type' => 'EDIT']);
+            return redirect()->route('pfi.pfi-document',['id' => Crypt::encrypt($pfi->id),'type' => 'EDIT']);
         }
 
         return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
@@ -773,16 +790,7 @@ class PFIController extends Controller
 
     }
    
-    // public function paymentStatusUpdate(Request $request, $id) {
-
-    //     (new UserActivityController)->createActivity('PFI payment status updated.');
-
-    //     $pfi = PFI::find($id);
-    //     $pfi->payment_status = $request->payment_status;
-    //     $pfi->updated_by = Auth::id();
-    //     $pfi->save();
-    //     return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
-    // }
+    
     public function relaesedAmountUpdate(Request $request) {
         (new UserActivityController)->createActivity('PFI released amount updated.');
 
@@ -826,9 +834,11 @@ class PFIController extends Controller
                     $query->where('master_model_line_id', $parentModel->master_model_line_id); 
                 });
             }              
-        // if($request->selectedLOIItemIds) {
-        //     $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
-        // }
+            
+            if($request->selectedLOIItemIds) {
+                $loiItems = $loiItems->whereNotIn('id', $request->selectedLOIItemIds);            
+            }
+
         $data['codes'] = $loiItems->get();
         $parentModels = MasterModel::where('model', $request->model)
                                 ->where('sfx', $request->sfx)
@@ -935,6 +945,7 @@ class PFIController extends Controller
         }
         return response($data);
     }
+   
 
      // document sealing
         // if($request->has('file')) {

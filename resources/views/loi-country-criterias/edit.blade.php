@@ -172,12 +172,10 @@
         $('#restricted_model_line').select2({
             placeholder : 'Select Restricted Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#allowed_model_line').select2({
             placeholder : 'Select Allowed Model Lines',
             allowClear: true,
-            // maximumSelectionLength: 1
         });
         $('#is_only_company_allowed').select2({
             placeholder : 'Select Option',

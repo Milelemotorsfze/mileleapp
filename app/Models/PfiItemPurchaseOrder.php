@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ApprovedLOIPFI extends Model
+class PfiItemPurchaseOrder extends Model
 {
     use HasFactory;
-    protected $table = "approved_loi_pfi";
 
+    public function pfi()
+    {
+        return $this->belongsTo(PFI::class,'pfi_id');
+    }
 }

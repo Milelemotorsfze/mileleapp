@@ -15,6 +15,14 @@
                 Inventory Stock
             </h4>
                 <div class="ml-auto float-end">
+                @can('supplier-inventory-create')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-create');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('supplier-inventories.createNew') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                    @endif
+                @endcan
                     @can('supplier-inventory-list')
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
@@ -28,7 +36,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-edit');
                         @endphp
                         @if ($hasPermission)
-                             <a  class="btn btn-sm btn-info float-end update-inventory-btn" href="#" > Update</a>
+                             <a  class="btn btn-sm btn-info float-end update-inventory-btn" style="margin-right:5px" href="#" > Update</a>
                         @endif
                     @endcan
                 </div>
@@ -147,7 +155,7 @@
                                 </select>
                             </td>
                             <td>
-                                <select  class="supplier" data-field="supplier_id" @if($supplierInventory->purchase_order_id) disabled @endif
+                                <select class="supplier" data-field="supplier_id" @if($supplierInventory->purchase_order_id) disabled @endif
                                         data-id="{{ $supplierInventory->id }}" id="supplier_id-editable-{{$supplierInventory->id}}">
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}" {{ $supplierInventory->supplier_id == $supplier->id ? 'selected' : '' }}>

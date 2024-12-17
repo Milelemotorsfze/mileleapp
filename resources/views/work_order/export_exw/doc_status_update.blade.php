@@ -33,7 +33,14 @@
                         <textarea class="form-control" id="docComment_{{$data->id}}" name="docComment" rows="3" style="font-size: 14px;"></textarea>
                         <span id="docCommentError_{{$data->id}}" class="text-danger"></span>
                     </div>
-
+                    <div id="hasClaimContainer_{{$data->id}}" style="display: none;" class="mb-3 mt-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="hasClaim_{{$data->id}}" name="hasClaim" value="1" {{ $data->has_claim == 'yes' ? 'checked' : '' }}>
+                            <label class="form-check-label" for="hasClaim_{{$data->id}}" style="font-size: 14px;">
+                                Has Claim
+                            </label>
+                        </div>
+                    </div></br>
                     <div id="boeFields_{{$data->id}}" style="display: none;">
                         @php
                             $boeCount = $data->total_number_of_boe == 0 ? 1 : $data->total_number_of_boe;
@@ -78,15 +85,18 @@
 <script type="text/javascript">
     function toggleFields_{{$data->id}}() {
         const selectedStatusInput = document.querySelector('input[name="docStatus_{{$data->id}}"]:checked');
+        const boeFields = document.getElementById('boeFields_{{$data->id}}');
+        const hasClaimContainer = document.getElementById('hasClaimContainer_{{$data->id}}');
 
         if (selectedStatusInput) {
             const selectedStatus = selectedStatusInput.value;
-            const boeFields = document.getElementById('boeFields_{{$data->id}}');
 
             if (selectedStatus === 'Ready') {
                 boeFields.style.display = 'block';
+                hasClaimContainer.style.display = 'block'; // Show the "Has Claim" checkbox
             } else {
                 boeFields.style.display = 'none';
+                hasClaimContainer.style.display = 'none'; // Hide the "Has Claim" checkbox
             }
         } else {
             console.error('No radio input selected for "docStatus_{{$data->id}}".');
@@ -101,7 +111,7 @@
         radio.addEventListener('change', toggleFields_{{$data->id}});
     });
 
-    function submiDtocStatus(workOrderId, woNumber) {
+    function submitDocStatus(workOrderId, woNumber) {
         document.querySelectorAll('.text-danger').forEach(function(span) {
             span.textContent = ''; 
         });
@@ -126,6 +136,7 @@
         if (!valid) {
             return; 
         }
+        const hasClaim = document.getElementById('hasClaim_' + workOrderId)?.checked ? 1 : 0;
         const boeData = [];
         document.querySelectorAll('.boe-set').forEach((boeSet, index) => {
             const boeNumberField = document.getElementById(`boeNumber_${workOrderId}_${index}`);
@@ -156,6 +167,7 @@
                         workOrderId: workOrderId,
                         status: selectedStatus.value,
                         comment: comment,
+                        hasClaim: hasClaim, // Send checkbox value
                         boeData: boeData,
                         _token: '{{ csrf_token() }}'
                     },

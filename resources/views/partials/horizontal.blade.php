@@ -295,6 +295,25 @@
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 <a href="{{route('getVehiclePenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized Vehicles</a>            
                                                 <a href="{{route('getClearedPenalties')}}" class="dropdown-item" data-key="t-login">Cleared Penalties</a>
+                                                <a href="{{route('getNoPenalties')}}" class="dropdown-item" data-key="t-login">No Penalties Vehicles</a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['can-view-vehicle-claims']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Claim</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('getPendingClaims')}}" class="dropdown-item" data-key="t-login">Pendings</a>            
+                                                <a href="{{route('getSubmittedClaims')}}" class="dropdown-item" data-key="t-login">Submitted</a>
+                                                <a href="{{route('getApprovedClaims')}}" class="dropdown-item" data-key="t-login">Approved</a>
+                                                <a href="{{route('getCancelledClaims')}}" class="dropdown-item" data-key="t-login">Cancelled</a>
                                             </div>
                                         </div>
                                         @endif
@@ -1129,9 +1148,9 @@
                                 </li>
                                 @endif
                                 @endcan
-                                @can('view-po-details')
+                                @canany(['view-po-details','demand-planning-po-list',])
                                 @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -1152,7 +1171,7 @@
                                 </li>
                                 @endif
                                 @endif
-                                @endcan
+                                @endcanany
                                 @can('variants-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
@@ -1375,7 +1394,7 @@
                                             </div>
                                         </div>
                                         @endif
-                                        @endcan
+                                        @endcanany
                                         @can('demand-create')
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-create');
@@ -1517,7 +1536,7 @@
                                     </div>
                                 </li>
                                 @endif
-                                @endcan
+                                @endcanany
 
                                 <!-- Demand Planning Module end -->
                                 @php
@@ -1790,7 +1809,7 @@
                 </div>
 
                 <!-- Second div with role name -->
-                <div class="nav-item rolename-button" id="rolename-dropdown-button">
+                <div class="nav-item rolename-button pb-2 pt-2" id="rolename-dropdown-button">
                     <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
                         @php
                         $selectedrole = Auth::user()->selectedRole;
@@ -2076,6 +2095,19 @@
                 showDropdown();
                 adjustDropdownPosition(rolenameButton, rolenameDropdown);
             });
+
+            rolenameButton.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200);
+            });
+
+            rolenameDropdown.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200); 
+            });
+
+            rolenameDropdown.addEventListener("mouseenter", function() {
+                showDropdown(); 
+            });
+
         }
 
         document.addEventListener("click", function() {
@@ -2083,11 +2115,22 @@
         });
 
         function toggleDropdownVisibility() {
-            if (rolenameDropdown.style.display === "block") {
-                hideDropdown();
-            } else {
-                showDropdown();
-                adjustDropdownPosition(rolenameButton, rolenameDropdown);
+            if (window.innerWidth < 992) {
+                const isVisible = rolenameDropdown.style.display === "block";
+                hideDropdown(); 
+                if (!isVisible) {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
+            }
+
+            else {
+                if (rolenameDropdown.style.display === "block") {
+                    hideDropdown();
+                } else {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
             }
         }
 
@@ -2097,6 +2140,12 @@
 
         function hideDropdown() {
             rolenameDropdown.style.display = "none";
+        }
+
+        function hideDropdownIfOutside() {
+            if (!rolenameDropdown.matches(":hover") && !rolenameButton.matches(":hover")) {
+                hideDropdown();
+            }
         }
 
         function adjustDropdownPosition(button, dropdown) {

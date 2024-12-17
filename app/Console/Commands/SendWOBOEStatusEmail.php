@@ -46,10 +46,22 @@ class SendWOBOEStatusEmail extends Command
             // Fetch team emails from the .env file
             $salesSupportEmail = env('SALESUPPORT_TEAM_EMAIL');
             $logisticsTeamEmail = env('LOGISTICS_TEAM_EMAIL');
-            $developerEmail = env('DEVELOPER_EMAIL');
-            // Send email to the salesperson's email and team emails from .env file
-            Mail::to([$salesperson->email, $salesSupportEmail, $logisticsTeamEmail,$developerEmail])
-                ->send(new WOBOEStatusMail($boe, $salesperson));
+            $wareHouseTeamEmail = env('WAREHOUSE_TEAM_EMAIL');
+            // Determine recipient list based on work order type
+            if ($boe->workOrder->type === 'export_cnf') {
+                // Send email only to the logistics team for export_cnf type
+                $recipients = [$logisticsTeamEmail];
+            } else {
+                // Send email to the salesperson's email and team emails for other types
+                $recipients = [
+                    $salesperson->email,
+                    $salesSupportEmail,
+                    $logisticsTeamEmail,
+                    $wareHouseTeamEmail
+                ];
+            }
+            // Send email to the determined recipient list
+            Mail::to($recipients)->send(new WOBOEStatusMail($boe, $salesperson));
         }
 
         $this->info('WOBOE status emails have been sent successfully.');

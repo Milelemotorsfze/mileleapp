@@ -55,8 +55,8 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Dealers</label>
                                 <select class="form-control widthinput" data-trigger name="whole_sales" id="wholesaler">
-                                    <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}">Trans Cars</option>
                                     <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}">Milele Motors</option>
+                                    <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}">Trans Cars</option>
                                 </select>
                             </div>
                         </div>
