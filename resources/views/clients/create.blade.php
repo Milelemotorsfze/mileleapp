@@ -124,35 +124,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         @endforeach
     </select>
 </div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">*</span>
-                    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" required>
-                    <datalist id="laList">
-                        <option value="English" data-value="English">English</option>
-                        <option value="Arabic" data-value="English">Arabic</option>
-                        <option value="Russian" data-value="English">Russian</option>
-                        <option value="Urdu" data-value="English">Urdu</option>
-                        <option value="Hindi" data-value="English">Hindi</option>
-                        <option value="Kannada" data-value="English">Kannada</option>
-                        <option value="French" data-value="English">French</option>
-                        <option value="Malayalam" data-value="English">Malayalam</option>
-                        <option value="Tamil" data-value="English">Tamil</option>
-                        <option value="Spanish" data-value="English">Spanish</option>
-                        <option value="Portuguese" data-value="English">Portuguese</option>
-                        <option value="Shona" data-value="English">Shona</option>
-                    </datalist>
-                </div>
-                    <div class="col-xs-4 col-sm-12 col-md-4">
-                    <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination / Nationality : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" required>
-                    <datalist id="loList">
-                    @foreach ($countries as $country)
-                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                    @endforeach
-                    </datalist>
-                        </div>
+<div class="col-lg-4 col-md-6">
+    <span class="error">*</span>
+    <label for="languageSelect" class="form-label">Preferred Language:</label>
+    <select name="language" id="languageSelect" class="form-control select2" required>
+        <option value="">Select Language</option>
+        <option value="English">English</option>
+        <option value="Arabic">Arabic</option>
+        <option value="Russian">Russian</option>
+        <option value="Urdu">Urdu</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Kannada">Kannada</option>
+        <option value="French">French</option>
+        <option value="Malayalam">Malayalam</option>
+        <option value="Tamil">Tamil</option>
+        <option value="Spanish">Spanish</option>
+        <option value="Portuguese">Portuguese</option>
+        <option value="Shona">Shona</option>
+    </select>
+</div>
+
+<div class="col-xs-4 col-sm-12 col-md-4">
+    <span class="error">* </span>
+    <label for="locationSelect" class="form-label">Destination / Nationality :</label>
+    <select name="location" id="locationSelect" class="form-control select2" required>
+        <option value="">Select Location</option>
+        @foreach ($countries as $country)
+            <option value="{{ $country }}">{{ $country }}</option>
+        @endforeach
+    </select>
+</div>
                     <div class="col-lg-4 col-md-6" id="tradeLicenseField">
                     <label for="basicpill-firstname-input" class="form-label">Trade License : </label>
                     <input type="file" id="tradelicense" class="form-control" name="tradelicense">
@@ -262,6 +263,14 @@ document.getElementById('languageInput').addEventListener('input', function(even
         input.value = newValue;
     });
 });
+</script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Select an option",
+            allowClear: true
+        });
+    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
