@@ -476,18 +476,32 @@
 </div>
     <!-- Page Header and Lead Title -->
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="card-title">Lead</h4>
-        <h4 class="card-title">{{$lead->name}}</h4>
-        <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
-            <i class="fa fa-arrow-left"></i> Back
+    <h4 class="card-title">Lead</h4>
+    <h4 class="card-title">{{$lead->name}}</h4>
+    
+    <div>
+    <a class="btn btn-sm btn-info" href="{{ route('dailyleads.index') }}">
+            <i class="fa fa-arrow-left"></i> Back to Listing
         </a>
+        @if($previousLead)
+            <a href="{{ route('calls.leaddetailpage', $previousLead->id) }}" class="btn btn-sm btn-warning">
+                <i class="fa fa-arrow-left"></i> Previous Lead
+            </a>
+        @endif
+
+        @if($nextLead)
+            <a href="{{ route('calls.leaddetailpage', $nextLead->id) }}" class="btn btn-sm btn-success">
+                Next Lead <i class="fa fa-arrow-right"></i>
+            </a>
+        @endif
     </div>
+</div>
 <!-- Full-width container for the progress bar -->
 <div class="progress-bar-container row">
     <div class="col-10">
         <div class="steps-container">
             <!-- Step 1: New -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'new' ? 'active' : ($lead->status !== 'new' ? 'completed' : '') }}" onclick="moveToStep(1)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'New' ? 'active' : ($lead->status === 'contacted' || $lead->status === 'working' || $lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}"  onclick="moveToStep(1)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">New</span>
@@ -495,7 +509,7 @@
             </a>
 
             <!-- Step 2: Contacted -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'contacted' ? 'active' : ($lead->status !== 'new' && $lead->status !== 'contacted' ? 'completed' : '') }}" onclick="moveToStep(2)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'contacted' ? 'active' : ($lead->status === 'working' || $lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(2)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Contacted</span>
@@ -503,7 +517,7 @@
             </a>
 
             <!-- Step 3: Working -->
-            <a href="javascript:void(0)" class="step {{ $lead->status === 'working' ? 'active' : ($lead->status !== 'new' && $lead->status !== 'contacted' && $lead->status !== 'working' ? 'completed' : '') }}" onclick="moveToStep(3)">
+            <a href="javascript:void(0)" class="step {{ $lead->status === 'working' ? 'active' : ($lead->status === 'qualify' || $lead->status === 'Rejected' || $lead->status === 'converted' ? 'completed' : '') }}" onclick="moveToStep(3)">
                 <span class="step-content">
                     <span class="tick-mark">✔</span>
                     <span class="text-step">Working</span>

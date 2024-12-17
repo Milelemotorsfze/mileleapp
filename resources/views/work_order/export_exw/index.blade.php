@@ -90,6 +90,7 @@
 		$canViewDocLog = Auth::user()->hasPermissionForSelectedRole(['view-doc-status-log']);
 		$canChangeWOStatus = Auth::user()->hasPermissionForSelectedRole(['can-change-status']);
 		$canViewWOStatusLog = Auth::user()->hasPermissionForSelectedRole(['view-wo-status-log']);
+		$canDeleteWO = Auth::user()->hasPermissionForSelectedRole(['delete-work-order']);
 	@endphp
 	@if ($canViewWOList && isset($type))
 		<h4>
@@ -183,7 +184,7 @@
 					<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<label for="{{ $id }}" class="col-form-label text-md-end">{{ __($filter['label']) }}</label>
-							<select name="{{ $id }}" id="{{ $id }}" multiple="true" class="form-control widthinput" autofocus>
+							<select name="{{ $id }}" id="{{ $id }}" multiple class="form-control widthinput">
 								@foreach($filter['options'] as $option)
 									<option value="{{ $option }}" 
 										{{ in_array($option, $filter['selected']) ? 'selected' : '' }}>
@@ -286,6 +287,7 @@
 								<th rowspan="2" class="dark">Sales Support Data Confirmation By</th>
 								<th rowspan="2" class="dark">Sales Support Data Confirmation At</th>
 								<th rowspan="2" class="dark">Total Number Of BOE</th>
+								<th rowspan="2" class="dark">Has Claim</th>
 							@endif
 							<th rowspan="2" class="light">Vehilce Count</th>
 						</tr>
@@ -389,6 +391,17 @@
 													</a>
 												</li>
 											@endif
+											@if ($canDeleteWO && $data->sales_support_data_confirmation_at == '')
+												<li>
+													<a 
+														title="Delete" 
+														class="btn btn-sm btn-info btn-full-width" 
+														href="javascript:void(0);" 
+														onclick="confirmDelete('{{ route('workorder.destroy', $data->id) }}', '{{ $data->wo_number }}')">
+														<i class="fas fa-trash"></i> Delete
+													</a>
+												</li>
+											@endif						
 										</ul>
 									</div>
 									@include('work_order.export_exw.doc_status_update')
@@ -542,12 +555,16 @@
 									<td>{{ $data->salesSupportDataConfirmationBy->name ?? '' }}</td>
 									<td>{{ $data->formatDate($data->sales_support_data_confirmation_at) }}</td>
 									<td>{{ $data->total_number_of_boe != 0 ? $data->total_number_of_boe : '' }}</td>
+									<td>{{ $data->has_claim ?? ''}}</td>
 								@endif
 								<td>{{ $data->vehicles->count() ?? 0 }}</td>
 							</tr>
 						@endforeach
 					</tbody>
 				</table>
+				<div class="d-flex justify-content-left mt-4">
+					{{ $datas->links() }}
+				</div>
 			</div>
 		</div>
     </div>
@@ -588,6 +605,8 @@
         ];
         selectFilters.forEach(filter => {
             $(filter.id).select2({ allowClear: true, placeholder: filter.placeholder });
+			// Manually remove aria-hidden on Select2 initialization
+			$(filter.id).removeAttr('aria-hidden');
         });
         $('#apply-filters').on('click', function(e) {
             e.preventDefault();
@@ -637,6 +656,41 @@
 			});
 		}
     });
+	$(document).on('select2:open', function(e) {
+		const selectId = e.target.id;
+		const searchField = document.querySelector(`#select2-${selectId}-container`);
+		if (searchField) searchField.focus();
+	});
+	$('.form-control').on('select2:open', function() {
+		$(this).removeAttr('aria-hidden');
+	});
+	function confirmDelete(url, woNumber) {
+		var message = "delete this work order " + woNumber; // Add the work order number
+		alertify.confirm(
+			'Are you sure you want to ' + message + '?',
+			function (confirmed) { // 'confirmed' will be true if OK is clicked
+				if (confirmed) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						data: {
+							_method: 'DELETE', // Emulates DELETE HTTP method
+							_token: '{{ csrf_token() }}'
+						},
+						success: function () {
+							window.location.reload();
+							alertify.success("Work order " + woNumber + " deleted successfully");
+						},
+						error: function () {
+							alertify.error("An error occurred while deleting work order " + woNumber);
+						}
+					});
+				} else {
+					alertify.error("Deletion canceled for work order " + woNumber);
+				}
+			}
+		).set({ title: "Confirm Deletion" });
+	}
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

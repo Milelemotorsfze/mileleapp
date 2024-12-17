@@ -2854,10 +2854,9 @@ foreach ($variants as $variant) {
                     ->where('vehicles.status', 'Approved');
                     foreach ($filters as $columnName => $values) {
                         if (in_array('__NULL__', $values)) {
-                            info($columnName);
                             $data->whereNull($columnName); // Filter for NULL values
                         } elseif (in_array('__Not EMPTY__', $values)) {
-                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                            $data->whereNotNull($columnName); // Filter for non-empty values
                         } else {
                             $data->whereIn($columnName, $values); // Regular filtering for selected values
                         }
@@ -3530,10 +3529,9 @@ public function availablevehicles(Request $request)
                     ->where('vehicles.status', 'Approved');
                     foreach ($filters as $columnName => $values) {
                         if (in_array('__NULL__', $values)) {
-                            info($columnName);
                             $data->whereNull($columnName); // Filter for NULL values
                         } elseif (in_array('__Not EMPTY__', $values)) {
-                            $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                            $data->whereNotNull($columnName); // Filter for non-empty values
                         } else {
                             $data->whereIn($columnName, $values); // Regular filtering for selected values
                         }
@@ -3707,7 +3705,7 @@ COALESCE(
                         info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
-                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        $data->whereNotNull($columnName); // Filter for non-empty values
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
@@ -3885,7 +3883,7 @@ COALESCE(
                         info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
-                        $data->whereNotNull($columnName)->where($columnName, '!=', ''); // Filter for non-empty values
+                        $data->whereNotNull($columnName); // Filter for non-empty values
                     } else {
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
