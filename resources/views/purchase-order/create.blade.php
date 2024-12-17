@@ -215,8 +215,7 @@
                         </div>
                         @foreach($pfiItems as $key => $pfiItem)
                                 <div class="row">
-                                <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
-                                  
+                                    <input type="hidden" id="pfi-item-id-{{$key}}" name="pfi_items[]" value="{{$pfiItem->id ?? ''}}"> 
                                     <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiItem->id}}" value="0">
                                     <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiItem->masterModel->id ?? ''}}">
                                     <div class="col-lg-2 col-md-6 mt-md-2">
@@ -252,7 +251,7 @@
                                             placeholder="Unit Price" readonly>
                                     </div>
                                     <div class="col-lg-1 col-md-6 mt-md-2">
-                                        <input type="number" id="quantity-{{$key}}" min="0 max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
+                                        <input type="number" id="quantity-{{$key}}" min="0" max="{{ $pfiItem->quantity }}" data-quantity="{{$pfiItem->quantity}}"
                                         data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
                                         <span class="QuantityError-{{$key}} text-danger"></span>
                                     </div>
@@ -363,8 +362,6 @@
         $('.bar').show();
         var variantQuantity = '{{ $pfiItems->count() }}';
         var price = 0;
-        var exColours = <?= json_encode($exColours) ?>;
-        var intColours = <?= json_encode($intColours) ?>;
         var sum = $('#total-price').val();
         for (var i = 0; i < variantQuantity; i++) {
             var selectedQty = $('#quantity-'+i).val();

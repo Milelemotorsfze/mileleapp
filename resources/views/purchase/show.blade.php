@@ -3,9 +3,7 @@
 <style>
     
    .select2-container {
-      z-index: 2050; /* Adjust this value as needed */
       width: 100% !important;
-      min-width: 200px;
     }
     .select2-selection {
       width: 100% !important;
@@ -151,6 +149,9 @@
     .row-space {
         margin-bottom: 10px;
     }
+    #dtBasicExample1 th {
+            min-width: 150px !important;
+        }
 </style>
 @section('content')
 
@@ -208,7 +209,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="paymentModalLabel">Initiate Payment</h5>
+        <h5 class="modal-title" id="paymentModalLabel">Initiate Payment uty</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -2133,85 +2134,91 @@
                 </div>
             </div>
             @if($purchasingOrder->status != "Cancelled")
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('add-more-vehicles-po');
-            @endphp
-            @if ($hasPermission)
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Add More Vehicles</h4>
-                    </div>
-                    <div class="card-body">
-                        {!! Form::model($purchasingOrder, ['route' => ['purchasing-order.update', $purchasingOrder->id], 'method' => 'PATCH', 'id' => 'purchasing-order']) !!}
-                        <div id="variantRowsContainer" style="display: none;">
-                            <div class="table-responsive" >
-                                <table id="dtBasicExampledata" class="table table-striped table-editable table-edits table table-bordered">
-                                    <thead class="bg-soft-secondary">
-                                    <tr >
-                                        <th>Variants</th>
-                                        <th>Brand</th>
-                                        <th>Model Line</th>
-                                        <th>Exterior Color</th>
-                                        <th>Interior Color</th>
-                                        <th>Unit Price</th>
-                                        <th>Estimated Arrival</th>
-                                        <th>Engine Number</th>
-                                        <th>VIN</th>
-                                        <th>Territory</th>
-                                        <th>Action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('add-more-vehicles-po');
+                @endphp
+                @if ($hasPermission)
+                    @if($purchasingOrder->is_demand_planning_purchase_order)
+                         <!-- add or remove qty is for only brands other than toyota PO -->
+                        @include('purchase-order.po_add_vehicles')
+                    @else
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Add More Vehicles</h4>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-2 col-md-6">
-                                <label for="brandInput" class="form-label">Variants:</label>
-                                <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id" autocomplete="off">
-                                <datalist id="variantslist">
-                                    @foreach ($variants as $variant)
-                                        <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
-                                    @endforeach
-                                </datalist>
-                            </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">Brand:</label>
-                                <input type="text" id="brands_id" name="brands_id" class="form-control" placeholder="Brand" readonly>
-                                <input type="hidden" id="currency" name="currency" class="form-control" readonly value="{{$purchasingOrder->currency}}">
-                            </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label for="QTY" class="form-label">Model Line:</label>
-                                <input type="text" id="master_model_lines_id" name="master_model_lines_id" class="form-control" placeholder="Model Line" readonly>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <label for="QTY" class="form-label">Variants Detail:</label>
-                                <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
-                            </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="unitprice" class="form-label">Unit Price:</label>
-                                <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="Unit Price">
-                            </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">QTY:</label>
-                                <input type="number" id="QTY" name="QTY" class="form-control" placeholder="QTY">
-                            </div>
-                            <div class="col-lg-1 col-md-6 upernac">
-                                <div class="btn btn-primary add-row-btn">
-                                    <i class="fas fa-plus"></i> Add More
+                        <div class="card-body">
+                            {!! Form::model($purchasingOrder, ['route' => ['purchasing-order.update', $purchasingOrder->id], 'method' => 'PATCH', 'id' => 'purchasing-order']) !!}
+                            <div id="variantRowsContainer" style="display: none;">
+                                <div class="table-responsive" >
+                                    <table id="dtBasicExampledata" class="table table-striped table-editable table-edits table table-bordered">
+                                        <thead class="bg-soft-secondary">
+                                        <tr >
+                                            <th>Variants</th>
+                                            <th>Brand</th>
+                                            <th>Model Line</th>
+                                            <th>Exterior Color</th>
+                                            <th>Interior Color</th>
+                                            <th>Unit Price</th>
+                                            <th>Estimated Arrival</th>
+                                            <th>Engine Number</th>
+                                            <th>VIN</th>
+                                            <th>Territory</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-6">
+                                    <label for="brandInput" class="form-label">Variants:</label>
+                                    <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id" autocomplete="off">
+                                    <datalist id="variantslist">
+                                        @foreach ($variants as $variant)
+                                            <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
+                                        @endforeach
+                                    </datalist>
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <label for="QTY" class="form-label">Brand:</label>
+                                    <input type="text" id="brands_id" name="brands_id" class="form-control" placeholder="Brand" readonly>
+                                    <input type="hidden" id="currency" name="currency" class="form-control" readonly value="{{$purchasingOrder->currency}}">
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label for="QTY" class="form-label">Model Line:</label>
+                                    <input type="text" id="master_model_lines_id" name="master_model_lines_id" class="form-control" placeholder="Model Line" readonly>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label for="QTY" class="form-label">Variants Detail:</label>
+                                    <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <label for="unitprice" class="form-label">Unit Price:</label>
+                                    <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="Unit Price">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <label for="QTY" class="form-label">QTY:</label>
+                                    <input type="number" id="QTY" name="QTY" class="form-control" placeholder="QTY">
+                                </div>
+                                <div class="col-lg-1 col-md-6 upernac">
+                                    <div class="btn btn-primary add-row-btn">
+                                        <i class="fas fa-plus"></i> Add More
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="col-lg-12 col-md-12">
+                                <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
+                            </div>
+                            {!! Form::close() !!}
                         </div>
-                        <br>
-                        <br>
-                        <div class="col-lg-12 col-md-12">
-                            <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
-                        </div>
-                        {!! Form::close() !!}
                     </div>
-                </div>
-            @endif
+                    @endif
+                @endif
 
                 <!-- @can('edit-demand-planning-po')
                     @php
@@ -3102,7 +3109,6 @@
                     }
                     var qty = $('#QTY').val();
                     var unitPrice = $('#unit_price').val();
-                    console.log(unitPrice);
                     var detail = variantOption.data('detail');
                     var brand = variantOption.data('brands_id');
                     var masterModelLine = variantOption.data('master_model_lines_id');
@@ -3166,32 +3172,37 @@
                 });
             });
         </script>
-       @php
+       <!-- @php
        $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
        @endphp
        @if (!$hasPermission)
         <script>
-            var input = document.getElementById('variants_id');
-            var dataList = document.getElementById('variantslist');
-            input.addEventListener('input', function() {
-                var inputValue = input.value;
-                var options = dataList.getElementsByTagName('option');
-                var matchFound = false;
-                for (var i = 0; i < options.length; i++) {
-                    var option = options[i];
-                    if (inputValue === option.value) {
-                        matchFound = true;
-                        break;
+            let isDPPO = "{{ $purchasingOrder->is_demand_planning_purchase_order }}";
+            if(isDPPO == false) {
+                var input = document.getElementById('variants_id');
+                var dataList = document.getElementById('variantslist');
+                input.addEventListener('input', function() {
+
+                    var inputValue = input.value;
+                    var options = dataList.getElementsByTagName('option');
+                    var matchFound = false;
+                    for (var i = 0; i < options.length; i++) {
+                        var option = options[i];
+                        if (inputValue === option.value) {
+                            matchFound = true;
+                            break;
+                        }
                     }
-                }
-                if (!matchFound) {
-                    input.setCustomValidity("Please select a value from the list.");
-                } else {
-                    input.setCustomValidity('');
-                }
-            });
+                    if (!matchFound) {
+                        input.setCustomValidity("Please select a value from the list.");
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                });
+            }
+            
         </script>
-        @endif
+        @endif -->
         <script>
             function updateStatusrej(status, orderId) {
                 let url = '{{ route('purchasing.updateStatuscancel') }}';
@@ -4945,7 +4956,8 @@ function submitPaymentForm() {
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
-                    transition_id: transitionId
+                    transition_id: transitionId,
+                    
                 },
                 success: function(response) {
                     if(response.success) {

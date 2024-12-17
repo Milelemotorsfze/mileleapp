@@ -1205,7 +1205,7 @@ public function getBrandsAndModelLines(Request $request)
                     //     }
                 }
         }
-        DB::commit();
+       
         $purchasingordereventsLog = New PurchasingOrderEventsLog();
         $purchasingordereventsLog->event_type = "PO Creation";
         $purchasingordereventsLog->created_by = auth()->user()->id;
@@ -1225,6 +1225,7 @@ public function getBrandsAndModelLines(Request $request)
         $supplier_created->suppliers_id = $vendors_id;
         $supplier_created->save();
         }
+        DB::commit();
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
     /**
@@ -1303,7 +1304,7 @@ public function getBrandsAndModelLines(Request $request)
             }
         }
         $pfiVehicleVariants = [];
-
+        $showAddMorePOSection = 1;
         if($purchasingOrder->is_demand_planning_purchase_order) {
             
             foreach($vehicles as $vehicle) {
@@ -1314,6 +1315,19 @@ public function getBrandsAndModelLines(Request $request)
             }
             
             $pfi = PFI::findOrFail($purchasingOrder->PFIPurchasingOrder->pfi->id);
+            // check for add more vehicle is possible or not
+            $PoUtilizedQty = PfiItemPurchaseOrder::where('pfi_id', $pfi->id)
+                                    ->sum('quantity');
+            if($PoUtilizedQty) {
+                $pfiQty =  PfiItem::select('is_parent','pfi_id','pfi_quantity')
+                            ->where('is_parent', true)
+                            ->where('pfi_id', $pfi->id)
+                            ->sum('pfi_quantity');
+                if($pfiQty <= $PoUtilizedQty) {
+                    $showAddMorePOSection = 0;
+                }
+            }   
+
             $pfiItemLatest = PfiItem::where('pfi_id', $pfi->id)
             ->where('is_parent', false)
             ->first();
@@ -1326,27 +1340,31 @@ public function getBrandsAndModelLines(Request $request)
 
                 $alreadyAddedQuantity =  PfiItemPurchaseOrder::where('pfi_item_id', $pfiVehicleVariant->id)
                                                     ->sum('quantity');
-
-                $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
+                $pfiVehicleVariant->remaining_quantity = 0;
+                $remainingQuantity = $pfiVehicleVariant->pfi_quantity - $alreadyAddedQuantity;
+                if($remainingQuantity > 0) {
+                    $pfiVehicleVariant->remaining_quantity = $remainingQuantity;
+                }
 
                 $masterModel = MasterModel::find($pfiVehicleVariant->masterModel->id);
                 $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
                                                 ->where('sfx', $masterModel->sfx)
                                                 ->get();
 
-                $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                                                ->where('sfx', $masterModel->sfx)->pluck('id');
+                // $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                //                                 ->where('sfx', $masterModel->sfx)->pluck('id');
 
-                $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                    ->whereNull('purchase_order_id')
-                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                    ->where('supplier_id', $pfi->supplier_id)
-                    ->where('whole_sales', $dealer)
-                    ->count();
+                // $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                //     ->whereNull('purchase_order_id')
+                //     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                //     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                //     ->where('supplier_id', $pfi->supplier_id)
+                //     ->where('whole_sales', $dealer)
+                //     ->count();
                 $variantCount = $variantCount + $pfiVehicleVariant->quantity;
             }
         }
+
         $purchasingOrderSwiftCopies = PurchasingOrderSwiftCopies::where('purchasing_order_id', $id)->orderBy('created_at', 'desc')
         ->get();
         $purchasedorderevents = PurchasingOrderEventsLog::where('purchasing_order_id', $id)->get();
@@ -1370,15 +1388,18 @@ public function getBrandsAndModelLines(Request $request)
         $additionalpaymentintreq = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated Request')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentint = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Initiated')->where('change_type', 'surcharge')->sum('price_change');
         $additionalpaymentpapproved = PurchasedOrderPriceChanges::where('purchasing_order_id', $id)->where('status', 'Approved')->where('change_type', 'surcharge')->sum('price_change');
+        $exColours = ColorCode::where('belong_to', 'ex')->orderBy('name', 'ASC')->get();
+        $intColours = ColorCode::where('belong_to', 'int')->orderBy('name', 'ASC')->get();
         $vehiclesdn = Vehicles::where('purchasing_order_id', $id)
         ->where('status', 'Approved')
         ->whereNotNull('dn_id')
         ->get();
+
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
+           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog','exColours','intColours','showAddMorePOSection',
             'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports','purchasingOrderSwiftCopies',
             'purchasedorderevents', 'vendorDisplay', 'vendorPaymentAdjustments', 'alreadypaidamount','intialamount','totalSum', 'totalSurcharges', 'totalDiscounts',
             'oldPlFiles','transitions', 'accounts','additionalpaymentpend','additionalpaymentint','additionalpaymentpapproved','additionalpaymentintreq','vehiclesdn'));
@@ -1400,7 +1421,6 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function update(Request $request, $id)
     {
-//     dd($request->all());
         DB::beginTransaction();
         $useractivities =  New UserActivities();
             $useractivities->activity = "Update the Purchased order details";
@@ -1496,6 +1516,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->save();
             }
             $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+            // return $purchasingOrder;
                 if ($purchasingOrder) {
                     $purchasingOrder->status = 'Pending Approval';
                     $purchasingOrder->save();
@@ -1503,79 +1524,33 @@ public function getBrandsAndModelLines(Request $request)
 
     //         Demand planning PO
                 if($request->po_from == 'DEMAND_PLANNING') {
-
                     $masterModels = $request->master_model_id;
-                    $pfiId = Crypt::decrypt($request->pfi_id);
-
+                    $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? " ";
                     foreach($request->pfi_items as $key => $pfiItem) {
                         if($request->item_quantity_selected[$key] > 0) {
-                            $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
+                            $PfiItemPurchaseOrder = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
+                            ->where('pfi_item_id', $pfiItem)
+                            ->where('master_model_id', $request->selected_model_ids[$key])
+                            ->first();
+                            if(!$PfiItemPurchaseOrder) {
+                                $PfiItemPurchaseOrder = new PfiItemPurchaseOrder();
+                                $PfiItemPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
+                            }else{
+                                $addedQty =  $PfiItemPurchaseOrder->quantity;
+                                $PfiItemPurchaseOrder->quantity = $addedQty + $request->item_quantity_selected[$key] ?? '';
+                            }
+
                             $PfiItemPurchaseOrder->pfi_id = $pfiId;
                             $PfiItemPurchaseOrder->pfi_item_id = $pfiItem;
                             $PfiItemPurchaseOrder->purchase_order_id = $purchasingOrderId;
                             $PfiItemPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
-                            $PfiItemPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
+                        
                             $PfiItemPurchaseOrder->save();
                         }
                     }
-                
-                    // if toyota pfi -> map with inventory
-                    $pfi = PFI::find($pfiId);
-                    $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    // $alreadyAddedIds = [];
-                    foreach($masterModels as $key => $masterModel)
-                    {
-                    // status change to WAITING
-                        
-                        $model = MasterModel::find($masterModel);
-                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
-                                                    ->where('vin', $vins[$key])
-                                                    ->whereNull('supplier_inventory_id')
-                                                    ->first();
-
-                    //     $possibleModelIds = MasterModel::where('model', $model->model)
-                    //                         ->where('sfx', $model->sfx)->pluck('id');
-
-                    //     $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                    //         ->whereNull('purchase_order_id')
-                    //         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                    //         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                    //         ->where('supplier_id', $vendors_id)
-                    //         ->whereNotIn('id', $alreadyAddedIds)
-                    //         ->where('whole_sales', $dealer);
-
-                    //     if($vins[$key]) {
-                    //          $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
-                    //     }
-
-                    //     if($inventoryItem->count() > 0) {
-                    //         $inventoryIds = $inventoryItem->pluck('id');
-                    //         $inventory = SupplierInventory::where('pfi_id', $pfi->id)
-                    //                             ->whereIn('id', $inventoryIds);
-
-                    //         if($inventory->count() > 0) {
-                    //             $inventoryItem = $inventory->first();
-                    //         }else{
-                    //             $inventoryItem = $inventoryItem->first();
-                    //             $inventoryItem->pfi_id = $pfi->id;
-                    //         }
-
-                    //         $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
-                    //         $inventoryItem->purchase_order_id = $purchasingOrder->id;
-                    //         $inventoryItem->save();
-
-                    //         // add entry to inventory log table
-
-                    //         $vehicle->supplier_inventory_id = $inventoryItem->id;
-                    //         $vehicle->save();
-
-                    //         $alreadyAddedIds[] = $inventoryItem->id;
-                    //     }
-                    }
                 }
-
         }
-        DB::commit();
+       
         foreach ($variantsQuantity as $variant => $quantity) {
             $description = $variant . ' with ' . $quantity . ' qty';
             $purchasingordereventsLog = new PurchasingOrderEventsLog();
@@ -1585,6 +1560,7 @@ public function getBrandsAndModelLines(Request $request)
             $purchasingordereventsLog->description = $description;
             $purchasingordereventsLog->save();
         }
+        DB::commit();
     return back()->with('success', 'Added Vehicles In PO successfully!');
     }
     public function deletes($id)
@@ -1870,10 +1846,7 @@ public function checkcreatevins(Request $request)
                 }else{
                     $pfiNumber = $purchasingOrder->pl_number;
                 }
-//                 // $recipients = $purchasingOrder->is_demand_planning_purchase_order == 1 
-//                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
-//                 ? [env('LOGISTICS_EMAIL')] 
-//                 : [env('LOGISTICS_EMAIL'), env('CSO_EMAIL')];
+
                 $logisticsEmail = env('LOGISTICS_EMAIL', 'default@domain.com');
                 $additionalEmail = env('CSO_EMAIL', null);
                 $recipients = $purchasingOrder->is_demand_planning_po == 1 
@@ -2080,26 +2053,27 @@ public function purchasingupdateStatus(Request $request)
                 $updatetotal->totalcost = $updatetotal->totalcost - $updateprice->unit_price;
                 $updatetotal->save();
                 }
-                if($vehicle->model_id) {
+                if($vehicle->purchasingOrder->is_demand_planning_purchase_order == true) {
+                    // dp purchase order
                     $masterModel = MasterModel::find($vehicle->model_id);
-                    $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                        ->where('sfx', $masterModel->sfx)->pluck('id');
-                    $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchasing_order_id)
-                        ->whereIn('master_model_id', $possibleModelIds)
-                        ->first();
-                    $inventoryItem->purchase_order_id = NULL;
-                    $inventoryItem->pfi_id = NULL;
-                    $inventoryItem->letter_of_indent_item_id  = NULL;
-                    $inventoryItem->save();
-
-                    $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                    // $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                    //     ->where('sfx', $masterModel->sfx)->pluck('id');
+                    // $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchasing_order_id)
+                    //     ->whereIn('master_model_id', $possibleModelIds)
+                    //     ->first();
+                    // $inventoryItem->purchase_order_id = NULL;
+                    // $inventoryItem->pfi_id = NULL;
+                    // $inventoryItem->letter_of_indent_item_id  = NULL;
+                    // $inventoryItem->save();
+        
+                    $PfiPurchaseOrder = PfiItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                                                 ->where('master_model_id', $vehicle->model_id)
                                                                 ->first();
-                    if($loiPurchaseOrder) {
-                        $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
-                        $loiPurchaseOrder->save();
+                    if($PfiPurchaseOrder) {
+                        $PfiPurchaseOrder->quantity = $PfiPurchaseOrder->quantity - 1;
+                        $PfiPurchaseOrder->save();
                     }
-
+        
                 }
             $vehicle->procurement_vehicle_remarks = $request->input('remarks');
             $vehicle->save();
@@ -2170,27 +2144,28 @@ public function purchasingupdateStatus(Request $request)
         $updatetotal->totalcost = $updatetotal->totalcost - $updateprice->unit_price;
         $updatetotal->save();
         }
-        if($vehicle->model_id) {
-                $masterModel = MasterModel::find($vehicle->model_id);
-                $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx)->pluck('id');
-                $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchasing_order_id)
-                    ->whereIn('master_model_id', $possibleModelIds)
-                    ->first();
-                $inventoryItem->purchase_order_id = NULL;
-                $inventoryItem->pfi_id = NULL;
-                $inventoryItem->letter_of_indent_item_id  = NULL;
-                $inventoryItem->save();
+        if($vehicle->purchasingOrder->is_demand_planning_purchase_order == true) {
+            // dp purchase order
+            $masterModel = MasterModel::find($vehicle->model_id);
+            // $possibleModelIds = MasterModel::where('model', $masterModel->model)
+            //     ->where('sfx', $masterModel->sfx)->pluck('id');
+            // $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchasing_order_id)
+            //     ->whereIn('master_model_id', $possibleModelIds)
+            //     ->first();
+            // $inventoryItem->purchase_order_id = NULL;
+            // $inventoryItem->pfi_id = NULL;
+            // $inventoryItem->letter_of_indent_item_id  = NULL;
+            // $inventoryItem->save();
 
-                $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                                                            ->where('master_model_id', $vehicle->model_id)
-                                                            ->first();
-                if($loiPurchaseOrder) {
-                    $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
-                    $loiPurchaseOrder->save();
-                }
-
+            $PfiPurchaseOrder = PfiItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                                                        ->where('master_model_id', $vehicle->model_id)
+                                                        ->first();
+            if($PfiPurchaseOrder) {
+                $PfiPurchaseOrder->quantity = $PfiPurchaseOrder->quantity - 1;
+                $PfiPurchaseOrder->save();
             }
+
+        }
         $vehicle->procurement_vehicle_remarks = $request->input('remarks');
         $vehicle->save();
         $vehicle->delete();
@@ -4958,6 +4933,7 @@ public function submitPaymentDetails(Request $request)
     }
     public function approveTransition(Request $request)
     {
+        // update utilization qty
     $transitionId = $request->input('transition_id');
     $supplierAccountTransaction = SupplierAccountTransaction::where('id', $transitionId)->first();
     if ($supplierAccountTransaction) {
@@ -4975,6 +4951,8 @@ public function submitPaymentDetails(Request $request)
         $vendorPayment->status = 'Approved';
         $vendorPayment->save();
     }
+    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
+
     $vehiclesSupplierAccountTransactions = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->get();
     $transactionCount = VehiclesSupplierAccountTransaction::where('sat_id', $transitionId)->count();
     foreach ($vehiclesSupplierAccountTransactions as $vehicleTransaction) {
@@ -4983,8 +4961,19 @@ public function submitPaymentDetails(Request $request)
         $vehiclespaid = VehiclePurchasingCost::where('vehicles_id', $vehicleTransaction->vehicles_id)->first();
         $vehiclespaid->total_paid_amount += $vehicleTransaction->amount;
         $vehiclespaid->save();
+        // DP PO
+        // get the vehicles model_id
+        // if($purchasingOrder->is_demand_planning_purchase_order) {
+        //     $vehicle = Vehicles::find($vehicleTransaction->vehicles_id);
+        //     // check if PO is toyota
+        //     // get loi item id of each vehicle
+        //     // update utilization qty of loi item
+            
+
+        // }
+
+
     }
-    $purchasingOrder = PurchasingOrder::where('id', $supplierAccountTransaction->purchasing_order_id)->first();
     $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);
     $currency = $supplierAccountTransaction->account_currency;
     if($purchasingOrder->is_demand_planning_po == 1)
@@ -5149,6 +5138,8 @@ public function submitPaymentDetails(Request $request)
     }
     public function uploadSwiftFile(Request $request)
 {
+
+    // update the utilization qty after confirmation
     // Validate the request
     $request->validate([
         'swiftFile' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx',

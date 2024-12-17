@@ -56,7 +56,6 @@ class PurchasingOrder extends Model
             return true;
         }
         return false;
-        info($isDemandPlanningPO);
     }
     public function polPort()
     {
