@@ -24,6 +24,14 @@ class UAEVehicleStockExport implements FromCollection, WithHeadings
             ->where('varaints.is_dp_variant', 'Yes')
             ->where('vehicles.latest_location', '!=', 38)
             ->where('purchasing_order.is_demand_planning_po', true)
+            ->whereNull('vehicles.so_id')
+            ->whereNull('vehicles.gdn_id')
+            ->whereNotNull('vehicles.vin')
+            ->where('vehicles.status', 'Approved')
+            ->where(function ($query) {
+            $query->whereNull('vehicles.reservation_end_date')
+            ->orWhere('vehicles.reservation_end_date', '<', now());
+            })
             ->select(
                 'master_models.model as Model',
                 'master_models.sfx as SFX',
