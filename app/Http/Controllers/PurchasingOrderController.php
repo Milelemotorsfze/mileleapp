@@ -4091,7 +4091,6 @@ public function updateVariants(Request $request)
             ->where('purchasing_order_id', $purchasingOrderId)
             ->first();
         if ($vehicle) {
-            
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -4104,7 +4103,6 @@ public function updateVariants(Request $request)
             $vehicleslog->new_value = $variant['variant_id'];
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
-            $vehicleslog->save();
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
             // Collect data for the email
