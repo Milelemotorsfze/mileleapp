@@ -3815,7 +3815,7 @@ $(document).ready(function() {
         // Perform AJAX check for duplicate PO number
         $.ajax({
             type: 'POST',
-            url: '{{ route("purchasing-order.checkPoNumber") }}', // Backend route to validate
+            url: '{{ route("purchasing-order.checkPoNumberedit") }}', // Backend route to validate
             data: {
                 po_number: poNumber,
                 purchasing_order_id: purchasingOrderId,
@@ -4951,6 +4951,9 @@ function submitPaymentForm() {
       if (button) {
         button.style.display = 'none';
       }
+      setTimeout(() => {
+        location.reload();
+      }, 1000); // 1-second delay
     } else {
       alert('Error submitting payment: ' + data.message);
     }
