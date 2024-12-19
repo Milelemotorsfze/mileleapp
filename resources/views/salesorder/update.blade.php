@@ -1,5 +1,31 @@
 @extends('layouts.table')
 @section('content')
+<style>
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .prefix {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 6px 10px;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .input-field {
+            border-radius: 0 4px 4px 0;
+            flex: 1;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">
@@ -316,7 +342,11 @@
         </div>
         <div class="col-md-2 mb-3">
             <label for="text_input">Netsuit SO Number</label>
-            <input type="text" class="form-control" id="so_number" name="so_number" value="{{$sodetails->so_number}}">
+            <div class="input-wrapper">
+            <span class="prefix">SO-00</span>
+            <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number" value="{{$sodetails->so_number}}">
+        </div>
+        <div id="error_message" class="error-message"></div>
         </div>
         <div class="col-md-8 mb-3">
             <label for="text_area">Sales Notes</label>
@@ -465,4 +495,21 @@ function checkForDuplicateVINs() {
     return true; // No duplicate VINs found, allow form submission
 }
 </script>
+<script>
+        const soInput = document.getElementById('so_number');
+        const errorMessage = document.getElementById('error_message');
+
+        soInput.addEventListener('input', function () {
+            const regex = /^[1-9][0-9]{3,20}$/; // Starts with 1-9, followed by 3-7 digits
+            const value = soInput.value;
+
+            if (!regex.test(value)) {
+                errorMessage.textContent = "SO Number must be 4-20 digits and cannot start with zero or include alphabets.";
+                soInput.setCustomValidity("Invalid");
+            } else {
+                errorMessage.textContent = "";
+                soInput.setCustomValidity("");
+            }
+        });
+    </script>
 @endpush
