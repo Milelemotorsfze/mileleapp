@@ -22,7 +22,7 @@ class UAEVehicleStockExport implements FromCollection, WithHeadings
             ->join('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->where('brands.brand_name', 'Toyota')
             ->where('varaints.is_dp_variant', 'Yes')
-            ->where('vehicles.latest_location', '!=', 38)
+            ->whereNotIn('vehicles.latest_location', ['102', '153', '147', '38'])
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select(
                 'master_models.model as Model',
