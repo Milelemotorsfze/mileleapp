@@ -108,6 +108,7 @@
                                             ->whereNull('so_id')
                                             ->whereNull('gdn_id')
                                             ->whereNotNull('vin')
+                                            ->whereNotIn('latest_location', ['102', '153', '147'])
                                             ->where('vehicles.status', 'Approved')
                                             ->where(function ($query) {
                                                 $query->whereNull('vehicles.reservation_end_date')
@@ -175,6 +176,7 @@
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
                                             ->whereNotNull('vin')
+                                            ->whereNotIn('latest_location', ['102', '153', '147'])
                                             ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->where(function ($query) {
