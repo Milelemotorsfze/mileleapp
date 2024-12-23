@@ -1181,43 +1181,28 @@
                                 @endif
                                 @endcan
                                 @php
-                                $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
-                                $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                                @endphp
-                                @if ($hasFullAccess || $hasLeadsViewOnly)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="film"></i>
-                                        <span data-key="t-extra-pages">Leads</span>
-                                    </a>
-                                </li>
-                                @if ($hasFullAccess)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="check-circle"></i>
-                                        <span data-key="t-extra-pages">Sales Order</span>
-                                    </a>
-                                </li>
-                                @endif
-                                @endif
+    $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+    $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
+    $hasSalesView = Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+
+@if ($hasFullAccess || $hasLeadsViewOnly || $hasSalesView)
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+            <i data-feather="film"></i>
+            <span data-key="t-extra-pages">Leads</span>
+        </a>
+    </li>
+    @if ($hasFullAccess || $hasSalesView)
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                <i data-feather="check-circle"></i>
+                <span data-key="t-extra-pages">Sales Order</span>
+            </a>
+        </li>
+    @endif
+@endif
                                 @can('sales-view')
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
-                                @endphp
-                                @if ($hasPermission)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="film"></i>
-                                        <span data-key="t-extra-pages">Leads</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="check-circle"></i>
-                                        <span data-key="t-extra-pages">Sales Order</span>
-                                    </a>
-                                </li>
-                                @endif
                                 <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
                                 @endphp
