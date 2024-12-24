@@ -196,7 +196,7 @@ class SalesOrderController extends Controller
                 $so->quotation_id = $quotationId;
                 $so->sales_person_id = $qoutation->created_by;
                 $so_number = $request->input('so_number'); // Get the input value
-                $so->so_number = 'SO-00' . $so_number;    // Concatenate "SO-00" with the input value
+                $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
                 $so->so_date = $request->input('so_date');
                 $so->notes = $request->input('notes');
                 $so->total = $request->input('total_payment');
@@ -368,7 +368,7 @@ class SalesOrderController extends Controller
     $so = So::findOrFail($so_id);
     // Update the Sales Order fields
     $so_number = $request->input('so_number'); // Get the input value
-    $so->so_number = 'SO-00' . $so_number; 
+    $so->so_number = 'SO-' . $so_number; 
     $so->so_date = $request->input('so_date');
     $so->notes = $request->input('notes');
     $so->total = $request->input('total_payment');

@@ -343,10 +343,10 @@
         <div class="col-md-2 mb-3">
         <label for="so_number">Netsuit SO Number</label>
         <div class="input-wrapper">
-            <span class="prefix">SO-00</span>
-            <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number">
-        </div>
-        <div id="error_message" class="error-message"></div>
+    <span class="prefix">SO-</span>
+    <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number">
+</div>
+<span id="error_message" style="color: red;"></span>
     </div>
         <div class="col-md-8 mb-3">
             <label for="text_area">Sales Notes</label>
@@ -485,20 +485,20 @@ function checkForDuplicateVINs() {
 }
 </script>
 <script>
-        const soInput = document.getElementById('so_number');
-        const errorMessage = document.getElementById('error_message');
+    const soInput = document.getElementById('so_number');
+    const errorMessage = document.getElementById('error_message');
 
-        soInput.addEventListener('input', function () {
-            const regex = /^[1-9][0-9]{3,20}$/; // Starts with 1-9, followed by 3-7 digits (total 4-8 digits)
-            const value = soInput.value;
+    soInput.addEventListener('input', function () {
+        const regex = /^\d{6}$/; // Pattern: Exactly 6 digits
+        const value = soInput.value;
 
-            if (!regex.test(value)) {
-                errorMessage.textContent = "SO Number must be 4-20 digits and cannot start with zero or include alphabets.";
-                soInput.setCustomValidity("Invalid");
-            } else {
-                errorMessage.textContent = "";
-                soInput.setCustomValidity("");
-            }
-        });
-    </script>
+        if (!regex.test(value)) {
+            errorMessage.textContent = "Please enter exactly 6 digits after 'SO-' (e.g., 007362).";
+            soInput.setCustomValidity("Invalid");
+        } else {
+            errorMessage.textContent = "";
+            soInput.setCustomValidity("");
+        }
+    });
+</script>
 @endpush
