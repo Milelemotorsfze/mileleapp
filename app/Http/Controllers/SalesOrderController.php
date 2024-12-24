@@ -203,6 +203,9 @@ class SalesOrderController extends Controller
                 $so->receiving = $request->input('receiving_payment');
                 $so->paidinso = $request->input('payment_so');
                 $so->paidinperforma = $request->input('advance_payment_performa');
+                $so->created_by = auth()->id();
+                $so->created_at = Carbon::now();
+                $so->updated_at = Carbon::now();
                 $so->save();
                 $calls = Calls::find($qoutation->calls_id);
                 $calls->status = "Closed";
@@ -375,6 +378,8 @@ class SalesOrderController extends Controller
     $so->receiving = $request->input('receiving_payment');
     $so->paidinso = $request->input('payment_so');
     $so->paidinperforma = $request->input('advance_payment_performa');
+    $so->updated_by = auth()->id(); // or $request->user()->id
+    $so->updated_at = Carbon::now();
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
