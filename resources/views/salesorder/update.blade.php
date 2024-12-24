@@ -344,7 +344,7 @@
             <label for="text_input">Netsuit SO Number</label>
             <div class="input-wrapper">
             <span class="prefix">SO-00</span>
-            <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number" value="{{$sodetails->so_number}}">
+            <input type="text" class="form-control input-field" id="so_number" name="so_number" placeholder="Enter SO Number" value="{{ preg_replace('/[^1-9]+/', '', ltrim($sodetails->so_number, 'SO-')) }}">
         </div>
         <div id="error_message" class="error-message"></div>
         </div>
