@@ -113,7 +113,6 @@
             right: 0px;
         }
         #rolename-dropdown-menu.dropdown-menu-scrollable {
-            right: 9px !important;
             top: 55px !important;
         }
         .topnav .dropdown .dropdown-menu {
@@ -1181,43 +1180,28 @@
                                 @endif
                                 @endcan
                                 @php
-                                $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
-                                $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-                                @endphp
-                                @if ($hasFullAccess || $hasLeadsViewOnly)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="film"></i>
-                                        <span data-key="t-extra-pages">Leads</span>
-                                    </a>
-                                </li>
-                                @if ($hasFullAccess)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="check-circle"></i>
-                                        <span data-key="t-extra-pages">Sales Order</span>
-                                    </a>
-                                </li>
-                                @endif
-                                @endif
+    $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+    $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
+    $hasSalesView = Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+
+@if ($hasFullAccess || $hasLeadsViewOnly || $hasSalesView)
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+            <i data-feather="film"></i>
+            <span data-key="t-extra-pages">Leads</span>
+        </a>
+    </li>
+    @if ($hasFullAccess || $hasSalesView)
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                <i data-feather="check-circle"></i>
+                <span data-key="t-extra-pages">Sales Order</span>
+            </a>
+        </li>
+    @endif
+@endif
                                 @can('sales-view')
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
-                                @endphp
-                                @if ($hasPermission)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="film"></i>
-                                        <span data-key="t-extra-pages">Leads</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="check-circle"></i>
-                                        <span data-key="t-extra-pages">Sales Order</span>
-                                    </a>
-                                </li>
-                                @endif
                                 <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
                                 @endphp
@@ -1809,7 +1793,7 @@
                 </div>
 
                 <!-- Second div with role name -->
-                <div class="nav-item rolename-button" id="rolename-dropdown-button">
+                <div class="nav-item rolename-button pb-2 pt-2" id="rolename-dropdown-button">
                     <button class="btn rolename-toggle btn-success" id="rolename-dropdown">
                         @php
                         $selectedrole = Auth::user()->selectedRole;
@@ -2095,6 +2079,19 @@
                 showDropdown();
                 adjustDropdownPosition(rolenameButton, rolenameDropdown);
             });
+
+            rolenameButton.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200);
+            });
+
+            rolenameDropdown.addEventListener("mouseleave", function() {
+                setTimeout(hideDropdownIfOutside, 200); 
+            });
+
+            rolenameDropdown.addEventListener("mouseenter", function() {
+                showDropdown(); 
+            });
+
         }
 
         document.addEventListener("click", function() {
@@ -2102,11 +2099,22 @@
         });
 
         function toggleDropdownVisibility() {
-            if (rolenameDropdown.style.display === "block") {
-                hideDropdown();
-            } else {
-                showDropdown();
-                adjustDropdownPosition(rolenameButton, rolenameDropdown);
+            if (window.innerWidth < 992) {
+                const isVisible = rolenameDropdown.style.display === "block";
+                hideDropdown(); 
+                if (!isVisible) {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
+            }
+
+            else {
+                if (rolenameDropdown.style.display === "block") {
+                    hideDropdown();
+                } else {
+                    showDropdown();
+                    adjustDropdownPosition(rolenameButton, rolenameDropdown);
+                }
             }
         }
 
@@ -2116,6 +2124,12 @@
 
         function hideDropdown() {
             rolenameDropdown.style.display = "none";
+        }
+
+        function hideDropdownIfOutside() {
+            if (!rolenameDropdown.matches(":hover") && !rolenameButton.matches(":hover")) {
+                hideDropdown();
+            }
         }
 
         function adjustDropdownPosition(button, dropdown) {

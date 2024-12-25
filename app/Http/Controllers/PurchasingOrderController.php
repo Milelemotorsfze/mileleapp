@@ -1214,7 +1214,8 @@ public function getBrandsAndModelLines(Request $request)
         $supplier_account_id = $request->input('vendors_id');
         $purchasing_order_id = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
-        $updateponum->po_number = $request->input('po_number');
+        $po_number = $request->input('po_number');
+        $updateponum->po_number = 'PO-' . $po_number;
         $updateponum->save();
         $supplier_exists = SupplierAccount::where('suppliers_id', $vendors_id)->exists();
         if (!$supplier_exists) {
@@ -3441,10 +3442,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         'pl_number',
         'po_number',
     ];
-
     // Store old values
     $oldValues = $purchasingOrder->only($fieldsToUpdate);
-
     // Update purchasing order details
     foreach ($fieldsToUpdate as $field) {
         if ($request->has($field)) {
@@ -4091,7 +4090,6 @@ public function updateVariants(Request $request)
             ->where('purchasing_order_id', $purchasingOrderId)
             ->first();
         if ($vehicle) {
-            
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -4104,7 +4102,6 @@ public function updateVariants(Request $request)
             $vehicleslog->new_value = $variant['variant_id'];
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
-            $vehicleslog->save();
             $vehicle->varaints_id = $variant['variant_id'];
             $vehicle->save();
             // Collect data for the email
@@ -5408,5 +5405,17 @@ public function getVehiclesdn($purchaseOrderId) {
         ->with(['variant.brand', 'variant.master_model_lines', 'vehiclePurchasingCost'])
         ->get();
     return response()->json($vehicles);
+}
+public function checkPoNumberedit(Request $request)
+{
+    $poNumber = $request->input('po_number');
+    $currentId = $request->input('purchasing_order_id');
+
+    // Check if PO number exists for another ID
+    $exists = PurchasingOrder::where('po_number', $poNumber)
+                ->where('id', '!=', $currentId)
+                ->exists();
+
+    return response()->json(['exists' => $exists]);
 }
 }

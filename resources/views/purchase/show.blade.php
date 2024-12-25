@@ -813,7 +813,15 @@
                 <label for="netsuitpo" class="form-label font-size-13 text-center">Netsuit PO:</label>
             </div>
             <div class="col-md-8 p-3">
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" value="{{$purchasingOrder->po_number}}">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <div style="display: flex; align-items: center; width: 100%;">
+        <input type="text" id="po_number" name="po_number" class="form-control" 
+               style="flex-grow: 1; padding: 5px; border: 1px solid #ced4da; border-radius: 4px;" 
+               placeholder="Enter PO Number (e.g., PO-123456)" value="{{$purchasingOrder->po_number}}" required>
+    </div>
+    <small id="po_error_message" style="color: red; margin-top: 5px;"></small>
+</div>
+        <span id="po_error_message" style="color: red; font-size: 12px; margin-top: 5px; display: block;"></span>
             </div>
             @if($purchasingOrder->is_demand_planning_purchase_order == false)
                 <div class="col-md-4 p-3">
@@ -3809,22 +3817,44 @@ $(document).ready(function() {
     $('#form-update_basicdetails').submit(function(event) {
         event.preventDefault();
 
-        // Create a FormData object
-        var formData = new FormData(this);
+        var poNumber = $('#po_number').val();
+        var purchasingOrderId = $('#purchasing_order_id').val();
 
+        // Perform AJAX check for duplicate PO number
         $.ajax({
             type: 'POST',
-            url: $(this).attr('action'),
-            data: formData,
-            contentType: false, // Important for file upload
-            processData: false, // Important for file upload
-            success: function(response) {
-                alert('Purchase order details updated successfully!');
-                location.reload();
+            url: '{{ route("purchasing-order.checkPoNumberedit") }}', // Backend route to validate
+            data: {
+                po_number: poNumber,
+                purchasing_order_id: purchasingOrderId,
+                _token: '{{ csrf_token() }}' // CSRF token for security
             },
-            error: function(xhr, status, error) {
+            success: function(response) {
+                if (response.exists) {
+                    alert('Error: PO Number already exists for a different record!');
+                } else {
+                    // If validation passes, submit the form data
+                    var formData = new FormData($('#form-update_basicdetails')[0]);
+                    $.ajax({
+                        type: 'POST',
+                        url: $('#form-update_basicdetails').attr('action'),
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            alert('Purchase order details updated successfully!');
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                            alert('An error occurred while updating purchase order details.');
+                        }
+                    });
+                }
+            },
+            error: function(xhr) {
                 console.error(xhr.responseText);
-                alert('An error occurred while updating purchase order details.');
+                alert('An error occurred while validating PO Number.');
             }
         });
     });
@@ -4929,6 +4959,9 @@ function submitPaymentForm() {
       if (button) {
         button.style.display = 'none';
       }
+      setTimeout(() => {
+        location.reload();
+      }, 1000); // 1-second delay
     } else {
       alert('Error submitting payment: ' + data.message);
     }
@@ -5280,6 +5313,23 @@ $.ajax({
             placeholder: 'Variant',
             maximumSelectionLength: 1 // Adjust the width dynamically or apply your custom width
         });
+    });
+</script>
+<script>
+    const poInput = document.getElementById('po_number');
+    const poErrorMessage = document.getElementById('po_error_message');
+
+    poInput.addEventListener('input', function () {
+        const regex = /^PO-\d{6,}$/; // Pattern: Starts with 'PO-' followed by at least 6 digits
+        const value = poInput.value;
+
+        if (!regex.test(value)) {
+            poErrorMessage.textContent = "Please enter a valid PO number starting with 'PO-' followed by at least 6 digits (e.g., PO-123456).";
+            poInput.setCustomValidity("Invalid");
+        } else {
+            poErrorMessage.textContent = "";
+            poInput.setCustomValidity("");
+        }
     });
 </script>
 @endsection

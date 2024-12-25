@@ -59,7 +59,7 @@
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pending Netsuite GDN</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite Netsuite GDN Info</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite GDN Info</a>
       </li>
     </ul>      
   </div>

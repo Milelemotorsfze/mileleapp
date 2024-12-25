@@ -195,13 +195,17 @@ class SalesOrderController extends Controller
                 $so = New So();
                 $so->quotation_id = $quotationId;
                 $so->sales_person_id = $qoutation->created_by;
-                $so->so_number = $request->input('so_number');
+                $so_number = $request->input('so_number'); // Get the input value
+                $so->so_number = 'SO-' . $so_number;    // Concatenate "SO-00" with the input value
                 $so->so_date = $request->input('so_date');
                 $so->notes = $request->input('notes');
                 $so->total = $request->input('total_payment');
                 $so->receiving = $request->input('receiving_payment');
                 $so->paidinso = $request->input('payment_so');
                 $so->paidinperforma = $request->input('advance_payment_performa');
+                $so->created_by = auth()->id();
+                $so->created_at = Carbon::now();
+                $so->updated_at = Carbon::now();
                 $so->save();
                 $calls = Calls::find($qoutation->calls_id);
                 $calls->status = "Closed";
@@ -366,13 +370,16 @@ class SalesOrderController extends Controller
     $so_id = $request->input('so_id');
     $so = So::findOrFail($so_id);
     // Update the Sales Order fields
-    $so->so_number = $request->input('so_number');
+    $so_number = $request->input('so_number'); // Get the input value
+    $so->so_number = 'SO-' . $so_number; 
     $so->so_date = $request->input('so_date');
     $so->notes = $request->input('notes');
     $so->total = $request->input('total_payment');
     $so->receiving = $request->input('receiving_payment');
     $so->paidinso = $request->input('payment_so');
     $so->paidinperforma = $request->input('advance_payment_performa');
+    $so->updated_by = auth()->id(); // or $request->user()->id
+    $so->updated_at = Carbon::now();
     $so->save();
 
     // Delete existing Soitems records related to the Sales Order ID
