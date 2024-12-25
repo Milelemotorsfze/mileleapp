@@ -1214,7 +1214,8 @@ public function getBrandsAndModelLines(Request $request)
         $supplier_account_id = $request->input('vendors_id');
         $purchasing_order_id = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
-        $updateponum->po_number = $request->input('po_number');
+        $po_number = $request->input('po_number');
+        $updateponum->po_number = 'PO-' . $po_number;
         $updateponum->save();
         $supplier_exists = SupplierAccount::where('suppliers_id', $vendors_id)->exists();
         if (!$supplier_exists) {
@@ -3441,10 +3442,8 @@ if ($paymentOrderStatus->isNotEmpty()) {
         'pl_number',
         'po_number',
     ];
-
     // Store old values
     $oldValues = $purchasingOrder->only($fieldsToUpdate);
-
     // Update purchasing order details
     foreach ($fieldsToUpdate as $field) {
         if ($request->has($field)) {

@@ -813,7 +813,15 @@
                 <label for="netsuitpo" class="form-label font-size-13 text-center">Netsuit PO:</label>
             </div>
             <div class="col-md-8 p-3">
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" value="{{$purchasingOrder->po_number}}">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+    <div style="display: flex; align-items: center; width: 100%;">
+        <input type="text" id="po_number" name="po_number" class="form-control" 
+               style="flex-grow: 1; padding: 5px; border: 1px solid #ced4da; border-radius: 4px;" 
+               placeholder="Enter PO Number (e.g., PO-123456)" value="{{$purchasingOrder->po_number}}" required>
+    </div>
+    <small id="po_error_message" style="color: red; margin-top: 5px;"></small>
+</div>
+        <span id="po_error_message" style="color: red; font-size: 12px; margin-top: 5px; display: block;"></span>
             </div>
             @if($purchasingOrder->is_demand_planning_purchase_order == false)
                 <div class="col-md-4 p-3">
@@ -5305,6 +5313,23 @@ $.ajax({
             placeholder: 'Variant',
             maximumSelectionLength: 1 // Adjust the width dynamically or apply your custom width
         });
+    });
+</script>
+<script>
+    const poInput = document.getElementById('po_number');
+    const poErrorMessage = document.getElementById('po_error_message');
+
+    poInput.addEventListener('input', function () {
+        const regex = /^PO-\d{6,}$/; // Pattern: Starts with 'PO-' followed by at least 6 digits
+        const value = poInput.value;
+
+        if (!regex.test(value)) {
+            poErrorMessage.textContent = "Please enter a valid PO number starting with 'PO-' followed by at least 6 digits (e.g., PO-123456).";
+            poInput.setCustomValidity("Invalid");
+        } else {
+            poErrorMessage.textContent = "";
+            poInput.setCustomValidity("");
+        }
     });
 </script>
 @endsection
