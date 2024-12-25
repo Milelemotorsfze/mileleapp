@@ -4,39 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WOVehicles;
-use App\Models\WOVehicleClaims;
+use App\Models\WOBOEClaims;
+use App\Models\WOBOE;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-class WOVehicleClaimsController extends Controller
+class WOBOEClaimsController extends Controller
 {
-    public function getPendingClaims() {
-        $vehicles = WOVehicles::select('id', 'vin', 'work_order_id')
+    public function getPendingClaims() { 
+        $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder']) 
         ->where(function($query) {
             // Condition 1: No associated claim
             $query->whereDoesntHave('claim')
                   // Condition 2: Or the latest associated claim has a 'Cancelled' status
                   ->orWhereHas('claim', function($q) {
                       $q->where('status', 'Cancelled')
-                        ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+                        ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
                   });
         })
-        ->whereHas('woBoe')
         ->get();
-    
         // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
-        $datas = $vehicles->filter(function ($vehicle) {
-            return $vehicle->delivery_status !== 'Delivered' && $vehicle->workOrder->sales_support_data_confirmation === 'Confirmed'
-                && $vehicle->workOrder->finance_approval_status === 'Approved' && $vehicle->workOrder->coo_approval_status === 'Approved';  // Only keep vehicles with non-delivered status
-        });
-        (new UserActivityController)->createActivity('Open Claim Pending Listing');
+        $datas = $boes->filter(function ($boe) { 
+            return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
+                && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
+                && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved';  // Only keep vehicles with non-delivered status
+        });  
+        (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
         return view('work_order.claims.index', compact('datas'));
     }
     public function getSubmittedClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
             $q->where('status','Submitted')
-                ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+                ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Submitted Vehicles Listing');
         return view('work_order.claims.submitted', compact('datas'));
@@ -44,7 +44,7 @@ class WOVehicleClaimsController extends Controller
     public function getApprovedClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
             $q->where('status','Approved')
-            ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Approved Vehicles Listing');
         return view('work_order.claims.approved', compact('datas'));
@@ -52,7 +52,7 @@ class WOVehicleClaimsController extends Controller
     public function getCancelledClaims() {
         $datas = WOVehicles::whereHas('claim', function($q) {
             $q->where('status','Cancelled')
-            ->whereRaw('id = (SELECT id FROM w_o_vehicle_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
         (new UserActivityController)->createActivity('Open Claim Cancelled Vehicles Listing');
         return view('work_order.claims.cancelled', compact('datas'));
@@ -86,7 +86,7 @@ class WOVehicleClaimsController extends Controller
                         'updated_by' => $authId,
                     ];
                     $claimsData['created_by'] = $authId;
-                    $claims = WOVehicleClaims::create($claimsData);
+                    $claims = WOBOEClaims::create($claimsData);
                 }
             }
             (new UserActivityController)->createActivity('claims Info added');
@@ -130,7 +130,7 @@ class WOVehicleClaimsController extends Controller
                     ];
     
                     // Use `updateOrCreate` to update existing or insert new, with `created_by` only for new entries
-                    $claims = WOVehicleClaims::where('wo_vehicle_id', $woVehicleId)->first();
+                    $claims = WOBOEClaims::where('wo_vehicle_id', $woVehicleId)->first();
     
                     if ($claims) {
                         // Update existing record

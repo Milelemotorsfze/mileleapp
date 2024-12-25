@@ -22,6 +22,7 @@ use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
 use App\Models\User;
+use App\Models\So;
 use Spatie\Permission\Models\Role;
 use App\Models\AddonDetails;
 use App\Models\WOUserFilterInputs;
@@ -3116,6 +3117,14 @@ class WorkOrderController extends Controller
     {
         $soNumber = $request->input('so_number');  
         $workOrderId = $request->input('work_order_id'); // In case of edit 
+    
+        // Check if the so_number exists in the So model
+        $salesOrderExists = So::where('so_number', $soNumber)->exists();
+        if (!$salesOrderExists) {
+            return response()->json(['error' => 'This SO number does not exist in Sales Order'], 404);
+        }
+    
+        // Proceed with the rest of the logic
         if ($workOrderId) {
             $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
             if($workOrders->so_number == $soNumber) {

@@ -35,6 +35,8 @@ class WOBOE extends Model
                       });
             });
     }
-
-    
+    public function claim()
+    {
+        return $this->hasOne(WOBOEClaims::class,'wo_boe_id','id');
+    }  
 }

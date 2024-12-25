@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WOVehicles;
-use App\Models\VehiclePenalty;
+use App\Models\BOEPenalty;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-class VehiclePenaltyController extends Controller
+class BOEPenaltyController extends Controller
 {
     public function getClearedPenalties() {
         $datas = WOVehicles::whereHas('penalty')->get();
@@ -53,7 +53,7 @@ class VehiclePenaltyController extends Controller
                     ];
 
                     // Use `updateOrCreate` to update existing or insert new, with `created_by` only for new entries
-                    $penalty = VehiclePenalty::where('wo_vehicle_id', $woVehicleId)->first();
+                    $penalty = BOEPenalty::where('wo_vehicle_id', $woVehicleId)->first();
 
                     if ($penalty) {
                         // Update existing record
@@ -61,7 +61,7 @@ class VehiclePenaltyController extends Controller
                     } else {
                         // Insert new record, including `created_by`
                         $penaltyData['created_by'] = $authId;
-                        $penalty = VehiclePenalty::create($penaltyData);
+                        $penalty = BOEPenalty::create($penaltyData);
                     }
 
                     // Handle file upload if present
@@ -80,7 +80,7 @@ class VehiclePenaltyController extends Controller
             (new UserActivityController)->createActivity('Penalty Info added');
             DB::commit(); // Commit transaction
 
-            return redirect()->route('getVehiclePenaltyReport')->with('success', 'Penalty information saved successfully.');
+            return redirect()->route('getBOEPenaltyReport')->with('success', 'Penalty information saved successfully.');
         } catch (\Exception $e) {
             DB::rollBack(); // Rollback transaction in case of error
             Log::channel('workorder_error_report')->error('Error saving penalty information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
@@ -89,11 +89,11 @@ class VehiclePenaltyController extends Controller
                 'request' => $request->all(),
             ]);
 
-            return redirect()->route('getVehiclePenaltyReport')->withErrors('An error occurred while saving penalty information.');
+            return redirect()->route('getBOEPenaltyReport')->withErrors('An error occurred while saving penalty information.');
         }
     }
 
-    public function getVehiclePenaltyReport() {
+    public function getBOEPenaltyReport() {
         $today = Carbon::today();
     
         // Get all `vehicles` where the declaration date is 29 days ago or earlier

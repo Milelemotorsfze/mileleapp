@@ -173,10 +173,6 @@ class WOVehicles extends Model
     }    
     public function penalty()
     {
-        return $this->hasOne(VehiclePenalty::class,'wo_vehicle_id','id');
-    }  
-    public function claim()
-    {
-        return $this->hasOne(WOVehicleClaims::class,'wo_vehicle_id','id');
+        return $this->hasOne(BOEPenalty::class,'wo_vehicle_id','id');
     }  
 }

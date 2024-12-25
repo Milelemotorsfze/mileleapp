@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WOVehicleClaims extends Model
+class WOBOEClaims extends Model
 {
     use HasFactory;
-    protected $table = "w_o_vehicle_claims";
+    protected $table = "wo_boe_claims";
     protected $fillable = [
-        'wo_vehicle_id',
+        'wo_boe_id',
         'claim_date',
         'claim_reference_number',
         'status',

@@ -19,7 +19,7 @@
 @if ($canViewClaimInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Claim Pending Vehicles Info</h4>
+        <h4 class="card-title">Claim Pending BOE Info</h4>
     </div>
 
     <div class="card-body">
@@ -43,7 +43,9 @@
                             <th>Action</th>
                             <th>SO Number</th>
                             <th>WO Number</th>
-                            <th>VIN Number</th>
+                            <th>BOE</th>
+                            <th>Declaration Number</th>
+                            <th>Declaration Date</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
@@ -63,6 +65,8 @@
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
+                            <th></th>
+                            <th></th>
                         </tr>
                         @endif
                     </thead>
@@ -154,12 +158,14 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
+                                    <td>{{ $data->declaration_number ?? '' }}</td>
+                                    <td>@if($data->declaration_date != ''){{\Carbon\Carbon::parse($data->declaration_date)->format('d M Y') ?? ''}}@endif</td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="4" class="text-center">No data history available.</td>
+                                <td colspan="6" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
