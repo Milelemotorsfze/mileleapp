@@ -3118,12 +3118,6 @@ class WorkOrderController extends Controller
         $soNumber = $request->input('so_number');  
         $workOrderId = $request->input('work_order_id'); // In case of edit 
     
-        // Check if the so_number exists in the So model
-        $salesOrderExists = So::where('so_number', $soNumber)->exists();
-        if (!$salesOrderExists) {
-            return response()->json(['error' => 'This SO number does not exist in Sales Order'], 404);
-        }
-    
         // Proceed with the rest of the logic
         if ($workOrderId) {
             $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
@@ -3168,4 +3162,11 @@ class WorkOrderController extends Controller
             ]);
         }
     }    
+    public function isExistInSalesOrder(Request $request)
+    {
+        $soNumber = $request->input('so_number');
+        // Check if the so_number exists in the So model
+        $exists = So::where('so_number', $soNumber)->exists();
+        return response()->json(['valid' => $exists]);
+    }  
 }

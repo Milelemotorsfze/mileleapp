@@ -282,7 +282,7 @@
                                         </div>
                                         @endif
 
-                                        @php
+                                        <!-- @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penalty-report']);
                                         @endphp
                                         @if ($hasPermission)
@@ -315,7 +315,7 @@
                                                 <a href="{{route('getCancelledClaims')}}" class="dropdown-item" data-key="t-login">Cancelled</a>
                                             </div>
                                         </div>
-                                        @endif
+                                        @endif -->
                                     </div>
                                 </li>
                                 @endif

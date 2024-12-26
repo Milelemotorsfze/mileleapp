@@ -451,6 +451,7 @@ Route::get('/d', function () {
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
+    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
