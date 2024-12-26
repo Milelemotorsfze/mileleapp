@@ -13,4 +13,9 @@ class PfiItemPurchaseOrder extends Model
     {
         return $this->belongsTo(PFI::class,'pfi_id');
     }
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchasingOrder::class,'purchase_order_id','id');
+    }
+    
 }

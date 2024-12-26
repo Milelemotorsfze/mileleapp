@@ -92,6 +92,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                             <input type="date" class="small-width" onchange="reload()" id="pfi-date-all" placeholder="PFI Date">
                         </th>
                         <th>PFI Number <input type="text" onkeyup="reload()" class="small-width" id="pfi-number-all" placeholder="PFI Number"></th>
+                        <th>PO Number <input type="text" onkeyup="reload()" class="small-width" id="PO-number-all" placeholder="PO Number"></th>
+                        <th>PO Payment Status 
+                            <select class="small-width" id="PO-payment-status-all" multiple onchange="reload()" >
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_UNPAID }}">Unpaid</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PARTIALY_PAID }}">Partially Paid</option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PAID }}">Paid</option>  
+                            </select>
+                        </th>
+                        <th> Payment Initiated Status 
+                            <select class="small-width" id="PO-payment-initiated-status-all" multiple onchange="reload()" >
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Pending</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Initiated</option>
+                            </select>
+                        </th>
                         <th>
                             Customer Name
                             <select class="medium-width customer-id" id="customer-id-all" multiple onchange="reload()">
@@ -186,6 +202,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                             <input type="date" class="small-width" onchange="reload()" id="pfi-date-toyota" placeholder="PFI Date">
                         </th>
                         <th>PFI Number <input type="text" onkeyup="reload()" class="small-width" id="pfi-number-toyota" placeholder="PFI Number"></th>
+                        <th>PO Number <input type="text" onkeyup="reload()" class="small-width" id="PO-number-toyota" placeholder="PO Number"></th>
+                        <th>PO Payment Status 
+                            <select class="small-width" id="PO-payment-status-toyota" onchange="reload()" multiple>
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Unpaid</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Partially Paid</option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PAID }}">Paid</option>  
+                            </select>
+                        </th>
+                        <th> Payment Initiated Status 
+                            <select class="small-width" id="PO-payment-initiated-status-toyota" multiple onchange="reload()" >
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Pending</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Initiated</option>
+                               
+                            </select>
+                        </th>
                         <th>
                             Customer Name
                             <select class="medium-width customer-id" id="customer-id-toyota" multiple onchange="reload()">
@@ -279,6 +312,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                             <input type="date" class="small-width" onchange="reload()" id="pfi-date-other-brand" placeholder="PFI Date">
                         </th>
                         <th>PFI Number <input type="text" onkeyup="reload()" class="small-width" id="pfi-number-other-brand" placeholder="PFI Number"></th>
+                        <th>PO Number <input type="text" onkeyup="reload()" class="small-width" id="PO-number-other-brand" placeholder="PO Number"></th>
+                        <th>PO Payment Status 
+                            <select class="small-width" id="PO-payment-status-other-brand" onchange="reload()" multiple>
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Unpaid</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Partially Paid</option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PAID }}">Paid</option>  
+                            </select>
+                        </th>
+                        <th> Payment Initiated Status 
+                            <select class="small-width" id="PO-payment-initiated-status-other-brand" multiple onchange="reload()" >
+                                <option></option>
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Pending</option>  
+                                <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Initiated</option>
+                            </select>
+                        </th>
                         <th>
                             Customer Name
                             <select class="medium-width customer-id" id="customer-id-other-brand" multiple onchange="reload()">
@@ -353,7 +402,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                             <input type="text" onkeyup="reload()" class="small-width" id="comment-other-brand" placeholder="comment">
                         </th>
                     </tr>
-
                 </thead>
                 <tbody>
                 </tbody>
@@ -423,6 +471,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
             maximumSelectionLength: 1,
             dropdownParent: $('#model-line-id-' + tabType).closest('.tab-pane')
         });
+        $('#PO-payment-status-' + tabType).select2({
+            placeholder: "Payment Status",
+            maximumSelectionLength: 1,
+            dropdownParent: $('#PO-payment-status-' + tabType).closest('.tab-pane')
+        });
+        $('#PO-payment-initiated-status-' + tabType).select2({
+            placeholder: "Payment Initiated Status",
+            maximumSelectionLength: 1,
+            dropdownParent: $('#PO-payment-initiated-status-' + tabType).closest('.tab-pane')
+        });
     }
 
     $(document).ready(function() {
@@ -434,11 +492,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                 url: "{{ route('pfi-item.list',['tab' => 'all']) }}",
                 data: function(d) {
                     let activeTabType = $('.tab-pane.active').attr('type');
-                d.pfi_item_code = $('#pfi-item-code-'+activeTabType).val();
+                    d.pfi_item_code = $('#pfi-item-code-'+activeTabType).val();
                     d.code = $('#code-'+activeTabType).val(); // Add custom parameters to send to the server
-                    // d.status = $('#loi-status').val();
                     d.pfi_date = $('#pfi-date-'+activeTabType).val();
                     d.pfi_number = $('#pfi-number-'+activeTabType).val();
+                    d.po_number = $('#PO-number-'+activeTabType).val();
+                    d.payment_status = $('#PO-payment-status-'+activeTabType).val();
+                    d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-'+activeTabType).val();
                     d.client_id = $('#customer-id-'+activeTabType).val();
                     d.country_id = $('#country-id-'+activeTabType).val();
@@ -481,6 +541,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     'data': 'pfi.pfi_reference_number',
                     'name': 'pfi.pfi_reference_number',
                     orderable: false
+                },
+                {
+                    'data': 'po_number',
+                    'name': 'po_number',
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_status',
+                    'name': 'payment_status',
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_initiated_status',
+                    'name': 'payment_initiated_status',
+                    orderable: false,
                 },
                 {
                     'data': 'pfi.customer.name',
@@ -567,6 +642,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     // d.status = $('#loi-status').val();
                     d.pfi_date = $('#pfi-date-'+activeTabType).val();
                     d.pfi_number = $('#pfi-number-'+activeTabType).val();
+                    d.po_number = $('#PO-number-'+activeTabType).val();
+                    d.payment_status = $('#PO-payment-status-'+activeTabType).val();
+                    d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-'+activeTabType).val();
                     d.client_id = $('#customer-id-'+activeTabType).val();
                     d.country_id = $('#country-id-'+activeTabType).val();
@@ -609,6 +687,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     'data': 'pfi.pfi_reference_number',
                     'name': 'pfi.pfi_reference_number',
                     orderable: false
+                },
+                {
+                    'data': 'po_number',
+                    'name': 'po_number',
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_status',
+                    'name': 'payment_status',
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_initiated_status',
+                    'name': 'payment_initiated_status',
+                    orderable: false,
                 },
                 {
                     'data': 'pfi.customer.name',
@@ -687,13 +780,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
             serverSide: true,
             searching: false,
             ajax: {
-                url: "{{ route('pfi-item.list', ['tab' => 'OTHER-BRANDS']) }}",
+                url: "{{ route('pfi-item.list', ['tab' => 'OTHER-BRAND']) }}",
                 data: function(d) {
                     let activeTabType = $('.tab-pane.active').attr('type');
                     d.pfi_item_code = $('#pfi-item-code-' + activeTabType).val();
                     d.code = $('#code-' + activeTabType).val();
                     d.pfi_date = $('#pfi-date-' + activeTabType).val();
                     d.pfi_number = $('#pfi-number-' + activeTabType).val();
+                    d.po_number = $('#PO-number-'+activeTabType).val();
+                    d.payment_status = $('#PO-payment-status-'+activeTabType).val();
+                    d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-' + activeTabType).val();
                     d.client_id = $('#customer-id-' + activeTabType).val();
                     d.country_id = $('#country-id-' + activeTabType).val();
@@ -731,6 +827,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     'data': 'pfi.pfi_reference_number',
                     'name': 'pfi.pfi_reference_number',
                     orderable: false
+                },
+                {
+                    'data': 'po_number',
+                    'name': 'po_number',
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_status',
+                    'name': 'payment_status',
+                   
+                    orderable: false,
+                },
+                {
+                    'data': 'payment_initiated_status',
+                    'name': 'payment_initiated_status',
+                    orderable: false,
                 },
                 {
                     'data': 'pfi.customer.name',
@@ -826,11 +938,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
 
     function exportData() {
         let activeTabType = $('.tab-pane.active').attr('type');
-
-        let code = $('#code-' + activeTabType).val();
+        // let tab = activeTabType.toUpperCase();
+        // console.log(tab);
+        let code = '';
+        if(activeTabType == 'toyota') {
+            let code = $('#code-' + activeTabType).val();
+            
+        }
         let pfi_date = $('#pfi-date-' + activeTabType).val();
         let pfi_item_code = $('#pfi-item-code-' + activeTabType).val();
         let pfi_number = $('#pfi-number-' + activeTabType).val();
+        let po_number = $('#PO-number-'+activeTabType).val();
+        let payment_status = $('#PO-payment-status-'+activeTabType).val();
+        let payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
         let supplier_id = $('#supplier-id-' + activeTabType).val();
         let client_id = $('#customer-id-' + activeTabType).val();
         let country_id = $('#country-id-' + activeTabType).val();
@@ -847,9 +967,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
         let comment = $('#comment-' + activeTabType).val();
 
         var exportUrl = "{{ route('pfi-item.list')}}" + "?code=" + code + "&pfi_date=" + pfi_date + "&pfi_item_code=" + pfi_item_code +
-            "&pfi_number=" + pfi_number + "&supplier_id=" + supplier_id + "&country_id=" + country_id + "&currency=" + currency + "&steering=" + steering +
-            "&brand=" + brand + "&client_id=" + client_id + "&model_line=" + model_line + "&model=" + model + "&sfx=" + sfx + "&unit_price=" + unit_price +
-            "&pfi_amount=" + pfi_amount + "&total_price=" + total_price + "&comment=" + comment + "&pfi_quantity=" + pfi_quantity + "&export=EXCEL";
+            "&pfi_number=" + pfi_number + "&po_number=" + po_number + "&payment_status=" + payment_status +
+            "&payment_initiated_status=" + payment_initiated_status + "&supplier_id=" + supplier_id + "&country_id=" + country_id +
+            "&currency=" + currency + "&steering=" + steering +"&brand=" + brand + "&client_id=" + client_id + "&model_line=" + model_line + 
+            "&model=" + model + "&sfx=" + sfx + "&unit_price=" + unit_price +"&pfi_amount=" + pfi_amount + 
+            "&total_price=" + total_price + "&comment=" + comment + "&pfi_quantity=" + pfi_quantity + "&export=EXCEL";
 
 
         window.location.href = exportUrl;

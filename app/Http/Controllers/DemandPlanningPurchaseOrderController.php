@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\MasterShippingPorts;
 use App\Models\PurchasingOrder;
 
+
 class DemandPlanningPurchaseOrderController extends Controller
 {
     /**
@@ -34,19 +35,17 @@ class DemandPlanningPurchaseOrderController extends Controller
     public function create(Request $request)
     {
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
-
-        $pfi = Pfi::find($request->id);
         
+        $pfi = Pfi::find($request->id);
         $pfiItemLatest = PfiItem::where('pfi_id', $request->id)
                             ->where('is_parent', false)
                             ->first();
-        $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
-        // ask how to find dealer becz loi is multiple
-        $brand = $pfiItemLatest->masterModel->modelLine->brand->brand_name ?? '';
         $isToyotaPO = 0;
-        if(strcasecmp($brand, 'TOYOTA') == 0) {
+        if($pfiItemLatest) {
+            // only toyota PFI have child , so if child exist it will be toyota PO
             $isToyotaPO = 1;
         }
+        // $dealer =  $pfiItemLatest->letterOfIndentItem->LOI->dealers ?? '';
         $pfiItems = PfiItem::where('pfi_id', $request->id)
                                 ->where('is_parent', true)
                                 ->get();

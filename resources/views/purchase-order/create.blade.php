@@ -207,11 +207,11 @@
                             <div class="col-lg-1 col-md-6">
                                 <label  class="form-label">QTY</label>
                             </div>
-                            @if($isToyotaPO)
+                            <!-- @if($isToyotaPO)
                                 <div class="col-lg-1 col-md-6">
                                     <label  class="form-label">Inventory QTY</label>
                                 </div>
-                            @endif
+                            @endif -->
                         </div>
                         @foreach($pfiItems as $key => $pfiItem)
                                 <div class="row">
@@ -255,13 +255,13 @@
                                         data-id="{{ $pfiItem->id }}"  class="form-control qty-{{$pfiItem->id}}" value="{{ $pfiItem->quantity }}" placeholder="QTY" >
                                         <span class="QuantityError-{{$key}} text-danger"></span>
                                     </div>
-                                    @if($isToyotaPO)
+                                    <!-- @if($isToyotaPO)
                                         <div class="col-lg-1 col-md-6 mt-md-2">
                                             <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiItem->inventoryQuantity}}"
                                             data-id="{{ $pfiItem->id }}"  class="form-control inventory-qty-{{$pfiItem->id}}" value="{{ $pfiItem->inventoryQuantity }}" placeholder="QTY">
                                             <span class="InventoryQuantityError-{{$key}} text-danger"></span>
                                         </div>
-                                    @endif
+                                    @endif -->
                                 </div>
                         @endforeach
                         <div class="col-12 justify-content-end">
@@ -580,14 +580,12 @@
             }
 
             if(formValid == true) {
-                if(isToyotaPO == 1) {
-
-                }
+                
                 if (variantIds.length === 0) {
                     alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
                     formValid = false;
                 }else{
-                    if(isToyotaPO == 1 && totalPOqty !== variantIds.length) {
+                    if(isToyotaPO == 1 && totalPOqty != variantIds.length) {
                         alertify.alert('This is PO For Toyota, So Please utilize all quantity ('+totalPOqty+')').set({title:"Alert !"});
                         formValid = false;
                     }else{

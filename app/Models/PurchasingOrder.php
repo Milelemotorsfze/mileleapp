@@ -9,6 +9,13 @@ class PurchasingOrder extends Model
 {
     use HasFactory;
     protected $table = 'purchasing_order';
+
+    public const PAYMENT_STATUS_PENDING = 'Pending';
+    public const PAYMENT_STATUS_INITIATED = 'Initiated';
+    public const PAYMENT_STATUS_PARTIALY_PAID = 'Partially Paid';
+    public const PAYMENT_STATUS_PAID = 'Paid';
+    public const PAYMENT_STATUS_UNPAID = 'UnPaid';
+
     protected $fillable = [
         'po_number',
         'po_date',
@@ -29,6 +36,7 @@ class PurchasingOrder extends Model
         'pl_number',
         'pl_file_path',
     ];
+
     protected $appends = [
         'is_demand_planning_purchase_order',
 
@@ -45,6 +53,9 @@ class PurchasingOrder extends Model
     public function LOIPurchasingOrder()
     {
         return $this->hasOne(LOIItemPurchaseOrder::class, 'purchase_order_id');
+    }
+    public function PfiItemPurchaseOrders() {
+        return $this->hasMany(PfiItemPurchaseOrder::class,'purchase_order_id');
     }
     public function PFIPurchasingOrder()
     {
@@ -75,4 +86,5 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(PurchasedOrderPaidAmounts::class, 'purchasing_order_id');
     }
+  
 }
