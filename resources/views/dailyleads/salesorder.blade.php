@@ -330,10 +330,10 @@ table.dataTable thead th select {
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-                <th>Customer Name</th>
-                <th>Sales Person</th>
+            <th>SO Number</th>
                   <th>Sales Date</th>
-                  <th>SO Number</th>
+                  <th>Sales Person</th>
+                  <th>Customer Name</th>
                 <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
@@ -370,8 +370,7 @@ table.dataTable thead th select {
         serverSide: true,
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
-            { data: 'customername', name: 'calls.name' },
-            { data: 'name', name: 'users.name' },
+            { data: 'so_number', name: 'so.so_number' },
             {
                 data: 'so_date',
                 name: 'so.so_date',
@@ -386,7 +385,8 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'so_number', name: 'so.so_number' },
+            { data: 'name', name: 'users.name' },
+            { data: 'customername', name: 'calls.name' },
             { data: 'phone', name: 'calls.phone' },
             { data: 'email', name: 'calls.email' },
             {
@@ -422,9 +422,12 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
-                }
+                    if (row.quotation_id !== null) { // Check if quotation_id is not null
+            const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+            return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+        }
+        return ''; // Return empty string to hide the button
+    }
             },
             {
                 data: 'calls_id',
@@ -432,7 +435,10 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
+                    if (row.quotation_id !== null) { // Check if quotation_id is not null
                     return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
+                    }
+                    return '';
                 }
             }
         ],
@@ -462,7 +468,7 @@ table.dataTable thead th select {
                     if (index === 10 || index === 11) {
     return; // Skip adding a filter for these columns
 }
-                    if (index === 2 || index === 6) { // Assuming date columns are 3 and 8
+                    if (index === 1 || index === 6) { // Assuming date columns are 3 and 8
                         if (d) {
                             var dateObj = new Date(d);
                             var formattedDate = dateObj.toLocaleDateString('en-GB', {

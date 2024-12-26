@@ -59,11 +59,12 @@ class SalesOrderController extends Controller
                     'quotations.file_path',
                     'users.name',
                     'so.so_number',
+                    'so.quotation_id',
                     'so.so_date',
                     'quotations.calls_id',
                 ])
                 ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
-                ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
                 ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
                 ->groupby('so.id')
                 ->orderBy('so.so_date', 'desc');
