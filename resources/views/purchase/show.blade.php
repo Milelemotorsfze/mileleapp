@@ -153,7 +153,6 @@
     }
 </style>
 @section('content')
-
 <!-- Modal Structure -->
 <div class="modal fade" id="addDNModalUnique" data-purchase-order-id="{{ $purchasingOrder->id }}" tabindex="-1" aria-labelledby="addDNModalUniqueLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
