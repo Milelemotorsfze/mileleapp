@@ -1233,6 +1233,10 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function show($id)
     {
+        $user = Auth::user();
+    if (!$user->hasPermissionForSelectedRole('view-purchased-order-single-page')) {
+        return redirect()->route('not_access_page');
+    }
         $countries = Country::get();
         $ports = MasterShippingPorts::with('country')->get();
         $useractivities =  New UserActivities();
