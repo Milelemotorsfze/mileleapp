@@ -14,7 +14,18 @@ class Handler extends ExceptionHandler
     protected $levels = [
         //
     ];
+    public function render($request, Throwable $exception)
+    {
+        // Check for 500 errors or other server errors
+        if ($exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException && $exception->getStatusCode() === 500) {
+            return response()->view('errors.error.500', [], 500);
+        }
 
+        // You can add additional checks for other errors here
+
+        // Fallback to default error rendering
+        return parent::render($request, $exception);
+    }
     /**
      * A list of the exception types that are not reported.
      *
