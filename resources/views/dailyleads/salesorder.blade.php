@@ -422,6 +422,7 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
+                    console.log(row);
                     if (row.quotation_id !== null) { // Check if quotation_id is not null
             const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
             return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
