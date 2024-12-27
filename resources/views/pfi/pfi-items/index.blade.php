@@ -108,6 +108,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                                 <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Initiated</option>
                             </select>
                         </th>
+                        <th>Payment Released Date
+                            <input type="date" class="small-width" onchange="reload()" id="released-date-all" placeholder="Released Date">
+                        </th>
                         <th>
                             Customer Name
                             <select class="medium-width customer-id" id="customer-id-all" multiple onchange="reload()">
@@ -219,6 +222,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                                
                             </select>
                         </th>
+                        <th>Payment Released Date
+                            <input type="date" class="small-width" onchange="reload()" id="released-date-toyota" placeholder="Released Date">
+                        </th>
                         <th>
                             Customer Name
                             <select class="medium-width customer-id" id="customer-id-toyota" multiple onchange="reload()">
@@ -327,6 +333,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                                 <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_PENDING }}">Pending</option>  
                                 <option value="{{ \App\Models\PurchasingOrder::PAYMENT_STATUS_INITIATED }}">Initiated</option>
                             </select>
+                        </th>
+                        <th>Payment Released Date
+                            <input type="date" class="small-width" onchange="reload()" id="released-date-other-brand" placeholder="Released Date">
                         </th>
                         <th>
                             Customer Name
@@ -493,12 +502,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                 data: function(d) {
                     let activeTabType = $('.tab-pane.active').attr('type');
                     d.pfi_item_code = $('#pfi-item-code-'+activeTabType).val();
-                    d.code = $('#code-'+activeTabType).val(); // Add custom parameters to send to the server
+                    d.code = $('#code-'+activeTabType).val(); 
                     d.pfi_date = $('#pfi-date-'+activeTabType).val();
                     d.pfi_number = $('#pfi-number-'+activeTabType).val();
                     d.po_number = $('#PO-number-'+activeTabType).val();
                     d.payment_status = $('#PO-payment-status-'+activeTabType).val();
                     d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
+                    d.released_date = $('#released-date-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-'+activeTabType).val();
                     d.client_id = $('#customer-id-'+activeTabType).val();
                     d.country_id = $('#country-id-'+activeTabType).val();
@@ -555,6 +565,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                 {
                     'data': 'payment_initiated_status',
                     'name': 'payment_initiated_status',
+                    orderable: false,
+                },
+                {
+                    'data': 'released_date',
+                    'name': 'released_date',
                     orderable: false,
                 },
                 {
@@ -645,6 +660,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     d.po_number = $('#PO-number-'+activeTabType).val();
                     d.payment_status = $('#PO-payment-status-'+activeTabType).val();
                     d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
+                    d.released_date = $('#released-date-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-'+activeTabType).val();
                     d.client_id = $('#customer-id-'+activeTabType).val();
                     d.country_id = $('#country-id-'+activeTabType).val();
@@ -701,6 +717,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                 {
                     'data': 'payment_initiated_status',
                     'name': 'payment_initiated_status',
+                    orderable: false,
+                },
+                {
+                    'data': 'released_date',
+                    'name': 'released_date',
                     orderable: false,
                 },
                 {
@@ -790,6 +811,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                     d.po_number = $('#PO-number-'+activeTabType).val();
                     d.payment_status = $('#PO-payment-status-'+activeTabType).val();
                     d.payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
+                    d.released_date = $('#released-date-'+activeTabType).val();
                     d.supplier_id = $('#supplier-id-' + activeTabType).val();
                     d.client_id = $('#customer-id-' + activeTabType).val();
                     d.country_id = $('#country-id-' + activeTabType).val();
@@ -842,6 +864,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                 {
                     'data': 'payment_initiated_status',
                     'name': 'payment_initiated_status',
+                    orderable: false,
+                },
+                {
+                    'data': 'released_date',
+                    'name': 'released_date',
                     orderable: false,
                 },
                 {
@@ -938,8 +965,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
 
     function exportData() {
         let activeTabType = $('.tab-pane.active').attr('type');
-        // let tab = activeTabType.toUpperCase();
-        // console.log(tab);
+        let tab = activeTabType.toUpperCase();
         let code = '';
         if(activeTabType == 'toyota') {
             let code = $('#code-' + activeTabType).val();
@@ -951,6 +977,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
         let po_number = $('#PO-number-'+activeTabType).val();
         let payment_status = $('#PO-payment-status-'+activeTabType).val();
         let payment_initiated_status = $('#PO-payment-initiated-status-'+activeTabType).val();
+        let released_date = $('#released-date-'+activeTabType).val();
         let supplier_id = $('#supplier-id-' + activeTabType).val();
         let client_id = $('#customer-id-' + activeTabType).val();
         let country_id = $('#country-id-' + activeTabType).val();
@@ -967,10 +994,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
         let comment = $('#comment-' + activeTabType).val();
 
         var exportUrl = "{{ route('pfi-item.list')}}" + "?code=" + code + "&pfi_date=" + pfi_date + "&pfi_item_code=" + pfi_item_code +
-            "&pfi_number=" + pfi_number + "&po_number=" + po_number + "&payment_status=" + payment_status +
+            "&pfi_number=" + pfi_number + "&po_number=" + po_number + "&payment_status=" + payment_status + "&released_date=" + released_date +
             "&payment_initiated_status=" + payment_initiated_status + "&supplier_id=" + supplier_id + "&country_id=" + country_id +
             "&currency=" + currency + "&steering=" + steering +"&brand=" + brand + "&client_id=" + client_id + "&model_line=" + model_line + 
-            "&model=" + model + "&sfx=" + sfx + "&unit_price=" + unit_price +"&pfi_amount=" + pfi_amount + 
+            "&model=" + model + "&sfx=" + sfx + "&unit_price=" + unit_price +"&pfi_amount=" + pfi_amount + "&tab=" + tab +
             "&total_price=" + total_price + "&comment=" + comment + "&pfi_quantity=" + pfi_quantity + "&export=EXCEL";
 
 

@@ -10,6 +10,7 @@ use App\Models\PFI;
 use App\Models\PfiItem;
 use App\Models\PfiItemPurchaseOrder;
 use App\Models\PurchasingOrder;
+use App\Models\SupplierAccountTransaction;
 use App\Models\Supplier;
 use App\Models\Clients;
 use App\Models\Country;
@@ -194,6 +195,11 @@ class PFIController extends Controller
                         $query->whereDate('pfi_date', $request->pfi_date);
                     });
             }
+            if(!empty($request->released_date)) {
+                $data->whereHas('PfiItemPurchaseOrders.purchaseOrder.SupplierAccountTransactions',function($query) use($request) {
+                        $query->whereDate('payment_released_date', $request->released_date);
+                    });
+            }
             if(!empty($request->pfi_number)) {
                 $data->whereHas('pfi',function($query) use($request) {
                         $query->where('pfi_reference_number', 'like', "%{$request->pfi_number}%");
@@ -283,9 +289,7 @@ class PFIController extends Controller
             if(!empty($request->pfi_item_code)) {
                 $data->where("code", 'like', "%{$request->pfi_item_code}%");
             }
-    //   return $data->get();
-
-            // info($data->get());
+   
             if($request->tab == 'TOYOTA'){
                 $data = $data->whereHas('masterModel.modelLine.brand',function($query) use($request) {
                     $query->where('brand_name', 'like', "TOYOTA");
@@ -314,7 +318,37 @@ class PFIController extends Controller
                         })
                         ->pluck('po_number')->toArray();
                     
-                        $pfiPoNumbers = implode(", ", $PONumbers);  
+                        $pfiPoNumbers = implode(", ", $PONumbers); 
+                        
+                        $PfiItemPos = PfiItemPurchaseOrder::where('pfi_id', $pfiId)->where('pfi_item_id', $parentPfiItemId)
+                                            ->pluck('purchase_order_id')->toArray();
+                        $PO_with_payment_status = [];
+                        $PO_with_payment_initiated_status = [];
+                        $PO_with_latest_released_date = [];
+                        foreach($PfiItemPos as $PfiItemPo) {
+                            $purchaseOrder = PurchasingOrder::find($PfiItemPo);
+                            // payment status
+                            $paymentStatus = $purchaseOrder->payment_status ?  $purchaseOrder->payment_status : 'Not Available';
+                            $PO_with_payment_status[] = $purchaseOrder->po_number ." - ". $paymentStatus;
+
+                            // payment initiated status
+                            $paymentStatus = $purchaseOrder->payment_initiated_status ?  $purchaseOrder->payment_initiated_status : 'Not Available';
+                            $PO_with_payment_initiated_status[] = $purchaseOrder->po_number ." - ". $paymentStatus;
+                                // released date
+                            $latestSupplierAccount = SupplierAccountTransaction::Select('purchasing_order_id','payment_released_date','transaction_type')
+                                                    ->where('purchasing_order_id', $PfiItemPo)
+                                                    ->whereNot('Transaction_type','Rejected')
+                                                    ->latest('payment_released_date')
+                                                    ->first();
+                            if($latestSupplierAccount && $latestSupplierAccount->payment_released_date) {
+                                $PO_with_latest_released_date[] = $purchaseOrder->po_number ." - ".
+                                Carbon::parse($latestSupplierAccount->payment_released_date)->format('d-M-Y') ?? '';
+                            }
+                        }
+                        $payment_status = implode(", ", $PO_with_payment_status);
+                        $payment_initiated_status = implode(", ", $PO_with_payment_initiated_status);
+                        $released_date = implode(", ", $PO_with_latest_released_date);
+
                     return [
                         'PFI ID' => $data->pfi->id ?? '',
                         'PFI Item Code' => $data->code ?? '',
@@ -322,6 +356,9 @@ class PFIController extends Controller
                         'PFI Date' => Carbon::parse($data->pfi->pfi_date)->format('d-m-Y'),
                         'PFI Number' => $data->pfi->pfi_reference_number,
                         'PO Number' => $pfiPoNumbers ?? '',
+                        'Payment Status' => $payment_status ?? '',
+                        'Payment Initiated Status' => $payment_initiated_status ?? '',
+                        'Payment Released Date' => $released_date ?? '',
                         'Customer Name' => $data->pfi->customer->name ?? '',
                         'Country' => $data->pfi->country->name ?? '',
                         'Vendor' => $data->pfi->supplier->supplier ?? '',
@@ -403,7 +440,28 @@ class PFIController extends Controller
                         }
                         return implode(", ", $PO_with_payment_status);  
                     })
-                   
+                    ->addColumn('released_date', function($query) {
+                        $pfiId = $query->pfi->id;
+                        $parentPfiItemId = $query->id;
+                        $PfiItemPos = PfiItemPurchaseOrder::where('pfi_id', $pfiId)->where('pfi_item_id', $parentPfiItemId)
+                                                ->pluck('purchase_order_id')->toArray();
+                        $PO_with_latest_released_date = [];
+                        foreach($PfiItemPos as $PfiItemPo) {
+                            $purchaseOrder = PurchasingOrder::find($PfiItemPo);
+                            $latestSupplierAccount = SupplierAccountTransaction::Select('purchasing_order_id','payment_released_date','transaction_type')
+                            ->where('purchasing_order_id', $PfiItemPo)
+                            ->whereNot('Transaction_type','Rejected')
+                            ->latest('payment_released_date')
+                            ->first();
+                            if($latestSupplierAccount && $latestSupplierAccount->payment_released_date) {
+                                $PO_with_latest_released_date[] = $purchaseOrder->po_number ." - ".
+                                Carbon::parse($latestSupplierAccount->payment_released_date)->format('d-M-Y') ?? '';
+
+                            }
+                        }
+                        return implode(", ", $PO_with_latest_released_date);  
+                        
+                    })
                     ->editColumn('total_price', function($query) {
                         return number_format($query->total_price);
                     })

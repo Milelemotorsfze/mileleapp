@@ -86,5 +86,9 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(PurchasedOrderPaidAmounts::class, 'purchasing_order_id');
     }
+    public function SupplierAccountTransactions()
+    {
+        return $this->hasMany(SupplierAccountTransaction::class, 'purchasing_order_id');
+    }
   
 }
