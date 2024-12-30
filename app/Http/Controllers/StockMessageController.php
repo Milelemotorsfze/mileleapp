@@ -115,6 +115,12 @@ class StockMessageController extends Controller
             ->select('int_colour', 'ex_colour', DB::raw('SUM(CASE WHEN so_id IS NULL THEN 1 ELSE 0 END) as free_stock'), DB::raw('COUNT(*) as total_stock'))
             ->where('varaints_id', $variantId)
             ->whereNull('gdn_id')
+            ->whereNotNull('vin')
+            ->where('vehicles.status', 'Approved')
+            ->where(function ($query) {
+                $query->whereNull('vehicles.reservation_end_date')
+                      ->orWhere('vehicles.reservation_end_date', '<', now());
+            })
             ->groupBy('int_colour', 'ex_colour')
             ->get();
 
@@ -144,6 +150,12 @@ class StockMessageController extends Controller
             ->select('int_colour', 'ex_colour', DB::raw('SUM(CASE WHEN so_id IS NULL THEN 1 ELSE 0 END) as free_stock'), DB::raw('COUNT(*) as total_stock'))
             ->where('varaints_id', $variantId)
             ->whereNull('gdn_id')
+            ->whereNotNull('vin')
+            ->where('vehicles.status', 'Approved')
+            ->where(function ($query) {
+                $query->whereNull('vehicles.reservation_end_date')
+                      ->orWhere('vehicles.reservation_end_date', '<', now());
+            })
             ->groupBy('int_colour', 'ex_colour')
             ->get();
 

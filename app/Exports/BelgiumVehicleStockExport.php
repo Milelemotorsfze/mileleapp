@@ -23,6 +23,7 @@ class BelgiumVehicleStockExport implements FromCollection, WithHeadings
             ->where('brands.brand_name', 'Toyota')
             ->where('varaints.is_dp_variant', 'Yes')
             ->where('vehicles.latest_location', '=', 38)
+            ->whereNotIn('vehicles.latest_location', ['102', '153', '147'])
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select(
                 'master_models.model as Model',

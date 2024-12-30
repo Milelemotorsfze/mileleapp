@@ -140,7 +140,9 @@
                     <th>Transmission</th>
                     <th>Fuel Type</th>
                     <th>Steering</th>
-                    <th>Upholstery</th>                    
+                    <th>Upholstery</th>
+                    <th>Created By</th>
+                    <th>Created At</th>                    
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
@@ -175,6 +177,8 @@
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->fuel_type ?? 'null' )) }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->steering ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->upholestry ?? 'null' )) }}</td>
+                        <td class="nowrap-td">{{ $variant->users?->name ?? 'null' }}</td>
+                        <td class="nowrap-td">{{ $variant->created_at ? $variant->created_at->format('d-m-Y H:i:s') : 'null' }}</td>
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
@@ -242,7 +246,7 @@ $(document).ready(function () {
       var column = this;
       var columnId = column.index();
       var columnName = $(column.header()).attr('id');
-      if (d === 12 || d === 13) {
+      if (d === 14 || d === 15) {
         return;
       }
       var selectWrapper = $('<div class="select-wrapper"></div>');

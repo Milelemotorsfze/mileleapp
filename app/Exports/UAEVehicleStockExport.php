@@ -22,7 +22,7 @@ class UAEVehicleStockExport implements FromCollection, WithHeadings
             ->join('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
             ->where('brands.brand_name', 'Toyota')
             ->where('varaints.is_dp_variant', 'Yes')
-            ->where('vehicles.latest_location', '!=', 38)
+            ->whereNotIn('vehicles.latest_location', ['102', '153', '147', '38'])
             ->where('purchasing_order.is_demand_planning_po', true)
             ->select(
                 'master_models.model as Model',
@@ -31,7 +31,8 @@ class UAEVehicleStockExport implements FromCollection, WithHeadings
                 DB::raw('(SELECT COUNT(*) FROM vehicles 
                           WHERE varaints_id = varaints.id 
                           AND so_id IS NULL 
-                          AND gdn_id IS NULL 
+                          AND gdn_id IS NULL
+                          AND VIN IS NOT NULL 
                           AND status = "Approved" 
                           AND (reservation_end_date IS NULL 
                                OR reservation_end_date < NOW())
@@ -39,6 +40,7 @@ class UAEVehicleStockExport implements FromCollection, WithHeadings
                 DB::raw('(SELECT COUNT(*) FROM vehicles 
                           WHERE varaints_id = varaints.id 
                           AND status = "Approved" 
+                          AND VIN IS NOT NULL
                           AND gdn_id IS NULL
                           ) as `Total Quantity`')
             )
