@@ -1298,7 +1298,8 @@ public function getBrandsAndModelLines(Request $request)
          {
             if($vehicle->model_id) {
                 $masterModel = MasterModel::findOrFail($vehicle->model_id);
-                $vehicle->variants = Varaint::select('id','name','master_models_id')->whereHas('masterModel', function($query)use($masterModel){
+                $vehicle->variants = Varaint::select('id','name')
+                ->whereHas('masterModel', function($query)use($masterModel){
                     $query->where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx);
                 })
@@ -1357,7 +1358,7 @@ public function getBrandsAndModelLines(Request $request)
                 }
 
                 $masterModel = MasterModel::find($pfiVehicleVariant->masterModel->id);
-                $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
+                $pfiVehicleVariant->masterModels = MasterModel::select('id','model','sfx')->where('model', $masterModel->model)
                                                 ->where('sfx', $masterModel->sfx)
                                                 ->get();
 
