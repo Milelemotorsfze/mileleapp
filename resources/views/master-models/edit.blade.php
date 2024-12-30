@@ -41,19 +41,22 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Model</label>
-                        <input type="text" class="form-control" value="{{ $masterModel->model }}" name="model">
+                        <input type="text" class="form-control"  @if($disableEdit == 1) readonly title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        value="{{ $masterModel->model }}" name="model">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                        <input type="text" class="form-control" value="{{ $masterModel->sfx }}" name="sfx">
+                        <input type="text" class="form-control" @if($disableEdit == 1) readonly title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        value="{{ $masterModel->sfx }}" name="sfx">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">Model Year</label>
-                        <input type="text" class="form-control" id="model-year"  name="model_year" placeholder="Enter Model Year">
+                        <input type="text" class="form-control" id="model-year" @if($disableEdit == 1) disabled title="Not allowed to edit! model already used in LOI/PFI/PO" @endif 
+                        name="model_year" placeholder="Enter Model Year">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -73,7 +76,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
-                        <select class="form-control" data-trigger name="steering" >
+                        <select class="form-control" name="steering" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @endif >
                             <option value="LHD" {{ $masterModel->steering == "LHD" ? 'selected' : " "}} >LHD</option>
                             <option value="RHD"  {{ $masterModel->steering == "RHD" ? 'selected' : " "}} >RHD</option>
                         </select>
@@ -82,7 +85,8 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
-                        <select class="form-control" name="variant_id" id="variant_id">
+                        <select class="form-control" name="variant_id" @if($disableVariantEdit == 1) disabled title="Not allowed to edit! already used in LOI/PFI/PO" @else 
+                        title="Variant" @endif id="variant_id">
                             <option></option>
                             @foreach($variants as $variant)
                                 <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
@@ -286,6 +290,7 @@
 @endsection
 @push('scripts')
     <script>
+        
         $("#model-year").yearpicker({
             year: '{{ $masterModel->model_year }}',
             startYear: 2000,
@@ -391,9 +396,9 @@
                 }
             });
         }
-
-        $("#variant_id").attr("data-placeholder","Choose Variant....  Or  Type Here To Search....");
-        $("#variant_id").select2();
+        $("#variant_id").select2({
+            placeholder:'Choose Variant',
+        });
         $('#variant_id').on('change',function() {
             $('#variant_id-error').hide();
             getLOIDescription();
