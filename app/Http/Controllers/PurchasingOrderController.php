@@ -5091,37 +5091,39 @@ public function submitPaymentDetails(Request $request)
                 $pdf = new Fpdi();
                 $pfiId = $purchasingOrder->PFIPurchasingOrder->pfi->id ?? '';
                 $pfi = PFI::find($pfiId);
-                if($pfi->new_pfi_document_without_sign) {
-                    $destinationPath = 'New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign;
-                }else{
-                    $destinationPath = 'PFI_document_withoutsign/'. $pfi->pfi_document_without_sign; 
-                }
-                if($pfi->new_pfi_document_without_sign || $pfi->pfi_document_without_sign) {
-
-                    $pageCount = $pdf->setSourceFile($destinationPath);
-
-                    for ($i=1; $i <= $pageCount; $i++)
-                    {
-                        $pdf->setPrintHeader(false);
-                        $pdf->AddPage();
-                        $tplIdx = $pdf->importPage($i);
-                        $pdf->useTemplate($tplIdx);
-                        if($i == $pageCount) {
-                            $pdf->Image('milele_seal.png', 80, 230, 50,35);
-                        }
+                if(!$pfi->pfi_document_with_sign) {
+                    if($pfi->new_pfi_document_without_sign) {
+                        $destinationPath = 'New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign;
+                    }else{
+                        $destinationPath = 'PFI_document_withoutsign/'. $pfi->pfi_document_without_sign; 
                     }
+                    if($pfi->new_pfi_document_without_sign || $pfi->pfi_document_without_sign) {
     
-                    $signedFileName = 'MILELE - '.$pfi->pfi_reference_number.'.pdf';
-                    $directory = public_path('PFI_Document_with_sign');
-                    \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-                    if (File::exists(public_path('PFI_Document_with_sign/'.$signedFileName))) {
-                        File::delete(public_path('PFI_Document_with_sign/'.$signedFileName));
+                        $pageCount = $pdf->setSourceFile($destinationPath);
+    
+                        for ($i=1; $i <= $pageCount; $i++)
+                        {
+                            $pdf->setPrintHeader(false);
+                            $pdf->AddPage();
+                            $tplIdx = $pdf->importPage($i);
+                            $pdf->useTemplate($tplIdx);
+                            if($i == $pageCount) {
+                                $pdf->Image('milele_seal.png', 80, 230, 50,35);
+                            }
+                        }
+        
+                        $signedFileName = 'MILELE - '.$pfi->pfi_reference_number.'.pdf';
+                        $directory = public_path('PFI_Document_with_sign');
+                        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                        if (File::exists(public_path('PFI_Document_with_sign/'.$signedFileName))) {
+                            File::delete(public_path('PFI_Document_with_sign/'.$signedFileName));
+                        }
+                        $pdf->Output($directory.'/'.$signedFileName,'F');
+                        $pfi->pfi_document_with_sign = $signedFileName;
+                        $pfi->save();
                     }
-                    $pdf->Output($directory.'/'.$signedFileName,'F');
-                    $pfi->pfi_document_with_sign = $signedFileName;
-                    $pfi->save();
                 }
-
+               
             }
 
             $orderUrl = url('/purchasing-order/' . $purchasingOrder->id);

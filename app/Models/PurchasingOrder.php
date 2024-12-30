@@ -14,7 +14,7 @@ class PurchasingOrder extends Model
     public const PAYMENT_STATUS_INITIATED = 'Initiated';
     public const PAYMENT_STATUS_PARTIALY_PAID = 'Partially Paid';
     public const PAYMENT_STATUS_PAID = 'Paid';
-    public const PAYMENT_STATUS_UNPAID = 'UnPaid';
+    public const PAYMENT_STATUS_UNPAID = 'Unpaid';
 
     protected $fillable = [
         'po_number',

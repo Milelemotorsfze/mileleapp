@@ -448,24 +448,37 @@ class PFIController extends Controller
                         $PO_with_latest_released_date = [];
                         foreach($PfiItemPos as $PfiItemPo) {
                             $purchaseOrder = PurchasingOrder::find($PfiItemPo);
-                            $latestSupplierAccount = SupplierAccountTransaction::Select('purchasing_order_id','payment_released_date','transaction_type')
+                            $supplierAccounttransactions = SupplierAccountTransaction::Select('purchasing_order_id','payment_released_date','transaction_type')
                             ->where('purchasing_order_id', $PfiItemPo)
                             ->whereNot('Transaction_type','Rejected')
-                            ->latest('payment_released_date')
-                            ->first();
+                            ->latest('payment_released_date');
+                            
+                            $latestSupplierAccount = $supplierAccounttransactions->first();
                             if($latestSupplierAccount && $latestSupplierAccount->payment_released_date) {
-                                $PO_with_latest_released_date[] = $purchaseOrder->po_number ." - ".
-                                Carbon::parse($latestSupplierAccount->payment_released_date)->format('d-M-Y') ?? '';
+                                $PO_with_latest_released_date[] =  Carbon::parse($latestSupplierAccount->payment_released_date)->format('d-M-Y') .
+                                " (".$purchaseOrder->po_number.")";
 
                             }
                         }
-                        return implode(", ", $PO_with_latest_released_date);  
+                        if($PO_with_latest_released_date) {
+                            $released_date =  implode("<br>", $PO_with_latest_released_date); 
+
+                            if($released_date && $supplierAccounttransactions->count() > 1) {
+                                 return  '<button class="btn btn-sm btn-danger">'.$released_date.'</button>';
+                            }else{
+                                return '<button class="btn btn-sm btn-success">'.$released_date.'</button>';
+                            }
+                        }
+
+                        return "Payment Not Released";
+                        
                         
                     })
                     ->editColumn('total_price', function($query) {
                         return number_format($query->total_price);
                     })
-                    ->rawColumns(['pfi_date','loi_item_code','total_price','po_number','payment_initiated_status','payment_status'])
+                    ->rawColumns(['pfi_date','loi_item_code','total_price','po_number','payment_initiated_status','payment_status',
+                    'released_date'])
                     ->toJson();
                 }
             
