@@ -4119,7 +4119,7 @@ public function updateVariants(Request $request)
     foreach ($vehiclesGroupedByVariant as $group) {
         $purchasedorderitems = New PurchasingOrderItems();
         $purchasedorderitems->purchasing_order_id = $purchasingOrderId;
-        $purchasedorderitems->variant_id = $variant['variant_id'];
+        $purchasedorderitems->variant_id = $group->varaints_id;
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
@@ -5328,6 +5328,7 @@ public function submitPaymentDetails(Request $request)
                         ->where('po_payment_initiated_quantity', '>=', 1)
                         ->first();
                         // need to check with payment initiated qty with remaining qty
+                        info($loiItem);
                         if($loiItem) {
                             // update po_payment_initiated_quantity and keep ids in array
                             $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
