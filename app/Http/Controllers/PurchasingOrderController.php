@@ -1304,7 +1304,8 @@ public function getBrandsAndModelLines(Request $request)
          {
             if($vehicle->model_id) {
                 $masterModel = MasterModel::findOrFail($vehicle->model_id);
-                $vehicle->variants = Varaint::select('id','name','master_models_id')->whereHas('masterModel', function($query)use($masterModel){
+                $vehicle->variants = Varaint::select('id','name')
+                ->whereHas('masterModel', function($query)use($masterModel){
                     $query->where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx);
                 })
@@ -1363,7 +1364,7 @@ public function getBrandsAndModelLines(Request $request)
                 }
 
                 $masterModel = MasterModel::find($pfiVehicleVariant->masterModel->id);
-                $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
+                $pfiVehicleVariant->masterModels = MasterModel::select('id','model','sfx')->where('model', $masterModel->model)
                                                 ->where('sfx', $masterModel->sfx)
                                                 ->get();
 
@@ -4120,7 +4121,7 @@ public function updateVariants(Request $request)
     foreach ($vehiclesGroupedByVariant as $group) {
         $purchasedorderitems = New PurchasingOrderItems();
         $purchasedorderitems->purchasing_order_id = $purchasingOrderId;
-        $purchasedorderitems->variant_id = $variant['variant_id'];
+        $purchasedorderitems->variant_id = $group->varaints_id;
         $purchasedorderitems->qty = $group->qty;
         $purchasedorderitems->save();
     }
@@ -4663,7 +4664,6 @@ public function submitPaymentDetails(Request $request)
                             $possibleModels = MasterModel::where('model', $masterModel->model)
                                                     ->where('sfx',  $masterModel->sfx)
                                                     ->pluck('id')->toArray();
-                                                    info("possible models");
                             $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
                                                                 ->whereIn('master_model_id', $possibleModels)
                                                                 ->first();

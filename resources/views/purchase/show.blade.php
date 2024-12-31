@@ -30,7 +30,15 @@
     background-color: #f8f9fa;
     border-radius: 0.25rem;
 }
-
+.overlay {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(128,128,128,0.5); 
+            display: none; 
+        }
 .message-card, .message-reply {
     margin-bottom: 1rem;
     background-color: #ffffff;
@@ -459,7 +467,8 @@
                             <td>{{ $vehicle->vin }}</td>
                             <td>{{ $vehicle->variant->name ?? '' }}</td>
                             <td>
-                                <select class="form-control variant-id"  multiple data-vehicle-id="{{ $vehicle->id}}">
+                                <select class="form-control variant-id"  data-vehicle-id="{{ $vehicle->id}}">
+                                    <option></option>
                                     @foreach($vehicle->variants as $variant)
                                     <option value="{{$variant->id}}" > {{ $variant->name }}</option>
                                     @endforeach
@@ -1748,11 +1757,11 @@
                                     </td>
                                 @endif
                             @endcan
-                            <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
-                            <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
-                            <td>{{ ucfirst($vehicles->variant->name) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name ?? '')) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line ?? '')) }}</td>
+                            <td>{{ ucfirst($vehicles->variant->name ?? '') }}</td>
                             @php
-                        $words = explode(' ', ucfirst(strtolower($vehicles->variant->detail)));
+                        $words = explode(' ', ucfirst(strtolower($vehicles->variant->detail ?? '')));
                         $shortDetail = implode(' ', array_slice($words, 0, 3));
                         $remainingDetail = implode(' ', array_slice($words, 3));
                         @endphp
@@ -2794,7 +2803,9 @@
                 </div>
             </div>
         </div>
+        <div class="overlay"></div>
         <script>
+            
             let targetUrl;
     function openModal(id) {
         targetUrl = window.location.href; 
@@ -4217,20 +4228,23 @@ $('#savevariantBtn').click(function(){
         $('.variant-id').each(function() {
             var vehicleId = $(this).data('vehicle-id');
             var eachSelectedVariant = $(this).val();
-            if(eachSelectedVariant[0]) {
+            console.log(eachSelectedVariant);
+            if(eachSelectedVariant) {
                 selectedVariants.push({
                 vehicle_id: vehicleId,
-                variant_id: eachSelectedVariant[0]
+                variant_id: eachSelectedVariant
             });
             }
         });
+        console.log(selectedVariants);
         updateVariants(selectedVariants);
     
     });
 
     function updateVariants(selectedVariants){
         var purchasingOrderId = "{{ $purchasingOrder->id }}"; // Retrieve the stored id
-
+            $('#updateVariantBtn').prop('disabled', true);
+         
         $.ajax({
             url: '{{ route("vehicles.updateVariants") }}',
             method: 'POST',
@@ -4245,9 +4259,13 @@ $('#savevariantBtn').click(function(){
 
                 $('#vehicleModalvariant').modal('hide');
                 window.location.reload();
+                $('#updateVariantBtn').prop('disabled', false);
+         
             },
             error: function(xhr) {
-                console.log(xhr.responseText);
+                $('.overlay').hide();
+                $('#updateVariantBtn').prop('disabled', false);
+         
             }
         });
     }
@@ -5341,10 +5359,9 @@ $.ajax({
             width: 'resolve'  // Adjust the width dynamically or apply your custom width
         });
 
-        $('.variant-id').select2({
-            placeholder: 'Variant',
-            maximumSelectionLength: 1 // Adjust the width dynamically or apply your custom width
-        });
+        // $('.variant-id').select2({
+        //     placeholder: 'Variant',
+        // });
     });
 </script>
 <script>
@@ -5365,3 +5382,4 @@ $.ajax({
     });
 </script>
 @endsection
+
