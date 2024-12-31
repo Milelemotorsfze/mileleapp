@@ -4662,7 +4662,6 @@ public function submitPaymentDetails(Request $request)
                             $possibleModels = MasterModel::where('model', $masterModel->model)
                                                     ->where('sfx',  $masterModel->sfx)
                                                     ->pluck('id')->toArray();
-                                                    info("possible models");
                             $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $purchasingOrder->id)
                                                                 ->whereIn('master_model_id', $possibleModels)
                                                                 ->first();
@@ -5328,7 +5327,6 @@ public function submitPaymentDetails(Request $request)
                         ->where('po_payment_initiated_quantity', '>=', 1)
                         ->first();
                         // need to check with payment initiated qty with remaining qty
-                        info($loiItem);
                         if($loiItem) {
                             // update po_payment_initiated_quantity and keep ids in array
                             $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
