@@ -108,6 +108,7 @@
                                             ->whereNull('so_id')
                                             ->whereNull('gdn_id')
                                             ->whereNotNull('vin')
+                                            ->whereNotIn('latest_location', ['102', '153', '147'])
                                             ->where('vehicles.status', 'Approved')
                                             ->where(function ($query) {
                                                 $query->whereNull('vehicles.reservation_end_date')
@@ -175,6 +176,7 @@
                                             ->where('varaints_id', $variant->varaints_id)
                                             ->whereNull('so_id')
                                             ->whereNotNull('vin')
+                                            ->whereNotIn('latest_location', ['102', '153', '147'])
                                             ->where('vehicles.status', 'Approved')
                                             ->whereNull('gdn_id')
                                             ->where(function ($query) {
@@ -1431,7 +1433,22 @@ Procurement
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-<td><a href="{{ route('calls.showcalls', ['call' => $rowsyesterday->id, 'brand_id' => $rowsyesterday->brand_id, 'model_line_id' => $rowsyesterday->model_line_id, 'location' => $rowsyesterday->location, 'days' => '2', 'custom_brand_model' => $rowsyesterday->custom_brand_model]) }}">{{ $rowsyesterday->count }}</a></td>
+<td>
+    @if (!empty($rowsyesterday->id) && !empty($rowsyesterday->brand_id) && !empty($rowsyesterday->model_line_id) && !empty($rowsyesterday->location))
+        <a href="{{ route('calls.showcalls', [
+            'call' => $rowsyesterday->id, 
+            'brand_id' => $rowsyesterday->brand_id, 
+            'model_line_id' => $rowsyesterday->model_line_id, 
+            'location' => $rowsyesterday->location, 
+            'days' => '2', 
+            'custom_brand_model' => $rowsyesterday->custom_brand_model ?? null
+        ]) }}">
+            {{ $rowsyesterday->count }}
+        </a>
+    @else
+        <span>Invalid Data</span>
+    @endif
+</td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>

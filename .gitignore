@@ -36,7 +36,9 @@ yarn-error.log
 /latest
 /laravel-blog
 /testings
-
+/sbskillsage
+/skillsage
+/testskillsage
 # Configuration files
 php.ini
 user.ini

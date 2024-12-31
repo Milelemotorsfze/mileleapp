@@ -55,7 +55,7 @@
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pending Netsuite GRN</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite Netsuite GRN Info</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Netsuite GRN Info</a>
       </li>
     </ul>      
   </div>
