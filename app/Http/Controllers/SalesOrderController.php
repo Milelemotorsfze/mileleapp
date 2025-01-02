@@ -162,14 +162,17 @@ class SalesOrderController extends Controller
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                     $variantId = $item->reference_id;
-                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                    ->whereNull('so_id')
+                    ->whereNull('gdn_id')->get()->toArray();
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
                     $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
-                        $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -177,7 +180,9 @@ class SalesOrderController extends Controller
                     $variants = Varaint::where('brand_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -337,14 +342,18 @@ class SalesOrderController extends Controller
                     switch ($item->reference_type) {
                         case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
                         $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->whereNull('so_id')
+                            ->whereNull('gdn_id')->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;
@@ -352,7 +361,9 @@ class SalesOrderController extends Controller
                         $variants = Varaint::where('brand_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->whereNull('so_id')
+                            ->whereNull('gdn_id')->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;
