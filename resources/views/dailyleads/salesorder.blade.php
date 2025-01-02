@@ -330,11 +330,11 @@ table.dataTable thead th select {
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-            <th>SO Number</th>
+                  <th>SO Number</th>
                   <th>Sales Date</th>
                   <th>Sales Person</th>
                   <th>Customer Name</th>
-                <th>Customer Phone</th>
+                  <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
