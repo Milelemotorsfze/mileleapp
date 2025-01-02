@@ -463,6 +463,35 @@ table.dataTable thead th select {
         </div>
     </div>
 </div>
+<div class="modal fade" id="customdocumentstatusModal" tabindex="-1" role="dialog" aria-labelledby="customdocumentstatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="customdocumentForm" method="POST" action="{{ route('vehicles.savecustominspection') }}">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_idinspection">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customdocumentstatusModalLabel">Vehicle Document Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="document_status">Document Status</label>
+                        <select class="form-control" id="document_status" name="document_status" required>
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="">N/A</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Released">Released</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -541,6 +570,7 @@ table.dataTable thead th select {
                   <th>Sales Remarks</th>
                   <th>GDN</th>
                   <th>GDN Date</th>
+                  <th>Vehicle Document Status</th>
                   <th>PDI Report</th>
                   <th>Brand</th>
                   <th>Model Line</th>
@@ -687,6 +717,13 @@ var columns6 = [
         return ''; // If no date, return empty
     }
 },
+{ 
+        data: 'vehicle_document_status', 
+        name: 'vehicles.vehicle_document_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { 
             data: 'id', 
             name: 'id',
@@ -784,7 +821,7 @@ var columns6 = [
                 return `<span style="display: inline-block; background-color: #28a745; color: white; padding: 5px 10px; border-radius: 5px; font-weight: bold;">${data}</span>`;
             }
         }
-        return ''; // Return an empty string if there's no price
+        return '';
     }
 });
     }
@@ -1110,6 +1147,22 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
         @if ($hascustominspectionPermission)
             var datainspection = table6.row(this).data();
             opencustominspectionModal(datainspection.id);
+        @endif
+    }
+});
+$('#dtBasicExample6 tbody').on('click', 'td', function () {
+    var table6 = $('#dtBasicExample6').DataTable();
+    var cellIndex = table6.cell(this).index().column; // Get the clicked cell's column index
+    var columnHeader = table6.column(cellIndex).header().innerText; // Get the header text of the clicked column
+
+    // Check for "Custom Inspection Number" column click
+    if (columnHeader.includes('vehicle_document_status')) {
+        @php
+        $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-vehicle-document-status');
+        @endphp
+        @if ($hascustominspectionPermission)
+            var datainspection = table6.row(this).data();
+            opencustomindocumentstatusModal(datainspection.id);
         @endif
     }
 });
@@ -1444,6 +1497,28 @@ function openeditingcolorModal(vehicleId) {
 
     // Show the modal
     $('#custominspectionModal').modal('show');
+}
+function opencustomindocumentstatusModal(vehicleIdInspection) {
+    // Set the vehicle_idinspection value
+    $('#vehicle_idinspection').val(vehicleIdInspection);
+
+    // Make an AJAX call to get the custom inspection details
+    $.ajax({
+        url: '/get-custom-inspection-data',  // The route to get the custom inspection data
+        type: 'GET',
+        data: { vehicle_id: vehicleIdInspection },
+        success: function(response) {
+            // Populate the modal fields with the fetched data
+            $('#custom_inspection_number').val(response.custom_inspection_number);
+            $('#custom_inspection_status').val(response.custom_inspection_status);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+
+    // Show the modal
+    $('#customdocumentstatusModal').modal('show');
 }
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
