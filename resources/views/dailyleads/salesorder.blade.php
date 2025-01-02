@@ -51,6 +51,10 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
     margin-bottom: 5px;
     width: 100%;
 }
+.select2-dropdown.select2-dropdown--below {
+    position: inherit !important;
+}
+
 .select2-container--default .select2-search--inline .select2-search__field {
     font-size: 12px !important; /* Adjust the font-size as per your needs */
     width: 100% !important;
@@ -59,11 +63,6 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 table.dataTable thead th select {
     width: 100% !important; /* Ensures the select element fits the header width */
     min-width: 100%; /* Ensures it takes at least 100% width */
-}
-
-/* Ensure the Select2 dropdown fits the full header width when opened */
-.select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -98,7 +97,7 @@ table.dataTable thead th select {
     margin-top: -30px;
     background: url('https://logosbynick.com/wp-content/uploads/2021/01/animated-gif.gif') no-repeat center center;
     background-size: contain;
-    z-index: 1100; /* Higher than the z-index of the <thead> */
+    z-index: 1100;
     display: none;
 }
 #dtBasicExample3_processing {
@@ -484,7 +483,6 @@ table.dataTable thead th select {
 
                 // Initialize Select2 on the select element with a custom width to fit the column
                 select.select2({
-                    width: 'resolve', // Resolve the width to fit within the column
                     dropdownAutoWidth: true, // Adjust dropdown width to fit the content
                     placeholder: 'Filter'
                 });
