@@ -1016,7 +1016,7 @@ class QuotationController extends Controller
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;
         $newsignatures->save();
-        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation Update successfully.');
     }
     }
     /**
