@@ -468,9 +468,17 @@ $(document).ready(function () {
         return 0;
     });
 
-    var modelDetail = selectedOptions.map(function (option) {
-        return option.value;
-    }).join(' ');
+    var modelDetail = selectedOptions.map(function (option, index, arr) {
+        if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
+            // Combine engine and fuel values without a space
+            return arr[index - 1].value + option.value;
+        } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
+            // Skip adding engine value, as it will be combined later with fuel
+            return '';
+        } else {
+            return option.value;
+        }
+    }).filter(Boolean).join(' ');
 
     $('.model_detail').val(modelDetail);
 }
