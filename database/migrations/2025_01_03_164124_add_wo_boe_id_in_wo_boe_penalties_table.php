@@ -30,17 +30,18 @@ return new class extends Migration
         });
 
         // Reorder the columns to match the desired order
-        DB::statement("
-            ALTER TABLE boe_penalties 
-            MODIFY COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
-            MODIFY COLUMN invoice_date DATE NULL AFTER id,
-            MODIFY COLUMN invoice_number VARCHAR(255) NULL AFTER invoice_date,
-            MODIFY COLUMN penalty_amount DECIMAL(10, 2) NULL AFTER invoice_number,
-            MODIFY COLUMN payment_receipt VARCHAR(255) NULL AFTER penalty_amount,
-            MODIFY COLUMN remarks TEXT NULL AFTER payment_receipt,
-            MODIFY COLUMN created_by BIGINT UNSIGNED NULL AFTER remarks,
-            MODIFY COLUMN updated_by BIGINT UNSIGNED NULL AFTER created_by;
-        ");
+        // DB::statement("
+        //     ALTER TABLE boe_penalties 
+        //     MODIFY COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+        //     MODIFY COLUMN wo_boe_id BIGINT UNSIGNED NOT NULL AFTER id,
+        //     MODIFY COLUMN invoice_date DATE NULL AFTER wo_boe_id,
+        //     MODIFY COLUMN invoice_number VARCHAR(255) NULL AFTER invoice_date,
+        //     MODIFY COLUMN penalty_amount DECIMAL(10, 2) NULL AFTER invoice_number,
+        //     MODIFY COLUMN payment_receipt VARCHAR(255) NULL AFTER penalty_amount,
+        //     MODIFY COLUMN remarks TEXT NULL AFTER payment_receipt,
+        //     MODIFY COLUMN created_by BIGINT UNSIGNED NULL AFTER remarks,
+        //     MODIFY COLUMN updated_by BIGINT UNSIGNED NULL AFTER created_by;
+        // ");
     }
 
     /**
