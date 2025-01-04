@@ -22,6 +22,7 @@ use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
 use App\Models\User;
+use App\Models\So;
 use Spatie\Permission\Models\Role;
 use App\Models\AddonDetails;
 use App\Models\WOUserFilterInputs;
@@ -3116,6 +3117,8 @@ class WorkOrderController extends Controller
     {
         $soNumber = $request->input('so_number');  
         $workOrderId = $request->input('work_order_id'); // In case of edit 
+    
+        // Proceed with the rest of the logic
         if ($workOrderId) {
             $workOrders = WorkOrder::where('id',$workOrderId)->first(); 
             if($workOrders->so_number == $soNumber) {
@@ -3159,4 +3162,11 @@ class WorkOrderController extends Controller
             ]);
         }
     }    
+    public function isExistInSalesOrder(Request $request)
+    {
+        $soNumber = $request->input('so_number');
+        // Check if the so_number exists in the So model
+        $exists = So::where('so_number', $soNumber)->exists();
+        return response()->json(['valid' => $exists]);
+    }  
 }

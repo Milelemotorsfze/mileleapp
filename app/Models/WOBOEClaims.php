@@ -5,18 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VehiclePenalty extends Model
+class WOBOEClaims extends Model
 {
     use HasFactory;
-    protected $table = "vehicle_penalties";
+    protected $table = "wo_boe_claims";
     protected $fillable = [
-        'payment_date',
-        'wo_vehicle_id',
-        'excess_days',
-        'total_penalty_amount',
-        'amount_paid',
-        'payment_receipt',
-        'remarks',
+        'wo_boe_id',
+        'claim_date',
+        'claim_reference_number',
+        'status',
         'created_by',
         'updated_by',
     ];
