@@ -171,8 +171,4 @@ class WOVehicles extends Model
                               });
                     });
     }    
-    public function penalty()
-    {
-        return $this->hasOne(BOEPenalty::class,'wo_vehicle_id','id');
-    }  
 }

@@ -490,7 +490,7 @@ Route::get('/d', function () {
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
     Route::controller(BOEPenaltyController::class)->group(function(){
-        Route::get('/vehicle-penalty-report', 'getBOEPenaltyReport')->name('getBOEPenaltyReport');
+        Route::get('/boe-penalty-report', 'getBOEPenaltyReport')->name('getBOEPenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
         Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
@@ -501,8 +501,8 @@ Route::get('/d', function () {
         Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
         Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
         Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
-        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
-        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+        Route::post('/boe-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/boe-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
     });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');

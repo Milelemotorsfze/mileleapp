@@ -33,26 +33,82 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                             <th>SO Number</th>
                             <th>WO Number</th>
                             <th>BOE Number</th>
-                            <th>VIN Number</th>
+                            <th>Declaration Number</th>
                             <th>Declaration Date</th>
                             <th>Penalty Start</th>
-                            <th>Excess Days</th>
-                            <th>Total Penalty(AED)</th>
-                            <th>Amount Paid(AED)</th>
-                            <th>Payment Date</th>
+                            <th>Invoice Date</th>
+                            <th>Invoice Number</th>
+                            <th>Penalty Amount(AED)</th>
                             <th>Payment Receipt</th>
                             <th>Remark</th>
                             <th>Created By</th>
                             <th>Created At</th>
                         </tr>
+                        @if(isset($datas) && count($datas) > 0)
+                        <tr>
+                            <th><button id="clear-filters" class="btn btn-info btn-sm">Clear All Filters</button></th>
+                            <th>
+                                <select class="column-filter form-control" id="so-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="wo-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="boe-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="declaration-number-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <!-- <input type="text" id="declaration-date-filter" placeholder="Search Declaration Date" class="column-filter form-control" /> -->
+                            </th>
+                            <th>
+                                <!-- <input type="text" id="penalty-start-date-filter" placeholder="Penalty Start Date" class="column-filter form-control" /> -->
+                            </th>
+                            <th>
+                                <!-- Invoice Date -->
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="invoice-number-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <!-- Penalty Amount(AED) -->
+                            </th>
+                            <th>
+                                <!-- Payment Receipt -->
+                            </th>
+                            <th>
+                                <!-- Remark -->
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="created-by-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <!-- Created At -->
+                            </th>
+                        </tr>
+                        @endif
                     </thead>
                     <tbody>
                         @if(isset($datas) && count($datas) > 0)
+                            <div hidden>{{$i=0;}}</div>
                             @foreach($datas as $data)
-                                @if($data->woBoe->declaration_date != '')
+                                @if($data->declaration_date != '')
                                     @php
                                         $daysDifference = '';
-                                        $thirtiethDay = \Carbon\Carbon::parse($data->woBoe->declaration_date)->addDays(29);
+                                        $thirtiethDay = \Carbon\Carbon::parse($data->declaration_date)->addDays(29);
                                         $today = \Carbon\Carbon::today();
                                         $daysDifference = $thirtiethDay->diffInDays($today, false) + 1;
                                     @endphp
@@ -62,37 +118,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                                         $penalty = $daysDifference * 200;
                                     @endphp
                                 @endif
-                                <div hidden>{{$i=0;}}</div>
                                 <tr>
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->woBoe->boe ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
-                                    <td>@if($data->woBoe->declaration_date != ''){{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->format('d M Y') }}@endif</td>
-                                    <td>@if($data->woBoe->declaration_date != ''){{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->addDays(29)->format('d M Y') }}@endif</td>
-                                    <td>{{ $data->penalty->excess_days ?? '' }}</td>
-                                    <td>{{ $data->penalty->total_penalty_amount ?? '' }}</td>
-                                    <td>{{ $data->penalty->amount_paid ?? '' }}</td>
-                                    <td>@if($data->penalty->payment_date != ''){{ \Carbon\Carbon::parse($data->woBoe->payment_date)->format('d M Y') }}@endif</td>
-                                    @props(['filePath', 'fileName'])
-                                    <td class="no-click">
-                                        @if(isset($data->penalty->payment_receipt))
-                                            @php
-                                                $filePath = 'storage/'; // Update to the correct path if needed
-                                                $fileName = $data->penalty->payment_receipt;
-                                            @endphp
-
-                                            <a href="{{ url($filePath . $fileName) }}" target="_blank">
-                                                <button class="btn btn-primary mb-1 btn-style">View</button>
-                                            </a>
-                                            <a href="{{ url($filePath . $fileName) }}" download>
-                                                <button class="btn btn-info btn-style">Download</button>
-                                            </a>
-                                        @else
-                                            <span>No receipt available</span>
-                                        @endif
-                                    </td>
+                                    <td>{{ $data->boe ?? '' }}</td>
+                                    <td>{{ $data->declaration_number ?? '' }}</td>
+                                    <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->format('d M Y') }}@endif</td>
+                                    <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->addDays(29)->format('d M Y') }}@endif</td>
+                                    <td>@if($data->penalty->invoice_date != ''){{ \Carbon\Carbon::parse($data->invoice_date)->format('d M Y') }}@endif</td>
+                                    <td>{{ $data->penalty->invoice_number ?? '' }}</td>
+                                    <td>{{ $data->penalty->penalty_amount ?? '' }}</td>
+                                    @component('components.view-download-buttons', ['filePath' => 'work_order/boe_penalty_receipt/', 'fileName' => $data->penalty->payment_receipt])@endcomponent
                                     <td>{{ $data->penalty->remarks ?? '' }}</td>
                                     <td>{{ $data->penalty->createdUser->name ?? '' }}</td>
                                     <td>@if($data->penalty->created_at != ''){{ \Carbon\Carbon::parse($data->penalty->created_at)->format('d M Y') }}@endif</td>
@@ -100,7 +137,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="15" class="text-center">No data history available.</td>
+                                <td colspan="14" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -117,12 +154,67 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                 info: true,
                 lengthChange: true,
             });
+            // Initialize Select2 for multi-select filters
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #invoice-number-filter, #created-by-filter').select2({
+                placeholder: "Select filter",
+                allowClear: true
+            });
+
+            // Function to populate multi-select dropdowns with unique, sorted data
+            function populateDropdown(columnIndex, dropdownId) {
+                var uniqueValues = new Set();
+                table.column(columnIndex).data().each(function(value) { // Directly use table.column()
+                    if (value !== '') {
+                        uniqueValues.add(value);
+                    }
+                });
+
+                uniqueValues = Array.from(uniqueValues).sort(); // Sort the values in ascending order
+
+                uniqueValues.forEach(function(value) {
+                    $(dropdownId).append('<option value="' + value + '">' + value + '</option>');
+                });
+            }
+
+            // Populate filters
+            populateDropdown(1, '#so-filter');
+            populateDropdown(2, '#wo-filter');
+            populateDropdown(3, '#boe-filter');
+            populateDropdown(4, '#declaration-number-filter');
+            populateDropdown(8, '#invoice-number-filter');
+            populateDropdown(12, '#created-by-filter');
+
+            // Apply multi-select filter for each dropdown
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #invoice-number-filter, #created-by-filter').on('change', function() {
+                var columnIndex = $(this).parent().index();
+                var selectedOptions = $(this).val();
+                var searchValue = selectedOptions ? selectedOptions.join('|') : '';
+                table.column(columnIndex).search(searchValue, true, false).draw();  // Use table.column() directly
+            });
+
+            // Clear all filters on button click
+            $('#clear-filters').click(function() {
+                $('#so-filter, #wo-filter, #boe-filter, #declaration-number-filter, #invoice-number-filter, #created-by-filter').val(null).trigger('change');
+                table.search('').columns().search('').draw();
+            });
         @else
             console.log("No data available to initialize DataTable.");
         @endif        
     });
 </script>
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection
 

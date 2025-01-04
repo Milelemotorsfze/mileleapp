@@ -23,38 +23,45 @@ class WOBOEClaimsController extends Controller
                         ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
                   });
         })
+        // New condition: declaration_number and declaration_date should not be null
+        ->whereNotNull('declaration_number')
+        ->whereNotNull('declaration_date')
         ->get();
         // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
         $datas = $boes->filter(function ($boe) { 
             return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
                 && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
-                && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved';  // Only keep vehicles with non-delivered status
+                && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved'; // Only keep vehicles with non-delivered status
         });  
         (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
         return view('work_order.claims.index', compact('datas'));
     }
     public function getSubmittedClaims() {
-        $datas = WOVehicles::whereHas('claim', function($q) {
+        $datas = WOBOE::whereHas('claim', function($q) {
             $q->where('status','Submitted')
-                ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+              ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
-        (new UserActivityController)->createActivity('Open Claim Submitted Vehicles Listing');
+        (new UserActivityController)->createActivity('Open Claim Submitted BOE Listing');
         return view('work_order.claims.submitted', compact('datas'));
     }
-    public function getApprovedClaims() {
-        $datas = WOVehicles::whereHas('claim', function($q) {
-            $q->where('status','Approved')
-            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+    public function getApprovedClaims() { 
+        $datas = WOBOE::whereHas('claim', function($q) {
+            $q->where('status', 'Approved')
+              ->whereIn('id', function($query) {
+                  $query->selectRaw('MAX(id)')
+                        ->from('wo_boe_claims')
+                        ->groupBy('wo_boe_id');
+              });
         })->get();
-        (new UserActivityController)->createActivity('Open Claim Approved Vehicles Listing');
+        (new UserActivityController)->createActivity('Open Claim Approved BOE Listing');
         return view('work_order.claims.approved', compact('datas'));
     }
-    public function getCancelledClaims() {
-        $datas = WOVehicles::whereHas('claim', function($q) {
+    public function getCancelledClaims() { 
+        $datas = WOBOE::whereHas('claim', function($q) {
             $q->where('status','Cancelled')
-            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_vehicle_id = w_o_vehicles.id ORDER BY updated_at DESC LIMIT 1)');
+            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
         })->get();
-        (new UserActivityController)->createActivity('Open Claim Cancelled Vehicles Listing');
+        (new UserActivityController)->createActivity('Open Claim Cancelled BOE Listing');
         return view('work_order.claims.cancelled', compact('datas'));
     }
     public function storeOrUpdate(Request $request)
@@ -65,24 +72,24 @@ class WOBOEClaimsController extends Controller
     
         try {
             foreach ($request->all() as $key => $value) {
-                if (strpos($key, 'wo_vehicle_id_') === 0) {
-                    $woVehicleId = $value;
+                if (strpos($key, 'wo_boe_id_') === 0) {
+                    $WOBOEID = $value;
     
-                    // Define validation rules for each unique wo_vehicle_id
+                    // Define validation rules for each unique wo_boe_id
                     $validationRules = [
-                        "claim_date_{$woVehicleId}" => 'required|date',
-                        "claim_reference_number_{$woVehicleId}" => 'nullable|integer|min:1',
-                        "status_{$woVehicleId}" => 'nullable|string|in:Submitted,Approved,Cancelled',
+                        "claim_date_{$WOBOEID}" => 'required|date',
+                        "claim_reference_number_{$WOBOEID}" => 'nullable|integer|min:1',
+                        "status_{$WOBOEID}" => 'nullable|string|in:Submitted,Approved,Cancelled',
                     ];
     
                     $validatedData = $request->validate($validationRules); // Validate data
     
                     // Prepare data for the record, conditionally including `created_by`
                     $claimsData = [
-                        'wo_vehicle_id' => $woVehicleId,
-                        'claim_date' => $validatedData["claim_date_{$woVehicleId}"],
-                        'claim_reference_number' => $validatedData["claim_reference_number_{$woVehicleId}"] ?? 0,
-                        'status' => $validatedData["status_{$woVehicleId}"] ?? '',
+                        'wo_boe_id' => $WOBOEID,
+                        'claim_date' => $validatedData["claim_date_{$WOBOEID}"],
+                        'claim_reference_number' => $validatedData["claim_reference_number_{$WOBOEID}"] ?? 0,
+                        'status' => $validatedData["status_{$WOBOEID}"] ?? '',
                         'updated_by' => $authId,
                     ];
                     $claimsData['created_by'] = $authId;
@@ -112,10 +119,10 @@ class WOBOEClaimsController extends Controller
     
         try {
             foreach ($request->all() as $key => $value) {
-                if (strpos($key, 'wo_vehicle_id_') === 0) {
+                if (strpos($key, 'wo_boe_id_') === 0) {
                     $woVehicleId = $value;
     
-                    // Define validation rules for each unique wo_vehicle_id
+                    // Define validation rules for each unique wo_boe_id
                     $validationRules = [
                         "status_{$woVehicleId}" => 'nullable|string|in:Approved,Cancelled',
                     ];
@@ -124,13 +131,13 @@ class WOBOEClaimsController extends Controller
     
                     // Prepare data for the record, conditionally including `created_by`
                     $claimsData = [
-                        'wo_vehicle_id' => $woVehicleId,
+                        'wo_boe_id' => $woVehicleId,
                         'status' => $validatedData["status_{$woVehicleId}"] ?? '',
                         'updated_by' => $authId,
                     ];
     
                     // Use `updateOrCreate` to update existing or insert new, with `created_by` only for new entries
-                    $claims = WOBOEClaims::where('wo_vehicle_id', $woVehicleId)->first();
+                    $claims = WOBOEClaims::where('wo_boe_id', $woVehicleId)->first();
     
                     if ($claims) {
                         // Update existing record
@@ -152,5 +159,8 @@ class WOBOEClaimsController extends Controller
     
             return redirect()->route('getSubmittedClaims')->withErrors('An error occurred while updating claims status.');
         }
+    }
+    public function getClaimsLog($id) {
+        info('hi');
     }
 }

@@ -7,6 +7,10 @@
         td {
             font-size:12px!important;
         }
+        .error
+        {
+        color: #FF0000;
+        }
     </style>
 </head>
 @section('content')
@@ -18,7 +22,7 @@
 @if ($canViewClaimInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Claim Submitted Vehicles Info</h4>
+        <h4 class="card-title">Claim Submitted BOE Info</h4>
     </div>
 
     <div class="card-body">
@@ -42,7 +46,7 @@
                             <th>Action</th>
                             <th>SO Number</th>
                             <th>WO Number</th>
-                            <th>VIN Number</th>
+                            <th>BOE</th>
                             <th>Claim Date</th>
                             <th>Claim Reference Number</th>
                             <th>Submitted By</th>
@@ -62,13 +66,21 @@
                                 </select>
                             </th>
                             <th>
-                                <select class="column-filter form-control" id="vin-filter" multiple="multiple">
+                                <select class="column-filter form-control" id="boe-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
                             <th></th>
-                            <th></th>
-                            <th></th>
+                            <th>
+                                <select class="column-filter form-control" id="claim-reference-number-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th>
+                                <select class="column-filter form-control" id="submitted-by-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
                             <th></th>
                         </tr>
                         @endif
@@ -102,15 +114,16 @@
                                             <div class="modal-dialog"> <!-- Add modal-dialog here -->
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="updateClaimStatusModalLabel_{{$data->id}}">Update Vehicle Claim Status For {{$data->vin ?? ''}}</h5>
+                                                        <h5 class="modal-title" id="updateClaimStatusModalLabel_{{$data->id}}">Update BOE Claim Status For {{$data->boe ?? ''}}</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <form id="docStatusForm_{{$data->id}}" method="POST" enctype="multipart/form-data" action="{{ route('claim.updateStatus') }}" onsubmit="return validateForm({{ $data->id }})">
                                                         @csrf
                                                         <div class="modal-body">
-                                                            <input type="hidden" value="{{$data->id}}" name="wo_vehicle_id_{{$data->id}}">
+                                                            <input type="hidden" value="{{$data->id}}" name="wo_boe_id_{{$data->id}}">
                                                             <div class="row">
-                                                                <label for="status_{{$data->id}}" class="form-label">Vehicle Claim Status :</label>
+                                                                <span class="error">* </span>
+                                                                <label for="status_{{$data->id}}" class="form-label">BOE Claim Status :</label>
                                                                 <div class="d-flex align-items-center" style="gap: 10px;"> <!-- Add d-flex and gap for spacing -->                                                                    
                                                                     <div class="form-check form-check-inline">
                                                                         <input class="form-check-input" type="radio" name="status_{{$data->id}}" id="status_approved_{{$data->id}}" value="Approved">
@@ -135,7 +148,7 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
                                     <td>@if($data->claim->claim_date != ''){{ \Carbon\Carbon::parse($data->claim->claim_date)->format('d M Y') }}@endif</td>
                                     <td>{{ $data->claim->claim_reference_number ?? '' }}</td>
                                     <td>{{ $data->claim->createdUser->name ?? '' }}</td>
@@ -163,7 +176,7 @@
             });
 
             // Initialize Select2 for multi-select filters
-            $('#so-filter, #wo-filter, #vin-filter').select2({
+            $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #submitted-by-filter').select2({
                 placeholder: "Select filter",
                 allowClear: true
             });
@@ -187,10 +200,11 @@
             // Populate filters
             populateDropdown(1, '#so-filter');
             populateDropdown(2, '#wo-filter');
-            populateDropdown(3, '#vin-filter');
-
+            populateDropdown(3, '#boe-filter');
+            populateDropdown(5, '#claim-reference-number-filter');
+            populateDropdown(6, '#submitted-by-filter');
             // Apply multi-select filter for each dropdown
-            $('#so-filter, #wo-filter, #vin-filter').on('change', function() {
+            $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #submitted-by-filter').on('change', function() {
                 var columnIndex = $(this).parent().index();
                 var selectedOptions = $(this).val();
                 var searchValue = selectedOptions ? selectedOptions.join('|') : '';
@@ -199,7 +213,7 @@
 
             // Clear all filters on button click
             $('#clear-filters').click(function() {
-                $('#so-filter, #wo-filter, #vin-filter').val(null).trigger('change');
+                $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #submitted-by-filter').val(null).trigger('change');
                 table.search('').columns().search('').draw();
             });
         @else
@@ -210,7 +224,7 @@
         var radioStatus = document.querySelector('input[name="status_' + id + '"]:checked');
         console.log(radioStatus);
         if (!radioStatus) {
-            document.getElementById('claimStatus_Error_' + id).textContent = 'Please select a Vehicle Penalty Status.';
+            document.getElementById('claimStatus_Error_' + id).textContent = 'Please select a BOE Claim Status.';
             return false;
         } else {
             document.getElementById('claimStatus_Error_' + id).textContent = '';          
@@ -220,6 +234,18 @@
     }
 </script>
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection         
 
