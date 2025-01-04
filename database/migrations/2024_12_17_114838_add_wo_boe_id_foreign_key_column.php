@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('wo_boe_claims', function (Blueprint $table) {
-            $table->unsignedBigInteger('wo_boe_id');
-            $table->foreign('wo_boe_id')->references('id')->on('wo_boe')->onDelete('cascade');
+            // Check if the column `wo_boe_id` does not exist
+            if (!Schema::hasColumn('wo_boe_claims', 'wo_boe_id')) {
+                $table->unsignedBigInteger('wo_boe_id');
+                $table->foreign('wo_boe_id')
+                    ->references('id')
+                    ->on('wo_boe')
+                    ->onDelete('cascade');
+            }
         });
     }
 
@@ -23,11 +29,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('wo_boe_claims', function (Blueprint $table) {
-            // Drop the foreign key constraint
-            $table->dropForeign(['wo_boe_id']);
+            // Check if the column `wo_boe_id` exists before dropping
+            if (Schema::hasColumn('wo_boe_claims', 'wo_boe_id')) {
+                // Drop the foreign key constraint
+                $table->dropForeign(['wo_boe_id']);
 
-            // Drop the column
-            $table->dropColumn('wo_boe_id');
+                // Drop the column
+                $table->dropColumn('wo_boe_id');
+            }
         });
     }
 };
