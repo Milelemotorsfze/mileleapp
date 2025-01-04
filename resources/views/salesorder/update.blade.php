@@ -375,7 +375,7 @@
                 $soItemId = $soItem ? $soItem->id : null;
                 $selectedVehicleId = $soItem ? $soItem->vehicles_id : null;
             @endphp
-            <select name="vehicle_vin[{{ $quotationItem->id }}][]" id="soitem_{{ $soItemId }}" class="form-control select2">
+            <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
                 <option value="" selected>Select VIN</option>
                 @foreach($vehicles[$quotationItem->id] as $vehicle)
                     @if($vehicle->inspection_status != "Pending")

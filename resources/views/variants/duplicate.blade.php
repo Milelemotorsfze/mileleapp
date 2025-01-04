@@ -185,6 +185,7 @@
                                             <option value="4.5" {{ isset($variant) && $variant->engine == '4.5' ? 'selected' : '' }}>4.5</option>
                                             <option value="4.6" {{ isset($variant) && $variant->engine == '4.6' ? 'selected' : '' }}>4.6</option>
                                             <option value="4.8" {{ isset($variant) && $variant->engine == '4.8' ? 'selected' : '' }}>4.8</option>
+                                            <option value="5.0" {{ isset($variant) && $variant->engine == '5.0' ? 'selected' : '' }}>5.0</option>
                                             <option value="5.3" {{ isset($variant) && $variant->engine == '5.3' ? 'selected' : '' }}>5.3</option>
                                             <option value="5.6" {{ isset($variant) && $variant->engine == '5.6' ? 'selected' : '' }}>5.6</option>
                                             <option value="5.7" {{ isset($variant) && $variant->engine == '5.7' ? 'selected' : '' }}>5.7</option>
@@ -354,37 +355,51 @@ $(document).ready(function () {
     var selectedOptions = [];
     var fieldIdOrder = ['steering', 'model', 'engine', 'fuel', 'gear'];
     var gradeOption = null;
+
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
         var fieldValue = $('#' + fieldId + ' option:selected').text();
         if (fieldId === 'fuel') {
-            fieldValue = fieldValue.charAt(0);
-        }
+    if (fieldValue === 'Petrol') {
+        fieldValue = 'P';
+    } else if (fieldValue === 'Diesel') {
+        fieldValue = 'D';
+    } else if (fieldValue === 'PHEV') {
+        fieldValue = 'PHEV';
+    } else if (fieldValue === 'MHEV') {
+        fieldValue = 'MHEV';
+    } else if (fieldValue === 'PH') {
+        fieldValue = 'PH';
+    } else {
+        fieldValue = 'EV';
+    }
+}
         selectedOptions.push({ fieldId: fieldId, value: fieldValue });
+
         // Check if the field is "model" and save the grade option
         if (fieldId === 'model') {
             gradeOption = selectedOptions.find(option => option.fieldId === 'model');
         }
     });
+
     $('input[name^="specification_checkbox"]:checked').each(function () {
         var specificationId = $(this).data('specification-id');
         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();;
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
         var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
         var specificationName = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
-
         if (specificationName === 'Grade') {
             // If specificationName is "Grade," update the gradeOption
-            // If specificationName is "Grade," update the gradeOption
-if (gradeOption) {
-    gradeOption.value += ' ' + displayValue;
-} else {
-    selectedOptions.push({ fieldId: 'model', value: displayValue.trim() }); // Trim the displayValue before pushing
-}
+            if (gradeOption) {
+                gradeOption.value += ' ' + displayValue;
+            } else {
+                selectedOptions.push({ fieldId: 'model', value: displayValue });
+            }
         } else {
             selectedOptions.push({ specificationId: specificationId, value: displayValue });
         }
     });
+
     selectedOptions.sort(function (a, b) {
         var orderA = fieldIdOrder.indexOf(a.fieldId);
         var orderB = fieldIdOrder.indexOf(b.fieldId);
@@ -400,14 +415,17 @@ if (gradeOption) {
         return 0;
     });
 
-    var modelDetail = selectedOptions
-    .map(function (option) {
-        return option.value.trim(); // Trim to remove leading/trailing whitespaces
-    })
-    .filter(function (value) {
-        return value !== null && value !== ''; // Filter out null or empty values
-    })
-    .join(' ');
+    var modelDetail = selectedOptions.map(function (option, index, arr) {
+        if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
+            // Combine engine and fuel values without a space
+            return arr[index - 1].value + option.value;
+        } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
+            // Skip adding engine value, as it will be combined later with fuel
+            return '';
+        } else {
+            return option.value;
+        }
+    }).filter(Boolean).join(' ');
 
     $('.model_detail').val(modelDetail);
 }

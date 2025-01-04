@@ -168,6 +168,7 @@
                                         <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
                                         <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
+                                        <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
                                         <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
@@ -467,9 +468,17 @@ $(document).ready(function () {
         return 0;
     });
 
-    var modelDetail = selectedOptions.map(function (option) {
-        return option.value;
-    }).join(' ');
+    var modelDetail = selectedOptions.map(function (option, index, arr) {
+        if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
+            // Combine engine and fuel values without a space
+            return arr[index - 1].value + option.value;
+        } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
+            // Skip adding engine value, as it will be combined later with fuel
+            return '';
+        } else {
+            return option.value;
+        }
+    }).filter(Boolean).join(' ');
 
     $('.model_detail').val(modelDetail);
 }

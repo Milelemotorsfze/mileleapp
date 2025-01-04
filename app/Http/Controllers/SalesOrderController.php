@@ -149,6 +149,7 @@ class SalesOrderController extends Controller
     public function createsalesorder($callId) {
         $quotation = Quotation::where('calls_id', $callId)->first();
         $calls = Calls::find($callId);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
         $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
         $vehicles = [];
         if ($quotation) {
@@ -162,14 +163,29 @@ class SalesOrderController extends Controller
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
                     $variantId = $item->reference_id;
-                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                    $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                    ->whereNull('so_id')
+                    ->whereNull('gdn_id')
+                    ->when(!$hasPermission, function ($query) {
+                        $query->where(function ($subQuery) {
+                            $subQuery->whereNull('booking_person_id')
+                                     ->orWhere('booking_person_id', Auth::id());
+                        });
+                    })->get()->toArray();
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
                     $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
-                        $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')
+                        ->when(!$hasPermission, function ($query) {
+                            $query->where(function ($subQuery) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', Auth::id());
+                            });
+                        })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -177,7 +193,15 @@ class SalesOrderController extends Controller
                     $variants = Varaint::where('brand_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
                         $variantId = $variant->id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')
+                        ->when(!$hasPermission, function ($query) {
+                            $query->where(function ($subQuery) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', Auth::id());
+                            });
+                        })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
@@ -321,6 +345,7 @@ class SalesOrderController extends Controller
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
             $sodetails = So::where('quotation_id', $quotation->id)->first();
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
                       ->where('so_id', $sodetails->id)
                       ->get();
@@ -337,14 +362,30 @@ class SalesOrderController extends Controller
                     switch ($item->reference_type) {
                         case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
-                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                        ->whereNull('so_id')
+                        ->whereNull('gdn_id')
+                        ->when(!$hasPermission, function ($query) {
+                            $query->where(function ($subQuery) {
+                                $subQuery->whereNull('booking_person_id')
+                                         ->orWhere('booking_person_id', Auth::id());
+                            });
+                        })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                         break;
                     case 'App\Models\MasterModelLines':
                         $variants = Varaint::where('master_model_lines_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->whereNull('so_id')
+                            ->whereNull('gdn_id')
+                            ->when(!$hasPermission, function ($query) {
+                                $query->where(function ($subQuery) {
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', Auth::id());
+                                });
+                            })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;
@@ -352,7 +393,15 @@ class SalesOrderController extends Controller
                         $variants = Varaint::where('brand_id', $item->reference_id)->get();
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
-                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
+                            ->whereNull('so_id')
+                            ->whereNull('gdn_id')
+                            ->when(!$hasPermission, function ($query) {
+                                $query->where(function ($subQuery) {
+                                    $subQuery->whereNull('booking_person_id')
+                                             ->orWhere('booking_person_id', Auth::id());
+                                });
+                            })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
                         }
                         break;

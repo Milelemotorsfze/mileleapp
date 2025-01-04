@@ -6,7 +6,10 @@ use App\Models\Brand;
 use App\Models\MasterModel;
 use App\Models\Varaint;
 use App\Models\VariantItems;
+use App\Models\PfiItemPurchaseOrder;
+use App\Models\PfiItem;
 use Carbon\Carbon;
+use App\Models\LetterOfIndentItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -182,8 +185,20 @@ class MasterModelController extends Controller
 
         $masterModel = MasterModel::find($id);
         $variants = Varaint::all();
-
-        return view('master-models.edit', compact('masterModel','variants'));
+        $ismasterModelExistLOI = LetterOfIndentItem::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $ismasterModelExistPFI = PfiItem::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $ismasterModelExistPO = PfiItemPurchaseOrder::select('master_model_id')->where('master_model_id',$masterModel->id)->first();
+        $disableEdit = 0;
+        $disableVariantEdit = 0;
+        if($ismasterModelExistLOI || $ismasterModelExistPFI || $ismasterModelExistPO) {
+            $disableEdit = 1;
+            if($ismasterModelExistPO || $ismasterModelExistPFI) {
+                $disableVariantEdit = 1;
+            }
+            
+        }
+        // return $disableEdit;
+        return view('master-models.edit', compact('masterModel','variants','disableEdit','disableVariantEdit'));
     }
 
     /**

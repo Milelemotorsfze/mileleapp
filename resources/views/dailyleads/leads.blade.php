@@ -962,7 +962,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             document.getElementById('quotationButton').style.display = 'block';
         }
     });
-
     function moveToStep(step) {
         currentStep = step;
         const steps = document.querySelectorAll('.step');
@@ -1130,12 +1129,12 @@ $(document).ready(function() {
             $(this).html('<i class="fas fa-save"></i>');
         } else if (field === 'location') {
             var dropdown = '<select class="form-control">';
-            @foreach($countries as $code => $name)
-            dropdown += `<option value="{{ $name }}" ${currentValue === '{{ $name }}' ? 'selected' : ''}>{{ $name }}</option>`;
-            @endforeach
-            dropdown += '</select>';
-            td.html(dropdown);
-            $(this).html('<i class="fas fa-save"></i>');
+            @foreach($countries as $country)
+dropdown += `<option value="{{ $country['name'] }}" ${currentValue === '{{ $country['name'] }}' ? 'selected' : ''}>{{ $country['name'] }}</option>`;
+@endforeach
+dropdown += '</select>';
+td.html(dropdown);
+$(this).html('<i class="fas fa-save"></i>');
         } else {
             var currentValue = td.text().trim();
             td.html('<input type="text" class="form-control" value="' + currentValue + '">');

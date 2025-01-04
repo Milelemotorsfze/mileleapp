@@ -3633,6 +3633,7 @@ public function availablevehicles(Request $request)
                     'vehicles.sales_remarks',
                     'vehicles.minimum_commission',
                     'vehicles.custom_inspection_number',
+                    'vehicles.vehicle_document_status',
                     'vehicles.custom_inspection_status',
                     'inspection_grn.id as grn_inspectionid',
                     'inspection_pdi.id as pdi_inspectionid',

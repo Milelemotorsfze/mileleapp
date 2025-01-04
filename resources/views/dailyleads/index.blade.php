@@ -1946,11 +1946,15 @@ $(document).ready(function () {
       $(column.header()).addClass('nowrap-td');
 
       column.data().unique().sort().each(function(d, j) {
-        if (columnId === 3) {  // Assuming the phone column is at index 2
+        if (columnId === 5) {  // Assuming the phone column is at index 2
           var phoneNumber = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
     }
-    else if (columnId === 4) {  // Assuming the phone column is at index 2
+    else  if (columnId === 4) {  // Assuming the phone column is at index 2
+          var phoneNumber = $(d).text().trim();  // Extract phone number
+        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
+    }
+    else if (columnId === 6) {  // Assuming the phone column is at index 2
           var Email = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + Email + '">' + Email + '</option>');
     }

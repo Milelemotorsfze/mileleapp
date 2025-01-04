@@ -26,5 +26,9 @@ class PfiItem extends Model
 
         return $this->hasMany(PfiItem::class,'parent_pfi_item_id','id')->where('is_parent', false);
     }
+    public function PfiItemPurchaseOrders() {
+
+        return $this->hasMany(PfiItemPurchaseOrder::class,'pfi_item_id','id');
+    }
     
 }
