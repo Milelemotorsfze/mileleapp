@@ -569,6 +569,7 @@ table.dataTable thead th select {
             <th>Reservation Sales Person</th>
             <th>GDN</th>
             <th>GDN Date</th>
+            <th>Vehicle Document Status</th>
             <th>PDI Report</th>
             <th>Brand</th>
             <th>Model Line</th>
@@ -766,6 +767,13 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
+{ 
+        data: 'vehicle_document_status', 
+        name: 'vehicles.vehicle_document_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { 
             data: 'id', 
             name: 'id',
@@ -981,44 +989,45 @@ var columnMap = {
         14: 'bp.name',
         15: 'gdn.gdn_number',
         16: 'gdn.date',
-        17: 'pdi_inspectionid',
-        18: 'brands.brand_name',
-        19: 'master_model_lines.model_line',
-        20: 'varaints.model_detail',
-        21: 'varaints.name',
-        22: 'varaints.detail',
-        23: 'vehicles.vin',
-        24: 'varaints.engine',
-        25: 'varaints.my',
-        26: 'varaints.steering',
-        27: 'varaints.fuel_type',
-        28: 'varaints.gear',
-        29: 'ex_color.name',
-        30: 'int_color.name',
-        31: 'varaints.upholestry',
-        32: 'vehicles.ppmmyyy',
-        33: 'warehouse.name',
-        34: 'vehicles.territory',
-        35: 'countries.name',
+        17: 'vehicles.vehicle_document_status',
+        18: 'pdi_inspectionid',
+        19: 'brands.brand_name',
+        20: 'master_model_lines.model_line',
+        21: 'varaints.model_detail',
+        22: 'varaints.name',
+        23: 'varaints.detail',
+        24: 'vehicles.vin',
+        25: 'varaints.engine',
+        26: 'varaints.my',
+        27: 'varaints.steering',
+        28: 'varaints.fuel_type',
+        29: 'varaints.gear',
+        30: 'ex_color.name',
+        31: 'int_color.name',
+        32: 'varaints.upholestry',
+        33: 'vehicles.ppmmyyy',
+        34: 'warehouse.name',
+        35: 'vehicles.territory',
+        36: 'countries.name',
     };
     // Extend columnMap based on permissions
 if (hasManagementPermission) {
-    columnMap[36] = 'costprice';
+    columnMap[37] = 'costprice';
+    columnMap[38] = 'vehicles.minimum_commission';
+    columnMap[39] = 'vehicles.price';
+    columnMap[40] = 'vehicles.ownership_type';
+    columnMap[41] = 'vehicles.custom_inspection_number';
+    columnMap[42] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
     columnMap[37] = 'vehicles.minimum_commission';
     columnMap[38] = 'vehicles.price';
     columnMap[39] = 'vehicles.ownership_type';
     columnMap[40] = 'vehicles.custom_inspection_number';
     columnMap[41] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[36] = 'vehicles.minimum_commission';
-    columnMap[37] = 'vehicles.price';
-    columnMap[38] = 'vehicles.ownership_type';
-    columnMap[39] = 'vehicles.custom_inspection_number';
-    columnMap[40] = 'vehicles.custom_inspection_status';
 } else {
-    columnMap[36] = 'vehicles.ownership_type';
-    columnMap[37] = 'vehicles.custom_inspection_number';
-    columnMap[38] = 'vehicles.custom_inspection_status';
+    columnMap[37] = 'vehicles.ownership_type';
+    columnMap[38] = 'vehicles.custom_inspection_number';
+    columnMap[39] = 'vehicles.custom_inspection_status';
 }
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
