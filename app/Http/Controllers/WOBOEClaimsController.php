@@ -13,56 +13,100 @@ use Illuminate\Support\Facades\Auth;
 class WOBOEClaimsController extends Controller
 {
     public function getPendingClaims() { 
-        $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder']) 
-        ->where(function($query) {
-            // Condition 1: No associated claim
-            $query->whereDoesntHave('claim')
-                  // Condition 2: Or the latest associated claim has a 'Cancelled' status
-                  ->orWhereHas('claim', function($q) {
-                      $q->where('status', 'Cancelled')
-                        ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
-                  });
-        })
-        // New condition: declaration_number and declaration_date should not be null
-        ->whereNotNull('declaration_number')
-        ->whereNotNull('declaration_date')
-        ->get();
-        // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
-        $datas = $boes->filter(function ($boe) { 
-            return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
-                && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
-                && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved'; // Only keep vehicles with non-delivered status
-        });  
-        (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
-        return view('work_order.claims.index', compact('datas'));
+        try {
+            $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder']) 
+            ->where(function($query) {
+                // Condition 1: No associated claim
+                $query->whereDoesntHave('claim')
+                    // Condition 2: Or the latest associated claim has a 'Cancelled' status
+                    ->orWhereHas('claim', function($q) {
+                        $q->where('status', 'Cancelled')
+                            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
+                    });
+            })
+            // New condition: declaration_number and declaration_date should not be null
+            ->whereNotNull('declaration_number')
+            ->whereNotNull('declaration_date')
+            ->get();
+            // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
+            $datas = $boes->filter(function ($boe) { 
+                return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
+                    && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
+                    && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved'; // Only keep vehicles with non-delivered status
+            });  
+            (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
+            return view('work_order.claims.index', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching claim pending boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function getSubmittedClaims() {
-        $datas = WOBOE::whereHas('claim', function($q) {
-            $q->where('status','Submitted')
-              ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
-        })->get();
-        (new UserActivityController)->createActivity('Open Claim Submitted BOE Listing');
-        return view('work_order.claims.submitted', compact('datas'));
+        try {
+            $datas = WOBOE::whereHas('claim', function($q) {
+                $q->where('status','Submitted')
+                ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
+            })->get();
+            (new UserActivityController)->createActivity('Open Claim Submitted BOE Listing');
+            return view('work_order.claims.submitted', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching submitted claim boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function getApprovedClaims() { 
-        $datas = WOBOE::whereHas('claim', function($q) {
-            $q->where('status', 'Approved')
-              ->whereIn('id', function($query) {
-                  $query->selectRaw('MAX(id)')
-                        ->from('wo_boe_claims')
-                        ->groupBy('wo_boe_id');
-              });
-        })->get();
-        (new UserActivityController)->createActivity('Open Claim Approved BOE Listing');
-        return view('work_order.claims.approved', compact('datas'));
+        try {
+            $datas = WOBOE::whereHas('claim', function($q) {
+                $q->where('status', 'Approved')
+                ->whereIn('id', function($query) {
+                    $query->selectRaw('MAX(id)')
+                            ->from('wo_boe_claims')
+                            ->groupBy('wo_boe_id');
+                });
+            })->get();
+            (new UserActivityController)->createActivity('Open Claim Approved BOE Listing');
+            return view('work_order.claims.approved', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching approved claim boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function getCancelledClaims() { 
-        $datas = WOBOE::whereHas('claim', function($q) {
-            $q->where('status','Cancelled')
-            ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
-        })->get();
-        (new UserActivityController)->createActivity('Open Claim Cancelled BOE Listing');
-        return view('work_order.claims.cancelled', compact('datas'));
+        try {
+            $datas = WOBOE::whereHas('claim', function($q) {
+                $q->where('status','Cancelled')
+                ->whereRaw('id = (SELECT id FROM wo_boe_claims WHERE wo_boe_id = wo_boe.id ORDER BY updated_at DESC LIMIT 1)');
+            })->get();
+            (new UserActivityController)->createActivity('Open Claim Cancelled BOE Listing');
+            return view('work_order.claims.cancelled', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching cancelled claim boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function storeOrUpdate(Request $request)
     {

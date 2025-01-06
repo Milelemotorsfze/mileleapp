@@ -17,9 +17,22 @@ use Illuminate\Support\Facades\Auth;
 class BOEPenaltyController extends Controller
 {
     public function getClearedPenalties() {
-        $datas = WOBOE::whereHas('penalty')->get();
-        (new UserActivityController)->createActivity('Open Penalty Cleared BOE Listing');
-        return view('work_order.penalty.cleared', compact('datas'));
+        try {
+            $datas = WOBOE::whereHas('penalty.penaltyTypes.penaltyTypesName')
+            ->with('penalty.penaltyTypes.penaltyTypesName')
+            ->get();
+            (new UserActivityController)->createActivity('Open Penalty Cleared BOE Listing');
+            return view('work_order.penalty.cleared', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching cleared penalty boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function storeOrUpdate(Request $request)
     {
@@ -93,35 +106,57 @@ class BOEPenaltyController extends Controller
     }
 
     public function getBOEPenaltyReport() {
-        $today = Carbon::today();
-        // Get all `BOE` where the declaration date is 29 days ago or earlier       
-        $BOE = WOBOE::where('declaration_date', '<=', $today->copy()->subDays(29))
-            ->whereDoesntHave('penalty') // Exclude BOE that already have a penalty record
-            ->whereHas('workOrder')      // Ensure workOrder exists
-            ->with(['workOrder'])        // Eager load workOrder
-            ->get();
-        // Filter out BOE with 'Delivered' status in PHP (since it's an appended attribute)
-        $datas = $BOE->filter(function ($oneBOE) {
-            return $oneBOE->workOrder && $oneBOE->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS';
-        });
-        $penaltyTypes = PenaltyTypes::where('is_active',true)->select('id','name')->get();
-        (new UserActivityController)->createActivity('Open Penalized BOE Listing');
-        return view('work_order.penalty.index', compact('datas','penaltyTypes'));
+        try {
+            $today = Carbon::today();
+            // Get all `BOE` where the declaration date is 29 days ago or earlier       
+            $BOE = WOBOE::where('declaration_date', '<=', $today->copy()->subDays(29))
+                ->whereDoesntHave('penalty') // Exclude BOE that already have a penalty record
+                ->whereHas('workOrder')      // Ensure workOrder exists
+                ->with(['workOrder'])        // Eager load workOrder
+                ->get();
+            // Filter out BOE with 'Delivered' status in PHP (since it's an appended attribute)
+            $datas = $BOE->filter(function ($oneBOE) {
+                return $oneBOE->workOrder && $oneBOE->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS';
+            });
+            $penaltyTypes = PenaltyTypes::where('is_active',true)->select('id','name')->get();
+            (new UserActivityController)->createActivity('Open Penalized BOE Listing');
+            return view('work_order.penalty.index', compact('datas','penaltyTypes'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching cleared penalty boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }  
     public function getNoPenalties() {
-        $today = Carbon::today();
-    
-        // Get all `BOE` where the declaration date is 29 days ago or earlier
-        $BOE = WOBOE::whereHas('workOrder')
-            ->whereDoesntHave('penalty') // Exclude BOE that already have a penalty record
-            ->with('workOrder')   // Eager load woBoe and its nested workOrder relationship
-            ->get();
-    
-        // Filter out BOE with 'Delivered' status in PHP (since it's an appended attribute)
-        $datas = $BOE->filter(function ($oneBOE) {
-            return $oneBOE->workOrder && $oneBOE->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS';
-        });
-        (new UserActivityController)->createActivity('Open No Penalty BOE Listing');
-        return view('work_order.penalty.no_penalty', compact('datas'));
+        try {
+            $today = Carbon::today();
+        
+            // Get all `BOE` where the declaration date is 29 days ago or earlier
+            $BOE = WOBOE::whereHas('workOrder')
+                ->whereDoesntHave('penalty') // Exclude BOE that already have a penalty record
+                ->with('workOrder')   // Eager load woBoe and its nested workOrder relationship
+                ->get();
+        
+            // Filter out BOE with 'Delivered' status in PHP (since it's an appended attribute)
+            $datas = $BOE->filter(function ($oneBOE) {
+                return $oneBOE->workOrder && $oneBOE->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS';
+            });
+            (new UserActivityController)->createActivity('Open No Penalty BOE Listing');
+            return view('work_order.penalty.no_penalty', compact('datas'));
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching no penalties boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     } 
 }

@@ -38,6 +38,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                             <th>Penalty Start</th>
                             <th>Invoice Date</th>
                             <th>Invoice Number</th>
+                            <th>Penalty Type</th>
                             <th>Penalty Amount(AED)</th>
                             <th>Payment Receipt</th>
                             <th>Remark</th>
@@ -80,6 +81,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                                 <select class="column-filter form-control" id="invoice-number-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
+                            </th>
+                            <th>
+                                <!-- Penalty Type -->
                             </th>
                             <th>
                                 <!-- Penalty Amount(AED) -->
@@ -128,6 +132,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
                                     <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->addDays(29)->format('d M Y') }}@endif</td>
                                     <td>@if($data->penalty->invoice_date != ''){{ \Carbon\Carbon::parse($data->invoice_date)->format('d M Y') }}@endif</td>
                                     <td>{{ $data->penalty->invoice_number ?? '' }}</td>
+                                    <td>
+                                        @if($data->penalty && $data->penalty->penaltyTypes)
+                                            {{ $data->penalty->penaltyTypes
+                                                ->sortBy(fn($penaltyType) => $penaltyType->penaltyTypesName->name) // Sort by name
+                                                ->map(fn($penaltyType) => $penaltyType->penaltyTypesName->name) // Extract names
+                                                ->join(', ') }} <!-- Join with commas -->
+                                        @else
+                                            No Penalty Types
+                                        @endif
+                                    </td>
                                     <td>{{ $data->penalty->penalty_amount ?? '' }}</td>
                                     @component('components.view-download-buttons', ['filePath' => 'work_order/boe_penalty_receipt/', 'fileName' => $data->penalty->payment_receipt])@endcomponent
                                     <td>{{ $data->penalty->remarks ?? '' }}</td>
