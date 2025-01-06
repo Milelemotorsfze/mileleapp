@@ -22,4 +22,8 @@ class BOEPenalty extends Model
     public function createdUser() {
         return $this->belongsTo(User::class,'created_by','id');
     }
+    public function penaltyTypes()
+    {
+        return $this->hasMany(BOEPenaltyType::class,'boe_penalties_id','id');
+    }
 }

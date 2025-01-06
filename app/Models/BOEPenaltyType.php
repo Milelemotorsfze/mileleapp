@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Masters\PenaltyTypes;
 
 class BOEPenaltyType extends Model
 {
@@ -26,8 +27,8 @@ class BOEPenaltyType extends Model
     /**
      * Relationship with PenaltyType.
      */
-    public function penaltyType()
+    public function penaltyTypesName()
     {
-        return $this->belongsTo(PenaltyType::class, 'penalty_types_id');
+        return $this->belongsTo(PenaltyTypes::class, 'penalty_types_id');
     }
 }
