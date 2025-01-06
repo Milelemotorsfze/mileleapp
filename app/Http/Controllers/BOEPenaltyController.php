@@ -56,37 +56,46 @@ class BOEPenaltyController extends Controller
                     ];
 
                     $validatedData = $request->validate($validationRules); // Validate data
-                    // Initialize $imageName
-                    $imageName = null;
                     // Handle file upload
+                    $imageName = null;
                     if ($request->hasFile("payment_receipt_{$woBOEId}")) {
                         $image = $request->file("payment_receipt_{$woBOEId}");
                         $imageName = $validatedData["wo_boe_{$woBOEId}"] . '_' . time() . '.' . $image->getClientOriginalExtension();
                         $image->move(public_path('work_order/boe_penalty_receipt'), $imageName);
                     }   
-                    // Handle remarks to store NULL if empty
-                    $remarks = trim($validatedData['remarks'] ?? '') === '' ? null : $validatedData['remarks'];    
-                    // Prepare data for the record, including `wo_boe_id`
+                    // Prepare remarks
+                    $remarks = trim($validatedData['remarks'] ?? '') === '' ? null : $validatedData['remarks'];   
+                    // Prepare data for the BOEPenalty record
                     $penaltyData = [
                         'wo_boe_id' => $woBOEId,
                         'invoice_date' => $validatedData["invoice_date_{$woBOEId}"],
                         'invoice_number' => $validatedData["invoice_number_{$woBOEId}"],
                         'penalty_amount' => $validatedData["penalty_amount_{$woBOEId}"],
-                        'remarks' => $remarks, // Set NULL if remarks are empty
+                        'remarks' => $remarks,
                         'updated_by' => $authId,
                         'payment_receipt' => $imageName,
                     ];
-                    // Use `updateOrCreate` to update existing or insert new, with `created_by` only for new entries
+                    // Check if a penalty record exists
                     $penalty = BOEPenalty::where('wo_boe_id', $woBOEId)->first();
                     if ($penalty) {
                         // Update existing record
                         $penalty->update($penaltyData);
                     } else {
-                        // Insert new record, including `created_by`
+                        // Insert new record
                         $penaltyData['created_by'] = $authId;
                         $penalty = BOEPenalty::create($penaltyData);
                     }
-                    // Handle penalty types in BOEPenaltyType model...
+                    // Store penalty types
+                    $penaltyTypeIds = $validatedData["penalty_type_{$woBOEId}"];
+                    foreach ($penaltyTypeIds as $penaltyTypeId) {
+                        BOEPenaltyType::updateOrCreate(
+                            [
+                                'boe_penalties_id' => $penalty->id,
+                                'penalty_types_id' => $penaltyTypeId,
+                            ],
+                            []
+                        );
+                    }
                 }
             }
             (new UserActivityController)->createActivity('Penalty Info added');

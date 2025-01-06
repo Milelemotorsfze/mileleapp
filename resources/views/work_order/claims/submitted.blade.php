@@ -122,9 +122,12 @@
                                                         <div class="modal-body">
                                                             <input type="hidden" value="{{$data->id}}" name="wo_boe_id_{{$data->id}}">
                                                             <div class="row">
-                                                                <span class="error">* </span>
-                                                                <label for="status_{{$data->id}}" class="form-label">BOE Claim Status :</label>
-                                                                <div class="d-flex align-items-center" style="gap: 10px;"> <!-- Add d-flex and gap for spacing -->                                                                    
+                                                                <!-- Use d-flex to align * and label in the same line -->
+                                                                <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                                                    <span class="error">*</span>
+                                                                    <label for="status_{{$data->id}}" class="form-label mb-0">BOE Claim Status:</label>
+                                                                </div>
+                                                                <div class="d-flex align-items-center" style="gap: 10px;"> <!-- Add d-flex and gap for spacing -->
                                                                     <div class="form-check form-check-inline">
                                                                         <input class="form-check-input" type="radio" name="status_{{$data->id}}" id="status_approved_{{$data->id}}" value="Approved">
                                                                         <label class="form-check-label" for="status_approved_{{$data->id}}">Approved</label>
@@ -135,7 +138,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <span id="claimStatus_Error_{{ $data->id }}" class="text-danger"></span>
-                                                            </div></br>                                                                                                                                                             
+                                                            </div></br>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -24,6 +24,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-vehicle-penal
     </div>
 
     <div class="card-body">
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
         <div class="row">
             <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
