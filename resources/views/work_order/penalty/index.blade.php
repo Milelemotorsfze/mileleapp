@@ -227,6 +227,7 @@
             </div>
         </div>
     </div>
+    @if(isset($data) && isset($data->id))
     <script type="text/javascript">
     $(document).ready(function() {
         $('.select2').select2({
@@ -331,6 +332,7 @@
         return true; // Submit if all validations pass
     }
 </script>
+@endif
 </body>
 @else
     <div class="card-header">
