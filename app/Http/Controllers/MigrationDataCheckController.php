@@ -26,34 +26,51 @@ class MigrationDataCheckController extends Controller
       */
     public function index(Request $request)
     {
-       // chcek all pfi have pfiitems
-       $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
-       foreach($allPfi as $pfi) { 
-        $pfiItems = PFIItem::where('pfi_id', $pfi->id)->where('is_parent', true)->get();
-        if($pfiItems->count() <= 0) {
-            return $pfi->id;
-        }
-       }
-       return "all pfi have pfi items";
-        // $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
-        // $notmatchingPfis = [];
-        // foreach($allPfi as $pfi) { 
-        //     $pfiSum = DB::table('pfi_items')
-        //         ->where('pfi_id', $pfi->id)
-        //         ->where('is_parent', true)
-        //         ->select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))->first(); 
+        // update all pfi is toyota or not
+    //    $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+    //    foreach($allPfi as $pfi) { 
+    //     // $pfiItems = PFIItem::where('pfi_id', $pfi->id)->where('is_parent', true)->get();
+    //     // if($pfiItems->count() <= 0) {
+    //     //     return $pfi->id;
+    //     // }
+    //     $pfiItemLatest = PfiItem::where('pfi_id', $pfi->id)
+    //                         ->where('is_parent', false)
+    //                         ->first();
+    //                         info($pfi->id);
+    //                         info("pfi");
+    //         if($pfiItemLatest) {
+    //             info($pfiItemLatest);
+    //         // only toyota PFI have child , so if child exist it will be toyota PO
+    //             $pfi->is_toyota_pfi = 1;
+              
+    //         }else{
+    //             $pfi->is_toyota_pfi = 0;
+    //         }
+    //         $pfi->save();
+    //    }
 
-        //         if($pfiSum->total != $pfi->amount) {
-        //             $notmatchingPfis[] = $pfi->id;
-        //             // info($pfiSum->total);
-        //             // info($pfi->amount);
-        //             return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
+      
+    //    return "all pfi updated";
+      // chcek pfi amount
+
+      $allPfi = PFI::select('id','pfi_reference_number','created_at','amount')->get();
+        $notmatchingPfis = [];
+        foreach($allPfi as $pfi) { 
+            $pfiSum = PFIItem::select('*',DB::raw('SUM(pfi_quantity * unit_price) as total'))
+                ->where('pfi_id', $pfi->id)
+                ->where('is_parent', true)
+                ->first(); 
+                
+                if($pfiSum->total != $pfi->amount) {
+                    $notmatchingPfis[] = $pfi->id;
+                    // info($pfiSum->total);
+                    // info($pfi->amount);
+                    // return "PFI Amount not tally, The PFI Id ".$pfi->id.',  PFI reference number '.$pfi->pfi_reference_number ;
         
-        //         }
-        // }
-        // // return $notmatchingPfis;
-        // return "all PFI Amount is correct";
-
+                }
+        }
+        return $notmatchingPfis;
+        return "all PFI Amount is correct";
         
     }
 

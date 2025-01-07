@@ -10,11 +10,14 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-edit');
         @endphp
         @if ($hasPermission)
-        <li>
-            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
-                <i class="fa fa-edit"></i> Edit
-            </a>
-        <li>
+            @if($isExistPO && $pfi->is_toyota_pfi == 1)
+                <!-- if Other brand pfi => edit not needed after PO creation -->
+                <li>
+                    <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
+                <li>
+            @endif
         <li>
             <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px; font-size:12px;"  class="btn btn-info btn-sm" title="To Update Released Amount"
                 data-bs-toggle="modal" data-bs-target="#update-released-amount-{{$pfi->id}}">
@@ -70,18 +73,18 @@
         </li>
         @endif
     @endcan -->
-    @can('pfi-delete')
+        @can('pfi-delete')
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
             @endphp
             @if ($hasPermission)
-            @if($PoUtilizedQty <= 0 )
-                <li>
-                    <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
-                            data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
-                        <i class="fa fa-trash"></i> To Delete PFI
-                    </button>
-                </li>
+                @if(!$isExistPO)
+                    <li>
+                        <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
+                                data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
+                            <i class="fa fa-trash"></i> To Delete PFI
+                        </button>
+                    </li>
                 @endif
             @endif
         @endcan

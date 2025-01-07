@@ -425,14 +425,40 @@
                         return false;
                     }
                 });
-              
-                if(formValid == true) {
-                    if($("#form-create").valid()) {
-                        $('#form-create').unbind('submit').submit();
+
+                selectedModelIds = [];
+                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+               
+                for(let i=1; i<= parentIndex; i++)
+                {
+                    var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
+                    if(eachSelectedModelId) {
+                        selectedModelIds.push(eachSelectedModelId);
                     }
-                }else{
-                    e.preventDefault();
-                }
+                }        
+
+                let url = '{{ route('pfi.get-pfi-brand') }}';
+                 // check each parent model for toyota PFI or other brand
+                 $.ajax({
+                    type:"GET",
+                    url: url, 
+                    data: {
+                        master_model_ids: selectedModelIds
+                    },
+                    success: function(data) {
+                        if(data == true) {
+                            if(formValid == true) {
+                                if($("#form-create").valid()) {
+                                    $('#form-create').unbind('submit').submit();
+                                }
+                            }
+                        }else{
+                            e.preventDefault();
+                            formValid = false;
+                            alertify.confirm('You are selected non-toyota and toyota Brands together which is not allowed!');
+                        }
+                    }
+                });
         });
 
         // check the pfi number is unique within the year
@@ -644,14 +670,11 @@
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=1; j<=childIndex;j++) 
                 {
-                    
                     $("#loi-item-"+i+"-item-"+j).empty();
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remaining-quantity-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
                     $('#master-model-id-'+i+'-item-'+j).val("");
-                   
-                   
                 }
             }
         }
@@ -676,7 +699,6 @@
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<= totalIndex;j++) 
                 {                   
-                   
                     resetRowData(index,j); 
                 }
                 enableOrDisableAddMoreButton(index);
@@ -906,6 +928,7 @@
             }
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
+            calculatePfiAmount();
          });
         $(document.body).on('click', ".removePFIButton", function (e) {
             var rowCount = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -940,8 +963,8 @@
                     var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
                     ReIndex(index);
                
-            });
-
+                });
+                calculatePfiAmount();
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one PFI Item Required',function (e) {
                 }).set({title:"Can't Remove PFI Item"})
@@ -953,7 +976,6 @@
             let i = 0;
             $('.child-item-'+index).each(function (i) {
                
-
                     $(this).attr('id', 'row-'+index+'-item-'+ i);
                     $(this).find('.models').attr('item',i);
                     $(this).find('.models').attr('id','model-'+index+'-item-'+i);
