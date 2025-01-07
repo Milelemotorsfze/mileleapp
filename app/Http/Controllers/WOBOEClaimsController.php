@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class WOBOEClaimsController extends Controller
 {
     public function getPendingClaims() { 
-        // try {
+        try {
             $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder']) 
             ->where(function($query) {
                 // Condition 1: No associated claim
@@ -32,25 +32,24 @@ class WOBOEClaimsController extends Controller
             $datas = $boes->filter(function ($boe) { 
                 return isset($boe->workOrder) 
                 && $boe->workOrder->has_claim === 'yes'
-                //     && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' 
-                //     && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
-                //     && $boe->workOrder->finance_approval_status === 'Approved' 
-                //     && $boe->workOrder->coo_approval_status === 'Approved'
+                    && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' 
+                    && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
+                    && $boe->workOrder->finance_approval_status === 'Approved' 
+                    && $boe->workOrder->coo_approval_status === 'Approved'
                     ; // Only keep vehicles with non-delivered status
             });  
-            dd($datas);
             (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
             return view('work_order.claims.index', compact('datas'));
-        // } catch (\Exception $e) {
-        //     DB::rollBack(); // Rollback transaction in case of error
-        //     // Log the error
-        //     Log::channel('workorder_error_report')->error('Error fetching claim pending boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
-        //         'error' => $e->getMessage(),
-        //         'trace' => $e->getTraceAsString(),
-        //     ]);
-        //     // Show a friendly error page
-        //     return response()->view('errors.generic', [], 500); // Return a 500 error page
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaction in case of error
+            // Log the error
+            Log::channel('workorder_error_report')->error('Error fetching claim pending boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Show a friendly error page
+            return response()->view('errors.generic', [], 500); // Return a 500 error page
+        }
     }
     public function getSubmittedClaims() {
         try {
