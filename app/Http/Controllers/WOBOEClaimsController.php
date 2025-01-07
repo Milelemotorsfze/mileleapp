@@ -28,6 +28,7 @@ class WOBOEClaimsController extends Controller
             ->whereNotNull('declaration_number')
             ->whereNotNull('declaration_date')
             ->get();
+            dd($boes);
             // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
             $datas = $boes->filter(function ($boe) { 
                 return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
