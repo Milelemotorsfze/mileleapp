@@ -435,10 +435,10 @@
                     if(eachSelectedModelId) {
                         selectedModelIds.push(eachSelectedModelId);
                     }
-                }        
-
+                }                 
                 let url = '{{ route('pfi.get-pfi-brand') }}';
                  // check each parent model for toyota PFI or other brand
+                 // check if any existing item qty or price changed
                  $.ajax({
                     type:"GET",
                     url: url, 
@@ -446,20 +446,43 @@
                         master_model_ids: selectedModelIds
                     },
                     success: function(data) {
-                        if(data == true) {
-                            if(formValid == true) {
-                                if($("#form-create").valid()) {
-                                    $('#form-create').unbind('submit').submit();
+                        if(data['is_pfi_valid_brand'] == true) {
+                            if(data['is_toyota_pfi'] == true) {
+                                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                                for(let i=1; i<= parentIndex; i++)
+                                {
+                                    let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                                    if(totalChildIndex <= 0) {
+                                        let msg = "You have to add atleast one LOI Item for each parent item!";
+                                        showError(msg);
+                                        return false;
+                                    }
                                 }
                             }
+                            // if brand is toyota make sure have child
+                            submitForm(formValid); 
                         }else{
-                            e.preventDefault();
-                            formValid = false;
-                            alertify.confirm('You are selected non-toyota and toyota Brands together which is not allowed!');
+                            let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
+                            showError(msg);
                         }
                     }
                 });
         });
+
+        function showError(msg) {
+            formValid = false;
+            $('.overlay').hide();
+            alertify.confirm(msg);
+        }
+        function submitForm(formValid) {
+            if(formValid == true) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                }
+            }else{
+                $('.overlay').hide();
+            }
+        }
 
         // check the pfi number is unique within the year
         $('#pfi_reference_number').keyup(function(){
@@ -875,7 +898,7 @@
                             </div>
                             
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  required index="${index}" name="PfiItem[${index}][unit_price]" 
+                                <input type="number" min="1"  required index="${index}" name="PfiItem[${index}][unit_price]" 
                                 class="form-control widthinput mb-2 unit-prices"  oninput=calculateTotalAmount(${index},0)
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>

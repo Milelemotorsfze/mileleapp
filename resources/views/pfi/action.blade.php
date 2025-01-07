@@ -10,13 +10,13 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-edit');
         @endphp
         @if ($hasPermission)
-            @if($isExistPO && $pfi->is_toyota_pfi == 1)
-                <!-- if Other brand pfi => edit not needed after PO creation -->
-                <li>
-                    <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
-                        <i class="fa fa-edit"></i> Edit
-                    </a>
-                <li>
+            @if($pfi->is_toyota_pfi == 1 || ($pfi->is_toyota_pfi == 0 && !$isExistPO) )
+                    <!-- if Other brand pfi => show if po not exist -->
+                    <li>
+                        <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                    <li>
             @endif
         <li>
             <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px; font-size:12px;"  class="btn btn-info btn-sm" title="To Update Released Amount"
@@ -60,19 +60,7 @@
         @endif
         @endcan
 
-    <!-- @can('pfi-payment-status-update')
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
-        @endphp
-        @if ($hasPermission)
-        <li>
-            <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;"class="btn btn-sm btn-info"
-                    title="To Update PFI Payment Status" data-bs-toggle="modal" data-bs-target="#update-pfi-payment-status-{{$pfi->id}}">
-                <i class="fa fa-dollar-sign"></i>
-            </button>
-        </li>
-        @endif
-    @endcan -->
+   
         @can('pfi-delete')
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
@@ -91,7 +79,6 @@
     </ul>
 </div>
 
-      
         <!-- PFI released amount update Model -->
         <div class="modal fade " id="update-released-amount-{{$pfi->id}}" data-bs-backdrop="static" 
                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -128,7 +115,7 @@
             </div>
 
            
-            <!--  PFI PAYMENT DOCS MODAL -->
+            <!--  PFI PFI DOCS VIEW MODAL -->
 
         <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -254,7 +241,6 @@
             </div>
         </div>
                                       
-                   
 <script>
     
     $('.pfi-button-delete').on('click',function(){

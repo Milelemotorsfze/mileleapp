@@ -624,6 +624,17 @@ class PFIController extends Controller
                         
                     }
         }
+        /// get any parent item 
+        $pfiItemLatest =  PfiItem::where('pfi_id', $pfi->id)
+                            ->where('is_parent', false)
+                            ->first();
+        $pfi->is_toyota_pfi = 0;
+        if($pfiItemLatest) {
+            // only toyota PFI have child , so if child exist it will be toyota PO
+            $pfi->is_toyota_pfi = 1;
+        }
+        $pfi->save();
+        
         DB::commit();
 
         $supplier = Supplier::find($request->supplier_id);
@@ -922,6 +933,17 @@ class PFIController extends Controller
 
             $deletedRows = array_diff($alreadyAddedRows,$updatedRows);
             PfiItem::whereIn('id', $deletedRows)->delete();
+
+            $pfiItemLatest =  PfiItem::where('pfi_id', $pfi->id)
+                        ->where('is_parent', false)
+                        ->first();
+            $pfi->is_toyota_pfi = 0;
+                if($pfiItemLatest) {
+                    // only toyota PFI have child , so if child exist it will be toyota PO
+                    $pfi->is_toyota_pfi = 1;
+                }
+            $pfi->save();
+
             // if PFI has PO and change in QTY or unit price or model and sfx PO status not approved
             $pfiPo = PfiItemPurchaseOrder::where('pfi_id',$pfi->id)->groupBy('purchase_order_id')->get();  
             if($pfiPo) {
@@ -1138,16 +1160,21 @@ class PFIController extends Controller
             $model = MasterModel::find($masterModel);
             $brands[] = strtoupper($model->modelLine->brand->brand_name);
         }
-        $data = true;
+       $data = [];
+       $data['is_pfi_valid_brand'] = true;
+       $data['is_toyota_pfi'] = false;
         // check array contains toyota models
         if(in_array("TOYOTA", $brands)) {
             if(count(array_unique($brands)) === 1) {
+                info("all model are toyota");
                 // all model is toyota
-                $data = true;
+                $data['is_pfi_valid_brand'] = true;
+                $data['is_toyota_pfi'] = true;
             }else{
+
                 // not all model are toyota
                 info("not all toyota model");
-                $data = false;
+                $data['is_pfi_valid_brand'] = false;
             }
         }
        
