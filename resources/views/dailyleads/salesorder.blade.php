@@ -402,7 +402,7 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'deal_value', name: 'quotations.deal_value' },
+            { data: 'deal_value', name: 'quotations.deal_value', type: 'num' },
             { data: 'sales_notes', name: 'quotations.sales_notes' },
             {
                 data: 'file_path',
@@ -442,6 +442,18 @@ table.dataTable thead th select {
                 }
             }
         ],
+        columnDefs: [
+        {
+            targets: 7, // Target the deal_value column
+            render: function (data, type, row) {
+                // Ensure proper numeric formatting
+                return type === 'display' || type === 'filter'
+                    ? parseFloat(data).toFixed(2) // Format for display
+                    : parseFloat(data); // Use numeric for sorting
+            },
+            type: 'num' // Explicitly set type to numeric
+        }
+    ],
         pageLength: -1,
         initComplete: function () {
             // Apply dropdown filters to each column

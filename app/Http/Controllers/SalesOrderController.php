@@ -35,43 +35,19 @@ class SalesOrderController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "Open Sales Order";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        if ($request->ajax()) {
-            $status = $request->input('status');
-            if($status === "SalesOrder")
-            {
-                $id = Auth::user()->id;
-                // info($id);
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
-        if($hasPermission)
-        {
-                $data = So::select([
-                    'calls.name as customername',
-                    'calls.email',
-                    'calls.phone',
-                    'quotations.created_at',
-                    'quotations.deal_value',
-                    'quotations.sales_notes',
-                    'quotations.file_path',
-                    'users.name',
-                    'so.so_number',
-                    'so.quotation_id',
-                    'so.so_date',
-                    'quotations.calls_id',
-                ])
-                ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
-                ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
-                ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
-                ->groupby('so.id')
-                ->orderBy('so.so_date', 'desc');
-        }
-        else
-        {
-            $data = So::select([
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Open Sales Order";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+
+    if ($request->ajax()) {
+        $status = $request->input('status');
+        if ($status === "SalesOrder") {
+            $id = Auth::user()->id;
+
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            $query = So::select([
                 'calls.name as customername',
                 'calls.email',
                 'calls.phone',
@@ -85,19 +61,43 @@ class SalesOrderController extends Controller
                 'quotations.calls_id',
             ])
             ->leftJoin('quotations', 'so.quotation_id', '=', 'quotations.id')
-            ->leftJoin('users', 'quotations.created_by', '=', 'users.id')
+            ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
             ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
-            ->where('calls.sales_person', $id)
-            ->groupby('so.id')
-            ->orderBy('so.so_date', 'desc');  
+            ->groupBy('so.id');
+
+            if (!$hasPermission) {
+                $query->where('calls.sales_person', $id);
+            }
+
+            // Handle dynamic sorting
+            $columns = [
+                0 => 'so.so_number',
+                1 => 'so.so_date',
+                2 => 'users.name',
+                3 => 'calls.name',
+                4 => 'calls.phone',
+                5 => 'calls.email',
+                6 => 'quotations.created_at',
+                7 => 'quotations.deal_value',
+                8 => 'quotations.sales_notes'
+            ];
+
+            $orderColumnIndex = $request->input('order.0.column'); // Column index from request
+            $orderDirection = $request->input('order.0.dir', 'asc'); // Sort direction (asc/desc)
+
+            // Default to sorting by `so.so_date` if index is invalid
+            $orderColumn = $columns[$orderColumnIndex] ?? 'so.so_date';
+
+            // Apply the sorting dynamically
+            $query->orderBy($orderColumn, $orderDirection);
+
+            return DataTables::of($query)->toJson();
         }
-    }  
-            if ($data) {
-                return DataTables::of($data)->toJson();
-            }
-            }
-        return view('dailyleads.salesorder');
     }
+
+    return view('dailyleads.salesorder');
+}
+
 
     /**
      * Show the form for creating a new resource.
