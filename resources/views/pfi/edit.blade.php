@@ -178,10 +178,10 @@
                                     </div>  
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <div id="file-preview">
-                                            @if($pfi->pfi_document_without_sign)
-                                                <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
-                                            @elseif($pfi->new_pfi_document_without_sign)
+                                            @if($pfi->new_pfi_document_without_sign)
                                                 <iframe src="{{ url('New_PFI_document_without_sign/'.$pfi->new_pfi_document_without_sign) }}" ></iframe>
+                                            @elseif($pfi->pfi_document_without_sign )
+                                                <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
                                             @endif
                                         </div>
                                     </div>                                  
@@ -247,7 +247,7 @@
                                                             </div>
                                                            
                                                             <div class="col-lg-2 col-md-6">
-                                                                <input type="number" min="0"  required placeholder="0" name="PfiItem[{{$key+1}}][unit_price]" oninput=calculateTotalAmount({{$key+1}},0) 
+                                                                <input type="number" min="1"  required placeholder="0" name="PfiItem[{{$key+1}}][unit_price]" oninput=calculateTotalAmount({{$key+1}},0) 
                                                                     class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
                                                                     index="{{$key+1}}" item="0" id="unit-price-{{$key+1}}-item-0" value="{{$pfi_item->unit_price }}">
                                                             </div>
@@ -494,66 +494,80 @@
               
                 selectedModelIds = [];
                 var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-               
                 for(let i=1; i<= parentIndex; i++)
                 {
                     var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
                     if(eachSelectedModelId) {
                         selectedModelIds.push(eachSelectedModelId);
                     }
-                }                 
+                } 
+
                 let url = '{{ route('pfi.get-pfi-brand') }}';
                  // check each parent model for toyota PFI or other brand
                  // check if any existing item qty or price changed
-                 $.ajax({
+                $.ajax({
                     type:"GET",
                     url: url, 
                     data: {
                         master_model_ids: selectedModelIds
                     },
                     success: function(data) {
-                        if(data == true) {
-                            let newPfiPrice = $('#amount').val();
-                            // check all master model have same parent count
-                            if(ParentPfiCount != parentIndex || parseInt(oldPfiPrice) != parseInt(newPfiPrice)) {
-                              
-                                let msg = "You have changes in Pfi Qty or Unit Price or model and sfx which will directly update in PO and PO Need approval again to process Changes";
-                                var confirm = alertify.confirm(msg,function (e) {
-                                    if (e) {
-                                        $('.overlay').show();
-                                        if(formValid == true) {
-                                            if($("#form-update").valid()) {
-                                                $('#form-update').unbind('submit').submit();
-                                            }
-                                        }else{
-                                            $('.overlay').hide();
-                                        }
-                                    }
-                                }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
-                                    
-                                    e.preventDefault();
-                                    formValid = false;
-                                    });
-                            }else{
-                                // no change just update
-                                if(formValid == true) {
-                                    if($("#form-update").valid()) {
-                                        $('#form-update').unbind('submit').submit();
+                        var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                        if(data['is_pfi_valid_brand'] == true) {
+                         
+                            if(data['is_toyota_pfi'] == true) {
+                                // if brand is toyota make sure have child
+                                
+                                for(let i=1; i<= parentIndex; i++)
+                                {
+                                    let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                                    if(totalChildIndex <= 0) {
+                                        let msg = "You have to add atleast one LOI Item for each parent item!";
+                                        showError(msg);
+                                        return false;
                                     }
                                 }
                             }
-
+                            if(formValid == true) {
+                                let newPfiPrice = $('#amount').val();
+                                if(isPoCreated == 1) {
+                                    // if(ParentPfiCount != parentIndex || parseInt(oldPfiPrice) != parseInt(newPfiPrice)) {
+                                        let msg = "If you have changes in Pfi Qty or Unit Price or model and sfx which will directly update in PO and PO Need approval again to process Changes";
+                                        var confirm = alertify.confirm(msg,function (e) {
+                                            if (e) {
+                                                submitForm(formValid); 
+                                            }
+                                        }).set({title:"Are You Sure ?"}).set('oncancel', function(e){
+                                            $('.overlay').hide();
+                                            formValid = false;
+                                        });
+                                    // }
+                                }
+                                submitForm(formValid); 
+                            }
                         }else{
-                            $('.overlay').hide();
-                            e.preventDefault();
-                            formValid = false;
-                            alertify.confirm('You are selected non-toyota and toyota Brands together which is not allowed!');
+                            let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
+                            showError(msg);
                         }
                     }
                 });
 
-
         });
+
+       function showError(msg) {
+            formValid = false;
+            $('.overlay').hide();
+            alertify.confirm(msg);
+        }
+        function submitForm(formValid) {
+            if(formValid == true) {
+                if($("#form-update").valid()) {
+                    $('#form-update').unbind('submit').submit();
+                }
+            }else{
+                $('.overlay').hide();
+            }
+        }
 
 
 
@@ -807,7 +821,7 @@
 
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<= totalIndex;j++) 
-                {                   
+                {      
                     resetRowData(index,j); 
                 }
                 enableOrDisableAddMoreButton(index); 
@@ -995,7 +1009,7 @@
                             </div>
                             
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  required index="${index}" name="PfiItem[${index}][unit_price]" 
+                                <input type="number" min="1"  required index="${index}" name="PfiItem[${index}][unit_price]" 
                                 class="form-control widthinput mb-2 unit-prices"  oninput=calculateTotalAmount(${index},0)
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>
