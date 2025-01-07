@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class WOBOEClaimsController extends Controller
 {
     public function getPendingClaims() { 
-        try {
+        // try {
             $boes = WOBOE::select('id', 'wo_id','boe', 'declaration_number','declaration_date')->with(['claim', 'workOrder']) 
             ->where(function($query) {
                 // Condition 1: No associated claim
@@ -28,6 +28,7 @@ class WOBOEClaimsController extends Controller
             ->whereNotNull('declaration_number')
             ->whereNotNull('declaration_date')
             ->get();
+            dd($boes);
             // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
             $datas = $boes->filter(function ($boe) { 
                 return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
@@ -36,16 +37,16 @@ class WOBOEClaimsController extends Controller
             });  
             (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
             return view('work_order.claims.index', compact('datas'));
-        } catch (\Exception $e) {
-            DB::rollBack(); // Rollback transaction in case of error
-            // Log the error
-            Log::channel('workorder_error_report')->error('Error fetching claim pending boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            // Show a friendly error page
-            return response()->view('errors.generic', [], 500); // Return a 500 error page
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack(); // Rollback transaction in case of error
+        //     // Log the error
+        //     Log::channel('workorder_error_report')->error('Error fetching claim pending boe information by ' . (Auth::check() ? Auth::user()->name : 'Guest'), [
+        //         'error' => $e->getMessage(),
+        //         'trace' => $e->getTraceAsString(),
+        //     ]);
+        //     // Show a friendly error page
+        //     return response()->view('errors.generic', [], 500); // Return a 500 error page
+        // }
     }
     public function getSubmittedClaims() {
         try {
