@@ -30,9 +30,13 @@ class WOBOEClaimsController extends Controller
             ->get();
             // Filter out vehicles with 'Delivered' status in PHP (since it's an appended attribute)
             $datas = $boes->filter(function ($boe) { 
-                return isset($boe->workOrder) && $boe->workOrder->has_claim === 'yes'
-                    && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
-                    && $boe->workOrder->finance_approval_status === 'Approved' && $boe->workOrder->coo_approval_status === 'Approved'; // Only keep vehicles with non-delivered status
+                return isset($boe->workOrder) 
+                // && $boe->workOrder->has_claim === 'yes'
+                //     && $boe->workOrder->delivery_summary !== 'DELIVERED WITH DOCUMENTS' 
+                //     && $boe->workOrder->sales_support_data_confirmation === 'Confirmed'
+                //     && $boe->workOrder->finance_approval_status === 'Approved' 
+                //     && $boe->workOrder->coo_approval_status === 'Approved'
+                    ; // Only keep vehicles with non-delivered status
             });  
             dd($datas);
             (new UserActivityController)->createActivity('Open Claim Pending BOE Listing');
