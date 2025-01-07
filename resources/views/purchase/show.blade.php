@@ -4236,7 +4236,7 @@ $('#savevariantBtn').click(function(){
             });
             }
         });
-        console.log(selectedVariants);
+        // console.log(selectedVariants);
         updateVariants(selectedVariants);
     
     });

@@ -264,6 +264,7 @@
                                                                     </a>
                                                                 <a class="btn btn-sm btn-danger removePFIButton" id="remove-btn-{{$key+1}}" index="{{$key+1}}"> 
                                                                     <i class="fas fa-trash-alt"></i> </a>
+                                                            
                                                             </div>
                                                         </div>
                                                      
@@ -285,7 +286,7 @@
                                                                 </div>
                                                                 <div class="col-lg-2 col-md-6">
                                                                     @if($child_Key == 0 )  <label class="form-label">PFI Quantity</label> @endif
-                                                                    <input type="number" min="1" max="{{ $childPfiItem->remainingQuantity }}" placeholder="0" required oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}}) 
+                                                                    <input type="number" min="1" max="{{ $childPfiItem->maximumPfiQty }}" placeholder="0" required oninput=calculateTotalAmount({{$key+1}},{{$child_Key+1}}) 
                                                                     name="PfiItem[{{$key+1}}][pfi_quantity][{{$child_Key+1}}]" class="form-control mb-2 widthinput pfi-quantities" 
                                                                     index="{{$key+1}}" item="{{$child_Key+1}}" id="pfi-quantity-{{$key+1}}-item-{{$child_Key+1}}" value="{{ $childPfiItem->pfi_quantity}}">
                                                                 </div>
@@ -329,10 +330,16 @@
         @endif
         @endcan
         <div class="overlay"></div>
+        <input type="hidden" value="0" name="is_pfi_edited">
 @endsection
 @push('scripts')
+   
     <script type="text/javascript">
+         let ParentPfiCount = "{{ $parentPfiItems->count() }}";
         let pfiDocument = "{{ $pfi->pfi_document_without_sign }}";
+        let isToyotaPFI = "{{ $pfi->is_toyota_pfi }}";
+        let isPoCreated = "{{ $pfi->isCreatedPO }}";
+        let oldPfiPrice = "{{ $pfi->amount }}";
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -447,6 +454,7 @@
 
         $('.btn-submit').click(function (e) {
             e.preventDefault();
+            $('.overlay').show();
            let formValid = true;
                 // get all loi items Ids
                var loiItems = $('.loi-items').map(function() {
@@ -475,6 +483,7 @@
                         }
                     });
                     if(pfiQty > remainingQty ) {
+                        $('.overlay').hide();
                          formValid = false;
                          e.preventDefault();
                         alertify.confirm('Total pfi quantity of '+ loiItemCode+ ' should be less than remaining quantity ( '+remainingQty+' ) ',function (e) {
@@ -483,13 +492,67 @@
                     }
                 });
               
-                if(formValid == true) {
-                    if($("#form-update").valid()) {
-                        $('#form-update').unbind('submit').submit();
+                selectedModelIds = [];
+                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+               
+                for(let i=1; i<= parentIndex; i++)
+                {
+                    var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
+                    if(eachSelectedModelId) {
+                        selectedModelIds.push(eachSelectedModelId);
                     }
-                }else{
-                    e.preventDefault();
-                }
+                }                 
+                let url = '{{ route('pfi.get-pfi-brand') }}';
+                 // check each parent model for toyota PFI or other brand
+                 // check if any existing item qty or price changed
+                 $.ajax({
+                    type:"GET",
+                    url: url, 
+                    data: {
+                        master_model_ids: selectedModelIds
+                    },
+                    success: function(data) {
+                        if(data == true) {
+                            let newPfiPrice = $('#amount').val();
+                            // check all master model have same parent count
+                            if(ParentPfiCount != parentIndex || parseInt(oldPfiPrice) != parseInt(newPfiPrice)) {
+                              
+                                let msg = "You have changes in Pfi Qty or Unit Price or model and sfx which will directly update in PO and PO Need approval again to process Changes";
+                                var confirm = alertify.confirm(msg,function (e) {
+                                    if (e) {
+                                        $('.overlay').show();
+                                        if(formValid == true) {
+                                            if($("#form-update").valid()) {
+                                                $('#form-update').unbind('submit').submit();
+                                            }
+                                        }else{
+                                            $('.overlay').hide();
+                                        }
+                                    }
+                                }).set({title:"Are You Sure ?"}).set('oncancel', function(closeEvent){
+                                    
+                                    e.preventDefault();
+                                    formValid = false;
+                                    });
+                            }else{
+                                // no change just update
+                                if(formValid == true) {
+                                    if($("#form-update").valid()) {
+                                        $('#form-update').unbind('submit').submit();
+                                    }
+                                }
+                            }
+
+                        }else{
+                            $('.overlay').hide();
+                            e.preventDefault();
+                            formValid = false;
+                            alertify.confirm('You are selected non-toyota and toyota Brands together which is not allowed!');
+                        }
+                    }
+                });
+
+
         });
 
 
@@ -987,6 +1050,7 @@
 
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
+            calculatePfiAmount();
             
          });
         $(document.body).on('click', ".removePFIButton", function (e) {
@@ -1002,7 +1066,6 @@
                 if(sfx[0]) {
                     appendSFX(indexNumber,model[0],sfx[0]);
                 }
-
                 $(this).closest('#row-'+indexNumber).remove();
 
                 $('.pfi-items-parent-div').each(function(j){
@@ -1022,8 +1085,9 @@
                     var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
                     ReIndex(index);
                
-            });
+                });
 
+                calculatePfiAmount();
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one PFI Item Required',function (e) {
                 }).set({title:"Can't Remove PFI Item"})
@@ -1223,7 +1287,9 @@
                     success:function (data) {
                     
                         $('#remaining-quantity-'+index+'-item-'+childIndex).val(data.remaining_quantity);
-                        $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',data.remaining_quantity);
+                        let  currentItemPfiQty = $('#pfi-quantity-'+index+'-item-'+childIndex).val();
+                        let maxPfiQty = parseInt(data.remaining_quantity) +  parseInt(currentItemPfiQty);
+                        $('#pfi-quantity-'+index+'-item-'+childIndex).attr('max',maxPfiQty);
                        
                         calculateTotalAmount(index,childIndex);
                         if(data.isLOIItemPfiExist.length > 0) {

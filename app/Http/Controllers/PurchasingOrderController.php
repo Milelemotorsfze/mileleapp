@@ -2090,7 +2090,33 @@ public function purchasingupdateStatus(Request $request)
                         $PfiPurchaseOrder->quantity = $PfiPurchaseOrder->quantity - 1;
                         $PfiPurchaseOrder->save();
                     }
-        
+                    // if payment initiated reduce the payment initiated qty => chcek toyota have any case of cancel
+                        // $supplierAccountTransaction = SupplierAccountTransaction::select('transaction_type','purchasing_order_id')
+                        //                             ->whereNot('transaction_type','Rejected')
+                        //                             ->where('purchasing_order_id',  $vehicle->purchasing_order_id)
+                        //                             ->first();
+                        // if($supplierAccountTransaction){
+                        //     // get the LOI Item to update initiated qty
+                        //     $possibleModels = MasterModel::where('model', $masterModel->model)
+                        //                             ->where('sfx',  $masterModel->sfx)
+                        //                             ->pluck('id')->toArray();
+                        //         $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                        //                                         ->whereIn('master_model_id', $possibleModels)
+                        //                                         ->first();
+                        //         $loiItem = LetterOfIndentItem::whereHas('pfiItems', function($query)use($pfiItem) {
+                        //                     $query->where('is_parent', false)
+                        //                     ->where('pfi_id', $pfiItem->pfi_id)
+                        //                     ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                        //                 })
+                        //                 ->first();
+                        //         if($loiItem) {
+                        //             $latestUtilizedQuantity = $loiItem->utilized_quantity + 1;
+                        //             $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
+                        //             $loiItem->utilized_quantity = $latestUtilizedQuantity;
+                        //             $loiItem->save();
+                        //         }
+                        // }
+                                                    
                 }
             $vehicle->procurement_vehicle_remarks = $request->input('remarks');
             $vehicle->save();
