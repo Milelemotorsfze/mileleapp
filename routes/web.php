@@ -32,8 +32,8 @@ use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
-use App\Http\Controllers\VehiclePenaltyController;
-use App\Http\Controllers\WOVehicleClaimsController;
+use App\Http\Controllers\BOEPenaltyController;
+use App\Http\Controllers\WOBOEClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -451,6 +451,7 @@ Route::get('/d', function () {
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
+    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
@@ -488,20 +489,20 @@ Route::get('/d', function () {
         Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
-    Route::controller(VehiclePenaltyController::class)->group(function(){
-        Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
+    Route::controller(BOEPenaltyController::class)->group(function(){
+        Route::get('/boe-penalty-report', 'getBOEPenaltyReport')->name('getBOEPenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
         Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    Route::controller(WOVehicleClaimsController::class)->group(function(){
-        Route::get('/vehicle-pending-claims', 'getPendingClaims')->name('getPendingClaims');
+    Route::controller(WOBOEClaimsController::class)->group(function(){
+        Route::get('/pending-boe-claims', 'getPendingClaims')->name('getPendingClaims');
         Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
         Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
         Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
         Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
-        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
-        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+        Route::post('/boe-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/boe-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
     });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
@@ -547,7 +548,9 @@ Route::get('/d', function () {
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::get('pfi/pfi-document', [PFIController::class,'generatePFIDocument'])->name('pfi.pfi-document');
+    Route::get('pfi/get-PFI-brand', [PFIController::class,'getPfiBrand'])->name('pfi.get-pfi-brand');
     Route::resource('pfi', PFIController::class);
+   
     Route::get('pfi-item/list', [PFIController::class,'PFIItemList'])->name('pfi-item.list');
     // Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::post('pfi-released-amount/update', [PFIController::class, 'relaesedAmountUpdate'])->name('pfi-released-amount-update');
