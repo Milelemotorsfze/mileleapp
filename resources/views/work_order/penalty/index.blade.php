@@ -25,7 +25,7 @@
 @if ($canViewPenaltyInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Penalized Vehicles Info</h4>
+        <h4 class="card-title">Penalized BOE Info</h4>
     </div>
 
     <div class="card-body">
