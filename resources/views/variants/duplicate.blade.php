@@ -487,31 +487,57 @@ $(document).ready(function () {
             }
         });
         $(document).ready(function () {
-    function updatevariantDetail() {
-        var selectedOptionsv = [];
-        $('input[name^="variantcheckbox"]:checked').each(function () {
-            var specificationId = $(this).data('specification-id');
-            var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
-            console.log(selectedText);
+            function updatevariantDetail() {
+    var selectedOptionsv = [];
+    var sfxValue = null; // To store the SFX value if found
+
+    // Process specification checkboxes
+    $('input[name^="variantcheckbox"]:checked').each(function () {
+        var specificationId = $(this).data('specification-id');
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
+        var displayValue = (selectedText.toUpperCase() === 'YES')
+            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+            : selectedText;
+
+        console.log(selectedText);
+
+        // Check if the selected option is SFX
+        if (selectedText.toUpperCase() === 'SFX') {
+            sfxValue = displayValue; // Store SFX value
+        } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        });
-        $('input[name^="fieldvariants"]:checked').each(function () {
-            var fieldId = $(this).data('field-id');
-            var fieldValue = $('#' + fieldId + ' option:selected').text();
-            selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-        });
-        var Detail = selectedOptionsv
-    .map(function (option) {
-        return option.value.trim(); // Trim to remove leading/trailing whitespaces
-    })
-    .filter(function (value) {
-        return value !== null && value !== ''; // Filter out null or empty values
-    })
-    .join(', ');
-        $('.variant').val(Detail);
+        }
+    });
+
+    // Process field checkboxes
+    $('input[name^="fieldvariants"]:checked').each(function () {
+        var fieldId = $(this).data('field-id');
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
+        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+    });
+
+    // Filter and prioritize SFX
+    var Detail = [];
+
+    // Add SFX value first if it exists
+    if (sfxValue) {
+        Detail.push(sfxValue);
     }
+
+    // Add remaining values, filtering out null or empty values
+    Detail = Detail.concat(
+        selectedOptionsv
+            .map(function (option) {
+                return option.value.trim(); // Trim to remove leading/trailing whitespaces
+            })
+            .filter(function (value) {
+                return value !== null && value !== ''; // Filter out null or empty values
+            })
+    );
+
+    // Join all values into a single string
+    $('.variant').val(Detail.join(', '));
+}
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
                 updatevariantDetail();
             });

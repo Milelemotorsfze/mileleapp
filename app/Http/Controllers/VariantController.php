@@ -45,7 +45,6 @@ class VariantController extends Controller
         foreach ($variants as $variant) {
             $details = [];
             $otherDetails = [];
-            
             foreach ($variant->variantItems as $item) {
                 $modelSpecification = $item->model_specification;
                 $modelSpecificationOption = $item->model_specification_option;
