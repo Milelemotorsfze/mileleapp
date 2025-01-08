@@ -1180,7 +1180,10 @@ class WorkOrderController extends Controller
     
         // Adjust the query based on user permissions
         if ($hasLimitedAccess) {
-            $query->where('created_by', $authId);
+            $query->where(function ($subQuery) use ($authId) {
+                $subQuery->where('created_by', $authId)
+                         ->orWhere('sales_person_id', $authId);
+            });
         }
     
         try {
