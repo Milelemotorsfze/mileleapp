@@ -498,8 +498,8 @@
                 Bank Address : DUBAI UAE<br>
                 @elseif ($quotationDetail->selected_bank == "rak-usd")
                 Account Name : MlLELE MOTORS FZE<br>
-                IBAN : AE930400000882723910002<br>
-                Account No : 0882723910002<br>
+                IBAN : AE930400000882723910001<br>
+                Account No : 0882723910001<br>
                 Swift Code : NRAKAEAK<br>
                 Bank Name : RAK BANK<br>
                 Branch Name : DRAGON MART<br>
@@ -507,6 +507,14 @@
                 @elseif ($quotationDetail->selected_bank == "city-aed")
                 Account Name : MlLELE MOTORS FZE<br>
                 IBAN : AE880211000000110720211<br>
+                Account No : 0110720211<br>
+                Swift Code : CITIAEAD<br>
+                Bank Name : CITI BANK N.A<br>
+                Branch Name : AL WASL BRANCH<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-eur")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910002<br>
                 Account No : 0110720211<br>
                 Swift Code : CITIAEAD<br>
                 Bank Name : CITI BANK N.A<br>

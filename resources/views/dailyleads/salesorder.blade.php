@@ -422,7 +422,6 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    console.log(row);
                     if (row.calls_id !== null) { // Check if quotation_id is not null
             const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
             return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
@@ -507,7 +506,6 @@ table.dataTable thead th select {
      function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
-    console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);
     $('#fileModal').modal('show');
 }
