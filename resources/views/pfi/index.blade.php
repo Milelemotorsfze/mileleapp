@@ -55,6 +55,7 @@
                             <th>Actions</th>
                             <th>S.NO</th>
                             <th>PFI Number</th>
+                            <th>PO Number</th>
                             <th>PFI Date</th>
                             <th>Customer Name </th>
                             <th>Country</th>                   
@@ -93,6 +94,7 @@
             {'data': 'action', 'name': 'action', orderable: false, searchable: false},
             { 'data': 'DT_RowIndex', 'name': 'DT_RowIndex', orderable: false, searchable: false },
             {'data' : 'pfi_reference_number', 'name' : 'pfi_reference_number', orderable: false },
+            {'data' : 'po_number', 'name' : 'po_number', orderable: false },
             {'data' : 'pfi_date', 'name' : 'pfi_date', orderable: false},
             {'data' : 'customer.name', 'name': 'customer.name', orderable: false },                    
             {'data' : 'country.name', 'name': 'country.name', orderable: false },        
