@@ -741,14 +741,17 @@
         $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
         return [$color->id => $formattedName];
     })
+    ->sort() // Sort by value alphabetically
     ->toArray();
-    $intColours = \App\Models\ColorCode::where('belong_to', 'int')
+
+// Fetch and sort internal colours
+$intColours = \App\Models\ColorCode::where('belong_to', 'int')
     ->get(['id', 'name', 'code']) // Fetch the 'id', 'name', and 'code' attributes
     ->mapWithKeys(function ($color) {
-        // Combine 'name' and 'code' and use 'id' as the key
         $formattedName = $color->code ? $color->name . ' (' . $color->code . ')' : $color->name;
         return [$color->id => $formattedName];
     })
+    ->sort() // Sort by value alphabetically
     ->toArray();
     @endphp
     <div class="card-body">
@@ -5296,21 +5299,27 @@ $.ajax({
 </script>
 <script>
     $(document).ready(function() {
-        $('.ex-colour-select').select2({
-            placeholder: 'Exterior Color',
-            allowClear: true,
-            width: 'resolve'  // This tells Select2 to inherit the width from the CSS or element itself
-        });
-
-        $('.int-colour-select').select2({
-            placeholder: 'Interior Color',
-            allowClear: true,
-            width: 'resolve'  // Adjust the width dynamically or apply your custom width
-        });
-
+        $('body').on('focus', '.ex-colour-select', function () {
+        if (!$(this).hasClass("select2-hidden-accessible")) {
+            $(this).select2({
+                placeholder: 'Exterior Color',
+                allowClear: true,
+                width: 'resolve'
+            });
+        }
+    });
+    $('body').on('focus', '.int-colour-select', function () {
+        if (!$(this).hasClass("select2-hidden-accessible")) {
+            $(this).select2({
+                placeholder: 'Interior Color',
+                allowClear: true,
+                width: 'resolve'
+            });
+        }
+    });
         $('.variant-id').select2({
             placeholder: 'Variant',
-            maximumSelectionLength: 1 // Adjust the width dynamically or apply your custom width
+            maximumSelectionLength: 1
         });
     });
 </script>
