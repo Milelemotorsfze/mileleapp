@@ -90,6 +90,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Created By</th>
+                     <th>Created At</th>
+                     <th>Updated By</th>
+                     <th>Updated At</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -118,6 +122,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
                      </td>
+                     <td>
+                        {{ $user->createdBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->created_at != ''){{\Carbon\Carbon::parse($user->created_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>
+                     <td>
+                        {{ $user->updatedBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->updated_at != ''){{\Carbon\Carbon::parse($user->updated_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>                   
                      <td>
                         @can('user-view')
                         @php
@@ -208,6 +224,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Created By</th>
+                     <th>Created At</th>
+                     <th>Updated By</th>
+                     <th>Updated At</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -236,6 +256,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
                      </td>
+                     <td>
+                        {{ $user->createdBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->created_at != ''){{\Carbon\Carbon::parse($user->created_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>
+                     <td>
+                        {{ $user->updatedBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->updated_at != ''){{\Carbon\Carbon::parse($user->updated_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>     
                      <td>
                      @php
                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create']);
@@ -341,6 +373,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <th>Status</th>
                      <th>Is Sales Rep.</th>
                      <th>Can Send WO Email</th>
+                     <th>Created By</th>
+                     <th>Created At</th>
+                     <th>Updated By</th>
+                     <th>Updated At</th>
                      <th>Action</th>
                   </tr>
                </thead>
@@ -365,6 +401,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                      <td>
                         {{ $user->can_send_wo_email ?? '' }}
                      </td>
+                     <td>
+                        {{ $user->createdBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->created_at != ''){{\Carbon\Carbon::parse($user->created_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>
+                     <td>
+                        {{ $user->updatedBy->name ?? '' }}
+                     </td>
+                     <td>
+                        @if($user->updated_at != ''){{\Carbon\Carbon::parse($user->updated_at)->format('d M Y h:i A') ?? ''}}@endif
+                     </td>     
                      <td>
                         @can('user-view')
                         @php
@@ -437,12 +485,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                   @endforeach
                </tbody>
             </table>
-            </div> 
-         </div>
+         </div> 
       </div>
-      @endif
-      @endcan
-      @can('user-list-deleted')
+   </div>
+   @endif
+   @endcan
+   @can('user-list-deleted')
       @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-deleted']);
       @endphp
@@ -460,6 +508,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <th>Status</th>
                         <th>Is Sales Rep.</th>
                         <th>Can Send WO Email</th>
+                        <th>Created By</th>
+                        <th>Created At</th>
+                        <th>Updated By</th>
+                        <th>Updated At</th>
                         <th>Action</th>
                      </tr>
                   </thead>
@@ -480,8 +532,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         <td><label class="badge badge-soft-danger">deleted</label></td>
                         <td>{{ $user->is_sales_rep ?? '' }}</td>
                         <td>
-                        {{ $user->can_send_wo_email ?? '' }}
-                     </td>
+                           {{ $user->can_send_wo_email ?? '' }}
+                        </td>
+                        <td>
+                           {{ $user->createdBy->name ?? '' }}
+                        </td>
+                        <td>
+                           @if($user->created_at != ''){{\Carbon\Carbon::parse($user->created_at)->format('d M Y h:i A') ?? ''}}@endif
+                        </td>
+                        <td>
+                           {{ $user->updatedBy->name ?? '' }}
+                        </td>
+                        <td>
+                           @if($user->updated_at != ''){{\Carbon\Carbon::parse($user->updated_at)->format('d M Y h:i A') ?? ''}}@endif
+                        </td>     
                         <td>
                            @can('user-view')
                            @php
@@ -544,7 +608,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
          </div>
       </div>
       @endif
-      @endcan
+   @endcan
    </div>
    <!-- end tab-content-->
 </div>

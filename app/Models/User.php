@@ -34,6 +34,9 @@ class User extends Authenticatable
         'is_management',
         'is_sales_rep',
         'can_send_wo_email',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
     protected $hidden = [
         'password',
@@ -578,6 +581,15 @@ class User extends Authenticatable
             }
         }
         return false;
+    }
+    public function createdBy() {
+        return $this->hasOne(User::class,'id', 'created_by');
+    }
+    public function updatedBy() {
+        return $this->hasOne(User::class,'id', 'updated_by');
+    }
+    public function deletedBy() {
+        return $this->hasOne(User::class,'id', 'deleted_by');
     }
     public function empProfile() {
         return $this->hasOne(EmployeeProfile::class, 'user_id')->where('type','employee');

@@ -63,6 +63,7 @@ namespace App\Http\Controllers;
                 'lauguages' => 'required',
                 'user_image' => 'nullable|image|mimes:jpg,jpeg,png|max:100',
             ]);
+            $authId = Auth::id();
             $user = new User();
             $user->name = $request->input('name');
             $user->email = $request->input('email');
@@ -71,6 +72,7 @@ namespace App\Http\Controllers;
             $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
             $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
             $user->selected_role = $request->roles[0];
+            $user->created_by = $authId;
             $user->save();
             $empProfile = new EmployeeProfile();
             $empProfile->user_id = $user->id;
@@ -78,6 +80,7 @@ namespace App\Http\Controllers;
             $empProfile->company_number = $request->input('phone');
             $empProfile->department_id = $request->input('department');
             $empProfile->designation_id = $request->input('designation');
+            $empProfile->created_by = $authId;
             if ($request->hasFile('user_image')) {
                 $image = $request->file('user_image');
                 $imageName = time().'.'.$image->getClientOriginalExtension();
@@ -156,6 +159,7 @@ namespace App\Http\Controllers;
         'designation' => 'required',
         'user_image' => 'nullable|image|mimes:jpg,jpeg,png|max:100',
     ]);
+    $authId =Auth::id();
     $user = User::find($id);
     $user->name = $request->input('name');
     $user->email = $request->input('email');
@@ -163,6 +167,7 @@ namespace App\Http\Controllers;
     $user->is_sales_rep = $request->has('is_sales_rep') ? 'Yes' : 'No';
     $user->can_send_wo_email = $request->has('can_send_wo_email') ? 'yes' : 'no';
     $user->selected_role = $request->roles[0];
+    $user->updated_by = $authId;
     $user->save();
 
     $empProfile = $user->empProfile ?? new EmployeeProfile();
@@ -171,6 +176,7 @@ namespace App\Http\Controllers;
     $empProfile->company_number = $request->input('phone');
     $empProfile->department_id = $request->input('department');
     $empProfile->designation_id = $request->input('designation');
+    $empProfile->updated_by = $authId;
     if ($request->hasFile('user_image')) {
         $image = $request->file('user_image');
         $imageName = time().'.'.$image->getClientOriginalExtension();
