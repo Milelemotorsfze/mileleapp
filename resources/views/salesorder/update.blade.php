@@ -378,13 +378,10 @@
             <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
                 <option value="" selected>Select VIN</option>
                 @foreach($vehicles[$quotationItem->id] as $vehicle)
-                    @if($vehicle->inspection_status != "Pending")
                         @php
-                            // Determine if this vehicle should be selected
                             $selected = ($vehicle->id == $selectedVehicleId) ? 'selected' : '';
                         @endphp
                         <option value="{{ $vehicle->id }}" {{ $selected }}>{{ $vehicle->vin }}</option>
-                    @endif
                 @endforeach
             </select>
         </div>

@@ -363,12 +363,15 @@ class SalesOrderController extends Controller
                         case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                        ->whereNull('so_id')
+                        ->where(function ($query) use ($sodetails) {
+                            $query->whereNull('so_id')
+                                  ->orWhere('so_id', $sodetails->id);
+                        })
                         ->whereNull('gdn_id')
                         ->when(!$hasPermission, function ($query) {
                             $query->where(function ($subQuery) {
                                 $subQuery->whereNull('booking_person_id')
-                                         ->orWhere('booking_person_id', Auth::id());
+                                         ->orWhere('booking_person_id', $sodetails->sales_person_id);
                             });
                         })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
@@ -378,12 +381,15 @@ class SalesOrderController extends Controller
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                            ->whereNull('so_id')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
                             ->whereNull('gdn_id')
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')
-                                             ->orWhere('booking_person_id', Auth::id());
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
                             })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
@@ -394,12 +400,15 @@ class SalesOrderController extends Controller
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                            ->whereNull('so_id')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
                             ->whereNull('gdn_id')
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')
-                                             ->orWhere('booking_person_id', Auth::id());
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
                             })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
