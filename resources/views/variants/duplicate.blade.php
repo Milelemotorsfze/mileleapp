@@ -221,8 +221,8 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                    <option value="4x2" {{ isset($variant) && $variant->drive_train == '4x2' ? 'selected' : '' }}>4x2</option>
-                                    <option value="4x4" {{ isset($variant) && $variant->drive_train == '4x4' ? 'selected' : '' }}>4x4</option>
+                                    <option value="4X2" {{ isset($variant) && $variant->drive_train == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ isset($variant) && $variant->drive_train == '4X4' ? 'selected' : '' }}>4X4</option>
                                     <option value="AWD" {{ isset($variant) && $variant->drive_train == 'AWD' ? 'selected' : '' }}>AWD</option>
                                     <option value="4WD" {{ isset($variant) && $variant->drive_train == '4WD' ? 'selected' : '' }}>4WD</option>
                                     <option value="FWD" {{ isset($variant) && $variant->drive_train == 'FWD' ? 'selected' : '' }}>FWD</option>
