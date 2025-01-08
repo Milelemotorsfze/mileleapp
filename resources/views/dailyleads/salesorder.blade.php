@@ -423,7 +423,7 @@ table.dataTable thead th select {
                 searchable: false,
                 render: function (data, type, row) {
                     console.log(row);
-                    if (row.quotation_id !== null) { // Check if quotation_id is not null
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
             const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
             return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
         }
@@ -436,7 +436,7 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.quotation_id !== null) { // Check if quotation_id is not null
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
                     return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
                     }
                     return '';
