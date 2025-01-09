@@ -2502,6 +2502,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 <td>
                                     @if($transition->transaction_type == "Released")
                                         <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
+                                        <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
                                     @elseif($transition->transaction_type == "Request For Payment")
                                         <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
