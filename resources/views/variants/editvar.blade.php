@@ -267,13 +267,13 @@
                             <div class="col-lg-12 col-md-12 col-sm-12" id="model_detail">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Description</label>
-                                    <input type="text" class="form-control model_detail" name="model_detail" id="model_detail" readonly/>
+                                    <input type="text" class="form-control model_detail" name="model_detail" id="model_detail" value = "{{$variant->model_detail}}" readonly/>
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Details</label>
-                                    <input type="text" class="form-control variant" name="variant" id="variant" readonly/>
+                                    <input type="text" class="form-control variant" name="variant" id="variant" value = "{{$variant->detail}}" readonly/>
                                 </div>
                             </div>
                             <div class="col-12 text-center">
