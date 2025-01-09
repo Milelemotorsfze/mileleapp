@@ -358,7 +358,7 @@ $(document).ready(function () {
 
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
         if (fieldId === 'fuel') {
     if (fieldValue === 'Petrol') {
         fieldValue = 'P';
@@ -425,10 +425,9 @@ $(document).ready(function () {
         } else {
             return option.value;
         }
-    }).filter(Boolean).join(' ');
-
-    $('.model_detail').val(modelDetail);
-}
+    }).filter(Boolean).join(' ').replace(/\s+/g, ' '); // Ensure single spaces only
+    $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leading/trailing spaces
+    }
             $(document).on('change', 'input[name^="specification_checkbox"], input[name^="field_checkbox"]', function () {
                 updateModelDetail();
             });
@@ -503,7 +502,7 @@ $(document).ready(function () {
 
         // Check if the selected option is SFX
         if (selectedText.toUpperCase() === 'SFX') {
-            sfxValue = displayValue; // Store SFX value
+            sfxValue = '(' + displayValue + ')'; // Store SFX value
         } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
         }

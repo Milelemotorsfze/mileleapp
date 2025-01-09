@@ -194,6 +194,9 @@
                                 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
+                                <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+                                <a data-placement="top" href="{{ route('variants.editvar', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Edit</i>
+                                </a>
                                 </td>
                                 @else
                                 <td class="nowrap-td">

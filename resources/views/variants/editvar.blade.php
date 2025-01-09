@@ -6,7 +6,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Add New Variant</h4>
+                <h4 class="card-title">Edit Variant - {{$variant->name}}</h4>
                 @can('variants-list')
                     @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-list');
@@ -66,38 +66,55 @@
                                 </div>
                             </div>
                             </div>
-                <form id="form-create" action="{{ route('variants.store') }}" method="POST">
-                    @csrf
+                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                                        </div>
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            <form id="form-create" action="{{ route('variants.storevar', ['variant' => $variant->id]) }}" method="POST">
+                            @csrf
                         <div class="row">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Netsuite Variant Name</label>
-                                   <input type = "text" name="netsuite_name" class="form-control"/>
+                                   <input type = "text" name="netsuite_name" class="form-control" value= "{{$variant->netsuite_name}}"/>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Brand</label>
-                                    <select class="form-control" autofocus name="brands_id" id="brand">
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
-                                                {{ $brand->brand_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <input class="form-control" type="text" class="" value="{{$brand->brand_name}}" readonly/>
+                                    <input type="hidden" name="brands_id" value="{{$brand->id}}">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Line</label>
-                                    <select class="form-control" autofocus name="master_model_lines_id" id="model">
-                                    <option value="" disabled selected>Select a Model Line</option>
-                                        @foreach($masterModelLines as $masterModelLine)
-                                            <option value="{{ $masterModelLine->id }}" {{ old('master_model_lines_id') == $masterModelLine->id ? 'selected' : '' }}>
-                                                {{ $masterModelLine->model_line }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <select class="form-control" name="master_model_lines_id" id="model" readonly>
+                                    <option value="{{$masterModelLine->id}}">{{$masterModelLine->model_line}}</option>
+                                </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="my">
@@ -110,7 +127,7 @@
                                     @endphp
                                     <select name="my" class="form-control">
                                         @foreach ($years as $year)
-                                            <option value="{{ $year }}" {{ old('my') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                        <option value="{{ $year }}" {{ isset($variant) && $variant->my == $year ? 'selected' : '' }}>{{ $year }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -119,134 +136,133 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>
                                     <select class="form-control" autofocus name="gearbox" id="gear">
-                                        <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
-                                        <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
+                                    <option value="AT" {{ isset($variant) && $variant->gearbox == 'AT' ? 'selected' : '' }}>AT</option>
+                                    <option value="MT" {{ isset($variant) && $variant->gearbox == 'MT' ? 'selected' : '' }}>MT</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Fuel Type</label>
-                                    <select class="form-control" autofocus name="fuel_type" id="fuel">
-                                        <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
-                                        <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
-                                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
-                                        <option value="PHEV" {{ old('fuel_type') == 'PHEV' ? 'selected' : '' }}>PHEV</option>
-                                        <option value="MHEV" {{ old('fuel_type') == 'MHEV' ? 'selected' : '' }}>MHEV</option>
-                                        <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
+                                    <select class="form-control" autofocus name="fuel_type" id="fuel" disabled>
+                                    <option value="Petrol" {{ isset($variant) && $variant->fuel_type == 'Petrol' ? 'selected' : '' }}>Petrol</option>
+                                    <option value="Diesel" {{ isset($variant) && $variant->fuel_type == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                                    <option value="PH" {{ isset($variant) && $variant->fuel_type == 'PH' ? 'selected' : '' }}>PH</option>
+                                    <option value="PHEV" {{ isset($variant) && $variant->fuel_type == 'PHEV' ? 'selected' : '' }}>PHEV</option>
+                                    <option value="MHEV" {{ isset($variant) && $variant->fuel_type == 'MHEV' ? 'selected' : '' }}>MHEV</option>
+                                    <option value="EV" {{ isset($variant) && $variant->fuel_type == 'EV' ? 'selected' : '' }}>EV</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
-                                    <select class="form-control" autofocus name="engine" id="engine">
-                                        <option value="" {{ old('engine') == '' ? 'selected' : '' }}>Please Select The Engine Capacity</option>
-                                        <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
-                                        <option value="1.0" {{ old('engine') == '1.0' ? 'selected' : '' }}>1.0</option>
-                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
-                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.3</option>
-                                        <option value="1.4" {{ old('engine') == '1.4' ? 'selected' : '' }}>1.4</option>
-                                        <option value="1.5" {{ old('engine') == '1.5' ? 'selected' : '' }}>1.5</option>
-                                        <option value="1.6" {{ old('engine') == '1.6' ? 'selected' : '' }}>1.6</option>
-                                        <option value="1.8" {{ old('engine') == '1.8' ? 'selected' : '' }}>1.8</option>
-                                        <option value="2.0" {{ old('engine') == '2.0' ? 'selected' : '' }}>2.0</option>
-                                        <option value="2.2" {{ old('engine') == '2.2' ? 'selected' : '' }}>2.2</option>
-                                        <option value="2.4" {{ old('engine') == '2.4' ? 'selected' : '' }}>2.4</option>
-                                        <option value="2.5" {{ old('engine') == '2.5' ? 'selected' : '' }}>2.5</option>
-                                        <option value="2.7" {{ old('engine') == '2.7' ? 'selected' : '' }}>2.7</option>
-                                        <option value="2.8" {{ old('engine') == '2.8' ? 'selected' : '' }}>2.8</option>
-                                        <option value="3.0" {{ old('engine') == '3.0' ? 'selected' : '' }}>3.0</option>
-                                        <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
-                                        <option value="3.4" {{ old('engine') == '3.4' ? 'selected' : '' }}>3.4</option>
-                                        <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
-                                        <option value="3.6" {{ old('engine') == '3.6' ? 'selected' : '' }}>3.6</option>
-                                        <option value="3.8" {{ old('engine') == '3.8' ? 'selected' : '' }}>3.8</option>
-                                        <option value="4.0" {{ old('engine') == '4.0' ? 'selected' : '' }}>4.0</option>
-                                        <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
-                                        <option value="4.4" {{ old('engine') == '4.4' ? 'selected' : '' }}>4.4</option>
-                                        <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
-                                        <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
-                                        <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
-                                        <option value="5.0" {{ old('engine') == '5.0' ? 'selected' : '' }}>5.0</option>
-                                        <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
-                                        <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
-                                        <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
-                                        <option value="5.9" {{ old('engine') == '5.9' ? 'selected' : '' }}>5.9</option>
-                                        <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
-                                        <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
-                                        <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
+                                    <select class="form-control" autofocus name="engine" id="engine" disabled>
+                                            <option value="" {{ isset($variant) && $variant->engine == '' ? 'selected' : '' }}>Please Select the Engine Capacity</option>
+                                            <option value="0.8" {{ isset($variant) && $variant->engine == '0.8' ? 'selected' : '' }}>0.8</option>
+                                            <option value="1.0" {{ isset($variant) && $variant->engine == '1.0' ? 'selected' : '' }}>1.0</option>
+                                            <option value="1.2" {{ isset($variant) && $variant->engine == '1.2' ? 'selected' : '' }}>1.2</option>
+                                            <option value="1.3" {{ isset($variant) && $variant->engine == '1.3' ? 'selected' : '' }}>1.3</option>
+                                            <option value="1.4" {{ isset($variant) && $variant->engine == '1.4' ? 'selected' : '' }}>1.4</option>
+                                            <option value="1.5" {{ isset($variant) && $variant->engine == '1.5' ? 'selected' : '' }}>1.5</option>
+                                            <option value="1.6" {{ isset($variant) && $variant->engine == '1.6' ? 'selected' : '' }}>1.6</option>
+                                            <option value="1.8" {{ isset($variant) && $variant->engine == '1.8' ? 'selected' : '' }}>1.8</option>
+                                            <option value="2.0" {{ isset($variant) && $variant->engine == '2.0' ? 'selected' : '' }}>2.0</option>
+                                            <option value="2.2" {{ isset($variant) && $variant->engine == '2.2' ? 'selected' : '' }}>2.2</option>
+                                            <option value="2.4" {{ isset($variant) && $variant->engine == '2.4' ? 'selected' : '' }}>2.4</option>
+                                            <option value="2.5" {{ isset($variant) && $variant->engine == '2.5' ? 'selected' : '' }}>2.5</option>
+                                            <option value="2.7" {{ isset($variant) && $variant->engine == '2.7' ? 'selected' : '' }}>2.7</option>
+                                            <option value="2.8" {{ isset($variant) && $variant->engine == '2.8' ? 'selected' : '' }}>2.8</option>
+                                            <option value="3.0" {{ isset($variant) && $variant->engine == '3.0' ? 'selected' : '' }}>3.0</option>
+                                            <option value="3.3" {{ isset($variant) && $variant->engine == '3.3' ? 'selected' : '' }}>3.3</option>
+                                            <option value="3.4" {{ isset($variant) && $variant->engine == '3.4' ? 'selected' : '' }}>3.4</option>
+                                            <option value="3.5" {{ isset($variant) && $variant->engine == '3.5' ? 'selected' : '' }}>3.5</option>
+                                            <option value="3.6" {{ isset($variant) && $variant->engine == '3.6' ? 'selected' : '' }}>3.6</option>
+                                            <option value="3.8" {{ isset($variant) && $variant->engine == '3.8' ? 'selected' : '' }}>3.8</option>
+                                            <option value="4.0" {{ isset($variant) && $variant->engine == '4.0' ? 'selected' : '' }}>4.0</option>
+                                            <option value="4.2" {{ isset($variant) && $variant->engine == '4.2' ? 'selected' : '' }}>4.2</option>
+                                            <option value="4.4" {{ isset($variant) && $variant->engine == '4.4' ? 'selected' : '' }}>4.4</option>
+                                            <option value="4.5" {{ isset($variant) && $variant->engine == '4.5' ? 'selected' : '' }}>4.5</option>
+                                            <option value="4.6" {{ isset($variant) && $variant->engine == '4.6' ? 'selected' : '' }}>4.6</option>
+                                            <option value="4.8" {{ isset($variant) && $variant->engine == '4.8' ? 'selected' : '' }}>4.8</option>
+                                            <option value="5.0" {{ isset($variant) && $variant->engine == '5.0' ? 'selected' : '' }}>5.0</option>
+                                            <option value="5.3" {{ isset($variant) && $variant->engine == '5.3' ? 'selected' : '' }}>5.3</option>
+                                            <option value="5.6" {{ isset($variant) && $variant->engine == '5.6' ? 'selected' : '' }}>5.6</option>
+                                            <option value="5.7" {{ isset($variant) && $variant->engine == '5.7' ? 'selected' : '' }}>5.7</option>
+                                            <option value="5.9" {{ isset($variant) && $variant->engine == '5.9' ? 'selected' : '' }}>5.9</option>
+                                            <option value="6.0" {{ isset($variant) && $variant->engine == '6.0' ? 'selected' : '' }}>6.0</option>
+                                            <option value="6.2" {{ isset($variant) && $variant->engine == '6.2' ? 'selected' : '' }}>6.2</option>
+                                            <option value="6.7" {{ isset($variant) && $variant->engine == '6.7' ? 'selected' : '' }}>6.7</option>
+                                        </select>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="steering">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Steering</label>
-                                    <select class="form-control" autofocus name="steering" id="steering">
-                                        <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
-                                        <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
-                                    </select>
+                                    <select class="form-control" autofocus name="steering" id="steering" disabled>
+                                    <option value="LHD" {{ isset($variant) && $variant->steering == 'LHD' ? 'selected' : '' }}>LHD</option>
+                                    <option value="RHD" {{ isset($variant) && $variant->steering == 'RHD' ? 'selected' : '' }}>RHD</option>
+                                </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="coo">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">COO</label>
                                     <select class="form-control coo" name="coo" id="coo">
-                                        <option value="" disabled selected>Select Country</option>
-                                        @foreach ($countries as $country)
-                                        <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                                        @endforeach
-                                    </select>
+                                    <option value="" disabled selected>Select Country</option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country }}" data-value="{{ $country }}" {{ isset($variant) && $variant->coo == $country ? 'selected' : '' }}>{{ $country }}</option>
+                                    @endforeach
+                                </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="drive_train">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                    <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
-                                    <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
-                                        <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
-                                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
-                                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
-
-                                    </select>
+                                    <option value="4X2" {{ isset($variant) && $variant->drive_train == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ isset($variant) && $variant->drive_train == '4X4' ? 'selected' : '' }}>4X4</option>
+                                    <option value="AWD" {{ isset($variant) && $variant->drive_train == 'AWD' ? 'selected' : '' }}>AWD</option>
+                                    <option value="4WD" {{ isset($variant) && $variant->drive_train == '4WD' ? 'selected' : '' }}>4WD</option>
+                                    <option value="FWD" {{ isset($variant) && $variant->drive_train == 'FWD' ? 'selected' : '' }}>FWD</option>
+                                    <option value="RWD" {{ isset($variant) && $variant->drive_train == 'RWD' ? 'selected' : '' }}>RWD</option>
+                                </select>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>
                                     <select class="form-control" autofocus name="upholestry" id="upholstery">
-                                        <option value="Leather" {{ old('upholstery') == 'Leather' ? 'selected' : '' }}>Leather</option>
-                                        <option value="Fabric" {{ old('upholstery') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
-                                        <option value="Vinyl" {{ old('upholstery') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
-                                        <option value="Leather & Fabric" {{ old('upholstery') == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
-                                    </select>
+                                    <option value="Leather" {{ isset($variant) && $variant->upholestry == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                    <option value="Fabric" {{ isset($variant) && $variant->upholestry == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                    <option value="Vinyl" {{ isset($variant) && $variant->upholestry == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                                    <option value="Leather & Fabric" {{ isset($variant) && $variant->upholestry == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
+                                </select>
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-2 col-md-6 col-sm-12" id="int">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Interior Colour</label>
-                                    <select class="form-control" autofocus name="int_colour[]" id="int_colour" multiple>
-                                        @foreach($int_colour as $color)
-                                            <option value="{{ $color->id }}" {{ (is_array(old('int_colour')) && in_array($color->id, old('int_colour'))) ? 'selected' : '' }}>{{ $color->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div> -->
-                            <!-- <div class="col-lg-2 col-md-6 col-sm-12" id="ex">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Exterior Colour</label>
-                                    <select class="form-control" autofocus name="ex_colour[]" id="ex_colour" multiple>
-                                        @foreach($ex_colour as $color)
-                                            <option value="{{ $color->id }}" {{ (is_array(old('ex_colour')) && in_array($color->id, old('ex_colour'))) ? 'selected' : '' }}>{{ $color->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div> -->
                             <div class="row" id="specification-details-container">
-                            </div>
-                            <input type="hidden" name="selected_model_id" id="selected_model_id">
+    @foreach ($data as $specData)
+        <div class="col-lg-4 mb-3">
+            <label>{{ $specData['specification']->name }}</label>
+            <div class="input-group">
+                <select name="specification_{{ $specData['specification']->id }}" data-specification-id="{{ $specData['specification']->id }}" class="form-control specification-dropdown">
+                    <option value="" disabled selected>Select an Option</option>
+                    @foreach ($specData['options'] as $option)
+                        <option value="{{ $option->id }}" @if (in_array($option->id, $specData['selectedOptions'])) selected @endif>
+                            {{ $option->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" data-specification-id="{{ $specData['specification']->id }}" data-toggle="modal" data-target="#optionsmodal">
+                        +
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endforeach
+</div>
                             <input type="hidden" name="selected_specifications" id="selected_specifications">
                             <div class="col-lg-12 col-md-12 col-sm-12" id="model_detail">
                                 <div class="mb-3">
@@ -271,6 +287,34 @@
     @endcan
 @endsection
 @push('scripts')
+<script>
+    // Assuming selectedSpecifications is already defined
+    var selectedSpecifications = [];
+    $('.specification-dropdown').on('change', function () {
+        var selectedValue = $(this).val();
+        var specificationId = $(this).data('specification-id');
+
+        // Check if selectedValue is not null or empty
+        if (selectedValue !== null && selectedValue !== "") {
+            var specIndex = selectedSpecifications.findIndex(spec => spec.specification_id === specificationId);
+
+            if (specIndex !== -1) {
+                // Update existing entry
+                selectedSpecifications[specIndex].value = selectedValue;
+            } else {
+                // Add new entry
+                selectedSpecifications.push({
+                    specification_id: specificationId,
+                    value: selectedValue
+                });
+            }
+
+            $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
+        }
+    });
+    // Trigger change event for each dropdown to capture initially selected values
+    $('.specification-dropdown').trigger('change');
+</script>
     <script>
         $('#brand').select2({
             placeholder: 'Select Brand'
@@ -281,9 +325,6 @@
         })
         $('#ex_colour').select2({
             placeholder: 'Select Exterior Colour'
-        })
-        $('#model').select2({
-            placeholder: 'Select Model'
         })
         $('#brand').on('change',function() {
             $('#brand-error').remove();
@@ -308,101 +349,7 @@
             }
         });
     </script>
-    <script>
-    $(document).ready(function() {
-        $('#brand').on('change', function() {
-            $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').hide();
-            $('#specification-details-container').empty();
-            var selectedBrandId = $(this).val();
-            $.ajax({
-                url: '/get-model-lines/' + selectedBrandId,
-                type: 'GET',
-                success: function(data) {
-                    $('#model').empty();
-                    $('#model').append('<option value="" disabled selected>Select a Model</option>');
-                    $.each(data, function(index, modelLine) {
-                        $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
-                    });
-                },
-                error: function(error) {
-                    console.log('Error fetching model lines:', error);
-                }
-            });
-        });
-    });
-</script>
 <script>
-$(document).ready(function () {
-    $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').hide();
-    $('#model').on('change', function () {
-        $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').show();
-        var selectedModelLineId = $(this).val();
-        selectedSpecifications = [];
-        $.ajax({
-            type: 'GET',
-            url: '/getSpecificationDetails/' + selectedModelLineId,
-            success: function (response) {
-                var data = response.data;
-                $('#specification-details-container').empty();
-                var selectedSpecifications = [];
-                data.forEach(function (item) {
-                    var specification = item.specification;
-                    var options = item.options;
-                    var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '">');
-                    select.append('<option value="" disabled selected>Select an Option</option>');
-                    options.forEach(function (option) {
-                        select.append('<option value="' + option.id + '">' + option.name + '</option>');
-                    });
-                    var addButton = $('<a><button class="btn btn-primary btn-sm ml-2">+</button></a>');
-                    addButton.on('click', function (event) {
-                        event.preventDefault();
-                        $('#specification-id-input').val(specification.id);
-                        $('#optionsmodal').modal('show');
-                    });
-                    var selectContainer = $('<div class="d-flex align-items-center"></div>');
-                    selectContainer.append(select).append(addButton);
-                    select.on('change', function () {
-                        var selectedValue = $(this).val();
-                        selectedSpecifications.push({
-                            specification_id: specification.id,
-                            value: selectedValue
-                        });
-                        $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
-                    });
-
-                    var specificationColumn = $('<div class="col-lg-4 mb-3">');
-                    specificationColumn.append('<label class="form-label">' + specification.name + '</label');
-                    specificationColumn.append(selectContainer);
-                    $('#specification-details-container').append(specificationColumn);
-                });
-            }
-        });
-        $('#selected_model_id').val(selectedModelLineId);
-    });
-});
-</script>
-<script>
-    function savenewoptions() {
-        var specificationId = $('#specification-id-input').val();
-        var newOptionValue = $('#option_name').val();
-        $.ajax({
-            url: '{{ route('variants.saveOption') }}',
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                specificationId: specificationId,
-                newOption: newOptionValue
-            },
-            success: function (response) {
-                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
-                $('[data-specification-id="' + specificationId + '"]').append(option);
-                alertify.success('Specification Option successfully Added');
-                $('#optionsmodal').modal('hide');
-            }
-        });
-    }
-    </script>
-<script> 
 $(document).ready(function () {
     function updateModelDetail() {
     var selectedOptions = [];
@@ -411,7 +358,7 @@ $(document).ready(function () {
 
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
         if (fieldId === 'fuel') {
     if (fieldValue === 'Petrol') {
         fieldValue = 'P';
@@ -478,9 +425,9 @@ $(document).ready(function () {
         } else {
             return option.value;
         }
-    }).filter(Boolean).join(' ');
+    }).filter(Boolean).join(' ').replace(/\s+/g, ' '); // Ensure single spaces only
 
-    $('.model_detail').val(modelDetail);
+$('.model_detail').val(modelDetail.trim()); // Trim final result to remove leading/trailing spaces
 }
             $(document).on('change', 'input[name^="specification_checkbox"], input[name^="field_checkbox"]', function () {
                 updateModelDetail();
@@ -491,11 +438,9 @@ $(document).ready(function () {
             });
             function createSpecificationCheckboxes() {
     $('.specification-checkbox-container').remove();
-    
     $('select[name^="specification_"]').each(function () {
         var specificationId = $(this).data('specification-id');
         var selectedOption = $(this).val();
-        
         if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
             var checkboxId = 'checkbox_specification_' + specificationId;
             var checkbox = $('<input type="checkbox">')
@@ -544,44 +489,50 @@ $(document).ready(function () {
         $(document).ready(function () {
             function updatevariantDetail() {
     var selectedOptionsv = [];
-    var sfxValue = null;
+    var sfxValue = null; // To store the SFX value if found
 
+    // Process specification checkboxes
     $('input[name^="variantcheckbox"]:checked').each(function () {
         var specificationId = $(this).data('specification-id');
-        var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
         var displayValue = (selectedText.toUpperCase() === 'YES')
             ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
             : selectedText;
-
+        console.log(selectedText);
+        // Check if the selected option is SFX
         if (selectedText.toUpperCase() === 'SFX') {
-            // Capture sfxValue to ensure it comes first
             sfxValue = '(' + displayValue + ')';
         } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
         }
     });
-
+    // Process field checkboxes
     $('input[name^="fieldvariants"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
         selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
     });
 
-    // Initialize the Detail array
+    // Filter and prioritize SFX
     var Detail = [];
 
-    // Add sfxValue first if it exists
+    // Add SFX value first if it exists
     if (sfxValue) {
         Detail.push(sfxValue);
     }
 
-    // Concatenate other selected options
-    selectedOptionsv.forEach(function (option) {
-        Detail.push(option.value);
-    });
+    // Add remaining values, filtering out null or empty values
+    Detail = Detail.concat(
+        selectedOptionsv
+            .map(function (option) {
+                return option.value.trim(); // Trim to remove leading/trailing whitespaces
+            })
+            .filter(function (value) {
+                return value !== null && value !== ''; // Filter out null or empty values
+            })
+    );
 
-    // Update the variant field
+    // Join all values into a single string
     $('.variant').val(Detail.join(', '));
 }
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
@@ -644,5 +595,36 @@ $(document).ready(function () {
                 });
             }
         });
+</script>
+<script>
+    $(document).ready(function () {
+        // Attach click event to the plus buttons
+        $('.btn-outline-secondary').click(function () {
+            var specificationId = $(this).data('specification-id');
+            $('#specification-id-input').val(specificationId);
+            $('#optionsmodal').modal('show');
+        });
+    });
+</script>
+<script>
+    function savenewoptions() {
+        var specificationId = $('#specification-id-input').val();
+        var newOptionValue = $('#option_name').val();
+        $.ajax({
+            url: '{{ route('variants.saveOption') }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                specificationId: specificationId,
+                newOption: newOptionValue
+            },
+            success: function (response) {
+                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
+                $('select[name="specification_' + specificationId + '"]').append(option);
+                alertify.success('Specification Option successfully Added');
+                $('#optionsmodal').modal('hide');
+            }
+        });
+    }
 </script>
 @endpush
