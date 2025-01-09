@@ -44,8 +44,13 @@
 } */
 
 .nav-link:focus, .nav-link:hover {
-  color: aqua;
-}
+  color: white;
+  background: linear-gradient(
+    to right,
+    rgba(0, 101, 172, 0.8),
+    rgba(0, 101, 172, 0.8)
+  );
+  }
 
 .border-start{
   padding-left: 10px;
