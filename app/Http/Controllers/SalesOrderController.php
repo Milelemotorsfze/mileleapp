@@ -367,7 +367,13 @@ class SalesOrderController extends Controller
                             $query->whereNull('so_id')
                                   ->orWhere('so_id', $sodetails->id);
                         })
-                        ->whereNull('gdn_id')
+                        ->when(function ($query) use ($sodetails) {
+                            // Check if so_id exists with the same $sodetails->id
+                            return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                        }, function ($query) {
+                            // Apply gdn_id condition only if so_id is not the same
+                            $query->whereNull('gdn_id');
+                        })
                         ->when(!$hasPermission, function ($query) {
                             $query->where(function ($subQuery) {
                                 $subQuery->whereNull('booking_person_id')
@@ -385,7 +391,13 @@ class SalesOrderController extends Controller
                                 $query->whereNull('so_id')
                                       ->orWhere('so_id', $sodetails->id);
                             })
-                            ->whereNull('gdn_id')
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')
@@ -404,7 +416,13 @@ class SalesOrderController extends Controller
                                 $query->whereNull('so_id')
                                       ->orWhere('so_id', $sodetails->id);
                             })
-                            ->whereNull('gdn_id')
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')

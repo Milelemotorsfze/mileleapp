@@ -1132,4 +1132,6 @@ Route::get('/d', function () {
     Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
     Route::post('/purchasing-order/check-po-number-edit', [PurchasingOrderController::class, 'checkPoNumberedit'])->name('purchasing-order.checkPoNumberedit');
     Route::post('/custom-documentstatus-update', [VehiclesController::class, 'customdocumentstatusupdate'])->name('vehicles.customdocumentstatusupdate');
+    Route::get('/variants/{id}/editvar', [VariantController::class, 'editvar'])->name('variants.editvar');
+    Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
 });
