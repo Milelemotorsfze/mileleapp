@@ -133,6 +133,7 @@ use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
+use App\Http\Controllers\CompanyDomainController;
 
 /*
 /*
@@ -509,6 +510,12 @@ Route::get('/d', function () {
     Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
     // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
 
+    
+    // Company Domains 
+    Route::resource('companyDomains', CompanyDomainController::class);
+    Route::get('companyDomains/createEdit/{action}', [CompanyDomainController::class, 'createEdit'])->name('companyDomains.createEdit');
+    
+    
     // Demand & Planning Module
 
     // Demands
