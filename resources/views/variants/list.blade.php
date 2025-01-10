@@ -180,7 +180,9 @@
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->steering ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->upholestry ?? 'null' )) }}</td>
                         <td class="nowrap-td">{{ $variant->users?->name ?? 'null' }}</td>
-                        <td class="nowrap-td">{{ $variant->created_at ? $variant->created_at->format('d-m-Y H:i:s') : 'null' }}</td>
+                        <td class="nowrap-td">
+    {{ $variant->created_at ? $variant->created_at->format('d-m-Y H:i:s') : ($variant->updated_at ? $variant->updated_at->format('d-m-Y H:i:s') : 'null') }}
+</td>
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
