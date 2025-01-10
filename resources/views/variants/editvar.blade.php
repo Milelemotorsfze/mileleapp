@@ -144,7 +144,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Fuel Type</label>
-                                    <select class="form-control" autofocus name="fuel_type" id="fuel" disabled>
+                                    <input type="hidden" name="fuel_type" value="{{ isset($variant) ? $variant->fuel_type : '' }}">
+                                    <select class="form-control" disabled>
                                     <option value="Petrol" {{ isset($variant) && $variant->fuel_type == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                                     <option value="Diesel" {{ isset($variant) && $variant->fuel_type == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                                     <option value="PH" {{ isset($variant) && $variant->fuel_type == 'PH' ? 'selected' : '' }}>PH</option>
@@ -157,7 +158,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
-                                    <select class="form-control" autofocus name="engine" id="engine" disabled>
+                                    <input type="hidden" name="engine" value="{{ isset($variant) ? $variant->engine : '' }}">
+                                    <select class="form-control" disabled>
                                             <option value="" {{ isset($variant) && $variant->engine == '' ? 'selected' : '' }}>Please Select the Engine Capacity</option>
                                             <option value="0.8" {{ isset($variant) && $variant->engine == '0.8' ? 'selected' : '' }}>0.8</option>
                                             <option value="1.0" {{ isset($variant) && $variant->engine == '1.0' ? 'selected' : '' }}>1.0</option>
@@ -200,7 +202,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="steering">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Steering</label>
-                                    <select class="form-control" autofocus name="steering" id="steering" disabled>
+                                    <input type="hidden" name="steering" value="{{ isset($variant) ? $variant->steering : '' }}">
+                                    <select class="form-control" disabled>
                                     <option value="LHD" {{ isset($variant) && $variant->steering == 'LHD' ? 'selected' : '' }}>LHD</option>
                                     <option value="RHD" {{ isset($variant) && $variant->steering == 'RHD' ? 'selected' : '' }}>RHD</option>
                                 </select>

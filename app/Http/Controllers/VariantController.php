@@ -476,6 +476,7 @@ $existingspecifications = Varaint::with('VariantItems')
     $variant->model_detail = $model_details;
     $variant->detail = $variant_details;
     $variant->my = $request->input('my');
+    $variant->created_by = auth()->user()->id;
     $variant->save();
     $variantId = $variant->id;
     foreach ($selectedSpecifications as $specificationData) {
@@ -882,6 +883,44 @@ public function savespecification(Request $request)
 
     try {
     (new UserActivityController)->createActivity('Editing Variant');
+    $selectedSpecifications = json_decode(request('selected_specifications'), true);
+    ksort($selectedSpecifications);
+    $totalSpecifications = count($selectedSpecifications);
+    $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
+        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+        ->where('fuel_type', $request->input('fuel_type'))
+        ->where('engine', $request->input('engine'))
+        ->where('coo', $request->input('coo'))
+        ->where('my', $request->input('my'))
+        ->where('drive_train', $request->input('drive_train'))
+        ->where('gearbox', $request->input('gearbox'))
+        ->where('steering', $request->input('steering'))
+        ->where('upholestry', $request->input('upholestry'))
+        ->where('id', '!=', $variant)
+        ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
+            $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
+              ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
+        })
+        ->orderBy('created_at', 'desc')
+        ->first();
+        info($request->input('fuel_type'));
+    if ($existingVariantop) {
+        // Check if all specifications and values match
+        $matchedSpecifications = 0;
+        foreach ($selectedSpecifications as $specificationData) {
+            $matchFound = $existingVariantop->variantItems->contains(function ($variantItem) use ($specificationData) {
+                return $variantItem->model_specification_id == $specificationData['specification_id'] &&
+                       $variantItem->model_specification_options_id == $specificationData['value'];
+            });
+    
+            if ($matchFound) {
+                $matchedSpecifications++;
+            }
+        }
+        if ($matchedSpecifications == $totalSpecifications) {
+            return redirect()->back()->with('error', 'Variant with the same specifications and options already exists');
+        }
+    }
     $variant = Varaint::findOrFail($variant);
     VariantItems::where('varaint_id', $variant->id)->delete();
     $model_details= $request->input('model_detail');
@@ -973,10 +1012,9 @@ public function savespecification(Request $request)
     $variant->model_detail = $model_details;
     $variant->detail = $variant_details;
     $variant->my = $request->input('my');
+    $variant->created_by = auth()->user()->id;
     $variant->save();
     $variantId = $variant->id;
-    $selectedSpecifications = json_decode(request('selected_specifications'), true);
-    ksort($selectedSpecifications);
     foreach ($selectedSpecifications as $specificationData) {
         $specification = new VariantItems();
         $specification->varaint_id = $variantId;
