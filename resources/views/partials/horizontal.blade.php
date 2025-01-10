@@ -195,7 +195,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('companyDomains.createEdit', ['action' => 'create']) }}" id="topnav-auth" role="button">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('companyDomains.create')}}" id="topnav-auth" role="button">
                                                 <span data-key="t-authentication">Create</span>
                                             </a>
                                         </div>

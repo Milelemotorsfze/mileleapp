@@ -512,8 +512,12 @@ Route::get('/d', function () {
 
     
     // Company Domains 
-    Route::resource('companyDomains', CompanyDomainController::class);
-    Route::get('companyDomains/createEdit/{action}', [CompanyDomainController::class, 'createEdit'])->name('companyDomains.createEdit');
+    Route::get('companyDomains/create', [CompanyDomainController::class, 'create'])->name('companyDomains.create');
+    Route::get('companyDomains/{id}/edit', [CompanyDomainController::class, 'edit'])->name('companyDomains.edit');
+    Route::post('companyDomains', [CompanyDomainController::class, 'store'])->name('companyDomains.store');
+    Route::put('companyDomains/{id}', [CompanyDomainController::class, 'update'])->name('companyDomains.update');
+    Route::delete('companyDomains/{id}', [CompanyDomainController::class, 'destroy'])->name('companyDomains.destroy');
+    Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
     
     
     // Demand & Planning Module
