@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('company_domains', function (Blueprint $table) {
             $table->id();
+            $table->string('system_requirement')->nullable(); 
             $table->timestamps();
         });
     }
