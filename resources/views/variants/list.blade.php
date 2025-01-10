@@ -195,9 +195,9 @@
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
                                 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-                                <!-- <a href="{{ route('variants.editvar', $variant->id) }}" class="btn btn-info btn-sm" style="background-color: #17a2b8; color: white; border: none;">
+                                <a href="{{ route('variants.editvar', $variant->id) }}" class="btn btn-info btn-sm" style="background-color: #17a2b8; color: white; border: none;">
                                   <i class="fa fa-edit"></i> Edit
-                              </a> -->
+                              </a>
                                 </td>
                                 @else
                                 <td class="nowrap-td">
