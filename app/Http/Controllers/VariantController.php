@@ -782,6 +782,7 @@ public function savespecification(Request $request)
     $newvariant->upholestry = $request->input('upholstery');
     $newvariant->detail = $variantfull->detail;
     $newvariant->model_detail = $variantfull->model_detail;
+    $newvariant->created_by = auth()->user()->id;
     $newvariant->category = "Modified";
     $newvariant->save();
     if($attributes)
