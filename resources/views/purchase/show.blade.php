@@ -486,7 +486,56 @@
         </div>
     </div>
 </div>
-           
+
+        <!-- DP Vehicle Price Update -->
+<div class="modal fade" id="updateDPVehiclePrice" tabindex="-1" role="dialog" aria-labelledby="updateDPVehiclePriceLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateDPVehiclePriceLabel">Update Vehicles Price</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+              
+                <div class="modal-body">
+                    <table class="table table-striped table-editable table-edits table table-condensed" >
+                        <thead class="bg-soft-secondary">
+                        <tr>
+                            <th>S.No:</th>
+                            <th>Model - SFX</th>
+                            <th>Quantity</th>
+                            <th>Unit Price ( {{$purchasingOrder->currency}} ) </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <div hidden>{{$i=0;}}
+                        </div>
+                            @foreach($pfiVehicleVariants as $pfiVehicleVariant)
+                            <tr>
+                                <td> {{ ++$i }} </td>
+                                <td>{{ $pfiVehicleVariant->masterModel->model ?? ''}} - {{ $pfiVehicleVariant->masterModel->sfx ?? '' }}</td>
+                                <td>{{ $pfiVehicleVariant->pfi_quantity ?? '' }}</td>
+                                <td> 
+                                    <input type="number" min="1" placeholder="Price" oninput=calculateTotalPOPrice() value="{{ $pfiVehicleVariant->unit_price ?? '' }}"
+                                    name="unit_prices[]" data-parent-pfi-item-id="{{ $pfiVehicleVariant->id }}" class="form-control mb-2 widthinput unit-prices" >
+                                </td>
+                            </tr>
+                            @endforeach
+                        <tr>
+                            <th colspan="3"> Total Price: </th>
+                            <th id="total-PO-Price"> {{ $purchasingOrder->totalcost }}</th>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-purchase-order-id="{{ $purchasingOrder->id }}"
+                     id="updatePriceBtn">Update Price</button>
+                </div>
+        </div>
+    </div>
+</div>
+
    <!-- modal end  -->
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -1663,7 +1712,8 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('update-po-price');
                         @endphp
                         @if ($hasPermission)
-                            <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
+                            
+                                <a href="#" class="btn btn-sm btn-primary float-left updateprice-btn me-2" data-id="{{ $purchasingOrder->id }}">Price Update</a>
                         @endif
                             <!-- Variant update -->
                         @php
@@ -2813,6 +2863,16 @@
         $('#remarksrejModal').modal('show');
         return false;  // Prevent default button behavior
     }
+    function calculateTotalPOPrice() {
+        var totalPrice = 0;
+        $('.unit-prices').each(function() {
+            var price = parseFloat($(this).val());
+            if (!isNaN(price)) {
+                totalPrice += price;
+            }
+        });
+        $('#total-PO-Price').text(totalPrice.toFixed(2)); 
+    };
 
     $('#submitRemarksrej').click(function() {
         var vehicleId = $('#vehicleId').val();
@@ -4151,6 +4211,7 @@ function confirmPayment(status, orderId, current_amount, totalamount, remainingA
                     $('.new-price').on('input', function() {
                         calculateTotalPrice();
                     });
+                    
 
                     // Store the purchasing order id in the modal for later use
                     $('#vehicleModal').data('purchasingOrderId', id);
@@ -4228,7 +4289,7 @@ $('#savevariantBtn').click(function(){
         $('.variant-id').each(function() {
             var vehicleId = $(this).data('vehicle-id');
             var eachSelectedVariant = $(this).val();
-            console.log(eachSelectedVariant);
+            // console.log(eachSelectedVariant);
             if(eachSelectedVariant) {
                 selectedVariants.push({
                 vehicle_id: vehicleId,
@@ -4240,7 +4301,7 @@ $('#savevariantBtn').click(function(){
         updateVariants(selectedVariants);
     
     });
-
+    
     function updateVariants(selectedVariants){
         var purchasingOrderId = "{{ $purchasingOrder->id }}"; // Retrieve the stored id
             $('#updateVariantBtn').prop('disabled', true);
@@ -4269,6 +4330,7 @@ $('#savevariantBtn').click(function(){
             }
         });
     }
+            // update DP vehcile Price //
 
         function calculateTotalPrice() {
             var totalPrice = 0;
@@ -4280,7 +4342,43 @@ $('#savevariantBtn').click(function(){
             });
             $('#totalPrice').text(totalPrice.toFixed(2)); // Update the total price in the table footer
         }
+    
+        $('#updatePriceBtn').click(function() {
+            var pfiItems = [];
+            $('.unit-prices').each(function() {
+                var parent_pfi_item_id = $(this).attr('data-parent-pfi-item-id');
+                var newPrice = $(this).val();
+                pfiItems.push({
+                    parent_pfi_item_id: parent_pfi_item_id,
+                    unit_price: newPrice
+                });
+            });
+            console.log(pfiItems);
 
+            var purchasingOrderId = $(this).attr('data-purchase-order-id'); // Retrieve the stored id
+            console.log(purchasingOrderId);
+            $.ajax({
+                url: '{{ route("vehicles.updateDPPrices") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    pfiItems: pfiItems,
+                    purchase_order_id: purchasingOrderId 
+                },
+                success: function(response) {
+                    alert('Prices updated successfully!');
+                  
+                    // window.location.reload();
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+
+
+        // end //
+    
         $('#savePricesBtn').click(function(){
             var newPrices = [];
             $('.new-price').each(function() {

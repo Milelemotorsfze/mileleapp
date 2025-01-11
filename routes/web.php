@@ -1009,6 +1009,7 @@ Route::get('/d', function () {
     Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
+    Route::post('vehicles/update-dp-prices', [PurchasingOrderController::class, 'updatePOPrices'])->name('vehicles.updateDPPrices');
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
     Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);

@@ -3852,6 +3852,52 @@ public function vehiclesdatagetting($id)
     }
     return response()->json($vehicleData);
 }
+public function updatePOPrices(Request $request) {
+    info("reached");
+    info($request->all());
+    // identify which item has price change
+    try { 
+
+        DB::beginTransaction();
+            $pfiItems = $request->pfiItems;
+            $prices = [];
+            foreach($pfiItems as $key => $pfiItem) {
+                $pfiItemId = $pfiItem[$key]->parent_pfi_item_id;
+                $ParentPfiItem = PfiItem::find($pfiItemId);
+            
+                if($ParentPfiItem->unit_price != $pfiItem[$key]->unit_price) {
+                    // add all vehcileId and Price to array
+                    // get the model and sfx Ids and get vehicles
+                    // PoPfiItem 
+                    $PoPfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $request->purchase_order_id)
+                    ->where('pfi_item_id', $pfiItemId)
+                    ->first();
+            
+                    // $possibleModelIds = MasterModel::where('model', $POpfiItem->model)
+                    //                     ->where('sfx', $POpfiItem->sfx)->pluck('id')->toArray();
+                    if($POpfiItem) {
+                        $qty = $POpfiItem->quantity;
+                        $vehicles = Vehicles::where('purchasing_order_id', $request->purchase_order_id)
+                                        ->where('model_id', $PoPfiItem->master_model_id)   
+                                        ->orderBy('id','DESC')    
+                                        ->take($qty)
+                                        ->pluck('id')->toArray(); 
+                        foreach($vehicles as $vehicle) {
+                            $prices['vehicle_id'] = $vehicle;
+                            $prices['new_price'] = $pfiItem->unit_price; 
+                        }                     
+                    }
+                }
+            }
+            info($prices);
+        DB::commit();
+
+        return response()->json(['message' => 'Price Updated successfully'], 200);
+        } catch (Exception $e) { // Catch any exception
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+
+}
 public function updatePrices(Request $request)
 {
     $prices = $request->input('prices');
@@ -3886,7 +3932,8 @@ public function updatePrices(Request $request)
     $priceChanges = [];
     $totalAmountOfChanges = 0;
     $totalVehiclesChanged = 0;
-
+    // check if po is dp
+    // add vehicle id to each 
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
