@@ -15,6 +15,7 @@ class WOVehicleDeliveryStatus extends Model
         'w_o_vehicle_id',
         'user_id',
         'status',
+        'is_documents_hold',
         'comment',
         'location',
         'gdn_number',

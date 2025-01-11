@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <style>
+     .error{
+            color: #f12323;
+        }
     .btn-style {
 		font-size:0.7rem!important;
 		line-height: 0.1!important;

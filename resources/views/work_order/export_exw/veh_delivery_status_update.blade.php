@@ -21,13 +21,13 @@
                             <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusReady_{{$vehicle->id}}" value="Ready" {{ $vehicle->Delivery_status == 'Ready' ? 'checked' : '' }}>
                             <label class="form-check-label" for="DeliveryReady_{{$vehicle->id}}" style="font-size: 14px;">Ready</label>
                         </div>
-                        <div class="form-check flex-fill d-flex align-items-left justify-content-left">
+                        <!-- <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusDocsHold_{{$vehicle->id}}" value="Delivered With Docs Hold" {{ $vehicle->Delivery_status == 'Delivered With Docs Hold' ? 'checked' : '' }}>
                             <label class="form-check-label" for="DeliveryDocsHold_{{$vehicle->id}}" style="font-size: 14px;">Delivered/Documents Hold</label>
-                        </div>
+                        </div> -->
                         <div class="form-check flex-fill d-flex align-items-left justify-content-left">
                             <input class="form-check-input me-1" type="radio" name="vehDeliveryStatus_{{$vehicle->id}}" id="vehDeliveryStatusDelivered_{{$vehicle->id}}" value="Delivered" {{ $vehicle->Delivery_status == 'Delivered' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="DeliveryDelivered_{{$vehicle->id}}" style="font-size: 14px;">Delivered With Documents</label>
+                            <label class="form-check-label" for="DeliveryDelivered_{{$vehicle->id}}" style="font-size: 14px;">Delivered</label>
                         </div>
                     </div>
 
@@ -46,15 +46,19 @@
                     </div>
 
                     <div class="mb-3 mt-3" id="deliveredFields_{{$vehicle->id}}" style="display:none;">
-                        <label for="gdnNumber_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">GDN Number:</label>
-                        <input type="text" class="form-control" id="gdnNumber_{{$vehicle->id}}" name="gdn_number" style="font-size: 14px;">
-
+                        
                         <label for="deliveredAt_{{$vehicle->id}}" class="form-label mt-3" style="font-size: 14px;">Delivered At:</label>
-
                         <input type="date" class="form-control" id="deliveredAt_{{$vehicle->id}}" name="delivered_at" style="font-size: 14px;">
+
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="isDocumentHold_{{$vehicle->id}}" name="is_document_hold" value="1" onchange="toggleDocsHoldFields({{$vehicle->id}})">
+                            <label class="form-check-label" for="isDocumentHold_{{$vehicle->id}}" style="font-size: 14px;">Is Document Hold</label>
+                        </div>
                     </div>
 
                     <div class="mb-3 mt-3" id="docsHoldFields_{{$vehicle->id}}" style="display:none;">
+                        <label for="gdnNumber_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">GDN Number:</label>
+                        <input type="text" class="form-control" id="gdnNumber_{{$vehicle->id}}" name="gdn_number" style="font-size: 14px;">
                         <label for="docsDeliveryDate_{{$vehicle->id}}" class="form-label" style="font-size: 14px;">Docs Delivery Date:</label>
                         <input type="date" class="form-control" id="docsDeliveryDate_{{$vehicle->id}}" name="doc_delivery_date" style="font-size: 14px;">
                     </div>
@@ -162,11 +166,21 @@
             } else if (selectedStatus === 'Delivered') {
                 deliveredFields.style.display = 'block';
                 deliveredAtInput.value = getCurrentDateTime();
-            } else if (selectedStatus === 'Delivered With Docs Hold') {
-                docsHoldFields.style.display = 'block';
+            } 
+            // else if (selectedStatus === 'Delivered With Docs Hold') {
+            //     docsHoldFields.style.display = 'block';
+            // }
+        }
+        function toggleDocsHoldFields(vehicleId) {
+            const checkbox = document.getElementById(`isDocumentHold_${vehicleId}`);
+            const docsHoldFields = document.getElementById(`docsHoldFields_${vehicleId}`);
+            
+            if (checkbox.checked) {
+                docsHoldFields.style.display = "block";
+            } else {
+                docsHoldFields.style.display = "none";
             }
         }
-
         document.querySelectorAll(`input[name="vehDeliveryStatus_{{$vehicle->id}}"]`).forEach(function(input) {
             input.addEventListener('change', function() {
                 toggleFieldsBasedOnStatus('{{$vehicle->id}}');
