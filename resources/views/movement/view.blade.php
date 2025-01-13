@@ -82,14 +82,14 @@
                         $sonumber = DB::table('so')->where('id', $soids)->first();
                         $so_numbers = $sonumber ? $sonumber->so_number : '';
                         @endphp
-                        <td>SO - {{ $so_numbers }}</td>
+                        <td>{{ $so_numbers }}</td>
                         @php
                         $purchasingorderid = DB::table('vehicles')->where('vin', $movements->vin)->first();
                         $purchasingorderids = $purchasingorderid ? $purchasingorderid->purchasing_order_id : '';
                         $purchasing_orders = DB::table('purchasing_order')->where('id', $purchasingorderids)->first();
                         $po_number = $purchasing_orders ? $purchasing_orders->po_number : '';
                         @endphp
-                        <td>PO - {{ $po_number }}</td>
+                        <td>{{ $po_number }}</td>
                         @php
                         // Check if there is a more recent movement entry for the same VIN
                         $latestMovement = DB::table('movements')
