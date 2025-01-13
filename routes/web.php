@@ -918,6 +918,11 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
     Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
+    // Variant Attributes
+    Route::get('fetch-model-spectifications', [VariantController::class,'fetchModelSpecifications'])
+        ->name('fetch.model_spectifications');
+    Route::get('fetch-model-spectification-options', [VariantController::class,'fetchModelSpecificationOptions'])
+    ->name('fetch.model_spectification_options');
 
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');

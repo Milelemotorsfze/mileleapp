@@ -51,9 +51,10 @@
                                         <div class="row">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                             <label class="form-label font-size-13 text-center">New Option Name</label>
+                                            <span class="text-danger">* </span>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type="text" class="form-control" placeholder="Enter Attribute Option" name="option_name" id="option_name" />
                                             <input type ="hidden" name="specification-id-input" id="specification-id-input" />
                                         </div>
                                         </div>
@@ -569,6 +570,14 @@ if (gradeOption) {
     function savenewoptions() {
         var specificationId = $('#specification-id-input').val();
         var newOptionValue = $('#option_name').val();
+
+        if(!validateSpacing(newOptionValue)) {
+            alertify.confirm("No leading or trailing spaces allowed or No more than one consecutive space is allowed in the address!").set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+            return;
+        }
         $.ajax({
             url: '{{ route('variants.saveOption') }}',
             type: 'POST',
@@ -582,8 +591,27 @@ if (gradeOption) {
                 $('select[name="specification_' + specificationId + '"]').append(option);
                 alertify.success('Specification Option successfully Added');
                 $('#optionsmodal').modal('hide');
+            },
+            error: function (error) {
+                let errors = error.responseJSON.error;
+                let errorMessages = '';
+                $.each(errors, function(field, messages) {
+                    $.each(messages, function(index, message) {
+                        errorMessages += `<p>${message}</p>`;
+                    });
+                });
+                alertify.confirm(errorMessages).set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+                
             }
         });
     }
+
+    function validateSpacing(value) {
+       const invalidChars = /^\s|\s{2,}|\s$/;
+        return !invalidChars.test(value);
+    } 
 </script>
 @endpush

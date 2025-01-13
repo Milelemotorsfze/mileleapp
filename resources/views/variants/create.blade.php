@@ -51,10 +51,11 @@
                                         <div class="row">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                             <label class="form-label font-size-13 text-center">New Option Name</label>
+                                            <span class="text-danger">* </span>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
-                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                            <input type="text" class="form-control" placeholder="Enter Attribute Option" name="option_name" id="option_name" />
+                                            <input type ="hidden"  name="specification-id-input" id="specification-id-input" />
                                         </div>
                                         </div>
                                     </div>
@@ -397,6 +398,19 @@ $(document).ready(function () {
                 $('[data-specification-id="' + specificationId + '"]').append(option);
                 alertify.success('Specification Option successfully Added');
                 $('#optionsmodal').modal('hide');
+            },
+            error: function (error) {
+                let errors = error.responseJSON.error;
+                let errorMessages = '';
+                $.each(errors, function(field, messages) {
+                    $.each(messages, function(index, message) {
+                        errorMessages += `<p>${message}</p>`;
+                    });
+                });
+                alertify.confirm(errorMessages).set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
             }
         });
     }

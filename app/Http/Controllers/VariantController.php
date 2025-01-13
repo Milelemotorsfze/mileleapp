@@ -18,6 +18,7 @@ use App\Models\ModifiedVariants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
+use Illuminate\Support\Facades\Validator;
 
 class VariantController extends Controller
 {
@@ -622,25 +623,34 @@ $existingspecifications = Varaint::with('VariantItems')
     {
         (new UserActivityController)->createActivity('Open Model Speification Page');
         $specifications = ModelSpecification::where('master_model_lines_id', $id)->get();
+        $modelLine = MasterModelLines::find($id);
         $model_line_id = $id;
-        return view('model-lines.specificationslist', compact('specifications', 'model_line_id'));
+        return view('model-lines.specificationslist', compact('specifications', 'model_line_id','modelLine'));
     }
     public function viewSpecification($id)
-{
+    {
     $options = ModelSpecificationOption::where('model_specification_id', $id)->get();
     return response()->json(['options' => $options]);
-}
+    }
 public function saveOption(Request $request)
 {
-    $request->validate([
+    $validator = Validator::make($request->all(), [
         'specificationId' => 'required|numeric',
-        'newOption' => 'required|string|max:255',
+        'newOption' => ['required','string','regex:/^[^\s]+(\s[^\s]+)*$/'] 
+    ],
+    [
+        'newOption.regex' => 'The specification name must not have leading or trailing spaces, and only one space is allowed between words.',
     ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
     $existingOption = ModelSpecificationOption::where('name', $request->input('newOption'))
         ->where('model_specification_id', $request->input('specificationId'))
         ->first();
     if ($existingOption) {
-        return response()->json(['error' => 'Option already exists for the given specification.'], 422);
+        return response()->json([ 'error' => [ 'newOption' => ['Option already exists for the given specification']
+        ]], 422);
     }
     $specificationoptions = new ModelSpecificationOption();
     $specificationoptions->name = $request->input('newOption');
@@ -650,6 +660,19 @@ public function saveOption(Request $request)
 }
 public function savespecification(Request $request)
 {
+    $validator = Validator::make($request->all(), [
+        'newSpecificationName' => ['required','string', 'regex:/^[^\s]+(\s[^\s]+)*$/'] 
+    ],
+    [
+        'newSpecificationName.regex' => 'The specification name must not have leading or trailing spaces, and only one space is allowed between words.',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'error' => $validator->errors()->first('newSpecificationName'), 
+        ], 422);
+    }
+
     $existingOption = ModelSpecification::where('name', $request->input('newSpecificationName'))
         ->where('master_model_lines_id', $request->input('model_line_id'))
         ->first();
@@ -847,5 +870,26 @@ public function savespecification(Request $request)
             'modifiedVariants' => $modifiedVariants ?? null,
             'basevaraint' => $basevaraint ?? null,
         ]);
-    }    
+    }  
+    
+    function fetchModelSpecifications(Request $request) {
+
+        $modelSpecifications = ModelSpecification::where('master_model_lines_id', $request->master_model_line_id)
+                    ->where('name','like', "%{$request->search}%")
+                    ->pluck('name')->toArray();
+
+         return response()->json($modelSpecifications);
+
     }
+    function fetchModelSpecificationOptions(Request $request) {
+
+        $modelSpecificationOptions = ModelSpecificationOption::where('model_specification_id', $request->model_specification_id)
+                    ->where('name','like', "%{$request->search}%")
+                    ->pluck('name')->toArray();
+
+         return response()->json($modelSpecificationOptions);
+
+    }
+
+}
+    
