@@ -873,16 +873,23 @@ class PFIController extends Controller
                                 }
                                 // add new code
                         $pfiItemParentRow->code = $code;
-
                     }
                     $updatedRows[] = $pfiItemParentRow->id;
                     $pfiItemParentRow->pfi_id = $pfi->id;
                     
                     $pfiItemParentRow->master_model_id = $masterModel->id ?? '';
+                    // chcek if qty updated
+                    if($pfiItemParentRow->pfi_quantity > $pfiQuantity) {
+                        // qty decresed => add to vehicle log and remove from vehicle table 
+                    }else if($pfiItemParentRow->pfi_quantity < $pfiQuantity) {
+                        // qty increased => add to vehicle log and vehicle table
+                    }
+                    
                     $pfiItemParentRow->pfi_quantity = $pfiQuantity;
                     $pfiItemParentRow->unit_price = $unitPrice;
                     $pfiItemParentRow->created_by = Auth::id();
                     $pfiItemParentRow->is_parent = true;
+
                     $pfiItemParentRow->save();
 
                     $parentId = $pfiItemParentRow->id;
@@ -944,19 +951,20 @@ class PFIController extends Controller
                 }
             $pfi->save();
 
-            // if PFI has PO and change in QTY or unit price or model and sfx PO status not approved
-            $pfiPo = PfiItemPurchaseOrder::where('pfi_id',$pfi->id)->groupBy('purchase_order_id')->get();  
-            if($pfiPo) {
-                // Other brand PO => Multiple PO
-                if($pfiPo->count() > 1) {
-                    // Other brand PO => Multiple PO
-                    // $parentPfiItem->isCreatedPO = 1;  
-    
-                }else{
-                    // update PO With latest data
-                    PfiItemPurchaseOrder::where('pfi_id', $pfi->id)->delete();
-    
+            // if PFI has PO and if pfi is toyota
+            $pfiPo = PfiItemPurchaseOrder::where('pfi_id',$pfi->id)->first();  
+            if($pfiPo && $pfi->is_toyota_pfi == true) {
+                // po exit chcek for update
+            // chcek the items are same or not
+            $parentpfiItems = PfiItemPurchaseOrder::where('pfi_id', $pfi->id)->get();
+            foreach($parentpfiItems as $parentpfiItem) {
+                $IseachItemExist =  PfiItem::where('pfi_id', $parentpfiItem->pfi_id)->where('parent_pfi_item_id', $parentpfiItem->pfi_item_id)
+                                                ->where('master_model_id', $parentpfiItem->master_model_id)->first();
+                if($IseachItemExist) {
+                    // check for price update
                 }
+            }
+
             }
 
         DB::commit();
