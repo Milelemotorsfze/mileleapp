@@ -107,6 +107,22 @@
                     <td>{{$vehicle->vin}}</td>
                 </tr>
                 <tr>
+                    <th>Engineen Number:</th>
+                    <td>{{$vehicle->engine}}</td>
+                </tr>
+                <tr>
+                    <th>VIN:</th>
+                    <td>{{$vehicle->vin}}</td>
+                </tr>
+                <tr>
+                    <th>Variant Name:</th>
+                    <td>{{$variant->name}}</td>
+                </tr>
+                <tr>
+                    <th>Model Year:</th>
+                    <td>{{$variant->my}}</td>
+                </tr>
+                <tr>
                     <th>Make & Model:</th>
                     <td>{{$variant->brand->brand_name}} - {{$variant->master_model_lines->model_line}}</td>
                 </tr>
