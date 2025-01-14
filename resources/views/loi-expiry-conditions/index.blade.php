@@ -9,8 +9,8 @@
                 <h4 class="card-title">
                     LOI Expiry Criteria
                 </h4>
-              <a  class="btn btn-sm btn-secondary float-end mr-2" href="{{ route('migrations.index') }}" >
-                <i class="fa fa-check" aria-hidden="true"></i> Migration Check</a> 
+              <!-- <a  class="btn btn-sm btn-secondary float-end mr-2" href="{{ route('migrations.index') }}" >
+                <i class="fa fa-check" aria-hidden="true"></i> Migration Check</a>  -->
                 <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
             <div class="card-body">

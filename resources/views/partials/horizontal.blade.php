@@ -1117,6 +1117,8 @@
                                     </div>
                                 </li>
                                 @endif
+
+                                
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -1187,17 +1189,8 @@
                                 </li>
                                 @endif
                                 @endcan
-                                @canany(['view-po-details','demand-planning-po-list',])
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
-                                @endphp
-                                @if ($hasPermission)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
-                                        <i data-feather="award"></i>
-                                        <span data-key="t-extra-pages">Purchase Order</span>
-                                    </a>
-                                </li>
+
+                                @can('pre-order')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pre-order');
                                 @endphp
@@ -1209,8 +1202,85 @@
                                     </a>
                                 </li>
                                 @endif
+                                @endcan
+                              
+                                            <!-- po List -->
+                                @canany(['view-po-details','demand-planning-po-list','create-po-details'])
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list','create-po-details']);
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="award"></i>
+                                        <span data-key="t-extra-pages">Purchase Order</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                        @can('create-po-details')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
+                                        @endphp
+                                            @if ($hasPermission)
+                                            <a href="{{ route('purchasing-order.create') }}" class="dropdown-item" data-key="t-login">Create New</a>
+                                            @endif
+                                        @endcan
+                                        <!-- Add summary Menu -->
+                                        @canany(['view-po-details','demand-planning-po-list'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
+                                        @endphp
+                                            @if ($hasPermission)
+                                            <a href="{{ route('purchasing-order.index') }}" class="dropdown-item" data-key="t-login"> List </a>
+                                            @endif
+                                        @endcanany
+                                    </div>
+                                </li>
                                 @endif
                                 @endcanany
+                                            <!-- po end -->
+
+                                            <!-- Vehicles -->
+                                @can('stock-full-view')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="award"></i>
+                                        <span data-key="t-extra-pages">Vehicles</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                        <a href="{{route('vehicles.currentstatus')}}" class="dropdown-item" data-key="t-login">Track Status</a>
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Stock</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                <a href="{{route('vehicles.availablevehicles')}}" class="dropdown-item" data-key="t-login">
+                                                    Incoming & In-stock
+                                                </a>
+                                                <a href="{{route('vehicles.deliveredvehicles')}}" class="dropdown-item" data-key="t-login">
+                                                    Sold
+                                                </a>
+                                                <a href="{{route('vehicles.statuswise')}}" class="dropdown-item" data-key="t-login">
+                                                    List All
+                                                </a>
+                                                <a href="{{route('vehicles.dpvehicles')}}" class="dropdown-item" data-key="t-login">
+                                                    DP List All
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                @endif
+                                @endcan
+
+                                            <!-- end vehicles -->
+
                                 @can('variants-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
@@ -1220,27 +1290,27 @@
                                 @endif
                                 @endcan
                                 @php
-    $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
-    $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
-    $hasSalesView = Auth::user()->hasPermissionForSelectedRole('sales-view');
-@endphp
+                                $hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                                $hasLeadsViewOnly = Auth::user()->hasPermissionForSelectedRole('leads-view-only');
+                                $hasSalesView = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                            @endphp
 
-@if ($hasFullAccess || $hasLeadsViewOnly || $hasSalesView)
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-            <i data-feather="film"></i>
-            <span data-key="t-extra-pages">Leads</span>
-        </a>
-    </li>
-    @if ($hasFullAccess || $hasSalesView)
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
-                <i data-feather="check-circle"></i>
-                <span data-key="t-extra-pages">Sales Order</span>
-            </a>
-        </li>
-    @endif
-@endif
+                            @if ($hasFullAccess || $hasLeadsViewOnly || $hasSalesView)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="film"></i>
+                                        <span data-key="t-extra-pages">Leads</span>
+                                    </a>
+                                </li>
+                                @if ($hasFullAccess || $hasSalesView)
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salesorder.index') }}" id="topnav-more" role="button">
+                                            <i data-feather="check-circle"></i>
+                                            <span data-key="t-extra-pages">Sales Order</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            @endif
                                 @can('sales-view')
                                 <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');

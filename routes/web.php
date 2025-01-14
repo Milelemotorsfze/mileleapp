@@ -930,6 +930,11 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
     Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
+    // Variant Attributes
+    Route::get('fetch-model-spectifications', [VariantController::class,'fetchModelSpecifications'])
+        ->name('fetch.model_spectifications');
+    Route::get('fetch-model-spectification-options', [VariantController::class,'fetchModelSpecificationOptions'])
+    ->name('fetch.model_spectification_options');
 
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
@@ -1021,6 +1026,7 @@ Route::get('/d', function () {
     Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
+    Route::post('vehicles/update-dp-prices', [PurchasingOrderController::class, 'updatePOPrices'])->name('vehicles.updateDPPrices');
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
     Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);
