@@ -51,9 +51,10 @@
                                         <div class="row">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                             <label class="form-label font-size-13 text-center">New Option Name</label>
+                                            <span class="text-danger">* </span>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type="text"class="form-control" placeholder="Enter Attribute Option"  name="option_name" id="option_name" />
                                             <input type ="hidden" name="specification-id-input" id="specification-id-input" />
                                         </div>
                                         </div>
@@ -66,33 +67,34 @@
                                 </div>
                             </div>
                             </div>
-                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                <div class="col-lg-12">
-                                        <div class="row">
-                                        <div class="col-lg-4 col-md-12 col-sm-12">
-                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                            <!-- <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="col-lg-12">
+                                                <div class="row">
+                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                    <label class="form-label font-size-13 text-center">New Option Name</label>
+                                                    <span class="text-danger">* </span>
+                                                </div>
+                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                    <input type="text" class="form-control" placeholder="Enter Attribute Option" name="option_name" id="option_name" />
+                                                    <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                                </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
-                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
-                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
+                            </div> -->
                             <form id="form-create" action="{{ route('variants.storevar', ['variant' => $variant->id]) }}" method="POST">
                             @csrf
                         <div class="row">
@@ -144,7 +146,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Fuel Type</label>
-                                    <select class="form-control" autofocus name="fuel_type" id="fuel" disabled>
+                                    <input type="hidden" name="fuel_type" value="{{ isset($variant) ? $variant->fuel_type : '' }}">
+                                    <select class="form-control" disabled>
                                     <option value="Petrol" {{ isset($variant) && $variant->fuel_type == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                                     <option value="Diesel" {{ isset($variant) && $variant->fuel_type == 'Diesel' ? 'selected' : '' }}>Diesel</option>
                                     <option value="PH" {{ isset($variant) && $variant->fuel_type == 'PH' ? 'selected' : '' }}>PH</option>
@@ -157,7 +160,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
-                                    <select class="form-control" autofocus name="engine" id="engine" disabled>
+                                    <input type="hidden" name="engine" value="{{ isset($variant) ? $variant->engine : '' }}">
+                                    <select class="form-control" disabled>
                                             <option value="" {{ isset($variant) && $variant->engine == '' ? 'selected' : '' }}>Please Select the Engine Capacity</option>
                                             <option value="0.8" {{ isset($variant) && $variant->engine == '0.8' ? 'selected' : '' }}>0.8</option>
                                             <option value="1.0" {{ isset($variant) && $variant->engine == '1.0' ? 'selected' : '' }}>1.0</option>
@@ -200,7 +204,8 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="steering">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Steering</label>
-                                    <select class="form-control" autofocus name="steering" id="steering" disabled>
+                                    <input type="hidden" name="steering" value="{{ isset($variant) ? $variant->steering : '' }}">
+                                    <select class="form-control" disabled>
                                     <option value="LHD" {{ isset($variant) && $variant->steering == 'LHD' ? 'selected' : '' }}>LHD</option>
                                     <option value="RHD" {{ isset($variant) && $variant->steering == 'RHD' ? 'selected' : '' }}>RHD</option>
                                 </select>
@@ -602,6 +607,7 @@ $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leadi
         $('.btn-outline-secondary').click(function () {
             var specificationId = $(this).data('specification-id');
             $('#specification-id-input').val(specificationId);
+            $('#option_name').val('');
             $('#optionsmodal').modal('show');
         });
     });
@@ -610,6 +616,17 @@ $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leadi
     function savenewoptions() {
         var specificationId = $('#specification-id-input').val();
         var newOptionValue = $('#option_name').val();
+        if (newOptionValue.trim() === '') {
+            alert('Please enter a valid option.');
+            return;
+        }
+        if(!validateSpacing(newOptionValue)) {
+            alertify.confirm("No leading or trailing spaces allowed or No more than one consecutive space is allowed in the address!").set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+            return;
+        }
         $.ajax({
             url: '{{ route('variants.saveOption') }}',
             type: 'POST',
@@ -623,8 +640,26 @@ $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leadi
                 $('select[name="specification_' + specificationId + '"]').append(option);
                 alertify.success('Specification Option successfully Added');
                 $('#optionsmodal').modal('hide');
+            },
+            error: function (error) {
+                let errors = error.responseJSON.error;
+                let errorMessages = '';
+                $.each(errors, function(field, messages) {
+                    $.each(messages, function(index, message) {
+                        errorMessages += `<p>${message}</p>`;
+                    });
+                });
+                alertify.confirm(errorMessages).set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+                
             }
         });
     }
+    function validateSpacing(value) {
+       const invalidChars = /^\s|\s{2,}|\s$/;
+        return !invalidChars.test(value);
+    }  
 </script>
 @endpush

@@ -80,6 +80,13 @@
         @endphp
         @if ($hasPermission)
         <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Varitants</a>
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-description-info');
+        @endphp
+        @if ($hasPermission)
+        <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+            <a  class="btn btn-sm btn-primary float-end" href="{{ route('modeldescription.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Description</a>
+            @endif
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('model-lines.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Lines</a>
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
@@ -135,7 +142,9 @@
                     <th>Model Year</th>
                     <th>Netsuite Name</th>
                     <th>Variant</th>
-                    <th>Variant Detail</th>
+                    <th>
+                      Variant Detail
+                  </th>
                     <th>Engine Capacity</th>
                     <th>Transmission</th>
                     <th>Fuel Type</th>
@@ -178,7 +187,9 @@
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->steering ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->upholestry ?? 'null' )) }}</td>
                         <td class="nowrap-td">{{ $variant->users?->name ?? 'null' }}</td>
-                        <td class="nowrap-td">{{ $variant->created_at ? $variant->created_at->format('d-m-Y H:i:s') : 'null' }}</td>
+                        <td class="nowrap-td">
+                          {{ $variant->created_at ? $variant->created_at->format('d-m-Y H:i:s') : ($variant->updated_at ? $variant->updated_at->format('d-m-Y H:i:s') : 'null') }}
+                      </td>
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
@@ -195,9 +206,9 @@
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
                                 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-                                <!-- <a href="{{ route('variants.editvar', $variant->id) }}" class="btn btn-info btn-sm" style="background-color: #17a2b8; color: white; border: none;">
+                                <a href="{{ route('variants.editvar', $variant->id) }}" class="btn btn-info btn-sm" style="background-color: #17a2b8; color: white; border: none;">
                                   <i class="fa fa-edit"></i> Edit
-                              </a> -->
+                              </a>
                                 </td>
                                 @else
                                 <td class="nowrap-td">
@@ -244,38 +255,43 @@
 $(document).ready(function () {
   $('.select2').select2();
   var dataTable = $('#dtBasicExample3').DataTable({
-  pageLength: 20,
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-      if (d === 14 || d === 15) {
-        return;
-      }
-      var selectWrapper = $('<div class="select-wrapper"></div>');
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue'
+    pageLength: 20,
+    initComplete: function() {
+      this.api().columns().every(function(d) {
+        var column = this;
+        var columnId = column.index();
+        var columnName = $(column.header()).attr('id');
+        if (d === 14 || d === 15) {
+          return;
+        }
+        var selectWrapper = $('<div class="select-wrapper"></div>');
+        var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+          .appendTo(selectWrapper)
+          .select2({
+            width: '100%',
+            dropdownCssClass: 'select2-blue'
+          });
+        select.on('change', function() {
+          var selectedValues = $(this).val();
+          column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
         });
-      select.on('change', function() {
-        var selectedValues = $(this).val();
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
-      });
 
-      selectWrapper.appendTo($(column.header()));
-      $(column.header()).addClass('nowrap-td');
-      
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
+        selectWrapper.appendTo($(column.header()));
+        $(column.header()).addClass('nowrap-td');
+
+        // Populate the select dropdown with sanitized values
+        column.data().unique().sort().each(function(d, j) {
+          // Use a temporary DOM element to strip unwanted characters like "> "
+          var tempDiv = $('<div>').html(d);
+          var cleanText = tempDiv.text().trim(); // Extract clean text
+          select.append('<option value="' + cleanText + '">' + cleanText + '</option>');
+        });
       });
-    });
-  }
-});
+    }
+  });
 });
 </script>
+
 <script>
 function openModal(id) {
     $.ajax({
