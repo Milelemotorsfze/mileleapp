@@ -1241,43 +1241,7 @@
                                             <!-- po end -->
 
                                             <!-- Vehicles -->
-                                @can('stock-full-view')
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
-                                @endphp
-                                @if ($hasPermission)
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                                        <i data-feather="award"></i>
-                                        <span data-key="t-extra-pages">Vehicles</span>
-                                        <div class="arrow-down"></div>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                        <a href="{{route('vehicles.currentstatus')}}" class="dropdown-item" data-key="t-login">Track Status</a>
-                                        <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Stock</span>
-                                                <div class="arrow-down"></div>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('vehicles.availablevehicles')}}" class="dropdown-item" data-key="t-login">
-                                                    Incoming & In-stock
-                                                </a>
-                                                <a href="{{route('vehicles.deliveredvehicles')}}" class="dropdown-item" data-key="t-login">
-                                                    Sold
-                                                </a>
-                                                <a href="{{route('vehicles.statuswise')}}" class="dropdown-item" data-key="t-login">
-                                                    List All
-                                                </a>
-                                                <a href="{{route('vehicles.dpvehicles')}}" class="dropdown-item" data-key="t-login">
-                                                    DP List All
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                @endif
-                                @endcan
+                               
 
                                             <!-- end vehicles -->
 
