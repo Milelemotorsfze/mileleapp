@@ -111,10 +111,6 @@
                     <td>{{$vehicle->engine}}</td>
                 </tr>
                 <tr>
-                    <th>VIN:</th>
-                    <td>{{$vehicle->vin}}</td>
-                </tr>
-                <tr>
                     <th>Variant Name:</th>
                     <td>{{$variant->name}}</td>
                 </tr>
