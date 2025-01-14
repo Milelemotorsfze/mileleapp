@@ -78,7 +78,7 @@
                     class="form-control"
                     id="email_server"
                     value="{{ old('email_server', $isEdit ? $domain->email_server : '') }}"
-                    placeholder="Enter email server">
+                    placeholder="@example.com">
                 @error('email_server')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror

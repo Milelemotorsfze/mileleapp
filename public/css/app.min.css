@@ -281,10 +281,10 @@ body[data-layout-mode=dark][data-topbar=light] .app-search .form-control {
     padding: 20px calc(20px / 2);
     position: absolute;
     right: 0;
-    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
+    /* background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac); */
     left: 250px;
     height: 60px;
-    background-color: #fff;
+    background-color: #06203d;
     border-top: 1px solid #e9e9ef;
 }
 body[data-sidebar-size=md][data-sidebar-size=sm] .footer, body[data-sidebar-size=sm] .footer {
@@ -3043,7 +3043,8 @@ body[data-sidebar=brand] #vertical-menu-btn, body[data-sidebar=dark] #vertical-m
     color: #e9ecef;
 }
 .topnav {
-    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
+    /* background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac); */
+    background-color: #072c47;
 }
 .topnav .navbar-nav .nav-item:first-of-type .nav-link {
     padding-left: 0;
