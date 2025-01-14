@@ -486,6 +486,40 @@ table.dataTable thead th select {
         </div>
     </div>
 </div>
+<div class="modal fade" id="onwershipModal" tabindex="-1" role="dialog" aria-labelledby="onwershipModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <form id="onwershipForm" method="POST" action="/onwership-update">
+                @csrf
+                <input type="hidden" name="vehicle_id" id="vehicle_idonwership">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="onwershipModalLabel">Document Onwership</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="onwershiplabel">Document Onwership</label>
+                        <select class="form-control" id="documentonwership" name="documentonwership" required>
+                            <option value="" disabled selected>Select Onwership</option>
+                            <option value="Incoming">Incoming</option>
+                            <option value="Milele Motors FZE">Milele Motors FZE</option>
+                            <option value="Trans Car FZE">Trans Car FZE</option>
+                            <option value="Supplier Docs">Supplier Docs</option>
+                            <option value="Supplier Docs + VCC + BOE">Supplier Docs + VCC + BOE</option>
+                            <option value="RTA Possesion Cert/BOD">RTA Possesion Cert/BOD</option>
+                            <option value="RTA Possession Cert/Milele Cars Trading">RTA Possession Cert/Milele Cars Trading</option>
+                            <option value="RTA Possession Cert/Milele Car Rental">RTA Possession Cert/Milele Car Rental</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -592,12 +626,10 @@ table.dataTable thead th select {
                   @endif
                   @if ($hasPricePermission)
                      <th>Minimum Commission</th>
-                     <th>GP %</th>
+                     <!-- <th>GP %</th> -->
                     <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Custom Inspection Number</th>
                   <th>Custom Inspection Status</th>
                   <th>Comments</th>
@@ -798,7 +830,6 @@ table.dataTable thead th select {
                 var words = data.split(' ');
                 var firstFiveWords = words.slice(0, 5).join(' ') + '...';
                 var fullText = data;
-
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
@@ -898,7 +929,7 @@ table.dataTable thead th select {
                         return ''; // Return an empty string if there's no price
                     }
         },
-            { data: 'gp', name: 'vehicles.gp' },
+            // { data: 'gp', name: 'vehicles.gp' },
             {
             data: 'price', 
             name: 'vehicles.price', 
@@ -918,9 +949,7 @@ table.dataTable thead th select {
         });
     }
     columns3.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         { 
         data: 'custom_inspection_number', 
         name: 'vehicles.custom_inspection_number',
@@ -999,23 +1028,33 @@ table.dataTable thead th select {
         26: 'varaints.steering',
         27: 'varaints.fuel_type',
         28: 'varaints.gear',
-        29: 'vehicles.ex_colour',
-        30: 'vehicles.int_colour',
+        29: 'ex_color.name',
+        30: 'int_color.name',
         31: 'varaints.upholestry',
         32: 'vehicles.ppmmyyy',
         33: 'warehouse.name',
         34: 'vehicles.territory',
         35: 'countries.name',
-        36: 'costprice',
-        37: 'vehicles.minimum_commission',
-        38: 'vehicles.gp',
-        39: 'vehicles.price',
-        40: 'documents.import_type',
-        41: 'documents.owership',
-        42: 'documents.document_with',
-        43: 'vehicles.custom_inspection_number',
-        44: 'vehicles.custom_inspection_status',
     };
+// Extend columnMap based on permissions
+if (hasManagementPermission) {
+    columnMap[36] = 'costprice';
+    columnMap[37] = 'vehicles.minimum_commission';
+    columnMap[38] = 'vehicles.price';
+    columnMap[39] = 'vehicles.ownership_type';
+    columnMap[40] = 'vehicles.custom_inspection_number';
+    columnMap[41] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[36] = 'vehicles.minimum_commission';
+    columnMap[37] = 'vehicles.price';
+    columnMap[38] = 'vehicles.ownership_type';
+    columnMap[39] = 'vehicles.custom_inspection_number';
+    columnMap[40] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[36] = 'vehicles.ownership_type';
+    columnMap[37] = 'vehicles.custom_inspection_number';
+    columnMap[38] = 'vehicles.custom_inspection_status';
+}
             var table3 = $('#dtBasicExample3').DataTable({
     processing: true,
     serverSide: true,
@@ -1024,12 +1063,10 @@ table.dataTable thead th select {
         type: "POST",
         data: function (d) {
                 d.filters = {};  // Initialize an empty filters object
-
                 $('#dtBasicExample3 thead select').each(function () {
                     var columnIndex = $(this).parent().index(); // Get the column index
                     var columnName = columnMap[columnIndex]; // Map index to column name
                     var value = $(this).val();
-                        console.log(columnIndex);
                     // Send filter values using column names, including special `__NULL__` and `__Not EMPTY__`
                     if (value && columnName) {
                         if (value.includes('__NULL__') || value.includes('__Not EMPTY__')) {
@@ -1218,6 +1255,16 @@ $('#dtBasicExample3 tbody').on('click', 'td', function () {
             opencustominspectionModal(datainspection.id);
         @endif
     }
+    else if(columnHeader.includes('Document Owership')) {
+        @php
+        $hasonwershipPermission = Auth::user()->hasPermissionForSelectedRole('ownership-type');
+        @endphp
+        @if ($hasonwershipPermission)
+        console.log("inside");
+            var dataownership = table3.row(this).data();
+            openownershipModal(dataownership.id);
+        @endif
+    }
     else if (columnHeader.includes('Reservation End')) {
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('direct-booking');
@@ -1280,18 +1327,50 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cellText = cells[j].innerText || cells[j].textContent;
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");
@@ -1602,6 +1681,27 @@ function openeditingcolorModal(vehicleId) {
     // Show the modal
     $('#custominspectionModal').modal('show');
 }
+function openownershipModal(vehicleIdonwership) {
+    // Set the vehicle_idinspection value
+    $('#vehicle_idonwership').val(vehicleIdonwership);
+console.log("pounch");
+    // Make an AJAX call to get the custom inspection details
+    $.ajax({
+        url: '/get-onwership-data',  // The route to get the custom inspection data
+        type: 'GET',
+        data: { vehicle_id: vehicleIdonwership },
+        success: function(response) {
+            // Populate the modal fields with the fetched data
+            $('#documentonwership').val(response.documentonwership);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching custom inspection data:', error);
+        }
+    });
+
+    // Show the modal
+    $('#onwershipModal').modal('show');
+}
     function showFullText(button) {
         var fullText = button.getAttribute('data-fulltext');
         alert(fullText);
@@ -1802,6 +1902,48 @@ $('#custominspectionForm').on('submit', function(e) {
             ...row.data(), // Keep other fields intact
             custom_inspection_number: response.custom_inspection_number, // Update inspection number
             custom_inspection_status: response.custom_inspection_status // Update inspection status
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+$('#onwershipForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#onwershipModal').modal('hide');
+            alertify.success('Onwership Update Successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table3 = $('#dtBasicExample3').DataTable();
+           var vehicleId = $('#vehicle_idonwership').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table3.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            vehicle_idonwership: response.vehicle_idonwership, // Update inspection number
         }).draw(false); // Redraw the row
     } else {
         console.error("No matching row found for vehicle ID: " + vehicleId);

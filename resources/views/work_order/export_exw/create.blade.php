@@ -264,12 +264,7 @@
 						<i class="fa fa-eye" aria-hidden="true"></i> View Details
 					</a>
 				@endif
-				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top" @if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) disabled @endif>Submit</a>
-					@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
-					@else
-						</br>
-						<p>Contact IT team to update WO-006850-SW data</p>
-					@endif
+				<a class="btn btn-sm btn-success ms-auto" id="submit-from-top">Submit</a>
 			</div>
 			<br>
 
@@ -661,7 +656,7 @@
 						</div>
 						</br>
 						<div class="row">
-							<div class="table-responsive">
+							<div class="table-responsive" >
 								<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 									<tr style="border-bottom:1px solid #b3b3b3;">
 										<th>Action</th>
@@ -795,7 +790,7 @@
 									placeholder="Enter Delivery Date " value="{{ isset($workOrder) ? $workOrder->delivery_date : '' }}" autocomplete="delivery_date" autofocus
 									onkeyup="sanitizeInput(this)">
 							</div>
-						</div>
+						</div></br>
 						<div class="row" id="boe-div">
 							<div class="col-xxl-12 col-lg-12 col-md-12 form_field_outer" id="child">
 							</div>
@@ -1095,14 +1090,7 @@
 				<div class="card  no-border">
 					<div class="card-body">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-						@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1)) 
 						<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
-						@endif
-							@if(!isset($workOrder) || ($workOrder->id != 408) || ($workOrder->id == 408 && Auth::user()->selected_role == 1))
-							@else
-								</br>
-								<p>Contact IT team to update WO-006850-SW data</p>
-							@endif
 						</div>
 					</div>
 				</div>
@@ -1934,6 +1922,31 @@
 			$.validator.addMethod("year4digits", function(value, element) {
 				return this.optional(element) || /^\d{4}$/.test(value);
 			}, "Please enter a valid year with 4 digits.");
+			$.validator.addMethod("isExistInSalesOrder", function(value, element) {
+                var result = false;
+				// Make an AJAX call to the backend to check if the SO number exists
+				$.ajax({
+					url: '/is-exist-in-sales-order', // Ensure this matches the route defined in web.php
+					type: 'POST',
+					async: false, // Use synchronous request to wait for the response
+					data: {
+						_token: $('meta[name="csrf-token"]').attr('content'), // Include CSRF token
+						so_number: value, // The SO number entered by the user
+					},
+					success: function(response) {
+						if (response.valid) {
+							result = true; // SO number exists
+						} else {
+							result = false; // SO number does not exist
+						}
+					},
+					error: function(xhr) {
+						console.error("An error occurred while checking SO number: ", xhr.responseText);
+						result = false; // Default to false on error
+					}
+				});
+                return result; 
+            }, "This SO number is not in the sales order.");
 
 		
 			$('#WOForm').validate({ 
@@ -1946,6 +1959,7 @@
 						noSpaces: true,
 						SONumberFormat: true,
 						notSO000000: true,
+						isExistInSalesOrder: true,
 						// uniqueWO: true,
 						// uniqueSO: true,
 						// greaterThanExisting: true, 
@@ -3298,31 +3312,17 @@
 				editWoId = workOrder.id;
 			}
 			console.log("isEdit is - "+editWoId);
+			// Ensure the SO Number is valid (including custom validation isExistInSalesOrder)
+			if (!$('#so_number').valid()) {
+				console.log("SO number validation failed.");
+				return; // Stop execution if validation fails
+			}
+			console.log("SO number validation passed. Proceeding with the AJAX call.");
 			var selectedBatch = '';
 			if ($('#batch').length && (type == 'export_exw' || type == 'export_cnf')) {
 				selectedBatch = $('#batch').val(); 
 			}
-			
-			if (SONumber === '') { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			let parts = SONumber.split("SO-");
-			if (parts.length !== 2 || parts[0] !== '') { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			let numberPart = parts[1];
-			if (numberPart === '' || numberPart.length !== 6) { 
-				document.getElementById('wo_number').value = ''; 
-				return; 
-			}
-			
-			if (type === 'local_sale') {
-				setWo();
-			} else {
+			// Call the additional AJAX request to process the SO Number
 				$.ajax({
 					url: '/check-so-number',
 					method: 'POST',
@@ -3368,7 +3368,6 @@
 						console.error(xhr.responseText); 
 					} 
 				}); 
-			}
 		}
 		function setWo() {
 		var SONumber = $('#so_number').val().trim(); 
@@ -3617,47 +3616,6 @@
 					button.disabled = true;
 				});
 			});
-			document.addEventListener("DOMContentLoaded", function() {
-    // Define the conditions for enabling/disabling the buttons
-    const workorder = <?= json_encode($workorder ?? null) ?>;
-    const userRole = <?= json_encode(Auth()->user()->selected_role ?? null) ?>;
-
-    // Array of buttons to apply the condition to
-    const submitButtons = [document.getElementById("submit"), document.getElementById("submit-from-top")];
-
-    const shouldEnableSubmit = !workorder || 
-        (workorder && workorder.id !== 408) || 
-        (workorder && workorder.id === 408 && userRole === 1);
-
-    submitButtons.forEach(button => {
-        if (!shouldEnableSubmit) {
-            // Disable the button if the condition is not met
-            button.classList.add("disabled");
-            button.style.pointerEvents = "none";
-            
-            // Set the tooltip message and initialize with Bootstrap if available
-            button.setAttribute("title", "Contact IT team to update the data");
-            if (typeof $ !== "undefined" && typeof $.fn.tooltip === "function") {
-                $(button).tooltip();  // Initialize Bootstrap tooltip
-            }
-
-            // Add click event listener to show alert when the button is clicked
-            button.addEventListener("click", function(event) {
-                event.preventDefault();  // Prevent any default action
-                alert("Contact IT team to update the data");
-            });
-        } else {
-            // Enable the button if the condition is met
-            button.classList.remove("disabled");
-            button.style.pointerEvents = "auto";
-            button.removeAttribute("title");
-
-            // Remove any existing click event listeners
-            button.onclick = null;
-        }
-    });
-});
-
 		</script>
 	@endif
 

@@ -185,6 +185,7 @@
                                             <option value="4.5" {{ isset($variant) && $variant->engine == '4.5' ? 'selected' : '' }}>4.5</option>
                                             <option value="4.6" {{ isset($variant) && $variant->engine == '4.6' ? 'selected' : '' }}>4.6</option>
                                             <option value="4.8" {{ isset($variant) && $variant->engine == '4.8' ? 'selected' : '' }}>4.8</option>
+                                            <option value="5.0" {{ isset($variant) && $variant->engine == '5.0' ? 'selected' : '' }}>5.0</option>
                                             <option value="5.3" {{ isset($variant) && $variant->engine == '5.3' ? 'selected' : '' }}>5.3</option>
                                             <option value="5.6" {{ isset($variant) && $variant->engine == '5.6' ? 'selected' : '' }}>5.6</option>
                                             <option value="5.7" {{ isset($variant) && $variant->engine == '5.7' ? 'selected' : '' }}>5.7</option>
@@ -220,6 +221,8 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
+                                    <option value="4X2" {{ isset($variant) && $variant->drive_train == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ isset($variant) && $variant->drive_train == '4X4' ? 'selected' : '' }}>4X4</option>
                                     <option value="AWD" {{ isset($variant) && $variant->drive_train == 'AWD' ? 'selected' : '' }}>AWD</option>
                                     <option value="4WD" {{ isset($variant) && $variant->drive_train == '4WD' ? 'selected' : '' }}>4WD</option>
                                     <option value="FWD" {{ isset($variant) && $variant->drive_train == 'FWD' ? 'selected' : '' }}>FWD</option>
@@ -230,11 +233,11 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>
-                                    <select class="form-control" autofocus name="upholstery" id="upholstery">
-                                    <option value="Leather" {{ isset($variant) && $variant->upholstery == 'Leather' ? 'selected' : '' }}>Leather</option>
-                                    <option value="Fabric" {{ isset($variant) && $variant->upholstery == 'Fabric' ? 'selected' : '' }}>Fabric</option>
-                                    <option value="Vinyl" {{ isset($variant) && $variant->upholstery == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
-                                    <option value="Leather & Fabric" {{ isset($variant) && $variant->upholstery == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
+                                    <select class="form-control" autofocus name="upholestry" id="upholstery">
+                                    <option value="Leather" {{ isset($variant) && $variant->upholestry == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                    <option value="Fabric" {{ isset($variant) && $variant->upholestry == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                    <option value="Vinyl" {{ isset($variant) && $variant->upholestry == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                                    <option value="Leather & Fabric" {{ isset($variant) && $variant->upholestry == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
                                 </select>
                                 </div>
                             </div>
@@ -352,37 +355,51 @@ $(document).ready(function () {
     var selectedOptions = [];
     var fieldIdOrder = ['steering', 'model', 'engine', 'fuel', 'gear'];
     var gradeOption = null;
+
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
         if (fieldId === 'fuel') {
-            fieldValue = fieldValue.charAt(0);
-        }
+    if (fieldValue === 'Petrol') {
+        fieldValue = 'P';
+    } else if (fieldValue === 'Diesel') {
+        fieldValue = 'D';
+    } else if (fieldValue === 'PHEV') {
+        fieldValue = 'PHEV';
+    } else if (fieldValue === 'MHEV') {
+        fieldValue = 'MHEV';
+    } else if (fieldValue === 'PH') {
+        fieldValue = 'PH';
+    } else {
+        fieldValue = 'EV';
+    }
+}
         selectedOptions.push({ fieldId: fieldId, value: fieldValue });
+
         // Check if the field is "model" and save the grade option
         if (fieldId === 'model') {
             gradeOption = selectedOptions.find(option => option.fieldId === 'model');
         }
     });
+
     $('input[name^="specification_checkbox"]:checked').each(function () {
         var specificationId = $(this).data('specification-id');
         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();;
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
         var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
         var specificationName = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
-
         if (specificationName === 'Grade') {
             // If specificationName is "Grade," update the gradeOption
-            // If specificationName is "Grade," update the gradeOption
-if (gradeOption) {
-    gradeOption.value += ' ' + displayValue;
-} else {
-    selectedOptions.push({ fieldId: 'model', value: displayValue.trim() }); // Trim the displayValue before pushing
-}
+            if (gradeOption) {
+                gradeOption.value += ' ' + displayValue;
+            } else {
+                selectedOptions.push({ fieldId: 'model', value: displayValue });
+            }
         } else {
             selectedOptions.push({ specificationId: specificationId, value: displayValue });
         }
     });
+
     selectedOptions.sort(function (a, b) {
         var orderA = fieldIdOrder.indexOf(a.fieldId);
         var orderB = fieldIdOrder.indexOf(b.fieldId);
@@ -398,17 +415,19 @@ if (gradeOption) {
         return 0;
     });
 
-    var modelDetail = selectedOptions
-    .map(function (option) {
-        return option.value.trim(); // Trim to remove leading/trailing whitespaces
-    })
-    .filter(function (value) {
-        return value !== null && value !== ''; // Filter out null or empty values
-    })
-    .join(' ');
-
-    $('.model_detail').val(modelDetail);
-}
+    var modelDetail = selectedOptions.map(function (option, index, arr) {
+        if (option.fieldId === 'fuel' && arr[index - 1]?.fieldId === 'engine') {
+            // Combine engine and fuel values without a space
+            return arr[index - 1].value + option.value;
+        } else if (option.fieldId === 'engine' && arr[index + 1]?.fieldId === 'fuel') {
+            // Skip adding engine value, as it will be combined later with fuel
+            return '';
+        } else {
+            return option.value;
+        }
+    }).filter(Boolean).join(' ').replace(/\s+/g, ' '); // Ensure single spaces only
+    $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leading/trailing spaces
+    }
             $(document).on('change', 'input[name^="specification_checkbox"], input[name^="field_checkbox"]', function () {
                 updateModelDetail();
             });
@@ -467,31 +486,57 @@ if (gradeOption) {
             }
         });
         $(document).ready(function () {
-    function updatevariantDetail() {
-        var selectedOptionsv = [];
-        $('input[name^="variantcheckbox"]:checked').each(function () {
-            var specificationId = $(this).data('specification-id');
-            var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
-            console.log(selectedText);
+            function updatevariantDetail() {
+    var selectedOptionsv = [];
+    var sfxValue = null; // To store the SFX value if found
+
+    // Process specification checkboxes
+    $('input[name^="variantcheckbox"]:checked').each(function () {
+        var specificationId = $(this).data('specification-id');
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
+        var displayValue = (selectedText.toUpperCase() === 'YES')
+            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+            : selectedText;
+
+        console.log(selectedText);
+
+        // Check if the selected option is SFX
+        if (selectedText.toUpperCase() === 'SFX') {
+            sfxValue = '(' + displayValue + ')'; // Store SFX value
+        } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        });
-        $('input[name^="fieldvariants"]:checked').each(function () {
-            var fieldId = $(this).data('field-id');
-            var fieldValue = $('#' + fieldId + ' option:selected').text();
-            selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-        });
-        var Detail = selectedOptionsv
-    .map(function (option) {
-        return option.value.trim(); // Trim to remove leading/trailing whitespaces
-    })
-    .filter(function (value) {
-        return value !== null && value !== ''; // Filter out null or empty values
-    })
-    .join(', ');
-        $('.variant').val(Detail);
+        }
+    });
+
+    // Process field checkboxes
+    $('input[name^="fieldvariants"]:checked').each(function () {
+        var fieldId = $(this).data('field-id');
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
+        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+    });
+
+    // Filter and prioritize SFX
+    var Detail = [];
+
+    // Add SFX value first if it exists
+    if (sfxValue) {
+        Detail.push(sfxValue);
     }
+
+    // Add remaining values, filtering out null or empty values
+    Detail = Detail.concat(
+        selectedOptionsv
+            .map(function (option) {
+                return option.value.trim(); // Trim to remove leading/trailing whitespaces
+            })
+            .filter(function (value) {
+                return value !== null && value !== ''; // Filter out null or empty values
+            })
+    );
+
+    // Join all values into a single string
+    $('.variant').val(Detail.join(', '));
+}
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
                 updatevariantDetail();
             });

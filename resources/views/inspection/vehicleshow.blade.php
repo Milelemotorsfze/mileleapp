@@ -112,6 +112,34 @@
                                     </select>
                                 </div>
                             </div>
+    @php
+    // Initialize formattedDate as an empty string
+    $formattedDate = '';
+
+    // Check if $vehicle->ppmmyyy exists and matches the expected format
+    if (!empty($vehicle->ppmmyyy)) {
+        try {
+            // Attempt to parse 'Mar-2021' format
+            $date = \Carbon\Carbon::createFromFormat('M-Y', $vehicle->ppmmyyy);
+            $formattedDate = $date->format('Y-m');
+        } catch (\Exception $e) {
+            // Handle invalid date format gracefully
+            $formattedDate = '';
+        }
+    }
+@endphp
+<div class="col-lg-2 col-md-6 col-sm-12">
+    <div class="mb-3">
+        <label for="production-date" class="form-label">Production Date</label>
+        <input 
+            type="month" 
+            id="production-date" 
+            name="ppmmyyy" 
+            class="form-control" 
+            value="{{ $formattedDate }}"
+        >
+    </div>
+</div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>

@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
+        $schedule->command('reservations:clear-expired')->dailyAt('08:00');
         $schedule->command('email:send-daily-activity')->dailyAt('18:00');
         $schedule->command('leads:reassign')->hourly()->appendOutputTo(storage_path('logs/leads_reassign.log'));
         $schedule->command('notifications:send')->everyMinute();
@@ -21,7 +22,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('notificationspendingpeospecting:send')->everyMinute();
         $schedule->command('loi_expiry:check')->daily();
         $schedule->command('send:wo_boe_status')->dailyAt('09:00');
-        $schedule->command('claim_submission_reminder')->dailyAt('14:10');
+        // $schedule->command('claim_submission_reminder')->dailyAt('09:00');
     }
 
     /**
@@ -40,5 +41,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SendNotificationspendingsignquotation::class,
         \App\Console\Commands\SendNotificationspendingpeospecting::class,
         \App\Console\Commands\CheckLOIExpiry::class,
+        \App\Console\Commands\ClearExpiredReservations::class,
     ];
 }

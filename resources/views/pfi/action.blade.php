@@ -10,11 +10,14 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-edit');
         @endphp
         @if ($hasPermission)
-        <li>
-            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
-                <i class="fa fa-edit"></i> Edit
-            </a>
-        <li>
+            @if($pfi->is_toyota_pfi == 1 || ($pfi->is_toyota_pfi == 0 && !$isExistPO) )
+                    <!-- if Other brand pfi => show if po not exist -->
+                    <li>
+                        <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;"  title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
+                            <i class="fa fa-edit"></i> Edit
+                        </a>
+                    <li>
+            @endif
         <li>
             <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px; font-size:12px;"  class="btn btn-info btn-sm" title="To Update Released Amount"
                 data-bs-toggle="modal" data-bs-target="#update-released-amount-{{$pfi->id}}">
@@ -34,7 +37,8 @@
             </button>
         </li>
         <li>
-            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
+            <button type="button" class="btn btn-primary btn-sm"  style="width:100%; margin-top:2px; margin-bottom:2px;" 
+            title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
                 <i class="fa fa-list"></i> View PFI Items
             </button>
         </li>
@@ -45,46 +49,36 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
         @endphp
         @if ($hasPermission)
-             <!-- check PFI have pending qty -->
+            @if($showCreatePOBtn == 1) 
             <li>
-            <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
-             title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
-                <i class="fa fa-plus"></i> Create PO
-            </a>
-        <li> 
+                <a class="btn btn-info btn-sm" style="width:100%; margin-top:2px; margin-bottom:2px;" 
+                title="To Create PO" href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}">
+                    <i class="fa fa-plus"></i> Create PO
+                </a>
+            <li> 
+            @endif
         @endif
         @endcan
 
-    <!-- @can('pfi-payment-status-update')
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
-        @endphp
-        @if ($hasPermission)
-        <li>
-            <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;"class="btn btn-sm btn-info"
-                    title="To Update PFI Payment Status" data-bs-toggle="modal" data-bs-target="#update-pfi-payment-status-{{$pfi->id}}">
-                <i class="fa fa-dollar-sign"></i>
-            </button>
-        </li>
-        @endif
-    @endcan -->
-    @can('pfi-delete')
+   
+        @can('pfi-delete')
             @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-delete');
             @endphp
             @if ($hasPermission)
-            <li>
-                <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
-                        data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
-                    <i class="fa fa-trash"></i> To Delete PFI
-                </button>
-                </li>
+                @if(!$isExistPO)
+                    <li>
+                        <button type="button" style="width:100%; margin-top:2px; margin-bottom:2px;" class="btn btn-danger btn-sm pfi-button-delete mt-1" title="Delete PFI"
+                                data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
+                            <i class="fa fa-trash"></i> To Delete PFI
+                        </button>
+                    </li>
+                @endif
             @endif
         @endcan
     </ul>
 </div>
 
-      
         <!-- PFI released amount update Model -->
         <div class="modal fade " id="update-released-amount-{{$pfi->id}}" data-bs-backdrop="static" 
                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -121,7 +115,7 @@
             </div>
 
            
-            <!--  PFI PAYMENT DOCS MODAL -->
+            <!--  PFI PFI DOCS VIEW MODAL -->
 
         <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -247,7 +241,6 @@
             </div>
         </div>
                                       
-                   
 <script>
     
     $('.pfi-button-delete').on('click',function(){

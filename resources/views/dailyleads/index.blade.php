@@ -3,11 +3,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
                     @section('content')
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view') || Auth::user()->hasPermissionForSelectedRole('leads-view-only');
                     @endphp
                     @if ($hasPermission)
   <div class="card-header">
   <style>
+
+    .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+      width: 100% !important;     
+      padding: 8px 40px !important; 
+    }
+    
+    .nav-fill .nav-item, .nav-fill>.nav-link {
+      flex: none !important;
+      margin: 3px !important;
+    }
     #dtBasicExample2 {
         width: 100%;
     }
@@ -158,6 +168,10 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
+      @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    @endphp
+                    @if ($hasPermission)
       <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
         <i class="fa fa-users" aria-hidden="true"></i> Customers
       </a>
@@ -169,18 +183,16 @@ input[type=number]::-webkit-outer-spin-button
       <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
+      @endif
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
       </a> -->
       <div class="clearfix"></div>
 <br>
-    <ul class="nav nav-pills nav-fill">
-    <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
-      </li>
+    <ul class="nav nav-pills nav-fill d-flex">
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
@@ -207,12 +219,15 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li> -->
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab10">Bulk & Special Deals</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
       </li>
     </ul>
   </div>
   <div class="tab-content">
-      <div class="tab-pane fade show" id="tab1">
+      <div class="tab-pane fade show active" id="tab1">
       <br>
       <!-- <div class="row">
   <div class="col-lg-1">
@@ -220,7 +235,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div> -->
         <div class="card-body">
-          <div class="table-responsive">
+          <div class="table-responsive dragscroll">
             <table id="dtBasicExample1" class="table table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
@@ -236,6 +251,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Preferred Language</th>
                   <th>Location</th>
                   <th>Remarks & Messages</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -310,6 +326,35 @@ input[type=number]::-webkit-outer-spin-button
                     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
                     @endphp
                     <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
+                    <td>
+    @php
+        $colorClass = '';
+        switch ($calls->status) {
+            case 'contacted':
+                $colorClass = 'badge-primary';
+                break;
+            case 'working':
+                $colorClass = 'badge-info';
+                break;
+            case 'qualify':
+                $colorClass = 'badge-warning';
+                break;
+            case 'converted':
+                $colorClass = 'badge-success';
+                break;
+            case 'Follow Up':
+                $colorClass = 'badge-secondary';
+                break;
+            case 'New':
+                $colorClass = 'badge-danger';
+                break;
+            default:
+                $colorClass = 'badge-light';
+        }
+    @endphp
+
+    <span class="badge {{ $colorClass }}">{{ ucfirst($calls->status) }}</span>
+</td>
                     <td>
                     @php
                     $created_by = DB::table('users')->where('users.id', $calls->created_by)->first();
@@ -904,6 +949,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Inquiry Date</th>
                   <th>Inquiry Notes</th>
                   <th>Purchaser Remarks</th>
+                  <th>Stage</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
                 </tr>
@@ -980,7 +1026,12 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Signature Status</th>
                   <th>Created By</th>
                   <th>Assigned To</th>
+                  @php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
                   <th>Action</th>
+                  @endif
                 </tr>
               </thead>
             </table>
@@ -1164,7 +1215,7 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-      <div class="tab-pane fade show active" id="tab10">
+      <div class="tab-pane fade show" id="tab10">
       <br>
         <div class="card-body">
           <div class="table-responsive">
@@ -1879,6 +1930,7 @@ $(document).ready(function () {
     { type: 'date', targets: [1] },
   ],
   order: [[0, 'desc']],
+  orderCellsTop: true,
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
@@ -1904,11 +1956,15 @@ $(document).ready(function () {
       $(column.header()).addClass('nowrap-td');
 
       column.data().unique().sort().each(function(d, j) {
-        if (columnId === 3) {  // Assuming the phone column is at index 2
+        if (columnId === 5) {  // Assuming the phone column is at index 2
           var phoneNumber = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
     }
-    else if (columnId === 4) {  // Assuming the phone column is at index 2
+    else  if (columnId === 4) {  // Assuming the phone column is at index 2
+          var phoneNumber = $(d).text().trim();  // Extract phone number
+        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
+    }
+    else if (columnId === 6) {  // Assuming the phone column is at index 2
           var Email = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + Email + '">' + Email + '</option>');
     }
@@ -2475,6 +2531,10 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             },
             { data: 'created_by_name', name: 'created_by_name' },
 { data: 'sales_person_name', name: 'sales_person_name' },
+@php
+$hasFullAccess = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
+@endphp
+@if ($hasFullAccess)
             {
     data: 'id',
     name: 'id',
@@ -2512,6 +2572,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             </div>`;
     }
 },
+@endif
             ],
             createdRow: function (row, data, dataIndex) {
         console.log(data.created_by);

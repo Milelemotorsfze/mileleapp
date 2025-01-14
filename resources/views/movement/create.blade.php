@@ -83,7 +83,10 @@
         <div class="col-lg-1 col-md-6" style="width:6%;">
         <label for="basicpill-firstname-input" class="form-label">SO</label>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6" style="width:6%;">
+        <label for="basicpill-firstname-input" class="form-label">Ownership</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
         <label for="basicpill-firstname-input" class="form-label">From</label>
         </div>
         <div class="col-lg-2 col-md-6">
@@ -178,7 +181,20 @@
                 <div class="col-lg-1 col-md-6" style="width: 6%;">
                     <input type="text" id="so_number${row}" class="form-control" placeholder="SO #" readonly>
                 </div>
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                    <select id="ownership_type${row}" class="form-control" name="ownership_type[]">
+                        <option value="">Select Ownership</option>
+                        <option value="Incoming">Incoming</option>
+                        <option value="Milele Motors FZE">Milele Motors FZE</option>
+                        <option value="Trans Car FZE">Trans Car FZE</option>
+                        <option value="Supplier Docs">Supplier Docs</option>
+                        <option value="Supplier Docs + VCC + BOE">Supplier Docs + VCC + BOE</option>
+                        <option value="RTA Possesion Cert/BOD">RTA Possesion Cert/BOD</option>
+                        <option value="RTA Possession Cert/Milele Cars Trading">RTA Possession Cert/Milele Cars Trading</option>
+                        <option value="RTA Possession Cert/Milele Car Rental">RTA Possession Cert/Milele Car Rental</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-6">
                     <select class="form-control mb-1" id="from${row}" readonly disabled>
                         @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -228,6 +244,7 @@
             var fromField = $('#from' + row);
             var fromFieldinput = $('#from-input' + row);
             var SoFeildinput = $('#so_number' + row);
+            var ownershipFeildinput = $('#ownership_type' + row);
             var PoFeildinput = $('#po' + row);
             var modelLineField = $('#model-line' + row);
             var variantField = $('#variant' + row);
@@ -245,6 +262,7 @@
                     brandField.val(response.brand);
                     modelLineField.val(response.modelLine);
                     SoFeildinput.val(response.so_number);
+                    ownershipFeildinput.val(response.ownership_type);
                     PoFeildinput.val(response.po_number);
                 }
             });
@@ -277,7 +295,20 @@
                                 <div class="col-lg-1 col-md-6"style="width: 6%;"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <select class="form-control" id="ownership_type" name="ownership_type[]">
+                    <option value="">Select Ownership</option>
+                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                </select>
+            </div>
+                                <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
@@ -373,7 +404,20 @@
                                 <div class="col-lg-1 col-md-6" style="width: 6%;">
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                <select class="form-control" id="ownership_type" name="ownership_type[]">
+                    <option value="">Select Ownership</option>
+                    <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                    <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                    <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                    <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                    <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                    <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                    <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                    <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+                </select>
+            </div>
+                                <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
@@ -454,7 +498,6 @@
 
         var formData = new FormData();
         formData.append("vin_file", vinFile);
-
         // AJAX call to upload the file
         $.ajax({
             url: "{{ route('vehicles.uploadVinFile') }}",  // Define a new route for file upload
@@ -479,7 +522,20 @@
                                 <div class="col-lg-1 col-md-6"style="width: 6%;"> 
                                     <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+            <select class="form-control" id="ownership_type" name="ownership_type[]">
+                <option value=""${!vehicle.ownership_type ? 'selected' : ''}>Select Ownership</option>
+                <option value="Incoming" ${vehicle.ownership_type === 'Incoming' ? 'selected' : ''}>Incoming</option>
+                <option value="Milele Motors FZE" ${vehicle.ownership_type === 'Milele Motors FZE' ? 'selected' : ''}>Milele Motors FZE</option>
+                <option value="Trans Car FZE" ${vehicle.ownership_type === 'Trans Car FZE' ? 'selected' : ''}>Trans Car FZE</option>
+                <option value="Supplier Docs" ${vehicle.ownership_type === 'Supplier Docs' ? 'selected' : ''}>Supplier Docs</option>
+                <option value="Supplier Docs + VCC + BOE" ${vehicle.ownership_type === 'Supplier Docs + VCC + BOE' ? 'selected' : ''}>Supplier Docs + VCC + BOE</option>
+                <option value="RTA Possesion Cert/BOD" ${vehicle.ownership_type === 'RTA Possesion Cert/BOD' ? 'selected' : ''}>RTA Possesion Cert/BOD</option>
+                <option value="RTA Possession Cert/Milele Cars Trading" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Cars Trading' ? 'selected' : ''}>RTA Possession Cert/Milele Cars Trading</option>
+                <option value="RTA Possession Cert/Milele Car Rental" ${vehicle.ownership_type === 'RTA Possession Cert/Milele Car Rental' ? 'selected' : ''}>RTA Possession Cert/Milele Car Rental</option>
+            </select>
+        </div>
+                                <div class="col-lg-1 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>

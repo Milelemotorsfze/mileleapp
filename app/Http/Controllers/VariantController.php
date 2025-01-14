@@ -14,6 +14,7 @@ use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
 use App\Models\AddonTypes;
 use App\Models\AddonDetails;
+use Illuminate\Support\Facades\DB;
 use App\Models\ModifiedVariants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -45,7 +46,6 @@ class VariantController extends Controller
         foreach ($variants as $variant) {
             $details = [];
             $otherDetails = [];
-            
             foreach ($variant->variantItems as $item) {
                 $modelSpecification = $item->model_specification;
                 $modelSpecificationOption = $item->model_specification_option;
@@ -847,5 +847,158 @@ public function savespecification(Request $request)
             'modifiedVariants' => $modifiedVariants ?? null,
             'basevaraint' => $basevaraint ?? null,
         ]);
-    }    
+    }  
+    public function editvar(string $id)
+    {
+        (new UserActivityController)->createActivity('Duplicate the Variants');
+        $variant = Varaint::findOrFail($id);
+        $brand = Brand::findOrFail($variant->brands_id);
+        $brands = Brand::all();
+        $countries = CountryListFacade::getList('en');
+        $masterModelLines = MasterModelLines::all();
+        $masterModelLine = MasterModelLines::findOrFail($variant->master_model_lines_id);
+        $variantItems = VariantItems::where('varaint_id', '=', $id)->get();
+        $modelLineId = $masterModelLine->id;
+        $specifications = ModelSpecification::where('master_model_lines_id', $modelLineId)->get();
+        $data = [];
+        foreach ($specifications as $specification) {
+            $selectedOptions = VariantItems::where('varaint_id', $id)
+                ->where('model_specification_id', $specification->id)
+                ->pluck('model_specification_options_id')
+                ->toArray();
+            $options = ModelSpecificationOption::where('model_specification_id', $specification->id)->get();
+    
+            $data[] = [
+                'specification' => $specification,
+                'selectedOptions' => $selectedOptions,
+                'options' => $options,
+            ];
+        }
+        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+    }
+    public function storevar(Request $request, $variant)
+    {
+        DB::beginTransaction();
+
+    try {
+    (new UserActivityController)->createActivity('Editing Variant');
+    $variant = Varaint::findOrFail($variant);
+    VariantItems::where('varaint_id', $variant->id)->delete();
+    $model_details= $request->input('model_detail');
+    if($model_details == null){
+    $steering = $request->input('steering');
+    $master_model_lines_id = $request->input('master_model_lines_id');
+    $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+    $engine = $request->input('engine');
+    $gearbox = $request->input('gearbox');
+    $fuel_type = $request->input('fuel_type');
+    if($fuel_type == "Petrol")
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
+        if($gearbox == "Auto")
+        {
+            $gearbox = "AT";
+        }
+        if($gearbox == "Manual")
+        {
+            $gearbox = "MT";
+        }
+        $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $f . ' ' . $gearbox;
+        }
+    $variant_details= $request->input('variant');
+    if($variant_details == null)
+    {
+        $steering = $request->input('steering');
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        $engine = $request->input('engine');
+        $gearbox = $request->input('gearbox');
+        $coo = $request->input('coo');
+        $my = $request->input('my');
+        $drive_train = $request->input('drive_train');
+        $upholestry = $request->input('upholestry');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
+        $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
+    }
+    $variant->netsuite_name = $request->input('netsuite_name');
+    $variant->upholestry = $request->input('upholestry');
+    $variant->coo = $request->input('coo');
+    $variant->drive_train = $request->input('drive_train');
+    $variant->gearbox = $request->input('gearbox');
+    $variant->model_detail = $model_details;
+    $variant->detail = $variant_details;
+    $variant->my = $request->input('my');
+    $variant->save();
+    $variantId = $variant->id;
+    $selectedSpecifications = json_decode(request('selected_specifications'), true);
+    ksort($selectedSpecifications);
+    foreach ($selectedSpecifications as $specificationData) {
+        $specification = new VariantItems();
+        $specification->varaint_id = $variantId;
+        $specification->model_specification_id = $specificationData['specification_id'];
+        $specification->model_specification_options_id = $specificationData['value'];
+        $specification->save();
+    }
+    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+    $currentDateTime = Carbon::now($dubaiTimeZone);
+    $variantlog = new Variantlog();
+    $variantlog->time = $currentDateTime->toTimeString();
+    $variantlog->date = $currentDateTime->toDateString();
+    $variantlog->status = 'Update Variant Details';
+    $variantlog->variant_id = $variant->id;
+    $variantlog->created_by = auth()->user()->id;
+    $variantlog->save();
+    DB::commit();
+
+    return redirect()->route('variants.index')->with('success', 'Variant updated successfully.');
+} catch (\Exception $e) {
+    DB::rollBack();
+    return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
+}
+} 
     }

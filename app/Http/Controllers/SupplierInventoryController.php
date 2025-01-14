@@ -1591,10 +1591,13 @@ class SupplierInventoryController extends Controller
                     $colourcode = $fieldValue;
                     $extColour = mb_substr($colourcode, 0, -2);
                     $intColour = mb_substr($colourcode,  -2);
+                    info($extColour);
+                    info($intColour);
                     if($extColour) {
                         $extColourRow = ColorCode::where('code', $extColour)
                             ->where('belong_to', ColorCode::EXTERIOR)
                             ->first();
+                            info($extColourRow);
                         if ($extColourRow)
                         {
                             $exteriorColorId = $extColourRow->id;
@@ -2160,7 +2163,8 @@ class SupplierInventoryController extends Controller
         $intColourRow = ColorCode::where('code', $intColour)
             ->where('belong_to', ColorCode::INTERIOR)
             ->first();
-
+            info($extColour);
+            info($intColour);
         $data = 0;
        if($intColourRow && $extColourRow) {
            $data = 1;

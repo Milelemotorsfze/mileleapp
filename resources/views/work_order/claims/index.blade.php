@@ -7,6 +7,10 @@
         td {
             font-size:12px!important;
         }
+        .error
+        {
+        color: #FF0000;
+        }
     </style>
 </head>
 @section('content')
@@ -19,7 +23,7 @@
 @if ($canViewClaimInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Claim Pending Vehicles Info</h4>
+        <h4 class="card-title">Claim Pending BOE Info</h4>
     </div>
 
     <div class="card-body">
@@ -43,7 +47,9 @@
                             <th>Action</th>
                             <th>SO Number</th>
                             <th>WO Number</th>
-                            <th>VIN Number</th>
+                            <th>BOE</th>
+                            <th>Declaration Number</th>
+                            <th>Declaration Date</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
                         <tr>
@@ -63,6 +69,12 @@
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
+                            <th>
+                                <select class="column-filter form-control" id="declaration-number-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th></th>
                         </tr>
                         @endif
                     </thead>
@@ -89,13 +101,13 @@
                                                         <i class="fa fa-file" aria-hidden="true"></i> Update Claim Info
                                                     </a>
                                                 @endif
-                                                @if ($canViewClaimLog)
+                                                <!-- @if ($canViewClaimLog)
                                                 <li>
                                                     <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Claim Log" class="btn btn-sm btn-info" href="{{route('claim.log',$data->id ?? '')}}">
                                                     <i class="fa fa-eye" aria-hidden="true"></i> Claim Log
                                                     </a>
                                                 </li>
-                                                @endif
+                                                @endif -->
                                                 
                                             </ul>
                                         </div> 
@@ -103,28 +115,31 @@
                                             <div class="modal-dialog modal-xl"> <!-- Add modal-dialog here -->
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="updateClaimModalLabel_{{$data->id}}">Update Vehicle Claim Info For {{$data->vin ?? ''}}</h5>
+                                                        <h5 class="modal-title" id="updateClaimModalLabel_{{$data->id}}">Update Vehicle Claim Info For {{$data->boe ?? ''}}</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <form id="docStatusForm_{{$data->id}}" method="POST" enctype="multipart/form-data" action="{{ route('claim.storeOrUpdate') }}" onsubmit="return validateForm({{ $data->id }})">
                                                         @csrf
                                                         <div class="modal-body">
-                                                            <input type="hidden" value="{{$data->id}}" name="wo_vehicle_id_{{$data->id}}">
+                                                            <input type="hidden" value="{{$data->id}}" name="wo_boe_id_{{$data->id}}">
                                                             <div class="row">
                                                                 <!-- Claim Date -->
                                                                 <div class="col-4">
+                                                                    <span class="error">* </span>
                                                                     <label for="claim_date{{$data->id}}" class="form-label">Claim Date:</label>
                                                                     <input type="date" class="form-control" id="claim_date{{ $data->id }}" name="claim_date_{{$data->id}}" 
                                                                         value="{{ now()->format('Y-m-d') }}">
                                                                     <span id="claim_dateError_{{$data->id}}" class="text-danger"></span>
                                                                 </div>
                                                                 <div class="col-4">
+                                                                    <span class="error">* </span>
                                                                     <label for="claim_reference_number_{{ $data->id }}" class="form-label">Claim Reference Number:</label>
                                                                     <input type="text" class="form-control" id="claim_reference_number_{{ $data->id }}" name="claim_reference_number_{{ $data->id }}" pattern="\d*" placeholder="Enter Claim Reference Number" value="">
                                                                     <span id="claimReferenceNumber_Error_{{ $data->id }}" class="text-danger"></span>
                                                                 </div>
                                                                 <div class="col-4">
-                                                                    <label for="status_{{$data->id}}" class="form-label">Vehicle Penalty Status :</label>
+                                                                    <span class="error">* </span>
+                                                                    <label for="status_{{$data->id}}" class="form-label">BOE Penalty Status :</label>
                                                                     <div class="d-flex align-items-center" style="gap: 10px;"> <!-- Add d-flex and gap for spacing -->
                                                                         <div class="form-check form-check-inline"> <!-- form-check-inline keeps items inline -->
                                                                             <input class="form-check-input" type="radio" name="status_{{$data->id}}" id="status_submitted_{{$data->id}}" value="Submitted">
@@ -154,12 +169,14 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
+                                    <td>{{ $data->declaration_number ?? '' }}</td>
+                                    <td>@if($data->declaration_date != ''){{\Carbon\Carbon::parse($data->declaration_date)->format('d M Y') ?? ''}}@endif</td>
                                 </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="4" class="text-center">No data history available.</td>
+                                <td colspan="6" class="text-center">No data history available.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -178,7 +195,7 @@
             });
 
             // Initialize Select2 for multi-select filters
-            $('#so-filter, #wo-filter, #vin-filter').select2({
+            $('#so-filter, #wo-filter, #vin-filter, #declaration-number-filter').select2({
                 placeholder: "Select filter",
                 allowClear: true
             });
@@ -203,9 +220,10 @@
             populateDropdown(1, '#so-filter');
             populateDropdown(2, '#wo-filter');
             populateDropdown(3, '#vin-filter');
+            populateDropdown(4, '#declaration-number-filter');
 
             // Apply multi-select filter for each dropdown
-            $('#so-filter, #wo-filter, #vin-filter').on('change', function() {
+            $('#so-filter, #wo-filter, #vin-filter, #declaration-number-filter').on('change', function() {
                 var columnIndex = $(this).parent().index();
                 var selectedOptions = $(this).val();
                 var searchValue = selectedOptions ? selectedOptions.join('|') : '';
@@ -214,7 +232,7 @@
 
             // Clear all filters on button click
             $('#clear-filters').click(function() {
-                $('#so-filter, #wo-filter, #vin-filter').val(null).trigger('change');
+                $('#so-filter, #wo-filter, #vin-filter, #declaration-number-filter').val(null).trigger('change');
                 table.search('').columns().search('').draw();
             });
         @else
@@ -240,7 +258,7 @@
             document.getElementById('claimReferenceNumber_Error_' + id).textContent = '';      
         }
         if (!radioStatus) {
-            document.getElementById('claimStatus_Error_' + id).textContent = 'Please select a Vehicle Penalty Status.';
+            document.getElementById('claimStatus_Error_' + id).textContent = 'Please select a BOE Claim Status.';
             return false;
         } else {
             document.getElementById('claimStatus_Error_' + id).textContent = '';          
@@ -250,6 +268,18 @@
     }
 </script>
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection
 

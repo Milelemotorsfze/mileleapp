@@ -51,6 +51,10 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
     margin-bottom: 5px;
     width: 100%;
 }
+.select2-dropdown.select2-dropdown--below {
+    position: inherit !important;
+}
+
 .select2-container--default .select2-search--inline .select2-search__field {
     font-size: 12px !important; /* Adjust the font-size as per your needs */
     width: 100% !important;
@@ -59,11 +63,6 @@ table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td
 table.dataTable thead th select {
     width: 100% !important; /* Ensures the select element fits the header width */
     min-width: 100%; /* Ensures it takes at least 100% width */
-}
-
-/* Ensure the Select2 dropdown fits the full header width when opened */
-.select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -98,7 +97,7 @@ table.dataTable thead th select {
     margin-top: -30px;
     background: url('https://logosbynick.com/wp-content/uploads/2021/01/animated-gif.gif') no-repeat center center;
     background-size: contain;
-    z-index: 1100; /* Higher than the z-index of the <thead> */
+    z-index: 1100;
     display: none;
 }
 #dtBasicExample3_processing {
@@ -330,11 +329,11 @@ table.dataTable thead th select {
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-                <th>Customer Name</th>
-                <th>Sales Person</th>
-                  <th>Sales Date</th>
                   <th>SO Number</th>
-                <th>Customer Phone</th>
+                  <th>Sales Date</th>
+                  <th>Sales Person</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
@@ -370,8 +369,7 @@ table.dataTable thead th select {
         serverSide: true,
         ajax: "{{ route('salesorder.index', ['status' => 'SalesOrder']) }}",
         columns: [
-            { data: 'customername', name: 'calls.name' },
-            { data: 'name', name: 'users.name' },
+            { data: 'so_number', name: 'so.so_number' },
             {
                 data: 'so_date',
                 name: 'so.so_date',
@@ -386,7 +384,8 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'so_number', name: 'so.so_number' },
+            { data: 'name', name: 'users.name' },
+            { data: 'customername', name: 'calls.name' },
             { data: 'phone', name: 'calls.phone' },
             { data: 'email', name: 'calls.email' },
             {
@@ -403,7 +402,7 @@ table.dataTable thead th select {
                     return ''; // If no date, return empty
                 }
             },
-            { data: 'deal_value', name: 'quotations.deal_value' },
+            { data: 'deal_value', name: 'quotations.deal_value', type: 'num' },
             { data: 'sales_notes', name: 'quotations.sales_notes' },
             {
                 data: 'file_path',
@@ -422,9 +421,12 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
-                    return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
-                }
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
+            const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+            return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
+        }
+        return ''; // Return empty string to hide the button
+    }
             },
             {
                 data: 'calls_id',
@@ -432,10 +434,25 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
                     return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
+                    }
+                    return '';
                 }
             }
         ],
+        columnDefs: [
+        {
+            targets: 7, // Target the deal_value column
+            render: function (data, type, row) {
+                // Ensure proper numeric formatting
+                return type === 'display' || type === 'filter'
+                    ? parseFloat(data).toFixed(2) // Format for display
+                    : parseFloat(data); // Use numeric for sorting
+            },
+            type: 'num' // Explicitly set type to numeric
+        }
+    ],
         pageLength: -1,
         initComplete: function () {
             // Apply dropdown filters to each column
@@ -462,7 +479,7 @@ table.dataTable thead th select {
                     if (index === 10 || index === 11) {
     return; // Skip adding a filter for these columns
 }
-                    if (index === 2 || index === 6) { // Assuming date columns are 3 and 8
+                    if (index === 1 || index === 6) { // Assuming date columns are 3 and 8
                         if (d) {
                             var dateObj = new Date(d);
                             var formattedDate = dateObj.toLocaleDateString('en-GB', {
@@ -477,7 +494,6 @@ table.dataTable thead th select {
 
                 // Initialize Select2 on the select element with a custom width to fit the column
                 select.select2({
-                    width: 'resolve', // Resolve the width to fit within the column
                     dropdownAutoWidth: true, // Adjust dropdown width to fit the content
                     placeholder: 'Filter'
                 });
@@ -500,7 +516,6 @@ table.dataTable thead th select {
      function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
-    console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);
     $('#fileModal').modal('show');
 }

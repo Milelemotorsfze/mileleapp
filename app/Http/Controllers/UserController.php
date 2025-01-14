@@ -22,6 +22,7 @@ namespace App\Http\Controllers;
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Crypt;
     use App\Http\Controllers\UserActivityController;
+    use App\Models\CompanyDomain;
     use Validator;
     use Exception;
     use App\Models\HRM\Employee\EmployeeProfile;
@@ -54,9 +55,23 @@ namespace App\Http\Controllers;
         }
         public function store(Request $request)
         {
+            $allowedDomains = CompanyDomain::pluck('email_server')->map(function ($domain) {
+                return strtolower(trim(str_replace(' ', '', substr(strrchr($domain, "@") ?: $domain, 1))));
+            })->toArray();
+
             $this->validate($request, [
                 'name' => 'required',
-                'email' => 'required|email|unique:users,email',
+                'email' => [
+                    'required',
+                    'email',
+                    'unique:users,email',
+                    function ($attribute, $value, $fail) use ($allowedDomains) {
+                        $domain = strtolower(trim(substr(strrchr($value, "@"), 1))); 
+                        if (!in_array($domain, $allowedDomains)) {
+                            $fail('The email domain must match one of the allowed email servers.');
+                        }
+                    },
+                ],                
                 'roles' => 'required',
                 'department' => 'required',
                 'designation' => 'required',

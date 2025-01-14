@@ -1052,6 +1052,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                                         </div>
                                                     </div>
                                                 @endif
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                                            <label for="choices-single-default" class="form-label">Has Claim</label>
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                                            <span class="data-font">
+                                                                <span class="data-font">
+                                                                    {{$workOrder->has_claim ?? ''}}
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>  
                                             <div class="row">
                                                 @if(isset($workOrder->boe) && count($workOrder->boe) > 0)
@@ -1089,7 +1103,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['export-exw-wo-deta
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="table-responsive">
+							            <div class="table-responsive" >
                                             <table class="my-datatable table table-striped table-editable table" style="width:100%;">
                                                 <tr style="border-bottom:1px solid #b3b3b3; background-color : #e8f3fd!important;">
                                                     <th>Action</th>

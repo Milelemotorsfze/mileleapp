@@ -425,15 +425,64 @@
                         return false;
                     }
                 });
-              
-                if(formValid == true) {
-                    if($("#form-create").valid()) {
-                        $('#form-create').unbind('submit').submit();
+
+                selectedModelIds = [];
+                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+               
+                for(let i=1; i<= parentIndex; i++)
+                {
+                    var eachSelectedModelId = $('#master-model-id-'+i+'-item-0').val();
+                    if(eachSelectedModelId) {
+                        selectedModelIds.push(eachSelectedModelId);
                     }
-                }else{
-                    e.preventDefault();
-                }
+                }                 
+                let url = '{{ route('pfi.get-pfi-brand') }}';
+                 // check each parent model for toyota PFI or other brand
+                 // check if any existing item qty or price changed
+                 $.ajax({
+                    type:"GET",
+                    url: url, 
+                    data: {
+                        master_model_ids: selectedModelIds
+                    },
+                    success: function(data) {
+                        if(data['is_pfi_valid_brand'] == true) {
+                            if(data['is_toyota_pfi'] == true) {
+                                var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
+                                for(let i=1; i<= parentIndex; i++)
+                                {
+                                    let totalChildIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
+                                    if(totalChildIndex <= 0) {
+                                        let msg = "You have to add atleast one LOI Item for each parent item!";
+                                        showError(msg);
+                                        return false;
+                                    }
+                                }
+                            }
+                            // if brand is toyota make sure have child
+                            submitForm(formValid); 
+                        }else{
+                            let msg = "You are selected non-toyota and toyota Brands together which is not allowed!";
+                            showError(msg);
+                        }
+                    }
+                });
         });
+
+        function showError(msg) {
+            formValid = false;
+            $('.overlay').hide();
+            alertify.confirm(msg);
+        }
+        function submitForm(formValid) {
+            if(formValid == true) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                }
+            }else{
+                $('.overlay').hide();
+            }
+        }
 
         // check the pfi number is unique within the year
         $('#pfi_reference_number').keyup(function(){
@@ -522,7 +571,7 @@
                     $('#pfi-quantity-'+index+'-item-0').val(totalPfiQty);
                 }
                
-                var unitPrice = $('#unit-price-'+index+'-item-0').val();
+            var unitPrice = $('#unit-price-'+index+'-item-0').val();
             var eachItemTotal = parseFloat(totalPfiQty) * parseFloat(unitPrice);
             $('#total-amount-'+index+'-item-0').val(eachItemTotal);
 
@@ -644,14 +693,11 @@
                 let childIndex =  $(".pfi-child-item-div-"+i).find(".child-item-"+i).length - 1;
                 for(let j=1; j<=childIndex;j++) 
                 {
-                    
                     $("#loi-item-"+i+"-item-"+j).empty();
                     $("#pfi-quantity-"+i+"-item-"+j).val("");
                     $("#remaining-quantity-"+i+"-item-"+j).val("");
                     $('#pfi-quantity-'+i+'-item-'+j).removeAttr("max");
                     $('#master-model-id-'+i+'-item-'+j).val("");
-                   
-                   
                 }
             }
         }
@@ -676,7 +722,6 @@
                 let totalIndex =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length - 1;
                 for(let j=1; j<= totalIndex;j++) 
                 {                   
-                   
                     resetRowData(index,j); 
                 }
                 enableOrDisableAddMoreButton(index);
@@ -853,7 +898,7 @@
                             </div>
                             
                             <div class="col-lg-2 col-md-6">
-                                <input type="number" min="0"  required index="${index}" name="PfiItem[${index}][unit_price]" 
+                                <input type="number" min="1"  required index="${index}" name="PfiItem[${index}][unit_price]" 
                                 class="form-control widthinput mb-2 unit-prices"  oninput=calculateTotalAmount(${index},0)
                                     id="unit-price-${index}-item-0" item="0" placeholder="Unit price">
                             </div>
@@ -906,6 +951,7 @@
             }
             $(this).closest('#row-' + index + '-item-' + childIndex).remove();
             ReIndex(index);
+            calculatePfiAmount();
          });
         $(document.body).on('click', ".removePFIButton", function (e) {
             var rowCount = $("#pfi-items").find(".pfi-items-parent-div").length;
@@ -914,7 +960,9 @@
                 var indexNumber = $(this).attr('index');
                 var sfx = $('#sfx-'+indexNumber+'-item-0').val();
                 var model = $('#model-'+indexNumber+'-item-0').val();
-                
+                if(model[0]) {
+                    appendModel(indexNumber,model[0]);
+                }
                 if(sfx[0]) {
                     appendSFX(indexNumber,model[0],sfx[0]);
                 }
@@ -938,8 +986,8 @@
                     var rowCount =  $(".pfi-child-item-div-"+index).find(".child-item-"+index).length;
                     ReIndex(index);
                
-            });
-
+                });
+                calculatePfiAmount();
             }else{
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one PFI Item Required',function (e) {
                 }).set({title:"Can't Remove PFI Item"})
@@ -951,7 +999,6 @@
             let i = 0;
             $('.child-item-'+index).each(function (i) {
                
-
                     $(this).attr('id', 'row-'+index+'-item-'+ i);
                     $(this).find('.models').attr('item',i);
                     $(this).find('.models').attr('id','model-'+index+'-item-'+i);
@@ -1248,11 +1295,10 @@
 
         function appendModel(index,model){
             var parentIndex = $("#pfi-items").find(".pfi-items-parent-div").length;
-            for(let i=1; i<=parentIndex; i++)
+            for(let i=1; i<= parentIndex; i++)
             {
                 if(i != index) {
-                    let Currentmodel = $('#model-'+index+'-item-0').val();
-        
+                    let Currentmodel = $('#model-'+i+'-item-0').val();
                     if(model !== Currentmodel[0] ) {
                         // chcek this option value alredy exist in dropdown list or not.
                         var currentId = 'model-'+i+'-item-0';    
@@ -1266,9 +1312,7 @@
                         });
                         if(isOptionExist == 'no'){
                             $('#model-'+i+'-item-0').append($('<option>', {value: model, text : model}))
-
                         }
-
                     }
                 }
             }

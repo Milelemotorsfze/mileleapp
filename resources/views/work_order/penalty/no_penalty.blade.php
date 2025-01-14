@@ -18,12 +18,12 @@
 @if ($canViewPenaltyInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">No Penalties Vehicles Info</h4>
+        <h4 class="card-title">No Penalties BOE Info</h4>
     </div>
 
     <div class="card-body">
         <div class="row">
-            <div class="table-responsive">
+            <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
                     <thead style="background-color: #e6f1ff">
                         <tr>
@@ -31,7 +31,7 @@
                             <th>SO Number</th>
                             <th>WO Number</th>
                             <th>BOE Number</th>
-                            <th>VIN Number</th>
+                            <th>Declaration Number</th>
                             <th>Declaration Date</th>
                         </tr>
                         @if(isset($datas) && count($datas) > 0)
@@ -53,7 +53,7 @@
                                 </select>
                             </th>
                             <th>
-                                <select class="column-filter form-control" id="vin-filter" multiple="multiple">
+                                <select class="column-filter form-control" id="declaration-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
@@ -85,9 +85,9 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->woBoe->boe ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
-                                    <td>@if($data->woBoe->declaration_date != ''){{ \Carbon\Carbon::parse($data->woBoe->declaration_date)->format('d M Y') }}@endif</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
+                                    <td>{{ $data->declaration_number ?? '' }}</td>
+                                    <td>@if($data->declaration_date != ''){{ \Carbon\Carbon::parse($data->declaration_date)->format('d M Y') }}@endif</td>
                                 </tr>
                             @endforeach
                         @else
@@ -111,7 +111,7 @@
             });
 
             // Initialize Select2 for multi-select filters
-            $('#so-filter, #wo-filter, #boe-filter, #vin-filter').select2({
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-filter').select2({
                 placeholder: "Select filter",
                 allowClear: true
             });
@@ -136,10 +136,10 @@
             populateDropdown(1, '#so-filter');
             populateDropdown(2, '#wo-filter');
             populateDropdown(3, '#boe-filter');
-            populateDropdown(4, '#vin-filter');
+            populateDropdown(4, '#declaration-filter');
 
             // Apply multi-select filter for each dropdown
-            $('#so-filter, #wo-filter, #boe-filter, #vin-filter').on('change', function() {
+            $('#so-filter, #wo-filter, #boe-filter, #declaration-filter').on('change', function() {
                 var columnIndex = $(this).parent().index();
                 var selectedOptions = $(this).val();
                 var searchValue = selectedOptions ? selectedOptions.join('|') : '';
@@ -148,7 +148,7 @@
 
             // Clear all filters on button click
             $('#clear-filters').click(function() {
-                $('#so-filter, #wo-filter, #boe-filter, #vin-filter').val(null).trigger('change');
+                $('#so-filter, #wo-filter, #boe-filter, #declaration-filter').val(null).trigger('change');
                 table.search('').columns().search('').draw();
             });
         @else
@@ -157,6 +157,18 @@
     });
 </script>
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection
 

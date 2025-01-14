@@ -568,12 +568,10 @@ table.dataTable thead th select {
                 @endif
                   @if ($hasPricePermission)
                   <th>Minimum Commission</th>
-                  <th>GP %</th>
+                  <!-- <th>GP %</th> -->
                   <th>Price</th>
                 @endif
-                  <th>Import Type</th>
-                  <th>Owership</th>
-                  <th>Document With</th>
+                  <th>Document Owership</th>
                   <th>Comments</th>
                 </tr>
               </thead>
@@ -840,7 +838,7 @@ if (hasPricePermission) {
                         return ''; // Return an empty string if there's no price
                     }
         },
-        { data: 'gp', name: 'vehicles.gp' },
+        // { data: 'gp', name: 'vehicles.gp' },
         {
                     data: 'price', 
                     name: 'vehicles.price', 
@@ -860,9 +858,7 @@ if (hasPricePermission) {
         });
     }
                 columns9.push(
-        { data: 'import_type', name: 'documents.import_type' },
-        { data: 'owership', name: 'documents.owership' },
-        { data: 'document_with', name: 'documents.document_with' },
+        { data: 'ownership_type', name: 'vehicles.ownership_type' },
         {
     data: null,
     name: 'chat',
@@ -923,23 +919,32 @@ if (hasPricePermission) {
         24: 'varaints.steering',
         25: 'varaints.fuel_type',
         26: 'varaints.gear',
-        27: 'vehicles.ex_colour',
-        28: 'vehicles.int_colour',
+        27: 'ex_color.name',
+        28: 'int_color.name',
         29: 'varaints.upholestry',
         30: 'vehicles.ppmmyyy',
         31: 'warehouse.name',
         32: 'vehicles.territory',
         33: 'countries.name',
-        34: 'costprice',
-        35: 'vehicles.minimum_commission',
-        36: 'vehicles.gp',
-        37: 'vehicles.price',
-        38: 'documents.import_type',
-        39: 'documents.owership',
-        40: 'documents.document_with',
-        41: 'vehicles.custom_inspection_number',
-        42: 'vehicles.custom_inspection_status',
     };   
+    if (hasManagementPermission) {
+    columnMap[33] = 'costprice';
+    columnMap[34] = 'vehicles.minimum_commission';
+    columnMap[35] = 'vehicles.price';
+    columnMap[36] = 'vehicles.ownership_type';
+    columnMap[37] = 'vehicles.custom_inspection_number';
+    columnMap[38] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
+    columnMap[33] = 'vehicles.minimum_commission';
+    columnMap[34] = 'vehicles.price';
+    columnMap[35] = 'vehicles.ownership_type';
+    columnMap[36] = 'vehicles.custom_inspection_number';
+    columnMap[37] = 'vehicles.custom_inspection_status';
+} else {
+    columnMap[33] = 'vehicles.ownership_type';
+    columnMap[34] = 'vehicles.custom_inspection_number';
+    columnMap[35] = 'vehicles.custom_inspection_status';
+}
     var table8 = $('#dtBasicExample8').DataTable({
           processing: true,
             serverSide: true,
@@ -1172,18 +1177,50 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cellText = cells[j].innerText || cells[j].textContent;
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");
