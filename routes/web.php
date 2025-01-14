@@ -133,6 +133,9 @@ use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
+use App\Http\Controllers\ModeldescriptionController;
+use App\Http\Controllers\MasterGradeController;
+
 
 /*
 /*
@@ -1134,4 +1137,6 @@ Route::get('/d', function () {
     Route::post('/custom-documentstatus-update', [VehiclesController::class, 'customdocumentstatusupdate'])->name('vehicles.customdocumentstatusupdate');
     Route::get('/variants/{id}/editvar', [VariantController::class, 'editvar'])->name('variants.editvar');
     Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
+    Route::resource('modeldescription', ModeldescriptionController::class);
+    Route::resource('mastergrade', MasterGradeController::class);
 });

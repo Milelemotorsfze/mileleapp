@@ -130,8 +130,8 @@ class MovementController extends Controller
             ->where('status', '!=', 'cancel')
             ->where('vin', '!=', '')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where(function ($query) {
                 $query->where('latest_location', '!=', '2')
@@ -143,8 +143,8 @@ class MovementController extends Controller
             ->whereHas('vehicles', function ($query) {
             $query->whereNotNull('vin')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where('status', 'Approved');
             })
@@ -174,8 +174,8 @@ class MovementController extends Controller
         ->where('vin', '!=', '')
         ->whereNull('gdn_id')
         ->where(function ($query) {
-            $query->whereNull('grn_id')
-                  ->orWhereNotNull('inspection_date');
+            $query->whereNull('grn_id');
+                //   ->orWhereNotNull('inspection_date');
         })
         ->where(function ($query) {
             $query->where('latest_location', '!=', '2')
@@ -231,6 +231,16 @@ class MovementController extends Controller
         $to = $request->input('to');
         $date = $request->input('date');
         $createdBy = $request->user()->id;
+    foreach ($vin as $index => $value) {
+        if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
+            $vehicle = Vehicles::where('vin', $vin[$index])->first();
+            if ($vehicle && $to[$index] === '2' && is_null($vehicle->inspection_date)) {
+                return redirect()->back()->withErrors([
+                    'error' => "Movement for VIN {$vin[$index]} cannot proceed because the inspection date is not set.",
+                ]);
+            }
+        }
+    }
         $movementsReference = new MovementsReference();
         $movementsReference->date = $date;
         $movementsReference->created_by = $createdBy;
@@ -560,8 +570,8 @@ public function grnfilepost(Request $request)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where('status', '=', 'Approved')
             ->pluck('id');
@@ -573,8 +583,8 @@ public function grnfilepost(Request $request)
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where('status', '=', 'Approved')
             ->pluck('id');
@@ -630,8 +640,8 @@ public function grnfilepost(Request $request)
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where('status', '=', 'Approved')
             ->pluck('id');
@@ -728,8 +738,8 @@ public function uploadVinFile(Request $request)
         $query = Vehicles::whereIn('vin', $vinNumbers)
             ->whereNotNull('vin')
             ->where(function ($query) {
-                $query->whereNull('grn_id')
-                      ->orWhereNotNull('inspection_date');
+                $query->whereNull('grn_id');
+                    //   ->orWhereNotNull('inspection_date');
             })
             ->where('status', '!=', 'cancel')
             ->whereNull($hasPermission ? 'grn_id' : 'gdn_id')
