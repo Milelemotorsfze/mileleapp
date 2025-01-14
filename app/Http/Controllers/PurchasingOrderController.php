@@ -66,6 +66,7 @@ use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use File;
+use Exception;
 
 
 class PurchasingOrderController extends Controller
@@ -5350,6 +5351,37 @@ public function submitPaymentDetails(Request $request)
                     $supplierAccountTransaction->status = 'Rejected';
                     $supplierAccountTransaction->remarks = $remarks;
                     $supplierAccountTransaction->save();
+                    $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+                    if ($supplierAccount) {
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.023,
+                            "AED" => 1,
+                            "CAD" => 2.68
+                        ];
+                
+                        $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
+                        $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                
+                        // Convert transaction amount if currencies differ
+                        if ($transactionCurrency !== $accountCurrency) {
+                            if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
+                                $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
+                            } else {
+                                // Handle missing conversion rate
+                                throw new Exception("Conversion rate not found for one of the currencies.");
+                            }
+                        } else {
+                            $convertedAmount = $transactionAmount; // No conversion needed
+                        }
+                
+                        // Update the current balance of the supplier account
+                        $supplierAccount->current_balance += $convertedAmount;
+                        $supplierAccount->save();
+                    }
                 }
             $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);    
 

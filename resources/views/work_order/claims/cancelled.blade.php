@@ -18,22 +18,10 @@
 @if ($canViewClaimInfo)
 <body>
     <div class="card-header">
-        <h4 class="card-title">Claim Cancelled Vehicles Info</h4>
+        <h4 class="card-title">Claim Cancelled BOE Info</h4>
     </div>
 
     <div class="card-body">
-        @if (Session::has('error'))
-            <div class="alert alert-danger" >
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('error') }}
-            </div>
-        @endif
-        @if (Session::has('success'))
-            <div class="alert alert-success" id="success-alert">
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('success') }}
-            </div>
-        @endif
         <div class="row">
             <div class="table-responsive dragscroll">
                 <table class="table table-striped table-editable table-condensed my-datatableclass">
@@ -42,7 +30,7 @@
                             <th>Action</th>
                             <th>SO Number</th>
                             <th>WO Number</th>
-                            <th>VIN Number</th>
+                            <th>BOE</th>
                             <th>Claim Date</th>
                             <th>Claim Reference Number</th>
                             <th>Cancelled By</th>
@@ -62,13 +50,21 @@
                                 </select>
                             </th>
                             <th>
-                                <select class="column-filter form-control" id="vin-filter" multiple="multiple">
+                                <select class="column-filter form-control" id="boe-filter" multiple="multiple">
                                     <!-- Options will be dynamically added via JS -->
                                 </select>
                             </th>
                             <th></th>
-                            <th></th>
-                            <th></th>
+                            <th>
+                                <select class="column-filter form-control" id="claim-reference-number-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
+                            <th> 
+                                <select class="column-filter form-control" id="cancelled-by-filter" multiple="multiple">
+                                    <!-- Options will be dynamically added via JS -->
+                                </select>
+                            </th>
                             <th></th>
                         </tr>
                         @endif
@@ -95,7 +91,7 @@
                                     </td>
                                     <td>{{ $data->workOrder->so_number ?? '' }}</td>
                                     <td>{{ $data->workOrder->wo_number ?? '' }}</td>
-                                    <td>{{ $data->vin ?? '' }}</td>
+                                    <td>{{ $data->boe ?? '' }}</td>
                                     <td>@if($data->claim->claim_date != ''){{ \Carbon\Carbon::parse($data->claim->claim_date)->format('d M Y') }}@endif</td>
                                     <td>{{ $data->claim->claim_reference_number ?? '' }}</td>
                                     <td>{{ $data->claim->createdUser->name ?? '' }}</td>
@@ -123,7 +119,7 @@
             });
 
             // Initialize Select2 for multi-select filters
-            $('#so-filter, #wo-filter, #vin-filter').select2({
+            $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #cancelled-by-filter').select2({
                 placeholder: "Select filter",
                 allowClear: true
             });
@@ -147,10 +143,12 @@
             // Populate filters
             populateDropdown(1, '#so-filter');
             populateDropdown(2, '#wo-filter');
-            populateDropdown(3, '#vin-filter');
+            populateDropdown(3, '#boe-filter');
+            populateDropdown(5, '#claim-reference-number-filter');
+            populateDropdown(6, '#cancelled-by-filter');
 
             // Apply multi-select filter for each dropdown
-            $('#so-filter, #wo-filter, #vin-filter').on('change', function() {
+            $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #cancelled-by-filter').on('change', function() {
                 var columnIndex = $(this).parent().index();
                 var selectedOptions = $(this).val();
                 var searchValue = selectedOptions ? selectedOptions.join('|') : '';
@@ -159,7 +157,7 @@
 
             // Clear all filters on button click
             $('#clear-filters').click(function() {
-                $('#so-filter, #wo-filter, #vin-filter').val(null).trigger('change');
+                $('#so-filter, #wo-filter, #boe-filter, #claim-reference-number-filter, #cancelled-by-filter').val(null).trigger('change');
                 table.search('').columns().search('').draw();
             });
         @else
@@ -168,6 +166,18 @@
     });
 </script>
 </body>
+@else
+    <div class="card-header">
+        <p class="card-title">Sorry! You don't have permission to access this page.</p>
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-sm btn-info" href="/">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
+            </a>
+            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
+            </a>
+        </div>
+    </div>
 @endif
 @endsection         
 
