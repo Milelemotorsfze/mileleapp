@@ -3634,8 +3634,11 @@ body[data-layout-mode=dark] .chat-conversation .right .conversation-list .ctext-
 }.timeline .timeline-launch .timeline-text {
     width: 100%}
 @media (max-width:767px) {
-    div.dataTables_wrapper div.dataTables_filter {
-    text-align: center;
+    div.dataTables_wrapper div.dataTables_length {
+    text-align: start !important;
+}
+div.dataTables_wrapper div.dataTables_filter {
+    text-align: end !important;
 }
 .email-leftbar {
     float: none;

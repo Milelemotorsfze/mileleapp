@@ -135,7 +135,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
 use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
-
+use App\Http\Controllers\CompanyDomainController;
 
 /*
 /*
@@ -513,6 +513,16 @@ Route::get('/d', function () {
     Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
     // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
 
+    
+    // Company Domains 
+    Route::get('companyDomains/create', [CompanyDomainController::class, 'create'])->name('companyDomains.create');
+    Route::get('companyDomains/{id}/edit', [CompanyDomainController::class, 'edit'])->name('companyDomains.edit');
+    Route::post('companyDomains', [CompanyDomainController::class, 'store'])->name('companyDomains.store');
+    Route::put('companyDomains/{id}', [CompanyDomainController::class, 'update'])->name('companyDomains.update');
+    Route::delete('companyDomains/{id}', [CompanyDomainController::class, 'destroy'])->name('companyDomains.destroy');
+    Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
+    
+    
     // Demand & Planning Module
 
     // Demands
@@ -922,6 +932,11 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
     Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
+    // Variant Attributes
+    Route::get('fetch-model-spectifications', [VariantController::class,'fetchModelSpecifications'])
+        ->name('fetch.model_spectifications');
+    Route::get('fetch-model-spectification-options', [VariantController::class,'fetchModelSpecificationOptions'])
+    ->name('fetch.model_spectification_options');
 
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
@@ -1013,6 +1028,7 @@ Route::get('/d', function () {
     Route::post('/transition/action', [VendorAccountController::class, 'handleAction'])->name('transition.action');
 
     //Price Update Purchased Order
+    Route::post('vehicles/update-dp-prices', [PurchasingOrderController::class, 'updatePOPrices'])->name('vehicles.updateDPPrices');
     Route::get('purchasedorder/vehicles-data/{id}', [PurchasingOrderController::class, 'vehiclesdatagetting'])->name('vehicles.vehiclesdatagetting');
     Route::post('vehicles/update-prices', [PurchasingOrderController::class, 'updatePrices'])->name('vehicles.updatePrices');
     Route::post('/messagespurchased', [PurchasingOrderController::class, 'storeMessages']);

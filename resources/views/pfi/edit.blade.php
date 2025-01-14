@@ -248,7 +248,7 @@
                                                            
                                                             <div class="col-lg-2 col-md-6">
                                                                 <input type="number" min="1"  required placeholder="0" name="PfiItem[{{$key+1}}][unit_price]" oninput=calculateTotalAmount({{$key+1}},0) 
-                                                                    class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" 
+                                                                    class="form-control widthinput mb-2 unit-prices" placeholder="Unit price" @if($pfi->isCreatedPO == 1) readonly @endif
                                                                     index="{{$key+1}}" item="0" id="unit-price-{{$key+1}}-item-0" value="{{$pfi_item->unit_price }}">
                                                             </div>
                                                             <div class="col-lg-2 col-md-6">
