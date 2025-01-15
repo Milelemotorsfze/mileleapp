@@ -1486,16 +1486,16 @@
                                                                         @endif
                                                                     @endcan
 
-                                                                    @can('view-model-description-list')
+                                                                    <!-- @can('view-model-description-list')
                                                                     @php
                                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-description-list');
                                                                     @endphp
                                                                         @if ($hasPermission)
-                                                                        <a href="{{ route('model-descriptions.index')}}" class="dropdown-item" data-key="t-login">
+                                                                        <a href="#" class="dropdown-item" data-key="t-login">
                                                                     @if(Auth::user()->empProfile->department->is_demand_planning == 1) DP @endif  Model Description
                                                                     </a>
                                                                     @endif
-                                                                    @endcan
+                                                                    @endcan -->
 
                                                                     @can('variants-view')
                                                                     @php
