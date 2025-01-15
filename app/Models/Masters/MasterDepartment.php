@@ -18,6 +18,7 @@ class MasterDepartment extends Model
         'department_head_id',
         'approval_by_id',
         'status',
+        'is_demand_planning',
         'created_by',
         'updated_by',
         'deleted_by'
