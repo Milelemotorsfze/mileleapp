@@ -134,6 +134,7 @@ use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
 use App\Http\Controllers\CompanyDomainController;
+use App\Http\Controllers\ModelDescriptionController;
 
 /*
 /*
@@ -922,6 +923,7 @@ Route::get('/d', function () {
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
+    Route::resource('model-descriptions', ModelDescriptionController::class)->only('index');
     Route::resource('master-addons', MasterAddonController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('modules', ModuleController::class);
