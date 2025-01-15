@@ -67,33 +67,33 @@
                                 </div>
                             </div>
                             </div>
-                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                <div class="col-lg-12">
-                                        <div class="row">
-                                        <div class="col-lg-4 col-md-12 col-sm-12">
-                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                            <!-- <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
-                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        <div class="modal-body">
+                                            <div class="col-lg-12">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                                        <label class="form-label font-size-13 text-center">New Option Name</label>
+                                                    </div>
+                                                    <div class="col-lg-8 col-md-12 col-sm-12">
+                                                        <input type="text" class="form-label" name="option_name" id="option_name" />
+                                                        <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
+                            </div> -->
                 <form id="form-create" action="{{ route('variants.store') }}" method="POST">
                     @csrf
                         <div class="row">
@@ -605,6 +605,7 @@ $(document).ready(function () {
         $('.btn-outline-secondary').click(function () {
             var specificationId = $(this).data('specification-id');
             $('#specification-id-input').val(specificationId);
+            $('#option_name').val('');
             $('#optionsmodal').modal('show');
         });
     });

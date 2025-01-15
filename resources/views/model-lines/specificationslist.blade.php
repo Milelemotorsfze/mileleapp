@@ -157,8 +157,8 @@
                                 <input type="hidden" class="form-control" id="updateModalId">
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="button" class="btn btn-primary" onclick="savenewoptions()">Save</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -303,7 +303,7 @@
     function savenewoptions() {
         var specificationId = $('#updateModalId').val();
         var newOption = $('#updateSpecification').val();
-        console.log(specificationId);
+     
         if (newOption.trim() === '') {
             alert('Please enter a valid option.');
             return;
