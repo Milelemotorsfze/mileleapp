@@ -962,7 +962,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
             document.getElementById('quotationButton').style.display = 'block';
         }
     });
-
     function moveToStep(step) {
         currentStep = step;
         const steps = document.querySelectorAll('.step');

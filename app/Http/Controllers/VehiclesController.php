@@ -2782,6 +2782,7 @@ foreach ($variants as $variant) {
                         'vehicles.so_id',
                         'vehicles.minimum_commission',
                         'vehicles.reservation_end_date',
+                        'vehicles.vehicle_document_status',
                         'warehouse.name as location',
                         'purchasing_order.po_date',
                         'vehicles.ppmmyyy',
@@ -3633,6 +3634,7 @@ public function availablevehicles(Request $request)
                     'vehicles.sales_remarks',
                     'vehicles.minimum_commission',
                     'vehicles.custom_inspection_number',
+                    'vehicles.vehicle_document_status',
                     'vehicles.custom_inspection_status',
                     'inspection_grn.id as grn_inspectionid',
                     'inspection_pdi.id as pdi_inspectionid',
@@ -3943,6 +3945,17 @@ COALESCE(
         ]);
         $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
         $vehicle->ownership_type = $request->input('documentonwership');
+        $vehicle->save();
+        return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
+    }
+    public function customdocumentstatusupdate(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'document_status' => 'required|in:On Hold,Released,N/A',
+        ]);
+        $vehicle = Vehicles::findOrFail($request->input('vehicle_id'));
+        $vehicle->vehicle_document_status = $request->input('document_status');
         $vehicle->save();
         return redirect()->route('vehicles.statuswise', ['status' => 'allstock']);
     }

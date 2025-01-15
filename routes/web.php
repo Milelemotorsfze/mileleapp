@@ -32,8 +32,8 @@ use App\Http\Controllers\WoStatusController;
 use App\Http\Controllers\WoVehicleController;
 use App\Http\Controllers\WoPDIStatusController;
 use App\Http\Controllers\WOVehicleDeliveryStatusController;
-use App\Http\Controllers\VehiclePenaltyController;
-use App\Http\Controllers\WOVehicleClaimsController;
+use App\Http\Controllers\BOEPenaltyController;
+use App\Http\Controllers\WOBOEClaimsController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -133,6 +133,7 @@ use App\Http\Controllers\LeadChatController;
 use App\Exports\UAEVehicleStockExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BelgiumVehicleStockExport;
+use App\Http\Controllers\CompanyDomainController;
 
 /*
 /*
@@ -451,6 +452,7 @@ Route::get('/d', function () {
     // Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments']);
     Route::get('/comments/{workOrderId}', [WorkOrderController::class, 'getComments'])->name('comments.get');
     Route::delete('/workorder/{id}', [WorkOrderController::class, 'destroy'])->name('workorder.destroy');
+    Route::post('/is-exist-in-sales-order', [WorkOrderController::class, 'isExistInSalesOrder'])->name('work-order.is-exist-in-sales-ordder');
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
         Route::get('work-order-info/{type}', 'index')->name('work-order.index');
@@ -488,20 +490,20 @@ Route::get('/d', function () {
         Route::post('/update-vehicle-delivery-status', 'updateVehDeliveryStatus')->name('wo.updateVehDeliveryStatus');
         Route::get('/vehicle-delivery-status-log/{id}', 'vehDeliveryStatusHistory')->name('vehDeliveryStatusHistory');
     }); 
-    Route::controller(VehiclePenaltyController::class)->group(function(){
-        Route::get('/vehicle-penalty-report', 'getVehiclePenaltyReport')->name('getVehiclePenaltyReport');
+    Route::controller(BOEPenaltyController::class)->group(function(){
+        Route::get('/boe-penalty-report', 'getBOEPenaltyReport')->name('getBOEPenaltyReport');
         Route::get('/cleared-penalty-report', 'getClearedPenalties')->name('getClearedPenalties');
         Route::get('/no-penalty-report', 'getNoPenalties')->name('getNoPenalties');
         Route::post('/vehicle-penalty/storeOrUpdate', 'storeOrUpdate')->name('penalty.storeOrUpdate');
     }); 
-    Route::controller(WOVehicleClaimsController::class)->group(function(){
-        Route::get('/vehicle-pending-claims', 'getPendingClaims')->name('getPendingClaims');
+    Route::controller(WOBOEClaimsController::class)->group(function(){
+        Route::get('/pending-boe-claims', 'getPendingClaims')->name('getPendingClaims');
         Route::get('/cleared-submitted-claims', 'getSubmittedClaims')->name('getSubmittedClaims');
         Route::get('/cleared-approved-claims', 'getApprovedClaims')->name('getApprovedClaims');
         Route::get('/cleared-cancelled-claims', 'getCancelledClaims')->name('getCancelledClaims');
         Route::get('/claims-log/{id}', 'getClaimsLog')->name('claim.log');
-        Route::post('/vehicle-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
-        Route::post('/vehicle-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
+        Route::post('/boe-claims/storeOrUpdate', 'storeOrUpdate')->name('claim.storeOrUpdate');
+        Route::post('/boe-claims/updateStatus', 'updateStatus')->name('claim.updateStatus');
     });    
     Route::get('/finance-approval-history/{id}', [WOApprovalsController::class, 'fetchFinanceApprovalHistory'])->name('fetchFinanceApprovalHistory');
     // Route::get('/finance-approval-history-page/{id}', [WOApprovalsController::class, 'showFinanceApprovalHistoryPage'])->name('showFinanceApprovalHistoryPage');
@@ -509,6 +511,16 @@ Route::get('/d', function () {
     Route::get('/coo-approval-history/{id}', [WOApprovalsController::class, 'fetchCooApprovalHistory'])->name('fetchCooApprovalHistory');
     // Route::get('/coo-approval-history-page/{id}', [WOApprovalsController::class, 'showCooApprovalHistoryPage'])->fetch('showCooApprovalHistoryPage');
 
+    
+    // Company Domains 
+    Route::get('companyDomains/create', [CompanyDomainController::class, 'create'])->name('companyDomains.create');
+    Route::get('companyDomains/{id}/edit', [CompanyDomainController::class, 'edit'])->name('companyDomains.edit');
+    Route::post('companyDomains', [CompanyDomainController::class, 'store'])->name('companyDomains.store');
+    Route::put('companyDomains/{id}', [CompanyDomainController::class, 'update'])->name('companyDomains.update');
+    Route::delete('companyDomains/{id}', [CompanyDomainController::class, 'destroy'])->name('companyDomains.destroy');
+    Route::get('companyDomains', [CompanyDomainController::class, 'index'])->name('companyDomains.index');    
+    
+    
     // Demand & Planning Module
 
     // Demands
@@ -1136,4 +1148,7 @@ Route::get('/d', function () {
     Route::get('/get-onwership-data', [VehiclesController::class, 'getonwershipData']);
     Route::post('/onwership-update', [VehiclesController::class, 'saveonwership'])->name('vehicles.saveonwership');
     Route::post('/purchasing-order/check-po-number-edit', [PurchasingOrderController::class, 'checkPoNumberedit'])->name('purchasing-order.checkPoNumberedit');
+    Route::post('/custom-documentstatus-update', [VehiclesController::class, 'customdocumentstatusupdate'])->name('vehicles.customdocumentstatusupdate');
+    Route::get('/variants/{id}/editvar', [VariantController::class, 'editvar'])->name('variants.editvar');
+    Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
 });

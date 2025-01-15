@@ -8,6 +8,16 @@
                     @if ($hasPermission)
   <div class="card-header">
   <style>
+
+    .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+      width: 100% !important;     
+      padding: 8px 40px !important; 
+    }
+    
+    .nav-fill .nav-item, .nav-fill>.nav-link {
+      flex: none !important;
+      margin: 3px !important;
+    }
     #dtBasicExample2 {
         width: 100%;
     }
@@ -180,7 +190,7 @@ input[type=number]::-webkit-outer-spin-button
       </a> -->
       <div class="clearfix"></div>
 <br>
-    <ul class="nav nav-pills nav-fill">
+    <ul class="nav nav-pills nav-fill d-flex">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
@@ -1946,11 +1956,15 @@ $(document).ready(function () {
       $(column.header()).addClass('nowrap-td');
 
       column.data().unique().sort().each(function(d, j) {
-        if (columnId === 3) {  // Assuming the phone column is at index 2
+        if (columnId === 5) {  // Assuming the phone column is at index 2
           var phoneNumber = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
     }
-    else if (columnId === 4) {  // Assuming the phone column is at index 2
+    else  if (columnId === 4) {  // Assuming the phone column is at index 2
+          var phoneNumber = $(d).text().trim();  // Extract phone number
+        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
+    }
+    else if (columnId === 6) {  // Assuming the phone column is at index 2
           var Email = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + Email + '">' + Email + '</option>');
     }

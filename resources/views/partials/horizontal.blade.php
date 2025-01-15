@@ -176,6 +176,46 @@
                                         <span data-key="t-extra-pages">Dashboard</span>
                                     </a>
                                 </li>
+
+
+
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['company-domain-create','company-domain-list']);
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="grid"></i>
+                                        <span data-key="t-extra-pages">Company Domains</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['company-domain-create']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('companyDomains.create')}}" id="topnav-auth" role="button">
+                                                <span data-key="t-authentication">Create</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['company-domain-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('companyDomains.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Info </span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </li>
+                                @endif
+
+
+
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo','list-export-exw-wo','view-current-user-export-exw-wo-list','view-current-user-export-exw-wo-list','list-export-cnf-wo','view-current-user-export-cnf-wo-list','list-export-local-sale-wo','view-current-user-local-sale-wo-list']);
                                 @endphp
@@ -292,9 +332,9 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('getVehiclePenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized Vehicles</a>            
+                                                <a href="{{route('getBOEPenaltyReport')}}" class="dropdown-item" data-key="t-login">Penalized BOE</a>            
                                                 <a href="{{route('getClearedPenalties')}}" class="dropdown-item" data-key="t-login">Cleared Penalties</a>
-                                                <a href="{{route('getNoPenalties')}}" class="dropdown-item" data-key="t-login">No Penalties Vehicles</a>
+                                                <a href="{{route('getNoPenalties')}}" class="dropdown-item" data-key="t-login">No Penalties BOE</a>
                                             </div>
                                         </div>
                                         @endif
