@@ -1234,7 +1234,6 @@
                                         @endphp
                                             @if ($hasPermission)
                                                 <a href="{{ route('purchasing-order.index') }}" class="dropdown-item" data-key="t-login"> List </a>
-                                                <!-- <a href="{{ route('purchase-order.list') }}" class="dropdown-item" data-key="t-login"> List </a> -->
                                             @endif
                                         @endcanany
                                     </div>
