@@ -14,4 +14,12 @@ class MasterModelDescription extends Model
         'model_line_id',
         'model_description'
     ];
+    public function modelLine()
+    {
+        return $this->belongsTo(MasterModelLines::class, 'model_line_id','id');
+    }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by','id');
+    }
 }
