@@ -1,20 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\MasterModelDescription;
 
+use App\Models\Brand;
+use App\Models\MasterModelLines;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserActivityController;
+use Illuminate\Support\Facades\Validator;
 
-class ModelDescriptionController extends Controller
+class ModeldescriptionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $modelDescriptions = MasterModelDescription::orderBy('id','DESC')->get();
-        (new UserActivityController)->createActivity('Open Master Descriptions');
-        return view('model-descriptions.index', compact('modelDescriptions'));
+        $modelLines = MasterModelLines::orderBy('id','DESC')->get();
+        (new UserActivityController)->createActivity('Open Master Model Lines Description');
+        return view('modeldescription.index', compact('modelLines'));
     }
 
     /**
@@ -22,7 +26,9 @@ class ModelDescriptionController extends Controller
      */
     public function create()
     {
-        //
+        $masterModelLines = MasterModelLines::get();
+        $brands = Brand::get();
+        return view('modeldescription.create',compact('masterModelLines', 'brands'));
     }
 
     /**
@@ -30,7 +36,7 @@ class ModelDescriptionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -46,7 +52,7 @@ class ModelDescriptionController extends Controller
      */
     public function edit(string $id)
     {
-        //
+       
     }
 
     /**
@@ -54,7 +60,7 @@ class ModelDescriptionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+       
     }
 
     /**
