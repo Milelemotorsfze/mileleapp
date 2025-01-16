@@ -17,7 +17,26 @@
             object-fit: contain;
        }
     }
+
+    .dropdown-item:hover {
+        background-color: #1c6192 !important;
+        color: white !important;
+    }
     
+    .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	/* color: black!important; */
+	/* background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important; */
+	background: #072c47 !important;
+	}
+
+    .nav-item.dropdown.active {
+        background-color:rgba(7, 44, 71, 0.88);
+    }
+
+    .nav-item.dropdown.active .nav-link.dropdown-toggle.arrow-none.active {
+        color: white !important;
+    }
+
     .badge-notification {
       top: -20;
       right: 0;
@@ -56,6 +75,16 @@
 
     .container, .main-wrapper, .navbar, .header {
         overflow: visible !important; 
+    }
+
+    .username-toggle {
+        background-color: #072c47 !important;
+    }
+
+    .rolename-toggle {
+        background-color: #072c47 !important;
+        border-color: #4ba6ef !important;
+
     }
 
     @media (max-width: 991.99px) {

@@ -3044,7 +3044,7 @@ body[data-sidebar=brand] #vertical-menu-btn, body[data-sidebar=dark] #vertical-m
 }
 .topnav {
     /* background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac); */
-    background-color: #072c47;
+    background-color: #004d85e3;
 }
 .topnav .navbar-nav .nav-item:first-of-type .nav-link {
     padding-left: 0;
