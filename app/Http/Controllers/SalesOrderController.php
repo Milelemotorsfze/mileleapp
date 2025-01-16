@@ -45,7 +45,6 @@ class SalesOrderController extends Controller
         $status = $request->input('status');
         if ($status === "SalesOrder") {
             $id = Auth::user()->id;
-
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
             $query = So::select([
                 'calls.name as customername',
@@ -64,7 +63,6 @@ class SalesOrderController extends Controller
             ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
             ->leftJoin('calls', 'quotations.calls_id', '=', 'calls.id')
             ->groupBy('so.id');
-
             if (!$hasPermission) {
                 $query->where('calls.sales_person', $id);
             }
@@ -345,7 +343,7 @@ class SalesOrderController extends Controller
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
             $sodetails = So::where('quotation_id', $quotation->id)->first();
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            $hasPermission = Auth::user()?->hasPermissionForSelectedRole('sales-support-full-access', 'list-daily-leads');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
                       ->where('so_id', $sodetails->id)
                       ->get();

@@ -51,22 +51,25 @@
             <th>Model Line</th>
             <th>Created By</th>
             <th>Created At</th>
-            <th>Action</th>
         </tr>
     </thead>
     <tbody>
+        @forelse ($MasterModelDescription as $description)
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-            <a href="" class="btn btn-sm btn-warning shadow-sm">Edit</a>
-            </td>
+            <td>{{ $description->model_description }}</td>
+            <td>{{ $description->modelLine->brand->brand_name ?? 'N/A' }}</td>
+            <td>{{ $description->modelLine->model_line ?? 'N/A' }}</td>
+            <td>{{ $description->user->name ?? 'System' }}</td>
+            <td>{{ $description->created_at->format('d-m-Y H:i:s') }}</td>
         </tr>
+        @empty
+        <tr>
+            <td colspan="6" class="text-center">No data available</td>
+        </tr>
+        @endforelse
     </tbody>
 </table>
+
     </div>
 </div>
 </div>
