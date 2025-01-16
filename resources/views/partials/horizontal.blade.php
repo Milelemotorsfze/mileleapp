@@ -829,7 +829,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
-                                        <span data-key="t-extra-pages">Vehicles</span>
+                                        <span data-key="t-extra-pages">Vehicle Addons</span>
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
@@ -1970,7 +1970,7 @@
                                             </a>
                                         </div>
                                         @endif
-                                        <!-- @php
+                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
                                         @endphp
                                         @if ($hasPermission)
@@ -1979,7 +1979,7 @@
                                                 <span data-key="t-utility">Vendors </span>
                                             </a>
                                         </div>
-                                        @endif -->
+                                        @endif 
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-bank-accounts');
                                         @endphp
