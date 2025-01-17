@@ -210,7 +210,7 @@
                                         <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
                                         <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
                                         <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
-
+                                        <option value="4MATIC" {{ old('geadrive_trainrbox') == '4MATIC' ? 'selected' : '' }}>4MATIC</option>
                                     </select>
                                 </div>
                             </div>
