@@ -165,13 +165,20 @@
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="model_detail" class="form-label">Model Description</label>
-                                    <select class="form-control select2" name="model_detail" id="model_detail">
-                                        <option value="">Select a Model</option>
-                                    </select>
-                                </div>
-                            </div>
+                            {{$variant->master_model_descriptions_id}}
+    <div class="mb-3">
+        <label for="model_detail" class="form-label">Model Description</label>
+        <select class="form-control select2" name="model_detail" id="model_detail">
+            <option value="">Select a Model</option>
+            @foreach ($modelDescriptions as $description)
+                <option value="{{ $description->id }}" 
+                    {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
+                    {{ $description->model_description }} - {{$description->id }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+</div>
                             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Details</label>
@@ -214,8 +221,6 @@
 <script>
     $(document).ready(function () {
         $('#model_detail').select2({
-            placeholder: "Select a Model",
-            allowClear: true
         });
         $('#model_detail').change(function () {
             const selectedModelId = $(this).val();
@@ -246,7 +251,6 @@
             $('#drive_train').val(model.drive_train);
             $('#netsuite_name').val(model.grade_name);
         }
-
         // Clear the input fields
         function clearModelDetails() {
             $('#steering, #engine, #fuel_type, #transmission, #window_type, #drive_train, #netsuite_name').val('');

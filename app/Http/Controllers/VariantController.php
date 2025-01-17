@@ -569,7 +569,9 @@ if (!empty($window_type)) {
                 'options' => $options,
             ];
         }
-        return view('variants.duplicate',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+        $selectedModelDescriptionId = $variant->master_model_descriptions_id;
+        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)->get();
+        return view('variants.duplicate',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine','modelDescriptions'));
     }
 
     /**
