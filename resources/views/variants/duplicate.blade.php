@@ -228,6 +228,7 @@
                                     <option value="4WD" {{ isset($variant) && $variant->drive_train == '4WD' ? 'selected' : '' }}>4WD</option>
                                     <option value="FWD" {{ isset($variant) && $variant->drive_train == 'FWD' ? 'selected' : '' }}>FWD</option>
                                     <option value="RWD" {{ isset($variant) && $variant->drive_train == 'RWD' ? 'selected' : '' }}>RWD</option>
+                                    <option value="4MATIC" {{ isset($variant) && $variant->drive_train == '4MATIC' ? 'selected' : '' }}>4MATIC</option>
                                 </select>
                                 </div>
                             </div>
