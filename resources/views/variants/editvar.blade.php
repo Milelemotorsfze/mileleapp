@@ -157,7 +157,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12" id="fuel">
+                            <div class="col-lg-2 col-md-6 col-sm-12" id="engine">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <input type="hidden" name="engine" value="{{ isset($variant) ? $variant->engine : '' }}">
