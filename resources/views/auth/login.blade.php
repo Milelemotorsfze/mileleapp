@@ -24,15 +24,37 @@
             background-color: #216da4;
         }
 
+        .main-logo-img {
+            width: 70%;
+            aspect-ratio: 3;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%;
+        }
+
+        .logo-img {
+            max-width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            object-position: top; 
+        }
+
         @media (max-width: 767px) {
             .side-image-container {
                 display: none;
             }
 
-            .mobile-logo-container {
+            .main-logo-container {
                 display: block;
                 text-align: center;
-                /* Center the mobile logo horizontally */
+            }
+
+            .main-logo-img {
+                width: 60%;
             }
         }
 
@@ -40,10 +62,6 @@
         @media (min-width: 768px) {
             .side-image-container {
                 display: block;
-            }
-
-            .mobile-logo-container {
-                display: none;
             }
         }
 
@@ -61,19 +79,11 @@
             height: auto;
         } */
 
-        .logo-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        height: 100%;
-    }
-
-    .logo-img {
-        max-width: 100%; 
-        height: auto; 
-        object-fit: cover; 
-        object-position: top; 
-    }
+    @media (min-width: 768px) {
+            .side-image-container {
+                display: block;
+            }
+        }
 
     </style>
 </head>
@@ -81,7 +91,7 @@
 
 <body>
     <div class="auth-page">
-        <div class="container-fluid p-0">
+        <div class="p-0">
             <div class="row g-0">
                 <div class="col-xxl-3 col-lg-4 col-md-5">
                     <div class="auth-full-page-content d-flex p-sm-5 p-4">
@@ -91,10 +101,11 @@
                                     <a href="/" class="d-block auth-logo">
                                     </a>
                                 </div>
-                                <div class="mobile-logo-container d-block d-md-none">
-                                    <img src="mobile-logo.png" class="mobile-logo-img">
-                                </div>
+                                
                                 <div class="auth-content my-auto">
+                                    <div class="main-logo-container d-flex justify-content-center pb-5 mb-5">
+                                        <img src="mobile-logo.png" class="main-logo-img">
+                                    </div>
                                     <div class="text-center">
                                         <h5 class="mb-0">Welcome Back !</h5>
                                         <p class="text-muted mt-2">Sign in to continue to Milele.</p>
