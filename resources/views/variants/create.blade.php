@@ -169,6 +169,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12" id="drive_train">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Drive Train</label>
+                                    <select class="form-control" autofocus name="drive_train" id="drive_train">
+                                    <option value="4X2" {{ old('geadrive_trainrbox') == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ old('geadrive_trainrbox') == '4X4' ? 'selected' : '' }}>4X4</option>
+                                        <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
+                                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
+                                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
+                                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
+                                        <option value="4MATIC" {{ old('geadrive_trainrbox') == '4MATIC' ? 'selected' : '' }}>4MATIC</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>

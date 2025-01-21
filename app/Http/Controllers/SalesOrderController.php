@@ -343,7 +343,8 @@ class SalesOrderController extends Controller
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
             $sodetails = So::where('quotation_id', $quotation->id)->first();
-            $hasPermission = Auth::user()?->hasPermissionForSelectedRole('sales-support-full-access', 'list-daily-leads');
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') 
+                 || Auth::user()->hasPermissionForSelectedRole('sales-view');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
                       ->where('so_id', $sodetails->id)
                       ->get();

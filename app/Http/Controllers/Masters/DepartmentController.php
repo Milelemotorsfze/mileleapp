@@ -51,6 +51,7 @@ class DepartmentController extends Controller
                 $newApprovalPerson = User::where('status','active')->whereNotIn('id',[1,16])->where('id',$request->approval_by_id)->first();
                 $data = MasterDepartment::where('id',$id)->first();
                 if($data) {
+                 
                     if($data->approval_by_id != $request->approval_by_id) {
                         // Hiring Request
                         $hiringDeptHead = EmployeeHiringRequest::where([
@@ -265,6 +266,7 @@ class DepartmentController extends Controller
                     $data->approval_by_id = $request->approval_by_id;
                     $data->updated_by = $authId;
                     $data->division_id = $request->division_id;
+                    $data->is_demand_planning = $request->is_demand_planning ? true : false;
                     $data->update();
                     (new UserActivityController)->createActivity('Master Department Edited');
                     $successMessage = "Master Department Updated Successfully";
@@ -348,6 +350,7 @@ class DepartmentController extends Controller
                 $authId = Auth::id();
                 $input = $request->all();
                 $input['created_by'] = $authId; 
+                $input['is_demand_planning'] = $request->is_demand_planning ? true : false;
                 $createRequest = MasterDepartment::create($input);
                 $lead = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$request->department_head_id)->first();
                 if($lead) {
