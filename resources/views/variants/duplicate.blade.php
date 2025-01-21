@@ -365,11 +365,6 @@
                             });
                             $('#form-create').on('submit', function (e) {
                         var variantValue = $('.variant').val().trim();
-                        if (!updatevariantDetail()) {
-                        alert('Error: SFX is required for the variant. Please select it.');
-                        e.preventDefault();
-                        return false;
-                    }
                         // Check if Variant Details is empty
                         if (!variantValue) {
                             alert('Error: Variant Details is required. Please fill it in before submitting.');

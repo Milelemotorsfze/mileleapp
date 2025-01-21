@@ -109,6 +109,9 @@ class VariantController extends Controller
      */
 public function store(Request $request)
 {
+    DB::beginTransaction();
+
+    try {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
     $totalSpecifications = count($selectedSpecifications);
@@ -527,7 +530,12 @@ if (!empty($window_type)) {
     $variantlog->variant_id = $variantId;
     $variantlog->created_by = auth()->user()->id;
     $variantlog->save();
+    DB::commit();
     return redirect()->route('variants.index')->with('success', 'Variant added successfully.');
+} catch (\Exception $e) {
+DB::rollBack();
+return redirect()->back()->with('error', 'Failed to update variant: ' . $e->getMessage());
+}
 }
     /**
      * Display the specified resource.
@@ -941,7 +949,11 @@ public function savespecification(Request $request)
                 'options' => $options,
             ];
         }
-        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
+        $modelDescriptions = \App\Models\MasterModelDescription::where('model_line_id', $modelLineId)
+        ->where('steering', $variant->steering)
+        ->where('engine', $variant->engine)
+        ->where('fuel_type', $variant->fuel_type)->get();
+        return view('variants.editvar',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine','modelDescriptions'));
     }
     public function storevar(Request $request, $variant)
     {
@@ -969,7 +981,6 @@ public function savespecification(Request $request)
             })
             ->orderBy('created_at', 'desc')
             ->first();
-            info($request->input('fuel_type'));
         if ($existingVariantop) {
             // Check if all specifications and values match
             $matchedSpecifications = 0;
@@ -1070,11 +1081,17 @@ public function savespecification(Request $request)
             }
             $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
         }
-        $variant->netsuite_name = $request->input('netsuite_name');
+
+        $variant->steering = $request->input('steering');
+        $variant->fuel_type = $request->input('fuel_type');
+        $variant->engine = $request->input('engine');
         $variant->upholestry = $request->input('upholestry');
         $variant->coo = $request->input('coo');
         $variant->drive_train = $request->input('drive_train');
         $variant->gearbox = $request->input('gearbox');
+        $variant->grade_name = $grade_name = $request->input('grade_name');
+        $variant->window_type = $request->input('window_type');
+        $variant->master_model_descriptions_id = $request->input('model_detail');
         $variant->model_detail = $model_details;
         $variant->detail = $variant_details;
         $variant->my = $request->input('my');
@@ -1130,9 +1147,7 @@ public function savespecification(Request $request)
             'drive_train' => $model->drive_train,
         ]);
     }
-
     return response()->json(['success' => false], 404);
 }
-
 }
     
