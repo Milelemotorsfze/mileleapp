@@ -51,9 +51,10 @@
                                         <div class="row">
                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                             <label class="form-label font-size-13 text-center">New Option Name</label>
+                                            <span class="text-danger">* </span>
                                         </div>
                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type="text" class="form-control" placeholder="Enter Attribute Option" name="option_name" id="option_name" />
                                             <input type ="hidden" name="specification-id-input" id="specification-id-input" />
                                         </div>
                                         </div>
@@ -66,33 +67,33 @@
                                 </div>
                             </div>
                             </div>
-                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                <div class="col-lg-12">
-                                        <div class="row">
-                                        <div class="col-lg-4 col-md-12 col-sm-12">
-                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                            <!-- <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <div class="col-lg-8 col-md-12 col-sm-12">
-                                            <input type="text" class="form-label" name="option_name" id="option_name" />
-                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        <div class="modal-body">
+                                            <div class="col-lg-12">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                                        <label class="form-label font-size-13 text-center">New Option Name</label>
+                                                    </div>
+                                                    <div class="col-lg-8 col-md-12 col-sm-12">
+                                                        <input type="text" class="form-label" name="option_name" id="option_name" />
+                                                        <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
-                                </div>
-                                </div>
-                            </div>
-                            </div>
+                            </div> -->
                 <form id="form-create" action="{{ route('variants.store') }}" method="POST">
                     @csrf
                         <div class="row">
@@ -221,12 +222,13 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Drive Train</label>
                                     <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                    <option value="4x2" {{ isset($variant) && $variant->drive_train == '4x2' ? 'selected' : '' }}>4x2</option>
-                                    <option value="4x4" {{ isset($variant) && $variant->drive_train == '4x4' ? 'selected' : '' }}>4x4</option>
+                                    <option value="4X2" {{ isset($variant) && $variant->drive_train == '4X2' ? 'selected' : '' }}>4X2</option>
+                                    <option value="4X4" {{ isset($variant) && $variant->drive_train == '4X4' ? 'selected' : '' }}>4X4</option>
                                     <option value="AWD" {{ isset($variant) && $variant->drive_train == 'AWD' ? 'selected' : '' }}>AWD</option>
                                     <option value="4WD" {{ isset($variant) && $variant->drive_train == '4WD' ? 'selected' : '' }}>4WD</option>
                                     <option value="FWD" {{ isset($variant) && $variant->drive_train == 'FWD' ? 'selected' : '' }}>FWD</option>
                                     <option value="RWD" {{ isset($variant) && $variant->drive_train == 'RWD' ? 'selected' : '' }}>RWD</option>
+                                    <option value="4MATIC" {{ isset($variant) && $variant->drive_train == '4MATIC' ? 'selected' : '' }}>4MATIC</option>
                                 </select>
                                 </div>
                             </div>
@@ -358,7 +360,7 @@ $(document).ready(function () {
 
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
         if (fieldId === 'fuel') {
     if (fieldValue === 'Petrol') {
         fieldValue = 'P';
@@ -425,10 +427,9 @@ $(document).ready(function () {
         } else {
             return option.value;
         }
-    }).filter(Boolean).join(' ');
-
-    $('.model_detail').val(modelDetail);
-}
+    }).filter(Boolean).join(' ').replace(/\s+/g, ' '); // Ensure single spaces only
+    $('.model_detail').val(modelDetail.trim()); // Trim final result to remove leading/trailing spaces
+    }
             $(document).on('change', 'input[name^="specification_checkbox"], input[name^="field_checkbox"]', function () {
                 updateModelDetail();
             });
@@ -487,31 +488,57 @@ $(document).ready(function () {
             }
         });
         $(document).ready(function () {
-    function updatevariantDetail() {
-        var selectedOptionsv = [];
-        $('input[name^="variantcheckbox"]:checked').each(function () {
-            var specificationId = $(this).data('specification-id');
-            var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
-            console.log(selectedText);
+            function updatevariantDetail() {
+    var selectedOptionsv = [];
+    var sfxValue = null; // To store the SFX value if found
+
+    // Process specification checkboxes
+    $('input[name^="variantcheckbox"]:checked').each(function () {
+        var specificationId = $(this).data('specification-id');
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
+        var displayValue = (selectedText.toUpperCase() === 'YES')
+            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+            : selectedText;
+
+        console.log(selectedText);
+
+        // Check if the selected option is SFX
+        if (selectedText.toUpperCase() === 'SFX') {
+            sfxValue = '(' + displayValue + ')'; // Store SFX value
+        } else {
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        });
-        $('input[name^="fieldvariants"]:checked').each(function () {
-            var fieldId = $(this).data('field-id');
-            var fieldValue = $('#' + fieldId + ' option:selected').text();
-            selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-        });
-        var Detail = selectedOptionsv
-    .map(function (option) {
-        return option.value.trim(); // Trim to remove leading/trailing whitespaces
-    })
-    .filter(function (value) {
-        return value !== null && value !== ''; // Filter out null or empty values
-    })
-    .join(', ');
-        $('.variant').val(Detail);
+        }
+    });
+
+    // Process field checkboxes
+    $('input[name^="fieldvariants"]:checked').each(function () {
+        var fieldId = $(this).data('field-id');
+        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
+        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+    });
+
+    // Filter and prioritize SFX
+    var Detail = [];
+
+    // Add SFX value first if it exists
+    if (sfxValue) {
+        Detail.push(sfxValue);
     }
+
+    // Add remaining values, filtering out null or empty values
+    Detail = Detail.concat(
+        selectedOptionsv
+            .map(function (option) {
+                return option.value.trim(); // Trim to remove leading/trailing whitespaces
+            })
+            .filter(function (value) {
+                return value !== null && value !== ''; // Filter out null or empty values
+            })
+    );
+
+    // Join all values into a single string
+    $('.variant').val(Detail.join(', '));
+}
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
                 updatevariantDetail();
             });
@@ -579,6 +606,7 @@ $(document).ready(function () {
         $('.btn-outline-secondary').click(function () {
             var specificationId = $(this).data('specification-id');
             $('#specification-id-input').val(specificationId);
+            $('#option_name').val('');
             $('#optionsmodal').modal('show');
         });
     });
@@ -587,6 +615,14 @@ $(document).ready(function () {
     function savenewoptions() {
         var specificationId = $('#specification-id-input').val();
         var newOptionValue = $('#option_name').val();
+
+        if(!validateSpacing(newOptionValue)) {
+            alertify.confirm("No leading or trailing spaces allowed or No more than one consecutive space is allowed in the address!").set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+            return;
+        }
         $.ajax({
             url: '{{ route('variants.saveOption') }}',
             type: 'POST',
@@ -600,8 +636,27 @@ $(document).ready(function () {
                 $('select[name="specification_' + specificationId + '"]').append(option);
                 alertify.success('Specification Option successfully Added');
                 $('#optionsmodal').modal('hide');
+            },
+            error: function (error) {
+                let errors = error.responseJSON.error;
+                let errorMessages = '';
+                $.each(errors, function(field, messages) {
+                    $.each(messages, function(index, message) {
+                        errorMessages += `<p>${message}</p>`;
+                    });
+                });
+                alertify.confirm(errorMessages).set({
+                            labels: {ok: "Retry", cancel: "Cancel"},
+                            title: "Error",
+                        });
+                
             }
         });
     }
+
+    function validateSpacing(value) {
+       const invalidChars = /^\s|\s{2,}|\s$/;
+        return !invalidChars.test(value);
+    } 
 </script>
 @endpush

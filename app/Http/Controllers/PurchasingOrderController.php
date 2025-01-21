@@ -66,6 +66,7 @@ use Illuminate\Support\Facades\Crypt;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use File;
+use Exception;
 
 
 class PurchasingOrderController extends Controller
@@ -2090,7 +2091,33 @@ public function purchasingupdateStatus(Request $request)
                         $PfiPurchaseOrder->quantity = $PfiPurchaseOrder->quantity - 1;
                         $PfiPurchaseOrder->save();
                     }
-        
+                    // if payment initiated reduce the payment initiated qty => chcek toyota have any case of cancel
+                        // $supplierAccountTransaction = SupplierAccountTransaction::select('transaction_type','purchasing_order_id')
+                        //                             ->whereNot('transaction_type','Rejected')
+                        //                             ->where('purchasing_order_id',  $vehicle->purchasing_order_id)
+                        //                             ->first();
+                        // if($supplierAccountTransaction){
+                        //     // get the LOI Item to update initiated qty
+                        //     $possibleModels = MasterModel::where('model', $masterModel->model)
+                        //                             ->where('sfx',  $masterModel->sfx)
+                        //                             ->pluck('id')->toArray();
+                        //         $pfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                        //                                         ->whereIn('master_model_id', $possibleModels)
+                        //                                         ->first();
+                        //         $loiItem = LetterOfIndentItem::whereHas('pfiItems', function($query)use($pfiItem) {
+                        //                     $query->where('is_parent', false)
+                        //                     ->where('pfi_id', $pfiItem->pfi_id)
+                        //                     ->where('parent_pfi_item_id', $pfiItem->pfi_item_id);
+                        //                 })
+                        //                 ->first();
+                        //         if($loiItem) {
+                        //             $latestUtilizedQuantity = $loiItem->utilized_quantity + 1;
+                        //             $loiItem->po_payment_initiated_quantity = $loiItem->po_payment_initiated_quantity - 1;
+                        //             $loiItem->utilized_quantity = $latestUtilizedQuantity;
+                        //             $loiItem->save();
+                        //         }
+                        // }
+                                                    
                 }
             $vehicle->procurement_vehicle_remarks = $request->input('remarks');
             $vehicle->save();
@@ -3826,6 +3853,52 @@ public function vehiclesdatagetting($id)
     }
     return response()->json($vehicleData);
 }
+public function updatePOPrices(Request $request) {
+    info("reached");
+    info($request->all());
+    // identify which item has price change
+    try { 
+
+        DB::beginTransaction();
+            $pfiItems = $request->pfiItems;
+            $prices = [];
+            foreach($pfiItems as $key => $pfiItem) {
+                $pfiItemId = $pfiItem[$key]->parent_pfi_item_id;
+                $ParentPfiItem = PfiItem::find($pfiItemId);
+            
+                if($ParentPfiItem->unit_price != $pfiItem[$key]->unit_price) {
+                    // add all vehcileId and Price to array
+                    // get the model and sfx Ids and get vehicles
+                    // PoPfiItem 
+                    $PoPfiItem = PfiItemPurchaseOrder::where('purchase_order_id', $request->purchase_order_id)
+                    ->where('pfi_item_id', $pfiItemId)
+                    ->first();
+            
+                    // $possibleModelIds = MasterModel::where('model', $POpfiItem->model)
+                    //                     ->where('sfx', $POpfiItem->sfx)->pluck('id')->toArray();
+                    if($POpfiItem) {
+                        $qty = $POpfiItem->quantity;
+                        $vehicles = Vehicles::where('purchasing_order_id', $request->purchase_order_id)
+                                        ->where('model_id', $PoPfiItem->master_model_id)   
+                                        ->orderBy('id','DESC')    
+                                        ->take($qty)
+                                        ->pluck('id')->toArray(); 
+                        foreach($vehicles as $vehicle) {
+                            $prices['vehicle_id'] = $vehicle;
+                            $prices['new_price'] = $pfiItem->unit_price; 
+                        }                     
+                    }
+                }
+            }
+            info($prices);
+        DB::commit();
+
+        return response()->json(['message' => 'Price Updated successfully'], 200);
+        } catch (Exception $e) { // Catch any exception
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+
+}
 public function updatePrices(Request $request)
 {
     $prices = $request->input('prices');
@@ -3860,7 +3933,8 @@ public function updatePrices(Request $request)
     $priceChanges = [];
     $totalAmountOfChanges = 0;
     $totalVehiclesChanged = 0;
-
+    // check if po is dp
+    // add vehicle id to each 
     foreach ($prices as $priceData) {
         $vehicleId = $priceData['vehicle_id'];
         $newPrice = $priceData['new_price'];
@@ -5277,6 +5351,37 @@ public function submitPaymentDetails(Request $request)
                     $supplierAccountTransaction->status = 'Rejected';
                     $supplierAccountTransaction->remarks = $remarks;
                     $supplierAccountTransaction->save();
+                    $supplierAccount = SupplierAccount::where('id', $supplierAccountTransaction->supplier_account_id)->first();
+                    if ($supplierAccount) {
+                        $conversionRates = [
+                            "USD" => 3.67,
+                            "EUR" => 3.94,
+                            "GBP" => 4.67,
+                            "JPY" => 0.023,
+                            "AED" => 1,
+                            "CAD" => 2.68
+                        ];
+                
+                        $transactionCurrency = $supplierAccountTransaction->account_currency; // Assuming there's a 'currency' column
+                        $accountCurrency = $supplierAccount->currency; // Assuming there's a 'currency' column in SupplierAccount
+                        $transactionAmount = $supplierAccountTransaction->transaction_amount;
+                
+                        // Convert transaction amount if currencies differ
+                        if ($transactionCurrency !== $accountCurrency) {
+                            if (isset($conversionRates[$transactionCurrency]) && isset($conversionRates[$accountCurrency])) {
+                                $convertedAmount = $transactionAmount * ($conversionRates[$transactionCurrency] / $conversionRates[$accountCurrency]);
+                            } else {
+                                // Handle missing conversion rate
+                                throw new Exception("Conversion rate not found for one of the currencies.");
+                            }
+                        } else {
+                            $convertedAmount = $transactionAmount; // No conversion needed
+                        }
+                
+                        // Update the current balance of the supplier account
+                        $supplierAccount->current_balance += $convertedAmount;
+                        $supplierAccount->save();
+                    }
                 }
             $purchasingOrder = PurchasingOrder::find($supplierAccountTransaction->purchasing_order_id);    
 
