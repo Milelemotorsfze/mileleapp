@@ -88,45 +88,45 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="steering" class="form-label">Steering</label>
-            <input type="text" id="steering" name="steering" class="form-control" readonly />
+            <input type="text" id="steering" name="steering" value= "{{$variant->steering}}" class="form-control" readonly />
         </div>
     </div>
     <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="engine" class="form-label">Engine</label>
-            <input type="text" id="engine" name="engine" class="form-control" readonly />
+            <input type="text" id="engine" name="engine" value= "{{$variant->engine}}" class="form-control" readonly />
         </div>
     </div>
     <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="fuel_type" class="form-label">Fuel Type</label>
-            <input type="text" id="fuel_type" name="fuel_type" class="form-control" readonly />
+            <input type="text" id="fuel_type" name="fuel_type" value= "{{$variant->fuel_type}}" class="form-control" readonly />
         </div>
     </div>
     <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="transmission" class="form-label">Transmission</label>
-            <input type="text" id="transmission" name="gearbox" class="form-control" readonly />
+            <input type="text" id="transmission" name="gearbox" value= "{{$variant->gearbox}}" class="form-control" readonly />
         </div>
     </div>
     <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="window_type" class="form-label">Window Type</label>
-            <input type="text" id="window_type" name="window_type" class="form-control" readonly />
+            <input type="text" id="window_type" name="window_type" value= "{{$variant->window_type}}" class="form-control" readonly />
         </div>
     </div>
     <div class="col-lg-2 col-md-6 col-sm-12">
         <div class="mb-3">
             <label for="drive_train" class="form-label">Drive Train</label>
-            <input type="text" id="drive_train" name="drive_train" class="form-control" readonly />
+            <input type="text" id="drive_train" name="drive_train" value= "{{$variant->drive_train}}" class="form-control" readonly />
         </div>
     </div>
-    <div class="col-lg-2 col-md-6 col-sm-12">
-        <div class="mb-3">
-            <label for="netsuite_name" class="form-label">Grade</label>
-            <input type="text" id="netsuite_name" name= "grade_name" class="form-control" readonly />
-        </div>
-    </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="netsuite_name" class="form-label">Grade</label>
+                                    <input type="text" id="netsuite_name" name= "grade_name" value= "{{$variant->grade_name}}" class="form-control" readonly />
+                                </div>
+                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="my">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Year</label>
@@ -165,327 +165,327 @@
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12">
-    <div class="mb-3">
-        <label for="model_detail" class="form-label">Model Description</label>
-        <select class="form-control select2" name="model_detail" id="model_detail">
-            @foreach ($modelDescriptions as $description)
-                <option value="{{ $description->id }}" 
-                    {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
-                    {{ $description->model_description }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-</div>
+                                <div class="mb-3">
+                                    <label for="model_detail" class="form-label">Model Description</label>
+                                    <select class="form-control select2" name="model_detail" id="model_detail">
+                                        @foreach ($modelDescriptions as $description)
+                                            <option value="{{ $description->id }}" 
+                                                {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
+                                                {{ $description->model_description }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Details</label>
-                                    <input type="text" class="form-control variant" name="variant" id="variant" readonly/>
+                                    <input type="text" class="form-control variant" value= "{{$variant->detail}}" name="variant" id="variant" readonly/>
                                 </div>
                             </div>
                             <div class="row" id="specification-details-container">
-    @foreach ($data as $specData)
-        <div class="col-lg-4 mb-3">
-            <label>{{ $specData['specification']->name }}</label>
-            <div class="input-group">
-                <select name="specification_{{ $specData['specification']->id }}" data-specification-id="{{ $specData['specification']->id }}" class="form-control specification-dropdown">
-                    <option value="" disabled selected>Select an Option</option>
-                    @foreach ($specData['options'] as $option)
-                        <option value="{{ $option->id }}" @if (in_array($option->id, $specData['selectedOptions'])) selected @endif>
-                            {{ $option->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" data-specification-id="{{ $specData['specification']->id }}" data-toggle="modal" data-target="#optionsmodal">
-                        +
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endforeach
-</div>
-<input type="hidden" name="selected_specifications" id="selected_specifications">
-                            <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
+                            @foreach ($data as $specData)
+                                <div class="col-lg-4 mb-3">
+                                    <label>{{ $specData['specification']->name }}</label>
+                                    <div class="input-group">
+                                        <select name="specification_{{ $specData['specification']->id }}" data-specification-id="{{ $specData['specification']->id }}" class="form-control specification-dropdown">
+                                            <option value="" disabled selected>Select an Option</option>
+                                            @foreach ($specData['options'] as $option)
+                                                <option value="{{ $option->id }}" @if (in_array($option->id, $specData['selectedOptions'])) selected @endif>
+                                                    {{ $option->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" data-specification-id="{{ $specData['specification']->id }}" data-toggle="modal" data-target="#optionsmodal">
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                </form>
-            </div>
-            </div>
-        @endif
-    @endcan
-@endsection
-@push('scripts')
-<script>
-    $(document).ready(function () {
-        $('#model_detail').select2({
-        });
-        $('#model_detail').change(function () {
-            const selectedModelId = $(this).val();
-            if (selectedModelId) {
-                $.ajax({
-                    url: `/get-model-details/${$('#model').val()}`,
-                    type: 'GET',
-                    success: function (data) {
-                        const selectedModel = data.find(model => model.id == selectedModelId);
-                        if (selectedModel) {
-                            populateModelDetails(selectedModel);
+                        <input type="hidden" name="selected_specifications" id="selected_specifications">
+                                                    <div class="col-12 text-center">
+                                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                                    </div>
+                                                </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                @endif
+                            @endcan
+                        @endsection
+                        @push('scripts')
+                <script>
+                    $(document).ready(function () {
+                        $('#model_detail').select2({
+                        });
+                        $('#model_detail').change(function () {
+                            const selectedModelId = $(this).val();
+                            if (selectedModelId) {
+                                $.ajax({
+                                    url: `/get-model-details/${$('#model').val()}`,
+                                    type: 'GET',
+                                    success: function (data) {
+                                        const selectedModel = data.find(model => model.id == selectedModelId);
+                                        if (selectedModel) {
+                                            populateModelDetails(selectedModel);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert('Failed to fetch model details. Please try again.');
+                                    }
+                                });
+                            } else {
+                                clearModelDetails();
+                            }
+                        });
+                        function populateModelDetails(model) {
+                            $('#steering').val(model.steering);
+                            $('#engine').val(model.engine);
+                            $('#fuel_type').val(model.fuel_type);
+                            $('#transmission').val(model.transmission);
+                            $('#window_type').val(model.window_type);
+                            $('#drive_train').val(model.drive_train);
+                            $('#netsuite_name').val(model.grade_name);
                         }
-                    },
-                    error: function () {
-                        alert('Failed to fetch model details. Please try again.');
+                        // Clear the input fields
+                        function clearModelDetails() {
+                            $('#steering, #engine, #fuel_type, #transmission, #window_type, #drive_train, #netsuite_name').val('');
+                        }
+                    });
+                </script>
+                <script>
+                    // Assuming selectedSpecifications is already defined
+                    var selectedSpecifications = [];
+                    $('.specification-dropdown').on('change', function () {
+                        var selectedValue = $(this).val();
+                        var specificationId = $(this).data('specification-id');
+
+                        // Check if selectedValue is not null or empty
+                        if (selectedValue !== null && selectedValue !== "") {
+                            var specIndex = selectedSpecifications.findIndex(spec => spec.specification_id === specificationId);
+
+                            if (specIndex !== -1) {
+                                // Update existing entry
+                                selectedSpecifications[specIndex].value = selectedValue;
+                            } else {
+                                // Add new entry
+                                selectedSpecifications.push({
+                                    specification_id: specificationId,
+                                    value: selectedValue
+                                });
+                            }
+
+                            $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
+                        }
+                    });
+                    // Trigger change event for each dropdown to capture initially selected values
+                    $('.specification-dropdown').trigger('change');
+                </script>
+                    <script>
+                        $('#brand').select2({
+                            placeholder: 'Select Brand'
+                        })
+                        $('.coo').select2();
+                        $('#int_colour').select2({
+                            placeholder: 'Select Interior Colour'
+                        })
+                        $('#ex_colour').select2({
+                            placeholder: 'Select Exterior Colour'
+                        })
+                        $('#brand').on('change',function() {
+                            $('#brand-error').remove();
+                        })
+                        $('#model').on('change',function() {
+                            $('#model-error').remove();
+                        })
+                    </script>
+                <script>
+                        $(document).ready(function () {
+                            function updatevariantDetail() {
+                    var selectedOptionsv = [];
+                    var sfxValue = null; // To store the SFX value if found
+                    var sfxExists = false;
+
+                    // Process specification checkboxes
+                    $('input[name^="variantcheckbox"]:checked').each(function () {
+                        var specificationId = $(this).data('specification-id');
+                        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
+                        var displayValue = (selectedText.toUpperCase() === 'YES')
+                            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+                            : selectedText;
+                            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
+                            if (labelsvalue.toUpperCase() === 'SFX') {
+                                // Capture sfxValue to ensure it comes first
+                                sfxValue = '(' + displayValue + ')';
+                                sfxExists = true; // Set flag to true when SFX is found
+                            } else {
+                                selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
+                            }
+                    });
+
+                    // Process field checkboxes
+                    $('input[name^="fieldvariants"]:checked').each(function () {
+                        var fieldId = $(this).data('field-id');
+                        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
+                        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+                    });
+
+                    // Filter and prioritize SFX
+                    var Detail = [];
+
+                    // Add SFX value first if it exists
+                    if (sfxValue) {
+                        Detail.push(sfxValue);
+                    }
+
+                    // Add remaining values, filtering out null or empty values
+                    Detail = Detail.concat(
+                        selectedOptionsv
+                            .map(function (option) {
+                                return option.value.trim(); // Trim to remove leading/trailing whitespaces
+                            })
+                            .filter(function (value) {
+                                return value !== null && value !== ''; // Filter out null or empty values
+                            })
+                    );
+
+                    // Join all values into a single string
+                    $('.variant').val(Detail.join(', '));
+                    return sfxExists;
+                }
+                            $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
+                                updatevariantDetail();
+                            });
+                            $('#variant').on('click', function () {
+                                createSpecificationCheckboxesv();
+                                createFieldCheckboxesv();
+                            });
+                            $('#form-create').on('submit', function (e) {
+                        var variantValue = $('.variant').val().trim();
+                        if (!updatevariantDetail()) {
+                        alert('Error: SFX is required for the variant. Please select it.');
+                        e.preventDefault();
+                        return false;
+                    }
+                        // Check if Variant Details is empty
+                        if (!variantValue) {
+                            alert('Error: Variant Details is required. Please fill it in before submitting.');
+                            e.preventDefault(); // Prevent form submission
+                            return false;
+                        }
+                    });
+                            function createSpecificationCheckboxesv() {
+                    $('select[name^="specification_"]').each(function () {
+                    var specificationId = $(this).data('specification-id');
+                    var selectedOption = $(this).val();
+                    var existingCheckbox = $('#checkbox_specification_' + specificationId);
+
+                    if (selectedOption && !existingCheckbox.length) {
+                        var checkboxIdv = 'checkbox_specification_' + specificationId;
+                        var checkboxv = $('<input type="checkbox">')
+                            .attr('id', checkboxIdv)
+                            .attr('name', 'variantcheckbox')
+                            .data('specification-id', specificationId);
+                        var label = $('<label>')
+                            .attr('for', checkboxIdv)
+                            .text('\u00A0Variant');
+                        var checkboxContainerv = $('<div class="specification-details-container">')
+                            .append(checkboxv)
+                            .append(label);
+                        $(this).closest('.col-lg-4').append(checkboxContainerv);
                     }
                 });
-            } else {
-                clearModelDetails();
-            }
-        });
-        function populateModelDetails(model) {
-            $('#steering').val(model.steering);
-            $('#engine').val(model.engine);
-            $('#fuel_type').val(model.fuel_type);
-            $('#transmission').val(model.transmission);
-            $('#window_type').val(model.window_type);
-            $('#drive_train').val(model.drive_train);
-            $('#netsuite_name').val(model.grade_name);
-        }
-        // Clear the input fields
-        function clearModelDetails() {
-            $('#steering, #engine, #fuel_type, #transmission, #window_type, #drive_train, #netsuite_name').val('');
-        }
-    });
-</script>
-<script>
-    // Assuming selectedSpecifications is already defined
-    var selectedSpecifications = [];
-    $('.specification-dropdown').on('change', function () {
-        var selectedValue = $(this).val();
-        var specificationId = $(this).data('specification-id');
+                }
+                            function createFieldCheckboxesv() {
+                                var fields = [
+                    { id: 'brands_id', label: 'Brand' },
+                    { id: 'master_model_lines_id', label: 'Model Line' },
+                    { id: 'coo', label: 'COO' },
+                    { id: 'my', label: 'Model Year' },
+                    { id: 'gear', label: 'Gear' },
+                    { id: 'upholstery', label: 'Upholstery' }
+                ];
 
-        // Check if selectedValue is not null or empty
-        if (selectedValue !== null && selectedValue !== "") {
-            var specIndex = selectedSpecifications.findIndex(spec => spec.specification_id === specificationId);
-
-            if (specIndex !== -1) {
-                // Update existing entry
-                selectedSpecifications[specIndex].value = selectedValue;
-            } else {
-                // Add new entry
-                selectedSpecifications.push({
-                    specification_id: specificationId,
-                    value: selectedValue
+                fields.forEach(function (field) {
+                    var existingCheckbox = $('#checkbox_field_' + field.id);
+                    if (!existingCheckbox.length) {
+                        var checkboxIdv = 'checkbox_field_' + field.id;
+                        var checkbox = $('<input type="checkbox">')
+                            .attr('id', checkboxIdv)
+                            .attr('name', 'fieldvariants')
+                            .data('field-id', field.id);
+                        var label = $('<label>')
+                            .attr('for', checkboxIdv)
+                            .text('\u00A0Variant');
+                        var checkboxContainerv = $('<div class="field-checkbox-containerv">')
+                            .append(checkbox)
+                            .append(label);
+                        $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
+                    }
                 });
-            }
-
-            $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
-        }
-    });
-    // Trigger change event for each dropdown to capture initially selected values
-    $('.specification-dropdown').trigger('change');
-</script>
-    <script>
-        $('#brand').select2({
-            placeholder: 'Select Brand'
-        })
-        $('.coo').select2();
-        $('#int_colour').select2({
-            placeholder: 'Select Interior Colour'
-        })
-        $('#ex_colour').select2({
-            placeholder: 'Select Exterior Colour'
-        })
-        $('#brand').on('change',function() {
-            $('#brand-error').remove();
-        })
-        $('#model').on('change',function() {
-            $('#model-error').remove();
-        })
-    </script>
-<script>
-        $(document).ready(function () {
-            function updatevariantDetail() {
-    var selectedOptionsv = [];
-    var sfxValue = null; // To store the SFX value if found
-    var sfxExists = false;
-
-    // Process specification checkboxes
-    $('input[name^="variantcheckbox"]:checked').each(function () {
-        var specificationId = $(this).data('specification-id');
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
-        var displayValue = (selectedText.toUpperCase() === 'YES')
-            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
-            : selectedText;
-            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
-            if (labelsvalue.toUpperCase() === 'SFX') {
-                // Capture sfxValue to ensure it comes first
-                sfxValue = '(' + displayValue + ')';
-                sfxExists = true; // Set flag to true when SFX is found
-            } else {
-                selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-            }
-    });
-
-    // Process field checkboxes
-    $('input[name^="fieldvariants"]:checked').each(function () {
-        var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text().trim();
-        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-    });
-
-    // Filter and prioritize SFX
-    var Detail = [];
-
-    // Add SFX value first if it exists
-    if (sfxValue) {
-        Detail.push(sfxValue);
-    }
-
-    // Add remaining values, filtering out null or empty values
-    Detail = Detail.concat(
-        selectedOptionsv
-            .map(function (option) {
-                return option.value.trim(); // Trim to remove leading/trailing whitespaces
-            })
-            .filter(function (value) {
-                return value !== null && value !== ''; // Filter out null or empty values
-            })
-    );
-
-    // Join all values into a single string
-    $('.variant').val(Detail.join(', '));
-    return sfxExists;
-}
-            $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
-                updatevariantDetail();
-            });
-            $('#variant').on('click', function () {
-                createSpecificationCheckboxesv();
-                createFieldCheckboxesv();
-            });
-            $('#form-create').on('submit', function (e) {
-        var variantValue = $('.variant').val().trim();
-        if (!updatevariantDetail()) {
-        alert('Error: SFX is required for the variant. Please select it.');
-        e.preventDefault();
-        return false;
-    }
-        // Check if Variant Details is empty
-        if (!variantValue) {
-            alert('Error: Variant Details is required. Please fill it in before submitting.');
-            e.preventDefault(); // Prevent form submission
-            return false;
-        }
-    });
-            function createSpecificationCheckboxesv() {
-    $('select[name^="specification_"]').each(function () {
-    var specificationId = $(this).data('specification-id');
-    var selectedOption = $(this).val();
-    var existingCheckbox = $('#checkbox_specification_' + specificationId);
-
-    if (selectedOption && !existingCheckbox.length) {
-        var checkboxIdv = 'checkbox_specification_' + specificationId;
-        var checkboxv = $('<input type="checkbox">')
-            .attr('id', checkboxIdv)
-            .attr('name', 'variantcheckbox')
-            .data('specification-id', specificationId);
-        var label = $('<label>')
-            .attr('for', checkboxIdv)
-            .text('\u00A0Variant');
-        var checkboxContainerv = $('<div class="specification-details-container">')
-            .append(checkboxv)
-            .append(label);
-        $(this).closest('.col-lg-4').append(checkboxContainerv);
-    }
-});
-}
-            function createFieldCheckboxesv() {
-                var fields = [
-    { id: 'brands_id', label: 'Brand' },
-    { id: 'master_model_lines_id', label: 'Model Line' },
-    { id: 'coo', label: 'COO' },
-    { id: 'my', label: 'Model Year' },
-    { id: 'gear', label: 'Gear' },
-    { id: 'upholstery', label: 'Upholstery' }
-];
-
-fields.forEach(function (field) {
-    var existingCheckbox = $('#checkbox_field_' + field.id);
-    if (!existingCheckbox.length) {
-        var checkboxIdv = 'checkbox_field_' + field.id;
-        var checkbox = $('<input type="checkbox">')
-            .attr('id', checkboxIdv)
-            .attr('name', 'fieldvariants')
-            .data('field-id', field.id);
-        var label = $('<label>')
-            .attr('for', checkboxIdv)
-            .text('\u00A0Variant');
-        var checkboxContainerv = $('<div class="field-checkbox-containerv">')
-            .append(checkbox)
-            .append(label);
-        $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
-    }
-});
-    }
-});
-</script>
-<script>
-    $(document).ready(function () {
-        // Attach click event to the plus buttons
-        $('.btn-outline-secondary').click(function () {
-            var specificationId = $(this).data('specification-id');
-            $('#specification-id-input').val(specificationId);
-            $('#option_name').val('');
-            $('#optionsmodal').modal('show');
-        });
-    });
-</script>
-<script>
-    function savenewoptions() {
-        var specificationId = $('#specification-id-input').val();
-        var newOptionValue = $('#option_name').val();
-
-        if(!validateSpacing(newOptionValue)) {
-            alertify.confirm("No leading or trailing spaces allowed or No more than one consecutive space is allowed in the address!").set({
-                            labels: {ok: "Retry", cancel: "Cancel"},
-                            title: "Error",
+                    }
+                });
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        // Attach click event to the plus buttons
+                        $('.btn-outline-secondary').click(function () {
+                            var specificationId = $(this).data('specification-id');
+                            $('#specification-id-input').val(specificationId);
+                            $('#option_name').val('');
+                            $('#optionsmodal').modal('show');
                         });
-            return;
-        }
-        $.ajax({
-            url: '{{ route('variants.saveOption') }}',
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                specificationId: specificationId,
-                newOption: newOptionValue
-            },
-            success: function (response) {
-                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
-                $('select[name="specification_' + specificationId + '"]').append(option);
-                alertify.success('Specification Option successfully Added');
-                $('#optionsmodal').modal('hide');
-            },
-            error: function (error) {
-                let errors = error.responseJSON.error;
-                let errorMessages = '';
-                $.each(errors, function(field, messages) {
-                    $.each(messages, function(index, message) {
-                        errorMessages += `<p>${message}</p>`;
                     });
-                });
-                alertify.confirm(errorMessages).set({
-                            labels: {ok: "Retry", cancel: "Cancel"},
-                            title: "Error",
-                        });
-                
-            }
-        });
-    }
+                </script>
+                <script>
+                    function savenewoptions() {
+                        var specificationId = $('#specification-id-input').val();
+                        var newOptionValue = $('#option_name').val();
 
-    function validateSpacing(value) {
-       const invalidChars = /^\s|\s{2,}|\s$/;
-        return !invalidChars.test(value);
-    } 
-</script>
-@endpush
+                        if(!validateSpacing(newOptionValue)) {
+                            alertify.confirm("No leading or trailing spaces allowed or No more than one consecutive space is allowed in the address!").set({
+                                            labels: {ok: "Retry", cancel: "Cancel"},
+                                            title: "Error",
+                                        });
+                            return;
+                        }
+                        $.ajax({
+                            url: '{{ route('variants.saveOption') }}',
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                specificationId: specificationId,
+                                newOption: newOptionValue
+                            },
+                            success: function (response) {
+                                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
+                                $('select[name="specification_' + specificationId + '"]').append(option);
+                                alertify.success('Specification Option successfully Added');
+                                $('#optionsmodal').modal('hide');
+                            },
+                            error: function (error) {
+                                let errors = error.responseJSON.error;
+                                let errorMessages = '';
+                                $.each(errors, function(field, messages) {
+                                    $.each(messages, function(index, message) {
+                                        errorMessages += `<p>${message}</p>`;
+                                    });
+                                });
+                                alertify.confirm(errorMessages).set({
+                                            labels: {ok: "Retry", cancel: "Cancel"},
+                                            title: "Error",
+                                        });
+                                
+                            }
+                        });
+                    }
+
+                    function validateSpacing(value) {
+                    const invalidChars = /^\s|\s{2,}|\s$/;
+                        return !invalidChars.test(value);
+                    } 
+                </script>
+                @endpush
