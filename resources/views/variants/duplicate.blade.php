@@ -165,15 +165,13 @@
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12">
-                            {{$variant->master_model_descriptions_id}}
     <div class="mb-3">
         <label for="model_detail" class="form-label">Model Description</label>
         <select class="form-control select2" name="model_detail" id="model_detail">
-            <option value="">Select a Model</option>
             @foreach ($modelDescriptions as $description)
                 <option value="{{ $description->id }}" 
                     {{ $variant->master_model_descriptions_id == $description->id ? 'selected' : '' }}>
-                    {{ $description->model_description }} - {{$description->id }}
+                    {{ $description->model_description }}
                 </option>
             @endforeach
         </select>
@@ -207,6 +205,7 @@
         </div>
     @endforeach
 </div>
+<input type="hidden" name="selected_specifications" id="selected_specifications">
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
@@ -302,28 +301,13 @@
         $('#model').on('change',function() {
             $('#model-error').remove();
         })
-        $("#form-create").validate({
-            ignore: [],
-            rules: {
-                name: {
-                    required: true,
-                    string:true,
-                    max:255
-                },
-                master_model_lines_id:{
-                    required:true,
-                },
-                brands_id:{
-                    required:true,
-                },
-            }
-        });
     </script>
 <script>
         $(document).ready(function () {
             function updatevariantDetail() {
     var selectedOptionsv = [];
     var sfxValue = null; // To store the SFX value if found
+    var sfxExists = false;
 
     // Process specification checkboxes
     $('input[name^="variantcheckbox"]:checked').each(function () {
@@ -332,15 +316,14 @@
         var displayValue = (selectedText.toUpperCase() === 'YES')
             ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
             : selectedText;
-
-        console.log(selectedText);
-
-        // Check if the selected option is SFX
-        if (selectedText.toUpperCase() === 'SFX') {
-            sfxValue = '(' + displayValue + ')'; // Store SFX value
-        } else {
-            selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        }
+            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
+            if (labelsvalue.toUpperCase() === 'SFX') {
+                // Capture sfxValue to ensure it comes first
+                sfxValue = '(' + displayValue + ')';
+                sfxExists = true; // Set flag to true when SFX is found
+            } else {
+                selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
+            }
     });
 
     // Process field checkboxes
@@ -371,6 +354,7 @@
 
     // Join all values into a single string
     $('.variant').val(Detail.join(', '));
+    return sfxExists;
 }
             $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
                 updatevariantDetail();
@@ -379,59 +363,71 @@
                 createSpecificationCheckboxesv();
                 createFieldCheckboxesv();
             });
-            function createSpecificationCheckboxesv() {
-    $('.specification-details-container').remove();
-    
-    $('select[name^="specification_"]').each(function () {
-        var specificationId = $(this).data('specification-id');
-        var selectedOption = $(this).val();
-        
-        if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
-            var checkboxIdv = 'checkbox_specification_' + specificationId;
-            var checkboxv = $('<input type="checkbox">')
-                .attr('id', checkboxIdv)
-                .attr('name', 'variantcheckbox')
-                .data('specification-id', specificationId);
-            var label = $('<label>')
-                .attr('for', checkboxIdv)
-                .text('\u00A0Variant');
-            var checkboxContainerv = $('<div class="specification-details-container">')
-                .append(checkboxv)
-                .append(label);
-            $(this).closest('.col-lg-4').append(checkboxContainerv);
+            $('#form-create').on('submit', function (e) {
+        var variantValue = $('.variant').val().trim();
+        if (!updatevariantDetail()) {
+        alert('Error: SFX is required for the variant. Please select it.');
+        e.preventDefault();
+        return false;
+    }
+        // Check if Variant Details is empty
+        if (!variantValue) {
+            alert('Error: Variant Details is required. Please fill it in before submitting.');
+            e.preventDefault(); // Prevent form submission
+            return false;
         }
     });
+            function createSpecificationCheckboxesv() {
+    $('select[name^="specification_"]').each(function () {
+    var specificationId = $(this).data('specification-id');
+    var selectedOption = $(this).val();
+    var existingCheckbox = $('#checkbox_specification_' + specificationId);
+
+    if (selectedOption && !existingCheckbox.length) {
+        var checkboxIdv = 'checkbox_specification_' + specificationId;
+        var checkboxv = $('<input type="checkbox">')
+            .attr('id', checkboxIdv)
+            .attr('name', 'variantcheckbox')
+            .data('specification-id', specificationId);
+        var label = $('<label>')
+            .attr('for', checkboxIdv)
+            .text('\u00A0Variant');
+        var checkboxContainerv = $('<div class="specification-details-container">')
+            .append(checkboxv)
+            .append(label);
+        $(this).closest('.col-lg-4').append(checkboxContainerv);
+    }
+});
 }
             function createFieldCheckboxesv() {
-                $('.field-checkbox-containerv').remove();
                 var fields = [
-                    { id: 'steering', label: 'Steering' },
-                    { id: 'brands_id', label: 'Brand' },
-                    { id: 'master_model_lines_id', label: 'Model Line' },
-                    { id: 'coo', label: 'COO' },
-                    { id: 'my', label: 'Model Year' },
-                    { id: 'drive_train', label: 'Drive Train' },
-                    { id: 'gear', label: 'Gear' },
-                    { id: 'fuel', label: 'Fuel Type' },
-                    { id: 'engine', label: 'Engine' },
-                    { id: 'upholstery', label: 'Upholstery' }
-                ];
-                fields.forEach(function (field) {
-                    var checkboxIdv = 'checkbox_field_' + field.id;
-                    var checkbox = $('<input type="checkbox">')
-                        .attr('id', checkboxIdv)
-                        .attr('name', 'fieldvariants')
-                        .data('field-id', field.id);
-                    var label = $('<label>')
-                        .attr('for', checkboxIdv)
-                        .text('\u00A0Variant');
-                    var checkboxContainerv = $('<div class="field-checkbox-containerv">')
-                        .append(checkbox)
-                        .append(label);
-                    $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
-                });
-            }
-        });
+    { id: 'brands_id', label: 'Brand' },
+    { id: 'master_model_lines_id', label: 'Model Line' },
+    { id: 'coo', label: 'COO' },
+    { id: 'my', label: 'Model Year' },
+    { id: 'gear', label: 'Gear' },
+    { id: 'upholstery', label: 'Upholstery' }
+];
+
+fields.forEach(function (field) {
+    var existingCheckbox = $('#checkbox_field_' + field.id);
+    if (!existingCheckbox.length) {
+        var checkboxIdv = 'checkbox_field_' + field.id;
+        var checkbox = $('<input type="checkbox">')
+            .attr('id', checkboxIdv)
+            .attr('name', 'fieldvariants')
+            .data('field-id', field.id);
+        var label = $('<label>')
+            .attr('for', checkboxIdv)
+            .text('\u00A0Variant');
+        var checkboxContainerv = $('<div class="field-checkbox-containerv">')
+            .append(checkbox)
+            .append(label);
+        $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
+    }
+});
+    }
+});
 </script>
 <script>
     $(document).ready(function () {

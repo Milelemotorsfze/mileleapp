@@ -503,7 +503,7 @@ if (!empty($window_type)) {
     $variant->gearbox = $request->input('gearbox');
     $variant->grade_name = $grade_name = $request->input('grade_name');
     $variant->window_type = $request->input('window_type');
-    $variant->master_model_descriptions_id = $request->input('master_model_lines_id');
+    $variant->master_model_descriptions_id = $request->input('model_detail');
     $variant->name = $name;
     $variant->model_detail = $model_details;
     $variant->detail = $variant_details;

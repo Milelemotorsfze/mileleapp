@@ -584,110 +584,175 @@ $(document).ready(function () {
 //                 });
 //             }
 //         });
-        $(document).ready(function () {
-            function updatevariantDetail() {
-    var selectedOptionsv = [];
-    var sfxValue = null;
+$(document).ready(function () {
+    function updatevariantDetail() {
+        var selectedOptionsv = [];
+        var sfxValue = null;
+        var sfxExists = false;
 
-    $('input[name^="variantcheckbox"]:checked').each(function () {
-        var specificationId = $(this).data('specification-id');
-        var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-        var displayValue = (selectedText.toUpperCase() === 'YES')
-            ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
-            : selectedText;
-
-        if (selectedText.toUpperCase() === 'SFX') {
-            // Capture sfxValue to ensure it comes first
-            sfxValue = '(' + displayValue + ')';
-        } else {
-            selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
-        }
-    });
-
-    $('input[name^="fieldvariants"]:checked').each(function () {
-        var fieldId = $(this).data('field-id');
-        var fieldValue = $('#' + fieldId + ' option:selected').text();
-        selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-    });
-    // var dynamicFields = ['window_type', 'drive_train', 'netsuite_name', 'steering', 'gear', 'fuel_type']; // Add other field IDs here
-    // dynamicFields.forEach(function (fieldId) {
-    //     var fieldValue = $('#' + fieldId).val(); // Dynamically fetch field value
-    //     if (fieldValue) {
-    //         selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
-    //     }
-    // });
-    // Initialize the Detail array
-    var Detail = [];
-
-    // Add sfxValue first if it exists
-    if (sfxValue) {
-        Detail.push(sfxValue);
-    }
-
-    // Concatenate other selected options
-    selectedOptionsv.forEach(function (option) {
-        Detail.push(option.value);
-    });
-
-    // Update the variant field
-    $('.variant').val(Detail.join(', '));
-}
-            $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
-                updatevariantDetail();
-            });
-            $('#variant').on('click', function () {
-                createSpecificationCheckboxesv();
-                createFieldCheckboxesv();
-            });
-            function createSpecificationCheckboxesv() {
-    $('.specification-details-container').remove();
-    
-    $('select[name^="specification_"]').each(function () {
-        var specificationId = $(this).data('specification-id');
-        var selectedOption = $(this).val();
-        
-        if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
-            var checkboxIdv = 'checkbox_specification_' + specificationId;
-            var checkboxv = $('<input type="checkbox">')
-                .attr('id', checkboxIdv)
-                .attr('name', 'variantcheckbox')
-                .data('specification-id', specificationId);
-            var label = $('<label>')
-                .attr('for', checkboxIdv)
-                .text('\u00A0Variant');
-            var checkboxContainerv = $('<div class="specification-details-container">')
-                .append(checkboxv)
-                .append(label);
-            $(this).closest('.col-lg-4').append(checkboxContainerv);
-        }
-    });
-}
-            function createFieldCheckboxesv() {
-                $('.field-checkbox-containerv').remove();
-                var fields = [
-                    { id: 'brands_id', label: 'Brand' },
-                    { id: 'master_model_lines_id', label: 'Model Line' },
-                    { id: 'coo', label: 'COO' },
-                    { id: 'my', label: 'Model Year' },
-                    { id: 'gear', label: 'Gear' },
-                    { id: 'upholstery', label: 'Upholstery' }
-                ];
-                fields.forEach(function (field) {
-                    var checkboxIdv = 'checkbox_field_' + field.id;
-                    var checkbox = $('<input type="checkbox">')
-                        .attr('id', checkboxIdv)
-                        .attr('name', 'fieldvariants')
-                        .data('field-id', field.id);
-                    var label = $('<label>')
-                        .attr('for', checkboxIdv)
-                        .text('\u00A0Variant');
-                    var checkboxContainerv = $('<div class="field-checkbox-containerv">')
-                        .append(checkbox)
-                        .append(label);
-                    $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
-                });
+        $('input[name^="variantcheckbox"]:checked').each(function () {
+            var specificationId = $(this).data('specification-id');
+            var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
+            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
+            var displayValue = (selectedText.toUpperCase() === 'YES')
+                ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text()
+                : selectedText;
+            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
+            if (labelsvalue.toUpperCase() === 'SFX') {
+                // Capture sfxValue to ensure it comes first
+                sfxValue = '(' + displayValue + ')';
+                sfxExists = true; // Set flag to true when SFX is found
+                console.log(sfxExists);
+            } else {
+                selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
             }
         });
+
+        $('input[name^="fieldvariants"]:checked').each(function () {
+            var fieldId = $(this).data('field-id');
+            var fieldValue = $('#' + fieldId + ' option:selected').text();
+            selectedOptionsv.push({ fieldId: fieldId, value: fieldValue });
+        });
+
+        // Initialize the Detail array
+        var Detail = [];
+
+        // Add sfxValue first if it exists
+        if (sfxValue) {
+            Detail.push(sfxValue);
+        }
+
+        // Concatenate other selected options
+        selectedOptionsv.forEach(function (option) {
+            Detail.push(option.value);
+        });
+
+        // Update the variant field
+        $('.variant').val(Detail.join(', '));
+        return sfxExists;
+    }
+
+    $(document).on('change', 'input[name^="variantcheckbox"], input[name^="fieldvariants"]', function () {
+        updatevariantDetail();
+    });
+
+    $('#variant').on('click', function () {
+        createSpecificationCheckboxesv();
+        createFieldCheckboxesv();
+    });
+
+    // Form Submission Validation
+    $('#form-create').on('submit', function (e) {
+        var variantValue = $('.variant').val().trim();
+        if (!updatevariantDetail()) {
+        alert('Error: SFX is required for the variant. Please select it.');
+        e.preventDefault();
+        return false;
+    }
+        // Check if Variant Details is empty
+        if (!variantValue) {
+            alert('Error: Variant Details is required. Please fill it in before submitting.');
+            e.preventDefault(); // Prevent form submission
+            return false;
+        }
+    });
+
+    function createSpecificationCheckboxesv() {
+        // $('.specification-details-container').remove();
+
+        // $('select[name^="specification_"]').each(function () {
+        //     var specificationId = $(this).data('specification-id');
+        //     var selectedOption = $(this).val();
+
+        //     if (selectedOption && selectedOption !== '' && selectedOption !== null && selectedOption !== 'null') {
+        //         var checkboxIdv = 'checkbox_specification_' + specificationId;
+        //         var checkboxv = $('<input type="checkbox">')
+        //             .attr('id', checkboxIdv)
+        //             .attr('name', 'variantcheckbox')
+        //             .data('specification-id', specificationId);
+        //         var label = $('<label>')
+        //             .attr('for', checkboxIdv)
+        //             .text('\u00A0Variant');
+        //         var checkboxContainerv = $('<div class="specification-details-container">')
+        //             .append(checkboxv)
+        //             .append(label);
+        //         $(this).closest('.col-lg-4').append(checkboxContainerv);
+        //     }
+        // });
+        $('select[name^="specification_"]').each(function () {
+    var specificationId = $(this).data('specification-id');
+    var selectedOption = $(this).val();
+    var existingCheckbox = $('#checkbox_specification_' + specificationId);
+
+    if (selectedOption && !existingCheckbox.length) {
+        var checkboxIdv = 'checkbox_specification_' + specificationId;
+        var checkboxv = $('<input type="checkbox">')
+            .attr('id', checkboxIdv)
+            .attr('name', 'variantcheckbox')
+            .data('specification-id', specificationId);
+        var label = $('<label>')
+            .attr('for', checkboxIdv)
+            .text('\u00A0Variant');
+        var checkboxContainerv = $('<div class="specification-details-container">')
+            .append(checkboxv)
+            .append(label);
+        $(this).closest('.col-lg-4').append(checkboxContainerv);
+    }
+});
+
+    }
+
+    function createFieldCheckboxesv() {
+        // $('.field-checkbox-containerv').remove();
+        // var fields = [
+        //     { id: 'brands_id', label: 'Brand' },
+        //     { id: 'master_model_lines_id', label: 'Model Line' },
+        //     { id: 'coo', label: 'COO' },
+        //     { id: 'my', label: 'Model Year' },
+        //     { id: 'gear', label: 'Gear' },
+        //     { id: 'upholstery', label: 'Upholstery' }
+        // ];
+        // fields.forEach(function (field) {
+        //     var checkboxIdv = 'checkbox_field_' + field.id;
+        //     var checkbox = $('<input type="checkbox">')
+        //         .attr('id', checkboxIdv)
+        //         .attr('name', 'fieldvariants')
+        //         .data('field-id', field.id);
+        //     var label = $('<label>')
+        //         .attr('for', checkboxIdv)
+        //         .text('\u00A0Variant');
+        //     var checkboxContainerv = $('<div class="field-checkbox-containerv">')
+        //         .append(checkbox)
+        //         .append(label);
+        //     $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
+        // });
+        var fields = [
+    { id: 'brands_id', label: 'Brand' },
+    { id: 'master_model_lines_id', label: 'Model Line' },
+    { id: 'coo', label: 'COO' },
+    { id: 'my', label: 'Model Year' },
+    { id: 'gear', label: 'Gear' },
+    { id: 'upholstery', label: 'Upholstery' }
+];
+
+fields.forEach(function (field) {
+    var existingCheckbox = $('#checkbox_field_' + field.id);
+    if (!existingCheckbox.length) {
+        var checkboxIdv = 'checkbox_field_' + field.id;
+        var checkbox = $('<input type="checkbox">')
+            .attr('id', checkboxIdv)
+            .attr('name', 'fieldvariants')
+            .data('field-id', field.id);
+        var label = $('<label>')
+            .attr('for', checkboxIdv)
+            .text('\u00A0Variant');
+        var checkboxContainerv = $('<div class="field-checkbox-containerv">')
+            .append(checkbox)
+            .append(label);
+        $('#' + field.id).closest('.col-lg-2').append(checkboxContainerv);
+    }
+});
+    }
+});
 </script>
 @endpush
