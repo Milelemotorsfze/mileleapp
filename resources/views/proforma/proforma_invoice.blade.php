@@ -498,8 +498,8 @@
                 Bank Address : DUBAI UAE<br>
                 @elseif ($quotationDetail->selected_bank == "rak-usd")
                 Account Name : MlLELE MOTORS FZE<br>
-                IBAN : AE930400000882723910001<br>
-                Account No : 0882723910001<br>
+                IBAN : AE930400000882723910002<br>
+                Account No : 0882723910002<br>
                 Swift Code : NRAKAEAK<br>
                 Bank Name : RAK BANK<br>
                 Branch Name : DRAGON MART<br>
@@ -514,19 +514,67 @@
                 Bank Address : DUBAI UAE<br>
                 @elseif ($quotationDetail->selected_bank == "rak-eur")
                 Account Name : MlLELE MOTORS FZE<br>
-                IBAN : AE93040000082723910002<br>
-                Account No : 0110720211<br>
-                Swift Code : CITIAEAD<br>
-                Bank Name : CITI BANK N.A<br>
-                Branch Name : AL WASL BRANCH<br>
+                IBAN : AE93040000082723910003<br>
+                Account No : 0882723910002<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-aud")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910004<br>
+                Account No : 0882723910004<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "rak-jpy")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE93040000082723910005<br>
+                Account No : 0882723910005<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-aed")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE890290190210501040608<br>
+                Account No : 02-01-01-020311-105-1040608<br>
+                Swift Code : HABZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-usd")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE330290190233301040608<br>
+                Account No : 02-01-01-020311-333-1040608<br>
+                Swift Code : HABZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-eur")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE100290190297401040608<br>
+                Account No : 02-01-01-020311-974-1040608<br>
+                Swift Code : HABZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
+                Bank Address : DUBAI UAE<br>
+                @elseif ($quotationDetail->selected_bank == "hbz-jpy")
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE500290190253401040608<br>
+                Account No : 02-01-01-020311-534-1040608<br>
+                Swift Code : HABZUAEADXXX<br>
+                Bank Name : HBZ BANK<br>
+                Branch Name : Main Branch, Dubai<br>
                 Bank Address : DUBAI UAE<br>
                 @else
                 Account Name : MlLELE MOTORS FZE<br>
-                IBAN : AE380211000000110720238<br>
-                Account No : 0110720238<br>
-                Swift Code : CITIAEAD<br>
-                Bank Name : CITI BANK N.A<br>
-                Branch Name : AL WASL BRANCH<br>
+                IBAN : AE230400000882723910001<br>
+                Account No : 0882723910001<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
                 Bank Address : DUBAI UAE<br>
                 @endif
             </div>
