@@ -671,8 +671,6 @@
                         <option value="rak-eur">RAK BANK EUR</option>
                         <option value="rak-aud">RAK BANK AUD</option>
                         <option value="rak-jpy">RAK BANK JPY</option>
-                        <option value="city-aed">CITY BANK AED</option>
-                        <option value="city-usd">CITY BANK USD</option>
                         <option value="hbz-aed">HBZ BANK AED</option>
                         <option value="hbz-usd">HBZ BANK USD</option>
                         <option value="hbz-eur">HBZ BANK EUR</option>
