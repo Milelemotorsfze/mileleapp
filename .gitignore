@@ -43,3 +43,11 @@ yarn-error.log
 php.ini
 user.ini
 .htaccess
+
+/node_modules/
+/vendor/
+/storage/logs/
+/storage/framework/sessions/
+/storage/framework/cache/
+/storage/
+/Backup folder/
