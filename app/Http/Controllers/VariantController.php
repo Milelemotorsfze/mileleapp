@@ -955,7 +955,9 @@ public function savespecification(Request $request)
             }
         }
         $variant = Varaint::findOrFail($variant);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         VariantItems::where('varaint_id', $variant->id)->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $model_details= $request->input('model_detail');
         if($model_details == null){
         $steering = $request->input('steering');
