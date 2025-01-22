@@ -574,6 +574,8 @@ class ApprovalsController extends Controller
             {
                 $vehicles->qc_remarks = $comments;
             }
+            $vehicles->ex_colour = $request->input('ex_colour');
+            $vehicles->int_colour = $request->input('int_colour');
             $vehicles->save();
             $selectedSpecifications = [];
             foreach ($request->all() as $key => $value) {
