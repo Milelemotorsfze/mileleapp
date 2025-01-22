@@ -9,6 +9,10 @@
         max-width: 100%;
         object-fit: contain;
     }
+    #more-dropdown-menu .dropdown .dropdown-menu {
+        left: inherit !important;
+        right: 100% !important;
+    }
 
     @supports (-webkit-touch-callout: none) {
         .logo-img {
