@@ -13,7 +13,7 @@ use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
-class ModelDescriptionController extends Controller
+class ModeldescriptionController extends Controller
 {
     /**
      * Display a listing of the resource.

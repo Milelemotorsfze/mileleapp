@@ -30,10 +30,6 @@ class MasterModelDescription extends Model
     {
         return $this->belongsTo(MasterModelLines::class,'model_line_id','id');
     }
-    public function modelLine()
-    {
-        return $this->belongsTo(MasterModelLines::class, 'model_line_id','id');
-    }
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by','id');
