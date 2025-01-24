@@ -78,8 +78,8 @@
                             </div> -->
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Brand</label>
-                                    <select class="form-control" autofocus name="brands_id" id="brand">
+                                    <label for="choices-single-default" class="form-label">Brand<span style="color: red;">*</span></label>
+                                    <select class="form-control" autofocus name="brands_id" id="brand" required>
                                         @foreach($brands as $brand)
                                             <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
                                                 {{ $brand->brand_name }}
@@ -90,8 +90,8 @@
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Model Line</label>
-                                    <select class="form-control" autofocus name="master_model_lines_id" id="model">
+                                    <label for="choices-single-default" class="form-label">Model Line<span style="color: red;">*</span></label>
+                                    <select class="form-control" autofocus name="master_model_lines_id" id="model" required>
                                     <option value="" disabled selected>Select a Model Line</option>
                                         @foreach($masterModelLines as $masterModelLine)
                                             <option value="{{ $masterModelLine->id }}" {{ old('master_model_lines_id') == $masterModelLine->id ? 'selected' : '' }}>
@@ -182,7 +182,7 @@
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="model_detail" class="form-label">Model Description</label>
+                                    <label for="model_detail" class="form-label">Model Description <span style="color: red;">*</span></label>
                                     <select class="form-control select2" name="model_detail" id="model_detail">
                                         <option value="">Select a Model</option>
                                     </select>
@@ -210,7 +210,7 @@
                             </div> -->
                             <div class="col-lg-12 col-md-12 col-sm-12" id="variant">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Variant Details</label>
+                                    <label for="choices-single-default" class="form-label">Variant Details <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control variant" name="variant" id="variant" readonly/>
                                 </div>
                             </div>
