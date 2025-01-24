@@ -821,14 +821,14 @@ table.dataTable thead th select {
             }
         },
         {
-            data: 'variant_detail',
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
             name: 'varaints.detail',
             render: function(data, type, row) {
                 if (!data) {
-                    return '';
+                    return ''; // Return an empty string if data is undefined or null
                 }
                 var words = data.split(' ');
-                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
                 var fullText = data;
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">

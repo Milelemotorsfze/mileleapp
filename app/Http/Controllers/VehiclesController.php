@@ -2692,144 +2692,82 @@ public function viewalls(Request $request)
     }
     public function statuswise(Request $request)
     {
+        // Log user activity
         $useractivities = new UserActivities();
         $useractivities->activity = "View the Stock Status Wise";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        // Variant detail computation
-        $sales_persons = ModelHasRoles::where('role_id', 7)
-        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-        ->where('users.status', 'active')
-        ->get();
-$variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-->orderBy('id', 'DESC')
-->whereNot('category', 'Modified')
-->get();
-$sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-$normalizationMap = [
-'COO' => 'COO',
-'SFX' => 'SFX',
-'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-'HeadLamp Type' => 'HeadLamp Type',
-'infotainment type' => 'infotainment type',
-'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-'Speakers' => 'Speakers',
-'sunroof' => 'sunroof'
-];
-foreach ($variants as $variant) {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
-                    }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
-                }
-            }
     
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
-            }
-        }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
+        // Fetch salespersons
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+            ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('users.status', 'active')
+            ->get();
+    
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            info($filters);
-            if($status === "allstock")
-                {
-                    $data = Vehicles::select( [
-                        'vehicles.id',
-                        'vehicles.grn_id',
-                        'vehicles.gdn_id',
-                        'vehicles.gp',
-                        'vehicles.sales_remarks',
-                        'vehicles.estimation_date',
-                        'vehicles.territory',
-                        'vehicles.ownership_type',
-                        'vehicles.inspection_date',
-                        'vehicles.custom_inspection_number',
-                        'vehicles.custom_inspection_status',
-                        'vehicles.so_id',
-                        'vehicles.minimum_commission',
-                        'vehicles.reservation_end_date',
-                        'vehicles.vehicle_document_status',
-                        'warehouse.name as location',
-                        'purchasing_order.po_date',
-                        'vehicles.ppmmyyy',
-                        'vehicles.vin as vin',
-                        'inspection_grn.id as grn_inspectionid',
-                        'inspection_pdi.id as pdi_inspectionid',
-                        'vehicles.engine',
-                        'vehicles.price',
-                        'countries.name as fd',
-                        'brands.brand_name',
-                        'varaints.name as variant',
-                        'varaints.id as variant_id',
-                        'varaints.model_detail',
-                        'varaints.detail',
-                        'varaints.seat',
-                        'varaints.detail as variant_detail',
-                        'varaints.upholestry',
-                        'varaints.steering',
-                        'varaints.my',
-                        'varaints.fuel_type',
-                        'varaints.gearbox',
-                        'so.so_number',
-                        'master_model_lines.model_line',
-                        'int_color.name as interior_color',
-                        'ex_color.name as exterior_color',
-                        'purchasing_order.po_number',
-                        'documents.import_type',
-                        'documents.owership',
-                        'documents.document_with',
-                        'grn.grn_number',
-                        'gdn.gdn_number',
-                        'bp.name as bpn',
-                        'sp.name as spn',
-                        DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
-                        'so.so_date',
-                        'grn.date',
-                        'gdn.date as gdndate',
-                        DB::raw("
-    COALESCE(
-        (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
-        (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
-        ''
-    ) as costprice,
-    (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
-")
-
-                    ])
+            if ($status === "allstock") {
+                $data = Vehicles::select([
+                    'vehicles.id',
+                    'vehicles.grn_id',
+                    'vehicles.gdn_id',
+                    'vehicles.gp',
+                    'vehicles.sales_remarks',
+                    'vehicles.estimation_date',
+                    'vehicles.territory',
+                    'vehicles.ownership_type',
+                    'vehicles.inspection_date',
+                    'vehicles.custom_inspection_number',
+                    'vehicles.custom_inspection_status',
+                    'vehicles.so_id',
+                    'vehicles.minimum_commission',
+                    'vehicles.reservation_end_date',
+                    'vehicles.vehicle_document_status',
+                    'warehouse.name as location',
+                    'purchasing_order.po_date',
+                    'vehicles.ppmmyyy',
+                    'vehicles.vin as vin',
+                    'inspection_grn.id as grn_inspectionid',
+                    'inspection_pdi.id as pdi_inspectionid',
+                    'vehicles.engine',
+                    'vehicles.price',
+                    'countries.name as fd',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.id as variant_id',
+                    'varaints.model_detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'so.so_number',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'documents.import_type',
+                    'documents.owership',
+                    'documents.document_with',
+                    'grn.grn_number',
+                    'gdn.gdn_number',
+                    'bp.name as bpn',
+                    'sp.name as spn',
+                    DB::raw("(SELECT COUNT(*) FROM stock_message WHERE stock_message.vehicle_id = vehicles.id) as message_count"),
+                    'so.so_date',
+                    'grn.date',
+                    'gdn.date as gdndate',
+                    DB::raw("
+                        COALESCE(
+                            (SELECT FORMAT(CAST(cost AS UNSIGNED), 0) FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1),
+                            (SELECT FORMAT(CAST(unit_price AS UNSIGNED), 0) FROM vehicle_purchasing_cost WHERE vehicle_purchasing_cost.vehicles_id = vehicles.id LIMIT 1),
+                            ''
+                        ) as costprice,
+                        (SELECT netsuite_link FROM vehicle_netsuite_cost WHERE vehicle_netsuite_cost.vehicles_id = vehicles.id LIMIT 1) as netsuite_link
+                    ")
+                ])
                     ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                     ->leftJoin('countries', 'purchasing_order.fd', '=', 'countries.id')
                     ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
@@ -2843,30 +2781,100 @@ foreach ($variants as $variant) {
                     ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                     ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                     ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                    ->leftJoin('inspection as inspection_grn', function($join) {
+                    ->leftJoin('inspection as inspection_grn', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_grn.vehicle_id')
                              ->where('inspection_grn.stage', '=', 'GRN');
                     })
                     ->leftJoin('documents', 'documents.id', '=', 'vehicles.documents_id')
-                    ->leftJoin('inspection as inspection_pdi', function($join) {
+                    ->leftJoin('inspection as inspection_pdi', function ($join) {
                         $join->on('vehicles.id', '=', 'inspection_pdi.vehicle_id')
                              ->where('inspection_pdi.stage', '=', 'PDI');
                     })
                     ->where('vehicles.status', 'Approved');
-                    foreach ($filters as $columnName => $values) {
-                        if (in_array('__NULL__', $values)) {
-                            $data->whereNull($columnName); // Filter for NULL values
-                        } elseif (in_array('__Not EMPTY__', $values)) {
-                            $data->whereNotNull($columnName); // Filter for non-empty values
-                        } else {
-                            $data->whereIn($columnName, $values); // Regular filtering for selected values
-                        }
-                    } 
-                    $data = $data->groupBy('vehicles.id');  
+    
+                // Apply filters
+                foreach ($filters as $columnName => $values) {
+                    if (in_array('__NULL__', $values)) {
+                        $data->whereNull($columnName);
+                    } elseif (in_array('__Not EMPTY__', $values)) {
+                        $data->whereNotNull($columnName);
+                    } else {
+                        $data->whereIn($columnName, $values);
+                    }
                 }
-        if ($data) {
-            return DataTables::of($data)->toJson();
-        }
+    
+                $data = $data->groupBy('vehicles.id')->get();
+    
+                // Sequence and normalization map
+                $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+                $normalizationMap = [
+                    'COO' => 'COO',
+                    'SFX' => 'SFX',
+                    'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                    'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                    'HeadLamp Type' => 'HeadLamp Type',
+                    'infotainment type' => 'infotainment type',
+                    'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                    'Speakers' => 'Speakers',
+                    'sunroof' => 'sunroof'
+                ];
+                    foreach ($data as $vehicle) {
+                        $variant = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->Where('id', $vehicle->variant_id)
+                ->first();
+                        if ($variant) {
+                            $details = [];
+                            $otherDetails = [];
+                            foreach ($variant->variantItems as $item) {
+                                $modelSpecification = $item->model_specification;
+                                $modelSpecificationOption = $item->model_specification_option;
+                    
+                                if ($modelSpecification && $modelSpecificationOption) {
+                                    $name = $modelSpecification->name;
+                                    $optionName = $modelSpecificationOption->name;
+                    
+                                    $normalized = null;
+                                    foreach ($normalizationMap as $key => $values) {
+                                        if (is_array($values) && in_array($name, $values)) {
+                                            $normalized = $key;
+                                            break;
+                                        } elseif ($name === $values) {
+                                            $normalized = $key;
+                                            break;
+                                        }
+                                    }
+                    
+                                    if ($normalized) {
+                                        $name = $normalized;
+                                    }
+                    
+                                    if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                        if (strtolower($optionName) === 'yes') {
+                                            $optionName = $name;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+                    
+                                    if (in_array($name, $sequence)) {
+                                        $index = array_search($name, $sequence);
+                                        $details[$index] = $optionName;
+                                    } else {
+                                        $otherDetails[] = $optionName;
+                                    }
+                                }
+                            }
+                            ksort($details);
+                            $vehicle->variant_detail = implode(', ', array_merge($details, $otherDetails));
+                        } else {
+                            $variant = Varaint::Where('id', $vehicle->variant_id)
+                            ->first();
+                            $vehicle->$variant->detail = '';
+                        }
+                    }
+                    
+                return DataTables::of($data)->toJson();
+            }
         }
         return view('vehicles.stock', ['salesperson' => $sales_persons]);
     }
@@ -3380,70 +3388,9 @@ public function availablevehicles(Request $request)
         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
         ->get();
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
-        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-        $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
-        ];
-    foreach ($variants as $variant) {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
-                    }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
-                }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
-            }
-        }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
-            \Log::info("Received Filters: ", $filters);
                 if($status === "Available Stock")
                 {
                     $data = Vehicles::select( [
@@ -3472,7 +3419,6 @@ public function availablevehicles(Request $request)
                         'varaints.name as variant',
                         'varaints.model_detail',
                         'varaints.id as variant_id',
-                        'varaints.detail as variant_detail',
                        'countries.name as fd',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -3537,7 +3483,74 @@ public function availablevehicles(Request $request)
                             $data->whereIn($columnName, $values); // Regular filtering for selected values
                         }
                     }                               
-                    $data = $data->groupBy('vehicles.id');  
+                    $data = $data->groupBy('vehicles.id')->get();
+                   // Sequence and normalization map
+                $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+                $normalizationMap = [
+                    'COO' => 'COO',
+                    'SFX' => 'SFX',
+                    'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                    'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                    'HeadLamp Type' => 'HeadLamp Type',
+                    'infotainment type' => 'infotainment type',
+                    'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                    'Speakers' => 'Speakers',
+                    'sunroof' => 'sunroof'
+                ];
+                    foreach ($data as $vehicle) {
+                        $variant = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->Where('id', $vehicle->variant_id)
+                ->first();
+                        if ($variant) {
+                            $details = [];
+                            $otherDetails = [];
+                            foreach ($variant->variantItems as $item) {
+                                $modelSpecification = $item->model_specification;
+                                $modelSpecificationOption = $item->model_specification_option;
+                    
+                                if ($modelSpecification && $modelSpecificationOption) {
+                                    $name = $modelSpecification->name;
+                                    $optionName = $modelSpecificationOption->name;
+                    
+                                    $normalized = null;
+                                    foreach ($normalizationMap as $key => $values) {
+                                        if (is_array($values) && in_array($name, $values)) {
+                                            $normalized = $key;
+                                            break;
+                                        } elseif ($name === $values) {
+                                            $normalized = $key;
+                                            break;
+                                        }
+                                    }
+                    
+                                    if ($normalized) {
+                                        $name = $normalized;
+                                    }
+                    
+                                    if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                        if (strtolower($optionName) === 'yes') {
+                                            $optionName = $name;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+                    
+                                    if (in_array($name, $sequence)) {
+                                        $index = array_search($name, $sequence);
+                                        $details[$index] = $optionName;
+                                    } else {
+                                        $otherDetails[] = $optionName;
+                                    }
+                                }
+                            }
+                            ksort($details);
+                            $vehicle->variant_detail = implode(', ', array_merge($details, $otherDetails));
+                        } else {
+                            $variant = Varaint::Where('id', $vehicle->variant_id)
+                            ->first();
+                            $vehicle->$variant->detail = '';
+                        }
+                    }
                 }
         if ($data) {
             return DataTables::of($data)->toJson();
@@ -3556,66 +3569,6 @@ public function availablevehicles(Request $request)
         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
         ->get();
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
-        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-        $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
-        ];
-    foreach ($variants as $variant) {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
-                    }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
-                }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
-            }
-        }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
@@ -3644,7 +3597,6 @@ public function availablevehicles(Request $request)
                     'varaints.name as variant',
                     'varaints.id as variant_id',
                     'varaints.model_detail',
-                    'varaints.detail as variant_detail',
                     'countries.name as fd',
                     'varaints.seat',
                     'varaints.upholestry',
@@ -3704,7 +3656,6 @@ COALESCE(
                 ->where('vehicles.status', 'Approved');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
@@ -3712,7 +3663,74 @@ COALESCE(
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 } 
-                $data = $data->groupBy('vehicles.id');  
+                $data = $data->groupBy('vehicles.id')->get();
+                // Sequence and normalization map
+                $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+                $normalizationMap = [
+                    'COO' => 'COO',
+                    'SFX' => 'SFX',
+                    'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                    'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                    'HeadLamp Type' => 'HeadLamp Type',
+                    'infotainment type' => 'infotainment type',
+                    'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                    'Speakers' => 'Speakers',
+                    'sunroof' => 'sunroof'
+                ];
+                    foreach ($data as $vehicle) {
+                        $variant = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->Where('id', $vehicle->variant_id)
+                ->first();
+                        if ($variant) {
+                            $details = [];
+                            $otherDetails = [];
+                            foreach ($variant->variantItems as $item) {
+                                $modelSpecification = $item->model_specification;
+                                $modelSpecificationOption = $item->model_specification_option;
+                    
+                                if ($modelSpecification && $modelSpecificationOption) {
+                                    $name = $modelSpecification->name;
+                                    $optionName = $modelSpecificationOption->name;
+                    
+                                    $normalized = null;
+                                    foreach ($normalizationMap as $key => $values) {
+                                        if (is_array($values) && in_array($name, $values)) {
+                                            $normalized = $key;
+                                            break;
+                                        } elseif ($name === $values) {
+                                            $normalized = $key;
+                                            break;
+                                        }
+                                    }
+                    
+                                    if ($normalized) {
+                                        $name = $normalized;
+                                    }
+                    
+                                    if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                        if (strtolower($optionName) === 'yes') {
+                                            $optionName = $name;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+                    
+                                    if (in_array($name, $sequence)) {
+                                        $index = array_search($name, $sequence);
+                                        $details[$index] = $optionName;
+                                    } else {
+                                        $otherDetails[] = $optionName;
+                                    }
+                                }
+                            }
+                            ksort($details);
+                            $vehicle->variant_detail = implode(', ', array_merge($details, $otherDetails));
+                        } else {
+                            $variant = Varaint::Where('id', $vehicle->variant_id)
+                            ->first();
+                            $vehicle->$variant->detail = '';
+                        }
+                    } 
             }
             if ($data) {
                 return DataTables::of($data)->toJson();
@@ -3731,66 +3749,6 @@ COALESCE(
         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
         ->where('users.status', 'active')
         ->get();
-        $variants = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
-        ->orderBy('id', 'DESC')
-        ->whereNot('category', 'Modified')
-        ->get();
-        $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
-        $normalizationMap = [
-        'COO' => 'COO',
-        'SFX' => 'SFX',
-        'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
-        'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
-        'HeadLamp Type' => 'HeadLamp Type',
-        'infotainment type' => 'infotainment type',
-        'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
-        'Speakers' => 'Speakers',
-        'sunroof' => 'sunroof'
-        ];
-    foreach ($variants as $variant) {
-    $details = [];
-    $otherDetails = [];
-    foreach ($variant->variantItems as $item) {
-        $modelSpecification = $item->model_specification;
-        $modelSpecificationOption = $item->model_specification_option;
-        if ($modelSpecification && $modelSpecificationOption) {
-            $name = $modelSpecification->name;
-            $optionName = $modelSpecificationOption->name;
-            $normalized = null;
-            foreach ($normalizationMap as $key => $values) {
-                if (is_array($values)) {
-                    if (in_array($name, $values)) {
-                        $normalized = $key;
-                        break;
-                    }
-                } elseif ($name === $values) {
-                    $normalized = $key;
-                    break;
-                }
-            }
-    
-            if ($normalized) {
-                $name = $normalized;
-            }
-            if (in_array(strtolower($optionName), ['yes', 'no'])) {
-                if (strtolower($optionName) === 'yes') {
-                    $optionName = $name;
-                } else {
-                    continue;
-                }
-            }
-            if (in_array($name, $sequence)) {
-                $index = array_search($name, $sequence);
-                $details[$index] = $optionName;
-            } else {
-                $otherDetails[] = $optionName;
-            }
-        }
-    }
-    ksort($details);
-    $variant->detail = implode(', ', array_merge($details, $otherDetails));
-    $variant->save();
-    }
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
@@ -3822,7 +3780,6 @@ COALESCE(
                     'countries.name as fd',
                     'brands.brand_name',
                     'varaints.name as variant',
-                    'varaints.detail as variant_detail',
                     'varaints.id as variant_id',
                     'varaints.model_detail',
                     'varaints.detail',
@@ -3882,7 +3839,6 @@ COALESCE(
                 ->where('purchasing_order.is_demand_planning_po', '=', '1');
                 foreach ($filters as $columnName => $values) {
                     if (in_array('__NULL__', $values)) {
-                        info($columnName);
                         $data->whereNull($columnName); // Filter for NULL values
                     } elseif (in_array('__Not EMPTY__', $values)) {
                         $data->whereNotNull($columnName); // Filter for non-empty values
@@ -3890,7 +3846,74 @@ COALESCE(
                         $data->whereIn($columnName, $values); // Regular filtering for selected values
                     }
                 } 
-                $data = $data->groupBy('vehicles.id');
+                $data = $data->groupBy('vehicles.id')->get();
+                // Sequence and normalization map
+                $sequence = ['COO', 'SFX', 'Wheels', 'Seat Upholstery', 'HeadLamp Type', 'infotainment type', 'Speedometer Infotainment Type', 'Speakers', 'sunroof'];
+                $normalizationMap = [
+                    'COO' => 'COO',
+                    'SFX' => 'SFX',
+                    'Wheels' => ['wheel', 'Wheel', 'Wheels', 'Wheel type', 'wheel type', 'Wheel size', 'wheel size'],
+                    'Seat Upholstery' => ['Upholstery', 'Seat', 'seats', 'Seat Upholstery'],
+                    'HeadLamp Type' => 'HeadLamp Type',
+                    'infotainment type' => 'infotainment type',
+                    'Speedometer Infotainment Type' => 'Speedometer Infotainment Type',
+                    'Speakers' => 'Speakers',
+                    'sunroof' => 'sunroof'
+                ];
+                    foreach ($data as $vehicle) {
+                        $variant = Varaint::with(['variantItems.model_specification', 'variantItems.model_specification_option'])
+                ->Where('id', $vehicle->variant_id)
+                ->first();
+                        if ($variant) {
+                            $details = [];
+                            $otherDetails = [];
+                            foreach ($variant->variantItems as $item) {
+                                $modelSpecification = $item->model_specification;
+                                $modelSpecificationOption = $item->model_specification_option;
+                    
+                                if ($modelSpecification && $modelSpecificationOption) {
+                                    $name = $modelSpecification->name;
+                                    $optionName = $modelSpecificationOption->name;
+                    
+                                    $normalized = null;
+                                    foreach ($normalizationMap as $key => $values) {
+                                        if (is_array($values) && in_array($name, $values)) {
+                                            $normalized = $key;
+                                            break;
+                                        } elseif ($name === $values) {
+                                            $normalized = $key;
+                                            break;
+                                        }
+                                    }
+                    
+                                    if ($normalized) {
+                                        $name = $normalized;
+                                    }
+                    
+                                    if (in_array(strtolower($optionName), ['yes', 'no'])) {
+                                        if (strtolower($optionName) === 'yes') {
+                                            $optionName = $name;
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+                    
+                                    if (in_array($name, $sequence)) {
+                                        $index = array_search($name, $sequence);
+                                        $details[$index] = $optionName;
+                                    } else {
+                                        $otherDetails[] = $optionName;
+                                    }
+                                }
+                            }
+                            ksort($details);
+                            $vehicle->variant_detail = implode(', ', array_merge($details, $otherDetails));
+                        } else {
+                            $variant = Varaint::Where('id', $vehicle->variant_id)
+                            ->first();
+                            $vehicle->$variant->detail = '';
+                        }
+                    }
     }  
             if ($data) {
                 return DataTables::of($data)->toJson();

@@ -739,25 +739,23 @@ table.dataTable thead th select {
                 }
             },
             {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return ''; // Return an empty string if data is undefined or null
+                }
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
+                var fullText = data;
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                `;
+            }
+        },
                 {
     data: 'vin',
     name: 'vehicles.vin',
