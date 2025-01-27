@@ -71,14 +71,15 @@
             </div>
 
             <div class="col-lg-4 col-md-6 mt-3">
-                <label for="email_server" class="form-label"><b>Email Server</b></label>
+                <label for="email_server" class="form-label"><span class="text-danger">*</span> <b>Email Server</b></label>
                 <input
                     type="text"
                     name="email_server"
                     class="form-control"
                     id="email_server"
                     value="{{ old('email_server', $isEdit ? $domain->email_server : '') }}"
-                    placeholder="@example.com">
+                    placeholder="@example.com"
+                    required>
                 @error('email_server')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror

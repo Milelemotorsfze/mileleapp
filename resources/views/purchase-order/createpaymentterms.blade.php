@@ -32,7 +32,7 @@
             @csrf
             <div class="row">
                 <div class="col-lg-2 col-md-6">
-                    <label for="from_port" class="form-label">Payment Term Name</label>
+                    <label for="from_port" class="form-label"> <span class="text-danger">*</span> Payment Term Name</label>
                     <input type="text" name="name" class="form-control" required/>
                 </div>
                 <div class="col-lg-6 col-md-6">

@@ -59,7 +59,7 @@ table.dataTable thead th select {
 
 /* Ensure the Select2 dropdown fits the full header width when opened */
 .select2-container {
-    width: 100% !important; /* Ensures the container takes full width */
+    /* width: 100% !important;  */
 }
 
 /* Ensure the dropdown itself is properly styled */
@@ -67,6 +67,10 @@ table.dataTable thead th select {
     width: auto !important; /* Let the dropdown size adjust dynamically */
     min-width: 100%; /* Ensure the dropdown is at least the width of the select element */
     box-sizing: border-box; /* Makes sure the padding is included in width */
+}
+
+.select2-container--open .select2-dropdown--below {
+    position: inherit !important;
 }
 
 /* Ensure proper spacing between dropdown options */
@@ -547,7 +551,7 @@ table.dataTable thead th select {
       $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-export-option');
       @endphp
       @if ($hasPermission)
-        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
+        <button type="button" class="btn btn-success mb-2" onclick="exportToExcel('dtBasicExample6')">
   <i class="bi bi-file-earmark-excel"></i> Export to Excel
 </button>
 @endif
