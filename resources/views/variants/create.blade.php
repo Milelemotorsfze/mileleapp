@@ -647,23 +647,21 @@ $(document).ready(function () {
         let isSFXExist = false;
         let isSfxSelected = false;
         let SFXspecificationId = '';
-    $('select[name^="specification_"]').each(function () {
-      console.log("test");
-          var specificationId = $(this).data('specification-id');
-          var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
-    
-          var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
-          
-          if (labelsvalue.toUpperCase() === 'SFX') {
-             isSFXExist = true;
-             SFXspecificationId = specificationId;
-             if(selectedValue) {
-                isSfxSelected = true;
-             }
-                return false;
-            }
-          
-      });
+        $('select[name^="specification_"]').each(function () {
+            var specificationId = $(this).data('specification-id');
+            var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
+        
+            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
+            
+            if (labelsvalue.toUpperCase() === 'SFX') {
+                isSFXExist = true;
+                SFXspecificationId = specificationId;
+                if(selectedValue) {
+                    isSfxSelected = true;
+                }
+                    return false;
+                }
+        });
 
       if(isSFXExist == false){
             errorMessages = "Unable to find SFX in attribute list, Please create SFX as variant attribute for the selected Model Line";

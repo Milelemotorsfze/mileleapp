@@ -363,9 +363,53 @@
                                 createSpecificationCheckboxesv();
                                 createFieldCheckboxesv();
                             });
-                            $('#form-create').on('submit', function (e) {
+                    $('#form-create').on('submit', function (e) {
                         var variantValue = $('.variant').val().trim();
                         // Check if Variant Details is empty
+                        let isSFXExist = false;
+                        let isSfxSelected = false;
+                        let SFXspecificationId = '';
+                        $('select[name^="specification_"]').each(function () {
+                            var specificationId = $(this).data('specification-id');
+                            var selectedValue = $('select[name="specification_' + specificationId + '"]').val();
+                        
+                            var labelsvalue = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
+                            
+                            if (labelsvalue.toUpperCase() === 'SFX') {
+                                isSFXExist = true;
+                                SFXspecificationId = specificationId;
+                                if(selectedValue) {
+                                    isSfxSelected = true;
+                                }
+                                    return false;
+                                }
+                        });
+
+                    if(isSFXExist == false){
+                            errorMessages = "Unable to find SFX in attribute list, Please create SFX as variant attribute for the selected Model Line";
+                            alertify.confirm(errorMessages).set({
+                                            labels: {cancel: "Cancel"},
+                                            title: "SFX is Mandatory",
+                                        });
+
+                            e.preventDefault();
+                            return false;
+                    }else{
+                        // sfx existing chceck it is selected or not
+                        if(isSfxSelected == false) {
+                            errorMsg = "Please Choose any SFX, This attribute is mandatory to create variant.";
+                            alertify.confirm(errorMsg).set({
+                                            labels: {cancel: "Cancel"},
+                                            title: "SFX is Mandatory",
+                                        });
+                            $('select[name="specification_' + specificationId + '"]').addClass('is-invalid');
+                            e.preventDefault();
+                            return false;
+                        }else{
+                            $('select[name="specification_' + specificationId + '"]').removeClass('is-invalid');
+                        }
+                    }
+
                         if (!variantValue) {
                             alert('Error: Variant Details is required. Please fill it in before submitting.');
                             e.preventDefault(); // Prevent form submission
