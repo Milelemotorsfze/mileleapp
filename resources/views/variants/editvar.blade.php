@@ -407,7 +407,7 @@
                                 createSpecificationCheckboxesv();
                                 createFieldCheckboxesv();
                             });
-                            $('#form-create').on('submit', function (e) {
+                    $('#form-create').on('submit', function (e) {
                         var variantValue = $('.variant').val().trim();
                         // Check if Variant Details is empty
                         if (!variantValue) {
