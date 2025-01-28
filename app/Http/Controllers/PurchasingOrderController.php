@@ -3175,6 +3175,9 @@ if ($paymentOrderStatus->isNotEmpty()) {
             case "USD":
                 $totalcostconverted = $totalcost * 3.67;
                 break;
+                case "AUD":
+                    $totalcostconverted = $totalcost * 2.29;
+                    break;
             case "EUR":
                 $totalcostconverted = $totalcost * 3.94;
                 break;
@@ -4996,6 +4999,7 @@ public function submitPaymentDetails(Request $request)
                             "EUR" => 3.94,
                             "GBP" => 4.67,
                             "JPY" => 0.025,
+                            "AUD" => 2.29,
                             "AED" => 1,
                             "CAD" => 2.68
                         ];
@@ -5292,6 +5296,7 @@ public function submitPaymentDetails(Request $request)
                     "EUR" => 3.94,
                     "GBP" => 4.67,
                     "JPY" => 0.023,
+                    "AUD" => 2.29,
                     "AED" => 1,
                     "CAD" => 2.68
                 ];
@@ -5358,6 +5363,7 @@ public function submitPaymentDetails(Request $request)
                             "EUR" => 3.94,
                             "GBP" => 4.67,
                             "JPY" => 0.023,
+                            "AUD" => 2.29,
                             "AED" => 1,
                             "CAD" => 2.68
                         ];
@@ -5506,6 +5512,7 @@ public function submitPaymentDetails(Request $request)
                         "GBP" => 4.67,
                         "JPY" => 0.023,
                         "AED" => 1,
+                        "AUD" => 2.29,
                         "CAD" => 2.68
                     ];
                     // Check if the currencies are different
