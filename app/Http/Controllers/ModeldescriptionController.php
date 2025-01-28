@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Brand;
 use App\Models\MasterModelLines;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class ModeldescriptionController extends Controller
 {
@@ -36,7 +35,7 @@ class ModeldescriptionController extends Controller
      */
     public function store(Request $request)
     {
-
+        //
     }
 
     /**
@@ -52,7 +51,7 @@ class ModeldescriptionController extends Controller
      */
     public function edit(string $id)
     {
-       
+        //
     }
 
     /**
@@ -60,7 +59,7 @@ class ModeldescriptionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-       
+        //
     }
 
     /**
