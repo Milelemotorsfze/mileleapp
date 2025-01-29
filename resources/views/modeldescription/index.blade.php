@@ -17,11 +17,17 @@
   <a class="btn btn-sm btn-primary me-2" href="{{ route('mastergrade.index') }}">
     <i class="fa fa-plus" aria-hidden="true"></i> Master Grades
   </a>
-
-  <!-- Create Model Description Button -->
-  <a class="btn btn-sm btn-success" href="{{ route('modeldescription.create') }}">
-    <i class="fa fa-plus" aria-hidden="true"></i> Create Model Description
-  </a>
+  @can('create-model-description')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-model-description');
+    @endphp
+    @if ($hasPermission)
+        <!-- Create Model Description Button -->
+        <a class="btn btn-sm btn-success" href="{{ route('modeldescription.create') }}">
+            <i class="fa fa-plus" aria-hidden="true"></i> Create Model Description
+        </a>
+    @endif
+  @endcan
 
   <!-- Master Grades Button -->
   
