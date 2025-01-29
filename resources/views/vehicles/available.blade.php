@@ -835,6 +835,7 @@ table.dataTable thead th select {
                         ${firstFiveWords}
                     </div>
                     <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <span class="full-text" style="display: none;">${data}</span>
                 `;
             }
         },
@@ -1360,7 +1361,12 @@ function exportToExcel(tableId) {
         var rowData = [];
 
         for (var j = 0; j < cells.length; j++) {
-            var cellText = cells[j].innerText || cells[j].textContent;
+            var cell = cells[j];
+
+            // Check if the cell contains the hidden full-text span
+            var fullTextSpan = cell.querySelector('.full-text');
+            var cellText = fullTextSpan ? fullTextSpan.textContent : cell.innerText || cell.textContent;
+
             rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
         }
 
