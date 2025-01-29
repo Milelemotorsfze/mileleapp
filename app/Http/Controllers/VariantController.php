@@ -109,6 +109,13 @@ class VariantController extends Controller
      */
 public function store(Request $request)
 {
+    $this->validate($request, [
+        'brands_id' => 'required',
+        'master_model_lines_id' => 'required',
+        'model_detail' => 'required',
+
+    ]);
+
     DB::beginTransaction();
 
     try {

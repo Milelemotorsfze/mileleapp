@@ -343,6 +343,9 @@
                 brands_id:{
                     required:true,
                 },
+                model_detail:{
+                    required:true,
+                },
             }
         });
     </script>

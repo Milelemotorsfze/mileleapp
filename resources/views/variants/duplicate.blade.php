@@ -301,6 +301,15 @@
                         $('#model').on('change',function() {
                             $('#model-error').remove();
                         })
+
+                        $("#form-create").validate({
+                            ignore: [],
+                            rules: {
+                                model_detail:{
+                                    required:true,
+                                },
+                            }
+                        });
                     </script>
                 <script>
                         $(document).ready(function () {
