@@ -446,11 +446,11 @@
                                                 labels: {cancel: "Cancel"},
                                                 title: "SFX is Mandatory",
                                             });
-                                $('select[name="specification_' + specificationId + '"]').addClass('is-invalid');
+                                $('select[name="specification_' + SFXspecificationId + '"]').addClass('is-invalid');
                                 e.preventDefault();
                                 return false;
                             }else{
-                                $('select[name="specification_' + specificationId + '"]').removeClass('is-invalid');
+                                $('select[name="specification_' + SFXspecificationId + '"]').removeClass('is-invalid');
                             }
                         }
 
