@@ -76,17 +76,7 @@
         { data: 'id', name: 'payment_terms.id' },
         { data: 'name', name: 'payment_terms.name' },
         { data: 'description', name: 'payment_terms.description' },
-        {
-            data: 'milestones',
-            render: function (data) {
-                let html = '';
-                data.forEach(function (milestone) {
-                    html += milestone.type + ': ' + milestone.percentage + '%<br>';
-                });
-                return html;
-            },
-            name: 'milestones',
-        },
+        { data: 'milestone', name: 'milestones.type', },
     ],
 });
   });

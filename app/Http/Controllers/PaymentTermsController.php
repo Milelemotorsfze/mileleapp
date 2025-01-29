@@ -18,26 +18,32 @@ class PaymentTermsController extends Controller
      */
     public function index(Request $request)
     {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "Open to View the Payment Terms";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        if ($request->ajax()) {
-            $data = PaymentTerms::select([
-                'payment_terms.id',
-                'payment_terms.name',
-                'payment_terms.description',
-            ])
-            ->leftJoin('milestone', 'milestone.payment_terms_id', '=', 'payment_terms.id')
-            ->groupBy('payment_terms.id')
-            ->get();
-            $formattedData = $data->map(function ($paymentTerm) {
-                $milestones = Milestone::where('payment_terms_id', $paymentTerm->id)->get();
-                $paymentTerm->milestones = $milestones;
-                return $paymentTerm;
-            });
-            return DataTables::of($formattedData)->toJson();
-        }        
+        (new UserActivityController)->createActivity('Open to View the Payment Terms');
+        $data = PaymentTerms::with([
+                'milestones'  => function ($query) {
+                    $query->select('id','type','percentage','payment_terms_id');
+                }
+                ]);
+
+        if (request()->ajax()) {
+            return DataTables::of($data)
+                ->filterColumn('milestone', function($query, $keyword) {
+                    $query->whereHas('milestones', function ($q) use ($keyword) {
+                        $q->where('type', 'LIKE', "%{$keyword}%");
+                    });
+                })
+                ->addColumn('milestone', function($query) {
+                    if( $query->milestones) {
+                        return $query->milestones->map(function ($milestone) {
+                            return $milestone->type . ': ' . $milestone->percentage . '%';
+                            })->implode('<br>'); 
+                    }
+                    return "";
+                
+                })
+                ->rawColumns(['milestone'])
+                ->toJson();
+            }
         return view('purchase-order.paymentterms');
     }
     /**
