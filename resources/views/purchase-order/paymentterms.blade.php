@@ -67,18 +67,19 @@
         </div>  
   </div>
   <script>
-        $(document).ready(function () {
-            $('#dtBasicExample2').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('paymentterms.index') }}",
-    columns: [
-        { data: 'id', name: 'payment_terms.id' },
-        { data: 'name', name: 'payment_terms.name' },
-        { data: 'description', name: 'payment_terms.description' },
-        { data: 'milestone', name: 'milestones.type', },
-    ],
-});
-  });
+      $(document).ready(function () {
+          $('#dtBasicExample2').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('paymentterms.index') }}",
+            columns: [
+                { data: 'id', name: 'payment_terms.id' },
+                { data: 'name', name: 'payment_terms.name' },
+                { data: 'description', name: 'payment_terms.description' },
+                { data: 'payment_milestone', name: 'payment_milestone', },
+              
+            ],
+        });
+      });
     </script>
 @endsection

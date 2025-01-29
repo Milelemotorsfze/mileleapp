@@ -19,29 +19,30 @@ class PaymentTermsController extends Controller
     public function index(Request $request)
     {
         (new UserActivityController)->createActivity('Open to View the Payment Terms');
+        
         $data = PaymentTerms::with([
                 'milestones'  => function ($query) {
                     $query->select('id','type','percentage','payment_terms_id');
-                }
+                    }
                 ]);
 
         if (request()->ajax()) {
             return DataTables::of($data)
-                ->filterColumn('milestone', function($query, $keyword) {
+                ->filterColumn('payment_milestone', function($query, $keyword) {
                     $query->whereHas('milestones', function ($q) use ($keyword) {
-                        $q->where('type', 'LIKE', "%{$keyword}%");
+                        $q->whereRaw("CONCAT(type, ': ', percentage, '%') LIKE ?", ["%{$keyword}%"]);
                     });
                 })
-                ->addColumn('milestone', function($query) {
-                    if( $query->milestones) {
+                ->addColumn('payment_milestone', function($query) {
+                    if ($query->milestones->isNotEmpty()) {
                         return $query->milestones->map(function ($milestone) {
                             return $milestone->type . ': ' . $milestone->percentage . '%';
-                            })->implode('<br>'); 
+                        })->implode('<br>'); 
                     }
-                    return "";
+                    return " ";
                 
                 })
-                ->rawColumns(['milestone'])
+                ->rawColumns(['payment_milestone'])
                 ->toJson();
             }
         return view('purchase-order.paymentterms');
