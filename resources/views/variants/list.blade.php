@@ -115,7 +115,7 @@
             </div>
         @endif
         @if (Session::has('error'))
-            <div class="alert alert-error" id="error-alert">
+            <div class="alert alert-error alert-danger" id="error-alert">
                 <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                 {{ Session::get('error') }}
             </div>

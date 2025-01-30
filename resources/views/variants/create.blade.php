@@ -1,5 +1,10 @@
 @extends('layouts.main')
 @section('content')
+<style>
+    #model_detail-error, #model-error {
+        margin-top: 10px !important;
+    }
+</style>
     @can('variants-create')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
@@ -234,6 +239,8 @@
         $('#model_detail').select2({
             placeholder: "Select a Model",
             allowClear: true
+        }).on('change', function() {
+            $('#model_detail-error').remove();
         });
         $('#model').change(function () {
             const modelLineId = $(this).val();
