@@ -136,6 +136,7 @@ use App\Exports\BelgiumVehicleStockExport;
 use App\Http\Controllers\ModeldescriptionController;
 use App\Http\Controllers\MasterGradeController;
 use App\Http\Controllers\CompanyDomainController;
+use App\Http\Controllers\MasterChargesController;
 
 
 /*
@@ -1156,4 +1157,5 @@ Route::get('/d', function () {
     Route::post('/variants/storevar/{variant}', [VariantController::class, 'storevar'])->name('variants.storevar');
     Route::resource('modeldescription', ModeldescriptionController::class);
     Route::resource('mastergrade', MasterGradeController::class);
+    Route::resource('master-charges', MasterChargesController::class);
 });
