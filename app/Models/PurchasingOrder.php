@@ -90,5 +90,9 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(SupplierAccountTransaction::class, 'purchasing_order_id');
     }
-  
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'vendors_id','id');
+    }
+    
 }

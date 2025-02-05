@@ -2478,8 +2478,11 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <tbody>
                             @foreach ($transitions as $transition)
                             <tr data-transition-id="{{ $transition->id }}">
+                              
                                 <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
-                                <td>{{ $transition->created_at->format('d M Y') }}</td>
+                                <td>
+                                {{ $transition->id }}
+                                {{ $transition->created_at->format('d M Y') }}</td>
                                 <td>{{ $transition->transaction_type }}</td>
                                 <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
                                 <td>{{ $transition->account_currency }}</td>
@@ -2494,9 +2497,21 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                 $hasdebit = $transition->transaction_type == "Debit";
                                 @endphp
                                 @if ($haspostdebit || $hasreleased || $hasdebit)
-                                <button class="btn btn-info btn-sm" onclick="openSwiftDetailsModal({{ $transition->id }})">
-                                    <i class="fa fa-eye"></i> View
-                                </button>
+                                    <button class="btn btn-info btn-sm" onclick="openSwiftDetailsModal({{ $transition->id }})">
+                                        <i class="fa fa-eye"></i> View
+                                    </button>
+                                    @can('send-transfer-copy-to-supplier')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('send-transfer-copy-to-supplier');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 &&  $transition->transition_file)
+                                            <button class="btn btn-primary btn-sm mt-2"  title="send Transfer copy to vendor through email" onclick="sendTransferCopyToSupplier({{ $transition->id }})">
+                                            <i class="fa fa-envelope" ></i> Send email
+                                            </button>
+                                        @endif
+                                    @endif
+                                    @endcan
                                 @endif
                             </td>
                             <!-- @php
@@ -2551,9 +2566,24 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             @endphp
                             @if ($hasPermission)
                                 <td>
+                                @if($transition->transaction_type == "Debit")
+                                    @can('send-swift-copy-to-supplier')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('send-swift-copy-to-supplier');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 )
+                                                <button class="btn btn-primary btn-sm mt-2"  title="send Swift copy to vendor through email" 
+                                                    onclick="sendSwiftCopyToSupplier({{ $transition->id }})"> <i class="fa fa-envelope" ></i> Send Swift </button>
+                                            @endif 
+                                        @endif
+                                    @endcan
+                                @endif
                                     @if($transition->transaction_type == "Released")
                                         <button class="btn btn-success btn-sm" onclick="openSwiftUploadModal({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Uploading Swift</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
+                                       
+                                       
                                     @elseif($transition->transaction_type == "Request For Payment")
                                         <button class="btn btn-success btn-sm" onclick="modalforinitiated({{ $transition->id }})" data-transition-id="{{ $transition->id }}">Initiated</button>
                                         <button class="btn btn-danger btn-sm" onclick="showRejectModalinitiate({{ $transition->id }})">Reject</button>
@@ -5117,7 +5147,8 @@ function submitPaymentForm() {
       alert('Error submitting payment: ' + data.message);
     }
   })
-  .catch(error => console.error('There was a problem with the fetch operation:', error));
+  .catch(
+    error => alertify.error('A network error occurred. Please try again.'));
 }
 </script>
 <script>
@@ -5230,6 +5261,55 @@ $('#uploadSwiftButton').on('click', function() {
         }
     });
 });
+function sendTransferCopyToSupplier(transitionId) {
+    var confirm = alertify.confirm('Do you want to send payment transfer copy to vendor?',function (e) {
+        if (e) {
+            let purchasingOrderId = "{{ $purchasingOrder->id }}"
+            $.ajax({
+                url: "{{ route('send-transfer-copy.email')}}",
+                type: 'GET',
+                data: {
+                    transition_id: transitionId,
+                    purchasing_order_id:purchasingOrderId
+                },
+                success: function(response) {
+                    alertify.confirm(response.message,function (e) {
+                    }).set({title:"Success"});
+                },
+                error: function(response) {
+                    alertify.confirm(response.responseJSON.error  ,function (e) {
+                    }).set({title:"Opps..Error!"});
+                }
+            });
+        }
+    }).set({title:"Are You Sure ?"})
+  
+}
+function sendSwiftCopyToSupplier(transitionId) {
+    var confirm = alertify.confirm('Do you want to send Swift copy to vendor?',function (e) {
+        if (e) {
+            let purchasingOrderId = "{{ $purchasingOrder->id }}"
+            $.ajax({
+                url: "{{ route('send-swift-copy.email')}}",
+                type: 'GET',
+                data: {
+                    transition_id: transitionId,
+                    purchasing_order_id:purchasingOrderId
+                },
+                success: function(response) {
+                    alertify.confirm(response.message,function (e) {
+                    }).set({title:"Success"});
+                },
+                error: function(response) {
+                    alertify.confirm(response.responseJSON.error  ,function (e) {
+                    }).set({title:"Opps..Error!"});
+                }
+            });
+        }
+    }).set({title:"Are You Sure ?"})
+  
+}
+
 function openSwiftDetailsModal(transitionId) {
     $.ajax({
         url: '/get-swift-details/' + transitionId,

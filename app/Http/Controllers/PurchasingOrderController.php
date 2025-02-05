@@ -13,6 +13,8 @@ use App\Models\PFI;
 use App\Models\PfiItem;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PriceChangeNotification;
+use App\Mail\TransferCopyEmail;
+use App\Mail\SwiftCopyEmail;
 use App\Mail\DPEmailNotification;
 use App\Mail\DPrealeasedEmailNotification;
 use App\Mail\EmailNotificationInitiate;
@@ -5743,4 +5745,60 @@ public function checkPoNumberedit(Request $request)
 
     return response()->json(['exists' => $exists]);
 }
+public function sendTransferCopy(Request $request) {
+    $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
+    $supplierAccountTransaction = SupplierAccountTransaction::where('id', $request->transition_id)->first();
+        if(!$purchasingOrder->supplier->email )  {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Supplier email not Found! Please update it!"], 500);
+        }
+        if(!$supplierAccountTransaction->transition_file ) {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Transfer copy file is not found! Please contact admin!"], 500);
+        }
+            // $recipient = "priyanka.thomas@milele.com";
+            try{
+                $recipient = $purchasingOrder->supplier->email;
+                Mail::to($recipient)->send(new TransferCopyEmail($purchasingOrder->pl_number,
+                $supplierAccountTransaction->transaction_amount, $supplierAccountTransaction->transition_file));
+
+                return response()->json(['success' => true, 'message' => 'Email send to '.$purchasingOrder->supplier->supplier . " successfully."]);
+            } catch (\Exception $e) {
+                Log::error('Email sending failed', ['error' => $e->getMessage()]);
+                return response()->json(['success' => false, 'message' => 'Email sending failed',
+                 'error' => $e->getMessage()], 500);
+            }
+
+    }
+    public function sendSwiftCopy(Request $request) {
+
+        $purchasingOrder = PurchasingOrder::find($request->purchasing_order_id);
+        $supplierAccountTransaction = SupplierAccountTransaction::select('id','transaction_amount')
+                                            ->where('id', $request->transition_id)->first();
+
+        if(!$purchasingOrder->supplier->email )  {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Supplier email not Found! Please update it!"], 500);
+        }
+        $transitionSwifyCopy = PurchasingOrderSwiftCopies::select('sat_id','purchasing_order_id','file_path')
+                                        ->where('sat_id', $request->transition_id)
+                                        ->where('purchasing_order_id', $request->purchasing_order_id)->first();
+
+        if(!$transitionSwifyCopy->file_path) {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Swift copy file is not found! Please contact admin!"], 500);
+        }
+            // $recipient = "priyanka.thomas@milele.com";
+            try{
+                $recipient = $purchasingOrder->supplier->email;
+                Mail::to($recipient)->send(new SwiftCopyEmail($purchasingOrder->pl_number,
+                $supplierAccountTransaction->transaction_amount, $transitionSwifyCopy->file_path));
+
+                return response()->json(['success' => true, 'message' => 'Email send to '.$purchasingOrder->supplier->supplier . " successfully."]);
+            } catch (\Exception $e) {
+                Log::error('Email sending failed', ['error' => $e->getMessage()]);
+                return response()->json(['success' => false, 'message' => 'Email sending failed',
+                 'error' => $e->getMessage()], 500);
+            }
+    }
 }

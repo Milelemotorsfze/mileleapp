@@ -430,7 +430,8 @@ class SupplierController extends Controller
             'supplier' => 'required',
             'supplier_types' => 'required',
             'categories' => 'required',
-            'contact_number' => 'required'
+            'contact_number' => 'required',
+            'email' =>'required'
         ]);
 
         // $isSupplierExist = Supplier::where('supplier', $request->supplier)->where('contact_number', $request->contact_number['full'])->first();
@@ -723,7 +724,8 @@ class SupplierController extends Controller
             }
             elseif($request->activeTab == 'addSupplierDynamically')
             {
-             
+                $suppliers = $this->createSupplier($request);
+
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
                 $supAdd['supplier_id'] = $suppliers->id;
@@ -976,7 +978,8 @@ class SupplierController extends Controller
             'supplier' => 'required',
             'contact_number' => 'required',
             'supplier_types' => 'required',
-            'categories' => 'required'
+            'categories' => 'required',
+            'email' => 'required',
         ]);
         if ($validator->fails())
         {
