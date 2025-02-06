@@ -5261,6 +5261,7 @@ $('#uploadSwiftButton').on('click', function() {
             $('#swiftUploadModal').modal('hide');
             $('button[data-transition-id="' + transitionId + '"]').hide();
             alert('File uploaded successfully!');
+            location.reload();
         },
         error: function(response) {
             alert('Failed to upload file. ' + response.responseJSON.message);

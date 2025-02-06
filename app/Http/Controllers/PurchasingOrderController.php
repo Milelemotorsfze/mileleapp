@@ -5756,7 +5756,10 @@ public function sendTransferCopy(Request $request) {
             return response()->json(['success' => false, 'message' => 'Email sending failed',
             'error' => "Transfer copy file is not found! Please contact admin!"], 500);
         }
-            // $recipient = "priyanka.thomas@milele.com";
+        if(!$purchasingOrder->pl_number) {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Invoice number (PFI number) is not added ! Please contact procurement!"], 500);
+        }
             try{
                 $Torecipient = $purchasingOrder->supplier->email;
                 $recipients = config('mail.custom_recipients.procurement');
@@ -5790,6 +5793,10 @@ public function sendTransferCopy(Request $request) {
         if(!$transitionSwifyCopy->file_path) {
             return response()->json(['success' => false, 'message' => 'Email sending failed',
             'error' => "Swift copy file is not found! Please contact admin!"], 500);
+        }
+        if(!$purchasingOrder->pl_number) {
+            return response()->json(['success' => false, 'message' => 'Email sending failed',
+            'error' => "Invoice number(PFI number) is not added! Please contact procurement!"], 500);
         }
             try{
                 $Torecipient = $purchasingOrder->supplier->email;
