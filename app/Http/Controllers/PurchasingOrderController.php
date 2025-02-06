@@ -5758,11 +5758,14 @@ public function sendTransferCopy(Request $request) {
         }
             // $recipient = "priyanka.thomas@milele.com";
             try{
-                $recipient = $purchasingOrder->supplier->email;
-                Mail::to($recipient)->send(new TransferCopyEmail($purchasingOrder->pl_number,
+                $Torecipient = $purchasingOrder->supplier->email;
+                $recipients = config('mail.custom_recipients.procurement');
+                Mail::to($Torecipient)->cc($recipients)->send(new TransferCopyEmail($purchasingOrder->pl_number,
                 $supplierAccountTransaction->transaction_amount, $supplierAccountTransaction->transition_file));
 
-                return response()->json(['success' => true, 'message' => 'Email send to '.$purchasingOrder->supplier->supplier . " successfully."]);
+                $supplierAccountTransaction->is_transfer_copy_email_send = 1;
+                $supplierAccountTransaction->save();
+                return response()->json(['success' => true, 'message' => 'Email sent to '.$purchasingOrder->supplier->supplier . " successfully."]);
             } catch (\Exception $e) {
                 Log::error('Email sending failed', ['error' => $e->getMessage()]);
                 return response()->json(['success' => false, 'message' => 'Email sending failed',
@@ -5788,13 +5791,15 @@ public function sendTransferCopy(Request $request) {
             return response()->json(['success' => false, 'message' => 'Email sending failed',
             'error' => "Swift copy file is not found! Please contact admin!"], 500);
         }
-            // $recipient = "priyanka.thomas@milele.com";
             try{
-                $recipient = $purchasingOrder->supplier->email;
-                Mail::to($recipient)->send(new SwiftCopyEmail($purchasingOrder->pl_number,
+                $Torecipient = $purchasingOrder->supplier->email;
+                $recipients = config('mail.custom_recipients.procurement');
+                Mail::to($Torecipient)->cc($recipients)->send(new SwiftCopyEmail($purchasingOrder->pl_number,
                 $supplierAccountTransaction->transaction_amount, $transitionSwifyCopy->file_path));
 
-                return response()->json(['success' => true, 'message' => 'Email send to '.$purchasingOrder->supplier->supplier . " successfully."]);
+                $supplierAccountTransaction->is_swift_copy_email_send = 1;
+                $supplierAccountTransaction->save();
+                return response()->json(['success' => true, 'message' => 'Email sent to '.$purchasingOrder->supplier->supplier . " successfully."]);
             } catch (\Exception $e) {
                 Log::error('Email sending failed', ['error' => $e->getMessage()]);
                 return response()->json(['success' => false, 'message' => 'Email sending failed',

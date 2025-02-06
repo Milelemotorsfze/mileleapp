@@ -2480,9 +2480,7 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                             <tr data-transition-id="{{ $transition->id }}">
                               
                                 <td>{{ $transition->purchaseOrder->po_number ?? 'No Order Number' }} - {{ $transition->row_number }}</td>
-                                <td>
-                                {{ $transition->id }}
-                                {{ $transition->created_at->format('d M Y') }}</td>
+                                <td> {{ $transition->created_at->format('d M Y') }}</td>
                                 <td>{{ $transition->transaction_type }}</td>
                                 <td>{{ number_format($transition->transaction_amount, 0, '', ',') }}</td>
                                 <td>{{ $transition->account_currency }}</td>
@@ -2506,9 +2504,13 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                     @endphp
                                     @if ($hasPermission)
                                         @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 &&  $transition->transition_file)
-                                            <button class="btn btn-primary btn-sm mt-2"  title="send Transfer copy to vendor through email" onclick="sendTransferCopyToSupplier({{ $transition->id }})">
-                                            <i class="fa fa-envelope" ></i> Send email
-                                            </button>
+                                            @if($transition->is_transfer_copy_email_send == 0)
+                                                <button class="btn btn-primary btn-sm mt-2"  title="send Transfer copy to vendor through email" onclick="sendTransferCopyToSupplier({{ $transition->id }})">
+                                                <i class="fa fa-envelope" ></i> Send 
+                                                </button>
+                                            @else
+                                              <badge class="btn btn-success btn-sm mt-2">  Email sent</badge>
+                                            @endif
                                         @endif
                                     @endif
                                     @endcan
@@ -2573,8 +2575,12 @@ $intColours = \App\Models\ColorCode::where('belong_to', 'int')
                                         @endphp
                                         @if ($hasPermission)
                                             @if($purchasingOrder->supplier->is_AMS == 0 && $purchasingOrder->supplier->is_MMC == 0 )
+                                            @if($transition->is_swift_copy_email_send == 0)
                                                 <button class="btn btn-primary btn-sm mt-2"  title="send Swift copy to vendor through email" 
-                                                    onclick="sendSwiftCopyToSupplier({{ $transition->id }})"> <i class="fa fa-envelope" ></i> Send Swift </button>
+                                                onclick="sendSwiftCopyToSupplier({{ $transition->id }})"> <i class="fa fa-envelope" ></i> Send </button>
+                                            @else
+                                                <badge class="btn btn-success btn-sm mt-2">  Email sent</badge>
+                                            @endif
                                             @endif 
                                         @endif
                                     @endcan
@@ -5275,6 +5281,7 @@ function sendTransferCopyToSupplier(transitionId) {
                 success: function(response) {
                     alertify.confirm(response.message,function (e) {
                     }).set({title:"Success"});
+                    location.reload();
                 },
                 error: function(response) {
                     alertify.confirm(response.responseJSON.error  ,function (e) {
@@ -5299,6 +5306,7 @@ function sendSwiftCopyToSupplier(transitionId) {
                 success: function(response) {
                     alertify.confirm(response.message,function (e) {
                     }).set({title:"Success"});
+                    location.reload();
                 },
                 error: function(response) {
                     alertify.confirm(response.responseJSON.error  ,function (e) {
