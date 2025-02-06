@@ -5,7 +5,7 @@
   padding-top: 0px;
 }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
+  /* padding: 4px 8px 4px 8px; */
   text-align: center;
   vertical-align: middle;
 }

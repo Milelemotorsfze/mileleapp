@@ -40,6 +40,9 @@
     .nav-item.dropdown.active .nav-link.dropdown-toggle.arrow-none.active {
         color: white !important;
     }
+    .nav-item.dropdown.active .nav-link.dropdown-toggle.arrow-none {
+        color: white !important;
+    }
 
     .badge-notification {
       top: -20;
