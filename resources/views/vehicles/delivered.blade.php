@@ -470,9 +470,9 @@ table.dataTable thead th select {
 <div class="modal fade" id="customdocumentstatusModal" tabindex="-1" role="dialog" aria-labelledby="customdocumentstatusModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="customdocumentForm" method="POST" action="{{ route('vehicles.savecustominspection') }}">
+            <form id="customdocumentForm" method="POST" action="{{ route('vehicles.customdocumentstatusupdate') }}">
                 @csrf
-                <input type="hidden" name="vehicle_id" id="vehicle_idinspection">
+                <input type="hidden" name="vehicle_id" id="vehicle_iddocuments">
                 <div class="modal-header">
                     <h5 class="modal-title" id="customdocumentstatusModalLabel">Vehicle Document Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -750,22 +750,21 @@ var columns6 = [
                 }
             },
             {
-            data: 'variant_detail',
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
             name: 'varaints.detail',
             render: function(data, type, row) {
                 if (!data) {
-                    return '';
+                    return ''; // Return an empty string if data is undefined or null
                 }
-                
                 var words = data.split(' ');
-                var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
                 var fullText = data;
-
                 return `
                     <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         ${firstFiveWords}
                     </div>
                     <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <span class="full-text" style="display: none;">${data}</span>
                 `;
             }
         },
@@ -929,44 +928,45 @@ var columns6 = [
         9: 'vehicles.sales_remarks',
         10: 'gdn.gdn_number',
         11: 'gdn.date',
-        12: 'pdi_inspectionid',
-        13: 'brands.brand_name',
-        14: 'master_model_lines.model_line',
-        15: 'varaints.model_detail',
-        16: 'varaints.name',
-        17: 'varaints.detail',
-        18: 'vehicles.vin',
-        19: 'varaints.engine',
-        20: 'varaints.my',
-        21: 'varaints.steering',
-        22: 'varaints.fuel_type',
-        23: 'varaints.gear',
-        24: 'ex_color.name',
-        25: 'int_color.name',
-        26: 'varaints.upholestry',
-        27: 'vehicles.ppmmyyy',
-        28: 'warehouse.name',
-        29: 'vehicles.territory',
-        30: 'countries.name',
+        12: 'vehicles.vehicle_document_status',
+        13: 'pdi_inspectionid',
+        14: 'brands.brand_name',
+        15: 'master_model_lines.model_line',
+        16: 'varaints.model_detail',
+        17: 'varaints.name',
+        18: 'varaints.detail',
+        19: 'vehicles.vin',
+        20: 'varaints.engine',
+        21: 'varaints.my',
+        22: 'varaints.steering',
+        23: 'varaints.fuel_type',
+        24: 'varaints.gear',
+        25: 'ex_color.name',
+        26: 'int_color.name',
+        27: 'varaints.upholestry',
+        28: 'vehicles.ppmmyyy',
+        29: 'warehouse.name',
+        30: 'vehicles.territory',
+        31: 'countries.name',
     };
     // Extend columnMap based on permissions
 if (hasManagementPermission) {
-    columnMap[31] = 'costprice';
+    columnMap[32] = 'costprice';
+    columnMap[33] = 'vehicles.minimum_commission';
+    columnMap[34] = 'vehicles.price';
+    columnMap[35] = 'vehicles.ownership_type';
+    columnMap[36] = 'vehicles.custom_inspection_number';
+    columnMap[37] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
     columnMap[32] = 'vehicles.minimum_commission';
     columnMap[33] = 'vehicles.price';
     columnMap[34] = 'vehicles.ownership_type';
     columnMap[35] = 'vehicles.custom_inspection_number';
     columnMap[36] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[31] = 'vehicles.minimum_commission';
-    columnMap[32] = 'vehicles.price';
-    columnMap[33] = 'vehicles.ownership_type';
-    columnMap[34] = 'vehicles.custom_inspection_number';
-    columnMap[35] = 'vehicles.custom_inspection_status';
 } else {
-    columnMap[31] = 'vehicles.ownership_type';
-    columnMap[32] = 'vehicles.custom_inspection_number';
-    columnMap[33] = 'vehicles.custom_inspection_status';
+    columnMap[32] = 'vehicles.ownership_type';
+    columnMap[33] = 'vehicles.custom_inspection_number';
+    columnMap[34] = 'vehicles.custom_inspection_status';
 }
         var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
@@ -1160,13 +1160,13 @@ $('#dtBasicExample6 tbody').on('click', 'td', function () {
     var columnHeader = table6.column(cellIndex).header().innerText; // Get the header text of the clicked column
 
     // Check for "Custom Inspection Number" column click
-    if (columnHeader.includes('vehicle_document_status')) {
+    if (columnHeader.includes('Vehicle Document Status')) {
         @php
         $hascustominspectionPermission = Auth::user()->hasPermissionForSelectedRole('add-vehicle-document-status');
         @endphp
         @if ($hascustominspectionPermission)
-            var datainspection = table6.row(this).data();
-            opencustomindocumentstatusModal(datainspection.id);
+            var datadocument = table6.row(this).data();
+            opencustomindocumentstatusModal(datadocument.id);
         @endif
     }
 });
@@ -1195,18 +1195,55 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+
+            // Check if the cell contains the hidden full-text span
+            var fullTextSpan = cell.querySelector('.full-text');
+            var cellText = fullTextSpan ? fullTextSpan.textContent : cell.innerText || cell.textContent;
+
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");
@@ -1502,26 +1539,9 @@ function openeditingcolorModal(vehicleId) {
     // Show the modal
     $('#custominspectionModal').modal('show');
 }
-function opencustomindocumentstatusModal(vehicleIdInspection) {
+function opencustomindocumentstatusModal(vehicleIddocuments) {
     // Set the vehicle_idinspection value
-    $('#vehicle_idinspection').val(vehicleIdInspection);
-
-    // Make an AJAX call to get the custom inspection details
-    $.ajax({
-        url: '/get-custom-inspection-data',  // The route to get the custom inspection data
-        type: 'GET',
-        data: { vehicle_id: vehicleIdInspection },
-        success: function(response) {
-            // Populate the modal fields with the fetched data
-            $('#custom_inspection_number').val(response.custom_inspection_number);
-            $('#custom_inspection_status').val(response.custom_inspection_status);
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching custom inspection data:', error);
-        }
-    });
-
-    // Show the modal
+    $('#vehicle_iddocuments').val(vehicleIddocuments);
     $('#customdocumentstatusModal').modal('show');
 }
     function showFullText(button) {
@@ -1634,6 +1654,50 @@ $('#custominspectionForm').on('submit', function(e) {
             ...row.data(), // Keep other fields intact
             custom_inspection_number: response.custom_inspection_number, // Update inspection number
             custom_inspection_status: response.custom_inspection_status // Update inspection status
+        }).draw(false); // Redraw the row
+    } else {
+        console.error("No matching row found for vehicle ID: " + vehicleId);
+    }
+        },
+        error: function(xhr) {
+    console.log(xhr.responseText); // Log full response for debugging
+
+    var errors = xhr.responseJSON.errors;
+    var errorMessages = '';
+    for (var key in errors) {
+        if (errors.hasOwnProperty(key)) {
+            errorMessages += errors[key] + '\n';
+        }
+    }
+    alert('An error occurred:\n' + errorMessages);
+}
+    });
+});
+
+$('#customdocumentForm').on('submit', function(e) {
+    e.preventDefault();
+    var formData = $(this).serialize();
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        success: function(response) {
+            $('#customdocumentstatusModal').modal('hide');
+            alertify.success('Document Status Update Successfully');
+           // Update the corresponding row in the DataTable (assuming table7 is your DataTable variable)
+           var table6 = $('#dtBasicExample6').DataTable();
+           var vehicleId = $('#vehicle_iddocuments').val();
+    // Find the row in the DataTable using the 'id' field (since it's the unique identifier)
+    var row = table6.row(function(idx, data, node) {
+        return data.id == vehicleId; // Use 'id' to match the row
+    });
+    // Check if the row exists before attempting to update
+    if (row.node()) {
+        // Update the row data with new values from the response
+        row.data({
+            ...row.data(), // Keep other fields intact
+            vehicle_document_status: response.vehicle_document_status, // Update inspection number
         }).draw(false); // Redraw the row
     } else {
         console.error("No matching row found for vehicle ID: " + vehicleId);

@@ -329,11 +329,11 @@ table.dataTable thead th select {
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary" style="position: sticky; top: 0;">
             <tr>
-            <th>SO Number</th>
+                  <th>SO Number</th>
                   <th>Sales Date</th>
                   <th>Sales Person</th>
                   <th>Customer Name</th>
-                <th>Customer Phone</th>
+                  <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Quotation Date</th>
                   <th>Quotation Value</th>
@@ -421,8 +421,7 @@ table.dataTable thead th select {
                 name: 'quotations.calls_id',
                 searchable: false,
                 render: function (data, type, row) {
-                    console.log(row);
-                    if (row.quotation_id !== null) { // Check if quotation_id is not null
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
             const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
             return `<a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order"><i class="fa fa-window-maximize" aria-hidden="true"></i></a>`;
         }
@@ -435,7 +434,7 @@ table.dataTable thead th select {
                 searchable: false,
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.quotation_id !== null) { // Check if quotation_id is not null
+                    if (row.calls_id !== null) { // Check if quotation_id is not null
                     return `<button class="btn btn-sm btn-danger" onclick="cancelSO(${data})" title="Cancel Sales Order">Cancel SO</button>`;
                     }
                     return '';
@@ -517,7 +516,6 @@ table.dataTable thead th select {
      function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
-    console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);
     $('#fileModal').modal('show');
 }

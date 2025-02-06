@@ -573,6 +573,7 @@ table.dataTable thead th select {
             <th>Reservation Sales Person</th>
             <th>GDN</th>
             <th>GDN Date</th>
+            <th>Vehicle Document Status</th>
             <th>PDI Report</th>
             <th>Brand</th>
             <th>Model Line</th>
@@ -770,6 +771,13 @@ table.dataTable thead th select {
         return ''; // If no date, return empty
     }
 },
+{ 
+        data: 'vehicle_document_status', 
+        name: 'vehicles.vehicle_document_status',
+        render: function(data, type, row) {
+            return data ? data : '';
+        }
+    },
         { 
             data: 'id', 
             name: 'id',
@@ -792,23 +800,24 @@ table.dataTable thead th select {
                 }
             },
             {
-                    data: 'variant_detail', // Updated to use the alias
-                    name: 'varaints.detail',
-                    render: function(data, type, row) {
-                        if (!data) {
-                            return ''; // Return an empty string if data is undefined or null
-                        }
-                        var words = data.split(' ');
-                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
-                        var fullText = data;
-                        return `
-                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                ${firstFiveWords}
-                            </div>
-                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
-                        `;
-                    }
-                },
+            data: 'variant_detail', // Updated to use the computed `variant_detail`
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (!data) {
+                    return ''; // Return an empty string if data is undefined or null
+                }
+                var words = data.split(' ');
+                var firstFiveWords = words.slice(0, 15).join(' ') + '...';
+                var fullText = data;
+                return `
+                    <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${firstFiveWords}
+                    </div>
+                    <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                    <span class="full-text" style="display: none;">${data}</span>
+                `;
+            }
+        },
                 {
     data: 'vin',
     name: 'vehicles.vin',
@@ -985,44 +994,45 @@ var columnMap = {
         14: 'bp.name',
         15: 'gdn.gdn_number',
         16: 'gdn.date',
-        17: 'pdi_inspectionid',
-        18: 'brands.brand_name',
-        19: 'master_model_lines.model_line',
-        20: 'varaints.model_detail',
-        21: 'varaints.name',
-        22: 'varaints.detail',
-        23: 'vehicles.vin',
-        24: 'varaints.engine',
-        25: 'varaints.my',
-        26: 'varaints.steering',
-        27: 'varaints.fuel_type',
-        28: 'varaints.gear',
-        29: 'ex_color.name',
-        30: 'int_color.name',
-        31: 'varaints.upholestry',
-        32: 'vehicles.ppmmyyy',
-        33: 'warehouse.name',
-        34: 'vehicles.territory',
-        35: 'countries.name',
+        17: 'vehicles.vehicle_document_status',
+        18: 'pdi_inspectionid',
+        19: 'brands.brand_name',
+        20: 'master_model_lines.model_line',
+        21: 'varaints.model_detail',
+        22: 'varaints.name',
+        23: 'varaints.detail',
+        24: 'vehicles.vin',
+        25: 'varaints.engine',
+        26: 'varaints.my',
+        27: 'varaints.steering',
+        28: 'varaints.fuel_type',
+        29: 'varaints.gear',
+        30: 'ex_color.name',
+        31: 'int_color.name',
+        32: 'varaints.upholestry',
+        33: 'vehicles.ppmmyyy',
+        34: 'warehouse.name',
+        35: 'vehicles.territory',
+        36: 'countries.name',
     };
     // Extend columnMap based on permissions
 if (hasManagementPermission) {
-    columnMap[36] = 'costprice';
+    columnMap[37] = 'costprice';
+    columnMap[38] = 'vehicles.minimum_commission';
+    columnMap[39] = 'vehicles.price';
+    columnMap[40] = 'vehicles.ownership_type';
+    columnMap[41] = 'vehicles.custom_inspection_number';
+    columnMap[42] = 'vehicles.custom_inspection_status';
+} else if (hasPricePermission) {
     columnMap[37] = 'vehicles.minimum_commission';
     columnMap[38] = 'vehicles.price';
     columnMap[39] = 'vehicles.ownership_type';
     columnMap[40] = 'vehicles.custom_inspection_number';
     columnMap[41] = 'vehicles.custom_inspection_status';
-} else if (hasPricePermission) {
-    columnMap[36] = 'vehicles.minimum_commission';
-    columnMap[37] = 'vehicles.price';
-    columnMap[38] = 'vehicles.ownership_type';
-    columnMap[39] = 'vehicles.custom_inspection_number';
-    columnMap[40] = 'vehicles.custom_inspection_status';
 } else {
-    columnMap[36] = 'vehicles.ownership_type';
-    columnMap[37] = 'vehicles.custom_inspection_number';
-    columnMap[38] = 'vehicles.custom_inspection_status';
+    columnMap[37] = 'vehicles.ownership_type';
+    columnMap[38] = 'vehicles.custom_inspection_number';
+    columnMap[39] = 'vehicles.custom_inspection_status';
 }
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
@@ -1286,18 +1296,55 @@ handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
-    var rows = table.rows;
+    var theadRows = table.querySelectorAll("thead tr"); // Get header rows
+    var tbodyRows = table.querySelectorAll("tbody tr"); // Get data rows
     var csvContent = "";
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        for (var j = 0; j < row.cells.length; j++) {
-            var cellText = row.cells[j].innerText || row.cells[j].textContent;
-            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+
+    // Add table headers
+    for (var i = 0; i < theadRows.length; i++) {
+        var row = theadRows[i];
+        if (i === 1) continue; // Skip the second row (index 1)
+
+        var cells = row.querySelectorAll("th"); // Only include <th> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            var filterSelect = cell.querySelector('select'); // Check for filter dropdown
+            if (!filterSelect) { // Skip the filter dropdowns
+                var cellText = cell.innerText || cell.textContent;
+                rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+            }
         }
-        csvContent += "\n";
+
+        if (rowData.length > 0) { // Add header row only if it has content
+            csvContent += rowData.join(",") + "\n";
+        }
     }
+
+    // Add table body rows (data)
+    for (var i = 0; i < tbodyRows.length; i++) {
+        var row = tbodyRows[i];
+        var cells = row.querySelectorAll("td"); // Only include <td> elements
+        var rowData = [];
+
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+
+            // Check if the cell contains the hidden full-text span
+            var fullTextSpan = cell.querySelector('.full-text');
+            var cellText = fullTextSpan ? fullTextSpan.textContent : cell.innerText || cell.textContent;
+
+            rowData.push('"' + cellText.replace(/"/g, '""') + '"'); // Escape double quotes
+        }
+
+        csvContent += rowData.join(",") + "\n"; // Add data row to CSV
+    }
+
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
+
+    if (navigator.msSaveBlob) {
+        // For IE 10+
         navigator.msSaveBlob(blob, 'export.csv');
     } else {
         var link = document.createElement("a");

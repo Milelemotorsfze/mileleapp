@@ -345,7 +345,8 @@ class SalesOrderController extends Controller
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
             $sodetails = So::where('quotation_id', $quotation->id)->first();
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') 
+                 || Auth::user()->hasPermissionForSelectedRole('sales-view');
             $soitems = Soitems::with('vehicle') // Ensure that vehicle is eager loaded
                       ->where('so_id', $sodetails->id)
                       ->get();
@@ -363,12 +364,21 @@ class SalesOrderController extends Controller
                         case 'App\Models\Varaint':
                         $variantId = $item->reference_id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                        ->whereNull('so_id')
-                        ->whereNull('gdn_id')
+                        ->where(function ($query) use ($sodetails) {
+                            $query->whereNull('so_id')
+                                  ->orWhere('so_id', $sodetails->id);
+                        })
+                        ->when(function ($query) use ($sodetails) {
+                            // Check if so_id exists with the same $sodetails->id
+                            return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                        }, function ($query) {
+                            // Apply gdn_id condition only if so_id is not the same
+                            $query->whereNull('gdn_id');
+                        })
                         ->when(!$hasPermission, function ($query) {
                             $query->where(function ($subQuery) {
                                 $subQuery->whereNull('booking_person_id')
-                                         ->orWhere('booking_person_id', Auth::id());
+                                         ->orWhere('booking_person_id', $sodetails->sales_person_id);
                             });
                         })->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
@@ -378,12 +388,21 @@ class SalesOrderController extends Controller
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                            ->whereNull('so_id')
-                            ->whereNull('gdn_id')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')
-                                             ->orWhere('booking_person_id', Auth::id());
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
                             })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;
@@ -394,12 +413,21 @@ class SalesOrderController extends Controller
                         foreach ($variants as $variant) {
                             $variantId = $variant->id;
                             $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->whereNotNull('vin')
-                            ->whereNull('so_id')
-                            ->whereNull('gdn_id')
+                            ->where(function ($query) use ($sodetails) {
+                                $query->whereNull('so_id')
+                                      ->orWhere('so_id', $sodetails->id);
+                            })
+                            ->when(function ($query) use ($sodetails) {
+                                // Check if so_id exists with the same $sodetails->id
+                                return DB::table('vehicles')->where('so_id', $sodetails->id)->exists() === false;
+                            }, function ($query) {
+                                // Apply gdn_id condition only if so_id is not the same
+                                $query->whereNull('gdn_id');
+                            })
                             ->when(!$hasPermission, function ($query) {
                                 $query->where(function ($subQuery) {
                                     $subQuery->whereNull('booking_person_id')
-                                             ->orWhere('booking_person_id', Auth::id());
+                                             ->orWhere('booking_person_id', $sodetails->sales_person_id);
                                 });
                             })->get()->toArray();
                             $vehicles[$item->id] = $variantVehicles;

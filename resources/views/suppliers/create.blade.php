@@ -1725,7 +1725,15 @@
                     formInputError = true;
                     e.preventDefault();
                 }
+                if(inputEmail == '')
+                {
+                    $msg = "Email field is required";
+                    showEmailError($msg);
 
+                    formInputError = true;
+                    e.preventDefault();
+                }
+                
                 if(inputSupplierType == '')
                 {
                     $msg = "Supplier type is required";

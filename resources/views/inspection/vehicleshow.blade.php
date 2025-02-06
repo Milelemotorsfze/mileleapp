@@ -74,7 +74,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Interior Colour</label>
-                                    <select class="form-control" autofocus name="interior_colour" id="interior_colour">
+                                    <select class="form-control" autofocus name="int_colour" id="interior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($int_colours as $int_colours)
                                     <option value="{{ $int_colours->id }}">
@@ -87,7 +87,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Exterior Colour</label>
-                                    <select class="form-control" autofocus name="exterior_colour" id="exterior_colour">
+                                    <select class="form-control" autofocus name="ex_colour" id="exterior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($ext_colours as $ext_colours)
                                     <option value="{{ $ext_colours->id }}">
@@ -429,7 +429,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <label>Remarks</label>
-                            <textarea name="remarks" id="editor"></textarea>
+                            <textarea name="remarks" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>

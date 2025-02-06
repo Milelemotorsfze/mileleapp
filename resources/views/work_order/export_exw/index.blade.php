@@ -568,18 +568,6 @@
 			</div>
 		</div>
     </div>
-@else
-    <div class="card-header">
-        <p class="card-title">Sorry! You don't have permission to access this page.</p>
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-sm btn-info" href="/">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard
-            </a>
-            <a class="btn btn-sm btn-info" href="{{ url()->previous() }}">
-                <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page
-            </a>
-        </div>
-    </div>
 @endif
 @endsection
 @push('scripts')
