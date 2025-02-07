@@ -148,6 +148,18 @@
             <input type="text" id="netsuite_name" name= "grade_name" class="form-control" readonly />
         </div>
     </div>
+    <div class="col-lg-2 col-md-6 col-sm-12">
+        <div class="mb-3">
+            <label for="netsuite_name" class="form-label">Special Editions</label>
+            <input type="text" id="specialEditions" name= "specialEditions" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-6 col-sm-12">
+        <div class="mb-3">
+            <label for="netsuite_name" class="form-label">Others</label>
+            <input type="text" id="others" name= "others" class="form-control" readonly />
+        </div>
+    </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="my">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Year</label>
@@ -299,6 +311,8 @@
             $('#window_type').val(model.window_type);
             $('#drive_train').val(model.drive_train);
             $('#netsuite_name').val(model.grade_name);
+            $('#specialEditions').val(model.specialEditions);
+            $('#others').val(model.others);
         }
 
         // Clear the input fields
@@ -784,6 +798,9 @@ $(document).ready(function () {
     { id: 'coo', label: 'COO' },
     { id: 'my', label: 'Model Year' },
     { id: 'gear', label: 'Gear' },
+    { id: 'gear', label: 'Gear' },
+    { id: 'specialEditions', label: 'specialEditions' },
+    { id: 'others', label: 'others' },
     { id: 'upholstery', label: 'Upholstery' }
 ];
 

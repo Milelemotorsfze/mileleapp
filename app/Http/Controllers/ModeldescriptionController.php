@@ -66,6 +66,8 @@ class ModeldescriptionController extends Controller
             $description->transmission = $request->input('gearbox');
             $description->drive_train = $request->input('drive_train');
             $description->window_type = $request->input('window_type');
+            $description->specialEditions = $request->input('specialEditions');
+            $description->others = $request->input('others');
             $description->created_by = Auth::id();
             $description->model_description = $request->input('model_description');
             $description->save();
@@ -129,6 +131,8 @@ class ModeldescriptionController extends Controller
             'master_model_descriptions.transmission',
             'master_model_descriptions.window_type',
             'master_model_descriptions.drive_train',
+            'master_model_descriptions.specialEditions',
+            'master_model_descriptions.others',
             'master_vehicles_grades.grade_name as grade_name'
         )
         ->get();

@@ -55,6 +55,10 @@
                                     </select>
                                     </div>
                                     <div class="col-lg-4 col-md-6 mb-3">
+                                        <label for="specialEditions" class="form-label">Special Editions</label>
+                                        <input type="text" class="form-control" id="specialEditions" name="specialEditions" placeholder="Enter special edition details">
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <select class="form-control select2" autofocus name="engine" id="engine" required>
                                         <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
@@ -132,19 +136,23 @@
                                                         <option value="M.Window" {{ old('gearbox') == 'M.Window' ? 'selected' : '' }}>M.Window</option>
                                                     </select>
                                     </div>
+                                    <div class="col-lg-4 col-md-6 mb-3">
+                                        <label for="specialEditions" class="form-label">Others Important Option</label>
+                                        <input type="text" class="form-control" id="others" name="others" placeholder="Enter Other details">
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-12 text-center">
+                                        <input type="submit" name="submit" value="Submit" class="btn btn-success" />
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 mb-3">
+                    <label for="summary" class="form-label">Model Detail</label>
+                    <input type="text" class="form-control" id="summary" name="model_description" readonly>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-lg-12 text-center">
-                        <input type="submit" name="submit" value="Submit" class="btn btn-success" />
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <div class="col-lg-12 col-md-12 mb-3">
-    <label for="summary" class="form-label">Model Detail</label>
-    <input type="text" class="form-control" id="summary" name="model_description" readonly>
-</div>
-                </div>
-            </form>
-        </div>
-    </div>
 @else
     @php
         redirect()->route('home')->send();
@@ -154,9 +162,7 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        // Initialize select2
         $('.select2').select2();
-        // Handle brand change event
         $('#brand').on('change', function() {
             var selectedBrandId = $(this).val();
             if (selectedBrandId) {
@@ -181,7 +187,6 @@
                 $('#model').prop('disabled', true);
             }
         });
-// Handle model change event
 $('#model').on('change', function() {
             var selectedModelId = $(this).val();
             if (selectedModelId) {
@@ -223,22 +228,26 @@ $('#model').on('change', function() {
         var gear = $('#gear').val() ? $('#gear').val() : '';
         var driveTrain = $('#drive_train').val() ? $('#drive_train').val() : '';
         var windowType = $('#window_type').val() ? $('#window_type').val() : '';
+        var specialEditions = $('#specialEditions').val() ? $('#specialEditions').val() : '';
+        var others = $('#others').val() ? $('#others').val() : '';
         var engineFuel = engine + fuel;
         var summary = [
             steering,
             model,
             grade,
+            specialEditions,
             engineFuel,
             gear,
             driveTrain,
-            windowType
+            windowType,
+            others
         ]
             .filter(Boolean)
             .join(' ');
 
         $('#summary').val(summary);
     }
-    $('#steering, #brand, #model, #grade, #engine, #fuel, #gear, #drive_train, #window_type').on('change', updateSummary);
+    $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type').on('change', updateSummary);
 });
 </script>
 @endpush
