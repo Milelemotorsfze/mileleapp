@@ -247,7 +247,7 @@ $('#model').on('change', function() {
 
         $('#summary').val(summary);
     }
-    $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type').on('change', updateSummary);
+    $('#steering, #brand, #model, #grade, #specialEditions, #engine, #fuel, #gear, #drive_train, #window_type, #others').on('change', updateSummary);
 });
 </script>
 @endpush
