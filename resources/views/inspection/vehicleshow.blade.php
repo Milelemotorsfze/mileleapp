@@ -74,7 +74,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Interior Colour</label>
-                                    <select class="form-control" autofocus name="int_colour" id="interior_colour">
+                                    <select class="form-control" required autofocus name="int_colour" id="interior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($int_colours as $int_colours)
                                     <option value="{{ $int_colours->id }}">
@@ -86,8 +86,8 @@
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Exterior Colour</label>
-                                    <select class="form-control" autofocus name="ex_colour" id="exterior_colour">
+                                    <label for="choices-single-default" required class="form-label">Exterior Colour</label>
+                                    <select class="form-control" autofocus  name="ex_colour" id="exterior_colour">
                                     <option value="" disabled selected>Select a Colour</option>
                                     @foreach($ext_colours as $ext_colours)
                                     <option value="{{ $ext_colours->id }}">
@@ -444,8 +444,17 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('#interior_colour').select2();
-        $('#exterior_colour').select2();
+        $('#interior_colour').select2({
+            placeholder: 'Select Interior Colour'
+        }).on('change',function() {
+            $('#interior_colour-error').remove();
+        })
+        $('#exterior_colour').select2({
+            placeholder: 'Select Exterior Colour'
+        }).on('change',function() {
+            $('#exterior_colour-error').remove();
+        });
+       
         $('#enableInputs').change(function() {
             $('#vin, #variant, #newVariantDropdown, #interior_color, #exterior_color').prop('disabled', !this.checked);
         });
@@ -569,12 +578,7 @@
             placeholder: 'Select Brand'
         })
         $('.coo').select2();
-        $('#int_colour').select2({
-            placeholder: 'Select Interior Colour'
-        })
-        $('#ex_colour').select2({
-            placeholder: 'Select Exterior Colour'
-        })
+        
         $('#model').select2({
             placeholder: 'Select Model'
         })
@@ -584,18 +588,13 @@
         $('#model').on('change',function() {
             $('#model-error').remove();
         })
-        $("#form-create").validate({
+        $("#inspection-form").validate({
             ignore: [],
             rules: {
-                name: {
-                    required: true,
-                    string:true,
-                    max:255
-                },
-                master_model_lines_id:{
+                ex_colour:{
                     required:true,
                 },
-                brands_id:{
+                int_colour:{
                     required:true,
                 },
             }
