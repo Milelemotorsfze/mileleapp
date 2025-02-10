@@ -77,7 +77,7 @@
                  <input type="hidden" name="brands_id" value="{{$brands->id}}"/>
                 </td>
                 <td>
-                    @if($brand && brands && $brand->id == $brands->id)
+                    @if($brand && $brands && $brand->id == $brands->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
