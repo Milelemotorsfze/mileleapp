@@ -121,6 +121,7 @@ return [
     'dp' => env('DP_EMAIL', 'default@domain.com'),
     'finance' => env('FINANCE_EMAIL', 'default@domain.com'),
     'cso' => env('CSO_EMAIL', 'default@domain.com'),
+    'procurement' => env('VEHICLE_PROCUREMENT', 'default@domain.com'),
 ],
     'markdown' => [
         'theme' => 'default',

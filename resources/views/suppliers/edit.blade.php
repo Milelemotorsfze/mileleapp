@@ -1731,6 +1731,18 @@
             else{
                 removeSupplierTypeError();
             }
+            if(inputEmail == '')
+            {
+                $msg = "Email field is required";
+                showEmailError($msg);
+
+                formInputError = true;
+                e.preventDefault();
+            }else{
+                
+                removeEmailError();
+            }
+
             if(inputSupplierCatgeory == '') {
                 $msg = "Supplier Category is required";
                 showSupplierCategoryError($msg);
@@ -1759,6 +1771,7 @@
             }else{
                 removeOfficePhoneError();
             }
+           
             if(inputAlternativeContactNumber != '') {
                if(inputAlternativeContactNumber.length > 15) {
                    $msg = "Maximum 15 digits allowed";
