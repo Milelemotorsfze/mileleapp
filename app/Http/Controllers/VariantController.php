@@ -45,6 +45,8 @@ class VariantController extends Controller
         'sunroof' => 'sunroof'
     ];
         foreach ($variants as $variant) {
+            if($variant->category != 'Modified')
+            {
             $details = [];
             $otherDetails = [];
             foreach ($variant->variantItems as $item) {
@@ -87,6 +89,7 @@ class VariantController extends Controller
             ksort($details);
             $variant->detail = implode(', ', array_merge($details, $otherDetails));
         }
+    }
         return view('variants.list', compact('variants'));
     }
     /**

@@ -2718,6 +2718,8 @@ $normalizationMap = [
 'sunroof' => 'sunroof'
 ];
 foreach ($variants as $variant) {
+    if($variant->category != 'Modified')
+    {
     $details = [];
     $otherDetails = [];
     foreach ($variant->variantItems as $item) {
@@ -2760,6 +2762,7 @@ foreach ($variants as $variant) {
     ksort($details);
     $variant->detail = implode(', ', array_merge($details, $otherDetails));
     $variant->save();
+}
     }
         if ($request->ajax()) {
             $status = $request->input('status');
@@ -3397,6 +3400,8 @@ public function availablevehicles(Request $request)
         'sunroof' => 'sunroof'
         ];
     foreach ($variants as $variant) {
+        if($variant->category != 'Modified')
+        {
     $details = [];
     $otherDetails = [];
     foreach ($variant->variantItems as $item) {
@@ -3440,6 +3445,7 @@ public function availablevehicles(Request $request)
     $variant->detail = implode(', ', array_merge($details, $otherDetails));
     $variant->save();
     }
+}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
@@ -3573,6 +3579,8 @@ public function availablevehicles(Request $request)
         'sunroof' => 'sunroof'
         ];
     foreach ($variants as $variant) {
+        if($variant->category != 'Modified')
+        {
     $details = [];
     $otherDetails = [];
     foreach ($variant->variantItems as $item) {
@@ -3616,6 +3624,7 @@ public function availablevehicles(Request $request)
     $variant->detail = implode(', ', array_merge($details, $otherDetails));
     $variant->save();
     }
+}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
@@ -3748,6 +3757,8 @@ COALESCE(
         'sunroof' => 'sunroof'
         ];
     foreach ($variants as $variant) {
+        if($variant->category != 'Modified')
+        {
     $details = [];
     $otherDetails = [];
     foreach ($variant->variantItems as $item) {
@@ -3791,6 +3802,7 @@ COALESCE(
     $variant->detail = implode(', ', array_merge($details, $otherDetails));
     $variant->save();
     }
+}
         if ($request->ajax()) {
             $status = $request->input('status');
             $filters = $request->input('filters', []);
