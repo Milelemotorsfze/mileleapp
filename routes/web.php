@@ -869,6 +869,7 @@ Route::get('/d', function () {
     Route::get('reinspection/reshow/{id}', [InspectionController::class, 'reshow'])->name('reinspection.reshow');
     Route::get('inspection/instock/{id}', [InspectionController::class, 'instock'])->name('inspection.instock');
     Route::get('inspection/pdi/{id}', [InspectionController::class, 'pdiinspectionf'])->name('inspection.pdiinspection');
+    Route::resource('approvalsinspection', ApprovalsController::class);
     Route::resource('incident', IncidentController::class);
     Route::post('incident/saving', [IncidentController::class,'updatestatus'])->name('incidentupdate.updatestatus');
     Route::resource('variantrequests', VariantRequests::class);
@@ -908,8 +909,6 @@ Route::get('/d', function () {
     Route::get('inspectionedit/edit/{id}', [ApprovalsController::class, 'inspectionedit'])->name('inspectionedit.edit');
     Route::post('/update-routine-inspection', [ApprovalsController::class, 'updateRoutineInspection']);
     Route::post('/update-pdi-inspection', [ApprovalsController::class, 'updatepdiInspectionedit']);
-    Route::resource('approvalsinspection', ApprovalsController::class);
-
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
