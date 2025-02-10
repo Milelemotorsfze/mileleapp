@@ -177,7 +177,9 @@ class ApprovalsController extends Controller
     $useractivities->users_id = Auth::id();
     $useractivities->save();
     $inspection = Inspection::find($id);
+    info($inspection);
     $vehicle = Vehicles::find($inspection->vehicle_id);
+    info($vehicle);
     $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
     $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
     $gdnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GDN')->pluck('vehicle_picture_link')->first();
@@ -193,11 +195,19 @@ class ApprovalsController extends Controller
     $model_line = MasterModelLines::find($variant->master_model_lines_id);
     $model_lines = MasterModelLines::all();
     $vehiclecolour = ColorCode::find($vehicle->int_colour);
+    info("vehicle colour");
+    info($vehiclecolour);
     $intmaster = ColorCode::where('belong_to', 'int')->get();
+    info("int colour");
+    info($intmaster);
     $extvehicle = ColorCode::find($vehicle->ex_colour);
     $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
+    info("info variant request");
+    info($variant_request);
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
+    info($variantRequestItems);
+    info("before loop");
     $data = [];
     foreach ($variantRequestItems as $item) {
         $modelSpecification = ModelSpecification::find($item->model_specification_id);
@@ -211,6 +221,7 @@ class ApprovalsController extends Controller
             ];
         }
     }
+    info("after loop reached");
     $brands = Brand::find($variant_request->brands_id);
     $modal = MasterModelLines::find($variant_request->master_model_lines_id);
     $intrequest = ColorCode::find($variant_request->int_colour);
@@ -218,6 +229,7 @@ class ApprovalsController extends Controller
     $extraItems = DB::table('vehicles_extra_items')
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
+        info("last reached");
     return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
     }
 
