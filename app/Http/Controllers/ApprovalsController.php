@@ -170,8 +170,7 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
-        info("inspect id");
-        info($id);
+      
     $useractivities =  New UserActivities();
     $useractivities->activity = "Open the Approval Page For Approval";
     $useractivities->users_id = Auth::id();
@@ -220,20 +219,7 @@ class ApprovalsController extends Controller
     $extraItems = DB::table('vehicles_extra_items')
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
-        info("last reached");
-        info($inspection);
-        info("brands");
-        info($brands);
-        info("model line");
-        info($model_line);
-        info("int master");
-        info($intmaster);
-        info("intrequest");
-        info($intrequest);
-        info("vehicle colour");
-        info($vehiclecolour);
-        info("model");
-        info($modal);
+      
     return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data',
     'allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink',
      'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 

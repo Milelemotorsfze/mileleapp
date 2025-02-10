@@ -77,7 +77,7 @@
                  <input type="hidden" name="brands_id" value="{{$brands->id}}"/>
                 </td>
                 <td>
-                    @if($brand->id == $brands->id)
+                    @if($brand && brands && $brand->id == $brands->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -98,7 +98,7 @@
                  <input type="hidden" name="master_model_lines_id" value="{{$modal->id}}"/>
                 </td>
                 <td>
-                    @if($model_line->id == $modal->id)
+                    @if($model_line && $modal && $model_line->id == $modal->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -280,7 +280,7 @@
                  </select>
                 </td>
                 <td>
-                    @if($extrequest && $extvehicle->id == $extrequest->id)
+                    @if($extrequest && $extvehicle && $extvehicle->id == $extrequest->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
