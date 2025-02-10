@@ -260,10 +260,12 @@
         </select>
     </td>
     <td>
-        @if($intrequest && $vehiclecolour->id == $intrequest->id)
-        <i class="fas fa-check text-success"></i>
-        @else
-        <i class="fas fa-times text-danger"></i>
+        @if($intrequest && $vehiclecolour)
+            @if($intrequest && $vehiclecolour->id == $intrequest->id)
+            <i class="fas fa-check text-success"></i>
+            @else
+            <i class="fas fa-times text-danger"></i>
+            @endif
         @endif
     </td>
 </tr>
